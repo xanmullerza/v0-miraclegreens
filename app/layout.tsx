@@ -8,9 +8,9 @@ const _dmSans = DM_Sans({ subsets: ["latin"] })
 const _playfair = Playfair_Display({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Miracle Greens | Premium Healthy Foods",
+  title: "Miracle Greens | Growing Hope Through Moringa",
   description:
-    "Discover premium organic foods, superfoods, and wellness products. Nourish your body with nature's best.",
+    "A nonprofit organization growing moringa trees to produce nutrient-rich moringa capsules for distribution to communities in need.",
   generator: "v0.app",
   icons: {
     icon: [

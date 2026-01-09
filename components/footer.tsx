@@ -2,26 +2,26 @@ import Link from "next/link"
 import { Instagram, Facebook, Twitter, Youtube } from "lucide-react"
 
 const footerLinks = {
-  shop: [
-    { name: "Fresh Produce", href: "#" },
-    { name: "Superfoods", href: "#" },
-    { name: "Supplements", href: "#" },
-    { name: "Snacks", href: "#" },
-    { name: "Beverages", href: "#" },
+  about: [
+    { name: "Our Story", href: "#" },
+    { name: "Our Mission", href: "#mission" },
+    { name: "The Process", href: "#process" },
+    { name: "Impact Reports", href: "#" },
+    { name: "Team", href: "#" },
   ],
-  company: [
-    { name: "About Us", href: "#" },
-    { name: "Our Farmers", href: "#" },
-    { name: "Sustainability", href: "#" },
-    { name: "Careers", href: "#" },
-    { name: "Press", href: "#" },
+  getInvolved: [
+    { name: "Donate", href: "#" },
+    { name: "Volunteer", href: "#" },
+    { name: "Partner With Us", href: "#" },
+    { name: "Fundraise", href: "#" },
+    { name: "Spread the Word", href: "#" },
   ],
-  support: [
+  resources: [
     { name: "Contact Us", href: "#" },
     { name: "FAQs", href: "#" },
-    { name: "Shipping Info", href: "#" },
-    { name: "Returns", href: "#" },
-    { name: "Track Order", href: "#" },
+    { name: "Moringa Facts", href: "#" },
+    { name: "Blog", href: "#" },
+    { name: "Press", href: "#" },
   ],
 }
 
@@ -42,7 +42,8 @@ export function Footer() {
               Miracle Greens
             </Link>
             <p className="mt-4 text-background/70 text-sm leading-relaxed">
-              Premium organic foods and wellness products. Nourishing bodies, sustaining the planet.
+              A nonprofit organization growing moringa trees to produce nutrient-rich capsules for distribution to
+              communities in need.
             </p>
             <div className="flex gap-3 mt-6">
               {socialLinks.map((social) => (
@@ -58,9 +59,9 @@ export function Footer() {
             </div>
           </div>
           <div>
-            <h3 className="font-semibold mb-4">Shop</h3>
+            <h3 className="font-semibold mb-4">About</h3>
             <ul className="space-y-3">
-              {footerLinks.shop.map((link) => (
+              {footerLinks.about.map((link) => (
                 <li key={link.name}>
                   <Link href={link.href} className="text-sm text-background/70 hover:text-background transition-colors">
                     {link.name}
@@ -70,9 +71,9 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="font-semibold mb-4">Company</h3>
+            <h3 className="font-semibold mb-4">Get Involved</h3>
             <ul className="space-y-3">
-              {footerLinks.company.map((link) => (
+              {footerLinks.getInvolved.map((link) => (
                 <li key={link.name}>
                   <Link href={link.href} className="text-sm text-background/70 hover:text-background transition-colors">
                     {link.name}
@@ -82,9 +83,9 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="font-semibold mb-4">Support</h3>
+            <h3 className="font-semibold mb-4">Resources</h3>
             <ul className="space-y-3">
-              {footerLinks.support.map((link) => (
+              {footerLinks.resources.map((link) => (
                 <li key={link.name}>
                   <Link href={link.href} className="text-sm text-background/70 hover:text-background transition-colors">
                     {link.name}
@@ -96,7 +97,7 @@ export function Footer() {
         </div>
         <div className="pt-8 border-t border-background/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-background/60">
-            © {new Date().getFullYear()} Miracle Greens. All rights reserved.
+            © {new Date().getFullYear()} Miracle Greens. A registered nonprofit organization.
           </p>
           <div className="flex gap-6">
             <Link href="#" className="text-sm text-background/60 hover:text-background transition-colors">

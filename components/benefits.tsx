@@ -1,36 +1,39 @@
-import { Truck, Leaf, Shield, Sparkles } from "lucide-react"
+import { Users, Globe, Sprout, HandHeart } from "lucide-react"
 
 const benefits = [
   {
-    icon: Leaf,
-    title: "100% Organic",
-    description: "All our products are certified organic, free from pesticides and harmful chemicals.",
+    icon: Sprout,
+    title: "Sustainable Farming",
+    description:
+      "We employ eco-friendly agricultural practices and provide employment to local farmers in the communities we serve.",
   },
   {
-    icon: Truck,
-    title: "Fast Delivery",
-    description: "Fresh products delivered to your doorstep within 24-48 hours of ordering.",
+    icon: Users,
+    title: "Community Impact",
+    description:
+      "Every capsule distributed helps combat malnutrition in children, pregnant women, and vulnerable populations.",
   },
   {
-    icon: Shield,
-    title: "Quality Guarantee",
-    description: "Not satisfied? We offer a 100% money-back guarantee on all products.",
+    icon: HandHeart,
+    title: "Free Distribution",
+    description: "100% of our moringa capsules are distributed free of charge to those who need them most.",
   },
   {
-    icon: Sparkles,
-    title: "Sustainably Sourced",
-    description: "We partner with local farmers committed to sustainable farming practices.",
+    icon: Globe,
+    title: "Global Reach",
+    description:
+      "We partner with clinics, schools, and NGOs worldwide to reach communities facing nutritional challenges.",
   },
 ]
 
 export function Benefits() {
   return (
-    <section id="about" className="py-16 md:py-24 bg-background">
+    <section id="impact" className="py-16 md:py-24 bg-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">Why Choose Us</p>
+          <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">Our Impact</p>
           <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground">
-            The Miracle Greens Difference
+            Making a Difference Together
           </h2>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">

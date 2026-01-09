@@ -1,21 +1,17 @@
 "use client"
-
-import { useState } from "react"
 import Link from "next/link"
-import { ShoppingBag, Search, Menu, User } from "lucide-react"
+import { Menu, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
 const navigation = [
-  { name: "Shop", href: "#shop" },
-  { name: "Categories", href: "#categories" },
-  { name: "About", href: "#about" },
-  { name: "Contact", href: "#contact" },
+  { name: "Our Mission", href: "#mission" },
+  { name: "The Process", href: "#process" },
+  { name: "Impact", href: "#impact" },
+  { name: "Get Involved", href: "#involved" },
 ]
 
 export function Header() {
-  const [cartCount] = useState(0)
-
   return (
     <header className="sticky top-0 z-50 bg-primary border-b border-primary/80">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -39,6 +35,10 @@ export function Header() {
                     {item.name}
                   </Link>
                 ))}
+                <Button className="gap-2 mt-4">
+                  <Heart className="h-4 w-4" />
+                  Donate Now
+                </Button>
               </div>
             </SheetContent>
           </Sheet>
@@ -63,36 +63,18 @@ export function Header() {
             </span>
           </Link>
 
-          {/* Right actions */}
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="hidden sm:flex text-primary-foreground hover:bg-primary-foreground/10"
-            >
-              <Search className="h-5 w-5" />
-              <span className="sr-only">Search</span>
+            <Button variant="secondary" size="sm" className="hidden sm:flex gap-2">
+              <Heart className="h-4 w-4" />
+              Donate
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="hidden sm:flex text-primary-foreground hover:bg-primary-foreground/10"
+              className="sm:hidden text-primary-foreground hover:bg-primary-foreground/10"
             >
-              <User className="h-5 w-5" />
-              <span className="sr-only">Account</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="relative text-primary-foreground hover:bg-primary-foreground/10"
-            >
-              <ShoppingBag className="h-5 w-5" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary-foreground text-[10px] font-medium text-primary flex items-center justify-center">
-                  {cartCount}
-                </span>
-              )}
-              <span className="sr-only">Cart</span>
+              <Heart className="h-5 w-5" />
+              <span className="sr-only">Donate</span>
             </Button>
           </div>
         </div>

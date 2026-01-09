@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ShoppingBag, Heart, Star } from "lucide-react"
+import { ShoppingBag, Heart, Star, Leaf, Zap, Shield, Brain, Bone } from "lucide-react"
 
 const products = [
   {
@@ -65,6 +65,43 @@ const products = [
     reviews: 145,
     image: "/organic-quinoa-in-glass-jar.jpg",
     badge: "Organic",
+  },
+]
+
+const moringaBenefits = [
+  {
+    icon: Leaf,
+    title: "Rich in Nutrients",
+    description:
+      "Moringa contains vitamins A, C, E, calcium, potassium, and protein – essential nutrients for fighting malnutrition.",
+  },
+  {
+    icon: Heart,
+    title: "Supports Heart Health",
+    description:
+      "The antioxidants in moringa help lower cholesterol and support cardiovascular health in communities we serve.",
+  },
+  {
+    icon: Zap,
+    title: "Natural Energy Boost",
+    description:
+      "Iron-rich moringa helps combat fatigue and anemia, providing sustainable energy for daily activities.",
+  },
+  {
+    icon: Shield,
+    title: "Immune Support",
+    description: "High vitamin C content strengthens immune systems, protecting vulnerable populations from illness.",
+  },
+  {
+    icon: Brain,
+    title: "Cognitive Function",
+    description:
+      "Antioxidants and neuro-enhancers in moringa support brain health and cognitive development in children.",
+  },
+  {
+    icon: Bone,
+    title: "Strong Bones",
+    description: "Calcium and phosphorus content supports bone development and helps prevent osteoporosis.",
   },
 ]
 
@@ -135,6 +172,45 @@ export function FeaturedProducts() {
           ))}
         </div>
       </div>
+      <section id="mission" className="py-16 md:py-24 bg-secondary/30">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
+            <div>
+              <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">Why Moringa</p>
+              <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground mb-6">
+                The Miracle Tree That Transforms Lives
+              </h2>
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                Known as the "Miracle Tree," moringa oleifera has been used for centuries to combat malnutrition. Its
+                leaves contain more vitamin A than carrots, more calcium than milk, more iron than spinach, and more
+                potassium than bananas.
+              </p>
+              <p className="text-muted-foreground leading-relaxed">
+                By growing moringa and distributing its benefits as easy-to-take capsules, we're providing a sustainable
+                solution to nutritional deficiency in underserved communities.
+              </p>
+            </div>
+            <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted">
+              <Image src="/moringa-powder-and-capsules-on-wooden-surface-with.jpg" alt="Moringa powder and capsules" fill className="object-cover" />
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {moringaBenefits.map((benefit) => (
+              <div
+                key={benefit.title}
+                className="bg-card rounded-2xl p-6 border border-border hover:shadow-lg transition-shadow"
+              >
+                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                  <benefit.icon className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="font-semibold text-foreground mb-2">{benefit.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{benefit.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     </section>
   )
 }
