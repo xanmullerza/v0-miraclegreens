@@ -1,5 +1,6 @@
 import { Header } from "@/components/header"
 import { Hero } from "@/components/hero"
+import { WhyMoringa } from "@/components/why-moringa"
 import { HowItWorks } from "@/components/how-it-works"
 import { ShopSection } from "@/components/shop-section"
 import { Categories } from "@/components/categories"
@@ -14,6 +15,7 @@ export default function Home() {
     <main className="min-h-screen">
       <Header />
       <Hero />
+      <WhyMoringa />
       <HowItWorks />
       <ShopSection />
       <Categories />
