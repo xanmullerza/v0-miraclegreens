@@ -1,72 +1,8 @@
 "use client"
 
-import { useState } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ShoppingBag, Heart, Star, Leaf, Zap, Shield, Brain, Bone } from "lucide-react"
-
-const products = [
-  {
-    id: 1,
-    name: "Organic Avocados",
-    price: 8.99,
-    originalPrice: 12.99,
-    rating: 4.9,
-    reviews: 124,
-    image: "/fresh-organic-avocados-on-white-background.jpg",
-    badge: "Best Seller",
-  },
-  {
-    id: 2,
-    name: "Chia Seeds Premium",
-    price: 14.99,
-    originalPrice: null,
-    rating: 4.8,
-    reviews: 89,
-    image: "/chia-seeds-in-wooden-bowl.jpg",
-    badge: "Organic",
-  },
-  {
-    id: 3,
-    name: "Raw Honey Collection",
-    price: 18.99,
-    originalPrice: 24.99,
-    rating: 5.0,
-    reviews: 256,
-    image: "/raw-organic-honey-jar-with-honeycomb.jpg",
-    badge: "Sale",
-  },
-  {
-    id: 4,
-    name: "Mixed Berry Blend",
-    price: 12.99,
-    originalPrice: null,
-    rating: 4.7,
-    reviews: 67,
-    image: "/mixed-berries-blueberries-raspberries-strawberries.jpg",
-    badge: "New",
-  },
-  {
-    id: 5,
-    name: "Green Superfood Powder",
-    price: 34.99,
-    originalPrice: 44.99,
-    rating: 4.9,
-    reviews: 198,
-    image: "/green-superfood-powder-in-container-with-spinach-k.jpg",
-    badge: "Popular",
-  },
-  {
-    id: 6,
-    name: "Organic Quinoa",
-    price: 9.99,
-    originalPrice: null,
-    rating: 4.8,
-    reviews: 145,
-    image: "/organic-quinoa-in-glass-jar.jpg",
-    badge: "Organic",
-  },
-]
+import { TreeDeciduous, Heart, Leaf, Zap, Shield, Brain, Bone, Check, Infinity } from "lucide-react"
 
 const moringaBenefits = [
   {
@@ -105,73 +41,106 @@ const moringaBenefits = [
   },
 ]
 
+const sponsorBenefits = [
+  "Your tree produces leaves for 20+ years",
+  "Each tree yields thousands of capsules annually",
+  "Full transparency on your tree's impact",
+  "Certificate of sponsorship with tree location",
+  "Regular updates on harvest and distribution",
+  "Your name on our Wall of Growth",
+]
+
 export function FeaturedProducts() {
-  const [wishlist, setWishlist] = useState<number[]>([])
-
-  const toggleWishlist = (id: number) => {
-    setWishlist((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]))
-  }
-
   return (
-    <section id="shop" className="py-16 md:py-24 bg-secondary/30">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12">
-          <div>
-            <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">Featured Products</p>
-            <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground">Customer Favorites</h2>
-          </div>
-          <Button variant="outline">View All Products</Button>
-        </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="group bg-card rounded-2xl overflow-hidden border border-border hover:shadow-lg transition-shadow"
-            >
-              <div className="relative aspect-square bg-muted">
-                <Image src={product.image || "/placeholder.svg"} alt={product.name} fill className="object-cover" />
-                {product.badge && (
-                  <span className="absolute top-3 left-3 px-3 py-1 text-xs font-medium bg-primary text-primary-foreground rounded-full">
-                    {product.badge}
-                  </span>
-                )}
-                <button
-                  onClick={() => toggleWishlist(product.id)}
-                  className="absolute top-3 right-3 h-9 w-9 rounded-full bg-card/80 backdrop-blur flex items-center justify-center hover:bg-card transition-colors"
-                >
-                  <Heart
-                    className={`h-4 w-4 ${
-                      wishlist.includes(product.id) ? "fill-destructive text-destructive" : "text-foreground"
-                    }`}
-                  />
-                </button>
-              </div>
-              <div className="p-5">
-                <div className="flex items-center gap-1 mb-2">
-                  <Star className="h-4 w-4 fill-accent text-accent" />
-                  <span className="text-sm font-medium text-foreground">{product.rating}</span>
-                  <span className="text-sm text-muted-foreground">({product.reviews})</span>
-                </div>
-                <h3 className="font-medium text-foreground mb-2">{product.name}</h3>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-semibold text-foreground">${product.price.toFixed(2)}</span>
-                    {product.originalPrice && (
-                      <span className="text-sm text-muted-foreground line-through">
-                        ${product.originalPrice.toFixed(2)}
-                      </span>
-                    )}
+    <>
+      <section id="sponsor" className="py-16 md:py-24 bg-secondary/30">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">Help Us Grow</p>
+              <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground mb-6">
+                Invest in an Eternal Moringa Tree — R500
+              </h2>
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                Right now, we source our moringa powder from trusted growers. But our vision is bigger — we want to grow
+                and process our own trees. This means lower costs, better quality control, and the ability to help even
+                more families.
+              </p>
+              <p className="text-muted-foreground leading-relaxed mb-6">
+                By sponsoring an Eternal Moringa Tree for R500, you're investing in our future. Your tree will be
+                planted on our farm and will produce leaves for 20+ years — a gift that keeps giving.
+              </p>
+
+              <div className="space-y-3 mb-8">
+                {sponsorBenefits.map((benefit) => (
+                  <div key={benefit} className="flex items-center gap-3">
+                    <div className="h-5 w-5 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                      <Check className="h-3 w-3 text-primary" />
+                    </div>
+                    <span className="text-foreground">{benefit}</span>
                   </div>
-                  <Button size="sm" className="gap-2">
-                    <ShoppingBag className="h-4 w-4" />
-                    Add
-                  </Button>
+                ))}
+              </div>
+
+              <Button size="lg" className="gap-2">
+                <TreeDeciduous className="h-4 w-4" />
+                Sponsor a Tree — R500
+              </Button>
+            </div>
+
+            <div className="relative">
+              <div className="aspect-square rounded-2xl overflow-hidden bg-muted">
+                <Image
+                  src="/moringa-tree-farm-plantation-sustainable-agricultu.jpg"
+                  alt="Our future moringa tree farm"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="absolute -bottom-6 -right-6 bg-primary p-6 rounded-xl shadow-lg">
+                <div className="text-center text-primary-foreground">
+                  <Infinity className="h-8 w-8 mx-auto mb-2" />
+                  <p className="text-2xl font-bold">R500</p>
+                  <p className="text-sm opacity-80">One tree, forever</p>
                 </div>
               </div>
             </div>
-          ))}
+          </div>
         </div>
-      </div>
+      </section>
+
+      <section id="vision" className="py-16 md:py-24 bg-background">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">Our Vision</p>
+            <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground mb-4">
+              Why Growing Our Own Changes Everything
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              By establishing our own moringa farm and processing facility, we can dramatically increase our impact
+              while reducing costs and ensuring the highest quality for those we serve.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            {[
+              { title: "Lower Costs", desc: "Eliminate sourcing markups and reduce per-capsule cost by up to 60%" },
+              {
+                title: "Quality Control",
+                desc: "Oversee every step from seed to capsule for maximum nutritional value",
+              },
+              { title: "Sustainability", desc: "Build a self-sustaining operation that grows with community needs" },
+              { title: "Local Jobs", desc: "Create employment opportunities in the communities we serve" },
+            ].map((item) => (
+              <div key={item.title} className="bg-card rounded-2xl p-6 border border-border text-center">
+                <h3 className="font-semibold text-foreground mb-2">{item.title}</h3>
+                <p className="text-sm text-muted-foreground">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="mission" className="py-16 md:py-24 bg-secondary/30">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
@@ -191,7 +160,12 @@ export function FeaturedProducts() {
               </p>
             </div>
             <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted">
-              <Image src="/moringa-powder-and-capsules-on-wooden-surface-with.jpg" alt="Moringa powder and capsules" fill className="object-cover" />
+              <Image
+                src="/moringa-powder-and-capsules-on-wooden-surface-with.jpg"
+                alt="Moringa powder and capsules"
+                fill
+                className="object-cover"
+              />
             </div>
           </div>
 
@@ -211,6 +185,6 @@ export function FeaturedProducts() {
           </div>
         </div>
       </section>
-    </section>
+    </>
   )
 }

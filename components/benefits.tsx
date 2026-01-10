@@ -1,39 +1,39 @@
-import { Users, Globe, Sprout, HandHeart } from "lucide-react"
+import { TrendingDown, Award, Users, Scaling } from "lucide-react"
 
 const benefits = [
   {
-    icon: Sprout,
-    title: "Sustainable Farming",
+    icon: TrendingDown,
+    title: "60% Cost Reduction",
     description:
-      "We employ eco-friendly agricultural practices and provide employment to local farmers in the communities we serve.",
+      "By eliminating sourcing costs and middlemen, each capsule costs significantly less — meaning more nutrition for more people.",
+  },
+  {
+    icon: Award,
+    title: "Quality Guarantee",
+    description:
+      "When we control the entire process, we ensure every leaf is harvested at peak nutrition and processed under optimal conditions.",
   },
   {
     icon: Users,
-    title: "Community Impact",
+    title: "Community Employment",
     description:
-      "Every capsule distributed helps combat malnutrition in children, pregnant women, and vulnerable populations.",
+      "Our farm will create jobs for local community members, providing income while producing nutrition for those in need.",
   },
   {
-    icon: HandHeart,
-    title: "Free Distribution",
-    description: "100% of our moringa capsules are distributed free of charge to those who need them most.",
-  },
-  {
-    icon: Globe,
-    title: "Global Reach",
-    description:
-      "We partner with clinics, schools, and NGOs worldwide to reach communities facing nutritional challenges.",
+    icon: Scaling,
+    title: "Scalable Impact",
+    description: "A self-sustaining farm can grow with demand, allowing us to reach more communities year after year.",
   },
 ]
 
 export function Benefits() {
   return (
-    <section id="impact" className="py-16 md:py-24 bg-background">
+    <section className="py-16 md:py-24 bg-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">Our Impact</p>
+          <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">Why This Matters</p>
           <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground">
-            Making a Difference Together
+            Growing Our Own Changes Everything
           </h2>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">

@@ -3,23 +3,23 @@ import { Instagram, Facebook, Twitter, Youtube } from "lucide-react"
 
 const footerLinks = {
   about: [
-    { name: "Our Story", href: "#" },
-    { name: "Our Mission", href: "#mission" },
-    { name: "The Process", href: "#process" },
+    { name: "Our Story", href: "#story" },
+    { name: "How It Works", href: "#how-it-works" },
+    { name: "Our Vision", href: "#vision" },
     { name: "Impact Reports", href: "#" },
     { name: "Team", href: "#" },
   ],
-  getInvolved: [
-    { name: "Donate", href: "#" },
-    { name: "Volunteer", href: "#" },
-    { name: "Partner With Us", href: "#" },
-    { name: "Fundraise", href: "#" },
-    { name: "Spread the Word", href: "#" },
+  shop: [
+    { name: "Moringa Saplings", href: "#shop" },
+    { name: "Moringa Capsules", href: "#shop" },
+    { name: "Bulk Orders", href: "#" },
+    { name: "Corporate Gifting", href: "#" },
+    { name: "Sponsor a Tree", href: "#sponsor" },
   ],
   resources: [
     { name: "Contact Us", href: "#" },
     { name: "FAQs", href: "#" },
-    { name: "Moringa Facts", href: "#" },
+    { name: "Moringa Benefits", href: "#mission" },
     { name: "Blog", href: "#" },
     { name: "Press", href: "#" },
   ],
@@ -42,8 +42,8 @@ export function Footer() {
               Miracle Greens
             </Link>
             <p className="mt-4 text-background/70 text-sm leading-relaxed">
-              A nonprofit organization growing moringa trees to produce nutrient-rich capsules for distribution to
-              communities in need.
+              A social enterprise selling moringa products to fund nutrition programs for families in need. Every
+              purchase makes a difference.
             </p>
             <div className="flex gap-3 mt-6">
               {socialLinks.map((social) => (
@@ -71,9 +71,9 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h3 className="font-semibold mb-4">Get Involved</h3>
+            <h3 className="font-semibold mb-4">Shop</h3>
             <ul className="space-y-3">
-              {footerLinks.getInvolved.map((link) => (
+              {footerLinks.shop.map((link) => (
                 <li key={link.name}>
                   <Link href={link.href} className="text-sm text-background/70 hover:text-background transition-colors">
                     {link.name}
@@ -97,7 +97,7 @@ export function Footer() {
         </div>
         <div className="pt-8 border-t border-background/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-background/60">
-            © {new Date().getFullYear()} Miracle Greens. A registered nonprofit organization.
+            © {new Date().getFullYear()} Miracle Greens. A social enterprise for nutrition.
           </p>
           <div className="flex gap-6">
             <Link href="#" className="text-sm text-background/60 hover:text-background transition-colors">

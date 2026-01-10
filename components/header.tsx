@@ -1,14 +1,14 @@
 "use client"
 import Link from "next/link"
-import { Menu, Heart } from "lucide-react"
+import { Menu, TreeDeciduous, ShoppingBag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 
 const navigation = [
-  { name: "Our Mission", href: "#mission" },
-  { name: "The Process", href: "#process" },
-  { name: "Impact", href: "#impact" },
-  { name: "Get Involved", href: "#involved" },
+  { name: "Our Story", href: "#story" },
+  { name: "How It Works", href: "#how-it-works" },
+  { name: "Shop", href: "#shop" },
+  { name: "Our Vision", href: "#vision" },
 ]
 
 export function Header() {
@@ -35,9 +35,11 @@ export function Header() {
                     {item.name}
                   </Link>
                 ))}
-                <Button className="gap-2 mt-4">
-                  <Heart className="h-4 w-4" />
-                  Donate Now
+                <Button className="gap-2 mt-4" asChild>
+                  <Link href="#shop">
+                    <ShoppingBag className="h-4 w-4" />
+                    Visit Shop
+                  </Link>
                 </Button>
               </div>
             </SheetContent>
@@ -64,17 +66,33 @@ export function Header() {
           </Link>
 
           <div className="flex items-center gap-2">
-            <Button variant="secondary" size="sm" className="hidden sm:flex gap-2">
-              <Heart className="h-4 w-4" />
-              Donate
+            <Button variant="secondary" size="sm" className="hidden sm:flex gap-2" asChild>
+              <Link href="#shop">
+                <ShoppingBag className="h-4 w-4" />
+                Shop
+              </Link>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="hidden md:flex gap-2 text-primary-foreground hover:bg-primary-foreground/10"
+              asChild
+            >
+              <Link href="#sponsor">
+                <TreeDeciduous className="h-4 w-4" />
+                Sponsor a Tree
+              </Link>
             </Button>
             <Button
               variant="ghost"
               size="icon"
               className="sm:hidden text-primary-foreground hover:bg-primary-foreground/10"
+              asChild
             >
-              <Heart className="h-5 w-5" />
-              <span className="sr-only">Donate</span>
+              <Link href="#shop">
+                <ShoppingBag className="h-5 w-5" />
+                <span className="sr-only">Shop</span>
+              </Link>
             </Button>
           </div>
         </div>
