@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { Menu, TreeDeciduous, ShoppingBag } from 'lucide-react';
+import { Menu, TreeDeciduous, ShoppingBag, LayoutGrid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
@@ -31,6 +31,12 @@ export function Header() {
 						<SheetContent side="left" className="w-[300px] bg-background">
 							<div className="flex flex-col gap-6 mt-8">
 								<Button className="gap-2 mt-4" asChild>
+									<Link href="/browse">
+										<LayoutGrid className="h-4 w-4" />
+										Browse Resources
+									</Link>
+								</Button>
+								<Button className="gap-2 mt-2" asChild>
 									<Link href="/shop">
 										<ShoppingBag className="h-4 w-4" />
 										Visit Shop
@@ -55,6 +61,12 @@ export function Header() {
 
 					{/* Right-side buttons (Shop + Donate remain) */}
 					<div className="flex items-center gap-2">
+						<Button variant="secondary" size="sm" className="hidden sm:flex gap-2" asChild>
+							<Link href="/browse">
+								<LayoutGrid className="h-4 w-4" />
+								Browse
+							</Link>
+						</Button>
 						<Button variant="secondary" size="sm" className="hidden sm:flex gap-2" asChild>
 							<Link href="/shop">
 								<ShoppingBag className="h-4 w-4" />
