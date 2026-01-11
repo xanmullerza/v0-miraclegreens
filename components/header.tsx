@@ -16,7 +16,7 @@ export function Header() {
 		<header className="sticky top-0 z-50 bg-primary border-b border-primary/80">
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				<div className="flex h-16 items-center justify-between">
-					{/* Mobile menu */}
+					{/* Mobile menu (only Shop & Donate) */}
 					<Sheet>
 						<SheetTrigger asChild className="lg:hidden">
 							<Button
@@ -30,15 +30,6 @@ export function Header() {
 						</SheetTrigger>
 						<SheetContent side="left" className="w-[300px] bg-background">
 							<div className="flex flex-col gap-6 mt-8">
-								{navigation.map((item) => (
-									<Link
-										key={item.name}
-										href={item.href}
-										className="text-lg font-medium text-foreground hover:text-primary transition-colors"
-									>
-										{item.name}
-									</Link>
-								))}
 								<Button className="gap-2 mt-4" asChild>
 									<Link href="/shop">
 										<ShoppingBag className="h-4 w-4" />
@@ -55,19 +46,6 @@ export function Header() {
 						</SheetContent>
 					</Sheet>
 
-					{/* Desktop navigation */}
-					<nav className="hidden lg:flex lg:gap-8">
-						{navigation.map((item) => (
-							<Link
-								key={item.name}
-								href={item.href}
-								className="text-sm font-medium text-primary-foreground/80 hover:text-primary-foreground transition-colors"
-							>
-								{item.name}
-							</Link>
-						))}
-					</nav>
-
 					{/* Logo */}
 					<Link href="/" className="flex items-center gap-2">
 						<span className="font-serif text-xl md:text-2xl font-semibold text-primary-foreground tracking-tight">
@@ -75,6 +53,7 @@ export function Header() {
 						</span>
 					</Link>
 
+					{/* Right-side buttons (Shop + Donate remain) */}
 					<div className="flex items-center gap-2">
 						<Button variant="secondary" size="sm" className="hidden sm:flex gap-2" asChild>
 							<Link href="/shop">
