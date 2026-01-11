@@ -7,8 +7,8 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 const navigation = [
 	{ name: 'Our Story', href: '#story' },
 	{ name: 'How It Works', href: '#how-it-works' },
-	{ name: 'Shop', href: '/shop' }, // changed to shop page
-	{ name: 'Our Vision', href: '#vision' },
+	{ name: 'Shop', href: '/shop' },
+	{ name: 'Our Vision', href: '/vision' },
 ];
 
 export function Header() {
