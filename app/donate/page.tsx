@@ -21,7 +21,6 @@ export default function DonatePage() {
     <main className="min-h-screen bg-background">
       <Header />
       <Categories />
-      <FeaturedProducts />
       <section className="py-16 md:py-24">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="font-serif text-3xl md:text-4xl font-semibold mb-4">Donate</h1>
@@ -44,6 +43,7 @@ export default function DonatePage() {
           </div>
         </div>
       </section>
+      <FeaturedProducts />
       <Footer />
     </main>
   );
