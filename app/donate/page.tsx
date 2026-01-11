@@ -1,5 +1,6 @@
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
+import { Categories } from '@/components/categories';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
@@ -18,6 +19,7 @@ export default function DonatePage() {
   return (
     <main className="min-h-screen bg-background">
       <Header />
+      <Categories />
       <section className="py-16 md:py-24">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="font-serif text-3xl md:text-4xl font-semibold mb-4">Donate</h1>

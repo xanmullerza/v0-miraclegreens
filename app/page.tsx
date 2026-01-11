@@ -1,6 +1,5 @@
 import { Header } from '@/components/header';
 import { WhyMoringa } from '@/components/why-moringa';
-import { Categories } from '@/components/categories';
 import { FeaturedProducts } from '@/components/featured-products';
 import { Testimonials } from '@/components/testimonials';
 import { Newsletter } from '@/components/newsletter';
@@ -12,7 +11,6 @@ export default function Home() {
       <Header />
       <WhyMoringa />
       {/* Shop moved to /shop */}
-      <Categories />
       <FeaturedProducts />
       <Testimonials />
       <Newsletter />
