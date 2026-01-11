@@ -1,6 +1,5 @@
 import { Header } from '@/components/header';
 import { WhyMoringa } from '@/components/why-moringa';
-import { HowItWorks } from '@/components/how-it-works';
 import { ShopSection } from '@/components/shop-section';
 import { Categories } from '@/components/categories';
 import { FeaturedProducts } from '@/components/featured-products';
@@ -13,11 +12,9 @@ export default function Home() {
     <main className="min-h-screen">
       <Header />
       <WhyMoringa />
-      <HowItWorks />
       <ShopSection />
       <Categories />
       <FeaturedProducts />
-      {/* Benefits section moved to /vision */}
       <Testimonials />
       <Newsletter />
       <Footer />
