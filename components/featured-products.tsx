@@ -127,26 +127,6 @@ export function FeaturedProducts() {
         </div>
       </section>
 
-      {/* Vision CTA that links to the dedicated page */}
-      <section id="vision-cta" className="py-12 text-center bg-background">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">
-            Our Vision
-          </p>
-          <h3 className="font-serif text-2xl font-semibold mb-2">
-            Why Growing Our Own Changes Everything
-          </h3>
-          <p className="text-muted-foreground max-w-2xl mx-auto mb-4">
-            By establishing our own moringa farm and processing facility, we can dramatically
-            increase our impact while reducing costs and ensuring the highest quality for those we
-            serve.
-          </p>
-          <Link href="/vision" className="text-primary hover:underline">
-            Read the full vision &rarr;
-          </Link>
-        </div>
-      </section>
-
       <section id="mission" className="py-16 md:py-24 bg-secondary/30">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Removed duplicated "Why Moringa" block — canonical content now lives in WhyMoringa */}
