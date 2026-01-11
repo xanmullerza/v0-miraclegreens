@@ -5,11 +5,11 @@ import { TreeDeciduous, Pill, ExternalLink, Star } from 'lucide-react';
 const products = [
 	{
 		icon: TreeDeciduous,
-		name: 'Moringa Sapling',
+		name: 'Moringa Seedlings',
 		description:
 			'Grow your own miracle tree at home. Easy to care for and produces nutritious leaves year-round.',
-		price: 'R150',
-		image: '/placeholder.svg', // use placeholder to avoid 404s until real image is added
+		price: 'R125',
+		image: '/moringa-tree-sapling-being-planted-hands-in-soil-.jpg',
 		features: [
 			'Ready to plant',
 			'Care guide included',
@@ -23,8 +23,8 @@ const products = [
 		name: 'Moringa Capsules',
 		description:
 			'Premium moringa leaf powder in easy-to-take capsules. 60 capsules per bottle, one month supply.',
-		price: 'R250',
-		image: '/placeholder.svg', // use placeholder to avoid 404s until real image is added
+		price: 'R150',
+		image: '/moringa-powder-and-capsules-on-wooden-surface-with.jpg', // use placeholder to avoid 404s until real image is added
 		features: ['60 capsules', '100% pure moringa', 'Lab tested quality'],
 		rating: 4.8,
 		reviews: 243,
