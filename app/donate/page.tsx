@@ -26,9 +26,9 @@ export default function DonatePage() {
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="font-serif text-3xl md:text-4xl font-semibold mb-4">Donate</h1>
           <p className="text-muted-foreground mb-8">
-            Browsing the site and applying what you learn is already great. Buying our capsules and
-            seedlings really goes a long way to help us. For those able to do more — please
-            consider sponsoring an Eternal Moringa Tree.
+            Browsing the site and applying what you learn is really great. Buying our capsules and
+            seedlings really keeps us going. For those that are able to, kindly
+            consider making a donation to help us grow even more.
           </p>
 
           <div className="grid sm:grid-cols-3 gap-6 mb-8">
