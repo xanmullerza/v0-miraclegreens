@@ -1,6 +1,6 @@
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { ArrowRight, ShoppingBag, Heart } from "lucide-react"
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { ArrowRight, ShoppingBag, Heart } from 'lucide-react';
 
 export function Hero() {
   return (
@@ -8,14 +8,16 @@ export function Hero() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-24 lg:py-32">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="max-w-xl">
-            <p className="text-sm font-medium text-primary uppercase tracking-wider mb-4">Buy One, Give One</p>
+            <p className="text-sm font-medium text-primary uppercase tracking-wider mb-4">
+              Buy One, Give One
+            </p>
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground leading-tight text-balance">
               Your purchase feeds families in need
             </h1>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              We sell premium moringa saplings and capsules to the public. Every purchase funds the production and
-              distribution of moringa capsules to families fighting malnutrition. Shop with purpose — your wellness
-              supports their health.
+              We sell premium moringa saplings and capsules to the public. Every purchase funds the
+              production and distribution of moringa capsules to families fighting malnutrition.
+              Shop with purpose — your wellness supports their health.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
               <Button size="lg" className="gap-2" asChild>
@@ -51,7 +53,7 @@ export function Hero() {
           <div className="relative">
             <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-muted">
               <Image
-                src="/moringa-tree-with-green-leaves-in-sunlight--africa.jpg"
+                src="/images/moringa-hero.svg"
                 alt="Moringa trees growing on our farm"
                 fill
                 className="object-cover"
@@ -65,7 +67,9 @@ export function Hero() {
                 </div>
                 <div>
                   <p className="font-medium text-foreground">Every Sale Gives Back</p>
-                  <p className="text-sm text-muted-foreground">Profits fund capsules for the needy</p>
+                  <p className="text-sm text-muted-foreground">
+                    Profits fund capsules for the needy
+                  </p>
                 </div>
               </div>
             </div>
@@ -73,5 +77,5 @@ export function Hero() {
         </div>
       </div>
     </section>
-  )
+  );
 }

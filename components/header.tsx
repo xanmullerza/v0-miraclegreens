@@ -1,15 +1,15 @@
-"use client"
-import Link from "next/link"
-import { Menu, TreeDeciduous, ShoppingBag } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+'use client';
+import Link from 'next/link';
+import { Menu, TreeDeciduous, ShoppingBag } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const navigation = [
-  { name: "Our Story", href: "#story" },
-  { name: "How It Works", href: "#how-it-works" },
-  { name: "Shop", href: "#shop" },
-  { name: "Our Vision", href: "#vision" },
-]
+  { name: 'Our Story', href: '#story' },
+  { name: 'How It Works', href: '#how-it-works' },
+  { name: 'Shop', href: '#shop' },
+  { name: 'Our Vision', href: '#vision' },
+];
 
 export function Header() {
   return (
@@ -19,7 +19,11 @@ export function Header() {
           {/* Mobile menu */}
           <Sheet>
             <SheetTrigger asChild className="lg:hidden">
-              <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary-foreground/10">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-primary-foreground hover:bg-primary-foreground/10"
+              >
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Open menu</span>
               </Button>
@@ -98,5 +102,5 @@ export function Header() {
         </div>
       </div>
     </header>
-  )
+  );
 }

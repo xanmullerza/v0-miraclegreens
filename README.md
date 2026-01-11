@@ -16,6 +16,13 @@ Your project is live at:
 
 **[https://vercel.com/theodores-projects-f432d4f6/v0-miraclegreens](https://vercel.com/theodores-projects-f432d4f6/v0-miraclegreens)**
 
+
+## CI
+
+[![CI](https://github.com/speaktheo/v0-miraclegreens/actions/workflows/ci.yml/badge.svg)](https://github.com/speaktheo/v0-miraclegreens/actions/workflows/ci.yml)
+
+**Note:** `global.d.ts` contains temporary module declarations to help TypeScript while dependencies and editor settings finish syncing. Remove it after your editor recognizes `node_modules` types (restart TS server).
+
 ## Build your app
 
 Continue building your app on:

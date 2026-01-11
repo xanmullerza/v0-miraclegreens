@@ -1,54 +1,66 @@
-"use client"
+'use client';
 
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { TreeDeciduous, Heart, Leaf, Zap, Shield, Brain, Bone, Check, Infinity } from "lucide-react"
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import {
+  TreeDeciduous,
+  Heart,
+  Leaf,
+  Zap,
+  Shield,
+  Brain,
+  Bone,
+  Check,
+  Infinity,
+} from 'lucide-react';
 
 const moringaBenefits = [
   {
     icon: Leaf,
-    title: "Rich in Nutrients",
+    title: 'Rich in Nutrients',
     description:
-      "Moringa contains vitamins A, C, E, calcium, potassium, and protein – essential nutrients for fighting malnutrition.",
+      'Moringa contains vitamins A, C, E, calcium, potassium, and protein – essential nutrients for fighting malnutrition.',
   },
   {
     icon: Heart,
-    title: "Supports Heart Health",
+    title: 'Supports Heart Health',
     description:
-      "The antioxidants in moringa help lower cholesterol and support cardiovascular health in communities we serve.",
+      'The antioxidants in moringa help lower cholesterol and support cardiovascular health in communities we serve.',
   },
   {
     icon: Zap,
-    title: "Natural Energy Boost",
+    title: 'Natural Energy Boost',
     description:
-      "Iron-rich moringa helps combat fatigue and anemia, providing sustainable energy for daily activities.",
+      'Iron-rich moringa helps combat fatigue and anemia, providing sustainable energy for daily activities.',
   },
   {
     icon: Shield,
-    title: "Immune Support",
-    description: "High vitamin C content strengthens immune systems, protecting vulnerable populations from illness.",
+    title: 'Immune Support',
+    description:
+      'High vitamin C content strengthens immune systems, protecting vulnerable populations from illness.',
   },
   {
     icon: Brain,
-    title: "Cognitive Function",
+    title: 'Cognitive Function',
     description:
-      "Antioxidants and neuro-enhancers in moringa support brain health and cognitive development in children.",
+      'Antioxidants and neuro-enhancers in moringa support brain health and cognitive development in children.',
   },
   {
     icon: Bone,
-    title: "Strong Bones",
-    description: "Calcium and phosphorus content supports bone development and helps prevent osteoporosis.",
+    title: 'Strong Bones',
+    description:
+      'Calcium and phosphorus content supports bone development and helps prevent osteoporosis.',
   },
-]
+];
 
 const sponsorBenefits = [
-  "Your tree produces leaves for 20+ years",
-  "Each tree yields thousands of capsules annually",
-  "Full transparency on your tree's impact",
-  "Certificate of sponsorship with tree location",
-  "Regular updates on harvest and distribution",
-  "Your name on our Wall of Growth",
-]
+  'Your tree produces leaves for 20+ years',
+  'Each tree yields thousands of capsules annually',
+  'Full transparency on your tree&apos;s impact',
+  'Certificate of sponsorship with tree location',
+  'Regular updates on harvest and distribution',
+  'Your name on our Wall of Growth',
+];
 
 export function FeaturedProducts() {
   return (
@@ -57,18 +69,21 @@ export function FeaturedProducts() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">Help Us Grow</p>
+              <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">
+                Help Us Grow
+              </p>
               <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground mb-6">
                 Invest in an Eternal Moringa Tree — R500
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                Right now, we source our moringa powder from trusted growers. But our vision is bigger — we want to grow
-                and process our own trees. This means lower costs, better quality control, and the ability to help even
-                more families.
+                Right now, we source our moringa powder from trusted growers. But our vision is
+                bigger — we want to grow and process our own trees. This means lower costs, better
+                quality control, and the ability to help even more families.
               </p>
               <p className="text-muted-foreground leading-relaxed mb-6">
-                By sponsoring an Eternal Moringa Tree for R500, you're investing in our future. Your tree will be
-                planted on our farm and will produce leaves for 20+ years — a gift that keeps giving.
+                By sponsoring an Eternal Moringa Tree for R500, you&apos;re investing in our future.
+                Your tree will be planted on our farm and will produce leaves for 20+ years — a gift
+                that keeps giving.
               </p>
 
               <div className="space-y-3 mb-8">
@@ -91,7 +106,7 @@ export function FeaturedProducts() {
             <div className="relative">
               <div className="aspect-square rounded-2xl overflow-hidden bg-muted">
                 <Image
-                  src="/moringa-tree-farm-plantation-sustainable-agricultu.jpg"
+                  src="/images/moringa-farm.svg"
                   alt="Our future moringa tree farm"
                   fill
                   className="object-cover"
@@ -112,27 +127,42 @@ export function FeaturedProducts() {
       <section id="vision" className="py-16 md:py-24 bg-background">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">Our Vision</p>
+            <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">
+              Our Vision
+            </p>
             <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground mb-4">
               Why Growing Our Own Changes Everything
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              By establishing our own moringa farm and processing facility, we can dramatically increase our impact
-              while reducing costs and ensuring the highest quality for those we serve.
+              By establishing our own moringa farm and processing facility, we can dramatically
+              increase our impact while reducing costs and ensuring the highest quality for those we
+              serve.
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
             {[
-              { title: "Lower Costs", desc: "Eliminate sourcing markups and reduce per-capsule cost by up to 60%" },
               {
-                title: "Quality Control",
-                desc: "Oversee every step from seed to capsule for maximum nutritional value",
+                title: 'Lower Costs',
+                desc: 'Eliminate sourcing markups and reduce per-capsule cost by up to 60%',
               },
-              { title: "Sustainability", desc: "Build a self-sustaining operation that grows with community needs" },
-              { title: "Local Jobs", desc: "Create employment opportunities in the communities we serve" },
+              {
+                title: 'Quality Control',
+                desc: 'Oversee every step from seed to capsule for maximum nutritional value',
+              },
+              {
+                title: 'Sustainability',
+                desc: 'Build a self-sustaining operation that grows with community needs',
+              },
+              {
+                title: 'Local Jobs',
+                desc: 'Create employment opportunities in the communities we serve',
+              },
             ].map((item) => (
-              <div key={item.title} className="bg-card rounded-2xl p-6 border border-border text-center">
+              <div
+                key={item.title}
+                className="bg-card rounded-2xl p-6 border border-border text-center"
+              >
                 <h3 className="font-semibold text-foreground mb-2">{item.title}</h3>
                 <p className="text-sm text-muted-foreground">{item.desc}</p>
               </div>
@@ -145,23 +175,26 @@ export function FeaturedProducts() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
             <div>
-              <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">Why Moringa</p>
+              <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">
+                Why Moringa
+              </p>
               <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground mb-6">
                 The Miracle Tree That Transforms Lives
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                Known as the "Miracle Tree," moringa oleifera has been used for centuries to combat malnutrition. Its
-                leaves contain more vitamin A than carrots, more calcium than milk, more iron than spinach, and more
-                potassium than bananas.
+                Known as the &quot;Miracle Tree,&quot; moringa oleifera has been used for centuries
+                to combat malnutrition. Its leaves contain more vitamin A than carrots, more calcium
+                than milk, more iron than spinach, and more potassium than bananas.
               </p>
               <p className="text-muted-foreground leading-relaxed">
-                By growing moringa and distributing its benefits as easy-to-take capsules, we're providing a sustainable
-                solution to nutritional deficiency in underserved communities.
+                By growing moringa and distributing its benefits as easy-to-take capsules,
+                we&apos;re providing a sustainable solution to nutritional deficiency in underserved
+                communities.
               </p>
             </div>
             <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted">
               <Image
-                src="/moringa-powder-and-capsules-on-wooden-surface-with.jpg"
+                src="/images/moringa-powder.svg"
                 alt="Moringa powder and capsules"
                 fill
                 className="object-cover"
@@ -179,12 +212,14 @@ export function FeaturedProducts() {
                   <benefit.icon className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="font-semibold text-foreground mb-2">{benefit.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{benefit.description}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {benefit.description}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
     </>
-  )
+  );
 }

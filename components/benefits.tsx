@@ -1,37 +1,40 @@
-import { TrendingDown, Award, Users, Scaling } from "lucide-react"
+import { TrendingDown, Award, Users, Scaling } from 'lucide-react';
 
 const benefits = [
   {
     icon: TrendingDown,
-    title: "60% Cost Reduction",
+    title: '60% Cost Reduction',
     description:
-      "By eliminating sourcing costs and middlemen, each capsule costs significantly less — meaning more nutrition for more people.",
+      'By eliminating sourcing costs and middlemen, each capsule costs significantly less — meaning more nutrition for more people.',
   },
   {
     icon: Award,
-    title: "Quality Guarantee",
+    title: 'Quality Guarantee',
     description:
-      "When we control the entire process, we ensure every leaf is harvested at peak nutrition and processed under optimal conditions.",
+      'When we control the entire process, we ensure every leaf is harvested at peak nutrition and processed under optimal conditions.',
   },
   {
     icon: Users,
-    title: "Community Employment",
+    title: 'Community Employment',
     description:
-      "Our farm will create jobs for local community members, providing income while producing nutrition for those in need.",
+      'Our farm will create jobs for local community members, providing income while producing nutrition for those in need.',
   },
   {
     icon: Scaling,
-    title: "Scalable Impact",
-    description: "A self-sustaining farm can grow with demand, allowing us to reach more communities year after year.",
+    title: 'Scalable Impact',
+    description:
+      'A self-sustaining farm can grow with demand, allowing us to reach more communities year after year.',
   },
-]
+];
 
 export function Benefits() {
   return (
     <section className="py-16 md:py-24 bg-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">Why This Matters</p>
+          <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">
+            Why This Matters
+          </p>
           <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground">
             Growing Our Own Changes Everything
           </h2>
@@ -49,5 +52,5 @@ export function Benefits() {
         </div>
       </div>
     </section>
-  )
+  );
 }

@@ -1,36 +1,36 @@
-import Link from "next/link"
-import { Instagram, Facebook, Twitter, Youtube } from "lucide-react"
+import Link from 'next/link';
+import { Instagram, Facebook, Twitter, Youtube } from 'lucide-react';
 
 const footerLinks = {
   about: [
-    { name: "Our Story", href: "#story" },
-    { name: "How It Works", href: "#how-it-works" },
-    { name: "Our Vision", href: "#vision" },
-    { name: "Impact Reports", href: "#" },
-    { name: "Team", href: "#" },
+    { name: 'Our Story', href: '#story' },
+    { name: 'How It Works', href: '#how-it-works' },
+    { name: 'Our Vision', href: '#vision' },
+    { name: 'Impact Reports', href: '#' },
+    { name: 'Team', href: '#' },
   ],
   shop: [
-    { name: "Moringa Saplings", href: "#shop" },
-    { name: "Moringa Capsules", href: "#shop" },
-    { name: "Bulk Orders", href: "#" },
-    { name: "Corporate Gifting", href: "#" },
-    { name: "Sponsor a Tree", href: "#sponsor" },
+    { name: 'Moringa Saplings', href: '#shop' },
+    { name: 'Moringa Capsules', href: '#shop' },
+    { name: 'Bulk Orders', href: '#' },
+    { name: 'Corporate Gifting', href: '#' },
+    { name: 'Sponsor a Tree', href: '#sponsor' },
   ],
   resources: [
-    { name: "Contact Us", href: "#" },
-    { name: "FAQs", href: "#" },
-    { name: "Moringa Benefits", href: "#mission" },
-    { name: "Blog", href: "#" },
-    { name: "Press", href: "#" },
+    { name: 'Contact Us', href: '#' },
+    { name: 'FAQs', href: '#' },
+    { name: 'Moringa Benefits', href: '#mission' },
+    { name: 'Blog', href: '#' },
+    { name: 'Press', href: '#' },
   ],
-}
+};
 
 const socialLinks = [
-  { name: "Instagram", icon: Instagram, href: "#" },
-  { name: "Facebook", icon: Facebook, href: "#" },
-  { name: "Twitter", icon: Twitter, href: "#" },
-  { name: "YouTube", icon: Youtube, href: "#" },
-]
+  { name: 'Instagram', icon: Instagram, href: '#' },
+  { name: 'Facebook', icon: Facebook, href: '#' },
+  { name: 'Twitter', icon: Twitter, href: '#' },
+  { name: 'YouTube', icon: Youtube, href: '#' },
+];
 
 export function Footer() {
   return (
@@ -42,8 +42,8 @@ export function Footer() {
               Miracle Greens
             </Link>
             <p className="mt-4 text-background/70 text-sm leading-relaxed">
-              A social enterprise selling moringa products to fund nutrition programs for families in need. Every
-              purchase makes a difference.
+              A social enterprise selling moringa products to fund nutrition programs for families
+              in need. Every purchase makes a difference.
             </p>
             <div className="flex gap-3 mt-6">
               {socialLinks.map((social) => (
@@ -63,7 +63,10 @@ export function Footer() {
             <ul className="space-y-3">
               {footerLinks.about.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href} className="text-sm text-background/70 hover:text-background transition-colors">
+                  <Link
+                    href={link.href}
+                    className="text-sm text-background/70 hover:text-background transition-colors"
+                  >
                     {link.name}
                   </Link>
                 </li>
@@ -75,7 +78,10 @@ export function Footer() {
             <ul className="space-y-3">
               {footerLinks.shop.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href} className="text-sm text-background/70 hover:text-background transition-colors">
+                  <Link
+                    href={link.href}
+                    className="text-sm text-background/70 hover:text-background transition-colors"
+                  >
                     {link.name}
                   </Link>
                 </li>
@@ -87,7 +93,10 @@ export function Footer() {
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.name}>
-                  <Link href={link.href} className="text-sm text-background/70 hover:text-background transition-colors">
+                  <Link
+                    href={link.href}
+                    className="text-sm text-background/70 hover:text-background transition-colors"
+                  >
                     {link.name}
                   </Link>
                 </li>
@@ -100,15 +109,21 @@ export function Footer() {
             © {new Date().getFullYear()} Miracle Greens. A social enterprise for nutrition.
           </p>
           <div className="flex gap-6">
-            <Link href="#" className="text-sm text-background/60 hover:text-background transition-colors">
+            <Link
+              href="#"
+              className="text-sm text-background/60 hover:text-background transition-colors"
+            >
               Privacy Policy
             </Link>
-            <Link href="#" className="text-sm text-background/60 hover:text-background transition-colors">
+            <Link
+              href="#"
+              className="text-sm text-background/60 hover:text-background transition-colors"
+            >
               Terms of Service
             </Link>
           </div>
         </div>
       </div>
     </footer>
-  )
+  );
 }

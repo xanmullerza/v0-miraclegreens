@@ -1,22 +1,22 @@
-"use client"
+'use client';
 
-import type React from "react"
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { ArrowRight, Check, TreeDeciduous } from "lucide-react"
+import type React from 'react';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ArrowRight, Check, TreeDeciduous } from 'lucide-react';
 
 export function Newsletter() {
-  const [email, setEmail] = useState("")
-  const [submitted, setSubmitted] = useState(false)
+  const [email, setEmail] = useState('');
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (email) {
-      setSubmitted(true)
-      setEmail("")
+      setSubmitted(true);
+      setEmail('');
     }
-  }
+  };
 
   return (
     <section className="py-16 md:py-24 bg-primary">
@@ -26,8 +26,8 @@ export function Newsletter() {
             Help Us Grow Our Future
           </h2>
           <p className="text-primary-foreground/80 mb-8 leading-relaxed">
-            For just R500, you can sponsor an Eternal Moringa Tree that will produce nutrition for the needy for
-            decades. Join us in building a sustainable solution to malnutrition.
+            For just R500, you can sponsor an Eternal Moringa Tree that will produce nutrition for
+            the needy for decades. Join us in building a sustainable solution to malnutrition.
           </p>
           {submitted ? (
             <div className="flex items-center justify-center gap-2 text-primary-foreground">
@@ -45,7 +45,10 @@ export function Newsletter() {
 
               <p className="text-primary-foreground/60 text-sm">or subscribe for updates</p>
 
-              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+              <form
+                onSubmit={handleSubmit}
+                className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
+              >
                 <Input
                   type="email"
                   placeholder="Enter your email"
@@ -67,5 +70,5 @@ export function Newsletter() {
         </div>
       </div>
     </section>
-  )
+  );
 }

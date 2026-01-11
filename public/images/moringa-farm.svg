@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200">
+  <rect width="100%" height="100%" fill="#f3f9f3" />
+  <g transform="translate(60,60)">
+    <rect x="40" y="360" width="1020" height="520" fill="#cfe8cf" rx="28" />
+    <text x="80" y="160" font-size="44" fill="#2b5b2b" font-family="sans-serif">MORINGA FARM</text>
+    <text x="80" y="210" font-size="18" fill="#2b5b2b" font-family="sans-serif">Placeholder image — replace with real photo</text>
+  </g>
+</svg>
