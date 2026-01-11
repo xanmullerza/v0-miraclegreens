@@ -1,5 +1,6 @@
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
+import { Benefits } from '@/components/benefits';
 
 export const metadata = {
   title: 'Our Vision - Miracle Greens',
@@ -25,37 +26,11 @@ export default function VisionPage() {
               we serve.
             </p>
           </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                title: 'Lower Costs',
-                desc: 'Eliminate sourcing markups and reduce per-capsule cost by up to 60%',
-              },
-              {
-                title: 'Quality Control',
-                desc: 'Oversee every step from seed to capsule for maximum nutritional value',
-              },
-              {
-                title: 'Sustainability',
-                desc: 'Build a self-sustaining operation that grows with community needs',
-              },
-              {
-                title: 'Local Jobs',
-                desc: 'Create employment opportunities in the communities we serve',
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className="bg-card rounded-2xl p-6 border border-border text-center"
-              >
-                <h3 className="font-semibold text-foreground mb-2">{item.title}</h3>
-                <p className="text-sm text-muted-foreground">{item.desc}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
+
+      {/* Reuse the canonical Benefits component here to avoid duplicate messaging */}
+      <Benefits />
       <Footer />
     </main>
   );
