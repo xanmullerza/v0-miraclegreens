@@ -42,7 +42,7 @@ export function Header() {
 										Visit Shop
 									</Link>
 								</Button>
-								<Button className="gap-2 mt-2" variant="ghost" asChild>
+								<Button className="gap-2 mt-2" asChild>
 									<Link href="/donate">
 										<TreeDeciduous className="h-4 w-4" />
 										Donate
@@ -74,9 +74,9 @@ export function Header() {
 							</Link>
 						</Button>
 						<Button
-							variant="ghost"
+							variant="secondary"
 							size="sm"
-							className="hidden md:flex gap-2 text-primary-foreground hover:bg-primary-foreground/10"
+							className="hidden md:flex gap-2"
 							asChild
 						>
 							<Link href="/donate">
