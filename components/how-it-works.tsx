@@ -62,17 +62,6 @@ export function HowItWorks() {
             </div>
           ))}
         </div>
-
-        <div className="mt-12 bg-card rounded-2xl p-8 border border-border text-center">
-          <p className="text-lg text-foreground font-medium mb-2">
-            100% of profits go directly to our mission
-          </p>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            We source the finest moringa powder from trusted growers, ensuring top quality for both
-            our customers and the communities we serve. Our vision is to grow our own trees — and
-            you can help make that happen.
-          </p>
-        </div>
       </div>
     </section>
   );
