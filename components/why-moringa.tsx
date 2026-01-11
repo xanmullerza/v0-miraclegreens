@@ -69,7 +69,7 @@ export function WhyMoringa() {
 							medicinal properties. Every part of this extraordinary plant offers benefits.
 						</p>
 						<p className="text-muted-foreground leading-relaxed">
-              Its leaves contain more vitamin A than carrots, more calcium than milk,
+							Its leaves contain more vitamin A than carrots, more calcium than milk,
 							more iron than spinach, and more potassium than bananas. By growing moringa and
 							distributing its benefits as easy-to-take capsules, we're providing a sustainable
 							solution to nutritional deficiency in underserved communities.
@@ -100,17 +100,7 @@ export function WhyMoringa() {
 					))}
 				</div>
 
-				<div className="text-center">
-					<Link href="/about-moringa" target="_blank">
-						<Button
-							size="lg"
-							variant="outline"
-							className="border-primary text-primary hover:bg-primary hover:text-primary-foreground bg-transparent"
-						>
-							Find Out More About Moringa
-						</Button>
-					</Link>
-				</div>
+
 			</div>
 		</section>
 	);
