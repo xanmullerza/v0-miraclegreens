@@ -35,7 +35,7 @@ export function MoringaHistory() {
                         <Leaf className="h-8 w-8 text-primary mb-4" />
                         <h3 className="text-lg font-semibold text-foreground mb-2">Modern Recognition</h3>
                         <p className="text-muted-foreground text-sm leading-relaxed">
-                            Today, the WHO, FAO, and numerous NGOs promote moringa as a solution to
+                            Today, the WHO, FAO, and numerous NGOs, just like ours promote moringa as a solution to
                             malnutrition. Over 1,300 scientific studies have validated its nutritional and
                             medicinal properties.
                         </p>
