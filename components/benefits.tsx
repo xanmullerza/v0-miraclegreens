@@ -31,14 +31,7 @@ export function Benefits() {
   return (
     <section className="py-16 md:py-24 bg-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">
-            Why This Matters
-          </p>
-          <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground">
-            Growing Our Own Changes Everything
-          </h2>
-        </div>
+
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {benefits.map((benefit) => (
             <div key={benefit.title} className="text-center">
