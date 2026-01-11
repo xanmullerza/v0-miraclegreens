@@ -42,14 +42,6 @@ export default function DonatePage() {
               </div>
             ))}
           </div>
-
-          <p className="text-sm text-muted-foreground">
-            Prefer to set a custom amount or integrate your own payment flow? Contact us at{' '}
-            <Link href="/contact" className="text-primary hover:underline">
-              /contact
-            </Link>
-            .
-          </p>
         </div>
       </section>
       <Footer />

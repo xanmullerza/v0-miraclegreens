@@ -74,7 +74,7 @@ export function FeaturedProducts() {
                 Help Us Grow
               </p>
               <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground mb-6">
-                Invest in an Eternal Moringa Tree — R500
+                Invest in an Eternal Moringa Tree
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
                 Right now, we source our moringa powder from trusted growers. But our vision is
@@ -83,7 +83,7 @@ export function FeaturedProducts() {
               </p>
               <p className="text-muted-foreground leading-relaxed mb-6">
                 By sponsoring an Eternal Moringa Tree for R500, you&apos;re investing in our future.
-                Your tree will be planted on our farm and will produce leaves for 20+ years — a gift
+                Your tree will be planted on our farm and will produce leaves for years to come,,with every leaf processed for the community. Truly a gift
                 that keeps giving.
               </p>
 
