@@ -1,6 +1,5 @@
 import { Header } from '@/components/header';
 import { HowItWorks } from '@/components/how-it-works';
-import { Hero } from '@/components/hero';
 import { ShopSection } from '@/components/shop-section';
 import { Footer } from '@/components/footer';
 
@@ -14,7 +13,7 @@ export default function ShopPage() {
     <main className="min-h-screen bg-background">
       <Header />
       <HowItWorks />
-      <Hero />
+
       <ShopSection />
       <Footer />
     </main>

@@ -22,7 +22,7 @@ const steps = [
   {
     icon: Repeat,
     step: '04',
-    title: 'Cycle Continues',
+    title: 'The Cycle Continues',
     description: 'Every sale sustains our mission, creating lasting impact for years to come.',
   },
 ];
