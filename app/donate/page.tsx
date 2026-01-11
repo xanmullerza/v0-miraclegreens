@@ -4,7 +4,7 @@ import { Categories } from '@/components/categories';
 import { FeaturedProducts } from '@/components/featured-products';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Baby, Sprout, Package } from 'lucide-react';
+import { Heart, Sun, Gift } from 'lucide-react';
 
 export const metadata = {
   title: 'Donate - Miracle Greens',
@@ -12,9 +12,9 @@ export const metadata = {
 };
 
 const tiers = [
-  { name: 'R100', amount: 50, icon: Baby },
-  { name: 'R200', amount: 150, icon: Sprout },
-  { name: 'R300', amount: 500, icon: Package },
+  { name: 'R100', amount: 50, icon: Heart },
+  { name: 'R200', amount: 150, icon: Sun },
+  { name: 'R300', amount: 500, icon: Gift },
 ];
 
 export default function DonatePage() {
