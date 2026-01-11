@@ -4,6 +4,7 @@ import { Categories } from '@/components/categories';
 import { FeaturedProducts } from '@/components/featured-products';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Baby, Sprout, Package } from 'lucide-react';
 
 export const metadata = {
   title: 'Donate - Miracle Greens',
@@ -11,9 +12,9 @@ export const metadata = {
 };
 
 const tiers = [
-  { name: 'R100', amount: 50, description: 'Provide moringa capsules for a child' },
-  { name: 'R200', amount: 150, description: 'Sponsor a sapling and care guide' },
-  { name: 'R300', amount: 500, description: 'Community distribution pack' },
+  { name: 'R100', amount: 50, icon: Baby },
+  { name: 'R200', amount: 150, icon: Sprout },
+  { name: 'R300', amount: 500, icon: Package },
 ];
 
 export default function DonatePage() {
@@ -32,9 +33,11 @@ export default function DonatePage() {
 
           <div className="grid sm:grid-cols-3 gap-6 mb-8">
             {tiers.map((tier) => (
-              <div key={tier.name} className="bg-card p-6 rounded-xl border border-border">
-                <h3 className="text-xl font-semibold mb-2">{tier.name}</h3>
-                <p className="text-sm text-muted-foreground mb-4">{tier.description}</p>
+              <div key={tier.name} className="bg-card p-6 rounded-xl border border-border flex flex-col items-center text-center">
+                <h3 className="text-xl font-semibold mb-4">{tier.name}</h3>
+                <div className="mb-6 rounded-full bg-primary/10 p-4">
+                  <tier.icon className="h-8 w-8 text-primary" />
+                </div>
                 <Link href={`/api/donate?amount=${tier.amount}`}>
                   <Button className="w-full">Donate {tier.name}</Button>
                 </Link>
