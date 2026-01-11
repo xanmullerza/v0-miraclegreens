@@ -104,18 +104,6 @@ export function ShopSection() {
 						</div>
 					))}
 				</div>
-
-				<div className="mt-12 text-center">
-					<p className="text-muted-foreground mb-4">
-						Looking for bulk orders or corporate gifting?
-					</p>
-					<Button
-						variant="outline"
-						className="gap-2 bg-transparent"
-					>
-						Contact Us for Bulk Pricing
-					</Button>
-				</div>
 			</div>
 		</section>
 	);
