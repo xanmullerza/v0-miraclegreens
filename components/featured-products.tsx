@@ -83,8 +83,8 @@ export function FeaturedProducts() {
               </p>
               <p className="text-muted-foreground leading-relaxed mb-6">
                 By sponsoring an Eternal Moringa Tree for R500, you&apos;re investing in our future.
-                Your tree will be planted on our farm and will produce leaves for years to come,,with every leaf processed for the community. Truly a gift
-                that keeps giving.
+                Your tree will be planted on our farm and will produce leaves for years to come,
+                with every leaf processed for the community. Truly a gift that keeps giving.
               </p>
 
               <div className="space-y-3 mb-8">
