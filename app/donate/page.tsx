@@ -11,9 +11,9 @@ export const metadata = {
 };
 
 const tiers = [
-  { name: 'R50', amount: 50, description: 'Provide moringa capsules for a child' },
-  { name: 'R150', amount: 150, description: 'Sponsor a sapling and care guide' },
-  { name: 'R500', amount: 500, description: 'Community distribution pack' },
+  { name: 'R100', amount: 50, description: 'Provide moringa capsules for a child' },
+  { name: 'R200', amount: 150, description: 'Sponsor a sapling and care guide' },
+  { name: 'R300', amount: 500, description: 'Community distribution pack' },
 ];
 
 export default function DonatePage() {
