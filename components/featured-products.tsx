@@ -149,34 +149,7 @@ export function FeaturedProducts() {
 
       <section id="mission" className="py-16 md:py-24 bg-secondary/30">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
-            <div>
-              <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">
-                Why Moringa
-              </p>
-              <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground mb-6">
-                The Miracle Tree That Transforms Lives
-              </h2>
-              <p className="text-muted-foreground leading-relaxed mb-4">
-                Known as the &quot;Miracle Tree,&quot; moringa oleifera has been used for centuries
-                to combat malnutrition. Its leaves contain more vitamin A than carrots, more calcium
-                than milk, more iron than spinach, and more potassium than bananas.
-              </p>
-              <p className="text-muted-foreground leading-relaxed">
-                By growing moringa and distributing its benefits as easy-to-take capsules,
-                we&apos;re providing a sustainable solution to nutritional deficiency in underserved
-                communities.
-              </p>
-            </div>
-            <div className="relative aspect-square rounded-2xl overflow-hidden bg-muted">
-              <Image
-                src="/images/moringa-powder.svg"
-                alt="Moringa powder and capsules"
-                fill
-                className="object-cover"
-              />
-            </div>
-          </div>
+          {/* Removed duplicated "Why Moringa" block — canonical content now lives in WhyMoringa */}
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {moringaBenefits.map((benefit) => (
