@@ -69,8 +69,7 @@ export function WhyMoringa() {
 							medicinal properties. Every part of this extraordinary plant offers benefits.
 						</p>
 						<p className="text-muted-foreground leading-relaxed">
-							Known as the "Miracle Tree," moringa oleifera has been used for centuries to combat
-							malnutrition. Its leaves contain more vitamin A than carrots, more calcium than milk,
+              Its leaves contain more vitamin A than carrots, more calcium than milk,
 							more iron than spinach, and more potassium than bananas. By growing moringa and
 							distributing its benefits as easy-to-take capsules, we're providing a sustainable
 							solution to nutritional deficiency in underserved communities.
