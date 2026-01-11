@@ -23,7 +23,7 @@ const products = [
 		name: 'Moringa Capsules',
 		description:
 			'Premium moringa leaf powder in easy-to-take capsules. 60 capsules per bottle, one month supply.',
-		price: 'R150',
+		price: 'R100',
 		image: '/moringa-powder-and-capsules-on-wooden-surface-with.jpg', // use placeholder to avoid 404s until real image is added
 		features: ['60 capsules', '100% pure moringa', 'Lab tested quality'],
 		rating: 4.8,
