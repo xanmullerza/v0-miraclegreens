@@ -1,9 +1,15 @@
-import { Shield, Zap, Brain, Heart, Leaf, Sparkles } from 'lucide-react';
+import { Shield, Zap, Brain, Heart, Leaf, Sparkles, Bone } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 
 const benefits = [
+  {
+    icon: Leaf,
+    title: 'Rich in Nutrients',
+    description:
+      'Moringa contains vitamins A, C, E, calcium, potassium, and protein – essential nutrients for fighting malnutrition.',
+  },
   {
     icon: Shield,
     title: 'Immune Booster',
@@ -20,12 +26,18 @@ const benefits = [
     icon: Brain,
     title: 'Brain Health',
     description:
-      'Contains antioxidants and neuro-enhancers that support cognitive function and mental clarity.',
+      'Contains antioxidants and neuro-enhancers that support cognitive function, mental clarity, and healthy development.',
   },
   {
     icon: Heart,
     title: 'Heart Health',
     description: 'Helps maintain healthy cholesterol levels and supports cardiovascular function.',
+  },
+  {
+    icon: Bone,
+    title: 'Strong Bones',
+    description:
+      'High levels of calcium and phosphorus support bone development and help prevent osteoporosis.',
   },
   {
     icon: Leaf,
@@ -75,7 +87,7 @@ export function WhyMoringa() {
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           {benefits.map((benefit) => (
             <div
               key={benefit.title}
