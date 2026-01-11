@@ -119,7 +119,7 @@ export function FeaturedProducts() {
                 <div className="text-center text-primary-foreground">
                   <Infinity className="h-8 w-8 mx-auto mb-2" />
                   <p className="text-2xl font-bold">R500</p>
-                  <p className="text-sm opacity-80">One tree, forever</p>
+                  <p className="text-sm opacity-80">One tree, for life</p>
                 </div>
               </div>
             </div>
