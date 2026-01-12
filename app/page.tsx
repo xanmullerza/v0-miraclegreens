@@ -1,4 +1,5 @@
 import { Header } from '@/components/header';
+import { Hero } from '@/components/hero';
 import { WhyMoringa } from '@/components/why-moringa';
 import { MoringaNutrition } from '@/components/moringa-nutrition';
 import { MoringaMalnutrition } from '@/components/moringa-malnutrition';
@@ -8,6 +9,7 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       <Header />
+      <Hero />
       <MoringaMalnutrition />
       <WhyMoringa />
       <MoringaNutrition />
