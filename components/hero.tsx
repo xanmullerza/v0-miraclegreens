@@ -53,7 +53,7 @@ export function Hero() {
           <div className="relative">
             <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-muted">
               <Image
-                src="/images/moringa-hero.svg"
+                src="/child_with_plant.jpg"
                 alt="Moringa trees growing on our farm"
                 fill
                 className="object-cover"
