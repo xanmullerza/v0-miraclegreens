@@ -1,6 +1,5 @@
 import { Header } from '@/components/header';
 import { WhyMoringa } from '@/components/why-moringa';
-import { MoringaHistory } from '@/components/moringa-history';
 import { MoringaNutrition } from '@/components/moringa-nutrition';
 import { MoringaMalnutrition } from '@/components/moringa-malnutrition';
 import { Footer } from '@/components/footer';
@@ -11,7 +10,6 @@ export default function Home() {
       <Header />
       <MoringaMalnutrition />
       <WhyMoringa />
-      <MoringaHistory />
       <MoringaNutrition />
       {/* Testimonials temporarily removed from homepage */}
       <Footer />
