@@ -3,14 +3,7 @@ import Link from "next/link";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 
-const categories = [
-    {
-        title: "Recipes",
-        description: "Delicious and healthy moringa-infused recipes.",
-        icon: Utensils,
-        href: "/browse/recipes",
-        color: "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400",
-    },
+const plannerCategories = [
     {
         title: "Meal Plans",
         description: "Structured plans to help you stay on track.",
@@ -19,18 +12,28 @@ const categories = [
         color: "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400",
     },
     {
-        title: "Nutritional Info",
-        description: "Detailed breakdown of Moringa's benefits.",
-        icon: Activity,
-        href: "/browse/nutrition",
-        color: "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400",
+        title: "Recipes",
+        description: "Delicious and healthy moringa-infused recipes.",
+        icon: Utensils,
+        href: "/browse/recipes",
+        color: "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400",
     },
+];
+
+const libraryCategories = [
     {
         title: "Articles",
         description: "Read about the latest health trends and news.",
         icon: FileText,
         href: "/browse/articles",
         color: "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400",
+    },
+    {
+        title: "Videos",
+        description: "Watch tutorials, testimonials, and guides.",
+        icon: PlayCircle,
+        href: "/browse/videos",
+        color: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
     },
     {
         title: "Scientific Studies",
@@ -40,11 +43,11 @@ const categories = [
         color: "bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400",
     },
     {
-        title: "Videos",
-        description: "Watch tutorials, testimonials, and guides.",
-        icon: PlayCircle,
-        href: "/browse/videos",
-        color: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
+        title: "Nutritional Info",
+        description: "Detailed breakdown of Moringa's benefits.",
+        icon: Activity,
+        href: "/browse/nutrition",
+        color: "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400",
     },
 ];
 
@@ -53,8 +56,8 @@ export default function BrowsePage() {
         <main className="min-h-screen flex flex-col">
             <Header />
             <div className="flex-1 bg-background py-12 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-12">
+                <div className="max-w-7xl mx-auto space-y-16">
+                    <div className="text-center">
                         <h1 className="text-4xl font-serif font-bold tracking-tight text-foreground sm:text-5xl">
                             Resource Library
                         </h1>
@@ -63,24 +66,62 @@ export default function BrowsePage() {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {categories.map((category) => (
-                            <Link
-                                key={category.title}
-                                href={category.href}
-                                className="group relative flex flex-col items-start p-6 bg-card rounded-2xl border border-border transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/20"
-                            >
-                                <div className={`p-3 rounded-xl ${category.color} mb-4 transition-transform group-hover:scale-110`}>
-                                    <category.icon className="h-6 w-6" />
-                                </div>
-                                <h3 className="text-xl font-semibold text-card-foreground mb-2 group-hover:text-primary transition-colors">
-                                    {category.title}
-                                </h3>
-                                <p className="text-muted-foreground">
-                                    {category.description}
-                                </p>
-                            </Link>
-                        ))}
+                    {/* Library Section */}
+                    <div>
+                        <h2 className="text-2xl font-serif font-semibold mb-6 flex items-center gap-2">
+                            <span className="bg-primary/10 p-2 rounded-lg text-primary">
+                                <FileText className="h-5 w-5" />
+                            </span>
+                            Library
+                        </h2>
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                            {libraryCategories.map((category) => (
+                                <Link
+                                    key={category.title}
+                                    href={category.href}
+                                    className="group relative flex flex-col items-start p-6 bg-card rounded-2xl border border-border transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/20"
+                                >
+                                    <div className={`p-3 rounded-xl ${category.color} mb-4 transition-transform group-hover:scale-110`}>
+                                        <category.icon className="h-6 w-6" />
+                                    </div>
+                                    <h3 className="text-xl font-semibold text-card-foreground mb-2 group-hover:text-primary transition-colors">
+                                        {category.title}
+                                    </h3>
+                                    <p className="text-muted-foreground text-sm">
+                                        {category.description}
+                                    </p>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Planner Section */}
+                    <div>
+                        <h2 className="text-2xl font-serif font-semibold mb-6 flex items-center gap-2">
+                            <span className="bg-primary/10 p-2 rounded-lg text-primary">
+                                <Calendar className="h-5 w-5" />
+                            </span>
+                            Planner
+                        </h2>
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2">
+                            {plannerCategories.map((category) => (
+                                <Link
+                                    key={category.title}
+                                    href={category.href}
+                                    className="group relative flex flex-col items-start p-6 bg-card rounded-2xl border border-border transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-primary/20"
+                                >
+                                    <div className={`p-3 rounded-xl ${category.color} mb-4 transition-transform group-hover:scale-110`}>
+                                        <category.icon className="h-6 w-6" />
+                                    </div>
+                                    <h3 className="text-xl font-semibold text-card-foreground mb-2 group-hover:text-primary transition-colors">
+                                        {category.title}
+                                    </h3>
+                                    <p className="text-muted-foreground text-sm">
+                                        {category.description}
+                                    </p>
+                                </Link>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
