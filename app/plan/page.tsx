@@ -1,40 +1,27 @@
-import { Activity, FileText, Microscope, PlayCircle } from "lucide-react";
+
+import { Calendar, Utensils } from "lucide-react";
 import Link from "next/link";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 
-const libraryCategories = [
+const plannerCategories = [
     {
-        title: "Articles",
-        description: "Read about the latest health trends and news.",
-        icon: FileText,
-        href: "/browse/articles",
-        color: "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400",
+        title: "Meal Plans",
+        description: "Structured plans to help you stay on track.",
+        icon: Calendar,
+        href: "/plan/meal-plans",
+        color: "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400",
     },
     {
-        title: "Videos",
-        description: "Watch tutorials, testimonials, and guides.",
-        icon: PlayCircle,
-        href: "/browse/videos",
-        color: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
-    },
-    {
-        title: "Scientific Studies",
-        description: "Research backing the power of Miracle Greens.",
-        icon: Microscope,
-        href: "/browse/studies",
-        color: "bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400",
-    },
-    {
-        title: "Nutritional Info",
-        description: "Detailed breakdown of Moringa's benefits.",
-        icon: Activity,
-        href: "/browse/nutrition",
-        color: "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400",
+        title: "Recipes",
+        description: "Delicious and healthy moringa-infused recipes.",
+        icon: Utensils,
+        href: "/plan/recipes",
+        color: "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400",
     },
 ];
 
-export default function BrowsePage() {
+export default function PlanPage() {
     return (
         <main className="min-h-screen flex flex-col">
             <Header />
@@ -42,17 +29,17 @@ export default function BrowsePage() {
                 <div className="max-w-7xl mx-auto space-y-16">
                     <div className="text-center">
                         <h1 className="text-4xl font-serif font-bold tracking-tight text-foreground sm:text-5xl">
-                            Resource Library
+                            Meal Planner
                         </h1>
                         <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-                            Explore our comprehensive collection of recipes, meal plans, nutritional information, and more to support your journey with Miracle Greens.
+                            Plan your journey to health with our curated meal plans and delicious recipes.
                         </p>
                     </div>
 
-                    {/* Library Section */}
+                    {/* Planner Section */}
                     <div>
-                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                            {libraryCategories.map((category) => (
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2">
+                            {plannerCategories.map((category) => (
                                 <Link
                                     key={category.title}
                                     href={category.href}
