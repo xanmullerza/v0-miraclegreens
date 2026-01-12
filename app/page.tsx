@@ -9,10 +9,10 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       <Header />
+      <MoringaMalnutrition />
       <WhyMoringa />
       <MoringaHistory />
       <MoringaNutrition />
-      <MoringaMalnutrition />
       {/* Testimonials temporarily removed from homepage */}
       <Footer />
     </main>
