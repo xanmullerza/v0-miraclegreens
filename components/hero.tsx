@@ -8,9 +8,6 @@ export function Hero() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-24 lg:py-32">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="max-w-xl">
-            <p className="text-sm font-medium text-primary uppercase tracking-wider mb-4">
-              Buy One, Give One
-            </p>
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground leading-tight text-balance">
               Nutrition for everyone
             </h1>
