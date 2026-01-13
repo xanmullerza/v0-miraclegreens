@@ -9,7 +9,7 @@ const journeySteps = [
     description: 'Quality powder from trusted growers',
     detail:
       'We currently partner with experienced moringa growers to source the highest quality leaf powder. This ensures our capsules deliver maximum nutritional benefit to those in need.',
-    image: '/moringa-powder-being-sourced-and-packaged-quality-.jpg',
+    image: '/cycle.jpg',
   },
   {
     icon: TreeDeciduous,
