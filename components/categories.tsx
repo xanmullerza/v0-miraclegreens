@@ -24,9 +24,9 @@ const journeySteps = [
     icon: Leaf,
     step: '03',
     name: 'Then: We Process',
-    description: 'End-to-end in-house production',
+    description: 'Diverse products, all in-house',
     detail:
-      'Processing our own trees means lower costs, higher quality, and the ability to distribute a bigger variety of products to communities fighting malnutrition.',
+      'With our own processing facility, we will expand beyond capsules to produce moringa oils, teas, soups, and more — all processed and packaged in-house.Lower costs, higher quality, and a complete range of products to combat malnutrition.',
     image: '/moringa-leaves-being-harvested-and-dried-green-pow.jpg',
   },
 ];
