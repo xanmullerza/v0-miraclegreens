@@ -14,7 +14,7 @@ const journeySteps = [
   {
     icon: TreeDeciduous,
     step: '02',
-    name: 'Vision: We Grow',
+    name: 'Next: We Grow',
     description: 'Our own sustainable moringa farm',
     detail:
       "With your help, we'll establish our own moringa plantation — giving us full control over quality, sustainability, and the ability to scale our impact exponentially.",
@@ -23,7 +23,7 @@ const journeySteps = [
   {
     icon: Leaf,
     step: '03',
-    name: 'Vision: We Process',
+    name: 'Next: We Process',
     description: 'End-to-end in-house production',
     detail:
       'Processing our own leaves means lower costs, higher quality, and the ability to distribute even more capsules to communities fighting malnutrition.',
