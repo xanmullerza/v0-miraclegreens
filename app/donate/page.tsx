@@ -12,9 +12,9 @@ export const metadata = {
 };
 
 const tiers = [
-  { name: 'R100', amount: 50, icon: Heart },
-  { name: 'R200', amount: 150, icon: Sun },
-  { name: 'R300', amount: 500, icon: Gift },
+  { name: 'R50', amount: 50, icon: Heart },
+  { name: 'R100', amount: 100, icon: Sun },
+  { name: 'R200', amount: 200, icon: Gift },
 ];
 
 export default function DonatePage() {
