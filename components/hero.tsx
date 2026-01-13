@@ -12,7 +12,7 @@ export function Hero() {
               Buy One, Give One
             </p>
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground leading-tight text-balance">
-              Your purchase feeds families in need
+              Nutrition for everyone
             </h1>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
               We sell premium moringa saplings and capsules to the public. Every purchase funds the
