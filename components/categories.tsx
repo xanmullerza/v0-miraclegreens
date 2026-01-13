@@ -3,7 +3,7 @@ import { Package, Leaf, TreeDeciduous } from 'lucide-react';
 
 const journeySteps = [
   {
-    icon: Package,
+    icon: Leaf,
     step: '01',
     name: 'Now: We Source',
     description: 'Quality powder from trusted growers',
@@ -21,7 +21,7 @@ const journeySteps = [
     image: '/moringa-tree-farm-plantation-sustainable-agricultu.jpg',
   },
   {
-    icon: Leaf,
+    icon: Package,
     step: '03',
     name: 'Then: We Process',
     description: 'Diverse products, all in-house',
