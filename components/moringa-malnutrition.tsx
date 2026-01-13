@@ -1,4 +1,6 @@
 import Image from 'next/image';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export function MoringaMalnutrition() {
     return (
@@ -35,6 +37,12 @@ export function MoringaMalnutrition() {
                             communities fighting hunger and malnutrition.
                         </p>
                     </div>
+                </div>
+
+                <div className="flex justify-center mt-12">
+                    <Button asChild size="lg" className="px-8">
+                        <Link href="/donate">Support Our Mission</Link>
+                    </Button>
                 </div>
             </div>
         </section>
