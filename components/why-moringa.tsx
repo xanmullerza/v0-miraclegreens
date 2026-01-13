@@ -14,7 +14,7 @@ const benefits = [
 		icon: Shield,
 		title: 'Immune Booster',
 		description:
-			'Rich in vitamin C, vitamin A, and iron to strengthen your body&apos;s natural defenses.',
+			"Rich in vitamin C, vitamin A, and iron to strengthen your body's natural defenses.",
 	},
 	{
 		icon: Zap,

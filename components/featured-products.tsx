@@ -57,7 +57,7 @@ const moringaBenefits = [
 const sponsorBenefits = [
   'Your tree produces leaves for 20+ years',
   'Each tree yields thousands of capsules annually',
-  'Full transparency on your tree&apos;s impact',
+  "Full transparency on your tree's impact",
   'Certificate of sponsorship with tree location',
   'Regular updates on harvest and distribution',
   'Your name on our Wall of Growth',

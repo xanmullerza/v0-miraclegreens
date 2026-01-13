@@ -7,21 +7,21 @@ const testimonials = [
     role: 'Community Health Director',
     image: '/african-woman-doctor-professional-headshot.jpg',
     content:
-      'The quality of Miracle Greens&apos; moringa capsules is exceptional. They&apos;ve clearly partnered with the best growers — and I can only imagine the impact once they&apos;re growing and processing their own trees.',
+      "The quality of Miracle Greens' moringa capsules is exceptional. They've clearly partnered with the best growers — and I can only imagine the impact once they're growing and processing their own trees.",
   },
   {
     name: 'Samuel Ndlovu',
     role: 'Moringa Supplier Partner',
     image: '/african-man-farmer-headshot.jpg',
     content:
-      'I&apos;ve been supplying moringa powder for years. Miracle Greens insists on the highest quality — only the best leaves, properly dried. Their vision to grow their own is the right next step.',
+      "I've been supplying moringa powder for years. Miracle Greens insists on the highest quality — only the best leaves, properly dried. Their vision to grow their own is the right next step.",
   },
   {
     name: 'Maria Santos',
     role: 'NGO Partner Coordinator',
     image: '/latina-woman-nonprofit-worker-headshot.jpg',
     content:
-      'The R500 Eternal Tree initiative is brilliant. It&apos;s not just a donation — sponsors become part of a sustainable solution that will keep producing nutrition for decades.',
+      "The R500 Eternal Tree initiative is brilliant. It's not just a donation — sponsors become part of a sustainable solution that will keep producing nutrition for decades.",
   },
 ];
 
