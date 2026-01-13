@@ -100,6 +100,11 @@ export function WhyMoringa() {
 					))}
 				</div>
 
+				<div className="flex justify-center mt-8">
+					<Button asChild size="lg" className="px-8">
+						<Link href="/browse">Find Out More</Link>
+					</Button>
+				</div>
 
 			</div>
 		</section>
