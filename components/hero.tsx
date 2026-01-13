@@ -21,7 +21,7 @@ export function Hero() {
             </p>
             <div className="mt-8">
               <Button size="lg" className="gap-2" asChild>
-                <a href="#shop">
+                <a href="/shop">
                   <ShoppingBag className="h-4 w-4" />
                   Shop Now
                 </a>
