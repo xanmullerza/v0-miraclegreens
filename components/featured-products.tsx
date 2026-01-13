@@ -109,7 +109,7 @@ export function FeaturedProducts() {
             <div className="relative">
               <div className="aspect-square rounded-2xl overflow-hidden bg-muted">
                 <Image
-                  src="/images/moringa-farm.svg"
+                  src="/forest.png"
                   alt="Our future moringa tree farm"
                   fill
                   className="object-cover"
