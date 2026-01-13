@@ -12,7 +12,7 @@ export function Hero() {
               Nutrition for everyone
             </h1>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              We sell premium moringa saplings and capsules to the public. Every purchase funds the
+              At Miracle Greens, we sell premium moringa saplings and capsules to the public. As a registered non-profit, every purchase funds the
               production and distribution of moringa capsules to families fighting malnutrition.
               Shop with purpose — your wellness supports their health.
             </p>
