@@ -66,7 +66,7 @@ export function Categories() {
                 </div>
                 {index > 0 && (
                   <span className="px-2 py-1 text-xs font-medium bg-accent text-accent-foreground rounded-full">
-                    Coming Soon
+                    {index === 1 ? 'Coming Soon' : 'Coming Later'}
                   </span>
                 )}
               </div>
