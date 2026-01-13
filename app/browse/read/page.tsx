@@ -37,12 +37,32 @@ export default function ReadPage() {
                         Articles, scientific studies, and nutritional information for the knowledge seekers.
                     </p>
 
-                    <div className="rounded-2xl border border-dashed border-border p-12 text-center bg-muted/30">
-                        <div className="max-w-md mx-auto">
-                            <h3 className="text-lg font-semibold mb-2">Library Under Construction</h3>
-                            <p className="text-muted-foreground">
-                                We are currently compiling and verifying scientific research and articles to ensure you get the most accurate information about Moringa. Check back soon.
-                            </p>
+                    <div className="grid gap-6">
+                        <div className="group relative bg-card p-6 rounded-2xl border border-border transition-all hover:shadow-lg">
+                            <div className="flex items-start justify-between gap-4">
+                                <div>
+                                    <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+                                        Complementary Feeding Practices and Childhood Malnutrition in South Africa
+                                    </h3>
+                                    <p className="text-muted-foreground mb-4 leading-relaxed">
+                                        A comprehensive narrative review exploring the potential of Moringa Oleifera leaf powder as a fortificant to fight childhood malnutrition. Published in <em>Nutrients</em> (2023).
+                                    </p>
+                                    <div className="flex items-center gap-4">
+                                        <Button variant="outline" size="sm" asChild>
+                                            <a href="/nutrients-15-02011.pdf" target="_blank" rel="noopener noreferrer">
+                                                <BookOpen className="mr-2 h-4 w-4" />
+                                                Read Paper
+                                            </a>
+                                        </Button>
+                                        <span className="text-xs text-muted-foreground">PDF • 335 KB</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Future placeholder */}
+                        <div className="rounded-2xl border border-dashed border-border p-8 text-center bg-muted/30 flex flex-col items-center justify-center">
+                            <p className="text-muted-foreground">More research papers coming soon...</p>
                         </div>
                     </div>
                 </div>
