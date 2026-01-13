@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { TreeDeciduous, Pill, ExternalLink } from 'lucide-react';
+import { TreeDeciduous, Pill, ExternalLink, Leaf } from 'lucide-react';
 
 const products = [
 	{
@@ -15,6 +15,15 @@ const products = [
 			'Care guide included',
 			'Grows in most climates',
 		],
+	},
+	{
+		icon: Leaf,
+		name: 'Moringa Powder',
+		description:
+			'Pure, nutrient-dense moringa leaf powder. Perfect for smoothies, soups, and daily wellness.',
+		price: 'R150',
+		image: '/moringa-powder-and-capsules-on-wooden-surface-with.jpg',
+		features: ['250g pack', '100% pure leaf', 'High nutrition boost'],
 	},
 	{
 		icon: Pill,
@@ -44,7 +53,7 @@ export function ShopSection() {
 					</p>
 				</div>
 
-				<div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+				<div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
 					{products.map((product) => (
 						<div
 							key={product.name}
