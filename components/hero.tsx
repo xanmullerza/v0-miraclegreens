@@ -33,22 +33,6 @@ export function Hero() {
                 </a>
               </Button>
             </div>
-            <div className="mt-12 flex items-center gap-8">
-              <div>
-                <p className="text-3xl font-semibold text-foreground">50k+</p>
-                <p className="text-sm text-muted-foreground">Capsules Donated</p>
-              </div>
-              <div className="h-12 w-px bg-border" />
-              <div>
-                <p className="text-3xl font-semibold text-foreground">1:1</p>
-                <p className="text-sm text-muted-foreground">Buy One, Give One</p>
-              </div>
-              <div className="h-12 w-px bg-border hidden sm:block" />
-              <div className="hidden sm:block">
-                <p className="text-3xl font-semibold text-foreground">100%</p>
-                <p className="text-sm text-muted-foreground">Profits to Mission</p>
-              </div>
-            </div>
           </div>
           <div className="relative">
             <div className="aspect-[4/5] rounded-2xl overflow-hidden bg-muted">
