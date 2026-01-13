@@ -12,9 +12,8 @@ export default function ShopPage() {
   return (
     <main className="min-h-screen bg-background">
       <Header />
-      <HowItWorks />
-
       <ShopSection />
+      <HowItWorks />
       <Footer />
     </main>
   );
