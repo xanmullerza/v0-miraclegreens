@@ -22,7 +22,7 @@ const products = [
 		description:
 			'Pure, nutrient-dense moringa leaf powder. Perfect for smoothies, soups, and daily wellness.',
 		price: 'R150',
-		image: '/moringa-powder-and-capsules-on-wooden-surface-with.jpg',
+		image: '/powder.png',
 		features: ['250g pack', '100% pure leaf', 'High nutrition boost'],
 	},
 	{
