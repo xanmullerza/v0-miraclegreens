@@ -23,10 +23,10 @@ const journeySteps = [
   {
     icon: Leaf,
     step: '03',
-    name: 'Next: We Process',
+    name: 'Then: We Process',
     description: 'End-to-end in-house production',
     detail:
-      'Processing our own leaves means lower costs, higher quality, and the ability to distribute even more capsules to communities fighting malnutrition.',
+      'Processing our own trees means lower costs, higher quality, and the ability to distribute a bigger variety of products to communities fighting malnutrition.',
     image: '/moringa-leaves-being-harvested-and-dried-green-pow.jpg',
   },
 ];
