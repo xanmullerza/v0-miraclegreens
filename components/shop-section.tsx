@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { TreeDeciduous, Pill, ExternalLink, Star } from 'lucide-react';
+import { TreeDeciduous, Pill, ExternalLink } from 'lucide-react';
 
 const products = [
 	{
@@ -15,8 +15,6 @@ const products = [
 			'Care guide included',
 			'Grows in most climates',
 		],
-		rating: 4.9,
-		reviews: 127,
 	},
 	{
 		icon: Pill,
@@ -26,8 +24,6 @@ const products = [
 		price: 'R100',
 		image: '/moringa-powder-and-capsules-on-wooden-surface-with.jpg', // use placeholder to avoid 404s until real image is added
 		features: ['60 capsules', '100% pure moringa', 'Lab tested quality'],
-		rating: 4.8,
-		reviews: 243,
 	},
 ];
 
@@ -63,17 +59,6 @@ export function ShopSection() {
 								/>
 							</div>
 							<div className="p-6">
-								<div className="flex items-center gap-2 mb-2">
-									<div className="flex items-center gap-1">
-										<Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-										<span className="text-sm font-medium">
-											{product.rating}
-										</span>
-									</div>
-									<span className="text-sm text-muted-foreground">
-										({product.reviews} reviews)
-									</span>
-								</div>
 								<h3 className="text-xl font-semibold text-foreground mb-2">
 									{product.name}
 								</h3>
