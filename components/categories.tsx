@@ -8,7 +8,7 @@ const journeySteps = [
     name: 'Now: We Source',
     description: 'Quality powder from trusted growers',
     detail:
-      'We currently partner with experienced moringa growers to source the highest quality leaf powder. This ensures our capsules deliver maximum nutritional benefit to those in need.',
+      'We currently partner with experienced moringa growers to source the highest quality leaf powder. This ensures that we deliver maximum nutritional benefit to those in need.',
     image: '/cycle.jpg',
   },
   {

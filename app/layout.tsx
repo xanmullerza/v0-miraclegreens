@@ -9,7 +9,7 @@ const _playfair = Playfair_Display({ subsets: ['latin'] });
 export const metadata = {
   title: 'Miracle Greens | Growing Hope Through Moringa',
   description:
-    'A nonprofit organization growing moringa trees to produce nutrient-rich moringa capsules for distribution to communities in need.',
+    'A nonprofit organization growing moringa trees to distribute nutrient-rich moringa powder to communities in need.',
   generator: 'v0.app',
   icons: {
     icon: [

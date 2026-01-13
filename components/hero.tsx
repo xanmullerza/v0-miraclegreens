@@ -12,8 +12,8 @@ export function Hero() {
               Nutrition for everyone
             </h1>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              At Miracle Greens, we sell premium moringa saplings and capsules to the public. As a registered non-profit, every purchase funds the
-              production and distribution of moringa capsules to families fighting malnutrition.
+              At Miracle Greens, we sell premium moringa saplings, capsules and powder to the public. As a registered non-profit, every purchase funds the
+              production and distribution of moringa powder to families fighting malnutrition.
               Shop with purpose — your wellness supports their health.
             </p>
             <div className="mt-8">
@@ -43,7 +43,7 @@ export function Hero() {
                 <div>
                   <p className="font-medium text-foreground">Every Sale Gives Back</p>
                   <p className="text-sm text-muted-foreground">
-                    Profits fund capsules for the needy
+                    Profits fund nutritious moringa leaf powder for the needy
                   </p>
                 </div>
               </div>

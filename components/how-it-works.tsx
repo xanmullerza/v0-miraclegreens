@@ -5,19 +5,19 @@ const steps = [
     icon: ShoppingBag,
     step: '01',
     title: 'You Shop',
-    description: 'Purchase moringa saplings or capsules from our store at affordable prices.',
+    description: 'Purchase moringa saplings, powder or capsules from our store at affordable prices.',
   },
   {
     icon: Factory,
     step: '02',
     title: 'We Produce',
-    description: 'Your purchase funds the production of additional moringa capsules for donation.',
+    description: 'Your purchase funds the distribution of moringa leaf powder to families and communities fighting malnutrition.',
   },
   {
     icon: Heart,
     step: '03',
     title: 'We Donate',
-    description: 'We distribute capsules to families and communities fighting malnutrition.',
+    description: 'We distribute moringa leaf powder to families and communities fighting malnutrition.',
   },
   {
     icon: Repeat,
