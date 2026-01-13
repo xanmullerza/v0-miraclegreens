@@ -19,17 +19,11 @@ export function Hero() {
               production and distribution of moringa capsules to families fighting malnutrition.
               Shop with purpose — your wellness supports their health.
             </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-4">
+            <div className="mt-8">
               <Button size="lg" className="gap-2" asChild>
                 <a href="#shop">
                   <ShoppingBag className="h-4 w-4" />
                   Shop Now
-                </a>
-              </Button>
-              <Button size="lg" variant="outline" className="gap-2 bg-transparent" asChild>
-                <a href="#how-it-works">
-                  See How It Works
-                  <ArrowRight className="h-4 w-4" />
                 </a>
               </Button>
             </div>
