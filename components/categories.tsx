@@ -26,7 +26,7 @@ const journeySteps = [
     name: 'Then: We Process',
     description: 'Diverse products, all in-house',
     detail:
-      'With our own processing facility, we will expand beyond capsules to produce moringa oils, teas, soups, and more — all processed and packaged in-house.Lower costs, higher quality, and a complete range of products to combat malnutrition.',
+      'With our own processing facility, we will expand beyond capsules to produce moringa oils, teas, soups, and more — all processed and packaged in-house, for a complete range of products to combat deficiency and malnutrition.',
     image: '/moringa-leaves-being-harvested-and-dried-green-pow.jpg',
   },
 ];
