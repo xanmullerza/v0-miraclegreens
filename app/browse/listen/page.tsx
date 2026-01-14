@@ -60,6 +60,28 @@ export default function ListenPage() {
                             </div>
                         </div>
 
+                        <div id="malnutrition-south-africa" className="group relative bg-card p-6 rounded-2xl border border-border transition-all hover:shadow-lg">
+                            <div className="flex flex-col sm:flex-row items-start gap-6">
+                                <div className="h-24 w-24 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
+                                    <Headphones className="h-10 w-10 text-purple-600 dark:text-purple-400" />
+                                </div>
+                                <div className="flex-1 w-full">
+                                    <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+                                        Moringa Powder Combats South African Malnutrition
+                                    </h3>
+                                    <p className="text-muted-foreground mb-4 leading-relaxed">
+                                        Focusing on the specific impact of Moringa leaf powder in fighting malnutrition among South African children.
+                                    </p>
+                                    <div className="w-full bg-muted/50 rounded-full p-2">
+                                        <audio controls className="w-full h-8">
+                                            <source src="/Moringa_Powder_Combats_South_African_Malnutrition.m4a" type="audio/x-m4a" />
+                                            Your browser does not support the audio element.
+                                        </audio>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Future placeholder */}
                         <div className="rounded-2xl border border-dashed border-border p-8 text-center bg-muted/30 flex flex-col items-center justify-center">
                             <p className="text-muted-foreground">More episodes coming soon...</p>

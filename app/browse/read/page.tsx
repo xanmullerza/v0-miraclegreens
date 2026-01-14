@@ -55,7 +55,7 @@ export default function ReadPage() {
                                             </a>
                                         </Button>
                                         <Button variant="secondary" size="sm" asChild>
-                                            <Link href="/browse/listen">
+                                            <Link href="/browse/listen#malnutrition-south-africa">
                                                 <Headphones className="mr-2 h-4 w-4" />
                                                 Listen to Podcast
                                             </Link>
