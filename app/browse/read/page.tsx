@@ -1,6 +1,6 @@
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
-import { BookOpen, ArrowLeft, Headphones } from 'lucide-react';
+import { BookOpen, ArrowLeft, Headphones, PlayCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
@@ -60,6 +60,12 @@ export default function ReadPage() {
                                                 Listen to Podcast
                                             </Link>
                                         </Button>
+                                        <Button variant="secondary" size="sm" asChild>
+                                            <Link href="/browse/watch">
+                                                <PlayCircle className="mr-2 h-4 w-4" />
+                                                Watch Video
+                                            </Link>
+                                        </Button>
                                         <span className="text-xs text-muted-foreground ml-1">PDF • 335 KB</span>
                                     </div>
                                 </div>
@@ -86,6 +92,12 @@ export default function ReadPage() {
                                             <Link href="/browse/listen#moringa-south-africa">
                                                 <Headphones className="mr-2 h-4 w-4" />
                                                 Listen to Podcast
+                                            </Link>
+                                        </Button>
+                                        <Button variant="secondary" size="sm" asChild>
+                                            <Link href="/browse/watch">
+                                                <PlayCircle className="mr-2 h-4 w-4" />
+                                                Watch Video
                                             </Link>
                                         </Button>
                                         <span className="text-xs text-muted-foreground ml-1">PDF • 415 KB</span>
