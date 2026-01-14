@@ -1,6 +1,6 @@
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
-import { BookOpen, ArrowLeft } from 'lucide-react';
+import { BookOpen, ArrowLeft, Headphones } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
@@ -47,14 +47,20 @@ export default function ReadPage() {
                                     <p className="text-muted-foreground mb-4 leading-relaxed">
                                         A comprehensive narrative review exploring the potential of Moringa Oleifera leaf powder as a fortificant to fight childhood malnutrition. Published in <em>Nutrients</em> (2023).
                                     </p>
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex flex-wrap items-center gap-3">
                                         <Button variant="outline" size="sm" asChild>
                                             <a href="/nutrients-15-02011.pdf" target="_blank" rel="noopener noreferrer">
                                                 <BookOpen className="mr-2 h-4 w-4" />
                                                 Read Paper
                                             </a>
                                         </Button>
-                                        <span className="text-xs text-muted-foreground">PDF • 335 KB</span>
+                                        <Button variant="secondary" size="sm" asChild>
+                                            <Link href="/browse/listen">
+                                                <Headphones className="mr-2 h-4 w-4" />
+                                                Listen to Podcast
+                                            </Link>
+                                        </Button>
+                                        <span className="text-xs text-muted-foreground ml-1">PDF • 335 KB</span>
                                     </div>
                                 </div>
                             </div>
@@ -69,14 +75,20 @@ export default function ReadPage() {
                                     <p className="text-muted-foreground mb-4 leading-relaxed">
                                         This review highlights research on growing conditions, production, processing, and the consumption of Moringa as a food source within South Africa.
                                     </p>
-                                    <div className="flex items-center gap-4">
+                                    <div className="flex flex-wrap items-center gap-3">
                                         <Button variant="outline" size="sm" asChild>
                                             <a href="/moringa_production_in_south_africa.pdf" target="_blank" rel="noopener noreferrer">
                                                 <BookOpen className="mr-2 h-4 w-4" />
                                                 Read Paper
                                             </a>
                                         </Button>
-                                        <span className="text-xs text-muted-foreground">PDF • 415 KB</span>
+                                        <Button variant="secondary" size="sm" asChild>
+                                            <Link href="/browse/listen">
+                                                <Headphones className="mr-2 h-4 w-4" />
+                                                Listen to Podcast
+                                            </Link>
+                                        </Button>
+                                        <span className="text-xs text-muted-foreground ml-1">PDF • 415 KB</span>
                                     </div>
                                 </div>
                             </div>
