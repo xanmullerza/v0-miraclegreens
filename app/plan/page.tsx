@@ -16,7 +16,8 @@ import {
     ChefHat,
     ShoppingBasket,
     Sparkles,
-    Download
+    Download,
+    Bean
 } from 'lucide-react';
 import {
     Sheet,
@@ -31,18 +32,31 @@ import { generateDailyPlan, DailyPlan, generateShoppingList, ShoppingItem } from
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
+// --- HELPERS ---
+const CAL_TO_KJ = 4.184;
+type UnitType = 'kcal' | 'kJ';
+
+const formatEnergy = (calories: number, unit: UnitType) => {
+    if (unit === 'kJ') {
+        return `${Math.round(calories * CAL_TO_KJ).toLocaleString()} kJ`;
+    }
+    return `${calories.toLocaleString()} kcal`;
+};
+
 // --- COMPONENTS ---
 
 const DietCard = ({
     type,
     selected,
     onClick,
-    icon: Icon
+    icon: Icon,
+    label
 }: {
     type: DietType,
     selected: boolean,
     onClick: () => void,
-    icon: any
+    icon: any,
+    label?: string
 }) => (
     <div
         onClick={onClick}
@@ -60,7 +74,7 @@ const DietCard = ({
             )}>
                 <Icon className="h-8 w-8" />
             </div>
-            <h3 className="font-bold capitalize text-lg">{type === 'anything' ? 'Anything Goes' : type}</h3>
+            <h3 className="font-bold capitalize text-lg whitespace-nowrap">{label || (type === 'anything' ? 'Anything Goes' : type)}</h3>
             {selected && (
                 <div className="absolute top-4 right-4 text-primary">
                     <Check className="h-6 w-6" />
@@ -70,7 +84,7 @@ const DietCard = ({
     </div>
 );
 
-const RecipeCard = ({ recipe, mealLabel }: { recipe: Recipe, mealLabel: string }) => (
+const RecipeCard = ({ recipe, mealLabel, unit = 'kcal' }: { recipe: Recipe, mealLabel: string, unit?: UnitType }) => (
     <div className="group relative bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-all animate-in fade-in zoom-in-95 duration-500 flex flex-col h-full">
         <div className="aspect-video relative overflow-hidden bg-muted flex-shrink-0">
             {/* Fallback pattern if no image */}
@@ -90,7 +104,7 @@ const RecipeCard = ({ recipe, mealLabel }: { recipe: Recipe, mealLabel: string }
             <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
                 <span className="flex items-center gap-1">
                     <Flame className="h-4 w-4 text-orange-500" />
-                    {recipe.calories} kcal
+                    {formatEnergy(recipe.calories, unit)}
                 </span>
                 <span className="flex items-center gap-1">
                     <Leaf className="h-4 w-4 text-green-500" />
@@ -122,7 +136,7 @@ const RecipeCard = ({ recipe, mealLabel }: { recipe: Recipe, mealLabel: string }
     </div>
 );
 
-const ShoppingList = ({ items }: { items: ShoppingItem[] }) => {
+const ShoppingList = ({ items, calories, unit = 'kcal' }: { items: ShoppingItem[], calories: number, unit?: UnitType }) => {
     return (
         <div className="space-y-6 py-6">
             <div className="bg-primary/5 rounded-xl p-6 border border-primary/20">
@@ -179,6 +193,7 @@ export default function MealPlannerPage() {
     const [calories, setCalories] = useState(2000);
     const [diet, setDiet] = useState<DietType>('anything');
     const [mealsCount, setMealsCount] = useState(3);
+    const [unit, setUnit] = useState<UnitType>('kcal');
 
     const handleGenerate = () => {
         setGenerating(true);
@@ -200,6 +215,13 @@ export default function MealPlannerPage() {
     };
 
     const shoppingList = plan ? generateShoppingList(plan) : [];
+
+    // Helper for calorie display during step 1
+    const displayCalories = unit === 'kJ' ? Math.round(calories * CAL_TO_KJ) : calories;
+    const minCal = 1200;
+    const maxCal = 4000;
+    const displayMin = unit === 'kJ' ? Math.round(minCal * CAL_TO_KJ) : minCal;
+    const displayMax = unit === 'kJ' ? Math.round(maxCal * CAL_TO_KJ) : maxCal;
 
     return (
         <main className="min-h-screen flex flex-col bg-background">
@@ -226,7 +248,7 @@ export default function MealPlannerPage() {
                                         <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
                                         Choose your diet style
                                     </h2>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                                         <DietCard
                                             type="anything" selected={diet === 'anything'}
                                             onClick={() => setDiet('anything')} icon={Utensils}
@@ -234,6 +256,10 @@ export default function MealPlannerPage() {
                                         <DietCard
                                             type="vegan" selected={diet === 'vegan'}
                                             onClick={() => setDiet('vegan')} icon={Leaf}
+                                        />
+                                        <DietCard
+                                            type="vegetarian" selected={diet === 'vegetarian'}
+                                            onClick={() => setDiet('vegetarian')} icon={Bean}
                                         />
                                         <DietCard
                                             type="keto" selected={diet === 'keto'}
@@ -252,16 +278,42 @@ export default function MealPlannerPage() {
                                         Set your targets
                                     </h2>
 
-                                    <div className="space-y-6">
-                                        <div>
+                                    <div className="space-y-8">
+                                        <div className="bg-muted/30 p-4 rounded-xl border border-border/50">
+                                            <div className="flex justify-between items-center mb-4">
+                                                <Label className="text-base font-medium">Daily Energy Goal</Label>
+                                                <div className="bg-background border border-input rounded-lg p-1 flex">
+                                                    <button
+                                                        onClick={() => setUnit('kcal')}
+                                                        className={cn(
+                                                            "px-3 py-1 text-xs font-semibold rounded-md transition-colors",
+                                                            unit === 'kcal' ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted"
+                                                        )}
+                                                    >
+                                                        Calories
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setUnit('kJ')}
+                                                        className={cn(
+                                                            "px-3 py-1 text-xs font-semibold rounded-md transition-colors",
+                                                            unit === 'kJ' ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted"
+                                                        )}
+                                                    >
+                                                        Kilojoules
+                                                    </button>
+                                                </div>
+                                            </div>
                                             <div className="flex justify-between mb-2">
-                                                <Label className="text-base font-medium">Daily Calories</Label>
-                                                <span className="font-bold text-primary text-lg">{calories} kcal</span>
+                                                <span className="text-xs text-muted-foreground">Min: {displayMin}</span>
+                                                <span className="font-bold text-primary text-2xl">
+                                                    {displayCalories} <span className="text-sm font-normal text-muted-foreground">{unit}</span>
+                                                </span>
+                                                <span className="text-xs text-muted-foreground">Max: {displayMax}</span>
                                             </div>
                                             <input
                                                 type="range"
-                                                min="1200"
-                                                max="4000"
+                                                min={minCal}
+                                                max={maxCal}
                                                 step="50"
                                                 value={calories}
                                                 onChange={(e) => setCalories(parseInt(e.target.value))}
@@ -310,7 +362,7 @@ export default function MealPlannerPage() {
                                         <div>
                                             <h2 className="text-3xl font-bold mb-2">Ready to cook?</h2>
                                             <p className="text-muted-foreground">
-                                                We'll generate a <strong>{diet}</strong> plan with roughly <strong>{calories}</strong> calories across <strong>{mealsCount}</strong> meals.
+                                                We'll generate a <strong>{diet}</strong> plan with roughly <strong>{formatEnergy(calories, unit)}</strong> across <strong>{mealsCount}</strong> meals.
                                             </p>
                                         </div>
                                         <Button size="lg" onClick={handleGenerate} className="w-full h-14 text-lg rounded-xl">
@@ -339,8 +391,8 @@ export default function MealPlannerPage() {
                                 <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 bg-muted/30 rounded-2xl border border-border/50">
                                     <div className="flex items-center gap-4">
                                         <div className="text-center">
-                                            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Calories</p>
-                                            <p className="text-3xl font-bold text-foreground">{plan.totalCalories}</p>
+                                            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Energy</p>
+                                            <p className="text-3xl font-bold text-foreground">{formatEnergy(plan.totalCalories, unit)}</p>
                                         </div>
                                         <div className="h-12 w-px bg-border mx-2"></div>
                                         <div className="space-y-1 text-sm text-muted-foreground">
@@ -363,17 +415,17 @@ export default function MealPlannerPage() {
                                 {/* Meal Grid */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-24 md:pb-0">
                                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-0 fill-mode-backwards">
-                                        <RecipeCard recipe={plan.breakfast} mealLabel="Breakfast" />
+                                        <RecipeCard recipe={plan.breakfast} mealLabel="Breakfast" unit={unit} />
                                     </div>
                                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 fill-mode-backwards">
-                                        <RecipeCard recipe={plan.lunch} mealLabel="Lunch" />
+                                        <RecipeCard recipe={plan.lunch} mealLabel="Lunch" unit={unit} />
                                     </div>
                                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-backwards">
-                                        <RecipeCard recipe={plan.dinner} mealLabel="Dinner" />
+                                        <RecipeCard recipe={plan.dinner} mealLabel="Dinner" unit={unit} />
                                     </div>
                                     {plan.snacks.map((snack, i) => (
                                         <div key={i} className={`animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-backwards delay-[${(i + 3) * 100}ms]`}>
-                                            <RecipeCard recipe={snack} mealLabel={`Snack ${i + 1}`} />
+                                            <RecipeCard recipe={snack} mealLabel={`Snack ${i + 1}`} unit={unit} />
                                         </div>
                                     ))}
                                 </div>
@@ -391,10 +443,10 @@ export default function MealPlannerPage() {
                                             <SheetHeader className="text-left">
                                                 <SheetTitle>Your Shopping List</SheetTitle>
                                                 <SheetDescription>
-                                                    Everything you need for your {calories} calorie plan.
+                                                    Everything you need for your {formatEnergy(calories, unit)} plan.
                                                 </SheetDescription>
                                             </SheetHeader>
-                                            <ShoppingList items={shoppingList} />
+                                            <ShoppingList items={shoppingList} calories={calories} unit={unit} />
                                             <div className="mt-8 pt-6 border-t border-border pb-8 md:pb-0">
                                                 <Button className="w-full gap-2" variant="outline" onClick={() => window.print()}>
                                                     <Download className="h-4 w-4" />
