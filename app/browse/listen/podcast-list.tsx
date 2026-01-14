@@ -47,7 +47,7 @@ export function PodcastList() {
                     </div>
                     <div className="flex-1 w-full">
                         <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                            Moringa: The Miracle Tree in South Africa
+                            Moringa oleifera in South Africa: A Review on Production & Consumption
                         </h3>
                         <p className="text-muted-foreground mb-4 leading-relaxed">
                             A deep dive into how Moringa Oleifera is transforming health and agriculture across South Africa. Learn about its origins, benefits, and the community impact.
@@ -80,7 +80,7 @@ export function PodcastList() {
                     </div>
                     <div className="flex-1 w-full">
                         <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                            Moringa Powder Combats South African Malnutrition
+                            Complementary Feeding Practices and Childhood Malnutrition in South Africa
                         </h3>
                         <p className="text-muted-foreground mb-4 leading-relaxed">
                             Focusing on the specific impact of Moringa leaf powder in fighting malnutrition among South African children.
