@@ -37,12 +37,29 @@ export default function WatchPage() {
                         Video tutorials, testimonials, and visual guides for hands-on learners.
                     </p>
 
-                    <div className="rounded-2xl border border-dashed border-border p-12 text-center bg-muted/30">
-                        <div className="max-w-md mx-auto">
-                            <h3 className="text-lg font-semibold mb-2">Video Content Coming Soon</h3>
-                            <p className="text-muted-foreground">
-                                We are filming comprehensive guides on planting, processing, and using Moringa. Stay tuned for our visual library.
-                            </p>
+                    <div className="grid gap-6">
+                        <div className="group relative bg-card p-6 rounded-2xl border border-border transition-all hover:shadow-lg">
+                            <div className="flex flex-col gap-4">
+                                <div>
+                                    <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+                                        The Moringa Solution
+                                    </h3>
+                                    <p className="text-muted-foreground mb-4 leading-relaxed">
+                                        See the impact firsthand. This short film explores how we are using the "Miracle Tree" to combat malnutrition and build sustainable food systems in South Africa.
+                                    </p>
+                                </div>
+                                <div className="w-full aspect-video bg-muted rounded-xl overflow-hidden relative">
+                                    <video controls className="w-full h-full object-cover">
+                                        <source src="/The_Moringa_Solution.mp4" type="video/mp4" />
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Future placeholder */}
+                        <div className="rounded-2xl border border-dashed border-border p-8 text-center bg-muted/30 flex flex-col items-center justify-center">
+                            <p className="text-muted-foreground">More videos coming soon...</p>
                         </div>
                     </div>
                 </div>
