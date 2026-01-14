@@ -57,6 +57,25 @@ export default function WatchPage() {
                             </div>
                         </div>
 
+                        <div className="group relative bg-card p-6 rounded-2xl border border-border transition-all hover:shadow-lg">
+                            <div className="flex flex-col gap-4">
+                                <div>
+                                    <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+                                        The Miracle Tree
+                                    </h3>
+                                    <p className="text-muted-foreground mb-4 leading-relaxed">
+                                        Discover the incredible potential of the Moringa tree. Learn about its nutritional benefits and why it represents hope for sustainable nutrition.
+                                    </p>
+                                </div>
+                                <div className="w-full aspect-video bg-muted rounded-xl overflow-hidden relative">
+                                    <video controls className="w-full h-full object-cover">
+                                        <source src="/The_Miracle_Tree.mp4" type="video/mp4" />
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Future placeholder */}
                         <div className="rounded-2xl border border-dashed border-border p-8 text-center bg-muted/30 flex flex-col items-center justify-center">
                             <p className="text-muted-foreground">More videos coming soon...</p>
