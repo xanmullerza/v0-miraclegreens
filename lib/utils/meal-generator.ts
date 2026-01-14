@@ -112,3 +112,40 @@ export const generateDailyPlan = (settings: PlanSettings): DailyPlan => {
 
     return bestPlan;
 };
+
+export interface ShoppingItem {
+    name: string;
+    amounts: string[];
+    isMiracleProduct: boolean;
+}
+
+export const generateShoppingList = (plan: DailyPlan): ShoppingItem[] => {
+    const allIngredients = [
+        ...plan.breakfast.ingredients,
+        ...plan.lunch.ingredients,
+        ...plan.dinner.ingredients,
+        ...plan.snacks.flatMap(s => s.ingredients)
+    ];
+
+    const itemMap = new Map<string, ShoppingItem>();
+
+    allIngredients.forEach(ing => {
+        const existing = itemMap.get(ing.item);
+        if (existing) {
+            existing.amounts.push(ing.amount);
+        } else {
+            itemMap.set(ing.item, {
+                name: ing.item,
+                amounts: [ing.amount],
+                isMiracleProduct: ing.isMiracleProduct || false
+            });
+        }
+    });
+
+    return Array.from(itemMap.values()).sort((a, b) => {
+        // Miracle products first, then alphabetical
+        if (a.isMiracleProduct && !b.isMiracleProduct) return -1;
+        if (!a.isMiracleProduct && b.isMiracleProduct) return 1;
+        return a.name.localeCompare(b.name);
+    });
+};

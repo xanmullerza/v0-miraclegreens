@@ -14,11 +14,22 @@ import {
     ChevronRight,
     RotateCcw,
     ChefHat,
-    ShoppingBasket
+    ShoppingBasket,
+    Sparkles,
+    Download
 } from 'lucide-react';
+import {
+    Sheet,
+    SheetContent,
+    SheetDescription,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet"
 import { DietType, Recipe } from '@/lib/data/recipes';
-import { generateDailyPlan, DailyPlan } from '@/lib/utils/meal-generator';
+import { generateDailyPlan, DailyPlan, generateShoppingList, ShoppingItem } from '@/lib/utils/meal-generator';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 // --- COMPONENTS ---
 
@@ -60,8 +71,8 @@ const DietCard = ({
 );
 
 const RecipeCard = ({ recipe, mealLabel }: { recipe: Recipe, mealLabel: string }) => (
-    <div className="group relative bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-all animate-in fade-in zoom-in-95 duration-500">
-        <div className="aspect-video relative overflow-hidden bg-muted">
+    <div className="group relative bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-all animate-in fade-in zoom-in-95 duration-500 flex flex-col h-full">
+        <div className="aspect-video relative overflow-hidden bg-muted flex-shrink-0">
             {/* Fallback pattern if no image */}
             <div className="absolute inset-0 bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-muted-foreground">
                 {recipe.image ? (
@@ -74,7 +85,7 @@ const RecipeCard = ({ recipe, mealLabel }: { recipe: Recipe, mealLabel: string }
                 {mealLabel}
             </div>
         </div>
-        <div className="p-5">
+        <div className="p-5 flex flex-col flex-grow">
             <h4 className="font-bold text-lg mb-2 line-clamp-1">{recipe.title}</h4>
             <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
                 <span className="flex items-center gap-1">
@@ -86,14 +97,23 @@ const RecipeCard = ({ recipe, mealLabel }: { recipe: Recipe, mealLabel: string }
                     {recipe.protein}g protein
                 </span>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 mt-auto">
                 {recipe.ingredients.slice(0, 3).map((ing, i) => (
-                    <span key={i} className="text-xs bg-muted px-2 py-1 rounded-md">
+                    <span
+                        key={i}
+                        className={cn(
+                            "text-xs px-2 py-1 rounded-md border",
+                            ing.isMiracleProduct
+                                ? "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800 font-medium"
+                                : "bg-muted text-muted-foreground border-transparent"
+                        )}
+                    >
+                        {ing.isMiracleProduct && <Sparkles className="inline-block h-3 w-3 mr-1" />}
                         {ing.item}
                     </span>
                 ))}
                 {recipe.ingredients.length > 3 && (
-                    <span className="text-xs bg-muted px-2 py-1 rounded-md">
+                    <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-md border border-transparent">
                         +{recipe.ingredients.length - 3} more
                     </span>
                 )}
@@ -101,6 +121,54 @@ const RecipeCard = ({ recipe, mealLabel }: { recipe: Recipe, mealLabel: string }
         </div>
     </div>
 );
+
+const ShoppingList = ({ items }: { items: ShoppingItem[] }) => {
+    return (
+        <div className="space-y-6 py-6">
+            <div className="bg-primary/5 rounded-xl p-6 border border-primary/20">
+                <h4 className="font-bold text-lg mb-4 flex items-center gap-2 text-primary">
+                    <Sparkles className="h-5 w-5" />
+                    Miracle Essentials
+                </h4>
+                <div className="space-y-3">
+                    {items.filter(i => i.isMiracleProduct).map((item, idx) => (
+                        <div key={idx} className="flex items-center justify-between bg-background p-3 rounded-lg border border-primary/20 shadow-sm">
+                            <span className="font-medium text-foreground">{item.name}</span>
+                            <div className="flex items-center gap-3">
+                                <span className="text-sm text-muted-foreground bg-muted px-2 py-1 rounded">
+                                    {item.amounts.join(' + ')}
+                                </span>
+                                <Button size="sm" variant="secondary" className="h-8" asChild>
+                                    <Link href="/shop">Buy Now</Link>
+                                </Button>
+                            </div>
+                        </div>
+                    ))}
+                    {items.filter(i => i.isMiracleProduct).length === 0 && (
+                        <p className="text-muted-foreground text-sm italic">No Miracle products in this plan. Try checking out our shop for supplements!</p>
+                    )}
+                </div>
+            </div>
+
+            <div>
+                <h4 className="font-bold text-lg mb-4 text-foreground flex items-center gap-2">
+                    <ShoppingBasket className="h-5 w-5" />
+                    Grocery Items
+                </h4>
+                <div className="divide-y divide-border rounded-xl border border-border bg-card">
+                    {items.filter(i => !i.isMiracleProduct).map((item, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-4">
+                            <span className="text-foreground">{item.name}</span>
+                            <span className="text-sm text-muted-foreground bg-muted px-2 py-1 rounded">
+                                {item.amounts.join(' + ')}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+};
 
 export default function MealPlannerPage() {
     const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -130,6 +198,8 @@ export default function MealPlannerPage() {
     const handleRegenerate = () => {
         handleGenerate();
     };
+
+    const shoppingList = plan ? generateShoppingList(plan) : [];
 
     return (
         <main className="min-h-screen flex flex-col bg-background">
@@ -291,21 +361,48 @@ export default function MealPlannerPage() {
                                 </div>
 
                                 {/* Meal Grid */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                                    <RecipeCard recipe={plan.breakfast} mealLabel="Breakfast" />
-                                    <RecipeCard recipe={plan.lunch} mealLabel="Lunch" />
-                                    <RecipeCard recipe={plan.dinner} mealLabel="Dinner" />
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-24 md:pb-0">
+                                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-0 fill-mode-backwards">
+                                        <RecipeCard recipe={plan.breakfast} mealLabel="Breakfast" />
+                                    </div>
+                                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 fill-mode-backwards">
+                                        <RecipeCard recipe={plan.lunch} mealLabel="Lunch" />
+                                    </div>
+                                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-backwards">
+                                        <RecipeCard recipe={plan.dinner} mealLabel="Dinner" />
+                                    </div>
                                     {plan.snacks.map((snack, i) => (
-                                        <RecipeCard key={i} recipe={snack} mealLabel={`Snack ${i + 1}`} />
+                                        <div key={i} className={`animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-backwards delay-[${(i + 3) * 100}ms]`}>
+                                            <RecipeCard recipe={snack} mealLabel={`Snack ${i + 1}`} />
+                                        </div>
                                     ))}
                                 </div>
 
-                                {/* Actions */}
-                                <div className="flex justify-center pt-8">
-                                    <Button size="lg" className="rounded-full shadow-lg h-16 px-10 gap-3 text-lg bg-green-600 hover:bg-green-700">
-                                        <ShoppingBasket className="h-6 w-6" />
-                                        Get Grocery List
-                                    </Button>
+                                {/* Actions - Desktop (Standard) / Mobile (Sticky Bottom) */}
+                                <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-md border-t border-border md:static md:bg-transparent md:border-t-0 md:p-0 z-10 flex justify-center md:pt-8">
+                                    <Sheet>
+                                        <SheetTrigger asChild>
+                                            <Button size="lg" className="w-full md:w-auto rounded-full shadow-lg h-14 md:h-16 px-6 md:px-10 gap-3 text-lg bg-green-600 hover:bg-green-700 transition-all hover:scale-105 active:scale-95">
+                                                <ShoppingBasket className="h-5 w-5 md:h-6 md:w-6" />
+                                                Get Grocery List
+                                            </Button>
+                                        </SheetTrigger>
+                                        <SheetContent className="overflow-y-auto w-full sm:max-w-md">
+                                            <SheetHeader className="text-left">
+                                                <SheetTitle>Your Shopping List</SheetTitle>
+                                                <SheetDescription>
+                                                    Everything you need for your {calories} calorie plan.
+                                                </SheetDescription>
+                                            </SheetHeader>
+                                            <ShoppingList items={shoppingList} />
+                                            <div className="mt-8 pt-6 border-t border-border pb-8 md:pb-0">
+                                                <Button className="w-full gap-2" variant="outline" onClick={() => window.print()}>
+                                                    <Download className="h-4 w-4" />
+                                                    Print / Save Plan
+                                                </Button>
+                                            </div>
+                                        </SheetContent>
+                                    </Sheet>
                                 </div>
 
                             </div>
