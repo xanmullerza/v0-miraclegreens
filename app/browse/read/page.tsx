@@ -60,6 +60,28 @@ export default function ReadPage() {
                             </div>
                         </div>
 
+                        <div className="group relative bg-card p-6 rounded-2xl border border-border transition-all hover:shadow-lg">
+                            <div className="flex items-start justify-between gap-4">
+                                <div>
+                                    <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+                                        Moringa oleifera in South Africa: A Review on Production & Consumption
+                                    </h3>
+                                    <p className="text-muted-foreground mb-4 leading-relaxed">
+                                        This review highlights research on growing conditions, production, processing, and the consumption of Moringa as a food source within South Africa.
+                                    </p>
+                                    <div className="flex items-center gap-4">
+                                        <Button variant="outline" size="sm" asChild>
+                                            <a href="/moringa_production_in_south_africa.pdf" target="_blank" rel="noopener noreferrer">
+                                                <BookOpen className="mr-2 h-4 w-4" />
+                                                Read Paper
+                                            </a>
+                                        </Button>
+                                        <span className="text-xs text-muted-foreground">PDF • 415 KB</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Future placeholder */}
                         <div className="rounded-2xl border border-dashed border-border p-8 text-center bg-muted/30 flex flex-col items-center justify-center">
                             <p className="text-muted-foreground">More research papers coming soon...</p>
