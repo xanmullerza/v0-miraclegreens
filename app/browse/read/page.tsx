@@ -61,7 +61,7 @@ export default function ReadPage() {
                                             </Link>
                                         </Button>
                                         <Button variant="secondary" size="sm" asChild>
-                                            <Link href="/browse/watch">
+                                            <Link href="/browse/watch#malnutrition-south-africa">
                                                 <PlayCircle className="mr-2 h-4 w-4" />
                                                 Watch Video
                                             </Link>
@@ -95,7 +95,7 @@ export default function ReadPage() {
                                             </Link>
                                         </Button>
                                         <Button variant="secondary" size="sm" asChild>
-                                            <Link href="/browse/watch">
+                                            <Link href="/browse/watch#moringa-south-africa">
                                                 <PlayCircle className="mr-2 h-4 w-4" />
                                                 Watch Video
                                             </Link>
