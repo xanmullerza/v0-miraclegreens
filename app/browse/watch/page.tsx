@@ -42,7 +42,7 @@ export default function WatchPage() {
                             <div className="flex flex-col gap-4">
                                 <div>
                                     <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                                        The Moringa Solution
+                                        Complementary Feeding Practices and Childhood Malnutrition in South Africa
                                     </h3>
                                     <p className="text-muted-foreground mb-4 leading-relaxed">
                                         See the impact firsthand. This short film explores how we are using the "Miracle Tree" to combat malnutrition and build sustainable food systems in South Africa.
@@ -61,7 +61,7 @@ export default function WatchPage() {
                             <div className="flex flex-col gap-4">
                                 <div>
                                     <h3 className="text-xl font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-                                        The Miracle Tree
+                                        Moringa oleifera in South Africa: A Review on Production & Consumption
                                     </h3>
                                     <p className="text-muted-foreground mb-4 leading-relaxed">
                                         Discover the incredible potential of the Moringa tree. Learn about its nutritional benefits and why it represents hope for sustainable nutrition.
