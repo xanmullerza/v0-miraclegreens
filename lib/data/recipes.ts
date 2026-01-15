@@ -1,4 +1,4 @@
-export type DietType = 'anything' | 'vegan' | 'vegetarian' | 'keto' | 'paleo';
+export type DietType = 'anything' | 'vegan' | 'vegetarian';
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
 export interface Ingredient {
@@ -32,7 +32,7 @@ export const RECIPES: Recipe[] = [
         protein: 24,
         carbs: 45,
         fat: 6,
-        diet: ['vegan', 'vegetarian', 'paleo', 'anything'],
+        diet: ['vegan', 'vegetarian', 'anything'],
         image: '/images/recipes/green-smoothie.jpg',
         prepTime: 5,
         ingredients: [
@@ -46,13 +46,13 @@ export const RECIPES: Recipe[] = [
     },
     {
         id: 'b2',
-        title: 'Keto Avocado & Egg Bowl',
+        title: 'Avocado & Egg Bowl',
         type: 'breakfast',
         calories: 450,
         protein: 22,
         carbs: 8,
         fat: 35,
-        diet: ['keto', 'paleo', 'vegetarian', 'anything'],
+        diet: ['vegetarian', 'anything'],
         image: '/images/recipes/keto-eggs.jpg',
         prepTime: 10,
         ingredients: [
@@ -112,7 +112,7 @@ export const RECIPES: Recipe[] = [
         protein: 45,
         carbs: 10,
         fat: 25,
-        diet: ['keto', 'paleo', 'anything'],
+        diet: ['anything'],
         image: '/images/recipes/chicken-veg.jpg',
         prepTime: 25,
         ingredients: [
@@ -152,7 +152,7 @@ export const RECIPES: Recipe[] = [
         protein: 40,
         carbs: 8,
         fat: 42,
-        diet: ['keto', 'paleo', 'anything'],
+        diet: ['anything'],
         image: '/images/recipes/salmon.jpg',
         prepTime: 20,
         ingredients: [
@@ -173,7 +173,7 @@ export const RECIPES: Recipe[] = [
         protein: 6,
         carbs: 15,
         fat: 12,
-        diet: ['vegan', 'vegetarian', 'paleo', 'anything'],
+        diet: ['vegan', 'vegetarian', 'anything'],
         image: '/images/recipes/energy-balls.jpg',
         prepTime: 10,
         ingredients: [
@@ -191,7 +191,7 @@ export const RECIPES: Recipe[] = [
         protein: 15,
         carbs: 10,
         fat: 0,
-        diet: ['anything', 'keto', 'vegetarian'],
+        diet: ['anything', 'vegetarian'],
         image: '/images/recipes/yogurt.jpg',
         prepTime: 2,
         ingredients: [
@@ -208,7 +208,7 @@ export const RECIPES: Recipe[] = [
         protein: 12,
         carbs: 1,
         fat: 10,
-        diet: ['keto', 'paleo', 'vegetarian', 'anything'],
+        diet: ['vegetarian', 'anything'],
         image: '/images/recipes/eggs.jpg',
         prepTime: 10,
         ingredients: [

@@ -248,7 +248,7 @@ export default function MealPlannerPage() {
                                         <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
                                         Choose your diet style
                                     </h2>
-                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3">
                                         <DietCard
                                             type="anything" selected={diet === 'anything'}
                                             onClick={() => setDiet('anything')} icon={Utensils}
@@ -261,14 +261,7 @@ export default function MealPlannerPage() {
                                             type="vegetarian" selected={diet === 'vegetarian'}
                                             onClick={() => setDiet('vegetarian')} icon={Bean}
                                         />
-                                        <DietCard
-                                            type="keto" selected={diet === 'keto'}
-                                            onClick={() => setDiet('keto')} icon={Flame}
-                                        />
-                                        <DietCard
-                                            type="paleo" selected={diet === 'paleo'}
-                                            onClick={() => setDiet('paleo')} icon={ChefHat}
-                                        />
+
                                     </div>
                                 </div>
 
