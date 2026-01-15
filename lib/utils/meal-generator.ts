@@ -32,12 +32,15 @@ const getRandom = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)
 export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPlan> => {
     const { targetCalories, diet, numMeals } = settings;
 
-    // Fetch all recipes from Supabase with their related data
+    // Fetch all recipes from Supabase with their related data AND linked food items
     const { data: recipesData, error } = await supabase
         .from('recipes')
         .select(`
             *,
-            ingredients (*),
+            ingredients (
+                *,
+                food_items (*)
+            ),
             instructions (*)
         `);
 
@@ -46,27 +49,61 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
         throw new Error('Failed to fetch recipes');
     }
 
-    // Transform Supabase data to match Recipe interface (handling snake_case to camelCase where needed)
-    // Note: Our DB columns match the Recipe interface largely, but check nested arrays.
-    // The query returns ingredients as an array attached to the recipe object.
-    const allRecipes: Recipe[] = recipesData.map((r: any) => ({
-        id: r.id,
-        title: r.title,
-        type: r.type,
-        calories: r.calories,
-        protein: r.protein,
-        carbs: r.carbs,
-        fat: r.fat,
-        diet: r.diet, // Text array matches
-        image: r.image,
-        prepTime: r.prep_time,
-        ingredients: r.ingredients.map((i: any) => ({
-            item: i.item,
-            amount: i.amount,
-            isMiracleProduct: i.is_miracle_product
-        })),
-        instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text)
-    }));
+    // Helper function to calculate nutrition from ingredients
+    const calculateNutrition = (ingredients: any[]) => {
+        let totalCalories = 0;
+        let totalProtein = 0;
+        let totalCarbs = 0;
+        let totalFat = 0;
+
+        for (const ing of ingredients) {
+            // If ingredient is linked to food_items, calculate from there
+            if (ing.food_items && ing.weight_g) {
+                const foodItem = ing.food_items;
+                const ratio = ing.weight_g / 100; // Convert to per-100g basis
+
+                totalCalories += (foodItem.energy_kcal || 0) * ratio;
+                totalProtein += (foodItem.protein_g || 0) * ratio;
+                totalCarbs += (foodItem.carbs_g || 0) * ratio;
+                totalFat += (foodItem.fat_g || 0) * ratio;
+            }
+            // Otherwise, we have no data - this ingredient doesn't contribute
+            // (In the future, you could fall back to stored recipe values or throw a warning)
+        }
+
+        return {
+            calories: totalCalories,
+            protein: totalProtein,
+            carbs: totalCarbs,
+            fat: totalFat
+        };
+    };
+
+    // Transform Supabase data to match Recipe interface
+    // IMPORTANT: Nutrition is now CALCULATED from ingredients, not stored values
+    const allRecipes: Recipe[] = recipesData.map((r: any) => {
+        const calculatedNutrition = calculateNutrition(r.ingredients);
+
+        return {
+            id: r.id,
+            title: r.title,
+            type: r.type,
+            // Use calculated values if available, otherwise fall back to stored values
+            calories: calculatedNutrition.calories || r.calories || 0,
+            protein: calculatedNutrition.protein || r.protein || 0,
+            carbs: calculatedNutrition.carbs || r.carbs || 0,
+            fat: calculatedNutrition.fat || r.fat || 0,
+            diet: r.diet,
+            image: r.image,
+            prepTime: r.prep_time,
+            ingredients: r.ingredients.map((i: any) => ({
+                item: i.item,
+                amount: i.amount,
+                isMiracleProduct: i.is_miracle_product
+            })),
+            instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text)
+        };
+    });
 
     // Filter helper
     const getRecipesByDiet = (params: { startRecipes: Recipe[], diet: DietType, type?: Recipe['type'] }) => {
