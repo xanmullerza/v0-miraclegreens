@@ -358,7 +358,7 @@ export default function MealPlannerPage() {
                                                     onClick={() => setGender('male')}
                                                     className={cn(
                                                         "flex-1 py-2 text-sm font-medium rounded-md transition-all",
-                                                        gender === 'male' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                                                        gender === 'male' ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted/50"
                                                     )}
                                                 >
                                                     Male
@@ -367,7 +367,7 @@ export default function MealPlannerPage() {
                                                     onClick={() => setGender('female')}
                                                     className={cn(
                                                         "flex-1 py-2 text-sm font-medium rounded-md transition-all",
-                                                        gender === 'female' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                                                        gender === 'female' ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted/50"
                                                     )}
                                                 >
                                                     Female
