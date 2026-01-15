@@ -240,6 +240,7 @@ export default function MealPlannerPage() {
 
     // New Fields
     const [goal, setGoal] = useState<GoalType>('maintain');
+    const [gender, setGender] = useState<'male' | 'female'>('female');
     const [age, setAge] = useState<number | ''>('');
     const [weight, setWeight] = useState<number | ''>('');
     const [height, setHeight] = useState<number | ''>('');
@@ -321,7 +322,30 @@ export default function MealPlannerPage() {
                                         <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
                                         About You
                                     </h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                                        <div className="space-y-2">
+                                            <Label>Gender</Label>
+                                            <div className="flex w-full bg-muted rounded-lg p-1">
+                                                <button
+                                                    onClick={() => setGender('male')}
+                                                    className={cn(
+                                                        "flex-1 py-2 text-sm font-medium rounded-md transition-all",
+                                                        gender === 'male' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                                                    )}
+                                                >
+                                                    Male
+                                                </button>
+                                                <button
+                                                    onClick={() => setGender('female')}
+                                                    className={cn(
+                                                        "flex-1 py-2 text-sm font-medium rounded-md transition-all",
+                                                        gender === 'female' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                                                    )}
+                                                >
+                                                    Female
+                                                </button>
+                                            </div>
+                                        </div>
                                         <div className="space-y-2">
                                             <Label htmlFor="age">Age</Label>
                                             <Input
@@ -357,12 +381,12 @@ export default function MealPlannerPage() {
                                             onClick={() => setDiet('anything')} icon={Utensils}
                                         />
                                         <DietCard
-                                            type="vegan" selected={diet === 'vegan'}
-                                            onClick={() => setDiet('vegan')} icon={Leaf}
-                                        />
-                                        <DietCard
                                             type="vegetarian" selected={diet === 'vegetarian'}
                                             onClick={() => setDiet('vegetarian')} icon={Egg}
+                                        />
+                                        <DietCard
+                                            type="vegan" selected={diet === 'vegan'}
+                                            onClick={() => setDiet('vegan')} icon={Leaf}
                                         />
 
                                     </div>
