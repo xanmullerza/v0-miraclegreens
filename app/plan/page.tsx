@@ -923,10 +923,10 @@ export default function MealPlannerPage() {
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Header */}
-                        <div className="sticky top-0 bg-background border-b border-border p-6 flex justify-between items-start z-10">
+                        <div className="sticky top-0 bg-green-700 text-white p-6 flex justify-between items-start z-10 rounded-t-2xl shadow-md">
                             <div className="flex-1">
                                 <h2 className="text-2xl font-bold mb-1">Complete Nutritional Information</h2>
-                                <p className="text-muted-foreground">{nutritionRecipe.title}</p>
+                                <p className="text-green-100 opacity-90">{nutritionRecipe.title}</p>
                             </div>
                             <button
                                 onClick={() => {
@@ -934,7 +934,7 @@ export default function MealPlannerPage() {
                                     setNutritionData(null);
                                     setMoringaSpoons(0);
                                 }}
-                                className="p-2 hover:bg-muted rounded-lg transition-colors"
+                                className="p-2 hover:bg-green-600 rounded-lg transition-colors text-white"
                             >
                                 <X className="h-5 w-5" />
                             </button>
