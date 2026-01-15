@@ -23,7 +23,10 @@ import {
     Dumbbell,
     Armchair,
     Footprints,
-    Zap
+    Zap,
+    Beef,
+    Droplet,
+    Wheat
 } from 'lucide-react';
 import {
     Sheet,
@@ -196,15 +199,15 @@ const RecipeCard = ({ recipe, mealLabel, unit = 'kJ' }: { recipe: Recipe, mealLa
                     {formatEnergy(recipe.calories, unit)}
                 </span>
                 <span className="flex items-center gap-1">
-                    <Leaf className="h-4 w-4 text-green-500" />
+                    <Beef className="h-4 w-4 text-red-500" />
                     {recipe.protein}g P
                 </span>
                 <span className="flex items-center gap-1">
-                    <div className="h-2 w-2 rounded-full bg-yellow-500" />
+                    <Droplet className="h-4 w-4 text-yellow-500" />
                     {recipe.fat}g F
                 </span>
                 <span className="flex items-center gap-1">
-                    <div className="h-2 w-2 rounded-full bg-blue-500" />
+                    <Wheat className="h-4 w-4 text-amber-600" />
                     {recipe.carbs}g C
                 </span>
             </div>
