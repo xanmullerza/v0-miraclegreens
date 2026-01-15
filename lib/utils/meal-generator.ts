@@ -99,7 +99,8 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
             ingredients: r.ingredients.map((i: any) => ({
                 item: i.item,
                 amount: i.amount,
-                isMiracleProduct: i.is_miracle_product
+                isMiracleProduct: i.is_miracle_product,
+                baseIngredient: i.base_ingredient
             })),
             instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text)
         };
@@ -189,12 +190,15 @@ export const generateShoppingList = (plan: DailyPlan): ShoppingItem[] => {
     const itemMap = new Map<string, ShoppingItem>();
 
     allIngredients.forEach(ing => {
-        const existing = itemMap.get(ing.item);
+        // Use base_ingredient for shopping list grouping (e.g., "Egg" instead of "Egg, Scrambled")
+        const shoppingName = ing.baseIngredient || ing.item;
+
+        const existing = itemMap.get(shoppingName);
         if (existing) {
             existing.amounts.push(ing.amount);
         } else {
-            itemMap.set(ing.item, {
-                name: ing.item,
+            itemMap.set(shoppingName, {
+                name: shoppingName,
                 amounts: [ing.amount],
                 isMiracleProduct: ing.isMiracleProduct || false
             });

@@ -5,6 +5,7 @@ export interface Ingredient {
     item: string;
     amount: string;
     isMiracleProduct?: boolean;
+    baseIngredient?: string; // What you buy (e.g., "Egg" for "Egg, Scrambled")
 }
 
 export interface Recipe {
