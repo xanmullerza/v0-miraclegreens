@@ -17,7 +17,7 @@ import {
     ShoppingBasket,
     Sparkles,
     Download,
-    Bean
+    Egg
 } from 'lucide-react';
 import {
     Sheet,
@@ -259,7 +259,7 @@ export default function MealPlannerPage() {
                                         />
                                         <DietCard
                                             type="vegetarian" selected={diet === 'vegetarian'}
-                                            onClick={() => setDiet('vegetarian')} icon={Bean}
+                                            onClick={() => setDiet('vegetarian')} icon={Egg}
                                         />
 
                                     </div>
