@@ -1031,10 +1031,9 @@ export default function MealPlannerPage() {
                                         <h3 className="font-semibold text-lg mb-3">Macronutrients</h3>
                                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                             <div className="p-4 bg-muted rounded-lg relative overflow-hidden group">
-                                                {moringaSpoons > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-2 py-1 rounded-bl-lg font-bold">+{(MORINGA_TSP.energy_kcal * moringaSpoons).toFixed(0)}</div>}
+                                                {moringaSpoons > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-2 py-1 rounded-bl-lg font-bold">+{(MORINGA_TSP.energy_kj * moringaSpoons).toFixed(0)} kJ</div>}
                                                 <div className="text-sm text-muted-foreground mb-1">Energy</div>
-                                                <div className={`text-xl font-bold transition-colors ${moringaSpoons > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.energy_kcal.toFixed(1)} kcal</div>
-                                                <div className="text-xs text-muted-foreground">{current.energy_kj.toFixed(1)} kJ</div>
+                                                <div className={`text-xl font-bold transition-colors ${moringaSpoons > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.energy_kj.toFixed(0)} kJ</div>
                                             </div>
                                             <div className="p-4 bg-muted rounded-lg relative overflow-hidden">
                                                 {moringaSpoons > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-2 py-1 rounded-bl-lg font-bold">+{(MORINGA_TSP.protein_g * moringaSpoons).toFixed(1)}g</div>}
