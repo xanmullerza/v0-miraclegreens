@@ -572,18 +572,18 @@ export default function MealPlannerPage() {
                                 </div>
 
                                 {/* Meal Grid */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-24 md:pb-0">
-                                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-0 fill-mode-backwards">
+                                <div className="flex flex-wrap justify-center gap-6 pb-24 md:pb-0">
+                                    <div className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.33%-1rem)] animate-in fade-in slide-in-from-bottom-4 duration-500 delay-0 fill-mode-backwards">
                                         <RecipeCard recipe={plan.breakfast} mealLabel="Breakfast" unit={unit} />
                                     </div>
-                                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 fill-mode-backwards">
+                                    <div className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.33%-1rem)] animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 fill-mode-backwards">
                                         <RecipeCard recipe={plan.lunch} mealLabel="Lunch" unit={unit} />
                                     </div>
-                                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-backwards">
+                                    <div className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.33%-1rem)] animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-backwards">
                                         <RecipeCard recipe={plan.dinner} mealLabel="Dinner" unit={unit} />
                                     </div>
                                     {plan.snacks.map((snack, i) => (
-                                        <div key={i} className={`animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-backwards delay-[${(i + 3) * 100}ms]`}>
+                                        <div key={i} className={`w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.33%-1rem)] animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-backwards delay-[${(i + 3) * 100}ms]`}>
                                             <RecipeCard recipe={snack} mealLabel={`Snack ${i + 1}`} unit={unit} />
                                         </div>
                                     ))}
