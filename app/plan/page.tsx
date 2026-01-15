@@ -17,7 +17,10 @@ import {
     ShoppingBasket,
     Sparkles,
     Download,
-    Egg
+    Egg,
+    TrendingDown,
+    Activity,
+    Dumbbell
 } from 'lucide-react';
 import {
     Sheet,
@@ -35,6 +38,7 @@ import Link from 'next/link';
 // --- HELPERS ---
 const CAL_TO_KJ = 4.184;
 type UnitType = 'kcal' | 'kJ';
+type GoalType = 'lose-fat' | 'maintain' | 'build-muscle';
 
 const formatEnergy = (calories: number, unit: UnitType) => {
     if (unit === 'kJ') {
@@ -75,6 +79,45 @@ const DietCard = ({
                 <Icon className="h-8 w-8" />
             </div>
             <h3 className="font-bold capitalize text-lg whitespace-nowrap">{label || (type === 'anything' ? 'Anything Goes' : type)}</h3>
+            {selected && (
+                <div className="absolute top-4 right-4 text-primary">
+                    <Check className="h-6 w-6" />
+                </div>
+            )}
+        </div>
+    </div>
+);
+
+const GoalCard = ({
+    type,
+    selected,
+    onClick,
+    icon: Icon,
+    label
+}: {
+    type: GoalType,
+    selected: boolean,
+    onClick: () => void,
+    icon: any,
+    label?: string
+}) => (
+    <div
+        onClick={onClick}
+        className={cn(
+            "cursor-pointer relative overflow-hidden rounded-2xl border-2 p-6 transition-all duration-300 hover:scale-[1.02]",
+            selected
+                ? "border-primary bg-primary/5 shadow-xl"
+                : "border-border bg-card hover:border-primary/50"
+        )}
+    >
+        <div className="flex flex-col items-center gap-4 text-center">
+            <div className={cn(
+                "p-4 rounded-full",
+                selected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+            )}>
+                <Icon className="h-8 w-8" />
+            </div>
+            <h3 className="font-bold capitalize text-lg whitespace-nowrap">{label || type.replace('-', ' ')}</h3>
             {selected && (
                 <div className="absolute top-4 right-4 text-primary">
                     <Check className="h-6 w-6" />
@@ -195,6 +238,12 @@ export default function MealPlannerPage() {
     const [mealsCount, setMealsCount] = useState(3);
     const [unit, setUnit] = useState<UnitType>('kcal');
 
+    // New Fields
+    const [goal, setGoal] = useState<GoalType>('maintain');
+    const [age, setAge] = useState<number | ''>('');
+    const [weight, setWeight] = useState<number | ''>('');
+    const [height, setHeight] = useState<number | ''>('');
+
     const handleGenerate = () => {
         setGenerating(true);
         // Simulate "thinking" time for effect
@@ -246,6 +295,60 @@ export default function MealPlannerPage() {
                                 <div>
                                     <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
                                         <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
+                                        What is your goal?
+                                    </h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                        <GoalCard
+                                            type="lose-fat" selected={goal === 'lose-fat'}
+                                            onClick={() => setGoal('lose-fat')} icon={TrendingDown}
+                                            label="Lose Fat"
+                                        />
+                                        <GoalCard
+                                            type="maintain" selected={goal === 'maintain'}
+                                            onClick={() => setGoal('maintain')} icon={Activity}
+                                            label="Maintain Weight"
+                                        />
+                                        <GoalCard
+                                            type="build-muscle" selected={goal === 'build-muscle'}
+                                            onClick={() => setGoal('build-muscle')} icon={Dumbbell}
+                                            label="Build Muscle"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
+                                        About You
+                                    </h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div className="space-y-2">
+                                            <Label htmlFor="age">Age</Label>
+                                            <Input
+                                                id="age" type="number" placeholder="25"
+                                                value={age} onChange={(e) => setAge(e.target.value ? parseInt(e.target.value) : '')}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="weight">Weight (kg)</Label>
+                                            <Input
+                                                id="weight" type="number" placeholder="70"
+                                                value={weight} onChange={(e) => setWeight(e.target.value ? parseInt(e.target.value) : '')}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label htmlFor="height">Height (cm)</Label>
+                                            <Input
+                                                id="height" type="number" placeholder="175"
+                                                value={height} onChange={(e) => setHeight(e.target.value ? parseInt(e.target.value) : '')}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span>
                                         Choose your diet style
                                     </h2>
                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3">
@@ -267,7 +370,7 @@ export default function MealPlannerPage() {
 
                                 <div className="max-w-xl">
                                     <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
+                                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">4</span>
                                         Set your targets
                                     </h2>
 
