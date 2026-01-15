@@ -951,7 +951,6 @@ export default function MealPlannerPage() {
                                         'Vitamin B6': m.vitamin_b6_mg,
                                         'Vitamin B12': m.vitamin_b12_ug,
                                         'Folate': m.folate_ug,
-                                        'Choline': m.choline_mg,
                                     };
 
                                     const minerals = {
@@ -984,6 +983,10 @@ export default function MealPlannerPage() {
                                         'Added Sugars': m.added_sugars_g,
                                     };
 
+                                    const other = {
+                                        'Choline': m.choline_mg,
+                                    };
+
                                     const NutrientGrid = ({ nutrients, title }: { nutrients: Record<string, any>, title: string }) => {
                                         const filtered = Object.entries(nutrients).filter(([_, val]) => val !== undefined && val !== null);
                                         if (filtered.length === 0) return null;
@@ -998,7 +1001,7 @@ export default function MealPlannerPage() {
                                                         if (label.includes('Vitamin') || label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine')) {
                                                             unit = label.toLowerCase().includes('vitamin d') ? ' IU' :
                                                                 typeof value === 'number' && value < 1 ? ' µg' : ' mg';
-                                                        } else if (label.includes('Cholesterol') || label.toLowerCase().includes('calcium') || label.toLowerCase().includes('iron') || label.toLowerCase().includes('magnesium') || label.toLowerCase().includes('phosphorus') || label.toLowerCase().includes('potassium') || label.toLowerCase().includes('sodium') || label.toLowerCase().includes('zinc') || label.toLowerCase().includes('copper') || label.toLowerCase().includes('manganese')) {
+                                                        } else if (label.includes('Cholesterol') || label.toLowerCase().includes('calcium') || label.toLowerCase().includes('iron') || label.toLowerCase().includes('magnesium') || label.toLowerCase().includes('phosphorus') || label.toLowerCase().includes('potassium') || label.toLowerCase().includes('sodium') || label.toLowerCase().includes('zinc') || label.toLowerCase().includes('copper') || label.toLowerCase().includes('manganese') || label.toLowerCase().includes('choline')) {
                                                             unit = ' mg';
                                                         } else {
                                                             unit = ' g';
@@ -1024,6 +1027,7 @@ export default function MealPlannerPage() {
                                             <NutrientGrid nutrients={minerals} title="Minerals" />
                                             <NutrientGrid nutrients={fats} title="Fats Breakdown" />
                                             <NutrientGrid nutrients={carbs} title="Carbohydrates Breakdown" />
+                                            <NutrientGrid nutrients={other} title="Other Nutrients" />
                                         </div>
                                     );
                                 })()}
