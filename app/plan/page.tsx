@@ -176,44 +176,53 @@ const ActivityCard = ({
     </div>
 );
 
-const RecipeCard = ({ recipe, mealLabel, unit = 'kJ' }: { recipe: Recipe, mealLabel: string, unit?: UnitType }) => (
-    <div className="group relative bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-all animate-in fade-in zoom-in-95 duration-500 flex flex-col h-full">
-        <div className="aspect-video relative overflow-hidden bg-muted flex-shrink-0">
-            {/* Fallback pattern if no image */}
-            <div className="absolute inset-0 bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-muted-foreground">
-                {recipe.image ? (
-                    <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover" />
-                ) : (
-                    <ChefHat className="h-10 w-10 opacity-20" />
-                )}
+const RecipeCard = ({ recipe, mealLabel, unit = 'kJ' }: { recipe: Recipe, mealLabel: string, unit?: UnitType }) => {
+    const [imageError, setImageError] = useState(false);
+
+    return (
+        <div className="group relative bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-all animate-in fade-in zoom-in-95 duration-500 flex flex-col h-full">
+            <div className="aspect-video relative overflow-hidden bg-muted flex-shrink-0">
+                {/* Fallback pattern if no image */}
+                <div className="absolute inset-0 bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-muted-foreground">
+                    {recipe.image && !imageError ? (
+                        <img
+                            src={recipe.image}
+                            alt={recipe.title}
+                            className="w-full h-full object-cover"
+                            onError={() => setImageError(true)}
+                        />
+                    ) : (
+                        <ChefHat className="h-10 w-10 opacity-20" />
+                    )}
+                </div>
+                <div className="absolute top-3 left-3 bg-black/60 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm uppercase">
+                    {mealLabel}
+                </div>
             </div>
-            <div className="absolute top-3 left-3 bg-black/60 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm uppercase">
-                {mealLabel}
+            <div className="p-5 flex flex-col flex-grow">
+                <h4 className="font-bold text-lg mb-2 line-clamp-1">{recipe.title}</h4>
+                <div className="grid grid-cols-2 gap-y-1 text-sm text-muted-foreground mt-auto">
+                    <span className="flex items-center gap-1">
+                        <Flame className="h-4 w-4 text-orange-500" />
+                        {formatEnergy(recipe.calories, unit)}
+                    </span>
+                    <span className="flex items-center gap-1">
+                        <Beef className="h-4 w-4 text-red-500" />
+                        {recipe.protein}g
+                    </span>
+                    <span className="flex items-center gap-1">
+                        <Droplet className="h-4 w-4 text-yellow-500" />
+                        {recipe.fat}g
+                    </span>
+                    <span className="flex items-center gap-1">
+                        <Wheat className="h-4 w-4 text-amber-600" />
+                        {recipe.carbs}g
+                    </span>
+                </div>
             </div>
         </div>
-        <div className="p-5 flex flex-col flex-grow">
-            <h4 className="font-bold text-lg mb-2 line-clamp-1">{recipe.title}</h4>
-            <div className="grid grid-cols-2 gap-y-1 text-sm text-muted-foreground mt-auto">
-                <span className="flex items-center gap-1">
-                    <Flame className="h-4 w-4 text-orange-500" />
-                    {formatEnergy(recipe.calories, unit)}
-                </span>
-                <span className="flex items-center gap-1">
-                    <Beef className="h-4 w-4 text-red-500" />
-                    {recipe.protein}g
-                </span>
-                <span className="flex items-center gap-1">
-                    <Droplet className="h-4 w-4 text-yellow-500" />
-                    {recipe.fat}g
-                </span>
-                <span className="flex items-center gap-1">
-                    <Wheat className="h-4 w-4 text-amber-600" />
-                    {recipe.carbs}g
-                </span>
-            </div>
-        </div>
-    </div>
-);
+    );
+};
 
 const ShoppingList = ({ items, calories, unit = 'kJ' }: { items: ShoppingItem[], calories: number, unit?: UnitType }) => {
     return (
