@@ -310,6 +310,32 @@ export default function MealPlannerPage() {
     const [nutritionRecipe, setNutritionRecipe] = useState<Recipe | null>(null);
     const [nutritionData, setNutritionData] = useState<any>(null);
     const [loadingNutrition, setLoadingNutrition] = useState(false);
+    const [showMoringa, setShowMoringa] = useState(false);
+
+    // Standard 1 tsp (2g) Moringa Nutrition (Calculated from 100g data)
+    const MORINGA_TSP = {
+        energy_kcal: 5.00,
+        energy_kj: 20.93,
+        protein_g: 0.50,
+        carbs_g: 0.80,
+        fat_g: 0.05,
+        micronutrients: {
+            // Vitamins
+            vitamin_a_ug: 112.50,
+            vitamin_c_mg: 4.50,
+            thiamine_mg: 0.05,
+            riboflavin_mg: 0.41,
+            niacin_mg: 0.20,
+            // Minerals
+            calcium_mg: 40.00,
+            iron_mg: 0.76,
+            magnesium_mg: 7.35,
+            potassium_mg: 26.50,
+            sodium_mg: 0.50,
+            // Fiber
+            fiber_g: 0.80
+        }
+    };
 
     // Form State
     const [calories, setCalories] = useState(2000);
@@ -415,7 +441,16 @@ export default function MealPlannerPage() {
             };
 
             // Sum up all micronutrients from ingredients
+            let hasMoringa = false;
+
             for (const ing of data.ingredients) {
+                // Check if this is Moringa Powder
+                if (ing.item.toLowerCase().includes('moringa powder') ||
+                    (ing.food_items && ing.food_items.name.toLowerCase().includes('moringa powder'))) {
+                    hasMoringa = true;
+                    continue; // Skip adding it to base nutrition
+                }
+
                 if (ing.food_items && ing.weight_g) {
                     const foodItem = ing.food_items;
                     const ratio = ing.weight_g / 100;
@@ -440,6 +475,7 @@ export default function MealPlannerPage() {
             }
 
             setNutritionData(nutrition);
+            setShowMoringa(hasMoringa); // Auto-enable if recipe has it default
         } catch (err) {
             console.error('Error calculating nutrition:', err);
         } finally {
@@ -907,132 +943,190 @@ export default function MealPlannerPage() {
                                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                                 <p className="mt-4 text-muted-foreground">Calculating nutrition...</p>
                             </div>
-                        ) : nutritionData ? (
-                            <div className="p-6 space-y-6">
-                                {/* Macronutrients */}
-                                <div>
-                                    <h3 className="font-semibold text-lg mb-3">Macronutrients</h3>
-                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                        <div className="p-4 bg-muted rounded-lg">
-                                            <div className="text-sm text-muted-foreground mb-1">Energy</div>
-                                            <div className="text-xl font-bold">{nutritionData.energy_kcal.toFixed(1)} kcal</div>
-                                            <div className="text-xs text-muted-foreground">{nutritionData.energy_kj.toFixed(1)} kJ</div>
+                        ) : nutritionData ? (() => {
+                            // Calculate current nutrition based on toggle
+                            const current = showMoringa ? {
+                                energy_kcal: nutritionData.energy_kcal + MORINGA_TSP.energy_kcal,
+                                energy_kj: nutritionData.energy_kj + MORINGA_TSP.energy_kj,
+                                protein_g: nutritionData.protein_g + MORINGA_TSP.protein_g,
+                                carbs_g: nutritionData.carbs_g + MORINGA_TSP.carbs_g,
+                                fat_g: nutritionData.fat_g + MORINGA_TSP.fat_g,
+                                micronutrients: { ...nutritionData.micronutrients }
+                            } : { ...nutritionData };
+
+                            // Add moringa micros if shown
+                            if (showMoringa) {
+                                for (const [key, value] of Object.entries(MORINGA_TSP.micronutrients)) {
+                                    current.micronutrients[key] = (current.micronutrients[key] || 0) + value;
+                                }
+                            }
+
+                            return (
+                                <div className="p-6 space-y-6">
+                                    {/* Moringa Boost Toggle */}
+                                    <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 p-4 rounded-xl flex items-center gap-4 transition-all">
+                                        <div
+                                            className={`relative w-12 h-6 rounded-full transition-colors cursor-pointer ${showMoringa ? 'bg-green-500' : 'bg-gray-300'}`}
+                                            onClick={() => setShowMoringa(!showMoringa)}
+                                        >
+                                            <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-transform shadow-sm ${showMoringa ? 'translate-x-6' : 'translate-x-0'}`} />
                                         </div>
-                                        <div className="p-4 bg-muted rounded-lg">
-                                            <div className="text-sm text-muted-foreground mb-1">Protein</div>
-                                            <div className="text-xl font-bold">{nutritionData.protein_g.toFixed(1)}g</div>
-                                        </div>
-                                        <div className="p-4 bg-muted rounded-lg">
-                                            <div className="text-sm text-muted-foreground mb-1">Carbohydrates</div>
-                                            <div className="text-xl font-bold">{nutritionData.carbs_g.toFixed(1)}g</div>
-                                        </div>
-                                        <div className="p-4 bg-muted rounded-lg">
-                                            <div className="text-sm text-muted-foreground mb-1">Fat</div>
-                                            <div className="text-xl font-bold">{nutritionData.fat_g.toFixed(1)}g</div>
+                                        <div className="flex-1">
+                                            <div className="font-bold text-green-800 dark:text-green-300 flex items-center gap-2">
+                                                ✨ Boost with Moringa Powder
+                                                <span className="text-xs bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200 px-2 py-0.5 rounded-full">+1 tsp</span>
+                                            </div>
+                                            <p className="text-xs text-green-700 dark:text-green-400">
+                                                See the difference 1 teaspoon makes to your nutrition profile!
+                                            </p>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* Micronutrients - Categorized */}
-                                {nutritionData.micronutrients && (() => {
-                                    const m = nutritionData.micronutrients;
+                                    {/* Macronutrients */}
+                                    <div>
+                                        <h3 className="font-semibold text-lg mb-3">Macronutrients</h3>
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                            <div className="p-4 bg-muted rounded-lg relative overflow-hidden group">
+                                                {showMoringa && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{MORINGA_TSP.energy_kcal.toFixed(0)}</div>}
+                                                <div className="text-sm text-muted-foreground mb-1">Energy</div>
+                                                <div className={`text-xl font-bold transition-colors ${showMoringa ? 'text-green-600 dark:text-green-400' : ''}`}>{current.energy_kcal.toFixed(1)} kcal</div>
+                                                <div className="text-xs text-muted-foreground">{current.energy_kj.toFixed(1)} kJ</div>
+                                            </div>
+                                            <div className="p-4 bg-muted rounded-lg relative overflow-hidden">
+                                                {showMoringa && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{MORINGA_TSP.protein_g.toFixed(1)}g</div>}
+                                                <div className="text-sm text-muted-foreground mb-1">Protein</div>
+                                                <div className={`text-xl font-bold transition-colors ${showMoringa ? 'text-green-600 dark:text-green-400' : ''}`}>{current.protein_g.toFixed(1)}g</div>
+                                            </div>
+                                            <div className="p-4 bg-muted rounded-lg relative overflow-hidden">
+                                                {showMoringa && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{MORINGA_TSP.carbs_g.toFixed(1)}g</div>}
+                                                <div className="text-sm text-muted-foreground mb-1">Carbohydrates</div>
+                                                <div className={`text-xl font-bold transition-colors ${showMoringa ? 'text-green-600 dark:text-green-400' : ''}`}>{current.carbs_g.toFixed(1)}g</div>
+                                            </div>
+                                            <div className="p-4 bg-muted rounded-lg relative overflow-hidden">
+                                                <div className="text-sm text-muted-foreground mb-1">Fat</div>
+                                                <div className="text-xl font-bold">{current.fat_g.toFixed(1)}g</div>
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                    // Categorize nutrients
-                                    const vitamins = {
-                                        'Vitamin A': m.vitamin_a_ug,
-                                        'Vitamin C': m.vitamin_c_mg,
-                                        'Vitamin D': m.vitamin_d_iu,
-                                        'Vitamin E': m.vitamin_e_mg,
-                                        'Vitamin K': m.vitamin_k_ug,
-                                        'Thiamine (B1)': m.thiamine_mg,
-                                        'Riboflavin (B2)': m.riboflavin_mg,
-                                        'Niacin (B3)': m.niacin_mg,
-                                        'Pantothenic Acid (B5)': m.pantothenic_acid_mg,
-                                        'Vitamin B6': m.vitamin_b6_mg,
-                                        'Vitamin B12': m.vitamin_b12_ug,
-                                        'Folate': m.folate_ug,
-                                    };
+                                    {/* Micronutrients - Categorized */}
+                                    {current.micronutrients && (() => {
+                                        const m = current.micronutrients;
 
-                                    const minerals = {
-                                        'Calcium': m.calcium_mg,
-                                        'Iron': m.iron_mg,
-                                        'Magnesium': m.magnesium_mg,
-                                        'Phosphorus': m.phosphorus_mg,
-                                        'Potassium': m.potassium_mg,
-                                        'Sodium': m.sodium_mg,
-                                        'Zinc': m.zinc_mg,
-                                        'Copper': m.copper_mg,
-                                        'Manganese': m.manganese_mg,
-                                        'Selenium': m.selenium_ug,
-                                        'Iodine': m.iodine_ug,
-                                    };
+                                        // Categorize nutrients
+                                        const vitamins = {
+                                            'Vitamin A': m.vitamin_a_ug,
+                                            'Vitamin C': m.vitamin_c_mg,
+                                            'Vitamin D': m.vitamin_d_iu,
+                                            'Vitamin E': m.vitamin_e_mg,
+                                            'Vitamin K': m.vitamin_k_ug,
+                                            'Thiamine (B1)': m.thiamine_mg,
+                                            'Riboflavin (B2)': m.riboflavin_mg,
+                                            'Niacin (B3)': m.niacin_mg,
+                                            'Pantothenic Acid (B5)': m.pantothenic_acid_mg,
+                                            'Vitamin B6': m.vitamin_b6_mg,
+                                            'Vitamin B12': m.vitamin_b12_ug,
+                                            'Folate': m.folate_ug,
+                                        };
 
-                                    const fats = {
-                                        'Saturated Fat': m.saturated_fat_g,
-                                        'Monounsaturated Fat': m.monounsaturated_fat_g,
-                                        'Polyunsaturated Fat': m.polyunsaturated_fat_g,
-                                        'Omega-3': m.omega_3_g,
-                                        'Omega-6': m.omega_6_g,
-                                        'Trans Fats': m.trans_fats_g,
-                                        'Cholesterol': m.cholesterol_mg,
-                                    };
+                                        const minerals = {
+                                            'Calcium': m.calcium_mg,
+                                            'Iron': m.iron_mg,
+                                            'Magnesium': m.magnesium_mg,
+                                            'Phosphorus': m.phosphorus_mg,
+                                            'Potassium': m.potassium_mg,
+                                            'Sodium': m.sodium_mg,
+                                            'Zinc': m.zinc_mg,
+                                            'Copper': m.copper_mg,
+                                            'Manganese': m.manganese_mg,
+                                            'Selenium': m.selenium_ug,
+                                            'Iodine': m.iodine_ug,
+                                        };
 
-                                    const carbs = {
-                                        'Fiber': m.fiber_g,
-                                        'Sugars': m.sugars_g,
-                                        'Added Sugars': m.added_sugars_g,
-                                    };
+                                        const fats = {
+                                            'Saturated Fat': m.saturated_fat_g,
+                                            'Monounsaturated Fat': m.monounsaturated_fat_g,
+                                            'Polyunsaturated Fat': m.polyunsaturated_fat_g,
+                                            'Omega-3': m.omega_3_g,
+                                            'Omega-6': m.omega_6_g,
+                                            'Trans Fats': m.trans_fats_g,
+                                            'Cholesterol': m.cholesterol_mg,
+                                        };
 
-                                    const other = {
-                                        'Choline': m.choline_mg,
-                                    };
+                                        const carbs = {
+                                            'Fiber': m.fiber_g,
+                                            'Sugars': m.sugars_g,
+                                            'Added Sugars': m.added_sugars_g,
+                                        };
 
-                                    const NutrientGrid = ({ nutrients, title }: { nutrients: Record<string, any>, title: string }) => {
-                                        const filtered = Object.entries(nutrients).filter(([_, val]) => val !== undefined && val !== null);
-                                        if (filtered.length === 0) return null;
+                                        const other = {
+                                            'Choline': m.choline_mg,
+                                        };
+
+                                        const NutrientGrid = ({ nutrients, title }: { nutrients: Record<string, any>, title: string }) => {
+                                            const filtered = Object.entries(nutrients).filter(([_, val]) => val !== undefined && val !== null);
+                                            if (filtered.length === 0) return null;
+
+                                            return (
+                                                <div>
+                                                    <h4 className="font-medium mb-3 text-primary">{title}</h4>
+                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                        {filtered.map(([label, value]) => {
+                                                            // Determine unit
+                                                            let unit = '';
+                                                            if (label.includes('Vitamin') || label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine')) {
+                                                                unit = label.toLowerCase().includes('vitamin d') ? ' IU' :
+                                                                    typeof value === 'number' && value < 1 ? ' µg' : ' mg';
+                                                            } else if (label.includes('Cholesterol') || label.toLowerCase().includes('calcium') || label.toLowerCase().includes('iron') || label.toLowerCase().includes('magnesium') || label.toLowerCase().includes('phosphorus') || label.toLowerCase().includes('potassium') || label.toLowerCase().includes('sodium') || label.toLowerCase().includes('zinc') || label.toLowerCase().includes('copper') || label.toLowerCase().includes('manganese') || label.toLowerCase().includes('choline')) {
+                                                                unit = ' mg';
+                                                            } else {
+                                                                unit = ' g';
+                                                            }
+
+                                                            // Check for boosts
+                                                            let boostText = null;
+                                                            if (showMoringa) {
+                                                                // Simple mapping checks for key nutrients in Moringa
+                                                                if (label.includes('Vitamin A') && MORINGA_TSP.micronutrients.vitamin_a_ug) boostText = `+${Math.round(MORINGA_TSP.micronutrients.vitamin_a_ug)}µg`;
+                                                                if (label.includes('Calcium') && MORINGA_TSP.micronutrients.calcium_mg) boostText = `+${Math.round(MORINGA_TSP.micronutrients.calcium_mg)}mg`;
+                                                                if (label.includes('Iron') && MORINGA_TSP.micronutrients.iron_mg) boostText = `+${MORINGA_TSP.micronutrients.iron_mg.toFixed(1)}mg`;
+                                                                if (label.includes('Riboflavin (B2)') && MORINGA_TSP.micronutrients.riboflavin_mg) boostText = `+${MORINGA_TSP.micronutrients.riboflavin_mg.toFixed(1)}mg`;
+                                                            }
+
+                                                            return (
+                                                                <div key={label} className={`flex justify-between items-center p-3 rounded-lg relative overflow-hidden transition-colors ${showMoringa && boostText ? 'bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-900/30' : 'bg-muted/50'}`}>
+                                                                    <span className="text-sm relative z-10">{label}</span>
+                                                                    <div className="flex items-center gap-2 relative z-10">
+                                                                        {showMoringa && boostText && (
+                                                                            <span className="text-[10px] font-bold text-green-600 dark:text-green-400 bg-white dark:bg-black/20 px-1.5 rounded-full">
+                                                                                {boostText}
+                                                                            </span>
+                                                                        )}
+                                                                        <span className={`text-sm font-semibold transition-colors ${showMoringa && boostText ? 'text-green-700 dark:text-green-300' : ''}`}>
+                                                                            {typeof value === 'number' ? value.toFixed(2) : value}{unit}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            );
+                                        };
 
                                         return (
-                                            <div>
-                                                <h4 className="font-medium mb-3 text-primary">{title}</h4>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                    {filtered.map(([label, value]) => {
-                                                        // Determine unit
-                                                        let unit = '';
-                                                        if (label.includes('Vitamin') || label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine')) {
-                                                            unit = label.toLowerCase().includes('vitamin d') ? ' IU' :
-                                                                typeof value === 'number' && value < 1 ? ' µg' : ' mg';
-                                                        } else if (label.includes('Cholesterol') || label.toLowerCase().includes('calcium') || label.toLowerCase().includes('iron') || label.toLowerCase().includes('magnesium') || label.toLowerCase().includes('phosphorus') || label.toLowerCase().includes('potassium') || label.toLowerCase().includes('sodium') || label.toLowerCase().includes('zinc') || label.toLowerCase().includes('copper') || label.toLowerCase().includes('manganese') || label.toLowerCase().includes('choline')) {
-                                                            unit = ' mg';
-                                                        } else {
-                                                            unit = ' g';
-                                                        }
-
-                                                        return (
-                                                            <div key={label} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
-                                                                <span className="text-sm">{label}</span>
-                                                                <span className="text-sm font-semibold">
-                                                                    {typeof value === 'number' ? value.toFixed(2) : value}{unit}
-                                                                </span>
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
+                                            <div className="space-y-6">
+                                                <NutrientGrid nutrients={vitamins} title="Vitamins" />
+                                                <NutrientGrid nutrients={minerals} title="Minerals" />
+                                                <NutrientGrid nutrients={fats} title="Fats Breakdown" />
+                                                <NutrientGrid nutrients={carbs} title="Carbohydrates Breakdown" />
+                                                <NutrientGrid nutrients={other} title="Other Nutrients" />
                                             </div>
                                         );
-                                    };
-
-                                    return (
-                                        <div className="space-y-6">
-                                            <NutrientGrid nutrients={vitamins} title="Vitamins" />
-                                            <NutrientGrid nutrients={minerals} title="Minerals" />
-                                            <NutrientGrid nutrients={fats} title="Fats Breakdown" />
-                                            <NutrientGrid nutrients={carbs} title="Carbohydrates Breakdown" />
-                                            <NutrientGrid nutrients={other} title="Other Nutrients" />
-                                        </div>
-                                    );
-                                })()}
-                            </div>
-                        ) : (
+                                    })()}
+                                </div>
+                            );
+                        })() : (
                             <div className="p-12 text-center text-muted-foreground">
                                 No detailed nutritional data available for this recipe.
                             </div>
