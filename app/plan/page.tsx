@@ -200,15 +200,15 @@ const RecipeCard = ({ recipe, mealLabel, unit = 'kJ' }: { recipe: Recipe, mealLa
                 </span>
                 <span className="flex items-center gap-1">
                     <Beef className="h-4 w-4 text-red-500" />
-                    {recipe.protein}g P
+                    {recipe.protein}g
                 </span>
                 <span className="flex items-center gap-1">
                     <Droplet className="h-4 w-4 text-yellow-500" />
-                    {recipe.fat}g F
+                    {recipe.fat}g
                 </span>
                 <span className="flex items-center gap-1">
                     <Wheat className="h-4 w-4 text-amber-600" />
-                    {recipe.carbs}g C
+                    {recipe.carbs}g
                 </span>
             </div>
         </div>
