@@ -545,9 +545,9 @@ export default function MealPlannerPage() {
                                         </div>
                                         <div className="h-12 w-px bg-border mx-2"></div>
                                         <div className="space-y-1 text-sm text-muted-foreground">
-                                            <p><span className="font-semibold text-foreground">{plan.macros.protein}g</span> Protein</p>
-                                            <p><span className="font-semibold text-foreground">{plan.macros.carbs}g</span> Carbs</p>
-                                            <p><span className="font-semibold text-foreground">{plan.macros.fat}g</span> Fat</p>
+                                            <p className="flex items-center gap-2"><Beef className="h-4 w-4 text-red-500" /> <span className="font-semibold text-foreground">{plan.macros.protein}g</span> Protein</p>
+                                            <p className="flex items-center gap-2"><Wheat className="h-4 w-4 text-amber-600" /> <span className="font-semibold text-foreground">{plan.macros.carbs}g</span> Carbs</p>
+                                            <p className="flex items-center gap-2"><Droplet className="h-4 w-4 text-yellow-500" /> <span className="font-semibold text-foreground">{plan.macros.fat}g</span> Fat</p>
                                         </div>
                                     </div>
                                     <div className="flex gap-3 w-full md:w-auto">
