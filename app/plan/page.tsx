@@ -20,7 +20,10 @@ import {
     Egg,
     TrendingDown,
     Activity,
-    Dumbbell
+    Dumbbell,
+    Armchair,
+    Footprints,
+    Zap
 } from 'lucide-react';
 import {
     Sheet,
@@ -38,7 +41,9 @@ import Link from 'next/link';
 // --- HELPERS ---
 const CAL_TO_KJ = 4.184;
 type UnitType = 'kcal' | 'kJ';
+
 type GoalType = 'lose-fat' | 'maintain' | 'build-muscle';
+type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'active';
 
 const formatEnergy = (calories: number, unit: UnitType) => {
     if (unit === 'kJ') {
@@ -118,6 +123,47 @@ const GoalCard = ({
                 <Icon className="h-8 w-8" />
             </div>
             <h3 className="font-bold capitalize text-lg whitespace-nowrap">{label || type.replace('-', ' ')}</h3>
+            {selected && (
+                <div className="absolute top-4 right-4 text-primary">
+                    <Check className="h-6 w-6" />
+                </div>
+            )}
+        </div>
+    </div>
+);
+
+
+
+const ActivityCard = ({
+    type,
+    selected,
+    onClick,
+    icon: Icon,
+    label
+}: {
+    type: ActivityLevel,
+    selected: boolean,
+    onClick: () => void,
+    icon: any,
+    label?: string
+}) => (
+    <div
+        onClick={onClick}
+        className={cn(
+            "cursor-pointer relative overflow-hidden rounded-2xl border-2 p-6 transition-all duration-300 hover:scale-[1.02]",
+            selected
+                ? "border-primary bg-primary/5 shadow-xl"
+                : "border-border bg-card hover:border-primary/50"
+        )}
+    >
+        <div className="flex flex-col items-center gap-4 text-center">
+            <div className={cn(
+                "p-4 rounded-full",
+                selected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+            )}>
+                <Icon className="h-8 w-8" />
+            </div>
+            <h3 className="font-bold capitalize text-lg whitespace-nowrap">{label || type}</h3>
             {selected && (
                 <div className="absolute top-4 right-4 text-primary">
                     <Check className="h-6 w-6" />
@@ -240,6 +286,7 @@ export default function MealPlannerPage() {
 
     // New Fields
     const [goal, setGoal] = useState<GoalType>('maintain');
+    const [activityLevel, setActivityLevel] = useState<ActivityLevel>('sedentary');
     const [gender, setGender] = useState<'male' | 'female'>('female');
     const [age, setAge] = useState<number | ''>('');
     const [weight, setWeight] = useState<number | ''>('');
@@ -273,9 +320,15 @@ export default function MealPlannerPage() {
             bmr -= 161;
         }
 
-        // Activity Multiplier (assuming Sedentary/Light Active baseline ~1.2)
-        // Adjust based on goal
-        let tdee = bmr * 1.2;
+        // Activity Multiplier based on selection
+        let tdee = bmr;
+        switch (activityLevel) {
+            case 'sedentary': tdee = bmr * 1.2; break;
+            case 'light': tdee = bmr * 1.375; break;
+            case 'moderate': tdee = bmr * 1.55; break;
+            case 'active': tdee = bmr * 1.725; break;
+            default: tdee = bmr * 1.2;
+        }
 
         if (goal === 'lose-fat') tdee *= 0.80; // 20% deficit
         if (goal === 'build-muscle') tdee *= 1.10; // 10% surplus
@@ -401,6 +454,35 @@ export default function MealPlannerPage() {
                                 <div>
                                     <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
                                         <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span>
+                                        Activity Level
+                                    </h2>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                        <ActivityCard
+                                            type="sedentary" selected={activityLevel === 'sedentary'}
+                                            onClick={() => setActivityLevel('sedentary')} icon={Armchair}
+                                            label="Sedentary"
+                                        />
+                                        <ActivityCard
+                                            type="light" selected={activityLevel === 'light'}
+                                            onClick={() => setActivityLevel('light')} icon={Footprints}
+                                            label="Light Active"
+                                        />
+                                        <ActivityCard
+                                            type="moderate" selected={activityLevel === 'moderate'}
+                                            onClick={() => setActivityLevel('moderate')} icon={Activity}
+                                            label="Moderate"
+                                        />
+                                        <ActivityCard
+                                            type="active" selected={activityLevel === 'active'}
+                                            onClick={() => setActivityLevel('active')} icon={Zap}
+                                            label="Very Active"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">4</span>
                                         Choose your diet style
                                     </h2>
                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3">
@@ -539,8 +621,8 @@ export default function MealPlannerPage() {
 
                     </div>
                 </div>
-            </div>
+            </div >
             <Footer />
-        </main>
+        </main >
     );
 }
