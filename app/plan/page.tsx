@@ -26,7 +26,9 @@ import {
     Zap,
     Beef,
     Droplet,
-    Wheat
+    Wheat,
+    X,
+    Clock
 } from 'lucide-react';
 import {
     Sheet,
@@ -176,11 +178,14 @@ const ActivityCard = ({
     </div>
 );
 
-const RecipeCard = ({ recipe, mealLabel, unit = 'kJ' }: { recipe: Recipe, mealLabel: string, unit?: UnitType }) => {
+const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onClick }: { recipe: Recipe, mealLabel: string, unit?: UnitType, onClick?: () => void }) => {
     const [imageError, setImageError] = useState(false);
 
     return (
-        <div className="group relative bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-all animate-in fade-in zoom-in-95 duration-500 flex flex-col h-full">
+        <div
+            onClick={onClick}
+            className="group relative bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-all animate-in fade-in zoom-in-95 duration-500 flex flex-col h-full cursor-pointer"
+        >
             <div className="aspect-video relative overflow-hidden bg-muted flex-shrink-0">
                 {/* Fallback pattern if no image */}
                 <div className="absolute inset-0 bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-muted-foreground">
@@ -219,6 +224,15 @@ const RecipeCard = ({ recipe, mealLabel, unit = 'kJ' }: { recipe: Recipe, mealLa
                         {Number(recipe.carbs).toFixed(1)}g
                     </span>
                 </div>
+                <button
+                    className="mt-3 w-full py-2 px-4 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onClick?.();
+                    }}
+                >
+                    View Recipe
+                </button>
             </div>
         </div>
     );
@@ -276,6 +290,7 @@ export default function MealPlannerPage() {
     const [step, setStep] = useState<1 | 2 | 3>(1);
     const [generating, setGenerating] = useState(false);
     const [plan, setPlan] = useState<DailyPlan | null>(null);
+    const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
     // Form State
     const [calories, setCalories] = useState(2000);
@@ -579,17 +594,17 @@ export default function MealPlannerPage() {
                                 {/* Meal Grid */}
                                 <div className="flex flex-wrap justify-center gap-6 pb-24 md:pb-0">
                                     <div className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.33%-1rem)] animate-in fade-in slide-in-from-bottom-4 duration-500 delay-0 fill-mode-backwards">
-                                        <RecipeCard recipe={plan.breakfast} mealLabel="Breakfast" unit={unit} />
+                                        <RecipeCard recipe={plan.breakfast} mealLabel="Breakfast" unit={unit} onClick={() => setSelectedRecipe(plan.breakfast)} />
                                     </div>
                                     <div className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.33%-1rem)] animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 fill-mode-backwards">
-                                        <RecipeCard recipe={plan.lunch} mealLabel="Lunch" unit={unit} />
+                                        <RecipeCard recipe={plan.lunch} mealLabel="Lunch" unit={unit} onClick={() => setSelectedRecipe(plan.lunch)} />
                                     </div>
                                     <div className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.33%-1rem)] animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-backwards">
-                                        <RecipeCard recipe={plan.dinner} mealLabel="Dinner" unit={unit} />
+                                        <RecipeCard recipe={plan.dinner} mealLabel="Dinner" unit={unit} onClick={() => setSelectedRecipe(plan.dinner)} />
                                     </div>
                                     {plan.snacks.map((snack, i) => (
                                         <div key={i} className={`w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.33%-1rem)] animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-backwards delay-[${(i + 3) * 100}ms]`}>
-                                            <RecipeCard recipe={snack} mealLabel={`Snack ${i + 1}`} unit={unit} />
+                                            <RecipeCard recipe={snack} mealLabel={`Snack ${i + 1}`} unit={unit} onClick={() => setSelectedRecipe(snack)} />
                                         </div>
                                     ))}
                                 </div>
@@ -628,6 +643,125 @@ export default function MealPlannerPage() {
                 </div>
             </div >
             <Footer />
+
+            {/* Recipe Detail Modal */}
+            {selectedRecipe && (
+                <div
+                    className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+                    onClick={() => setSelectedRecipe(null)}
+                >
+                    <div
+                        className="bg-background rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Header */}
+                        <div className="sticky top-0 bg-background border-b border-border p-6 flex justify-between items-start z-10">
+                            <div className="flex-1">
+                                <h2 className="text-2xl font-bold mb-1">{selectedRecipe.title}</h2>
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Clock className="h-4 w-4" />
+                                    <span>{selectedRecipe.prepTime} min</span>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setSelectedRecipe(null)}
+                                className="p-2 hover:bg-muted rounded-lg transition-colors"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        {/* Image */}
+                        {selectedRecipe.image && (
+                            <div className="aspect-video relative bg-muted">
+                                <img
+                                    src={selectedRecipe.image}
+                                    alt={selectedRecipe.title}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        )}
+
+                        {/* Nutrition Summary */}
+                        <div className="p-6 border-b border-border">
+                            <h3 className="font-semibold mb-3">Nutrition Facts</h3>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                <div className="text-center p-3 bg-muted rounded-lg">
+                                    <div className="flex items-center justify-center gap-1 mb-1">
+                                        <Flame className="h-4 w-4 text-orange-500" />
+                                        <span className="text-xs text-muted-foreground">Energy</span>
+                                    </div>
+                                    <div className="text-lg font-bold">{formatEnergy(selectedRecipe.calories, unit).split(' ')[0]}</div>
+                                    <div className="text-xs text-muted-foreground">{unit}</div>
+                                </div>
+                                <div className="text-center p-3 bg-muted rounded-lg">
+                                    <div className="flex items-center justify-center gap-1 mb-1">
+                                        <Beef className="h-4 w-4 text-red-500" />
+                                        <span className="text-xs text-muted-foreground">Protein</span>
+                                    </div>
+                                    <div className="text-lg font-bold">{Number(selectedRecipe.protein).toFixed(1)}g</div>
+                                </div>
+                                <div className="text-center p-3 bg-muted rounded-lg">
+                                    <div className="flex items-center justify-center gap-1 mb-1">
+                                        <Wheat className="h-4 w-4 text-amber-600" />
+                                        <span className="text-xs text-muted-foreground">Carbs</span>
+                                    </div>
+                                    <div className="text-lg font-bold">{Number(selectedRecipe.carbs).toFixed(1)}g</div>
+                                </div>
+                                <div className="text-center p-3 bg-muted rounded-lg">
+                                    <div className="flex items-center justify-center gap-1 mb-1">
+                                        <Droplet className="h-4 w-4 text-yellow-500" />
+                                        <span className="text-xs text-muted-foreground">Fat</span>
+                                    </div>
+                                    <div className="text-lg font-bold">{Number(selectedRecipe.fat).toFixed(1)}g</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Ingredients */}
+                        <div className="p-6 border-b border-border">
+                            <h3 className="font-semibold mb-3 flex items-center gap-2">
+                                <ShoppingBasket className="h-5 w-5" />
+                                Ingredients
+                            </h3>
+                            <ul className="space-y-2">
+                                {selectedRecipe.ingredients.map((ing, i) => (
+                                    <li key={i} className="flex items-start gap-3">
+                                        <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
+                                        <div className="flex-1">
+                                            <span className="font-medium">{ing.item}</span>
+                                            <span className="text-muted-foreground"> - {ing.amount}</span>
+                                            {ing.isMiracleProduct && (
+                                                <span className="ml-2 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded-full">
+                                                    ✨ Miracle Product
+                                                </span>
+                                            )}
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Instructions */}
+                        <div className="p-6">
+                            <h3 className="font-semibold mb-3 flex items-center gap-2">
+                                <ChefHat className="h-5 w-5" />
+                                Instructions
+                            </h3>
+                            <ol className="space-y-4">
+                                {selectedRecipe.instructions.map((instruction, i) => (
+                                    <li key={i} className="flex gap-4">
+                                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+                                            {i + 1}
+                                        </div>
+                                        <p className="flex-1 pt-1">{instruction}</p>
+                                    </li>
+                                ))}
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main >
     );
 }
