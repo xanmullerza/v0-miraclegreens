@@ -540,7 +540,10 @@ export default function MealPlannerPage() {
                                 <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 bg-muted/30 rounded-2xl border border-border/50">
                                     <div className="flex items-center gap-4">
                                         <div className="text-center cursor-pointer hover:bg-muted p-2 rounded-lg transition-colors" onClick={() => setUnit(unit === 'kcal' ? 'kJ' : 'kcal')}>
-                                            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Energy ({unit})</p>
+                                            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center justify-center gap-2">
+                                                <Flame className="h-4 w-4 text-orange-500" />
+                                                Energy ({unit})
+                                            </p>
                                             <p className="text-3xl font-bold text-foreground">{formatEnergy(plan.totalCalories, unit).split(' ')[0]}</p>
                                         </div>
                                         <div className="h-12 w-px bg-border mx-2"></div>
