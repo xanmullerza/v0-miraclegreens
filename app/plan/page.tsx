@@ -282,19 +282,22 @@ export default function MealPlannerPage() {
     const [weight, setWeight] = useState<number | ''>('');
     const [height, setHeight] = useState<number | ''>('');
 
-    const handleGenerate = () => {
+    const handleGenerate = async () => {
         setGenerating(true);
-        // Simulate "thinking" time for effect
-        setTimeout(() => {
-            const newPlan = generateDailyPlan({
+        try {
+            const newPlan = await generateDailyPlan({
                 targetCalories: calories,
                 diet,
                 numMeals: 3 // Standardize on 3 meals
             });
             setPlan(newPlan);
-            setGenerating(false);
             setStep(3);
-        }, 1500);
+        } catch (error) {
+            console.error("Failed to generate plan:", error);
+            // In a real app, show a toast or error message here
+        } finally {
+            setGenerating(false);
+        }
     };
 
     const handleNextStep = () => {

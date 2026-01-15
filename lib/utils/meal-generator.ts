@@ -1,4 +1,5 @@
-import { Recipe, RECIPES, DietType } from '../data/recipes';
+import { supabase } from '../supabase';
+import { Recipe, DietType } from '../data/recipes';
 
 interface PlanSettings {
     targetCalories: number;
@@ -20,36 +21,73 @@ export interface DailyPlan {
 }
 
 /**
- * Filter recipes by diet preference.
- */
-const getRecipesByDiet = (diet: DietType, type?: Recipe['type']) => {
-    return RECIPES.filter(r =>
-        (diet === 'anything' || r.diet.includes(diet)) &&
-        (!type || r.type === type)
-    );
-};
-
-/**
  * Randomly select an item from an array.
  */
 const getRandom = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
 /**
  * Generates a single day meal plan trying to hit the calorie target.
- * This is a simplified "random + validation" logic for MVP.
+ * Now Async to fetch from Supabase.
  */
-export const generateDailyPlan = (settings: PlanSettings): DailyPlan => {
+export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPlan> => {
     const { targetCalories, diet, numMeals } = settings;
 
+    // Fetch all recipes from Supabase with their related data
+    const { data: recipesData, error } = await supabase
+        .from('recipes')
+        .select(`
+            *,
+            ingredients (*),
+            instructions (*)
+        `);
+
+    if (error || !recipesData) {
+        console.error('Error fetching recipes:', error);
+        throw new Error('Failed to fetch recipes');
+    }
+
+    // Transform Supabase data to match Recipe interface (handling snake_case to camelCase where needed)
+    // Note: Our DB columns match the Recipe interface largely, but check nested arrays.
+    // The query returns ingredients as an array attached to the recipe object.
+    const allRecipes: Recipe[] = recipesData.map((r: any) => ({
+        id: r.id,
+        title: r.title,
+        type: r.type,
+        calories: r.calories,
+        protein: r.protein,
+        carbs: r.carbs,
+        fat: r.fat,
+        diet: r.diet, // Text array matches
+        image: r.image,
+        prepTime: r.prep_time,
+        ingredients: r.ingredients.map((i: any) => ({
+            item: i.item,
+            amount: i.amount,
+            isMiracleProduct: i.is_miracle_product
+        })),
+        instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text)
+    }));
+
+    // Filter helper
+    const getRecipesByDiet = (params: { startRecipes: Recipe[], diet: DietType, type?: Recipe['type'] }) => {
+        return params.startRecipes.filter(r =>
+            (params.diet === 'anything' || r.diet.includes(params.diet)) &&
+            (!params.type || r.type === params.type)
+        );
+    };
+
     // Get candidates
-    const breakfastOpts = getRecipesByDiet(diet, 'breakfast');
-    const lunchOpts = getRecipesByDiet(diet, 'lunch');
-    const dinnerOpts = getRecipesByDiet(diet, 'dinner');
-    const snackOpts = getRecipesByDiet(diet, 'snack');
+    const breakfastOpts = getRecipesByDiet({ startRecipes: allRecipes, diet, type: 'breakfast' });
+    const lunchOpts = getRecipesByDiet({ startRecipes: allRecipes, diet, type: 'lunch' });
+    const dinnerOpts = getRecipesByDiet({ startRecipes: allRecipes, diet, type: 'dinner' });
+    const snackOpts = getRecipesByDiet({ startRecipes: allRecipes, diet, type: 'snack' });
 
-    // Simple brute-force retry up to 10 times to find a "close enough" match
-    // If not found, return the closest one.
+    // Fallback if no recipes found for a category (shouldn't happen with seeded data but good safety)
+    if (!breakfastOpts.length || !lunchOpts.length || !dinnerOpts.length) {
+        throw new Error('Insufficient recipes for the selected criteria.');
+    }
 
+    // Simple brute-force retry up to 20 times to find a "close enough" match
     let bestPlan: DailyPlan | null = null;
     let minDiff = Infinity;
 
@@ -94,23 +132,7 @@ export const generateDailyPlan = (settings: PlanSettings): DailyPlan => {
         }
     }
 
-    if (!bestPlan) {
-        // Fallback if something fails drastically (e.g. no recipes found), return just first items
-        // In real app, handle empty states.
-        const b = breakfastOpts[0];
-        const l = lunchOpts[0];
-        const d = dinnerOpts[0];
-        return {
-            breakfast: b,
-            lunch: l,
-            dinner: d,
-            snacks: [],
-            totalCalories: b.calories + l.calories + d.calories,
-            macros: { protein: 0, carbs: 0, fat: 0 } // simplified fallback
-        };
-    }
-
-    return bestPlan;
+    return bestPlan!;
 };
 
 export interface ShoppingItem {
