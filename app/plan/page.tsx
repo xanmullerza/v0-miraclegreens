@@ -933,26 +933,100 @@ export default function MealPlannerPage() {
                                     </div>
                                 </div>
 
-                                {/* Micronutrients */}
-                                {Object.keys(nutritionData.micronutrients).length > 0 && (
-                                    <div>
-                                        <h3 className="font-semibold text-lg mb-3">Micronutrients & Details</h3>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                                            {Object.entries(nutritionData.micronutrients)
-                                                .sort(([a], [b]) => a.localeCompare(b))
-                                                .map(([key, value]: [string, any]) => (
-                                                    <div key={key} className="p-3 bg-muted/50 rounded-lg flex justify-between items-center">
-                                                        <span className="text-sm capitalize">
-                                                            {key.replace(/_/g, ' ')}
-                                                        </span>
-                                                        <span className="text-sm font-medium">
-                                                            {typeof value === 'number' ? value.toFixed(2) : value}
-                                                        </span>
-                                                    </div>
-                                                ))}
+                                {/* Micronutrients - Categorized */}
+                                {nutritionData.micronutrients && (() => {
+                                    const m = nutritionData.micronutrients;
+
+                                    // Categorize nutrients
+                                    const vitamins = {
+                                        'Vitamin A': m.vitamin_a_ug,
+                                        'Vitamin C': m.vitamin_c_mg,
+                                        'Vitamin D': m.vitamin_d_iu,
+                                        'Vitamin E': m.vitamin_e_mg,
+                                        'Vitamin K': m.vitamin_k_ug,
+                                        'Thiamine (B1)': m.thiamine_mg,
+                                        'Riboflavin (B2)': m.riboflavin_mg,
+                                        'Niacin (B3)': m.niacin_mg,
+                                        'Pantothenic Acid (B5)': m.pantothenic_acid_mg,
+                                        'Vitamin B6': m.vitamin_b6_mg,
+                                        'Vitamin B12': m.vitamin_b12_ug,
+                                        'Folate': m.folate_ug,
+                                        'Choline': m.choline_mg,
+                                    };
+
+                                    const minerals = {
+                                        'Calcium': m.calcium_mg,
+                                        'Iron': m.iron_mg,
+                                        'Magnesium': m.magnesium_mg,
+                                        'Phosphorus': m.phosphorus_mg,
+                                        'Potassium': m.potassium_mg,
+                                        'Sodium': m.sodium_mg,
+                                        'Zinc': m.zinc_mg,
+                                        'Copper': m.copper_mg,
+                                        'Manganese': m.manganese_mg,
+                                        'Selenium': m.selenium_ug,
+                                        'Iodine': m.iodine_ug,
+                                    };
+
+                                    const fats = {
+                                        'Saturated Fat': m.saturated_fat_g,
+                                        'Monounsaturated Fat': m.monounsaturated_fat_g,
+                                        'Polyunsaturated Fat': m.polyunsaturated_fat_g,
+                                        'Omega-3': m.omega_3_g,
+                                        'Omega-6': m.omega_6_g,
+                                        'Trans Fats': m.trans_fats_g,
+                                        'Cholesterol': m.cholesterol_mg,
+                                    };
+
+                                    const carbs = {
+                                        'Fiber': m.fiber_g,
+                                        'Sugars': m.sugars_g,
+                                        'Added Sugars': m.added_sugars_g,
+                                    };
+
+                                    const NutrientGrid = ({ nutrients, title }: { nutrients: Record<string, any>, title: string }) => {
+                                        const filtered = Object.entries(nutrients).filter(([_, val]) => val !== undefined && val !== null);
+                                        if (filtered.length === 0) return null;
+
+                                        return (
+                                            <div>
+                                                <h4 className="font-medium mb-3 text-primary">{title}</h4>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                    {filtered.map(([label, value]) => {
+                                                        // Determine unit
+                                                        let unit = '';
+                                                        if (label.includes('Vitamin') || label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine')) {
+                                                            unit = label.toLowerCase().includes('vitamin d') ? ' IU' :
+                                                                typeof value === 'number' && value < 1 ? ' µg' : ' mg';
+                                                        } else if (label.includes('Cholesterol') || label.toLowerCase().includes('calcium') || label.toLowerCase().includes('iron') || label.toLowerCase().includes('magnesium') || label.toLowerCase().includes('phosphorus') || label.toLowerCase().includes('potassium') || label.toLowerCase().includes('sodium') || label.toLowerCase().includes('zinc') || label.toLowerCase().includes('copper') || label.toLowerCase().includes('manganese')) {
+                                                            unit = ' mg';
+                                                        } else {
+                                                            unit = ' g';
+                                                        }
+
+                                                        return (
+                                                            <div key={label} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg">
+                                                                <span className="text-sm">{label}</span>
+                                                                <span className="text-sm font-semibold">
+                                                                    {typeof value === 'number' ? value.toFixed(2) : value}{unit}
+                                                                </span>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        );
+                                    };
+
+                                    return (
+                                        <div className="space-y-6">
+                                            <NutrientGrid nutrients={vitamins} title="Vitamins" />
+                                            <NutrientGrid nutrients={minerals} title="Minerals" />
+                                            <NutrientGrid nutrients={fats} title="Fats Breakdown" />
+                                            <NutrientGrid nutrients={carbs} title="Carbohydrates Breakdown" />
                                         </div>
-                                    </div>
-                                )}
+                                    );
+                                })()}
                             </div>
                         ) : (
                             <div className="p-12 text-center text-muted-foreground">
