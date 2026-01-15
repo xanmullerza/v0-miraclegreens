@@ -987,18 +987,18 @@ export default function MealPlannerPage() {
                                         <h3 className="font-semibold text-lg mb-3">Macronutrients</h3>
                                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                             <div className="p-4 bg-muted rounded-lg relative overflow-hidden group">
-                                                {showMoringa && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{MORINGA_TSP.energy_kcal.toFixed(0)}</div>}
+                                                {showMoringa && <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-2 py-1 rounded-bl-lg font-bold">+{MORINGA_TSP.energy_kcal.toFixed(0)}</div>}
                                                 <div className="text-sm text-muted-foreground mb-1">Energy</div>
                                                 <div className={`text-xl font-bold transition-colors ${showMoringa ? 'text-green-600 dark:text-green-400' : ''}`}>{current.energy_kcal.toFixed(1)} kcal</div>
                                                 <div className="text-xs text-muted-foreground">{current.energy_kj.toFixed(1)} kJ</div>
                                             </div>
                                             <div className="p-4 bg-muted rounded-lg relative overflow-hidden">
-                                                {showMoringa && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{MORINGA_TSP.protein_g.toFixed(1)}g</div>}
+                                                {showMoringa && <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-2 py-1 rounded-bl-lg font-bold">+{MORINGA_TSP.protein_g.toFixed(1)}g</div>}
                                                 <div className="text-sm text-muted-foreground mb-1">Protein</div>
                                                 <div className={`text-xl font-bold transition-colors ${showMoringa ? 'text-green-600 dark:text-green-400' : ''}`}>{current.protein_g.toFixed(1)}g</div>
                                             </div>
                                             <div className="p-4 bg-muted rounded-lg relative overflow-hidden">
-                                                {showMoringa && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{MORINGA_TSP.carbs_g.toFixed(1)}g</div>}
+                                                {showMoringa && <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-2 py-1 rounded-bl-lg font-bold">+{MORINGA_TSP.carbs_g.toFixed(1)}g</div>}
                                                 <div className="text-sm text-muted-foreground mb-1">Carbohydrates</div>
                                                 <div className={`text-xl font-bold transition-colors ${showMoringa ? 'text-green-600 dark:text-green-400' : ''}`}>{current.carbs_g.toFixed(1)}g</div>
                                             </div>
@@ -1098,7 +1098,7 @@ export default function MealPlannerPage() {
                                                                     <span className="text-sm relative z-10">{label}</span>
                                                                     <div className="flex items-center gap-2 relative z-10">
                                                                         {showMoringa && boostText && (
-                                                                            <span className="text-[10px] font-bold text-green-600 dark:text-green-400 bg-white dark:bg-black/20 px-1.5 rounded-full">
+                                                                            <span className="text-sm font-bold text-green-700 dark:text-green-300 bg-green-100 dark:bg-green-900/40 px-2 py-0.5 rounded-full">
                                                                                 {boostText}
                                                                             </span>
                                                                         )}
