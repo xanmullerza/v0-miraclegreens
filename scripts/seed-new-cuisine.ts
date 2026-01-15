@@ -138,6 +138,64 @@ const NEW_RECIPES = [
             { item: 'Oat Milk', amount: '1 cup' }
         ],
         instructions: ['Whisk powders with hot water.', 'Add frothed milk.']
+    },
+
+    // VEGAN & VEGETARIAN FILLERS
+    {
+        id: 'veg1',
+        title: 'Moringa Power Salad',
+        type: 'lunch',
+        calories: 380,
+        protein: 12,
+        carbs: 45,
+        fat: 15,
+        diet: ['vegan', 'vegetarian', 'anything'],
+        image: IMAGES[2], // Reuse Salad image
+        prepTime: 15,
+        ingredients: [
+            { item: 'Mixed Greens', amount: '2 cups' },
+            { item: 'Chickpeas', amount: '1/2 cup' },
+            { item: 'Moringa Oil Dressing', amount: '2 tbsp', isMiracleProduct: true }
+        ],
+        instructions: ['Toss greens and chickpeas.', 'Drizzle with dressing.']
+    },
+    {
+        id: 'veg2',
+        title: 'Cheesy Black Bean Enchiladas',
+        type: 'dinner',
+        calories: 500,
+        protein: 20,
+        carbs: 55,
+        fat: 18,
+        diet: ['vegetarian', 'anything'],
+        image: IMAGES[4], // Reuse Curry image as "saucy dish"
+        prepTime: 35,
+        ingredients: [
+            { item: 'Corn Tortillas', amount: '3' },
+            { item: 'Black Beans', amount: '1 cup' },
+            { item: 'Cheese', amount: '1/2 cup' },
+            { item: 'Enchilada Sauce', amount: '1/2 cup' }
+        ],
+        instructions: ['Fill tortillas with beans.', 'Top with sauce and cheese.', 'Bake until melted.']
+    },
+    {
+        id: 'veg3',
+        title: 'Moringa Vegetable Curry',
+        type: 'dinner',
+        calories: 420,
+        protein: 15,
+        carbs: 50,
+        fat: 14,
+        diet: ['vegan', 'vegetarian', 'anything'],
+        image: IMAGES[4], // Reuse Curry image
+        prepTime: 30,
+        ingredients: [
+            { item: 'Mixed Vegetables', amount: '2 cups' },
+            { item: 'Coconut Milk', amount: '1 cup' },
+            { item: 'Moringa Powder', amount: '1 tbsp', isMiracleProduct: true },
+            { item: 'Curry Paste', amount: '1 tbsp' }
+        ],
+        instructions: ['Simmer veggies in coconut milk and curry paste.', 'Stir in Moringa at the end.']
     }
 ];
 
