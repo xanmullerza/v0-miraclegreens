@@ -173,7 +173,7 @@ const ActivityCard = ({
     </div>
 );
 
-const RecipeCard = ({ recipe, mealLabel, unit = 'kcal' }: { recipe: Recipe, mealLabel: string, unit?: UnitType }) => (
+const RecipeCard = ({ recipe, mealLabel, unit = 'kJ' }: { recipe: Recipe, mealLabel: string, unit?: UnitType }) => (
     <div className="group relative bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-all animate-in fade-in zoom-in-95 duration-500 flex flex-col h-full">
         <div className="aspect-video relative overflow-hidden bg-muted flex-shrink-0">
             {/* Fallback pattern if no image */}
@@ -225,7 +225,7 @@ const RecipeCard = ({ recipe, mealLabel, unit = 'kcal' }: { recipe: Recipe, meal
     </div>
 );
 
-const ShoppingList = ({ items, calories, unit = 'kcal' }: { items: ShoppingItem[], calories: number, unit?: UnitType }) => {
+const ShoppingList = ({ items, calories, unit = 'kJ' }: { items: ShoppingItem[], calories: number, unit?: UnitType }) => {
     return (
         <div className="space-y-6 py-6">
             <div className="bg-primary/5 rounded-xl p-6 border border-primary/20">
@@ -282,7 +282,7 @@ export default function MealPlannerPage() {
     const [calories, setCalories] = useState(2000);
     const [diet, setDiet] = useState<DietType>('anything');
     const [mealsCount, setMealsCount] = useState(3);
-    const [unit, setUnit] = useState<UnitType>('kcal');
+    const [unit, setUnit] = useState<UnitType>('kJ');
 
     // New Fields
     const [goal, setGoal] = useState<GoalType>('maintain');
