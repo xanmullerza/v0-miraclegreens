@@ -1,6 +1,6 @@
 
 import { createClient } from '@supabase/supabase-js';
-import { RECIPES } from '../lib/data/recipes';
+import { RECIPES } from './data/seed-data';
 import * as dotenv from 'dotenv';
 import path from 'path';
 
