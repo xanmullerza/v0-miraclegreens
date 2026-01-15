@@ -190,36 +190,23 @@ const RecipeCard = ({ recipe, mealLabel, unit = 'kJ' }: { recipe: Recipe, mealLa
         </div>
         <div className="p-5 flex flex-col flex-grow">
             <h4 className="font-bold text-lg mb-2 line-clamp-1">{recipe.title}</h4>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+            <div className="grid grid-cols-2 gap-y-1 text-sm text-muted-foreground mt-auto">
                 <span className="flex items-center gap-1">
                     <Flame className="h-4 w-4 text-orange-500" />
                     {formatEnergy(recipe.calories, unit)}
                 </span>
                 <span className="flex items-center gap-1">
                     <Leaf className="h-4 w-4 text-green-500" />
-                    {recipe.protein}g protein
+                    {recipe.protein}g P
                 </span>
-            </div>
-            <div className="flex flex-wrap gap-2 mt-auto">
-                {recipe.ingredients.slice(0, 3).map((ing, i) => (
-                    <span
-                        key={i}
-                        className={cn(
-                            "text-xs px-2 py-1 rounded-md border",
-                            ing.isMiracleProduct
-                                ? "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800 font-medium"
-                                : "bg-muted text-muted-foreground border-transparent"
-                        )}
-                    >
-                        {ing.isMiracleProduct && <Sparkles className="inline-block h-3 w-3 mr-1" />}
-                        {ing.item}
-                    </span>
-                ))}
-                {recipe.ingredients.length > 3 && (
-                    <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-md border border-transparent">
-                        +{recipe.ingredients.length - 3} more
-                    </span>
-                )}
+                <span className="flex items-center gap-1">
+                    <div className="h-2 w-2 rounded-full bg-yellow-500" />
+                    {recipe.fat}g F
+                </span>
+                <span className="flex items-center gap-1">
+                    <div className="h-2 w-2 rounded-full bg-blue-500" />
+                    {recipe.carbs}g C
+                </span>
             </div>
         </div>
     </div>
