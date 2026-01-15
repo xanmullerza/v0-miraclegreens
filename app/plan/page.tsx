@@ -521,7 +521,7 @@ export default function MealPlannerPage() {
                                         <div>
                                             <h2 className="text-3xl font-bold mb-2">Ready to cook?</h2>
                                             <p className="text-muted-foreground">
-                                                We'll generate a <strong>{diet}</strong> plan with roughly <strong>{formatEnergy(calories, unit)}</strong> across <strong>3</strong> standard meals.
+                                                We'll generate a <strong className="capitalize">{diet === 'anything' ? 'Balanced' : diet}</strong> plan with roughly <strong>{formatEnergy(calories, unit)}</strong> across <strong>3</strong> standard meals.
                                             </p>
                                         </div>
                                         <Button size="lg" onClick={handleGenerate} className="w-full h-14 text-lg rounded-xl">
