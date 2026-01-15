@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/sheet"
 import { DietType, Recipe } from '@/lib/data/recipes';
 import { generateDailyPlan, DailyPlan, generateShoppingList, ShoppingItem } from '@/lib/utils/meal-generator';
+import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
@@ -178,7 +179,13 @@ const ActivityCard = ({
     </div>
 );
 
-const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onClick }: { recipe: Recipe, mealLabel: string, unit?: UnitType, onClick?: () => void }) => {
+const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onClick, onNutritionClick }: {
+    recipe: Recipe,
+    mealLabel: string,
+    unit?: UnitType,
+    onClick?: () => void,
+    onNutritionClick?: () => void
+}) => {
     const [imageError, setImageError] = useState(false);
 
     return (
@@ -232,6 +239,15 @@ const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onClick }: { recipe: Recip
                     }}
                 >
                     View Recipe
+                </button>
+                <button
+                    className="mt-2 w-full py-2 px-4 bg-green-500/10 hover:bg-green-500/20 text-green-700 dark:text-green-400 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onNutritionClick?.();
+                    }}
+                >
+                    View Nutritional Info
                 </button>
             </div>
         </div>
@@ -291,6 +307,9 @@ export default function MealPlannerPage() {
     const [generating, setGenerating] = useState(false);
     const [plan, setPlan] = useState<DailyPlan | null>(null);
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+    const [nutritionRecipe, setNutritionRecipe] = useState<Recipe | null>(null);
+    const [nutritionData, setNutritionData] = useState<any>(null);
+    const [loadingNutrition, setLoadingNutrition] = useState(false);
 
     // Form State
     const [calories, setCalories] = useState(2000);
@@ -360,6 +379,72 @@ export default function MealPlannerPage() {
 
     const handleRegenerate = () => {
         handleGenerate();
+    };
+
+    const handleShowNutrition = async (recipe: Recipe) => {
+        setNutritionRecipe(recipe);
+        setLoadingNutrition(true);
+
+        try {
+            // Fetch recipe with full ingredient and food_items data
+            const { data, error } = await supabase
+                .from('recipes')
+                .select(`
+                    *,
+                    ingredients (
+                        *,
+                        food_items (*)
+                    )
+                `)
+                .eq('id', recipe.id)
+                .single();
+
+            if (error || !data) {
+                console.error('Error fetching nutrition:', error);
+                return;
+            }
+
+            // Calculate complete nutrition from ingredients
+            const nutrition: any = {
+                energy_kcal: 0,
+                energy_kj: 0,
+                protein_g: 0,
+                carbs_g: 0,
+                fat_g: 0,
+                micronutrients: {}
+            };
+
+            // Sum up all micronutrients from ingredients
+            for (const ing of data.ingredients) {
+                if (ing.food_items && ing.weight_g) {
+                    const foodItem = ing.food_items;
+                    const ratio = ing.weight_g / 100;
+
+                    // Macros
+                    nutrition.energy_kcal += (foodItem.energy_kcal || 0) * ratio;
+                    nutrition.energy_kj += (foodItem.energy_kj || 0) * ratio;
+                    nutrition.protein_g += (foodItem.protein_g || 0) * ratio;
+                    nutrition.carbs_g += (foodItem.carbs_g || 0) * ratio;
+                    nutrition.fat_g += (foodItem.fat_g || 0) * ratio;
+
+                    // Micronutrients (from JSONB)
+                    if (foodItem.micronutrients) {
+                        const micro = foodItem.micronutrients;
+                        for (const [key, value] of Object.entries(micro)) {
+                            if (typeof value === 'number') {
+                                nutrition.micronutrients[key] = (nutrition.micronutrients[key] || 0) + (value * ratio);
+                            }
+                        }
+                    }
+                }
+            }
+
+            setNutritionData(nutrition);
+        } catch (err) {
+            console.error('Error calculating nutrition:', err);
+        } finally {
+            setLoadingNutrition(false);
+        }
     };
 
     const shoppingList = plan ? generateShoppingList(plan) : [];
@@ -594,17 +679,41 @@ export default function MealPlannerPage() {
                                 {/* Meal Grid */}
                                 <div className="flex flex-wrap justify-center gap-6 pb-24 md:pb-0">
                                     <div className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.33%-1rem)] animate-in fade-in slide-in-from-bottom-4 duration-500 delay-0 fill-mode-backwards">
-                                        <RecipeCard recipe={plan.breakfast} mealLabel="Breakfast" unit={unit} onClick={() => setSelectedRecipe(plan.breakfast)} />
+                                        <RecipeCard
+                                            recipe={plan.breakfast}
+                                            mealLabel="Breakfast"
+                                            unit={unit}
+                                            onClick={() => setSelectedRecipe(plan.breakfast)}
+                                            onNutritionClick={() => handleShowNutrition(plan.breakfast)}
+                                        />
                                     </div>
                                     <div className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.33%-1rem)] animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 fill-mode-backwards">
-                                        <RecipeCard recipe={plan.lunch} mealLabel="Lunch" unit={unit} onClick={() => setSelectedRecipe(plan.lunch)} />
+                                        <RecipeCard
+                                            recipe={plan.lunch}
+                                            mealLabel="Lunch"
+                                            unit={unit}
+                                            onClick={() => setSelectedRecipe(plan.lunch)}
+                                            onNutritionClick={() => handleShowNutrition(plan.lunch)}
+                                        />
                                     </div>
                                     <div className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.33%-1rem)] animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-backwards">
-                                        <RecipeCard recipe={plan.dinner} mealLabel="Dinner" unit={unit} onClick={() => setSelectedRecipe(plan.dinner)} />
+                                        <RecipeCard
+                                            recipe={plan.dinner}
+                                            mealLabel="Dinner"
+                                            unit={unit}
+                                            onClick={() => setSelectedRecipe(plan.dinner)}
+                                            onNutritionClick={() => handleShowNutrition(plan.dinner)}
+                                        />
                                     </div>
                                     {plan.snacks.map((snack, i) => (
                                         <div key={i} className={`w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.33%-1rem)] animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-backwards delay-[${(i + 3) * 100}ms]`}>
-                                            <RecipeCard recipe={snack} mealLabel={`Snack ${i + 1}`} unit={unit} onClick={() => setSelectedRecipe(snack)} />
+                                            <RecipeCard
+                                                recipe={snack}
+                                                mealLabel={`Snack ${i + 1}`}
+                                                unit={unit}
+                                                onClick={() => setSelectedRecipe(snack)}
+                                                onNutritionClick={() => handleShowNutrition(snack)}
+                                            />
                                         </div>
                                     ))}
                                 </div>
@@ -759,6 +868,97 @@ export default function MealPlannerPage() {
                                 ))}
                             </ol>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Nutritional Info Modal */}
+            {nutritionRecipe && (
+                <div
+                    className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+                    onClick={() => {
+                        setNutritionRecipe(null);
+                        setNutritionData(null);
+                    }}
+                >
+                    <div
+                        className="bg-background rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Header */}
+                        <div className="sticky top-0 bg-background border-b border-border p-6 flex justify-between items-start z-10">
+                            <div className="flex-1">
+                                <h2 className="text-2xl font-bold mb-1">Complete Nutritional Information</h2>
+                                <p className="text-muted-foreground">{nutritionRecipe.title}</p>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    setNutritionRecipe(null);
+                                    setNutritionData(null);
+                                }}
+                                className="p-2 hover:bg-muted rounded-lg transition-colors"
+                            >
+                                <X className="h-5 w-5" />
+                            </button>
+                        </div>
+
+                        {loadingNutrition ? (
+                            <div className="p-12 text-center">
+                                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                <p className="mt-4 text-muted-foreground">Calculating nutrition...</p>
+                            </div>
+                        ) : nutritionData ? (
+                            <div className="p-6 space-y-6">
+                                {/* Macronutrients */}
+                                <div>
+                                    <h3 className="font-semibold text-lg mb-3">Macronutrients</h3>
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                        <div className="p-4 bg-muted rounded-lg">
+                                            <div className="text-sm text-muted-foreground mb-1">Energy</div>
+                                            <div className="text-xl font-bold">{nutritionData.energy_kcal.toFixed(1)} kcal</div>
+                                            <div className="text-xs text-muted-foreground">{nutritionData.energy_kj.toFixed(1)} kJ</div>
+                                        </div>
+                                        <div className="p-4 bg-muted rounded-lg">
+                                            <div className="text-sm text-muted-foreground mb-1">Protein</div>
+                                            <div className="text-xl font-bold">{nutritionData.protein_g.toFixed(1)}g</div>
+                                        </div>
+                                        <div className="p-4 bg-muted rounded-lg">
+                                            <div className="text-sm text-muted-foreground mb-1">Carbohydrates</div>
+                                            <div className="text-xl font-bold">{nutritionData.carbs_g.toFixed(1)}g</div>
+                                        </div>
+                                        <div className="p-4 bg-muted rounded-lg">
+                                            <div className="text-sm text-muted-foreground mb-1">Fat</div>
+                                            <div className="text-xl font-bold">{nutritionData.fat_g.toFixed(1)}g</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Micronutrients */}
+                                {Object.keys(nutritionData.micronutrients).length > 0 && (
+                                    <div>
+                                        <h3 className="font-semibold text-lg mb-3">Micronutrients & Details</h3>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                            {Object.entries(nutritionData.micronutrients)
+                                                .sort(([a], [b]) => a.localeCompare(b))
+                                                .map(([key, value]: [string, any]) => (
+                                                    <div key={key} className="p-3 bg-muted/50 rounded-lg flex justify-between items-center">
+                                                        <span className="text-sm capitalize">
+                                                            {key.replace(/_/g, ' ')}
+                                                        </span>
+                                                        <span className="text-sm font-medium">
+                                                            {typeof value === 'number' ? value.toFixed(2) : value}
+                                                        </span>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="p-12 text-center text-muted-foreground">
+                                No detailed nutritional data available for this recipe.
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
