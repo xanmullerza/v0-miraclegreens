@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
-import { BookOpen, PlayCircle, Search, ArrowRight, ArrowLeft, Headphones, X, Maximize2, ExternalLink, Download } from 'lucide-react';
+import { BookOpen, PlayCircle, Search, ArrowRight, ArrowLeft, Headphones, X, Maximize2, ExternalLink, Download, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,31 @@ import { Badge } from '../../components/ui/badge';
 import { cn } from '@/lib/utils';
 
 
+
+const resources = [
+    {
+        id: 'malnutrition',
+        title: 'Complementary Feeding Practices and Childhood Malnutrition in South Africa',
+        description: 'A comprehensive narrative review exploring Moringa leaf powder as a malnutrition fortificant.',
+        pdfUrl: '/nutrients-15-02011.pdf',
+        audioUrl: '/Moringa_Powder_Combats_South_African_Malnutrition.m4a',
+        videoUrl: '/The_Moringa_Solution.mp4',
+        pdfSize: '335 KB',
+        year: '2023',
+        source: 'Nutrients'
+    },
+    {
+        id: 'production',
+        title: 'Moringa oleifera in South Africa: A Review on Production & Consumption',
+        description: 'High-level research on growing conditions, production, and processing within South Africa.',
+        pdfUrl: '/moringa_production_in_south_africa.pdf',
+        audioUrl: '/Moringa_The_Miracle_Tree_in_South_Africa.m4a',
+        videoUrl: '/The_Miracle_Tree.mp4',
+        pdfSize: '415 KB',
+        year: '2023',
+        source: 'Research Review'
+    }
+];
 
 export default function BrowsePage() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -23,7 +48,10 @@ export default function BrowsePage() {
         title: string;
     } | null>(null);
 
-
+    const filteredResources = resources.filter(res =>
+        res.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        res.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
         <main className="min-h-screen flex flex-col bg-background selection:bg-primary/10">
@@ -63,7 +91,7 @@ export default function BrowsePage() {
                                     className="h-14 px-8 text-lg gap-2"
                                     onClick={() => {
                                         setWatchingId('production');
-                                        setTimeout(() => document.getElementById('production-video')?.scrollIntoView({ behavior: 'smooth' }), 100);
+                                        setTimeout(() => document.getElementById('resource-production')?.scrollIntoView({ behavior: 'smooth' }), 100);
                                     }}
                                 >
                                     <PlayCircle className="h-6 w-6" />
@@ -73,7 +101,7 @@ export default function BrowsePage() {
                                     size="lg"
                                     variant="outline"
                                     className="h-14 px-8 text-lg gap-2 text-white border-white/20 hover:bg-white/10 hover:text-white"
-                                    onClick={() => document.getElementById('research-papers')?.scrollIntoView({ behavior: 'smooth' })}
+                                    onClick={() => document.getElementById('knowledge-base')?.scrollIntoView({ behavior: 'smooth' })}
                                 >
                                     <BookOpen className="h-6 w-6" />
                                     Read Study
@@ -83,334 +111,236 @@ export default function BrowsePage() {
                     </div>
                 </section>
 
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     {/* Search and Navigation */}
-                    <div className="space-y-8">
-                        <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
-                            <h2 className="text-3xl font-bold font-serif text-foreground">Explore Resources</h2>
+                    <div className="space-y-12">
+                        <div className="flex flex-col md:flex-row gap-6 items-center justify-between border-b pb-8">
+                            <div>
+                                <h2 className="text-4xl font-bold font-serif text-foreground mb-2">Knowledge Base</h2>
+                                <p className="text-muted-foreground text-lg">Deep dive into scientific studies, nutritional facts, and comprehensive research.</p>
+                            </div>
                             <div className="relative w-full md:w-96">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                                 <Input
                                     placeholder="Search articles, videos, podcasts..."
-                                    className="pl-10 h-12 bg-card text-lg"
+                                    className="pl-10 h-12 bg-card text-lg rounded-xl shadow-sm border-muted-foreground/20"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                 />
                             </div>
                         </div>
 
-                        {/* Resource Cards */}
-                        <div id="research-papers" className="grid grid-cols-1 gap-8">
-                            {/* Paper 1: Malnutrition */}
-                            <div className="group relative bg-card p-6 md:p-8 rounded-3xl border border-border transition-all hover:shadow-lg">
-                                <div className="flex items-start justify-between gap-4">
-                                    <div>
-                                        <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
-                                            Complementary Feeding Practices and Childhood Malnutrition in South Africa
-                                        </h3>
-                                        <p className="text-muted-foreground text-lg mb-6 leading-relaxed">
-                                            A comprehensive narrative review exploring the potential of Moringa Oleifera leaf powder as a fortificant to fight childhood malnutrition. Published in <em>Nutrients</em> (2023).
-                                        </p>
-                                        <div className="flex flex-wrap items-center gap-3 mb-2">
-                                            <Button
-                                                variant={readingId === 'malnutrition' ? "default" : "outline"}
-                                                size="sm"
-                                                onClick={() => {
-                                                    setReadingId(readingId === 'malnutrition' ? null : 'malnutrition');
-                                                    setListeningId(null);
-                                                    setWatchingId(null);
-                                                }}
-                                                className="gap-2"
-                                            >
-                                                <BookOpen className="h-4 w-4" />
-                                                {readingId === 'malnutrition' ? 'Close Paper' : 'Read Paper'}
-                                            </Button>
-                                            <Button
-                                                variant={listeningId === 'malnutrition' ? "default" : "secondary"}
-                                                size="sm"
-                                                onClick={() => {
-                                                    setListeningId(listeningId === 'malnutrition' ? null : 'malnutrition');
-                                                    setWatchingId(null);
-                                                    setReadingId(null);
-                                                }}
-                                                className="gap-2"
-                                            >
-                                                <Headphones className="h-4 w-4" />
-                                                {listeningId === 'malnutrition' ? 'Close Player' : 'Listen to Podcast'}
-                                            </Button>
-                                            <Button
-                                                variant={watchingId === 'malnutrition' ? "default" : "secondary"}
-                                                size="sm"
-                                                onClick={() => {
-                                                    setWatchingId(watchingId === 'malnutrition' ? null : 'malnutrition');
-                                                    setListeningId(null);
-                                                    setReadingId(null);
-                                                }}
-                                                className="gap-2"
-                                            >
-                                                <PlayCircle className="h-4 w-4" />
-                                                {watchingId === 'malnutrition' ? 'Close Video' : 'Watch Video'}
-                                            </Button>
-                                            <span className="text-xs text-muted-foreground ml-1">PDF • 335 KB</span>
-                                        </div>
-
-                                        {watchingId === 'malnutrition' && (
-                                            <div className="mt-6 p-2 rounded-2xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                <div className="flex items-center justify-between mb-2 px-2 pt-1 border-b border-red-100/50 dark:border-red-800/50 pb-2">
-                                                    <span className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">Video Documentary</span>
-                                                    <div className="flex gap-2">
-                                                        <button
-                                                            onClick={() => setFullScreenItem({ type: 'video', url: '/The_Moringa_Solution.mp4', title: 'The Moringa Solution' })}
-                                                            className="text-muted-foreground hover:text-red-600 transition-colors"
-                                                            title="Fullscreen"
-                                                        >
-                                                            <Maximize2 className="h-4 w-4" />
-                                                        </button>
-                                                        <button onClick={() => setWatchingId(null)} className="text-muted-foreground hover:text-foreground">
-                                                            <X className="h-4 w-4" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    className="group/video relative aspect-video rounded-xl overflow-hidden bg-black shadow-inner cursor-pointer"
-                                                    onClick={() => setFullScreenItem({ type: 'video', url: '/The_Moringa_Solution.mp4', title: 'The Moringa Solution' })}
-                                                >
-                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/video:opacity-100 transition-opacity z-10 flex items-center justify-center">
-                                                        <div className="bg-white/20 backdrop-blur-md p-4 rounded-full">
-                                                            <Maximize2 className="h-8 w-8 text-white" />
-                                                        </div>
-                                                    </div>
-                                                    <video muted playsInline className="w-full h-full object-cover">
-                                                        <source src="/The_Moringa_Solution.mp4" type="video/mp4" />
-                                                    </video>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {listeningId === 'malnutrition' && (
-                                            <div className="mt-6 p-4 rounded-2xl bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <span className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Audio Summary</span>
-                                                    <div className="flex items-center gap-3">
-                                                        <a
-                                                            href="/Moringa_Powder_Combats_South_African_Malnutrition.m4a"
-                                                            download="Moringa_Powder_Combats_South_African_Malnutrition.m4a"
-                                                            className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
-                                                            title="Download Podcast"
-                                                        >
-                                                            <Download className="h-4 w-4" />
-                                                        </a>
-                                                        <button onClick={() => setListeningId(null)} className="text-muted-foreground hover:text-foreground">
-                                                            <X className="h-4 w-4" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <audio controls className="w-full h-8">
-                                                    <source src="/Moringa_Powder_Combats_South_African_Malnutrition.m4a" type="audio/x-m4a" />
-                                                </audio>
-                                            </div>
-                                        )}
-
-                                        {readingId === 'malnutrition' && (
-                                            <div className="mt-6 p-2 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                <div className="flex items-center justify-between mb-2 px-2 pt-1 border-b border-blue-100/50 dark:border-blue-800/50 pb-2">
-                                                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Research Document</span>
-                                                    <div className="flex gap-3">
-                                                        <button
-                                                            onClick={() => setFullScreenItem({ type: 'pdf', url: '/nutrients-15-02011.pdf', title: 'Malnutrition Study' })}
-                                                            className="text-muted-foreground hover:text-blue-600 transition-colors"
-                                                            title="Fullscreen"
-                                                        >
-                                                            <Maximize2 className="h-4 w-4" />
-                                                        </button>
-                                                        <button onClick={() => setReadingId(null)} className="text-muted-foreground hover:text-foreground">
-                                                            <X className="h-4 w-4" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    className="group/pdf relative w-full h-[500px] rounded-xl overflow-hidden bg-white border border-blue-100/50 cursor-pointer"
-                                                    onClick={() => setFullScreenItem({ type: 'pdf', url: '/nutrients-15-02011.pdf', title: 'Malnutrition Study' })}
-                                                >
-                                                    <div className="absolute inset-0 bg-blue-600/10 opacity-0 group-hover/pdf:opacity-100 transition-opacity z-10 flex items-center justify-center pointer-events-none">
-                                                        <div className="bg-white shadow-xl p-3 rounded-full scale-90 group-hover/pdf:scale-100 transition-transform">
-                                                            <div className="flex items-center gap-2 text-blue-600 font-bold px-1">
-                                                                <Maximize2 className="h-5 w-5" />
-                                                                <span>Click to expand</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <iframe
-                                                        src="/nutrients-15-02011.pdf#toolbar=0&navpanes=0"
-                                                        className="w-full h-full pointer-events-none"
-                                                        title="Malnutrition Study"
-                                                    />
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+                        {/* Knowledge Base Table */}
+                        <div id="knowledge-base" className="space-y-4">
+                            {/* Table Header - Desktop */}
+                            <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 text-sm font-bold text-muted-foreground uppercase tracking-wider border-b border-muted/50">
+                                <div className="col-span-1">Type</div>
+                                <div className="col-span-6">Resource Title</div>
+                                <div className="col-span-1">Year</div>
+                                <div className="col-span-4 text-right">Actions</div>
                             </div>
 
-                            {/* Paper 2: Production */}
-                            <div className="group relative bg-card p-6 md:p-8 rounded-3xl border border-border transition-all hover:shadow-lg">
-                                <div className="flex items-start justify-between gap-4">
-                                    <div>
-                                        <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
-                                            Moringa oleifera in South Africa: A Review on Production & Consumption
-                                        </h3>
-                                        <p className="text-muted-foreground text-lg mb-6 leading-relaxed">
-                                            This review highlights research on growing conditions, production, processing, and the consumption of Moringa as a food source within South Africa.
-                                        </p>
-                                        <div className="flex flex-wrap items-center gap-3 mb-2">
-                                            <Button
-                                                variant={readingId === 'production' ? "default" : "outline"}
-                                                size="sm"
-                                                onClick={() => {
-                                                    setReadingId(readingId === 'production' ? null : 'production');
-                                                    setListeningId(null);
-                                                    setWatchingId(null);
-                                                }}
-                                                className="gap-2"
-                                            >
-                                                <BookOpen className="h-4 w-4" />
-                                                {readingId === 'production' ? 'Close Paper' : 'Read Paper'}
-                                            </Button>
-                                            <Button
-                                                variant={listeningId === 'production' ? "default" : "secondary"}
-                                                size="sm"
-                                                onClick={() => {
-                                                    setListeningId(listeningId === 'production' ? null : 'production');
-                                                    setWatchingId(null);
-                                                    setReadingId(null);
-                                                }}
-                                                className="gap-2"
-                                            >
-                                                <Headphones className="h-4 w-4" />
-                                                {listeningId === 'production' ? 'Close Player' : 'Listen to Podcast'}
-                                            </Button>
-                                            <Button
-                                                variant={watchingId === 'production' ? "default" : "secondary"}
-                                                size="sm"
-                                                onClick={() => {
-                                                    setWatchingId(watchingId === 'production' ? null : 'production');
-                                                    setListeningId(null);
-                                                    setReadingId(null);
-                                                }}
-                                                className="gap-2"
-                                            >
-                                                <PlayCircle className="h-4 w-4" />
-                                                {watchingId === 'production' ? 'Close Video' : 'Watch Video'}
-                                            </Button>
-                                            <span className="text-xs text-muted-foreground ml-1">PDF • 415 KB</span>
+                            {/* Resource Rows */}
+                            <div className="space-y-2">
+                                {filteredResources.map((res) => (
+                                    <div
+                                        key={res.id}
+                                        id={`resource-${res.id}`}
+                                        className={cn(
+                                            "group flex flex-col rounded-2xl border transition-all hover:bg-muted/30",
+                                            (readingId === res.id || watchingId === res.id || listeningId === res.id)
+                                                ? "bg-muted/50 border-primary/20 shadow-sm"
+                                                : "bg-card border-border shadow-none"
+                                        )}
+                                    >
+                                        <div className="md:grid grid-cols-12 gap-4 items-center px-6 py-4">
+                                            {/* Type Icon */}
+                                            <div className="hidden md:block col-span-1">
+                                                <div className="p-2 w-fit rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+                                                    <BookOpen className="h-5 w-5" />
+                                                </div>
+                                            </div>
+
+                                            {/* Title & Description */}
+                                            <div className="col-span-12 md:col-span-6 space-y-1">
+                                                <h3 className="text-lg font-bold text-foreground leading-tight group-hover:text-primary transition-colors">
+                                                    {res.title}
+                                                </h3>
+                                                <p className="text-sm text-muted-foreground md:line-clamp-1 group-hover:line-clamp-none transition-all">
+                                                    {res.description}
+                                                </p>
+                                            </div>
+
+                                            {/* Metadata */}
+                                            <div className="hidden md:block col-span-1 text-sm text-muted-foreground font-medium">
+                                                {res.year}
+                                            </div>
+
+                                            {/* Actions */}
+                                            <div className="col-span-12 md:col-span-4 flex items-center justify-end gap-2 mt-4 md:mt-0">
+                                                <Button
+                                                    variant={readingId === res.id ? "default" : "ghost"}
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        setReadingId(readingId === res.id ? null : res.id);
+                                                        setListeningId(null);
+                                                        setWatchingId(null);
+                                                    }}
+                                                    className="gap-2 rounded-lg"
+                                                >
+                                                    <BookOpen className="h-4 w-4" />
+                                                    <span className="hidden lg:inline">{readingId === res.id ? 'Close' : 'Read'}</span>
+                                                </Button>
+                                                <Button
+                                                    variant={listeningId === res.id ? "default" : "ghost"}
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        setListeningId(listeningId === res.id ? null : res.id);
+                                                        setWatchingId(null);
+                                                        setReadingId(null);
+                                                    }}
+                                                    className="gap-2 rounded-lg"
+                                                >
+                                                    <Headphones className="h-4 w-4" />
+                                                    <span className="hidden lg:inline">{listeningId === res.id ? 'Close' : 'Listen'}</span>
+                                                </Button>
+                                                <Button
+                                                    variant={watchingId === res.id ? "default" : "ghost"}
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        setWatchingId(watchingId === res.id ? null : res.id);
+                                                        setListeningId(null);
+                                                        setReadingId(null);
+                                                    }}
+                                                    className="gap-2 rounded-lg"
+                                                >
+                                                    <PlayCircle className="h-4 w-4" />
+                                                    <span className="hidden lg:inline">{watchingId === res.id ? 'Close' : 'Watch'}</span>
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    title={`Download PDF (${res.pdfSize})`}
+                                                    className="rounded-lg text-muted-foreground hover:text-primary"
+                                                    asChild
+                                                >
+                                                    <a href={res.pdfUrl} download={res.pdfUrl.split('/').pop()}>
+                                                        <Download className="h-4 w-4" />
+                                                    </a>
+                                                </Button>
+                                            </div>
                                         </div>
 
-                                        {watchingId === 'production' && (
-                                            <div id="production-video" className="mt-6 p-2 rounded-2xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                <div className="flex items-center justify-between mb-2 px-2 pt-1 border-b border-red-100/50 dark:border-red-800/50 pb-2">
-                                                    <span className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">Visual Guide</span>
-                                                    <div className="flex gap-2">
-                                                        <button
-                                                            onClick={() => setFullScreenItem({ type: 'video', url: '/The_Miracle_Tree.mp4', title: 'The Miracle Tree' })}
-                                                            className="text-muted-foreground hover:text-red-600 transition-colors"
-                                                            title="Fullscreen"
-                                                        >
-                                                            <Maximize2 className="h-4 w-4" />
-                                                        </button>
-                                                        <button onClick={() => setWatchingId(null)} className="text-muted-foreground hover:text-foreground">
-                                                            <X className="h-4 w-4" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    className="group/video relative aspect-video rounded-xl overflow-hidden bg-black shadow-inner cursor-pointer"
-                                                    onClick={() => setFullScreenItem({ type: 'video', url: '/The_Miracle_Tree.mp4', title: 'The Miracle Tree' })}
-                                                >
-                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/video:opacity-100 transition-opacity z-10 flex items-center justify-center">
-                                                        <div className="bg-white/20 backdrop-blur-md p-4 rounded-full">
-                                                            <Maximize2 className="h-8 w-8 text-white" />
+                                        {/* Expandable Content Area */}
+                                        <div className="px-6 overflow-hidden">
+                                            {/* Video Player */}
+                                            {watchingId === res.id && (
+                                                <div className="pb-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                                                    <div className="relative aspect-video rounded-2xl overflow-hidden bg-black shadow-2xl group/video">
+                                                        <video controls autoPlay className="w-full h-full object-cover">
+                                                            <source src={res.videoUrl} type="video/mp4" />
+                                                        </video>
+                                                        <div className="absolute top-4 right-4 flex gap-2">
+                                                            <Button
+                                                                size="sm"
+                                                                variant="secondary"
+                                                                className="bg-black/50 backdrop-blur-md text-white border-0 hover:bg-black/70"
+                                                                onClick={() => setFullScreenItem({ type: 'video', url: res.videoUrl, title: res.title })}
+                                                            >
+                                                                <Maximize2 className="h-4 w-4 mr-2" />
+                                                                Fullscreen
+                                                            </Button>
+                                                            <Button
+                                                                size="icon"
+                                                                variant="secondary"
+                                                                className="bg-black/50 backdrop-blur-md text-white border-0 hover:bg-black/70"
+                                                                onClick={() => setWatchingId(null)}
+                                                            >
+                                                                <X className="h-4 w-4" />
+                                                            </Button>
                                                         </div>
                                                     </div>
-                                                    <video muted playsInline className="w-full h-full object-cover">
-                                                        <source src="/The_Miracle_Tree.mp4" type="video/mp4" />
-                                                    </video>
                                                 </div>
-                                            </div>
-                                        )}
+                                            )}
 
-                                        {listeningId === 'production' && (
-                                            <div className="mt-6 p-4 rounded-2xl bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <span className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Audio Review</span>
-                                                    <div className="flex items-center gap-3">
-                                                        <a
-                                                            href="/Moringa_The_Miracle_Tree_in_South_Africa.m4a"
-                                                            download="Moringa_The_Miracle_Tree_in_South_Africa.m4a"
-                                                            className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
-                                                            title="Download Podcast"
-                                                        >
-                                                            <Download className="h-4 w-4" />
-                                                        </a>
-                                                        <button onClick={() => setListeningId(null)} className="text-muted-foreground hover:text-foreground">
-                                                            <X className="h-4 w-4" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <audio controls className="w-full h-8">
-                                                    <source src="/Moringa_The_Miracle_Tree_in_South_Africa.m4a" type="audio/x-m4a" />
-                                                </audio>
-                                            </div>
-                                        )}
-
-                                        {readingId === 'production' && (
-                                            <div className="mt-6 p-2 rounded-2xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                <div className="flex items-center justify-between mb-2 px-2 pt-1 border-b border-blue-100/50 dark:border-blue-800/50 pb-2">
-                                                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Production & Processing Review</span>
-                                                    <div className="flex gap-3">
-                                                        <button
-                                                            onClick={() => setFullScreenItem({ type: 'pdf', url: '/moringa_production_in_south_africa.pdf', title: 'Production Review' })}
-                                                            className="text-muted-foreground hover:text-blue-600 transition-colors"
-                                                            title="Fullscreen"
-                                                        >
-                                                            <Maximize2 className="h-4 w-4" />
-                                                        </button>
-                                                        <button onClick={() => setReadingId(null)} className="text-muted-foreground hover:text-foreground">
-                                                            <X className="h-4 w-4" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                                <div
-                                                    className="group/pdf relative w-full h-[500px] rounded-xl overflow-hidden bg-white border border-blue-100/50 cursor-pointer"
-                                                    onClick={() => setFullScreenItem({ type: 'pdf', url: '/moringa_production_in_south_africa.pdf', title: 'Production Review' })}
-                                                >
-                                                    <div className="absolute inset-0 bg-blue-600/10 opacity-0 group-hover/pdf:opacity-100 transition-opacity z-10 flex items-center justify-center pointer-events-none">
-                                                        <div className="bg-white shadow-xl p-3 rounded-full scale-90 group-hover/pdf:scale-100 transition-transform">
-                                                            <div className="flex items-center gap-2 text-blue-600 font-bold px-1">
-                                                                <Maximize2 className="h-5 w-5" />
-                                                                <span>Click to expand</span>
+                                            {/* Audio Player */}
+                                            {listeningId === res.id && (
+                                                <div className="pb-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                                                    <div className="p-4 rounded-2xl bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 flex flex-col md:flex-row items-center gap-4">
+                                                        <div className="flex-1 w-full">
+                                                            <div className="flex items-center justify-between mb-2">
+                                                                <span className="text-xs font-bold text-purple-600 dark:text-purple-400 font-mono tracking-tighter">AUDIO SUMMARY • {res.source}</span>
+                                                                <button onClick={() => setListeningId(null)} className="text-muted-foreground hover:text-foreground">
+                                                                    <X className="h-4 w-4" />
+                                                                </button>
                                                             </div>
+                                                            <audio controls className="w-full h-10">
+                                                                <source src={res.audioUrl} type="audio/x-m4a" />
+                                                            </audio>
+                                                        </div>
+                                                        <Button variant="outline" size="sm" asChild className="shrink-0 gap-2 border-purple-200 text-purple-600 hover:bg-purple-100">
+                                                            <a href={res.audioUrl} download={res.audioUrl.split('/').pop()}>
+                                                                <Download className="h-4 w-4" />
+                                                                Batch Download
+                                                            </a>
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* PDF Viewer */}
+                                            {readingId === res.id && (
+                                                <div className="pb-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                                                    <div className="relative h-[600px] rounded-2xl overflow-hidden bg-white border border-blue-100 shadow-xl group/pdf">
+                                                        <iframe
+                                                            src={`${res.pdfUrl}#toolbar=0&navpanes=0`}
+                                                            className="w-full h-full border-none"
+                                                            title={res.title}
+                                                        />
+                                                        <div className="absolute top-4 right-4 flex gap-2">
+                                                            <Button
+                                                                size="sm"
+                                                                variant="secondary"
+                                                                className="bg-white/90 backdrop-blur-md shadow-sm border-blue-100 text-blue-600 hover:bg-white"
+                                                                onClick={() => setFullScreenItem({ type: 'pdf', url: res.pdfUrl, title: res.title })}
+                                                            >
+                                                                <Maximize2 className="h-4 w-4 mr-2" />
+                                                                Fullscreen View
+                                                            </Button>
+                                                            <Button
+                                                                size="icon"
+                                                                variant="secondary"
+                                                                className="bg-white/90 backdrop-blur-md shadow-sm border-blue-100 text-blue-600 hover:bg-white"
+                                                                onClick={() => setReadingId(null)}
+                                                            >
+                                                                <X className="h-4 w-4" />
+                                                            </Button>
                                                         </div>
                                                     </div>
-                                                    <iframe
-                                                        src="/moringa_production_in_south_africa.pdf#toolbar=0&navpanes=0"
-                                                        className="w-full h-full pointer-events-none"
-                                                        title="Production Review"
-                                                    />
                                                 </div>
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
+                                ))}
 
-                            {/* Future placeholder */}
-                            <div className="rounded-3xl border border-dashed border-border p-12 text-center bg-muted/30 flex flex-col items-center justify-center">
-                                <p className="text-muted-foreground text-lg">More research papers coming soon...</p>
+                                {filteredResources.length === 0 && (
+                                    <div className="text-center py-20 bg-muted/20 rounded-3xl border border-dashed border-muted-foreground/30">
+                                        <Search className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
+                                        <p className="text-xl text-muted-foreground font-medium">No articles found matching "{searchQuery}"</p>
+                                        <Button variant="link" onClick={() => setSearchQuery('')} className="mt-2 text-primary">
+                                            Clear search query
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
                         </div>
+
+                        {/* Future placeholder */}
+                        <div className="rounded-3xl border-2 border-dashed border-muted-foreground/20 p-12 text-center bg-muted/5 flex flex-col items-center justify-center">
+                            <Sparkles className="h-8 w-8 text-amber-500/50 mb-3" />
+                            <p className="text-muted-foreground text-lg font-medium italic">Our library is growing. New research papers are added weekly.</p>
+                        </div>
                     </div>
-
-
                 </div>
             </div>
             <Footer />
