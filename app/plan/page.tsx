@@ -537,7 +537,7 @@ export default function MealPlannerPage() {
                                             </p>
                                         </div>
                                         <Button size="lg" onClick={handleGenerate} className="w-full h-14 text-lg rounded-xl">
-                                            Generate Plan
+                                            {isFormComplete ? "Generate Plan" : "Show Me Recipes"}
                                         </Button>
                                         <Button variant="ghost" onClick={() => setStep(1)} className="text-muted-foreground">
                                             Back to settings
@@ -549,7 +549,9 @@ export default function MealPlannerPage() {
                                             <div className="absolute inset-0 border-4 border-muted rounded-full"></div>
                                             <div className="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
                                         </div>
-                                        <h3 className="text-2xl font-bold animate-pulse">Curating your menu...</h3>
+                                        <h3 className="text-2xl font-bold animate-pulse">
+                                            {isFormComplete ? "Curating your menu..." : "Loading random recipes..."}
+                                        </h3>
                                     </div>
                                 )}
                             </div>
