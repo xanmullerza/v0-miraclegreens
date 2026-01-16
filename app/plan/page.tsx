@@ -435,6 +435,9 @@ export default function MealPlannerPage() {
     const displayMin = unit === 'kJ' ? Math.round(minCal * CAL_TO_KJ) : minCal;
     const displayMax = unit === 'kJ' ? Math.round(maxCal * CAL_TO_KJ) : maxCal;
 
+    // Check if user has provided all necessary data for a personalized plan
+    const isFormComplete = Boolean(age && weight && height);
+
     return (
         <main className="min-h-screen flex flex-col bg-background">
             <Header />
@@ -507,7 +510,7 @@ export default function MealPlannerPage() {
 
                                 <div className="pt-4">
                                     <Button size="lg" onClick={handleNextStep} className="w-full h-12 text-base font-semibold rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-md">
-                                        Generate My Plan <ChevronRight className="h-4 w-4 ml-2" />
+                                        {isFormComplete ? "Generate My Plan" : "Show Me Recipes"} <ChevronRight className="h-4 w-4 ml-2" />
                                     </Button>
                                 </div>
                             </div>
@@ -522,9 +525,15 @@ export default function MealPlannerPage() {
                                             <ChefHat className="h-12 w-12" />
                                         </div>
                                         <div>
-                                            <h2 className="text-3xl font-bold mb-2">Ready to cook?</h2>
+                                            <h2 className="text-3xl font-bold mb-2">
+                                                {isFormComplete ? "Ready to cook?" : "Random Recipes"}
+                                            </h2>
                                             <p className="text-muted-foreground">
-                                                We'll generate a <strong className="capitalize">{diet === 'anything' ? 'Balanced' : diet}</strong> plan with roughly <strong>{formatEnergy(calories, unit)}</strong> across <strong>3</strong> standard meals.
+                                                {isFormComplete ? (
+                                                    <>We'll generate a <strong className="capitalize">{diet === 'anything' ? 'Balanced' : diet}</strong> plan with roughly <strong>{formatEnergy(calories, unit)}</strong> across <strong>3</strong> standard meals.</>
+                                                ) : (
+                                                    <>You have chosen not to generate a personalized meal plan. Here are some random recipes.</>
+                                                )}
                                             </p>
                                         </div>
                                         <Button size="lg" onClick={handleGenerate} className="w-full h-14 text-lg rounded-xl">
