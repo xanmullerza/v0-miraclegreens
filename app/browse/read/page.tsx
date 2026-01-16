@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
-import { BookOpen, ArrowLeft, Headphones, PlayCircle, X, Maximize2, ExternalLink } from 'lucide-react';
+import { BookOpen, ArrowLeft, Headphones, PlayCircle, X, Maximize2, ExternalLink, Download } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -137,9 +137,19 @@ export default function ReadPage() {
                                         <div className="mt-4 p-4 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 animate-in fade-in slide-in-from-top-2 duration-300">
                                             <div className="flex items-center justify-between mb-2">
                                                 <span className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Audio Summary</span>
-                                                <button onClick={() => setListeningId(null)} className="text-muted-foreground hover:text-foreground">
-                                                    <X className="h-4 w-4" />
-                                                </button>
+                                                <div className="flex items-center gap-3">
+                                                    <a
+                                                        href="/Moringa_Powder_Combats_South_African_Malnutrition.m4a"
+                                                        download="Moringa_Powder_Combats_South_African_Malnutrition.m4a"
+                                                        className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                                                        title="Download Podcast"
+                                                    >
+                                                        <Download className="h-4 w-4" />
+                                                    </a>
+                                                    <button onClick={() => setListeningId(null)} className="text-muted-foreground hover:text-foreground">
+                                                        <X className="h-4 w-4" />
+                                                    </button>
+                                                </div>
                                             </div>
                                             <audio controls className="w-full h-8">
                                                 <source src="/Moringa_Powder_Combats_South_African_Malnutrition.m4a" type="audio/x-m4a" />
@@ -277,9 +287,19 @@ export default function ReadPage() {
                                         <div className="mt-4 p-4 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 animate-in fade-in slide-in-from-top-2 duration-300">
                                             <div className="flex items-center justify-between mb-2">
                                                 <span className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Audio Review</span>
-                                                <button onClick={() => setListeningId(null)} className="text-muted-foreground hover:text-foreground">
-                                                    <X className="h-4 w-4" />
-                                                </button>
+                                                <div className="flex items-center gap-3">
+                                                    <a
+                                                        href="/Moringa_The_Miracle_Tree_in_South_Africa.m4a"
+                                                        download="Moringa_The_Miracle_Tree_in_South_Africa.m4a"
+                                                        className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 transition-colors"
+                                                        title="Download Podcast"
+                                                    >
+                                                        <Download className="h-4 w-4" />
+                                                    </a>
+                                                    <button onClick={() => setListeningId(null)} className="text-muted-foreground hover:text-foreground">
+                                                        <X className="h-4 w-4" />
+                                                    </button>
+                                                </div>
                                             </div>
                                             <audio controls className="w-full h-8">
                                                 <source src="/Moringa_The_Miracle_Tree_in_South_Africa.m4a" type="audio/x-m4a" />
