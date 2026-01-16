@@ -83,6 +83,7 @@ const allResources = [
 export default function BrowsePage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeFilter, setActiveFilter] = useState<'all' | 'read' | 'watch' | 'listen'>('all');
+    const [isListening, setIsListening] = useState(false);
 
     const filteredResources = allResources.filter(resource => {
         const matchesSearch = resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -177,18 +178,44 @@ export default function BrowsePage() {
 
                                 <div className="md:col-span-3 grid grid-rows-2 gap-6">
                                     {/* Listen - Wide Rectangle */}
-                                    <Link href="/browse/listen" className="group relative overflow-hidden rounded-3xl bg-purple-50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/50 p-8 transition-all hover:shadow-xl hover:-translate-y-1">
+                                    <div
+                                        onClick={() => setIsListening(!isListening)}
+                                        className={cn(
+                                            "group cursor-pointer relative overflow-hidden rounded-3xl bg-purple-50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/50 transition-all hover:shadow-xl",
+                                            isListening ? "ring-2 ring-purple-500 shadow-lg h-auto" : "h-auto hover:-translate-y-1"
+                                        )}
+                                    >
                                         <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                        <div className="relative z-10 h-full flex items-center gap-6">
-                                            <div className="p-4 rounded-2xl bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400">
-                                                <Headphones className="h-8 w-8" />
+                                        <div className="relative z-10 p-8">
+                                            <div className="flex items-center gap-6">
+                                                <div className="p-4 rounded-2xl bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400">
+                                                    <Headphones className="h-8 w-8" />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <h3 className="text-2xl font-bold text-foreground">Listen</h3>
+                                                    <p className="text-muted-foreground">{isListening ? 'Playing Podcast' : 'Podcasts for on-the-go.'}</p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <h3 className="text-2xl font-bold text-foreground">Listen</h3>
-                                                <p className="text-muted-foreground">Podcasts for on-the-go.</p>
-                                            </div>
+
+                                            {isListening && (
+                                                <div className="mt-6 space-y-4 animate-in fade-in slide-in-from-top-4 duration-300" onClick={(e) => e.stopPropagation()}>
+                                                    <div className="bg-white/50 dark:bg-black/20 p-4 rounded-xl space-y-2 border border-purple-100/50 dark:border-purple-900/50">
+                                                        <p className="text-xs font-bold text-purple-600 uppercase tracking-wider">Now Playing</p>
+                                                        <p className="text-sm font-semibold truncate leading-tight">Moringa oleifera: A Review on Production & Consumption</p>
+                                                        <audio controls className="w-full h-8 mt-2">
+                                                            <source src="/Moringa_The_Miracle_Tree_in_South_Africa.m4a" type="audio/x-m4a" />
+                                                        </audio>
+                                                    </div>
+                                                    <Link
+                                                        href="/browse/listen"
+                                                        className="inline-flex items-center gap-2 text-sm font-bold text-purple-600 hover:text-purple-700 transition-colors"
+                                                    >
+                                                        Explore all episodes <ArrowRight className="h-4 w-4" />
+                                                    </Link>
+                                                </div>
+                                            )}
                                         </div>
-                                    </Link>
+                                    </div>
 
                                     {/* Watch - Wide Rectangle */}
                                     <Link href="/browse/watch" className="group relative overflow-hidden rounded-3xl bg-red-50 dark:bg-red-950/20 border border-red-100 dark:border-red-900/50 p-8 transition-all hover:shadow-xl hover:-translate-y-1">
