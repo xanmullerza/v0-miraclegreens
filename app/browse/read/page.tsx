@@ -350,7 +350,10 @@ export default function ReadPage() {
                                     className="text-white border border-white/20 hover:bg-white/10 hover:text-white gap-2 h-10 px-4"
                                     asChild
                                 >
-                                    <a href={fullScreenItem.url} target="_blank" rel="noopener noreferrer">
+                                    <a
+                                        href={fullScreenItem.url}
+                                        download={fullScreenItem.url.split('/').pop()}
+                                    >
                                         <ExternalLink className="h-4 w-4" />
                                         <span>{fullScreenItem.type === 'pdf' ? 'Download PDF' : 'Download Video'}</span>
                                     </a>
