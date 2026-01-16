@@ -1020,7 +1020,7 @@ export default function MealPlannerPage() {
                                                 )}
                                             </div>
                                             <p className="text-sm text-green-700 dark:text-green-400">
-                                                Combating malnutrition? Add multiple spoons to supercharge this meal.
+                                                Need a nutritional boost? Add multiple spoons to supercharge this meal.
                                             </p>
                                         </div>
 
