@@ -61,15 +61,15 @@ const formatEnergy = (calories: number, unit: UnitType) => {
 // --- COMPONENTS ---
 
 const DietCard = ({ type, selected, onClick, icon: Icon, label }: { type: DietType, selected: boolean, onClick: () => void, icon: any, label?: string }) => (
-    <div onClick={onClick} className={cn("cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-2 transition-all hover:bg-muted/50", selected ? "border-primary bg-primary/10 text-primary font-medium ring-1 ring-primary" : "border-border bg-card text-muted-foreground")}>
-        <Icon className={cn("h-5 w-5 mb-1", selected ? "text-primary" : "text-muted-foreground")} />
+    <div onClick={onClick} className={cn("cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-2 transition-all hover:opacity-90", selected ? "bg-primary text-primary-foreground border-primary shadow-md" : "border-border bg-card text-muted-foreground hover:bg-muted/50")}>
+        <Icon className={cn("h-5 w-5 mb-1", selected ? "text-primary-foreground" : "text-muted-foreground")} />
         <span className="text-xs font-semibold text-center leading-tight">{label || (type === 'anything' ? 'Anything' : type)}</span>
     </div>
 );
 
 const GoalCard = ({ type, selected, onClick, icon: Icon, label }: { type: GoalType, selected: boolean, onClick: () => void, icon: any, label?: string }) => (
-    <div onClick={onClick} className={cn("cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-2 transition-all hover:bg-muted/50", selected ? "border-primary bg-primary/10 text-primary font-medium ring-1 ring-primary" : "border-border bg-card text-muted-foreground")}>
-        <Icon className="h-5 w-5 mb-1" />
+    <div onClick={onClick} className={cn("cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-2 transition-all hover:opacity-90", selected ? "bg-primary text-primary-foreground border-primary shadow-md" : "border-border bg-card text-muted-foreground hover:bg-muted/50")}>
+        <Icon className={cn("h-5 w-5 mb-1", selected ? "text-primary-foreground" : "text-muted-foreground")} />
         <span className="text-xs font-semibold text-center leading-tight">{label || type.replace('-', ' ')}</span>
     </div>
 );
@@ -77,8 +77,8 @@ const GoalCard = ({ type, selected, onClick, icon: Icon, label }: { type: GoalTy
 
 
 const ActivityCard = ({ type, selected, onClick, icon: Icon, label }: { type: ActivityLevel, selected: boolean, onClick: () => void, icon: any, label?: string }) => (
-    <div onClick={onClick} className={cn("cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-2 transition-all hover:bg-muted/50", selected ? "border-primary bg-primary/10 text-primary font-medium ring-1 ring-primary" : "border-border bg-card text-muted-foreground")}>
-        <Icon className="h-5 w-5 mb-1" />
+    <div onClick={onClick} className={cn("cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-2 transition-all hover:opacity-90", selected ? "bg-primary text-primary-foreground border-primary shadow-md" : "border-border bg-card text-muted-foreground hover:bg-muted/50")}>
+        <Icon className={cn("h-5 w-5 mb-1", selected ? "text-primary-foreground" : "text-muted-foreground")} />
         <span className="text-xs font-semibold text-center leading-tight">{label || type}</span>
     </div>
 );
