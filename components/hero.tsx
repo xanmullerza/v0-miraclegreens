@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, ShoppingBag, Heart } from 'lucide-react';
+import { ArrowRight, ShoppingBag, Heart, LayoutGrid, Calendar, TreeDeciduous } from 'lucide-react';
 
 export function Hero() {
   return (
@@ -16,13 +16,33 @@ export function Hero() {
               production and distribution of moringa powder to families fighting malnutrition.
               Shop with purpose — your wellness supports their health.
             </p>
-            <div className="mt-8">
-              <Button size="lg" className="gap-2" asChild>
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Button size="lg" className="h-12 px-8 text-base gap-2" asChild>
                 <a href="/shop">
-                  <ShoppingBag className="h-4 w-4" />
+                  <ShoppingBag className="h-5 w-5" />
                   Shop Now
                 </a>
               </Button>
+              <div className="flex flex-wrap gap-2 sm:gap-4">
+                <Button variant="outline" size="lg" className="h-12 px-6 text-base gap-2" asChild>
+                  <a href="/browse">
+                    <LayoutGrid className="h-5 w-5" />
+                    Browse
+                  </a>
+                </Button>
+                <Button variant="outline" size="lg" className="h-12 px-6 text-base gap-2" asChild>
+                  <a href="/plan">
+                    <Calendar className="h-5 w-5" />
+                    Plan
+                  </a>
+                </Button>
+                <Button variant="outline" size="lg" className="h-12 px-6 text-base gap-2" asChild>
+                  <a href="/donate">
+                    <TreeDeciduous className="h-5 w-5" />
+                    Donate
+                  </a>
+                </Button>
+              </div>
             </div>
           </div>
           <div className="relative">
