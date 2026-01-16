@@ -36,6 +36,36 @@ const resources = [
         source: 'Research Review',
         icon: Sprout,
         iconColor: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
+    },
+    {
+        id: 'amino-acids',
+        title: 'Amino acid and mineral composition of moringa',
+        description: 'Detailed analysis of the essential amino acids and rich mineral profile found in Moringa leaves.',
+        pdfUrl: '/Amino acid and mineral composition of moringa.pdf',
+        pdfSize: '610 KB',
+        source: 'Composition Study',
+        icon: Microscope,
+        iconColor: 'text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20'
+    },
+    {
+        id: 'nutritive-review',
+        title: 'Moringa - Nutritive Review',
+        description: 'A comprehensive review of the pharmacological properties and nutritional value of the Miracle Tree.',
+        pdfUrl: '/Moringa - Nutritive Review.pdf',
+        pdfSize: '1.4 MB',
+        source: 'Nutritive Review',
+        icon: Leaf,
+        iconColor: 'text-green-500 bg-green-50 dark:bg-green-900/20'
+    },
+    {
+        id: 'prominent-nutrients',
+        title: 'Moringa oleifera as a Prominent Source of Nutrients',
+        description: 'Evaluation of Moringa as a sustainable solution for food security and nutrient fortification.',
+        pdfUrl: '/Moringa oleifera as a Prominent Source of Nutrients.pdf',
+        pdfSize: '719 KB',
+        source: 'Nutrient Source Study',
+        icon: Activity,
+        iconColor: 'text-blue-500 bg-blue-50 dark:bg-blue-900/20'
     }
 ];
 
@@ -172,33 +202,36 @@ export default function BrowsePage() {
                                                     <BookOpen className="h-4 w-4" />
                                                     <span className="hidden lg:inline">{readingId === res.id ? 'Close' : 'Read'}</span>
                                                 </Button>
-                                                <Button
-                                                    variant={listeningId === res.id ? "default" : "ghost"}
-                                                    size="sm"
-                                                    onClick={() => {
-                                                        setListeningId(listeningId === res.id ? null : res.id);
-                                                        setWatchingId(null);
-                                                        setReadingId(null);
-                                                    }}
-                                                    className="gap-2 rounded-lg"
-                                                >
-                                                    <Headphones className="h-4 w-4" />
-                                                    <span className="hidden lg:inline">{listeningId === res.id ? 'Close' : 'Listen'}</span>
-                                                </Button>
-                                                <Button
-                                                    variant={watchingId === res.id ? "default" : "ghost"}
-                                                    size="sm"
-                                                    onClick={() => {
-                                                        setWatchingId(watchingId === res.id ? null : res.id);
-                                                        setListeningId(null);
-                                                        setReadingId(null);
-                                                    }}
-                                                    className="gap-2 rounded-lg"
-                                                >
-                                                    <PlayCircle className="h-4 w-4" />
-                                                    <span className="hidden lg:inline">{watchingId === res.id ? 'Close' : 'Watch'}</span>
-                                                </Button>
-
+                                                {res.audioUrl && (
+                                                    <Button
+                                                        variant={listeningId === res.id ? "default" : "ghost"}
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setListeningId(listeningId === res.id ? null : res.id);
+                                                            setWatchingId(null);
+                                                            setReadingId(null);
+                                                        }}
+                                                        className="gap-2 rounded-lg"
+                                                    >
+                                                        <Headphones className="h-4 w-4" />
+                                                        <span className="hidden lg:inline">{listeningId === res.id ? 'Close' : 'Listen'}</span>
+                                                    </Button>
+                                                )}
+                                                {res.videoUrl && (
+                                                    <Button
+                                                        variant={watchingId === res.id ? "default" : "ghost"}
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            setWatchingId(watchingId === res.id ? null : res.id);
+                                                            setListeningId(null);
+                                                            setReadingId(null);
+                                                        }}
+                                                        className="gap-2 rounded-lg"
+                                                    >
+                                                        <PlayCircle className="h-4 w-4" />
+                                                        <span className="hidden lg:inline">{watchingId === res.id ? 'Close' : 'Watch'}</span>
+                                                    </Button>
+                                                )}
                                             </div>
                                         </div>
 
@@ -209,14 +242,14 @@ export default function BrowsePage() {
                                                 <div className="pb-6 animate-in fade-in slide-in-from-top-4 duration-300">
                                                     <div className="relative aspect-video rounded-2xl overflow-hidden bg-black shadow-2xl group/video">
                                                         <video controls autoPlay className="w-full h-full object-cover">
-                                                            <source src={res.videoUrl} type="video/mp4" />
+                                                            <source src={res.videoUrl!} type="video/mp4" />
                                                         </video>
                                                         <div className="absolute top-4 right-4 flex gap-2">
                                                             <Button
                                                                 size="sm"
                                                                 variant="secondary"
                                                                 className="bg-black/50 backdrop-blur-md text-white border-0 hover:bg-black/70"
-                                                                onClick={() => setFullScreenItem({ type: 'video', url: res.videoUrl, title: res.title })}
+                                                                onClick={() => setFullScreenItem({ type: 'video', url: res.videoUrl!, title: res.title })}
                                                             >
                                                                 <Maximize2 className="h-4 w-4 mr-2" />
                                                                 Fullscreen
@@ -246,11 +279,11 @@ export default function BrowsePage() {
                                                                 </button>
                                                             </div>
                                                             <audio controls className="w-full h-10">
-                                                                <source src={res.audioUrl} type="audio/x-m4a" />
+                                                                <source src={res.audioUrl!} type="audio/x-m4a" />
                                                             </audio>
                                                         </div>
                                                         <Button variant="outline" size="sm" asChild className="shrink-0 gap-2 border-purple-200 text-purple-600 hover:bg-purple-100">
-                                                            <a href={res.audioUrl} download={res.audioUrl.split('/').pop()}>
+                                                            <a href={res.audioUrl!} download={res.audioUrl!.split('/').pop()}>
                                                                 <Download className="h-4 w-4" />
                                                                 Batch Download
                                                             </a>
