@@ -111,7 +111,7 @@ export default function BrowsePage() {
                         <div className="flex flex-col md:flex-row gap-6 items-center justify-between border-b pb-8">
                             <div>
                                 <h2 className="text-4xl font-bold font-serif text-foreground mb-2">Knowledge Base</h2>
-                                <p className="text-muted-foreground text-lg">Deep dive into scientific studies, nutritional facts, and comprehensive research.</p>
+                                <p className="text-muted-foreground text-lg">Deep dive into scientific studies and comprehensive research.</p>
                             </div>
                             <div className="relative w-full md:w-96">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -309,7 +309,7 @@ export default function BrowsePage() {
                         {/* Future placeholder */}
                         <div className="rounded-3xl border-2 border-dashed border-muted-foreground/20 p-12 text-center bg-muted/5 flex flex-col items-center justify-center">
                             <Sparkles className="h-8 w-8 text-amber-500/50 mb-3" />
-                            <p className="text-muted-foreground text-lg font-medium italic">Our library is growing. New research papers are added weekly.</p>
+                            <p className="text-muted-foreground text-lg font-medium italic">Our library is growing. New research papers are added regularly.</p>
                         </div>
                     </div>
                 </div>
