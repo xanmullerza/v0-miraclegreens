@@ -26,6 +26,78 @@ export interface DailyPlan {
 const getRandom = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
 /**
+ * Get a random recipe of a specific type (for individual meal regeneration).
+ * Optionally exclude a specific recipe ID to ensure variety.
+ */
+export const getRandomRecipeByType = async (
+    mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack',
+    diet: DietType,
+    excludeId?: string
+): Promise<Recipe | null> => {
+    const { data: recipesData, error } = await supabase
+        .from('recipes')
+        .select(`
+            *,
+            ingredients (
+                *,
+                food_items (*)
+            ),
+            instructions (*)
+        `)
+        .eq('type', mealType);
+
+    if (error || !recipesData || recipesData.length === 0) {
+        return null;
+    }
+
+    // Helper function to calculate nutrition
+    const calculateNutrition = (ingredients: any[]) => {
+        let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
+        for (const ing of ingredients) {
+            if (ing.food_items && ing.weight_g) {
+                const foodItem = ing.food_items;
+                const ratio = ing.weight_g / 100;
+                totalCalories += (foodItem.energy_kcal || 0) * ratio;
+                totalProtein += (foodItem.protein_g || 0) * ratio;
+                totalCarbs += (foodItem.carbs_g || 0) * ratio;
+                totalFat += (foodItem.fat_g || 0) * ratio;
+            }
+        }
+        return { calories: totalCalories, protein: totalProtein, carbs: totalCarbs, fat: totalFat };
+    };
+
+    // Transform and filter
+    const recipes: Recipe[] = recipesData
+        .filter((r: any) => diet === 'anything' || r.diet.includes(diet))
+        .filter((r: any) => r.id !== excludeId) // Exclude current recipe
+        .map((r: any) => {
+            const calculatedNutrition = calculateNutrition(r.ingredients);
+            return {
+                id: r.id,
+                title: r.title,
+                type: r.type,
+                calories: calculatedNutrition.calories || r.calories || 0,
+                protein: calculatedNutrition.protein || r.protein || 0,
+                carbs: calculatedNutrition.carbs || r.carbs || 0,
+                fat: calculatedNutrition.fat || r.fat || 0,
+                diet: r.diet,
+                image: r.image,
+                prepTime: r.prep_time,
+                ingredients: r.ingredients.map((i: any) => ({
+                    item: i.item,
+                    amount: i.amount,
+                    isMiracleProduct: i.is_miracle_product,
+                    baseIngredient: i.base_ingredient
+                })),
+                instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text)
+            };
+        });
+
+    if (recipes.length === 0) return null;
+    return getRandom(recipes);
+};
+
+/**
  * Generates a single day meal plan trying to hit the calorie target.
  * Now Async to fetch from Supabase.
  */

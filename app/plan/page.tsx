@@ -39,7 +39,7 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet"
 import { DietType, Recipe } from '@/lib/data/recipes';
-import { generateDailyPlan, DailyPlan, generateShoppingList, ShoppingItem } from '@/lib/utils/meal-generator';
+import { generateDailyPlan, DailyPlan, generateShoppingList, ShoppingItem, getRandomRecipeByType } from '@/lib/utils/meal-generator';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -179,12 +179,13 @@ const ActivityCard = ({
     </div>
 );
 
-const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onClick, onNutritionClick }: {
+const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onClick, onNutritionClick, onRegenerate }: {
     recipe: Recipe,
     mealLabel: string,
     unit?: UnitType,
     onClick?: () => void,
-    onNutritionClick?: () => void
+    onNutritionClick?: () => void,
+    onRegenerate?: () => void
 }) => {
     const [imageError, setImageError] = useState(false);
 
@@ -249,6 +250,18 @@ const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onClick, onNutritionClick 
                 >
                     View Nutritional Info
                 </button>
+                {onRegenerate && (
+                    <button
+                        className="mt-2 w-full py-2 px-4 bg-muted hover:bg-muted/80 text-muted-foreground rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onRegenerate();
+                        }}
+                    >
+                        <RotateCcw className="h-4 w-4" />
+                        Try Another
+                    </button>
+                )}
             </div>
         </div>
     );
@@ -405,6 +418,32 @@ export default function MealPlannerPage() {
 
     const handleRegenerate = () => {
         handleGenerate();
+    };
+
+    const handleRegenerateMeal = async (mealType: 'breakfast' | 'lunch' | 'dinner', currentId: string) => {
+        if (!plan) return;
+
+        const newRecipe = await getRandomRecipeByType(mealType, diet, currentId);
+        if (newRecipe) {
+            setPlan(prevPlan => {
+                if (!prevPlan) return prevPlan;
+
+                const updatedPlan = { ...prevPlan };
+                if (mealType === 'breakfast') updatedPlan.breakfast = newRecipe;
+                else if (mealType === 'lunch') updatedPlan.lunch = newRecipe;
+                else if (mealType === 'dinner') updatedPlan.dinner = newRecipe;
+
+                // Recalculate totals
+                updatedPlan.totalCalories = updatedPlan.breakfast.calories + updatedPlan.lunch.calories + updatedPlan.dinner.calories + updatedPlan.snacks.reduce((acc, s) => acc + s.calories, 0);
+                updatedPlan.macros = {
+                    protein: updatedPlan.breakfast.protein + updatedPlan.lunch.protein + updatedPlan.dinner.protein + updatedPlan.snacks.reduce((acc, s) => acc + s.protein, 0),
+                    carbs: updatedPlan.breakfast.carbs + updatedPlan.lunch.carbs + updatedPlan.dinner.carbs + updatedPlan.snacks.reduce((acc, s) => acc + s.carbs, 0),
+                    fat: updatedPlan.breakfast.fat + updatedPlan.lunch.fat + updatedPlan.dinner.fat + updatedPlan.snacks.reduce((acc, s) => acc + s.fat, 0),
+                };
+
+                return updatedPlan;
+            });
+        }
     };
 
     const handleShowNutrition = async (recipe: Recipe) => {
@@ -721,6 +760,7 @@ export default function MealPlannerPage() {
                                             unit={unit}
                                             onClick={() => setSelectedRecipe(plan.breakfast)}
                                             onNutritionClick={() => handleShowNutrition(plan.breakfast)}
+                                            onRegenerate={() => handleRegenerateMeal('breakfast', plan.breakfast.id)}
                                         />
                                     </div>
                                     <div className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.33%-1rem)] animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 fill-mode-backwards">
@@ -730,6 +770,7 @@ export default function MealPlannerPage() {
                                             unit={unit}
                                             onClick={() => setSelectedRecipe(plan.lunch)}
                                             onNutritionClick={() => handleShowNutrition(plan.lunch)}
+                                            onRegenerate={() => handleRegenerateMeal('lunch', plan.lunch.id)}
                                         />
                                     </div>
                                     <div className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.33%-1rem)] animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-backwards">
@@ -739,6 +780,7 @@ export default function MealPlannerPage() {
                                             unit={unit}
                                             onClick={() => setSelectedRecipe(plan.dinner)}
                                             onNutritionClick={() => handleShowNutrition(plan.dinner)}
+                                            onRegenerate={() => handleRegenerateMeal('dinner', plan.dinner.id)}
                                         />
                                     </div>
                                     {plan.snacks.map((snack, i) => (
