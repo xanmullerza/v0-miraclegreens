@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
-import { BookOpen, ArrowLeft, Headphones, PlayCircle, X } from 'lucide-react';
+import { BookOpen, ArrowLeft, Headphones, PlayCircle, X, Maximize2, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -14,6 +14,11 @@ export default function ReadPage() {
     const [listeningId, setListeningId] = useState<string | null>(null);
     const [watchingId, setWatchingId] = useState<string | null>(null);
     const [readingId, setReadingId] = useState<string | null>(null);
+    const [fullScreenItem, setFullScreenItem] = useState<{
+        type: 'pdf' | 'video';
+        url: string;
+        title: string;
+    } | null>(null);
 
     return (
         <main className="min-h-screen flex flex-col bg-background">
@@ -97,14 +102,31 @@ export default function ReadPage() {
 
                                     {watchingId === 'malnutrition' && (
                                         <div className="mt-4 p-2 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 animate-in fade-in slide-in-from-top-2 duration-300">
-                                            <div className="flex items-center justify-between mb-2 px-2 pt-1">
+                                            <div className="flex items-center justify-between mb-2 px-2 pt-1 border-b border-red-100/50 dark:border-red-800/50 pb-2">
                                                 <span className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">Video Documentary</span>
-                                                <button onClick={() => setWatchingId(null)} className="text-muted-foreground hover:text-foreground">
-                                                    <X className="h-4 w-4" />
-                                                </button>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => setFullScreenItem({ type: 'video', url: '/The_Moringa_Solution.mp4', title: 'The Moringa Solution' })}
+                                                        className="text-muted-foreground hover:text-red-600 transition-colors"
+                                                        title="Fullscreen"
+                                                    >
+                                                        <Maximize2 className="h-4 w-4" />
+                                                    </button>
+                                                    <button onClick={() => setWatchingId(null)} className="text-muted-foreground hover:text-foreground">
+                                                        <X className="h-4 w-4" />
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div className="aspect-video rounded-lg overflow-hidden bg-black shadow-inner">
-                                                <video controls className="w-full h-full">
+                                            <div
+                                                className="group/video relative aspect-video rounded-lg overflow-hidden bg-black shadow-inner cursor-pointer"
+                                                onClick={() => setFullScreenItem({ type: 'video', url: '/The_Moringa_Solution.mp4', title: 'The Moringa Solution' })}
+                                            >
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/video:opacity-100 transition-opacity z-10 flex items-center justify-center">
+                                                    <div className="bg-white/20 backdrop-blur-md p-4 rounded-full">
+                                                        <Maximize2 className="h-8 w-8 text-white" />
+                                                    </div>
+                                                </div>
+                                                <video muted playsInline className="w-full h-full object-cover">
                                                     <source src="/The_Moringa_Solution.mp4" type="video/mp4" />
                                                 </video>
                                             </div>
@@ -127,21 +149,36 @@ export default function ReadPage() {
 
                                     {readingId === 'malnutrition' && (
                                         <div className="mt-4 p-2 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 animate-in fade-in slide-in-from-top-2 duration-300">
-                                            <div className="flex items-center justify-between mb-2 px-2 pt-1">
+                                            <div className="flex items-center justify-between mb-2 px-2 pt-1 border-b border-blue-100/50 dark:border-blue-800/50 pb-2">
                                                 <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Research Document</span>
-                                                <div className="flex gap-2">
-                                                    <a href="/nutrients-15-02011.pdf" target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline flex items-center">
-                                                        Open Fullscreen
-                                                    </a>
+                                                <div className="flex gap-3">
+                                                    <button
+                                                        onClick={() => setFullScreenItem({ type: 'pdf', url: '/nutrients-15-02011.pdf', title: 'Malnutrition Study' })}
+                                                        className="text-muted-foreground hover:text-blue-600 transition-colors"
+                                                        title="Fullscreen"
+                                                    >
+                                                        <Maximize2 className="h-4 w-4" />
+                                                    </button>
                                                     <button onClick={() => setReadingId(null)} className="text-muted-foreground hover:text-foreground">
                                                         <X className="h-4 w-4" />
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div className="w-full h-[600px] rounded-lg overflow-hidden bg-white border border-blue-100/50">
+                                            <div
+                                                className="group/pdf relative w-full h-[400px] rounded-lg overflow-hidden bg-white border border-blue-100/50 cursor-pointer"
+                                                onClick={() => setFullScreenItem({ type: 'pdf', url: '/nutrients-15-02011.pdf', title: 'Malnutrition Study' })}
+                                            >
+                                                <div className="absolute inset-0 bg-blue-600/10 opacity-0 group-hover/pdf:opacity-100 transition-opacity z-10 flex items-center justify-center pointer-events-none">
+                                                    <div className="bg-white shadow-xl p-3 rounded-full scale-90 group-hover/pdf:scale-100 transition-transform">
+                                                        <div className="flex items-center gap-2 text-blue-600 font-bold px-1">
+                                                            <Maximize2 className="h-5 w-5" />
+                                                            <span>Click to expand</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <iframe
-                                                    src="/nutrients-15-02011.pdf"
-                                                    className="w-full h-full"
+                                                    src="/nutrients-15-02011.pdf#toolbar=0&navpanes=0"
+                                                    className="w-full h-full pointer-events-none"
                                                     title="Malnutrition Study"
                                                 />
                                             </div>
@@ -205,14 +242,31 @@ export default function ReadPage() {
 
                                     {watchingId === 'production' && (
                                         <div className="mt-4 p-2 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 animate-in fade-in slide-in-from-top-2 duration-300">
-                                            <div className="flex items-center justify-between mb-2 px-2 pt-1">
+                                            <div className="flex items-center justify-between mb-2 px-2 pt-1 border-b border-red-100/50 dark:border-red-800/50 pb-2">
                                                 <span className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">Visual Guide</span>
-                                                <button onClick={() => setWatchingId(null)} className="text-muted-foreground hover:text-foreground">
-                                                    <X className="h-4 w-4" />
-                                                </button>
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => setFullScreenItem({ type: 'video', url: '/The_Miracle_Tree.mp4', title: 'The Miracle Tree' })}
+                                                        className="text-muted-foreground hover:text-red-600 transition-colors"
+                                                        title="Fullscreen"
+                                                    >
+                                                        <Maximize2 className="h-4 w-4" />
+                                                    </button>
+                                                    <button onClick={() => setWatchingId(null)} className="text-muted-foreground hover:text-foreground">
+                                                        <X className="h-4 w-4" />
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div className="aspect-video rounded-lg overflow-hidden bg-black shadow-inner">
-                                                <video controls className="w-full h-full">
+                                            <div
+                                                className="group/video relative aspect-video rounded-lg overflow-hidden bg-black shadow-inner cursor-pointer"
+                                                onClick={() => setFullScreenItem({ type: 'video', url: '/The_Miracle_Tree.mp4', title: 'The Miracle Tree' })}
+                                            >
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/video:opacity-100 transition-opacity z-10 flex items-center justify-center">
+                                                    <div className="bg-white/20 backdrop-blur-md p-4 rounded-full">
+                                                        <Maximize2 className="h-8 w-8 text-white" />
+                                                    </div>
+                                                </div>
+                                                <video muted playsInline className="w-full h-full object-cover">
                                                     <source src="/The_Miracle_Tree.mp4" type="video/mp4" />
                                                 </video>
                                             </div>
@@ -235,21 +289,36 @@ export default function ReadPage() {
 
                                     {readingId === 'production' && (
                                         <div className="mt-4 p-2 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 animate-in fade-in slide-in-from-top-2 duration-300">
-                                            <div className="flex items-center justify-between mb-2 px-2 pt-1">
+                                            <div className="flex items-center justify-between mb-2 px-2 pt-1 border-b border-blue-100/50 dark:border-blue-800/50 pb-2">
                                                 <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Production & Processing Review</span>
-                                                <div className="flex gap-2">
-                                                    <a href="/moringa_production_in_south_africa.pdf" target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline flex items-center">
-                                                        Open Fullscreen
-                                                    </a>
+                                                <div className="flex gap-3">
+                                                    <button
+                                                        onClick={() => setFullScreenItem({ type: 'pdf', url: '/moringa_production_in_south_africa.pdf', title: 'Production Review' })}
+                                                        className="text-muted-foreground hover:text-blue-600 transition-colors"
+                                                        title="Fullscreen"
+                                                    >
+                                                        <Maximize2 className="h-4 w-4" />
+                                                    </button>
                                                     <button onClick={() => setReadingId(null)} className="text-muted-foreground hover:text-foreground">
                                                         <X className="h-4 w-4" />
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div className="w-full h-[600px] rounded-lg overflow-hidden bg-white border border-blue-100/50">
+                                            <div
+                                                className="group/pdf relative w-full h-[400px] rounded-lg overflow-hidden bg-white border border-blue-100/50 cursor-pointer"
+                                                onClick={() => setFullScreenItem({ type: 'pdf', url: '/moringa_production_in_south_africa.pdf', title: 'Production Review' })}
+                                            >
+                                                <div className="absolute inset-0 bg-blue-600/10 opacity-0 group-hover/pdf:opacity-100 transition-opacity z-10 flex items-center justify-center pointer-events-none">
+                                                    <div className="bg-white shadow-xl p-3 rounded-full scale-90 group-hover/pdf:scale-100 transition-transform">
+                                                        <div className="flex items-center gap-2 text-blue-600 font-bold px-1">
+                                                            <Maximize2 className="h-5 w-5" />
+                                                            <span>Click to expand</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                                 <iframe
-                                                    src="/moringa_production_in_south_africa.pdf"
-                                                    className="w-full h-full"
+                                                    src="/moringa_production_in_south_africa.pdf#toolbar=0&navpanes=0"
+                                                    className="w-full h-full pointer-events-none"
                                                     title="Production Review"
                                                 />
                                             </div>
@@ -267,6 +336,49 @@ export default function ReadPage() {
                 </div>
             </div>
             <Footer />
+
+            {/* Fullscreen Modal */}
+            {fullScreenItem && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-xl animate-in fade-in duration-300 p-4 md:p-8">
+                    <div className="relative w-full h-full max-w-7xl flex flex-col">
+                        <div className="flex justify-between items-center mb-4 text-white">
+                            <h3 className="text-xl md:text-2xl font-serif font-bold truncate pr-8">{fullScreenItem.title}</h3>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-white border-white/20 hover:bg-white/10 gap-2 h-10 px-4"
+                                    asChild
+                                >
+                                    <a href={fullScreenItem.url} target="_blank" rel="noopener noreferrer">
+                                        <ExternalLink className="h-4 w-4" />
+                                        <span>Download</span>
+                                    </a>
+                                </Button>
+                                <button
+                                    onClick={() => setFullScreenItem(null)}
+                                    className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                                >
+                                    <X className="h-8 w-8 text-white" />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="flex-1 bg-white rounded-2xl overflow-hidden shadow-2xl relative">
+                            {fullScreenItem.type === 'pdf' ? (
+                                <iframe
+                                    src={fullScreenItem.url}
+                                    className="w-full h-full border-none"
+                                    title={fullScreenItem.title}
+                                />
+                            ) : (
+                                <video controls autoPlay className="w-full h-full bg-black">
+                                    <source src={fullScreenItem.url} type="video/mp4" />
+                                </video>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }
