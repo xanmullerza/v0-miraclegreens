@@ -455,15 +455,6 @@ export default function MealPlannerPage() {
                         {/* COMPACT WIZARD: SINGLE VIEW */}
                         {step === 1 && (
                             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-2xl mx-auto">
-                                <div className="space-y-2">
-                                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">My Goal</Label>
-                                    <div className="grid grid-cols-3 gap-2">
-                                        <GoalCard type="lose-fat" selected={goal === 'lose-fat'} onClick={() => setGoal('lose-fat')} icon={TrendingDown} label="Lose Fat" />
-                                        <GoalCard type="maintain" selected={goal === 'maintain'} onClick={() => setGoal('maintain')} icon={Activity} label="Maintain" />
-                                        <GoalCard type="build-muscle" selected={goal === 'build-muscle'} onClick={() => setGoal('build-muscle')} icon={Dumbbell} label="Build Muscle" />
-                                    </div>
-                                </div>
-
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                     <div className="space-y-2 col-span-2 sm:col-span-1">
                                         <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Gender</Label>
@@ -483,6 +474,15 @@ export default function MealPlannerPage() {
                                     <div className="space-y-2">
                                         <Label htmlFor="height" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Height</Label>
                                         <div className="relative"><Input id="height" type="number" className="h-10 text-center" value={height} onChange={(e) => setHeight(e.target.value ? parseInt(e.target.value) : '')} /><span className="absolute right-3 top-2.5 text-xs text-muted-foreground">cm</span></div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">My Goal</Label>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <GoalCard type="lose-fat" selected={goal === 'lose-fat'} onClick={() => setGoal('lose-fat')} icon={TrendingDown} label="Lose Fat" />
+                                        <GoalCard type="maintain" selected={goal === 'maintain'} onClick={() => setGoal('maintain')} icon={Activity} label="Maintain" />
+                                        <GoalCard type="build-muscle" selected={goal === 'build-muscle'} onClick={() => setGoal('build-muscle')} icon={Dumbbell} label="Build Muscle" />
                                     </div>
                                 </div>
 
