@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 export default function ReadPage() {
     const [listeningId, setListeningId] = useState<string | null>(null);
     const [watchingId, setWatchingId] = useState<string | null>(null);
+    const [readingId, setReadingId] = useState<string | null>(null);
 
     return (
         <main className="min-h-screen flex flex-col bg-background">
@@ -52,16 +53,27 @@ export default function ReadPage() {
                                         A comprehensive narrative review exploring the potential of Moringa Oleifera leaf powder as a fortificant to fight childhood malnutrition. Published in <em>Nutrients</em> (2023).
                                     </p>
                                     <div className="flex flex-wrap items-center gap-3">
-                                        <Button variant="outline" size="sm" asChild>
-                                            <a href="/nutrients-15-02011.pdf" target="_blank" rel="noopener noreferrer">
-                                                <BookOpen className="mr-2 h-4 w-4" />
-                                                Read Paper
-                                            </a>
+                                        <Button
+                                            variant={readingId === 'malnutrition' ? "default" : "outline"}
+                                            size="sm"
+                                            onClick={() => {
+                                                setReadingId(readingId === 'malnutrition' ? null : 'malnutrition');
+                                                setListeningId(null);
+                                                setWatchingId(null);
+                                            }}
+                                            className="gap-2"
+                                        >
+                                            <BookOpen className="h-4 w-4" />
+                                            {readingId === 'malnutrition' ? 'Close Paper' : 'Read Paper'}
                                         </Button>
                                         <Button
                                             variant={listeningId === 'malnutrition' ? "default" : "secondary"}
                                             size="sm"
-                                            onClick={() => setListeningId(listeningId === 'malnutrition' ? null : 'malnutrition')}
+                                            onClick={() => {
+                                                setListeningId(listeningId === 'malnutrition' ? null : 'malnutrition');
+                                                setWatchingId(null);
+                                                setReadingId(null);
+                                            }}
                                             className="gap-2"
                                         >
                                             <Headphones className="h-4 w-4" />
@@ -73,6 +85,7 @@ export default function ReadPage() {
                                             onClick={() => {
                                                 setWatchingId(watchingId === 'malnutrition' ? null : 'malnutrition');
                                                 setListeningId(null);
+                                                setReadingId(null);
                                             }}
                                             className="gap-2"
                                         >
@@ -111,6 +124,29 @@ export default function ReadPage() {
                                             </audio>
                                         </div>
                                     )}
+
+                                    {readingId === 'malnutrition' && (
+                                        <div className="mt-4 p-2 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <div className="flex items-center justify-between mb-2 px-2 pt-1">
+                                                <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Research Document</span>
+                                                <div className="flex gap-2">
+                                                    <a href="/nutrients-15-02011.pdf" target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline flex items-center">
+                                                        Open Fullscreen
+                                                    </a>
+                                                    <button onClick={() => setReadingId(null)} className="text-muted-foreground hover:text-foreground">
+                                                        <X className="h-4 w-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="w-full h-[600px] rounded-lg overflow-hidden bg-white border border-blue-100/50">
+                                                <iframe
+                                                    src="/nutrients-15-02011.pdf"
+                                                    className="w-full h-full"
+                                                    title="Malnutrition Study"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -125,16 +161,27 @@ export default function ReadPage() {
                                         This review highlights research on growing conditions, production, processing, and the consumption of Moringa as a food source within South Africa.
                                     </p>
                                     <div className="flex flex-wrap items-center gap-3">
-                                        <Button variant="outline" size="sm" asChild>
-                                            <a href="/moringa_production_in_south_africa.pdf" target="_blank" rel="noopener noreferrer">
-                                                <BookOpen className="mr-2 h-4 w-4" />
-                                                Read Paper
-                                            </a>
+                                        <Button
+                                            variant={readingId === 'production' ? "default" : "outline"}
+                                            size="sm"
+                                            onClick={() => {
+                                                setReadingId(readingId === 'production' ? null : 'production');
+                                                setListeningId(null);
+                                                setWatchingId(null);
+                                            }}
+                                            className="gap-2"
+                                        >
+                                            <BookOpen className="h-4 w-4" />
+                                            {readingId === 'production' ? 'Close Paper' : 'Read Paper'}
                                         </Button>
                                         <Button
                                             variant={listeningId === 'production' ? "default" : "secondary"}
                                             size="sm"
-                                            onClick={() => setListeningId(listeningId === 'production' ? null : 'production')}
+                                            onClick={() => {
+                                                setListeningId(listeningId === 'production' ? null : 'production');
+                                                setWatchingId(null);
+                                                setReadingId(null);
+                                            }}
                                             className="gap-2"
                                         >
                                             <Headphones className="h-4 w-4" />
@@ -146,6 +193,7 @@ export default function ReadPage() {
                                             onClick={() => {
                                                 setWatchingId(watchingId === 'production' ? null : 'production');
                                                 setListeningId(null);
+                                                setReadingId(null);
                                             }}
                                             className="gap-2"
                                         >
@@ -182,6 +230,29 @@ export default function ReadPage() {
                                             <audio controls className="w-full h-8">
                                                 <source src="/Moringa_The_Miracle_Tree_in_South_Africa.m4a" type="audio/x-m4a" />
                                             </audio>
+                                        </div>
+                                    )}
+
+                                    {readingId === 'production' && (
+                                        <div className="mt-4 p-2 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <div className="flex items-center justify-between mb-2 px-2 pt-1">
+                                                <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Production & Processing Review</span>
+                                                <div className="flex gap-2">
+                                                    <a href="/moringa_production_in_south_africa.pdf" target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline flex items-center">
+                                                        Open Fullscreen
+                                                    </a>
+                                                    <button onClick={() => setReadingId(null)} className="text-muted-foreground hover:text-foreground">
+                                                        <X className="h-4 w-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="w-full h-[600px] rounded-lg overflow-hidden bg-white border border-blue-100/50">
+                                                <iframe
+                                                    src="/moringa_production_in_south_africa.pdf"
+                                                    className="w-full h-full"
+                                                    title="Production Review"
+                                                />
+                                            </div>
                                         </div>
                                     )}
                                 </div>
