@@ -345,14 +345,14 @@ export default function ReadPage() {
                             <h3 className="text-xl md:text-2xl font-serif font-bold truncate pr-8">{fullScreenItem.title}</h3>
                             <div className="flex gap-2">
                                 <Button
-                                    variant="outline"
+                                    variant="ghost"
                                     size="sm"
-                                    className="text-white border-white/20 hover:bg-white/10 gap-2 h-10 px-4"
+                                    className="text-white border border-white/20 hover:bg-white/10 hover:text-white gap-2 h-10 px-4"
                                     asChild
                                 >
                                     <a href={fullScreenItem.url} target="_blank" rel="noopener noreferrer">
                                         <ExternalLink className="h-4 w-4" />
-                                        <span>Download</span>
+                                        <span>{fullScreenItem.type === 'pdf' ? 'Download PDF' : 'Download Video'}</span>
                                     </a>
                                 </Button>
                                 <button
