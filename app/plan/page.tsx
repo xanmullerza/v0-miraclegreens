@@ -60,122 +60,26 @@ const formatEnergy = (calories: number, unit: UnitType) => {
 
 // --- COMPONENTS ---
 
-const DietCard = ({
-    type,
-    selected,
-    onClick,
-    icon: Icon,
-    label
-}: {
-    type: DietType,
-    selected: boolean,
-    onClick: () => void,
-    icon: any,
-    label?: string
-}) => (
-    <div
-        onClick={onClick}
-        className={cn(
-            "cursor-pointer relative overflow-hidden rounded-2xl border-2 p-6 transition-all duration-300 hover:scale-[1.02]",
-            selected
-                ? "border-primary bg-primary/5 shadow-xl"
-                : "border-border bg-card hover:border-primary/50"
-        )}
-    >
-        <div className="flex flex-col items-center gap-4 text-center">
-            <div className={cn(
-                "p-4 rounded-full",
-                selected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-            )}>
-                <Icon className="h-8 w-8" />
-            </div>
-            <h3 className="font-bold capitalize text-lg whitespace-nowrap">{label || (type === 'anything' ? 'Anything Goes' : type)}</h3>
-            {selected && (
-                <div className="absolute top-4 right-4 text-primary">
-                    <Check className="h-6 w-6" />
-                </div>
-            )}
-        </div>
+const DietCard = ({ type, selected, onClick, icon: Icon, label }: { type: DietType, selected: boolean, onClick: () => void, icon: any, label?: string }) => (
+    <div onClick={onClick} className={cn("cursor-pointer flex flex-col items-center justify-center gap-2 rounded-xl border p-3 transition-all hover:bg-muted/50 h-24", selected ? "border-primary bg-primary/10 text-primary font-medium ring-1 ring-primary" : "border-border bg-card text-muted-foreground")}>
+        <Icon className={cn("h-6 w-6", selected ? "text-primary" : "text-muted-foreground")} />
+        <span className="text-sm font-semibold">{label || (type === 'anything' ? 'Anything' : type)}</span>
     </div>
 );
 
-const GoalCard = ({
-    type,
-    selected,
-    onClick,
-    icon: Icon,
-    label
-}: {
-    type: GoalType,
-    selected: boolean,
-    onClick: () => void,
-    icon: any,
-    label?: string
-}) => (
-    <div
-        onClick={onClick}
-        className={cn(
-            "cursor-pointer relative overflow-hidden rounded-2xl border-2 p-6 transition-all duration-300 hover:scale-[1.02]",
-            selected
-                ? "border-primary bg-primary/5 shadow-xl"
-                : "border-border bg-card hover:border-primary/50"
-        )}
-    >
-        <div className="flex flex-col items-center gap-4 text-center">
-            <div className={cn(
-                "p-4 rounded-full",
-                selected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-            )}>
-                <Icon className="h-8 w-8" />
-            </div>
-            <h3 className="font-bold capitalize text-lg whitespace-nowrap">{label || type.replace('-', ' ')}</h3>
-            {selected && (
-                <div className="absolute top-4 right-4 text-primary">
-                    <Check className="h-6 w-6" />
-                </div>
-            )}
-        </div>
+const GoalCard = ({ type, selected, onClick, icon: Icon, label }: { type: GoalType, selected: boolean, onClick: () => void, icon: any, label?: string }) => (
+    <div onClick={onClick} className={cn("cursor-pointer flex items-center justify-center gap-2 rounded-xl border px-4 py-3 transition-all hover:bg-muted/50", selected ? "border-primary bg-primary/10 text-primary font-medium ring-1 ring-primary" : "border-border bg-card text-muted-foreground")}>
+        <Icon className="h-4 w-4" />
+        <span className="text-sm font-semibold">{label || type.replace('-', ' ')}</span>
     </div>
 );
 
 
 
-const ActivityCard = ({
-    type,
-    selected,
-    onClick,
-    icon: Icon,
-    label
-}: {
-    type: ActivityLevel,
-    selected: boolean,
-    onClick: () => void,
-    icon: any,
-    label?: string
-}) => (
-    <div
-        onClick={onClick}
-        className={cn(
-            "cursor-pointer relative overflow-hidden rounded-2xl border-2 p-6 transition-all duration-300 hover:scale-[1.02]",
-            selected
-                ? "border-primary bg-primary/5 shadow-xl"
-                : "border-border bg-card hover:border-primary/50"
-        )}
-    >
-        <div className="flex flex-col items-center gap-4 text-center">
-            <div className={cn(
-                "p-4 rounded-full",
-                selected ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-            )}>
-                <Icon className="h-8 w-8" />
-            </div>
-            <h3 className="font-bold capitalize text-lg whitespace-nowrap">{label || type}</h3>
-            {selected && (
-                <div className="absolute top-4 right-4 text-primary">
-                    <Check className="h-6 w-6" />
-                </div>
-            )}
-        </div>
+const ActivityCard = ({ type, selected, onClick, icon: Icon, label }: { type: ActivityLevel, selected: boolean, onClick: () => void, icon: any, label?: string }) => (
+    <div onClick={onClick} className={cn("cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-2 transition-all hover:bg-muted/50", selected ? "border-primary bg-primary/10 text-primary font-medium ring-1 ring-primary" : "border-border bg-card text-muted-foreground")}>
+        <Icon className="h-5 w-5 mb-1" />
+        <span className="text-xs font-semibold text-center leading-tight">{label || type}</span>
     </div>
 );
 
@@ -548,140 +452,62 @@ export default function MealPlannerPage() {
 
                     <div className="bg-card border border-border rounded-3xl p-6 sm:p-10 shadow-sm relative overflow-hidden min-h-[600px]">
 
-                        {/* WIZARD STEP 1: PREFERENCES */}
+                        {/* COMPACT WIZARD: SINGLE VIEW */}
                         {step === 1 && (
-                            <div className="space-y-10 animate-in fade-in slide-in-from-right-8 duration-500">
-                                <div>
-                                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
-                                        What is your goal?
-                                    </h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                        <GoalCard
-                                            type="lose-fat" selected={goal === 'lose-fat'}
-                                            onClick={() => setGoal('lose-fat')} icon={TrendingDown}
-                                            label="Lose Fat"
-                                        />
-                                        <GoalCard
-                                            type="maintain" selected={goal === 'maintain'}
-                                            onClick={() => setGoal('maintain')} icon={Activity}
-                                            label="Maintain Weight"
-                                        />
-                                        <GoalCard
-                                            type="build-muscle" selected={goal === 'build-muscle'}
-                                            onClick={() => setGoal('build-muscle')} icon={Dumbbell}
-                                            label="Build Muscle"
-                                        />
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-2xl mx-auto">
+                                <div className="space-y-2">
+                                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">My Goal</Label>
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <GoalCard type="lose-fat" selected={goal === 'lose-fat'} onClick={() => setGoal('lose-fat')} icon={TrendingDown} label="Lose Fat" />
+                                        <GoalCard type="maintain" selected={goal === 'maintain'} onClick={() => setGoal('maintain')} icon={Activity} label="Maintain" />
+                                        <GoalCard type="build-muscle" selected={goal === 'build-muscle'} onClick={() => setGoal('build-muscle')} icon={Dumbbell} label="Build Muscle" />
                                     </div>
                                 </div>
 
-                                <div>
-                                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
-                                        About You
-                                    </h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                                        <div className="space-y-2">
-                                            <Label>Gender</Label>
-                                            <div className="flex w-full bg-muted rounded-lg p-1">
-                                                <button
-                                                    onClick={() => setGender('male')}
-                                                    className={cn(
-                                                        "flex-1 py-2 text-sm font-medium rounded-md transition-all",
-                                                        gender === 'male' ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted/50"
-                                                    )}
-                                                >
-                                                    Male
-                                                </button>
-                                                <button
-                                                    onClick={() => setGender('female')}
-                                                    className={cn(
-                                                        "flex-1 py-2 text-sm font-medium rounded-md transition-all",
-                                                        gender === 'female' ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted/50"
-                                                    )}
-                                                >
-                                                    Female
-                                                </button>
-                                            </div>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                    <div className="space-y-2 col-span-2 sm:col-span-1">
+                                        <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Gender</Label>
+                                        <div className="flex w-full bg-muted rounded-lg p-1 h-10">
+                                            <button onClick={() => setGender('male')} className={cn("flex-1 text-xs font-medium rounded-md transition-all", gender === 'male' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:bg-background/50")}>Male</button>
+                                            <button onClick={() => setGender('female')} className={cn("flex-1 text-xs font-medium rounded-md transition-all", gender === 'female' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:bg-background/50")}>Female</button>
                                         </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="age">Age</Label>
-                                            <Input
-                                                id="age" type="number" placeholder="25"
-                                                value={age} onChange={(e) => setAge(e.target.value ? parseInt(e.target.value) : '')}
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="weight">Weight (kg)</Label>
-                                            <Input
-                                                id="weight" type="number" placeholder="70"
-                                                value={weight} onChange={(e) => setWeight(e.target.value ? parseInt(e.target.value) : '')}
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="height">Height (cm)</Label>
-                                            <Input
-                                                id="height" type="number" placeholder="175"
-                                                value={height} onChange={(e) => setHeight(e.target.value ? parseInt(e.target.value) : '')}
-                                            />
-                                        </div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="age" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Age</Label>
+                                        <div className="relative"><Input id="age" type="number" className="h-10 text-center" value={age} onChange={(e) => setAge(e.target.value ? parseInt(e.target.value) : '')} /><span className="absolute right-3 top-2.5 text-xs text-muted-foreground">yrs</span></div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="weight" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Weight</Label>
+                                        <div className="relative"><Input id="weight" type="number" className="h-10 text-center" value={weight} onChange={(e) => setWeight(e.target.value ? parseInt(e.target.value) : '')} /><span className="absolute right-3 top-2.5 text-xs text-muted-foreground">kg</span></div>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="height" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Height</Label>
+                                        <div className="relative"><Input id="height" type="number" className="h-10 text-center" value={height} onChange={(e) => setHeight(e.target.value ? parseInt(e.target.value) : '')} /><span className="absolute right-3 top-2.5 text-xs text-muted-foreground">cm</span></div>
                                     </div>
                                 </div>
 
-                                <div>
-                                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span>
-                                        Activity Level
-                                    </h2>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                        <ActivityCard
-                                            type="sedentary" selected={activityLevel === 'sedentary'}
-                                            onClick={() => setActivityLevel('sedentary')} icon={Armchair}
-                                            label="Sedentary"
-                                        />
-                                        <ActivityCard
-                                            type="light" selected={activityLevel === 'light'}
-                                            onClick={() => setActivityLevel('light')} icon={Footprints}
-                                            label="Light Active"
-                                        />
-                                        <ActivityCard
-                                            type="moderate" selected={activityLevel === 'moderate'}
-                                            onClick={() => setActivityLevel('moderate')} icon={Activity}
-                                            label="Moderate"
-                                        />
-                                        <ActivityCard
-                                            type="active" selected={activityLevel === 'active'}
-                                            onClick={() => setActivityLevel('active')} icon={Zap}
-                                            label="Very Active"
-                                        />
+                                <div className="space-y-2">
+                                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Daily Activity</Label>
+                                    <div className="grid grid-cols-4 gap-2">
+                                        <ActivityCard type="sedentary" selected={activityLevel === 'sedentary'} onClick={() => setActivityLevel('sedentary')} icon={Armchair} label="Sedentary" />
+                                        <ActivityCard type="light" selected={activityLevel === 'light'} onClick={() => setActivityLevel('light')} icon={Footprints} label="Light" />
+                                        <ActivityCard type="moderate" selected={activityLevel === 'moderate'} onClick={() => setActivityLevel('moderate')} icon={Activity} label="Moderate" />
+                                        <ActivityCard type="active" selected={activityLevel === 'active'} onClick={() => setActivityLevel('active')} icon={Zap} label="Active" />
                                     </div>
                                 </div>
 
-                                <div>
-                                    <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                                        <span className="bg-primary/10 text-primary w-8 h-8 rounded-full flex items-center justify-center text-sm">4</span>
-                                        Choose your diet style
-                                    </h2>
-                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3">
-                                        <DietCard
-                                            type="anything" selected={diet === 'anything'}
-                                            onClick={() => setDiet('anything')} icon={Utensils}
-                                        />
-                                        <DietCard
-                                            type="vegetarian" selected={diet === 'vegetarian'}
-                                            onClick={() => setDiet('vegetarian')} icon={Egg}
-                                        />
-                                        <DietCard
-                                            type="vegan" selected={diet === 'vegan'}
-                                            onClick={() => setDiet('vegan')} icon={Leaf}
-                                        />
-
+                                <div className="space-y-2">
+                                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Diet Preference</Label>
+                                    <div className="grid grid-cols-3 gap-3">
+                                        <DietCard type="anything" selected={diet === 'anything'} onClick={() => setDiet('anything')} icon={Utensils} label="Balanced" />
+                                        <DietCard type="vegetarian" selected={diet === 'vegetarian'} onClick={() => setDiet('vegetarian')} icon={Egg} label="Vegetarian" />
+                                        <DietCard type="vegan" selected={diet === 'vegan'} onClick={() => setDiet('vegan')} icon={Leaf} label="Vegan" />
                                     </div>
                                 </div>
 
-                                <div className="pt-6 border-t border-border flex justify-end">
-                                    <Button size="lg" onClick={handleNextStep} className="h-14 px-8 text-lg rounded-xl gap-2">
-                                        Generate Plan <ChevronRight className="h-5 w-5" />
+                                <div className="pt-4">
+                                    <Button size="lg" onClick={handleNextStep} className="w-full h-12 text-base font-semibold rounded-xl bg-green-600 hover:bg-green-700 shadow-md">
+                                        Generate My Plan <ChevronRight className="h-4 w-4 ml-2" />
                                     </Button>
                                 </div>
                             </div>
