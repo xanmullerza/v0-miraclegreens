@@ -61,16 +61,16 @@ const formatEnergy = (calories: number, unit: UnitType) => {
 // --- COMPONENTS ---
 
 const DietCard = ({ type, selected, onClick, icon: Icon, label }: { type: DietType, selected: boolean, onClick: () => void, icon: any, label?: string }) => (
-    <div onClick={onClick} className={cn("cursor-pointer flex flex-col items-center justify-center gap-2 rounded-xl border p-3 transition-all hover:bg-muted/50 h-24", selected ? "border-primary bg-primary/10 text-primary font-medium ring-1 ring-primary" : "border-border bg-card text-muted-foreground")}>
-        <Icon className={cn("h-6 w-6", selected ? "text-primary" : "text-muted-foreground")} />
-        <span className="text-sm font-semibold">{label || (type === 'anything' ? 'Anything' : type)}</span>
+    <div onClick={onClick} className={cn("cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-2 transition-all hover:bg-muted/50", selected ? "border-primary bg-primary/10 text-primary font-medium ring-1 ring-primary" : "border-border bg-card text-muted-foreground")}>
+        <Icon className={cn("h-5 w-5 mb-1", selected ? "text-primary" : "text-muted-foreground")} />
+        <span className="text-xs font-semibold text-center leading-tight">{label || (type === 'anything' ? 'Anything' : type)}</span>
     </div>
 );
 
 const GoalCard = ({ type, selected, onClick, icon: Icon, label }: { type: GoalType, selected: boolean, onClick: () => void, icon: any, label?: string }) => (
-    <div onClick={onClick} className={cn("cursor-pointer flex items-center justify-center gap-2 rounded-xl border px-4 py-3 transition-all hover:bg-muted/50", selected ? "border-primary bg-primary/10 text-primary font-medium ring-1 ring-primary" : "border-border bg-card text-muted-foreground")}>
-        <Icon className="h-4 w-4" />
-        <span className="text-sm font-semibold">{label || type.replace('-', ' ')}</span>
+    <div onClick={onClick} className={cn("cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-2 transition-all hover:bg-muted/50", selected ? "border-primary bg-primary/10 text-primary font-medium ring-1 ring-primary" : "border-border bg-card text-muted-foreground")}>
+        <Icon className="h-5 w-5 mb-1" />
+        <span className="text-xs font-semibold text-center leading-tight">{label || type.replace('-', ' ')}</span>
     </div>
 );
 
