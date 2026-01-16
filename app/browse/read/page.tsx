@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 
 export default function ReadPage() {
     const [listeningId, setListeningId] = useState<string | null>(null);
+    const [watchingId, setWatchingId] = useState<string | null>(null);
 
     return (
         <main className="min-h-screen flex flex-col bg-background">
@@ -66,14 +67,36 @@ export default function ReadPage() {
                                             <Headphones className="h-4 w-4" />
                                             {listeningId === 'malnutrition' ? 'Close Player' : 'Listen to Podcast'}
                                         </Button>
-                                        <Button variant="secondary" size="sm" asChild>
-                                            <Link href="/browse/watch#malnutrition-south-africa">
-                                                <PlayCircle className="mr-2 h-4 w-4" />
-                                                Watch Video
-                                            </Link>
+                                        <Button
+                                            variant={watchingId === 'malnutrition' ? "default" : "secondary"}
+                                            size="sm"
+                                            onClick={() => {
+                                                setWatchingId(watchingId === 'malnutrition' ? null : 'malnutrition');
+                                                setListeningId(null);
+                                            }}
+                                            className="gap-2"
+                                        >
+                                            <PlayCircle className="h-4 w-4" />
+                                            {watchingId === 'malnutrition' ? 'Close Video' : 'Watch Video'}
                                         </Button>
                                         <span className="text-xs text-muted-foreground ml-1">PDF • 335 KB</span>
                                     </div>
+
+                                    {watchingId === 'malnutrition' && (
+                                        <div className="mt-4 p-2 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <div className="flex items-center justify-between mb-2 px-2 pt-1">
+                                                <span className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">Video Documentary</span>
+                                                <button onClick={() => setWatchingId(null)} className="text-muted-foreground hover:text-foreground">
+                                                    <X className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                            <div className="aspect-video rounded-lg overflow-hidden bg-black shadow-inner">
+                                                <video controls className="w-full h-full">
+                                                    <source src="/The_Moringa_Solution.mp4" type="video/mp4" />
+                                                </video>
+                                            </div>
+                                        </div>
+                                    )}
 
                                     {listeningId === 'malnutrition' && (
                                         <div className="mt-4 p-4 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -117,14 +140,36 @@ export default function ReadPage() {
                                             <Headphones className="h-4 w-4" />
                                             {listeningId === 'production' ? 'Close Player' : 'Listen to Podcast'}
                                         </Button>
-                                        <Button variant="secondary" size="sm" asChild>
-                                            <Link href="/browse/watch#moringa-south-africa">
-                                                <PlayCircle className="mr-2 h-4 w-4" />
-                                                Watch Video
-                                            </Link>
+                                        <Button
+                                            variant={watchingId === 'production' ? "default" : "secondary"}
+                                            size="sm"
+                                            onClick={() => {
+                                                setWatchingId(watchingId === 'production' ? null : 'production');
+                                                setListeningId(null);
+                                            }}
+                                            className="gap-2"
+                                        >
+                                            <PlayCircle className="h-4 w-4" />
+                                            {watchingId === 'production' ? 'Close Video' : 'Watch Video'}
                                         </Button>
                                         <span className="text-xs text-muted-foreground ml-1">PDF • 415 KB</span>
                                     </div>
+
+                                    {watchingId === 'production' && (
+                                        <div className="mt-4 p-2 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <div className="flex items-center justify-between mb-2 px-2 pt-1">
+                                                <span className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">Visual Guide</span>
+                                                <button onClick={() => setWatchingId(null)} className="text-muted-foreground hover:text-foreground">
+                                                    <X className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                            <div className="aspect-video rounded-lg overflow-hidden bg-black shadow-inner">
+                                                <video controls className="w-full h-full">
+                                                    <source src="/The_Miracle_Tree.mp4" type="video/mp4" />
+                                                </video>
+                                            </div>
+                                        </div>
+                                    )}
 
                                     {listeningId === 'production' && (
                                         <div className="mt-4 p-4 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 animate-in fade-in slide-in-from-top-2 duration-300">
