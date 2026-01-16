@@ -99,15 +99,7 @@ export default function BrowsePage() {
                                     <PlayCircle className="h-6 w-6" />
                                     Watch Now
                                 </Button>
-                                <Button
-                                    size="lg"
-                                    variant="outline"
-                                    className="h-14 px-8 text-lg gap-2 text-white border-white/20 hover:bg-white/10 hover:text-white"
-                                    onClick={() => document.getElementById('knowledge-base')?.scrollIntoView({ behavior: 'smooth' })}
-                                >
-                                    <BookOpen className="h-6 w-6" />
-                                    Read Study
-                                </Button>
+
                             </div>
                         </div>
                     </div>
@@ -206,17 +198,7 @@ export default function BrowsePage() {
                                                     <PlayCircle className="h-4 w-4" />
                                                     <span className="hidden lg:inline">{watchingId === res.id ? 'Close' : 'Watch'}</span>
                                                 </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    title={`Download PDF (${res.pdfSize || 'Download'})`}
-                                                    className="rounded-lg text-muted-foreground hover:text-primary"
-                                                    asChild
-                                                >
-                                                    <a href={res.pdfUrl} download={res.pdfUrl.split('/').pop()}>
-                                                        <Download className="h-4 w-4" />
-                                                    </a>
-                                                </Button>
+
                                             </div>
                                         </div>
 
