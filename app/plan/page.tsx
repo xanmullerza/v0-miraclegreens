@@ -506,7 +506,7 @@ export default function MealPlannerPage() {
                                 </div>
 
                                 <div className="pt-4">
-                                    <Button size="lg" onClick={handleNextStep} className="w-full h-12 text-base font-semibold rounded-xl bg-green-600 hover:bg-green-700 shadow-md">
+                                    <Button size="lg" onClick={handleNextStep} className="w-full h-12 text-base font-semibold rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-md">
                                         Generate My Plan <ChevronRight className="h-4 w-4 ml-2" />
                                     </Button>
                                 </div>
