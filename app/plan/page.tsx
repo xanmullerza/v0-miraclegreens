@@ -741,10 +741,7 @@ export default function MealPlannerPage() {
                                         </div>
                                     </div>
                                     <div className="flex gap-3 w-full md:w-auto">
-                                        <Button variant="outline" onClick={handleRegenerate} className="flex-1 gap-2">
-                                            <RotateCcw className="h-4 w-4" />
-                                            Regenerate
-                                        </Button>
+
                                         <Button onClick={() => setStep(1)} className="flex-1 gap-2">
                                             Start Over
                                         </Button>
@@ -796,32 +793,7 @@ export default function MealPlannerPage() {
                                     ))}
                                 </div>
 
-                                {/* Actions - Desktop (Standard) / Mobile (Sticky Bottom) */}
-                                <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-md border-t border-border md:static md:bg-transparent md:border-t-0 md:p-0 z-10 flex justify-center md:pt-8">
-                                    <Sheet>
-                                        <SheetTrigger asChild>
-                                            <Button size="lg" className="w-full md:w-auto rounded-full shadow-lg h-14 md:h-16 px-6 md:px-10 gap-3 text-lg bg-green-600 hover:bg-green-700 transition-all hover:scale-105 active:scale-95">
-                                                <ShoppingBasket className="h-5 w-5 md:h-6 md:w-6" />
-                                                Get Grocery List
-                                            </Button>
-                                        </SheetTrigger>
-                                        <SheetContent className="overflow-y-auto w-full sm:max-w-md">
-                                            <SheetHeader className="text-left">
-                                                <SheetTitle>Your Shopping List</SheetTitle>
-                                                <SheetDescription>
-                                                    Everything you need for your {formatEnergy(calories, unit)} plan.
-                                                </SheetDescription>
-                                            </SheetHeader>
-                                            <ShoppingList items={shoppingList} calories={calories} unit={unit} />
-                                            <div className="mt-8 pt-6 border-t border-border pb-8 md:pb-0">
-                                                <Button className="w-full gap-2" variant="outline" onClick={() => window.print()}>
-                                                    <Download className="h-4 w-4" />
-                                                    Print / Save Plan
-                                                </Button>
-                                            </div>
-                                        </SheetContent>
-                                    </Sheet>
-                                </div>
+
 
                             </div>
                         )}
