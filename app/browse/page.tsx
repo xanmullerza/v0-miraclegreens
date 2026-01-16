@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
-import { BookOpen, PlayCircle, Search, ArrowRight, ArrowLeft, Headphones, X, Maximize2, ExternalLink, Download, Sparkles } from 'lucide-react';
+import { BookOpen, PlayCircle, Search, ArrowRight, ArrowLeft, Headphones, X, Maximize2, ExternalLink, Download, Sparkles, Baby, Sprout, Leaf, Activity, Microscope } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -21,8 +21,9 @@ const resources = [
         audioUrl: '/Moringa_Powder_Combats_South_African_Malnutrition.m4a',
         videoUrl: '/The_Moringa_Solution.mp4',
         pdfSize: '335 KB',
-        year: '2023',
-        source: 'Nutrients'
+        source: 'Nutrients',
+        icon: Baby,
+        iconColor: 'text-rose-500 bg-rose-50 dark:bg-rose-900/20'
     },
     {
         id: 'production',
@@ -32,8 +33,9 @@ const resources = [
         audioUrl: '/Moringa_The_Miracle_Tree_in_South_Africa.m4a',
         videoUrl: '/The_Miracle_Tree.mp4',
         pdfSize: '415 KB',
-        year: '2023',
-        source: 'Research Review'
+        source: 'Research Review',
+        icon: Sprout,
+        iconColor: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
     }
 ];
 
@@ -130,18 +132,10 @@ export default function BrowsePage() {
                             </div>
                         </div>
 
-                        {/* Knowledge Base Table */}
-                        <div id="knowledge-base" className="space-y-4">
-                            {/* Table Header - Desktop */}
-                            <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 text-sm font-bold text-muted-foreground uppercase tracking-wider border-b border-muted/50">
-                                <div className="col-span-1">Type</div>
-                                <div className="col-span-6">Resource Title</div>
-                                <div className="col-span-1">Year</div>
-                                <div className="col-span-4 text-right">Actions</div>
-                            </div>
-
+                        {/* Knowledge Base List */}
+                        <div id="knowledge-base" className="space-y-2">
                             {/* Resource Rows */}
-                            <div className="space-y-2">
+                            <div className="space-y-3">
                                 {filteredResources.map((res) => (
                                     <div
                                         key={res.id}
@@ -154,26 +148,21 @@ export default function BrowsePage() {
                                         )}
                                     >
                                         <div className="md:grid grid-cols-12 gap-4 items-center px-6 py-4">
-                                            {/* Type Icon */}
+                                            {/* Custom Theme Icon */}
                                             <div className="hidden md:block col-span-1">
-                                                <div className="p-2 w-fit rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
-                                                    <BookOpen className="h-5 w-5" />
+                                                <div className={cn("p-2.5 w-fit rounded-xl transition-transform group-hover:scale-110 duration-300", res.iconColor)}>
+                                                    <res.icon className="h-6 w-6" />
                                                 </div>
                                             </div>
 
                                             {/* Title & Description */}
-                                            <div className="col-span-12 md:col-span-6 space-y-1">
+                                            <div className="col-span-12 md:col-span-7 space-y-1">
                                                 <h3 className="text-lg font-bold text-foreground leading-tight group-hover:text-primary transition-colors">
                                                     {res.title}
                                                 </h3>
                                                 <p className="text-sm text-muted-foreground md:line-clamp-1 group-hover:line-clamp-none transition-all">
                                                     {res.description}
                                                 </p>
-                                            </div>
-
-                                            {/* Metadata */}
-                                            <div className="hidden md:block col-span-1 text-sm text-muted-foreground font-medium">
-                                                {res.year}
                                             </div>
 
                                             {/* Actions */}
@@ -220,7 +209,7 @@ export default function BrowsePage() {
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    title={`Download PDF (${res.pdfSize})`}
+                                                    title={`Download PDF (${res.pdfSize || 'Download'})`}
                                                     className="rounded-lg text-muted-foreground hover:text-primary"
                                                     asChild
                                                 >
