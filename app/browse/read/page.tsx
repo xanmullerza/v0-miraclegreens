@@ -1,15 +1,18 @@
+'use client';
+
+import { useState } from 'react';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
-import { BookOpen, ArrowLeft, Headphones, PlayCircle } from 'lucide-react';
+import { BookOpen, ArrowLeft, Headphones, PlayCircle, X } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
-export const metadata = {
-    title: 'Read - Miracle Greens',
-    description: 'Articles, scientific studies, and nutritional information about Moringa.',
-};
+
 
 export default function ReadPage() {
+    const [listeningId, setListeningId] = useState<string | null>(null);
+
     return (
         <main className="min-h-screen flex flex-col bg-background">
             <Header />
@@ -54,11 +57,14 @@ export default function ReadPage() {
                                                 Read Paper
                                             </a>
                                         </Button>
-                                        <Button variant="secondary" size="sm" asChild>
-                                            <Link href="/browse/listen#malnutrition-south-africa">
-                                                <Headphones className="mr-2 h-4 w-4" />
-                                                Listen to Podcast
-                                            </Link>
+                                        <Button
+                                            variant={listeningId === 'malnutrition' ? "default" : "secondary"}
+                                            size="sm"
+                                            onClick={() => setListeningId(listeningId === 'malnutrition' ? null : 'malnutrition')}
+                                            className="gap-2"
+                                        >
+                                            <Headphones className="h-4 w-4" />
+                                            {listeningId === 'malnutrition' ? 'Close Player' : 'Listen to Podcast'}
                                         </Button>
                                         <Button variant="secondary" size="sm" asChild>
                                             <Link href="/browse/watch#malnutrition-south-africa">
@@ -68,6 +74,20 @@ export default function ReadPage() {
                                         </Button>
                                         <span className="text-xs text-muted-foreground ml-1">PDF • 335 KB</span>
                                     </div>
+
+                                    {listeningId === 'malnutrition' && (
+                                        <div className="mt-4 p-4 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Audio Summary</span>
+                                                <button onClick={() => setListeningId(null)} className="text-muted-foreground hover:text-foreground">
+                                                    <X className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                            <audio controls className="w-full h-8">
+                                                <source src="/Moringa_Powder_Combats_South_African_Malnutrition.m4a" type="audio/x-m4a" />
+                                            </audio>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -88,11 +108,14 @@ export default function ReadPage() {
                                                 Read Paper
                                             </a>
                                         </Button>
-                                        <Button variant="secondary" size="sm" asChild>
-                                            <Link href="/browse/listen#moringa-south-africa">
-                                                <Headphones className="mr-2 h-4 w-4" />
-                                                Listen to Podcast
-                                            </Link>
+                                        <Button
+                                            variant={listeningId === 'production' ? "default" : "secondary"}
+                                            size="sm"
+                                            onClick={() => setListeningId(listeningId === 'production' ? null : 'production')}
+                                            className="gap-2"
+                                        >
+                                            <Headphones className="h-4 w-4" />
+                                            {listeningId === 'production' ? 'Close Player' : 'Listen to Podcast'}
                                         </Button>
                                         <Button variant="secondary" size="sm" asChild>
                                             <Link href="/browse/watch#moringa-south-africa">
@@ -102,6 +125,20 @@ export default function ReadPage() {
                                         </Button>
                                         <span className="text-xs text-muted-foreground ml-1">PDF • 415 KB</span>
                                     </div>
+
+                                    {listeningId === 'production' && (
+                                        <div className="mt-4 p-4 rounded-xl bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <span className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Audio Review</span>
+                                                <button onClick={() => setListeningId(null)} className="text-muted-foreground hover:text-foreground">
+                                                    <X className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                            <audio controls className="w-full h-8">
+                                                <source src="/Moringa_The_Miracle_Tree_in_South_Africa.m4a" type="audio/x-m4a" />
+                                            </audio>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
