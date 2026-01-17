@@ -1025,8 +1025,11 @@ export default function MealPlannerPage() {
 
                                             return (
                                                 <div className="space-y-4">
-                                                    <h4 className="font-bold text-sm text-primary uppercase tracking-wider border-b border-primary/10 pb-2">{title}</h4>
-                                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                                    <h4 className="font-bold text-sm text-primary uppercase tracking-wider border-b border-primary/20 pb-2 flex justify-between items-center">
+                                                        <span>{title}</span>
+                                                        <span className="text-[10px] opacity-40">ITEMIZED</span>
+                                                    </h4>
+                                                    <div className="flex flex-col">
                                                         {filtered.map(([label, value]) => {
                                                             const mKey = labelsToMoringaKey[label];
                                                             const boostValue = (mKey && moringaSpoons > 0) ? (MORINGA_TSP.micronutrients as any)[mKey] * moringaSpoons : 0;
@@ -1040,23 +1043,21 @@ export default function MealPlannerPage() {
 
                                                             return (
                                                                 <div key={label} className={cn(
-                                                                    "flex justify-between items-center p-3 rounded-xl border transition-all",
-                                                                    boostValue > 0
-                                                                        ? "bg-green-500/5 border-green-500/20 text-green-900 dark:text-green-100"
-                                                                        : "bg-muted/30 border-border/50 text-foreground"
+                                                                    "flex justify-between items-center py-2.5 border-b border-dashed border-border/60 transition-colors",
+                                                                    boostValue > 0 ? "bg-green-500/5 -mx-2 px-2 text-green-900 dark:text-green-100" : ""
                                                                 )}>
-                                                                    <div className="flex flex-col">
-                                                                        <span className="text-[10px] font-bold opacity-60 uppercase">{label}</span>
-                                                                        <div className="flex items-baseline gap-1">
-                                                                            <span className="text-lg font-black">{typeof value === 'number' ? (value >= 1 ? value.toFixed(1) : value.toFixed(2)) : value}</span>
-                                                                            <span className="text-xs font-bold opacity-40">{unit}</span>
+                                                                    <span className="text-sm font-medium text-muted-foreground uppercase tracking-tight">{label}</span>
+                                                                    <div className="flex items-center gap-2">
+                                                                        {boostValue > 0 && (
+                                                                            <span className="bg-green-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded shadow-sm">
+                                                                                +{boostValue >= 1 ? boostValue.toFixed(1) : boostValue.toFixed(2)}
+                                                                            </span>
+                                                                        )}
+                                                                        <div className="flex items-baseline gap-0.5 min-w-[60px] justify-end">
+                                                                            <span className="text-sm font-black tracking-tight">{typeof value === 'number' ? (value >= 1 ? value.toFixed(1) : value.toFixed(2)) : value}</span>
+                                                                            <span className="text-[10px] font-bold opacity-30">{unit}</span>
                                                                         </div>
                                                                     </div>
-                                                                    {boostValue > 0 && (
-                                                                        <div className="bg-green-600 text-white text-[10px] font-black px-2 py-1 rounded-lg shadow-sm">
-                                                                            +{boostValue >= 1 ? boostValue.toFixed(1) : boostValue.toFixed(2)}{unit}
-                                                                        </div>
-                                                                    )}
                                                                 </div>
                                                             );
                                                         })}
