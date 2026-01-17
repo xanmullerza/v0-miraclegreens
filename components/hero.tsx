@@ -2,6 +2,8 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, ShoppingBag, Heart, LayoutGrid, Calendar, TreeDeciduous } from 'lucide-react';
 
+const SHOW_SHOP = false;
+
 export function Hero() {
   return (
     <section className="relative overflow-hidden bg-secondary/30">
@@ -12,17 +14,28 @@ export function Hero() {
               Nutrition for everyone
             </h1>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              At Miracle Greens, we sell premium moringa saplings, capsules and powder to the public. As a registered non-profit, every purchase funds the
-              production and distribution of moringa powder to families fighting malnutrition.
-              Shop with purpose — your wellness supports their health.
+              {SHOW_SHOP ? (
+                <>
+                  At Miracle Greens, we sell premium moringa saplings, capsules and powder to the public. As a registered non-profit, every purchase funds the
+                  production and distribution of moringa powder to families fighting malnutrition.
+                  Shop with purpose — your wellness supports their health.
+                </>
+              ) : (
+                <>
+                  As a registered non-profit, Miracle Greens is dedicated to the production and distribution of moringa powder to families fighting malnutrition.
+                  Your support helps us bring this miracle tree to those who need it most.
+                </>
+              )}
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Button size="lg" className="h-12 px-8 text-base gap-2" asChild>
-                <a href="/shop">
-                  <ShoppingBag className="h-5 w-5" />
-                  Shop Now
-                </a>
-              </Button>
+              {SHOW_SHOP && (
+                <Button size="lg" className="h-12 px-8 text-base gap-2" asChild>
+                  <a href="/shop">
+                    <ShoppingBag className="h-5 w-5" />
+                    Shop Now
+                  </a>
+                </Button>
+              )}
               <div className="flex flex-wrap gap-2 sm:gap-4">
                 <Button variant="outline" size="lg" className="h-12 px-6 text-base gap-2" asChild>
                   <a href="/browse">

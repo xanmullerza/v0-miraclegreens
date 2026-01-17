@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ShoppingBag, TreeDeciduous, LayoutGrid } from 'lucide-react';
 
+const showShop = false;
+
 export function Newsletter() {
   return (
     <section className="py-16 md:py-24 bg-primary">
@@ -19,12 +21,14 @@ export function Newsletter() {
               </Link>
             </Button>
 
-            <Button variant="secondary" size="lg" className="gap-2" asChild>
-              <Link href="/shop">
-                <ShoppingBag className="h-4 w-4" />
-                Buy
-              </Link>
-            </Button>
+            {showShop && (
+              <Button variant="secondary" size="lg" className="gap-2" asChild>
+                <Link href="/shop">
+                  <ShoppingBag className="h-4 w-4" />
+                  Buy
+                </Link>
+              </Button>
+            )}
 
             <Button variant="secondary" size="lg" className="gap-2" asChild>
               <Link href="/donate">

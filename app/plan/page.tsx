@@ -44,6 +44,8 @@ import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
+const showShop = false;
+
 // --- HELPERS ---
 const CAL_TO_KJ = 4.184;
 type UnitType = 'kcal' | 'kJ';
@@ -187,9 +189,11 @@ const ShoppingList = ({ items, calories, unit = 'kJ' }: { items: ShoppingItem[],
                                 <span className="text-sm text-muted-foreground bg-muted px-2 py-1 rounded">
                                     {item.amounts.join(' + ')}
                                 </span>
-                                <Button size="sm" variant="secondary" className="h-8" asChild>
-                                    <Link href="/shop">Buy Now</Link>
-                                </Button>
+                                {showShop && (
+                                    <Button size="sm" variant="secondary" className="h-8" asChild>
+                                        <Link href="/shop">Buy Now</Link>
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     ))}

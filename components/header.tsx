@@ -4,10 +4,12 @@ import { Menu, TreeDeciduous, ShoppingBag, LayoutGrid, Calendar } from 'lucide-r
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
+const showShop = false;
+
 const navigation = [
 	{ name: 'Our Story', href: '#story' },
 	{ name: 'How It Works', href: '#how-it-works' },
-	{ name: 'Shop', href: '/shop' },
+	...(showShop ? [{ name: 'Shop', href: '/shop' }] : []),
 	{ name: 'Our Vision', href: '/vision' },
 ];
 
@@ -42,12 +44,14 @@ export function Header() {
 										Plan Meals
 									</Link>
 								</Button>
-								<Button className="gap-2 mt-2" asChild>
-									<Link href="/shop">
-										<ShoppingBag className="h-4 w-4" />
-										Visit Shop
-									</Link>
-								</Button>
+								{showShop && (
+									<Button className="gap-2 mt-2" asChild>
+										<Link href="/shop">
+											<ShoppingBag className="h-4 w-4" />
+											Visit Shop
+										</Link>
+									</Button>
+								)}
 								<Button className="gap-2 mt-2" asChild>
 									<Link href="/donate">
 										<TreeDeciduous className="h-4 w-4" />
@@ -79,12 +83,14 @@ export function Header() {
 								Plan
 							</Link>
 						</Button>
-						<Button variant="secondary" size="sm" className="hidden sm:flex gap-2" asChild>
-							<Link href="/shop">
-								<ShoppingBag className="h-4 w-4" />
-								Shop
-							</Link>
-						</Button>
+						{showShop && (
+							<Button variant="secondary" size="sm" className="hidden sm:flex gap-2" asChild>
+								<Link href="/shop">
+									<ShoppingBag className="h-4 w-4" />
+									Shop
+								</Link>
+							</Button>
+						)}
 						<Button
 							variant="secondary"
 							size="sm"

@@ -17,6 +17,8 @@ const tiers = [
   { name: 'R200', amount: 200, icon: Gift },
 ];
 
+const showShop = false;
+
 export default function DonatePage() {
   return (
     <main className="min-h-screen bg-background">
@@ -26,9 +28,19 @@ export default function DonatePage() {
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="font-serif text-3xl md:text-4xl font-semibold mb-4">Donate</h1>
           <p className="text-muted-foreground mb-8">
-            Browsing the site and applying what you learn is really great. Buying our powder, capsules or
-            seedlings really keeps us going. For those that are able to, kindly
-            consider making a donation to help us grow even more.
+            {showShop ? (
+              <>
+                Browsing the site and applying what you learn is really great. Buying our powder, capsules or
+                seedlings really keeps us going. For those that are able to, kindly
+                consider making a donation to help us grow even more.
+              </>
+            ) : (
+              <>
+                Browsing our resources and applying what you learn is the first step towards better health.
+                If you are able to, please consider making a donation to help us grow our mission
+                and reach more families in need.
+              </>
+            )}
           </p>
 
           <div className="grid sm:grid-cols-3 gap-6 mb-8">
