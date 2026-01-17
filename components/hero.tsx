@@ -74,9 +74,9 @@ export function Hero() {
                   <Heart className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">Every Sale Gives Back</p>
+                  <p className="font-medium text-foreground">Every Donation Helps</p>
                   <p className="text-sm text-muted-foreground">
-                    Profits fund nutritious moringa leaf powder for the needy
+                    Donations fund nutritious moringa leaf powder for the needy
                   </p>
                 </div>
               </div>
