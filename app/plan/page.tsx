@@ -1030,7 +1030,7 @@ export default function MealPlannerPage() {
                                                         <span className="text-[10px] opacity-40">ITEMIZED</span>
                                                     </h4>
                                                     <div className="flex flex-col">
-                                                        {filtered.map(([label, value]) => {
+                                                        {filtered.map(([label, value], idx) => {
                                                             const mKey = labelsToMoringaKey[label];
                                                             const boostValue = (mKey && moringaSpoons > 0) ? (MORINGA_TSP.micronutrients as any)[mKey] * moringaSpoons : 0;
 
@@ -1043,19 +1043,26 @@ export default function MealPlannerPage() {
 
                                                             return (
                                                                 <div key={label} className={cn(
-                                                                    "flex justify-between items-center py-2.5 border-b border-dashed border-border/60 transition-colors",
-                                                                    boostValue > 0 ? "bg-green-500/5 -mx-2 px-2 text-green-900 dark:text-green-100" : ""
+                                                                    "flex items-center gap-2 py-2 px-3 transition-colors rounded-md",
+                                                                    idx % 2 === 0 ? "bg-muted/10" : "bg-transparent",
+                                                                    boostValue > 0 ? "bg-green-500/10 text-green-900 dark:text-green-100 ring-1 ring-green-500/20" : ""
                                                                 )}>
-                                                                    <span className="text-sm font-medium text-muted-foreground uppercase tracking-tight">{label}</span>
+                                                                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-tight whitespace-nowrap">{label}</span>
+
+                                                                    {/* Dotted Leader */}
+                                                                    <div className="flex-1 border-b border-dotted border-border/60 mb-1.5" />
+
                                                                     <div className="flex items-center gap-2">
                                                                         {boostValue > 0 && (
                                                                             <span className="bg-green-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded shadow-sm">
                                                                                 +{boostValue >= 1 ? boostValue.toFixed(1) : boostValue.toFixed(2)}
                                                                             </span>
                                                                         )}
-                                                                        <div className="flex items-baseline gap-0.5 min-w-[60px] justify-end">
-                                                                            <span className="text-sm font-black tracking-tight">{typeof value === 'number' ? (value >= 1 ? value.toFixed(1) : value.toFixed(2)) : value}</span>
-                                                                            <span className="text-[10px] font-bold opacity-30">{unit}</span>
+                                                                        <div className="flex items-baseline gap-0.5 min-w-[70px] justify-end">
+                                                                            <span className="text-base font-mono font-black tabular-nums tracking-tighter">
+                                                                                {typeof value === 'number' ? (value >= 1 ? value.toFixed(1) : value.toFixed(2)) : value}
+                                                                            </span>
+                                                                            <span className="text-[10px] font-bold opacity-40">{unit}</span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
