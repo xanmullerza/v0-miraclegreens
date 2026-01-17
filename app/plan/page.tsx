@@ -461,22 +461,78 @@ export default function MealPlannerPage() {
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                     <div className="space-y-2 col-span-2 sm:col-span-1">
                                         <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Gender</Label>
-                                        <div className="flex w-full bg-muted rounded-lg p-1 h-10">
-                                            <button onClick={() => setGender('male')} className={cn("flex-1 text-xs font-medium rounded-md transition-all", gender === 'male' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:bg-background/50")}>Male</button>
-                                            <button onClick={() => setGender('female')} className={cn("flex-1 text-xs font-medium rounded-md transition-all", gender === 'female' ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:bg-background/50")}>Female</button>
+                                        <div className="flex w-full bg-muted rounded-lg p-1 h-10 border border-muted-foreground/10">
+                                            <button
+                                                onClick={() => setGender('male')}
+                                                className={cn(
+                                                    "flex-1 text-xs font-bold rounded-md transition-all",
+                                                    gender === 'male'
+                                                        ? "bg-primary text-primary-foreground shadow-md"
+                                                        : "text-muted-foreground hover:bg-background/50"
+                                                )}
+                                            >
+                                                Male
+                                            </button>
+                                            <button
+                                                onClick={() => setGender('female')}
+                                                className={cn(
+                                                    "flex-1 text-xs font-bold rounded-md transition-all",
+                                                    gender === 'female'
+                                                        ? "bg-primary text-primary-foreground shadow-md"
+                                                        : "text-muted-foreground hover:bg-background/50"
+                                                )}
+                                            >
+                                                Female
+                                            </button>
                                         </div>
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="age" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Age</Label>
-                                        <div className="relative"><Input id="age" type="number" className="h-10 text-center" value={age} onChange={(e) => setAge(e.target.value ? parseInt(e.target.value) : '')} /><span className="absolute right-3 top-2.5 text-xs text-muted-foreground">yrs</span></div>
+                                        <div className="relative">
+                                            <Input
+                                                id="age"
+                                                type="number"
+                                                className={cn(
+                                                    "h-10 text-center transition-all border-2",
+                                                    age ? "border-green-500 ring-green-500/10" : "border-red-500 ring-red-500/10"
+                                                )}
+                                                value={age}
+                                                onChange={(e) => setAge(e.target.value ? parseInt(e.target.value) : '')}
+                                            />
+                                            <span className="absolute right-3 top-2.5 text-xs text-muted-foreground font-bold">yrs</span>
+                                        </div>
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="weight" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Weight</Label>
-                                        <div className="relative"><Input id="weight" type="number" className="h-10 text-center" value={weight} onChange={(e) => setWeight(e.target.value ? parseInt(e.target.value) : '')} /><span className="absolute right-3 top-2.5 text-xs text-muted-foreground">kg</span></div>
+                                        <div className="relative">
+                                            <Input
+                                                id="weight"
+                                                type="number"
+                                                className={cn(
+                                                    "h-10 text-center transition-all border-2",
+                                                    weight ? "border-green-500 ring-green-500/10" : "border-red-500 ring-red-500/10"
+                                                )}
+                                                value={weight}
+                                                onChange={(e) => setWeight(e.target.value ? parseInt(e.target.value) : '')}
+                                            />
+                                            <span className="absolute right-3 top-2.5 text-xs text-muted-foreground font-bold">kg</span>
+                                        </div>
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="height" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Height</Label>
-                                        <div className="relative"><Input id="height" type="number" className="h-10 text-center" value={height} onChange={(e) => setHeight(e.target.value ? parseInt(e.target.value) : '')} /><span className="absolute right-3 top-2.5 text-xs text-muted-foreground">cm</span></div>
+                                        <div className="relative">
+                                            <Input
+                                                id="height"
+                                                type="number"
+                                                className={cn(
+                                                    "h-10 text-center transition-all border-2",
+                                                    height ? "border-green-500 ring-green-500/10" : "border-red-500 ring-red-500/10"
+                                                )}
+                                                value={height}
+                                                onChange={(e) => setHeight(e.target.value ? parseInt(e.target.value) : '')}
+                                            />
+                                            <span className="absolute right-3 top-2.5 text-xs text-muted-foreground font-bold">cm</span>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -510,7 +566,7 @@ export default function MealPlannerPage() {
 
                                 <div className="pt-4">
                                     <Button size="lg" onClick={handleNextStep} className="w-full h-12 text-base font-semibold rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground shadow-md">
-                                        {isFormComplete ? "Generate My Plan" : "Show Me Recipes"} <ChevronRight className="h-4 w-4 ml-2" />
+                                        {isFormComplete ? "Generate My Plan" : "Just Show Me The Recipes"} <ChevronRight className="h-4 w-4 ml-2" />
                                     </Button>
                                 </div>
                             </div>
