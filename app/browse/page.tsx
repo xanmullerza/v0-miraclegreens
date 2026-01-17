@@ -291,7 +291,7 @@ export default function BrowsePage() {
                                                         <Button variant="outline" size="sm" asChild className="shrink-0 gap-2 border-purple-200 text-purple-600 hover:bg-purple-100">
                                                             <a href={res.audioUrl!} download={res.audioUrl!.split('/').pop()}>
                                                                 <Download className="h-4 w-4" />
-                                                                Batch Download
+                                                                Download
                                                             </a>
                                                         </Button>
                                                     </div>
