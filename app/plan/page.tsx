@@ -324,6 +324,60 @@ export default function MealPlannerPage() {
         setStep(2);
     };
 
+    const getPersonalizedRDAs = (uAge: number, uGender: 'male' | 'female', uCalories: number) => {
+        // Base RDAs (Female 19-30)
+        const rdas: Record<string, number> = {
+            'Potassium': 2600,
+            'Magnesium': 310,
+            'Calcium': 1000,
+            'Phosphorus': 700,
+            'Sodium': 2300,
+            'Iron': 18,
+            'Zinc': 8,
+            'Selenium': 55,
+            'Copper': 0.9,
+            'Manganese': 1.8,
+            'Vitamin A': 700,
+            'Vitamin C': 75,
+            'Vitamin D': 600,
+            'Vitamin E': 15,
+            'Vitamin K': 90,
+            'B1 (Thiamine)': 1.1,
+            'B2 (Riboflavin)': 1.1,
+            'B3 (Niacin)': 14,
+            'B5 (Pantothenic Acid)': 5,
+            'B6 (Pyridoxine)': 1.3,
+            'B7 (Biotin)': 30,
+            'B9 (Folate)': 400,
+            'B12 (Cobalamin)': 2.4,
+            'Choline': 425,
+            'Fiber': (uCalories / 1000) * 14
+        };
+
+        if (uGender === 'male') {
+            rdas['Potassium'] = 3400;
+            rdas['Magnesium'] = 400;
+            rdas['Iron'] = 8;
+            rdas['Zinc'] = 11;
+            rdas['Manganese'] = 2.3;
+            rdas['Vitamin A'] = 900;
+            rdas['Vitamin C'] = 90;
+            rdas['Vitamin K'] = 120;
+            rdas['B1 (Thiamine)'] = 1.2;
+            rdas['B2 (Riboflavin)'] = 1.3;
+            rdas['B3 (Niacin)'] = 16;
+            rdas['Choline'] = 550;
+        }
+
+        if (uAge > 50) {
+            rdas['Calcium'] = 1200;
+            rdas['B6 (Pyridoxine)'] = uGender === 'male' ? 1.7 : 1.5;
+            if (uGender === 'female') rdas['Iron'] = 8;
+        }
+
+        return rdas;
+    };
+
     const handleRegenerate = () => {
         handleGenerate();
     };
@@ -1003,6 +1057,7 @@ export default function MealPlannerPage() {
 
                                         const other = {
                                             'Choline': m.choline_mg,
+                                            'Fiber': m.fiber_g,
                                         };
 
                                         const labelsToMoringaKey: Record<string, string> = {
@@ -1016,7 +1071,10 @@ export default function MealPlannerPage() {
                                             'Magnesium': 'magnesium_mg',
                                             'Potassium': 'potassium_mg',
                                             'Sodium': 'sodium_mg',
+                                            'Fiber': 'fiber_g',
                                         };
+
+                                        const userRDAs = (age && gender) ? getPersonalizedRDAs(Number(age), gender, calories) : null;
 
                                         const NutrientGrid = ({ nutrients, title }: { nutrients: Record<string, any>, title: string }) => {
                                             // Only show if at least one value is non-zero/non-null
@@ -1041,13 +1099,24 @@ export default function MealPlannerPage() {
                                                             if (labelLower.includes('vitamin d')) unit = 'IU';
                                                             if (labelLower.includes('fiber') || labelLower.includes('fat') || labelLower.includes('carbs') || labelLower.includes('protein')) unit = 'g';
 
+                                                            // Calculate RDA percentage
+                                                            const rdaValue = userRDAs?.[label];
+                                                            const percentage = (rdaValue && typeof value === 'number')
+                                                                ? Math.round(((value + boostValue) / rdaValue) * 100)
+                                                                : null;
+
                                                             return (
                                                                 <div key={label} className={cn(
                                                                     "flex items-center gap-2 py-2 px-3 transition-colors rounded-md",
                                                                     idx % 2 === 0 ? "bg-muted/10" : "bg-transparent",
                                                                     boostValue > 0 ? "bg-green-500/10 text-green-900 dark:text-green-100 ring-1 ring-green-500/20" : ""
                                                                 )}>
-                                                                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-tight whitespace-nowrap">{label}</span>
+                                                                    <div className="flex flex-col gap-0.5">
+                                                                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-tight whitespace-nowrap">{label}</span>
+                                                                        {percentage !== null && (
+                                                                            <span className="text-[10px] font-black text-primary/60">{percentage}% of daily</span>
+                                                                        )}
+                                                                    </div>
 
                                                                     {/* Dotted Leader */}
                                                                     <div className="flex-1 border-b border-dotted border-border/60 mb-1.5" />
