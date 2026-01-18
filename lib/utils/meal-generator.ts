@@ -18,6 +18,7 @@ export interface DailyPlan {
         carbs: number;
         fat: number;
     };
+    micronutrients: Record<string, number>;
 }
 
 /**
@@ -127,6 +128,7 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
         let totalProtein = 0;
         let totalCarbs = 0;
         let totalFat = 0;
+        const micronutrients: Record<string, number> = {};
 
         for (const ing of ingredients) {
             // If ingredient is linked to food_items, calculate from there
@@ -138,23 +140,37 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
                 totalProtein += (foodItem.protein_g || 0) * ratio;
                 totalCarbs += (foodItem.carbs_g || 0) * ratio;
                 totalFat += (foodItem.fat_g || 0) * ratio;
+
+                // Aggregate micronutrients
+                if (foodItem.micronutrients && typeof foodItem.micronutrients === 'object') {
+                    Object.entries(foodItem.micronutrients).forEach(([key, val]) => {
+                        if (typeof val === 'number') {
+                            micronutrients[key] = (micronutrients[key] || 0) + val * ratio;
+                        }
+                    });
+                }
             }
-            // Otherwise, we have no data - this ingredient doesn't contribute
-            // (In the future, you could fall back to stored recipe values or throw a warning)
         }
 
         return {
             calories: totalCalories,
             protein: totalProtein,
             carbs: totalCarbs,
-            fat: totalFat
+            fat: totalFat,
+            micronutrients
         };
     };
 
     // Transform Supabase data to match Recipe interface
     // IMPORTANT: Nutrition is now CALCULATED from ingredients, not stored values
+    // We also store micronutrients in a separate map for aggregation
+    const recipeMicronutrients: Record<string, Record<string, number>> = {};
+
     const allRecipes: Recipe[] = recipesData.map((r: any) => {
         const calculatedNutrition = calculateNutrition(r.ingredients);
+
+        // Store micronutrients keyed by recipe ID
+        recipeMicronutrients[r.id] = calculatedNutrition.micronutrients;
 
         return {
             id: r.id,
@@ -197,6 +213,20 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
         throw new Error('Insufficient recipes for the selected criteria.');
     }
 
+    // Helper to aggregate micronutrients from array of recipe IDs
+    const aggregateMicronutrients = (recipeIds: string[]): Record<string, number> => {
+        const result: Record<string, number> = {};
+        recipeIds.forEach(id => {
+            const micro = recipeMicronutrients[id];
+            if (micro) {
+                Object.entries(micro).forEach(([key, val]) => {
+                    result[key] = (result[key] || 0) + val;
+                });
+            }
+        });
+        return result;
+    };
+
     // Simple brute-force retry up to 20 times to find a "close enough" match
     let bestPlan: DailyPlan | null = null;
     let minDiff = Infinity;
@@ -218,6 +248,10 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
         const totalCalories = b.calories + l.calories + d.calories + snacks.reduce((acc, s) => acc + s.calories, 0);
         const diff = Math.abs(targetCalories - totalCalories);
 
+        // Aggregate micronutrients for all selected recipes
+        const allRecipeIds = [b.id, l.id, d.id, ...snacks.map(s => s.id)];
+        const aggregatedMicro = aggregateMicronutrients(allRecipeIds);
+
         const currentPlan: DailyPlan = {
             breakfast: b,
             lunch: l,
@@ -228,7 +262,8 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
                 protein: b.protein + l.protein + d.protein + snacks.reduce((acc, s) => acc + s.protein, 0),
                 carbs: b.carbs + l.carbs + d.carbs + snacks.reduce((acc, s) => acc + s.carbs, 0),
                 fat: b.fat + l.fat + d.fat + snacks.reduce((acc, s) => acc + s.fat, 0),
-            }
+            },
+            micronutrients: aggregatedMicro
         };
 
         if (diff < minDiff) {

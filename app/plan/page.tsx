@@ -30,7 +30,6 @@ import {
     X,
     Clock,
     Filter,
-    Expand,
     ChevronDown
 } from 'lucide-react';
 import {
@@ -633,31 +632,128 @@ export default function MealPlannerPage() {
                         {step === 3 && plan && (
                             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-500">
                                 {/* Dashboard Header */}
-                                <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 bg-muted/30 rounded-2xl border border-border/50">
-                                    <div className="flex items-center gap-4">
-                                        <div className="text-center cursor-pointer hover:bg-muted p-2 rounded-lg transition-colors" onClick={() => setUnit(unit === 'kcal' ? 'kJ' : 'kcal')}>
-                                            <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center justify-center gap-2">
-                                                <Flame className="h-4 w-4 text-orange-500" />
-                                                Energy ({unit})
-                                            </p>
-                                            <p className="text-3xl font-bold text-foreground">{formatEnergy(plan.totalCalories, unit).split(' ')[0]}</p>
+                                <div className="p-6 bg-muted/30 rounded-2xl border border-border/50">
+                                    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="text-center cursor-pointer hover:bg-muted p-2 rounded-lg transition-colors" onClick={() => setUnit(unit === 'kcal' ? 'kJ' : 'kcal')}>
+                                                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center justify-center gap-2">
+                                                    <Flame className="h-4 w-4 text-orange-500" />
+                                                    Energy ({unit})
+                                                </p>
+                                                <p className="text-3xl font-bold text-foreground">{formatEnergy(plan.totalCalories, unit).split(' ')[0]}</p>
+                                            </div>
+                                            <div className="h-12 w-px bg-border mx-2"></div>
+                                            <div className="space-y-1 text-sm text-muted-foreground">
+                                                <p className="flex items-center gap-2"><Beef className="h-4 w-4 text-red-500" /> <span className="font-semibold text-foreground">{plan.macros.protein.toFixed(1)}g</span> Protein</p>
+                                                <p className="flex items-center gap-2"><Wheat className="h-4 w-4 text-amber-600" /> <span className="font-semibold text-foreground">{plan.macros.carbs.toFixed(1)}g</span> Carbs</p>
+                                                <p className="flex items-center gap-2"><Droplet className="h-4 w-4 text-yellow-500" /> <span className="font-semibold text-foreground">{plan.macros.fat.toFixed(1)}g</span> Fat</p>
+                                            </div>
                                         </div>
-                                        <div className="h-12 w-px bg-border mx-2"></div>
-                                        <div className="space-y-1 text-sm text-muted-foreground">
-                                            <p className="flex items-center gap-2"><Beef className="h-4 w-4 text-red-500" /> <span className="font-semibold text-foreground">{plan.macros.protein.toFixed(1)}g</span> Protein</p>
-                                            <p className="flex items-center gap-2"><Wheat className="h-4 w-4 text-amber-600" /> <span className="font-semibold text-foreground">{plan.macros.carbs.toFixed(1)}g</span> Carbs</p>
-                                            <p className="flex items-center gap-2"><Droplet className="h-4 w-4 text-yellow-500" /> <span className="font-semibold text-foreground">{plan.macros.fat.toFixed(1)}g</span> Fat</p>
+                                        <div className="flex gap-3 w-full md:w-auto">
+                                            <Button
+                                                variant={showDailyNutrients ? "default" : "outline"}
+                                                onClick={() => setShowDailyNutrients(!showDailyNutrients)}
+                                                className="flex-1 gap-2"
+                                            >
+                                                <ChevronDown className={cn("h-4 w-4 transition-transform", showDailyNutrients && "rotate-180")} />
+                                                {showDailyNutrients ? "Hide" : "Show"} Micronutrients
+                                            </Button>
+                                            <Button onClick={() => setStep(1)} className="flex-1 gap-2">
+                                                Start Over
+                                            </Button>
                                         </div>
                                     </div>
-                                    <div className="flex gap-3 w-full md:w-auto">
-                                        <Button variant="outline" onClick={() => setShowDailyNutrients(true)} className="flex-1 gap-2">
-                                            <Expand className="h-4 w-4" />
-                                            Daily Nutrients
-                                        </Button>
-                                        <Button onClick={() => setStep(1)} className="flex-1 gap-2">
-                                            Start Over
-                                        </Button>
-                                    </div>
+
+                                    {/* Expandable Micronutrients Section */}
+                                    {showDailyNutrients && plan.micronutrients && (() => {
+                                        const m = plan.micronutrients;
+
+                                        // Categorize nutrients
+                                        const electrolytes: Record<string, number> = {
+                                            'Potassium': m.potassium_mg || 0,
+                                            'Magnesium': m.magnesium_mg || 0,
+                                            'Calcium': m.calcium_mg || 0,
+                                            'Phosphorus': m.phosphorus_mg || 0,
+                                            'Sodium': m.sodium_mg || 0,
+                                        };
+
+                                        const traceMinerals: Record<string, number> = {
+                                            'Iron': m.iron_mg || 0,
+                                            'Zinc': m.zinc_mg || 0,
+                                            'Selenium': m.selenium_ug || 0,
+                                            'Copper': m.copper_mg || 0,
+                                            'Manganese': m.manganese_mg || 0,
+                                        };
+
+                                        const vitamins: Record<string, number> = {
+                                            'Vitamin A': m.vitamin_a_ug || 0,
+                                            'B1 (Thiamine)': m.thiamine_mg || 0,
+                                            'B2 (Riboflavin)': m.riboflavin_mg || 0,
+                                            'B3 (Niacin)': m.niacin_mg || 0,
+                                            'B5 (Pantothenic Acid)': m.pantothenic_acid_mg || 0,
+                                            'B6 (Pyridoxine)': m.vitamin_b6_mg || 0,
+                                            'B9 (Folate)': m.folate_ug || 0,
+                                            'B12 (Cobalamin)': m.vitamin_b12_ug || 0,
+                                            'Vitamin C': m.vitamin_c_mg || 0,
+                                            'Vitamin D': m.vitamin_d_iu || 0,
+                                            'Vitamin E': m.vitamin_e_mg || 0,
+                                            'Vitamin K': m.vitamin_k_ug || 0,
+                                        };
+
+                                        const other: Record<string, number> = {
+                                            'Choline': m.choline_mg || 0,
+                                            'Fiber': m.fiber_g || 0,
+                                        };
+
+                                        const DailyNutrientGrid = ({ nutrients, title }: { nutrients: Record<string, number>, title: string }) => {
+                                            const filtered = Object.entries(nutrients).filter(([_, val]) => val > 0);
+                                            if (filtered.length === 0) return null;
+
+                                            return (
+                                                <div className="space-y-2">
+                                                    <h4 className="font-bold text-sm text-foreground border-b border-primary/10 pb-1">{title}</h4>
+                                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                                                        {filtered.map(([label, value]) => {
+                                                            let unit = 'mg';
+                                                            const labelLower = label.toLowerCase();
+                                                            if (labelLower.includes('vitamin a') || labelLower.includes('folate') || labelLower.includes('selenium') || labelLower.includes('b12') || labelLower.includes('vitamin k')) unit = 'µg';
+                                                            if (labelLower.includes('vitamin d')) unit = 'IU';
+                                                            if (labelLower.includes('fiber')) unit = 'g';
+
+                                                            const rdaValue = userRDAs?.[label];
+                                                            const percentage = rdaValue ? Math.round((value / rdaValue) * 100) : null;
+
+                                                            return (
+                                                                <div key={label} className="flex items-center justify-between gap-2 p-2 bg-background rounded-lg border border-border/50">
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <p className="text-xs text-muted-foreground truncate">{label}</p>
+                                                                        <p className="text-sm font-bold">{value >= 1 ? value.toFixed(1) : value.toFixed(2)} {unit}</p>
+                                                                    </div>
+                                                                    {percentage !== null && (
+                                                                        <span className={cn(
+                                                                            "text-xs font-bold px-1.5 py-0.5 rounded-sm shrink-0",
+                                                                            percentage >= 100 ? "bg-green-500 text-white" : "bg-muted text-muted-foreground"
+                                                                        )}>
+                                                                            {percentage}%
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            );
+                                        };
+
+                                        return (
+                                            <div className="mt-6 pt-6 border-t border-border space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                                                <DailyNutrientGrid nutrients={electrolytes} title="Electrolytes" />
+                                                <DailyNutrientGrid nutrients={traceMinerals} title="Trace Minerals" />
+                                                <DailyNutrientGrid nutrients={vitamins} title="Vitamins" />
+                                                <DailyNutrientGrid nutrients={other} title="Other Essential Nutrients" />
+                                            </div>
+                                        );
+                                    })()}
                                 </div>
 
                                 {/* Meal Grid */}
@@ -1118,253 +1214,6 @@ export default function MealPlannerPage() {
                     </div>
                 </div>
             )}
-
-            {/* Daily Nutrients Modal */}
-            {showDailyNutrients && plan && (() => {
-                // Aggregate nutrition from all 3 meals
-                const allRecipes = [plan.breakfast, plan.lunch, plan.dinner];
-
-                // We need to fetch and aggregate nutrition data
-                // For now, we'll show a loading state and calculate on mount
-                const DailyNutrientsContent = () => {
-                    const [dailyData, setDailyData] = useState<any>(null);
-                    const [loading, setLoading] = useState(true);
-
-                    // Fetch nutrition for all recipes
-                    useEffect(() => {
-                        const fetchAll = async () => {
-                            try {
-                                const results = await Promise.all(
-                                    allRecipes.map(async (recipe) => {
-                                        const { data } = await supabase
-                                            .from('recipe_nutrition')
-                                            .select('*')
-                                            .eq('recipe_id', recipe.id)
-                                            .single();
-                                        return data;
-                                    })
-                                );
-
-                                // Aggregate all micronutrients
-                                const aggregated: Record<string, number> = {};
-                                const macros = { energy_kj: 0, protein_g: 0, carbs_g: 0, fat_g: 0 };
-
-                                results.forEach((data) => {
-                                    if (!data) return;
-                                    macros.energy_kj += data.energy_kj || 0;
-                                    macros.protein_g += data.protein_g || 0;
-                                    macros.carbs_g += data.carbs_g || 0;
-                                    macros.fat_g += data.fat_g || 0;
-
-                                    if (data.micronutrients) {
-                                        Object.entries(data.micronutrients).forEach(([key, val]) => {
-                                            if (typeof val === 'number') {
-                                                aggregated[key] = (aggregated[key] || 0) + val;
-                                            }
-                                        });
-                                    }
-                                });
-
-                                setDailyData({ macros, micronutrients: aggregated });
-                            } catch (err) {
-                                console.error('Error fetching daily nutrition:', err);
-                            } finally {
-                                setLoading(false);
-                            }
-                        };
-                        fetchAll();
-                    }, []);
-
-                    if (loading) {
-                        return (
-                            <div className="p-12 text-center">
-                                <div className="relative h-16 w-16 mx-auto mb-4">
-                                    <div className="absolute inset-0 border-4 border-muted rounded-full"></div>
-                                    <div className="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                                </div>
-                                <p className="text-muted-foreground">Calculating daily totals...</p>
-                            </div>
-                        );
-                    }
-
-                    if (!dailyData) {
-                        return (
-                            <div className="p-12 text-center text-muted-foreground">
-                                Unable to load daily nutrition data.
-                            </div>
-                        );
-                    }
-
-                    const m = dailyData.micronutrients;
-
-                    // Categorize nutrients
-                    const electrolytes = {
-                        'Potassium': m.potassium_mg,
-                        'Magnesium': m.magnesium_mg,
-                        'Calcium': m.calcium_mg,
-                        'Phosphorus': m.phosphorus_mg,
-                        'Sodium': m.sodium_mg,
-                        'Chloride': m.chloride_mg,
-                    };
-
-                    const traceMinerals = {
-                        'Iron': m.iron_mg,
-                        'Zinc': m.zinc_mg,
-                        'Selenium': m.selenium_ug,
-                        'Copper': m.copper_mg,
-                        'Manganese': m.manganese_mg,
-                    };
-
-                    const vitamins = {
-                        'Vitamin A': m.vitamin_a_ug,
-                        'B1 (Thiamine)': m.thiamine_mg,
-                        'B2 (Riboflavin)': m.riboflavin_mg,
-                        'B3 (Niacin)': m.niacin_mg,
-                        'B5 (Pantothenic Acid)': m.pantothenic_acid_mg,
-                        'B6 (Pyridoxine)': m.vitamin_b6_mg,
-                        'B7 (Biotin)': m.biotin_ug,
-                        'B9 (Folate)': m.folate_ug,
-                        'B12 (Cobalamin)': m.vitamin_b12_ug,
-                        'Vitamin C': m.vitamin_c_mg,
-                        'Vitamin D': m.vitamin_d_iu,
-                        'Vitamin E': m.vitamin_e_mg,
-                        'Vitamin K': m.vitamin_k_ug,
-                    };
-
-                    const other = {
-                        'Choline': m.choline_mg,
-                        'Fiber': m.fiber_g,
-                    };
-
-                    const DailyNutrientGrid = ({ nutrients, title }: { nutrients: Record<string, any>, title: string }) => {
-                        const filtered = Object.entries(nutrients).filter(([_, val]) => val !== undefined && val !== null && val !== 0);
-                        if (filtered.length === 0) return null;
-
-                        return (
-                            <div className="space-y-3 w-full">
-                                <h4 className="font-black text-xs text-foreground tracking-wide border-b-2 border-primary/10 pb-1.5">
-                                    {title}
-                                </h4>
-                                <div className="flex flex-col gap-px">
-                                    {filtered.map(([label, value], idx) => {
-                                        let unit = 'mg';
-                                        const labelLower = label.toLowerCase();
-                                        if (labelLower.includes('vitamin a') || labelLower.includes('folate') || labelLower.includes('selenium') || labelLower.includes('iodine') || labelLower.includes('b12') || labelLower.includes('vitamin k')) unit = 'µg';
-                                        if (labelLower.includes('vitamin d')) unit = 'IU';
-                                        if (labelLower.includes('fiber') || labelLower.includes('fat') || labelLower.includes('carbs') || labelLower.includes('protein')) unit = 'g';
-
-                                        const rdaValue = userRDAs?.[label];
-                                        const percentage = (rdaValue && typeof value === 'number')
-                                            ? Math.round((value / rdaValue) * 100)
-                                            : null;
-
-                                        return (
-                                            <div key={label} className={cn(
-                                                "group flex items-center gap-2 py-1.5 px-2 transition-all rounded hover:bg-muted/50",
-                                                idx % 2 === 0 ? "bg-muted/5" : "bg-transparent"
-                                            )}>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-sm font-medium text-foreground/90 tracking-tight whitespace-nowrap">{label}</span>
-                                                    {percentage !== null && (
-                                                        <span className={cn(
-                                                            "text-xs font-bold px-1.5 py-0.5 rounded-sm leading-none",
-                                                            percentage >= 100 ? "bg-green-500 text-white" : "bg-primary/5 text-primary/70"
-                                                        )}>
-                                                            {percentage}%
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <div className="flex-1 border-b border-dotted border-border/40 mb-1" />
-                                                <div className="flex items-baseline justify-end gap-1 min-w-[60px] text-right">
-                                                    <span className="text-base font-bold tabular-nums tracking-tight text-foreground">
-                                                        {typeof value === 'number' ? (value >= 1 ? value.toFixed(1) : value.toFixed(2)) : value}
-                                                    </span>
-                                                    <span className="text-xs font-medium text-muted-foreground w-[14px]">{unit}</span>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        );
-                    };
-
-                    return (
-                        <div className="p-5 space-y-6">
-                            {/* Daily Macros Summary */}
-                            <div>
-                                <h3 className="font-semibold text-base mb-3">Daily Macronutrients</h3>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div className="p-3 bg-muted rounded-lg">
-                                        <div className="flex items-center gap-1.5 mb-0.5">
-                                            <Flame className="w-3.5 h-3.5 text-orange-500" />
-                                            <div className="text-xs text-muted-foreground">Energy</div>
-                                        </div>
-                                        <div className="text-lg font-bold">{dailyData.macros.energy_kj.toFixed(0)} kJ</div>
-                                    </div>
-                                    <div className="p-3 bg-muted rounded-lg">
-                                        <div className="flex items-center gap-1.5 mb-0.5">
-                                            <Beef className="w-3.5 h-3.5 text-red-500" />
-                                            <div className="text-xs text-muted-foreground">Protein</div>
-                                        </div>
-                                        <div className="text-lg font-bold">{dailyData.macros.protein_g.toFixed(1)}g</div>
-                                    </div>
-                                    <div className="p-3 bg-muted rounded-lg">
-                                        <div className="flex items-center gap-1.5 mb-0.5">
-                                            <Wheat className="w-3.5 h-3.5 text-yellow-500" />
-                                            <div className="text-xs text-muted-foreground">Carbs</div>
-                                        </div>
-                                        <div className="text-lg font-bold">{dailyData.macros.carbs_g.toFixed(1)}g</div>
-                                    </div>
-                                    <div className="p-3 bg-muted rounded-lg">
-                                        <div className="flex items-center gap-1.5 mb-0.5">
-                                            <Droplet className="w-3.5 h-3.5 text-blue-500" />
-                                            <div className="text-xs text-muted-foreground">Fat</div>
-                                        </div>
-                                        <div className="text-lg font-bold">{dailyData.macros.fat_g.toFixed(1)}g</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Daily Micronutrients */}
-                            <div className="space-y-10 mt-6 pt-8 border-t border-border">
-                                <DailyNutrientGrid nutrients={electrolytes} title="Electrolytes" />
-                                <DailyNutrientGrid nutrients={traceMinerals} title="Trace Minerals" />
-                                <DailyNutrientGrid nutrients={vitamins} title="Vitamins" />
-                                <DailyNutrientGrid nutrients={other} title="Other Essential Nutrients" />
-                            </div>
-                        </div>
-                    );
-                };
-
-                return (
-                    <div
-                        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
-                        onClick={() => setShowDailyNutrients(false)}
-                    >
-                        <div
-                            className="bg-background rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            {/* Header */}
-                            <div className="sticky top-0 bg-primary text-primary-foreground p-6 flex justify-between items-start z-10 rounded-t-2xl shadow-md">
-                                <div className="flex-1">
-                                    <h2 className="text-xl font-bold mb-1">Daily Nutrient Totals</h2>
-                                    <p className="opacity-90 text-sm">Combined from all 3 meals</p>
-                                </div>
-                                <button
-                                    onClick={() => setShowDailyNutrients(false)}
-                                    className="p-2 hover:bg-white/20 rounded-full transition-colors"
-                                >
-                                    <X className="h-5 w-5" />
-                                </button>
-                            </div>
-
-                            <DailyNutrientsContent />
-                        </div>
-                    </div>
-                );
-            })()}
         </main >
     );
 }
