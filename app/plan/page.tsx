@@ -30,7 +30,11 @@ import {
     X,
     Clock,
     Filter,
-    ChevronDown
+    ChevronDown,
+    Gem,
+    Microscope,
+    FlaskConical,
+    Dna
 } from 'lucide-react';
 import {
     Sheet,
@@ -789,14 +793,17 @@ export default function MealPlannerPage() {
                                             'Fiber': m.fiber_g || 0,
                                         };
 
-                                        const DailyNutrientGrid = ({ nutrients, title }: { nutrients: Record<string, number>, title: string }) => {
+                                        const DailyNutrientGrid = ({ nutrients, title, icon: Icon }: { nutrients: Record<string, number>, title: string, icon: any }) => {
                                             const filtered = Object.entries(nutrients).filter(([_, val]) => val > 0);
                                             if (filtered.length === 0) return null;
 
                                             return (
-                                                <div className="space-y-2">
-                                                    <h4 className="font-bold text-sm text-foreground border-b border-primary/10 pb-1">{title}</h4>
-                                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+                                                <div className="p-5 rounded-2xl border border-border bg-card/50 shadow-sm space-y-4">
+                                                    <h4 className="font-bold text-md text-foreground flex items-center gap-2 border-b border-border/50 pb-2">
+                                                        <Icon className="h-5 w-5 text-primary" />
+                                                        {title}
+                                                    </h4>
+                                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                                                         {filtered.map(([label, value]) => {
                                                             let unit = 'mg';
                                                             const labelLower = label.toLowerCase();
@@ -808,18 +815,19 @@ export default function MealPlannerPage() {
                                                             const percentage = rdaValue ? Math.round((value / rdaValue) * 100) : null;
 
                                                             return (
-                                                                <div key={label} className="flex items-center justify-between gap-2 p-2 bg-background rounded-lg border border-border/50">
-                                                                    <div className="flex-1 min-w-0">
-                                                                        <p className="text-xs text-muted-foreground truncate">{label}</p>
-                                                                        <p className="text-sm font-bold">{value >= 1 ? value.toFixed(1) : value.toFixed(2)} {unit}</p>
+                                                                <div key={label} className="flex flex-col justify-between gap-1 p-3 bg-background rounded-xl border border-border/50 hover:border-primary/20 transition-colors shadow-sm">
+                                                                    <div className="min-w-0">
+                                                                        <p className="text-[10px] uppercase font-bold text-muted-foreground truncate tracking-tight">{label}</p>
+                                                                        <p className="text-sm font-black">{value >= 1 ? value.toFixed(1) : value.toFixed(2)} <span className="text-[10px] font-medium opacity-60 font-sans">{unit}</span></p>
                                                                     </div>
                                                                     {percentage !== null && (
-                                                                        <span className={cn(
-                                                                            "text-xs font-bold px-1.5 py-0.5 rounded-sm shrink-0",
-                                                                            getPercentageColor(percentage, label)
-                                                                        )}>
-                                                                            {percentage}%
-                                                                        </span>
+                                                                        <div className="mt-1 w-full bg-muted rounded-full h-1 overflow-hidden">
+                                                                            <div
+                                                                                className={cn("h-full", getPercentageColor(percentage, label).split(' ')[0])}
+                                                                                style={{ width: `${Math.min(100, percentage)}%` }}
+                                                                            />
+                                                                            <span className="sr-only">{percentage}% RDA</span>
+                                                                        </div>
                                                                     )}
                                                                 </div>
                                                             );
@@ -831,10 +839,10 @@ export default function MealPlannerPage() {
 
                                         return (
                                             <div className="mt-6 pt-6 border-t border-border space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
-                                                <DailyNutrientGrid nutrients={electrolytes} title="Electrolytes" />
-                                                <DailyNutrientGrid nutrients={traceMinerals} title="Trace Minerals" />
-                                                <DailyNutrientGrid nutrients={vitamins} title="Vitamins" />
-                                                <DailyNutrientGrid nutrients={other} title="Other Essentials" />
+                                                <DailyNutrientGrid nutrients={electrolytes} title="Electrolytes" icon={Zap} />
+                                                <DailyNutrientGrid nutrients={traceMinerals} title="Trace Minerals" icon={Gem} />
+                                                <DailyNutrientGrid nutrients={vitamins} title="Vitamins" icon={FlaskConical} />
+                                                <DailyNutrientGrid nutrients={other} title="Other Essentials" icon={Dna} />
                                             </div>
                                         );
                                     })()}
@@ -1042,14 +1050,17 @@ export default function MealPlannerPage() {
                                     'Fiber': m.fiber_g || 0,
                                 };
 
-                                const ModalNutrientGrid = ({ nutrients, title }: { nutrients: Record<string, number>, title: string }) => {
+                                const ModalNutrientGrid = ({ nutrients, title, icon: Icon }: { nutrients: Record<string, number>, title: string, icon: any }) => {
                                     const filtered = Object.entries(nutrients).filter(([_, val]) => val > 0);
                                     if (filtered.length === 0) return null;
 
                                     return (
-                                        <div className="space-y-1.5">
-                                            <h4 className="font-bold text-[10px] uppercase tracking-widest text-muted-foreground border-b border-primary/5 pb-0.5">{title}</h4>
-                                            <div className="grid grid-cols-2 gap-1.5">
+                                        <div className="p-4 rounded-xl border border-border bg-card/30 space-y-3">
+                                            <h4 className="font-black text-[11px] uppercase tracking-widest text-primary flex items-center gap-2 border-b border-primary/5 pb-1.5">
+                                                <Icon className="h-3.5 w-3.5" />
+                                                {title}
+                                            </h4>
+                                            <div className="grid grid-cols-2 gap-2">
                                                 {filtered.map(([label, value]) => {
                                                     let u = 'mg';
                                                     const labelLower = label.toLowerCase();
@@ -1061,14 +1072,14 @@ export default function MealPlannerPage() {
                                                     const percentage = rdaValue ? Math.round((value / rdaValue) * 100) : null;
 
                                                     return (
-                                                        <div key={label} className="flex items-center justify-between gap-1 p-1.5 bg-muted/30 rounded-md border border-border/30">
+                                                        <div key={label} className="flex items-center justify-between gap-1 p-2 bg-background rounded-lg border border-border/40 shadow-sm">
                                                             <div className="min-w-0">
                                                                 <p className="text-[10px] text-muted-foreground truncate font-medium">{label}</p>
-                                                                <p className="text-xs font-bold tabular-nums">{value >= 1 ? value.toFixed(1) : value.toFixed(2)}<span className="ml-0.5 font-medium text-[10px] opacity-70">{u}</span></p>
+                                                                <p className="text-xs font-black tabular-nums">{value >= 1 ? value.toFixed(1) : value.toFixed(2)}<span className="ml-0.5 font-medium text-[10px] opacity-70">{u}</span></p>
                                                             </div>
                                                             {percentage !== null && (
                                                                 <span className={cn(
-                                                                    "text-[10px] font-black px-1 py-0.5 rounded-[2px] shrink-0",
+                                                                    "text-[10px] font-black px-1.5 py-0.5 rounded-[3px] shrink-0",
                                                                     getPercentageColor(percentage, label)
                                                                 )}>
                                                                     {percentage}%
@@ -1113,13 +1124,13 @@ export default function MealPlannerPage() {
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                                            <div className="space-y-4">
-                                                <ModalNutrientGrid nutrients={electrolytes} title="Electrolytes" />
-                                                <ModalNutrientGrid nutrients={traceMinerals} title="Trace Minerals" />
+                                            <div className="space-y-6">
+                                                <ModalNutrientGrid nutrients={electrolytes} title="Electrolytes" icon={Zap} />
+                                                <ModalNutrientGrid nutrients={traceMinerals} title="Trace Minerals" icon={Gem} />
                                             </div>
-                                            <div className="space-y-4">
-                                                <ModalNutrientGrid nutrients={vitamins} title="Vitamins" />
-                                                <ModalNutrientGrid nutrients={other} title="Other Essentials" />
+                                            <div className="space-y-6">
+                                                <ModalNutrientGrid nutrients={vitamins} title="Vitamins" icon={FlaskConical} />
+                                                <ModalNutrientGrid nutrients={other} title="Other Essentials" icon={Dna} />
                                             </div>
                                         </div>
                                     </div>
