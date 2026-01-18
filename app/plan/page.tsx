@@ -63,6 +63,14 @@ const formatEnergy = (calories: number, unit: UnitType) => {
     return `${calories.toLocaleString()} kcal`;
 };
 
+const getPercentageColor = (percentage: number) => {
+    if (percentage >= 100) return "bg-green-500 text-white";
+    if (percentage >= 75) return "bg-blue-500 text-white";
+    if (percentage >= 50) return "bg-yellow-400 text-black";
+    if (percentage >= 25) return "bg-orange-500 text-white";
+    return "bg-red-500 text-white";
+};
+
 // --- COMPONENTS ---
 
 const DietCard = ({ type, selected, onClick, icon: Icon, label }: { type: DietType, selected: boolean, onClick: () => void, icon: any, label?: string }) => (
@@ -762,7 +770,7 @@ export default function MealPlannerPage() {
                                                                     {percentage !== null && (
                                                                         <span className={cn(
                                                                             "text-xs font-bold px-1.5 py-0.5 rounded-sm shrink-0",
-                                                                            percentage >= 100 ? "bg-green-500 text-white" : "bg-muted text-muted-foreground"
+                                                                            getPercentageColor(percentage)
                                                                         )}>
                                                                             {percentage}%
                                                                         </span>
@@ -1194,7 +1202,7 @@ export default function MealPlannerPage() {
                                                                         {percentage !== null && (
                                                                             <span className={cn(
                                                                                 "text-xs font-bold px-1.5 py-0.5 rounded-sm leading-none",
-                                                                                percentage >= 100 ? "bg-green-500 text-white" : "bg-primary/5 text-primary/70"
+                                                                                getPercentageColor(percentage)
                                                                             )}>
                                                                                 {percentage}%
                                                                             </span>
