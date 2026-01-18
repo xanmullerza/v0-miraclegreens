@@ -903,17 +903,17 @@ export default function MealPlannerPage() {
                                         </div>
 
                                         <div className="flex items-center gap-2 w-full">
-                                            <div className="flex items-center bg-white dark:bg-black/20 rounded-lg p-1 border border-green-200 dark:border-green-800 flex-1 justify-between">
-                                                {[0, 1, 2, 3].map(spoons => (
+                                            <div className="flex items-center bg-white dark:bg-black/20 rounded-lg p-1 border border-green-200 dark:border-green-800 flex-1 justify-between gap-1 overflow-x-auto">
+                                                {[0, 1, 2, 3, 4, 5].map(spoons => (
                                                     <button
                                                         key={spoons}
                                                         onClick={() => setMoringaSpoons(spoons)}
-                                                        className={`w-8 h-8 rounded-md flex items-center justify-center text-sm font-bold transition-all ${moringaSpoons === spoons
+                                                        className={`min-w-[32px] w-8 h-8 rounded-md flex items-center justify-center text-sm font-bold transition-all flex-shrink-0 ${moringaSpoons === spoons
                                                             ? 'bg-green-600 text-white shadow-sm'
                                                             : 'hover:bg-green-100 dark:hover:bg-green-900/40 text-green-700 dark:text-green-400'
                                                             }`}
                                                     >
-                                                        {spoons > 0 ? spoons : '-'}
+                                                        {spoons}
                                                     </button>
                                                 ))}
                                             </div>
