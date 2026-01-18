@@ -164,22 +164,14 @@ const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onClick, onRegenerate }: {
                     </span>
                 </div>
                 <button
-                    className="mt-3 w-full py-2 px-4 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onClick?.();
-                    }}
-                >
-                    View Recipe
-                </button>
-                <button
-                    className="mt-3 w-full py-2 px-4 bg-primary/10 hover:bg-primary/20 text-primary rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                    className="mt-3 w-full py-2 px-4 bg-primary text-primary-foreground rounded-lg text-sm font-bold shadow-sm hover:bg-primary/90 transition-all flex items-center justify-center gap-2 group/btn"
                     onClick={(e) => {
                         e.stopPropagation();
                         onClick?.();
                     }}
                 >
                     View Recipe & Nutrition
+                    <ChevronRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-0.5" />
                 </button>
                 {onRegenerate && (
                     <button
