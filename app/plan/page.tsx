@@ -253,6 +253,7 @@ export default function MealPlannerPage() {
     const [loadingNutrition, setLoadingNutrition] = useState(false);
     const [moringaSpoons, setMoringaSpoons] = useState(0);
     const [showDailyNutrients, setShowDailyNutrients] = useState(false);
+    const [dailyMoringaSpoons, setDailyMoringaSpoons] = useState(0);
 
     // Standard 1 tsp (2g) Moringa Nutrition (Calculated from 100g data)
     const MORINGA_TSP = {
@@ -680,23 +681,53 @@ export default function MealPlannerPage() {
                             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-500">
                                 {/* Dashboard Header */}
                                 <div className="p-6 bg-muted/30 rounded-2xl border border-border/50">
-                                    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                                        <div className="flex items-center gap-4">
-                                            <div className="text-center cursor-pointer hover:bg-muted p-2 rounded-lg transition-colors" onClick={() => setUnit(unit === 'kcal' ? 'kJ' : 'kcal')}>
-                                                <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center justify-center gap-2">
-                                                    <Flame className="h-4 w-4 text-orange-500" />
-                                                    Energy ({unit})
-                                                </p>
-                                                <p className="text-3xl font-bold text-foreground">{formatEnergy(plan.totalCalories, unit).split(' ')[0]}</p>
+                                    <div className="flex flex-col xl:flex-row items-center justify-between gap-6">
+                                        <div className="flex flex-col md:flex-row items-center gap-6 w-full xl:w-auto">
+                                            {/* Totals */}
+                                            <div className="flex items-center gap-4">
+                                                <div className="text-center cursor-pointer hover:bg-muted p-2 rounded-lg transition-colors" onClick={() => setUnit(unit === 'kcal' ? 'kJ' : 'kcal')}>
+                                                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center justify-center gap-2">
+                                                        <Flame className="h-4 w-4 text-orange-500" />
+                                                        Energy ({unit})
+                                                    </p>
+                                                    <p className="text-3xl font-bold text-foreground">
+                                                        {formatEnergy(plan.totalCalories + (dailyMoringaSpoons * MORINGA_TSP.energy_kcal), unit).split(' ')[0]}
+                                                    </p>
+                                                </div>
+                                                <div className="h-12 w-px bg-border mx-2"></div>
+                                                <div className="space-y-1 text-sm text-muted-foreground">
+                                                    <p className="flex items-center gap-2"><Beef className="h-4 w-4 text-red-500" /> <span className="font-semibold text-foreground">{(plan.macros.protein + (dailyMoringaSpoons * MORINGA_TSP.protein_g)).toFixed(1)}g</span> Protein</p>
+                                                    <p className="flex items-center gap-2"><Wheat className="h-4 w-4 text-amber-600" /> <span className="font-semibold text-foreground">{(plan.macros.carbs + (dailyMoringaSpoons * MORINGA_TSP.carbs_g)).toFixed(1)}g</span> Carbs</p>
+                                                    <p className="flex items-center gap-2"><Droplet className="h-4 w-4 text-yellow-500" /> <span className="font-semibold text-foreground">{(plan.macros.fat + (dailyMoringaSpoons * MORINGA_TSP.fat_g)).toFixed(1)}g</span> Fat</p>
+                                                </div>
                                             </div>
-                                            <div className="h-12 w-px bg-border mx-2"></div>
-                                            <div className="space-y-1 text-sm text-muted-foreground">
-                                                <p className="flex items-center gap-2"><Beef className="h-4 w-4 text-red-500" /> <span className="font-semibold text-foreground">{plan.macros.protein.toFixed(1)}g</span> Protein</p>
-                                                <p className="flex items-center gap-2"><Wheat className="h-4 w-4 text-amber-600" /> <span className="font-semibold text-foreground">{plan.macros.carbs.toFixed(1)}g</span> Carbs</p>
-                                                <p className="flex items-center gap-2"><Droplet className="h-4 w-4 text-yellow-500" /> <span className="font-semibold text-foreground">{plan.macros.fat.toFixed(1)}g</span> Fat</p>
+
+                                            {/* Miracle Boost Selector */}
+                                            <div className="flex flex-col items-center gap-1.5 bg-green-50 dark:bg-green-900/10 p-2 rounded-xl border border-green-200 dark:border-green-800/30">
+                                                <span className="text-[10px] uppercase tracking-wider font-bold text-green-800 dark:text-green-300 flex items-center gap-1">
+                                                    <Sparkles className="w-3 h-3" />
+                                                    Miracle Boost
+                                                </span>
+                                                <div className="flex items-center bg-white dark:bg-black/20 rounded-lg shadow-sm border border-green-100 dark:border-green-800/50 p-0.5">
+                                                    {[0, 1, 2, 3, 4, 5].map(spoons => (
+                                                        <button
+                                                            key={spoons}
+                                                            onClick={() => setDailyMoringaSpoons(spoons)}
+                                                            className={cn(
+                                                                "w-7 h-7 flex items-center justify-center text-xs font-bold transition-all rounded-md",
+                                                                dailyMoringaSpoons === spoons
+                                                                    ? "bg-green-600 text-white shadow-sm"
+                                                                    : "text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/20"
+                                                            )}
+                                                        >
+                                                            {spoons}
+                                                        </button>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="flex gap-3 w-full md:w-auto">
+
+                                        <div className="flex gap-3 w-full xl:w-auto">
                                             <Button
                                                 variant={showDailyNutrients ? "default" : "outline"}
                                                 onClick={() => setShowDailyNutrients(!showDailyNutrients)}
@@ -713,7 +744,14 @@ export default function MealPlannerPage() {
 
                                     {/* Expandable Micronutrients Section */}
                                     {showDailyNutrients && plan.micronutrients && (() => {
-                                        const m = plan.micronutrients;
+                                        const m = { ...plan.micronutrients };
+
+                                        // Apply Daily Moringa Boost
+                                        if (dailyMoringaSpoons > 0) {
+                                            Object.entries(MORINGA_TSP.micronutrients).forEach(([key, value]) => {
+                                                m[key] = (m[key] || 0) + (value * dailyMoringaSpoons);
+                                            });
+                                        }
 
                                         // Categorize nutrients
                                         const electrolytes: Record<string, number> = {
