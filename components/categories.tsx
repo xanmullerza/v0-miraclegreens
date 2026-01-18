@@ -17,7 +17,7 @@ const journeySteps = [
     name: 'Next: We Grow',
     description: 'Our own sustainable moringa farm',
     detail:
-      "With your help, we'll establish our own moringa plantation — giving us full control over quality, sustainability, and the ability to scale our impact exponentially.",
+      "With your help, we'll establish our own moringa plantation — giving us full control over the process and the ability to scale our impact exponentially.",
     image: '/moringa-tree-farm-plantation-sustainable-agricultu.jpg',
   },
   {
@@ -26,7 +26,7 @@ const journeySteps = [
     name: 'Then: We Process',
     description: 'Diverse products, all in-house',
     detail:
-      'With our own processing facility, we will expand beyond capsules to produce moringa oils, teas, soups, and more — all processed and packaged in-house, for a complete range of moringa products.',
+      'With our own processing facility, we will expand beyond powder to produce moringa capsules, oils, teas, soups, and more — all processed and packaged in-house, for a complete range of moringa products.',
     image: '/products.jpg',
   },
 ];
