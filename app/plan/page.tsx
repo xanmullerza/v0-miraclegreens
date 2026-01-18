@@ -681,23 +681,74 @@ export default function MealPlannerPage() {
                                     <div className="flex flex-col xl:flex-row items-center justify-between gap-6">
                                         <div className="flex flex-col md:flex-row items-center gap-6 w-full xl:w-auto">
                                             {/* Totals */}
-                                            <div className="flex items-center gap-4">
-                                                <div className="text-center cursor-pointer hover:bg-muted p-2 rounded-lg transition-colors" onClick={() => setUnit(unit === 'kcal' ? 'kJ' : 'kcal')}>
-                                                    <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide flex items-center justify-center gap-2">
-                                                        <Flame className="h-4 w-4 text-orange-500" />
-                                                        Energy ({unit})
-                                                    </p>
-                                                    <p className="text-3xl font-bold text-foreground">
-                                                        {formatEnergy(plan.totalCalories + ((dailyMoringaGrams / 2) * MORINGA_TSP.energy_kcal), unit).split(' ')[0]}
-                                                    </p>
-                                                </div>
-                                                <div className="h-12 w-px bg-border mx-2"></div>
-                                                <div className="space-y-1 text-sm text-muted-foreground">
-                                                    <p className="flex items-center gap-2"><Beef className="h-4 w-4 text-red-500" /> <span className="font-semibold text-foreground">{(plan.macros.protein + ((dailyMoringaGrams / 2) * MORINGA_TSP.protein_g)).toFixed(1)}g</span> Protein</p>
-                                                    <p className="flex items-center gap-2"><Wheat className="h-4 w-4 text-amber-600" /> <span className="font-semibold text-foreground">{(plan.macros.carbs + ((dailyMoringaGrams / 2) * MORINGA_TSP.carbs_g)).toFixed(1)}g</span> Carbs</p>
-                                                    <p className="flex items-center gap-2"><Droplet className="h-4 w-4 text-yellow-500" /> <span className="font-semibold text-foreground">{(plan.macros.fat + ((dailyMoringaGrams / 2) * MORINGA_TSP.fat_g)).toFixed(1)}g</span> Fat</p>
-                                                </div>
-                                            </div>
+                                            {/* Daily Totals Cards */}
+                                            {(() => {
+                                                const targetCals = calories;
+                                                const pRatio = goal === 'lose-fat' ? 0.30 : goal === 'build-muscle' ? 0.25 : 0.20;
+                                                const cRatio = goal === 'lose-fat' ? 0.40 : goal === 'build-muscle' ? 0.50 : 0.50;
+                                                const fRatio = goal === 'lose-fat' ? 0.30 : goal === 'build-muscle' ? 0.25 : 0.30;
+
+                                                const targets = {
+                                                    energy: targetCals,
+                                                    protein: (targetCals * pRatio) / 4,
+                                                    carbs: (targetCals * cRatio) / 4,
+                                                    fat: (targetCals * fRatio) / 9
+                                                };
+
+                                                const current = {
+                                                    energy: plan.totalCalories + ((dailyMoringaGrams / 2) * MORINGA_TSP.energy_kcal),
+                                                    protein: plan.macros.protein + ((dailyMoringaGrams / 2) * MORINGA_TSP.protein_g),
+                                                    carbs: plan.macros.carbs + ((dailyMoringaGrams / 2) * MORINGA_TSP.carbs_g),
+                                                    fat: plan.macros.fat + ((dailyMoringaGrams / 2) * MORINGA_TSP.fat_g)
+                                                };
+
+                                                const MacroCard = ({ label, val, target, icon: Icon, colorClass, unit: u }: { label: string, val: number, target: number, icon: any, colorClass: string, unit: string }) => {
+                                                    const pct = Math.round((val / target) * 100);
+                                                    const styles = getNutrientLevelStyles(pct, label);
+
+                                                    return (
+                                                        <div className={cn(
+                                                            "flex-1 min-w-[140px] p-3 rounded-2xl border transition-all shadow-sm",
+                                                            styles.borderLight, styles.fade
+                                                        )}>
+                                                            <div className="flex items-center gap-2 mb-2">
+                                                                <Icon className={cn("h-4 w-4", colorClass)} />
+                                                                <span className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">{label}</span>
+                                                            </div>
+                                                            <div className="flex items-baseline gap-1 mb-1">
+                                                                <span className="text-xl font-black">{u === 'kcal' || u === 'kJ' ? Math.round(formatEnergyValue(val, u)) : val.toFixed(0)}</span>
+                                                                <span className="text-[10px] font-bold text-muted-foreground/60">/ {u === 'kcal' || u === 'kJ' ? Math.round(formatEnergyValue(target, u)) : target.toFixed(0)}{u}</span>
+                                                            </div>
+                                                            <div className="space-y-1.5">
+                                                                <div className="flex items-center justify-between text-[10px] font-black">
+                                                                    <span className={cn("px-1 rounded", styles.bg, styles.textFill)}>{pct}%</span>
+                                                                </div>
+                                                                <div className="w-full bg-muted/50 rounded-full h-1.5 overflow-hidden border border-black/5">
+                                                                    <div
+                                                                        className={cn("h-full transition-all duration-1000 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]", styles.bg)}
+                                                                        style={{ width: `${Math.min(100, pct)}%` }}
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                };
+
+                                                const formatEnergyValue = (kcal: number, u: string) => {
+                                                    return u === 'kJ' ? kcal * 4.184 : kcal;
+                                                };
+
+                                                return (
+                                                    <div className="flex flex-wrap items-center gap-3 w-full">
+                                                        <div className="cursor-pointer flex-1 min-w-[140px]" onClick={() => setUnit(unit === 'kcal' ? 'kJ' : 'kcal')}>
+                                                            <MacroCard label="Energy" val={current.energy} target={targets.energy} icon={Flame} colorClass="text-orange-500" unit={unit} />
+                                                        </div>
+                                                        <MacroCard label="Protein" val={current.protein} target={targets.protein} icon={Beef} colorClass="text-red-500" unit="g" />
+                                                        <MacroCard label="Carbs" val={current.carbs} target={targets.carbs} icon={Wheat} colorClass="text-amber-600" unit="g" />
+                                                        <MacroCard label="Fat" val={current.fat} target={targets.fat} icon={Droplet} colorClass="text-yellow-500" unit="g" />
+                                                    </div>
+                                                );
+                                            })()}
 
                                             {/* Miracle Boost Selector */}
                                             <div className="flex flex-col items-center gap-1.5 bg-green-50 dark:bg-green-900/10 p-2 rounded-xl border border-green-200 dark:border-green-800/30">
