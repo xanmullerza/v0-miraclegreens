@@ -834,7 +834,7 @@ export default function MealPlannerPage() {
                                                 <DailyNutrientGrid nutrients={electrolytes} title="Electrolytes" />
                                                 <DailyNutrientGrid nutrients={traceMinerals} title="Trace Minerals" />
                                                 <DailyNutrientGrid nutrients={vitamins} title="Vitamins" />
-                                                <DailyNutrientGrid nutrients={other} title="Other Essential Nutrients" />
+                                                <DailyNutrientGrid nutrients={other} title="Other Essentials" />
                                             </div>
                                         );
                                     })()}
@@ -1104,7 +1104,7 @@ export default function MealPlannerPage() {
                                             </div>
                                             <div className="space-y-4">
                                                 <ModalNutrientGrid nutrients={vitamins} title="Vitamins" />
-                                                <ModalNutrientGrid nutrients={other} title="Essential Fiber" />
+                                                <ModalNutrientGrid nutrients={other} title="Other Essentials" />
                                             </div>
                                         </div>
                                     </div>
