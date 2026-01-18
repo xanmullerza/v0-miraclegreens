@@ -818,15 +818,34 @@ export default function MealPlannerPage() {
                                                                 <div key={label} className="flex flex-col justify-between gap-1 p-3 bg-background rounded-xl border border-border/50 hover:border-primary/20 transition-colors shadow-sm">
                                                                     <div className="min-w-0">
                                                                         <p className="text-[10px] uppercase font-bold text-muted-foreground truncate tracking-tight">{label}</p>
-                                                                        <p className="text-sm font-black">{value >= 1 ? value.toFixed(1) : value.toFixed(2)} <span className="text-[10px] font-medium opacity-60 font-sans">{unit}</span></p>
+                                                                        <div className="flex items-baseline flex-wrap gap-x-1">
+                                                                            <span className="text-sm font-black">
+                                                                                {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
+                                                                                <span className="text-[10px] font-medium opacity-60 ml-0.5">{unit}</span>
+                                                                            </span>
+                                                                            {rdaValue && (
+                                                                                <span className="text-[11px] font-bold text-muted-foreground/50">
+                                                                                    / {rdaValue >= 1 ? Math.round(rdaValue) : rdaValue.toFixed(1)}{unit}
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
                                                                     </div>
                                                                     {percentage !== null && (
-                                                                        <div className="mt-1 w-full bg-muted rounded-full h-1 overflow-hidden">
-                                                                            <div
-                                                                                className={cn("h-full", getPercentageColor(percentage, label).split(' ')[0])}
-                                                                                style={{ width: `${Math.min(100, percentage)}%` }}
-                                                                            />
-                                                                            <span className="sr-only">{percentage}% RDA</span>
+                                                                        <div className="mt-2 space-y-1.5">
+                                                                            <div className="flex items-center justify-between text-[10px] font-black">
+                                                                                <span className={cn(
+                                                                                    "px-1 rounded-sm",
+                                                                                    getPercentageColor(percentage, label)
+                                                                                )}>
+                                                                                    {percentage}%
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+                                                                                <div
+                                                                                    className={cn("h-full transition-all duration-1000 ease-out", getPercentageColor(percentage, label).split(' ')[0])}
+                                                                                    style={{ width: `${Math.min(100, percentage)}%` }}
+                                                                                />
+                                                                            </div>
                                                                         </div>
                                                                     )}
                                                                 </div>
