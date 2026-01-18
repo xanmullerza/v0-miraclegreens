@@ -28,7 +28,8 @@ import {
     Droplet,
     Wheat,
     X,
-    Clock
+    Clock,
+    Filter
 } from 'lucide-react';
 import {
     Sheet,
@@ -979,21 +980,33 @@ export default function MealPlannerPage() {
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="p-3 bg-muted rounded-lg relative overflow-hidden group">
                                                 {moringaSpoons > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{(MORINGA_TSP.energy_kj * moringaSpoons).toFixed(0)}</div>}
-                                                <div className="text-xs text-muted-foreground mb-0.5">Energy</div>
+                                                <div className="flex items-center gap-1.5 mb-0.5">
+                                                    <Flame className="w-3.5 h-3.5 text-orange-500" />
+                                                    <div className="text-xs text-muted-foreground">Energy</div>
+                                                </div>
                                                 <div className={`text-lg font-bold transition-colors ${moringaSpoons > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.energy_kj.toFixed(0)} kJ</div>
                                             </div>
                                             <div className="p-3 bg-muted rounded-lg relative overflow-hidden">
                                                 {moringaSpoons > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{(MORINGA_TSP.protein_g * moringaSpoons).toFixed(1)}</div>}
-                                                <div className="text-xs text-muted-foreground mb-0.5">Protein</div>
+                                                <div className="flex items-center gap-1.5 mb-0.5">
+                                                    <Beef className="w-3.5 h-3.5 text-red-500" />
+                                                    <div className="text-xs text-muted-foreground">Protein</div>
+                                                </div>
                                                 <div className={`text-lg font-bold transition-colors ${moringaSpoons > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.protein_g.toFixed(1)}g</div>
                                             </div>
                                             <div className="p-3 bg-muted rounded-lg relative overflow-hidden group">
                                                 {moringaSpoons > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{(MORINGA_TSP.carbs_g * moringaSpoons).toFixed(1)}</div>}
-                                                <div className="text-xs text-muted-foreground mb-0.5">Carbs</div>
+                                                <div className="flex items-center gap-1.5 mb-0.5">
+                                                    <Wheat className="w-3.5 h-3.5 text-yellow-500" />
+                                                    <div className="text-xs text-muted-foreground">Carbs</div>
+                                                </div>
                                                 <div className={`text-lg font-bold transition-colors ${moringaSpoons > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.carbs_g.toFixed(1)}g</div>
                                             </div>
                                             <div className="p-3 bg-muted rounded-lg relative overflow-hidden">
-                                                <div className="text-xs text-muted-foreground mb-0.5">Fat</div>
+                                                <div className="flex items-center gap-1.5 mb-0.5">
+                                                    <Droplet className="w-3.5 h-3.5 text-blue-500" />
+                                                    <div className="text-xs text-muted-foreground">Fat</div>
+                                                </div>
                                                 <div className="text-lg font-bold">{current.fat_g.toFixed(1)}g</div>
                                             </div>
                                         </div>
