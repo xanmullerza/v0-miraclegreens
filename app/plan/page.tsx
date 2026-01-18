@@ -251,9 +251,9 @@ export default function MealPlannerPage() {
     const [nutritionRecipe, setNutritionRecipe] = useState<Recipe | null>(null);
     const [nutritionData, setNutritionData] = useState<any>(null);
     const [loadingNutrition, setLoadingNutrition] = useState(false);
-    const [moringaSpoons, setMoringaSpoons] = useState(0);
+    const [moringaGrams, setMoringaGrams] = useState(0);
     const [showDailyNutrients, setShowDailyNutrients] = useState(false);
-    const [dailyMoringaSpoons, setDailyMoringaSpoons] = useState(0);
+    const [dailyMoringaGrams, setDailyMoringaGrams] = useState(0);
 
     // Standard 1 tsp (2g) Moringa Nutrition (Calculated from 100g data)
     const MORINGA_TSP = {
@@ -481,7 +481,7 @@ export default function MealPlannerPage() {
             }
 
             setNutritionData(nutrition);
-            setMoringaSpoons(hasMoringa ? 1 : 0); // Auto-enable 1 spoon if recipe has it default
+            setMoringaGrams(hasMoringa ? 2 : 0); // Auto-enable 1 spoon (2g) if recipe has it default
         } catch (err) {
             console.error('Error calculating nutrition:', err);
         } finally {
@@ -691,14 +691,14 @@ export default function MealPlannerPage() {
                                                         Energy ({unit})
                                                     </p>
                                                     <p className="text-3xl font-bold text-foreground">
-                                                        {formatEnergy(plan.totalCalories + (dailyMoringaSpoons * MORINGA_TSP.energy_kcal), unit).split(' ')[0]}
+                                                        {formatEnergy(plan.totalCalories + ((dailyMoringaGrams / 2) * MORINGA_TSP.energy_kcal), unit).split(' ')[0]}
                                                     </p>
                                                 </div>
                                                 <div className="h-12 w-px bg-border mx-2"></div>
                                                 <div className="space-y-1 text-sm text-muted-foreground">
-                                                    <p className="flex items-center gap-2"><Beef className="h-4 w-4 text-red-500" /> <span className="font-semibold text-foreground">{(plan.macros.protein + (dailyMoringaSpoons * MORINGA_TSP.protein_g)).toFixed(1)}g</span> Protein</p>
-                                                    <p className="flex items-center gap-2"><Wheat className="h-4 w-4 text-amber-600" /> <span className="font-semibold text-foreground">{(plan.macros.carbs + (dailyMoringaSpoons * MORINGA_TSP.carbs_g)).toFixed(1)}g</span> Carbs</p>
-                                                    <p className="flex items-center gap-2"><Droplet className="h-4 w-4 text-yellow-500" /> <span className="font-semibold text-foreground">{(plan.macros.fat + (dailyMoringaSpoons * MORINGA_TSP.fat_g)).toFixed(1)}g</span> Fat</p>
+                                                    <p className="flex items-center gap-2"><Beef className="h-4 w-4 text-red-500" /> <span className="font-semibold text-foreground">{(plan.macros.protein + ((dailyMoringaGrams / 2) * MORINGA_TSP.protein_g)).toFixed(1)}g</span> Protein</p>
+                                                    <p className="flex items-center gap-2"><Wheat className="h-4 w-4 text-amber-600" /> <span className="font-semibold text-foreground">{(plan.macros.carbs + ((dailyMoringaGrams / 2) * MORINGA_TSP.carbs_g)).toFixed(1)}g</span> Carbs</p>
+                                                    <p className="flex items-center gap-2"><Droplet className="h-4 w-4 text-yellow-500" /> <span className="font-semibold text-foreground">{(plan.macros.fat + ((dailyMoringaGrams / 2) * MORINGA_TSP.fat_g)).toFixed(1)}g</span> Fat</p>
                                                 </div>
                                             </div>
 
@@ -708,21 +708,39 @@ export default function MealPlannerPage() {
                                                     <Sparkles className="w-3 h-3" />
                                                     Miracle Boost
                                                 </span>
-                                                <div className="flex items-center bg-white dark:bg-black/20 rounded-lg shadow-sm border border-green-100 dark:border-green-800/50 p-0.5">
-                                                    {[0, 1, 2, 3, 4, 5].map(spoons => (
-                                                        <button
-                                                            key={spoons}
-                                                            onClick={() => setDailyMoringaSpoons(spoons)}
-                                                            className={cn(
-                                                                "w-7 h-7 flex items-center justify-center text-xs font-bold transition-all rounded-md",
-                                                                dailyMoringaSpoons === spoons
-                                                                    ? "bg-green-600 text-white shadow-sm"
-                                                                    : "text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/20"
-                                                            )}
-                                                        >
-                                                            {spoons}
-                                                        </button>
-                                                    ))}
+                                                <div className="flex items-center gap-2">
+                                                    <div className="flex items-center bg-white dark:bg-black/20 rounded-lg shadow-sm border border-green-100 dark:border-green-800/50 p-0.5">
+                                                        {[0, 1, 2, 3, 4, 5].map(spoons => {
+                                                            const g = spoons * 2;
+                                                            const isActive = dailyMoringaGrams === g;
+                                                            return (
+                                                                <button
+                                                                    key={spoons}
+                                                                    onClick={() => setDailyMoringaGrams(g)}
+                                                                    className={cn(
+                                                                        "w-7 h-7 flex items-center justify-center text-xs font-bold transition-all rounded-md",
+                                                                        isActive
+                                                                            ? "bg-green-600 text-white shadow-sm"
+                                                                            : "text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/20"
+                                                                    )}
+                                                                    title={`${g}g`}
+                                                                >
+                                                                    {spoons}
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                    <div className="relative flex items-center">
+                                                        <Input
+                                                            type="number"
+                                                            min="0"
+                                                            value={dailyMoringaGrams}
+                                                            onChange={(e) => setDailyMoringaGrams(Number(e.target.value))}
+                                                            className="w-16 h-8 text-center text-xs pr-4 border-green-200 focus:ring-green-500"
+                                                            placeholder="0"
+                                                        />
+                                                        <span className="absolute right-1.5 text-[10px] text-green-600 font-bold pointer-events-none">g</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -747,9 +765,10 @@ export default function MealPlannerPage() {
                                         const m = { ...plan.micronutrients };
 
                                         // Apply Daily Moringa Boost
-                                        if (dailyMoringaSpoons > 0) {
+                                        if (dailyMoringaGrams > 0) {
+                                            const ratio = dailyMoringaGrams / 2;
                                             Object.entries(MORINGA_TSP.micronutrients).forEach(([key, value]) => {
-                                                m[key] = (m[key] || 0) + (value * dailyMoringaSpoons);
+                                                m[key] = (m[key] || 0) + (value * ratio);
                                             });
                                         }
 
@@ -1022,7 +1041,7 @@ export default function MealPlannerPage() {
                     onClick={() => {
                         setNutritionRecipe(null);
                         setNutritionData(null);
-                        setMoringaSpoons(0);
+                        setMoringaGrams(0);
                     }}
                 >
                     <div
@@ -1039,7 +1058,7 @@ export default function MealPlannerPage() {
                                 onClick={() => {
                                     setNutritionRecipe(null);
                                     setNutritionData(null);
-                                    setMoringaSpoons(0);
+                                    setMoringaGrams(0);
                                 }}
                                 className="p-2 hover:bg-green-600 rounded-lg transition-colors text-white"
                             >
@@ -1054,33 +1073,33 @@ export default function MealPlannerPage() {
                             </div>
                         ) : nutritionData ? (() => {
                             // Calculate current nutrition based on spoon count
-                            const current = moringaSpoons > 0 ? {
-                                energy_kcal: nutritionData.energy_kcal + (MORINGA_TSP.energy_kcal * moringaSpoons),
-                                energy_kj: nutritionData.energy_kj + (MORINGA_TSP.energy_kj * moringaSpoons),
-                                protein_g: nutritionData.protein_g + (MORINGA_TSP.protein_g * moringaSpoons),
-                                carbs_g: nutritionData.carbs_g + (MORINGA_TSP.carbs_g * moringaSpoons),
-                                fat_g: nutritionData.fat_g + (MORINGA_TSP.fat_g * moringaSpoons),
+                            const spoonsRatio = moringaGrams / 2;
+                            const current = moringaGrams > 0 ? {
+                                energy_kcal: nutritionData.energy_kcal + (MORINGA_TSP.energy_kcal * spoonsRatio),
+                                energy_kj: nutritionData.energy_kj + (MORINGA_TSP.energy_kj * spoonsRatio),
+                                protein_g: nutritionData.protein_g + (MORINGA_TSP.protein_g * spoonsRatio),
+                                carbs_g: nutritionData.carbs_g + (MORINGA_TSP.carbs_g * spoonsRatio),
+                                fat_g: nutritionData.fat_g + (MORINGA_TSP.fat_g * spoonsRatio),
                                 micronutrients: { ...nutritionData.micronutrients }
                             } : { ...nutritionData };
 
                             // Add moringa micros if shown
-                            if (moringaSpoons > 0) {
+                            if (moringaGrams > 0) {
                                 for (const [key, value] of Object.entries(MORINGA_TSP.micronutrients)) {
-                                    current.micronutrients[key] = (current.micronutrients[key] || 0) + (value * moringaSpoons);
+                                    current.micronutrients[key] = (current.micronutrients[key] || 0) + (value * spoonsRatio);
                                 }
                             }
 
                             return (
                                 <div className="p-5 space-y-6">
-                                    {/* Moringa Boost Selector */}
                                     <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 p-4 rounded-xl flex flex-col gap-4 transition-all">
 
                                         <div className="flex-1">
                                             <div className="font-bold text-green-800 dark:text-green-300 flex items-center flex-wrap gap-2 mb-1">
                                                 ✨ Miracle Boost
-                                                {moringaSpoons > 0 && (
+                                                {moringaGrams > 0 && (
                                                     <span className="text-xs bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200 px-2 py-0.5 rounded-full">
-                                                        +{moringaSpoons} tsp ({moringaSpoons * 2}g)
+                                                        +{Number(moringaGrams / 2).toFixed(1)} tsp ({moringaGrams}g)
                                                     </span>
                                                 )}
                                             </div>
@@ -1091,27 +1110,38 @@ export default function MealPlannerPage() {
 
                                         <div className="flex items-center gap-2 w-full">
                                             <div className="flex items-center bg-white dark:bg-black/20 rounded-lg p-1 border border-green-200 dark:border-green-800 flex-1 justify-between gap-1 overflow-x-auto">
-                                                {[0, 1, 2, 3, 4, 5].map(spoons => (
-                                                    <button
-                                                        key={spoons}
-                                                        onClick={() => setMoringaSpoons(spoons)}
-                                                        className={`min-w-[32px] w-8 h-8 rounded-md flex items-center justify-center text-sm font-bold transition-all flex-shrink-0 ${moringaSpoons === spoons
-                                                            ? 'bg-green-600 text-white shadow-sm'
-                                                            : 'hover:bg-green-100 dark:hover:bg-green-900/40 text-green-700 dark:text-green-400'
-                                                            }`}
-                                                    >
-                                                        {spoons}
-                                                    </button>
-                                                ))}
+                                                {[0, 1, 2, 3, 4, 5].map(spoons => {
+                                                    const g = spoons * 2;
+                                                    const isActive = moringaGrams === g;
+                                                    return (
+                                                        <button
+                                                            key={spoons}
+                                                            onClick={() => setMoringaGrams(g)}
+                                                            className={cn(
+                                                                "min-w-[32px] w-8 h-8 rounded-md flex items-center justify-center text-sm font-bold transition-all flex-shrink-0",
+                                                                isActive
+                                                                    ? "bg-green-600 text-white shadow-sm"
+                                                                    : "hover:bg-green-100 dark:hover:bg-green-900/40 text-green-700 dark:text-green-400"
+                                                            )}
+                                                            title={`${g}g`}
+                                                        >
+                                                            {spoons}
+                                                        </button>
+                                                    );
+                                                })}
                                             </div>
 
-                                            {/* Main Action Button */}
-                                            <button
-                                                onClick={() => setMoringaSpoons(prev => Math.min(prev + 1, 5))}
-                                                className="bg-green-600 hover:bg-green-700 text-white text-xs font-bold h-10 px-4 rounded-lg shadow-sm transition-colors whitespace-nowrap"
-                                            >
-                                                +1 Spoon
-                                            </button>
+                                            <div className="relative flex items-center">
+                                                <Input
+                                                    type="number"
+                                                    min="0"
+                                                    value={moringaGrams}
+                                                    onChange={(e) => setMoringaGrams(Number(e.target.value))}
+                                                    className="w-16 h-10 text-center font-bold border-green-200 focus:ring-green-500 pr-5"
+                                                    placeholder="0"
+                                                />
+                                                <span className="absolute right-2 text-xs text-green-600 font-bold pointer-events-none">g</span>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -1120,28 +1150,28 @@ export default function MealPlannerPage() {
                                         <h3 className="font-semibold text-base mb-3">Macronutrients</h3>
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="p-3 bg-muted rounded-lg relative overflow-hidden group">
-                                                {moringaSpoons > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{(MORINGA_TSP.energy_kj * moringaSpoons).toFixed(0)}</div>}
+                                                {moringaGrams > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{(MORINGA_TSP.energy_kj * (moringaGrams / 2)).toFixed(0)}</div>}
                                                 <div className="flex items-center gap-1.5 mb-0.5">
                                                     <Flame className="w-3.5 h-3.5 text-orange-500" />
                                                     <div className="text-xs text-muted-foreground">Energy</div>
                                                 </div>
-                                                <div className={`text-lg font-bold transition-colors ${moringaSpoons > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.energy_kj.toFixed(0)} kJ</div>
+                                                <div className={`text-lg font-bold transition-colors ${moringaGrams > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.energy_kj.toFixed(0)} kJ</div>
                                             </div>
                                             <div className="p-3 bg-muted rounded-lg relative overflow-hidden">
-                                                {moringaSpoons > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{(MORINGA_TSP.protein_g * moringaSpoons).toFixed(1)}</div>}
+                                                {moringaGrams > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{(MORINGA_TSP.protein_g * (moringaGrams / 2)).toFixed(1)}</div>}
                                                 <div className="flex items-center gap-1.5 mb-0.5">
                                                     <Beef className="w-3.5 h-3.5 text-red-500" />
                                                     <div className="text-xs text-muted-foreground">Protein</div>
                                                 </div>
-                                                <div className={`text-lg font-bold transition-colors ${moringaSpoons > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.protein_g.toFixed(1)}g</div>
+                                                <div className={`text-lg font-bold transition-colors ${moringaGrams > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.protein_g.toFixed(1)}g</div>
                                             </div>
                                             <div className="p-3 bg-muted rounded-lg relative overflow-hidden group">
-                                                {moringaSpoons > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{(MORINGA_TSP.carbs_g * moringaSpoons).toFixed(1)}</div>}
+                                                {moringaGrams > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{(MORINGA_TSP.carbs_g * (moringaGrams / 2)).toFixed(1)}</div>}
                                                 <div className="flex items-center gap-1.5 mb-0.5">
                                                     <Wheat className="w-3.5 h-3.5 text-yellow-500" />
                                                     <div className="text-xs text-muted-foreground">Carbs</div>
                                                 </div>
-                                                <div className={`text-lg font-bold transition-colors ${moringaSpoons > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.carbs_g.toFixed(1)}g</div>
+                                                <div className={`text-lg font-bold transition-colors ${moringaGrams > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.carbs_g.toFixed(1)}g</div>
                                             </div>
                                             <div className="p-3 bg-muted rounded-lg relative overflow-hidden">
                                                 <div className="flex items-center gap-1.5 mb-0.5">
@@ -1223,7 +1253,7 @@ export default function MealPlannerPage() {
                                                     <div className="flex flex-col gap-px">
                                                         {filtered.map(([label, value], idx) => {
                                                             const mKey = labelsToMoringaKey[label];
-                                                            const boostValue = (mKey && moringaSpoons > 0) ? (MORINGA_TSP.micronutrients as any)[mKey] * moringaSpoons : 0;
+                                                            const boostValue = (mKey && moringaGrams > 0) ? (MORINGA_TSP.micronutrients as any)[mKey] * (moringaGrams / 2) : 0;
 
                                                             // Determine unit
                                                             let unit = 'mg';
