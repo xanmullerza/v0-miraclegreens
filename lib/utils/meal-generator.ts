@@ -1,5 +1,6 @@
 import { supabase } from '../supabase';
 import { Recipe, DietType } from '../data/recipes';
+import { scaleIngredient } from './recipe-scaling';
 
 interface PlanSettings {
     targetCalories: number;
@@ -105,7 +106,8 @@ export const getRandomRecipeByType = async (
                         isMiracleProduct: i.is_miracle_product,
                         baseIngredient: i.base_ingredient
                     })),
-                    instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text)
+                    instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
+                    servings: 1
                 },
                 micronutrients: calculatedNutrition.micronutrients
             };
@@ -207,7 +209,8 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
                 isMiracleProduct: i.is_miracle_product,
                 baseIngredient: i.base_ingredient
             })),
-            instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text)
+            instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
+            servings: 1
         };
     });
 
@@ -311,11 +314,19 @@ export interface ShoppingItem {
 }
 
 export const generateShoppingList = (plan: DailyPlan): ShoppingItem[] => {
+    const getScaledIngredients = (recipe: Recipe) => {
+        const factor = recipe.servings || 1;
+        return recipe.ingredients.map(ing => ({
+            ...ing,
+            amount: scaleIngredient(ing.amount, factor)
+        }));
+    };
+
     const allIngredients = [
-        ...plan.breakfast.ingredients,
-        ...plan.lunch.ingredients,
-        ...plan.dinner.ingredients,
-        ...plan.snacks.flatMap(s => s.ingredients)
+        ...getScaledIngredients(plan.breakfast),
+        ...getScaledIngredients(plan.lunch),
+        ...getScaledIngredients(plan.dinner),
+        ...plan.snacks.flatMap(s => getScaledIngredients(s))
     ];
 
     const itemMap = new Map<string, ShoppingItem>();

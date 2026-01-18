@@ -45,6 +45,7 @@ import { DietType, Recipe } from '@/lib/data/recipes';
 import { generateDailyPlan, DailyPlan, generateShoppingList, ShoppingItem, getRandomRecipeByType } from '@/lib/utils/meal-generator';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
+import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import Link from 'next/link';
 
 const showShop = false;
@@ -137,25 +138,30 @@ const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onClick, onNutritionClick,
                 <div className="absolute top-3 left-3 bg-black/60 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm uppercase">
                     {mealLabel}
                 </div>
+                {recipe.servings && recipe.servings !== 1 && (
+                    <div className="absolute top-3 right-3 bg-primary text-primary-foreground text-[10px] font-black px-2 py-1 rounded-md shadow-lg animate-in zoom-in-50">
+                        x{recipe.servings}
+                    </div>
+                )}
             </div>
             <div className="p-5 flex flex-col flex-grow">
                 <h4 className="font-bold text-lg mb-2 line-clamp-1">{recipe.title}</h4>
                 <div className="grid grid-cols-2 gap-y-1 text-sm text-muted-foreground mt-auto">
                     <span className="flex items-center gap-1">
                         <Flame className="h-4 w-4 text-orange-500" />
-                        {formatEnergy(recipe.calories, unit)}
+                        {formatEnergy(recipe.calories * (recipe.servings || 1), unit)}
                     </span>
                     <span className="flex items-center gap-1">
                         <Beef className="h-4 w-4 text-red-500" />
-                        {Number(recipe.protein).toFixed(1)}g
+                        {Number(recipe.protein * (recipe.servings || 1)).toFixed(1)}g
                     </span>
                     <span className="flex items-center gap-1">
                         <Droplet className="h-4 w-4 text-yellow-500" />
-                        {Number(recipe.fat).toFixed(1)}g
+                        {Number(recipe.fat * (recipe.servings || 1)).toFixed(1)}g
                     </span>
                     <span className="flex items-center gap-1">
                         <Wheat className="h-4 w-4 text-amber-600" />
-                        {Number(recipe.carbs).toFixed(1)}g
+                        {Number(recipe.carbs * (recipe.servings || 1)).toFixed(1)}g
                     </span>
                 </div>
                 <button
@@ -410,6 +416,60 @@ export default function MealPlannerPage() {
 
                 return updatedPlan;
             });
+        }
+    };
+
+    const updateServings = (recipeId: string, newServings: number) => {
+        if (!plan) return;
+
+        setPlan(prev => {
+            if (!prev) return null;
+            const updated = { ...prev };
+
+            // Helper to get recipe by ID and update it
+            const updateRecipeInPlan = (r: Recipe) => r.id === recipeId ? { ...r, servings: newServings } : r;
+
+            updated.breakfast = updateRecipeInPlan(updated.breakfast);
+            updated.lunch = updateRecipeInPlan(updated.lunch);
+            updated.dinner = updateRecipeInPlan(updated.dinner);
+            updated.snacks = updated.snacks.map(updateRecipeInPlan);
+
+            // Recalculate totals
+            const getField = (r: Recipe, field: 'calories' | 'protein' | 'carbs' | 'fat') => (r[field] || 0) * (r.servings || 1);
+
+            updated.totalCalories = getField(updated.breakfast, 'calories') + getField(updated.lunch, 'calories') + getField(updated.dinner, 'calories') + updated.snacks.reduce((acc, s) => acc + getField(s, 'calories'), 0);
+
+            updated.macros = {
+                protein: getField(updated.breakfast, 'protein') + getField(updated.lunch, 'protein') + getField(updated.dinner, 'protein') + updated.snacks.reduce((acc, s) => acc + getField(s, 'protein'), 0),
+                carbs: getField(updated.breakfast, 'carbs') + getField(updated.lunch, 'carbs') + getField(updated.dinner, 'carbs') + updated.snacks.reduce((acc, s) => acc + getField(s, 'carbs'), 0),
+                fat: getField(updated.breakfast, 'fat') + getField(updated.lunch, 'fat') + getField(updated.dinner, 'fat') + updated.snacks.reduce((acc, s) => acc + getField(s, 'fat'), 0),
+            };
+
+            // Recalculate aggregated micronutrients
+            const newAggregatedMicros: Record<string, number> = {};
+            const addMicros = (r: Recipe) => {
+                const m = updated.recipeMicronutrients[r.id];
+                if (m) {
+                    const factor = r.servings || 1;
+                    Object.entries(m).forEach(([k, v]) => {
+                        newAggregatedMicros[k] = (newAggregatedMicros[k] || 0) + ((v as number) * factor);
+                    });
+                }
+            };
+
+            addMicros(updated.breakfast);
+            addMicros(updated.lunch);
+            addMicros(updated.dinner);
+            updated.snacks.forEach(s => addMicros(s));
+
+            updated.micronutrients = newAggregatedMicros;
+
+            return updated;
+        });
+
+        // Update selectedRecipe if it matches (to reflect in modal immediately)
+        if (selectedRecipe?.id === recipeId) {
+            setSelectedRecipe(prev => prev ? { ...prev, servings: newServings } : null);
         }
     };
 
@@ -962,7 +1022,7 @@ export default function MealPlannerPage() {
                                         <Flame className="h-4 w-4 text-orange-500" />
                                         <span className="text-xs text-muted-foreground">Energy</span>
                                     </div>
-                                    <div className="text-lg font-bold">{formatEnergy(selectedRecipe.calories, unit).split(' ')[0]}</div>
+                                    <div className="text-lg font-bold">{formatEnergy(selectedRecipe.calories * (selectedRecipe.servings || 1), unit).split(' ')[0]}</div>
                                     <div className="text-xs text-muted-foreground">{unit}</div>
                                 </div>
                                 <div className="text-center p-3 bg-muted rounded-lg">
@@ -970,21 +1030,52 @@ export default function MealPlannerPage() {
                                         <Beef className="h-4 w-4 text-red-500" />
                                         <span className="text-xs text-muted-foreground">Protein</span>
                                     </div>
-                                    <div className="text-lg font-bold">{Number(selectedRecipe.protein).toFixed(1)}g</div>
+                                    <div className="text-lg font-bold">{Number(selectedRecipe.protein * (selectedRecipe.servings || 1)).toFixed(1)}g</div>
                                 </div>
                                 <div className="text-center p-3 bg-muted rounded-lg">
                                     <div className="flex items-center justify-center gap-1 mb-1">
                                         <Wheat className="h-4 w-4 text-amber-600" />
                                         <span className="text-xs text-muted-foreground">Carbs</span>
                                     </div>
-                                    <div className="text-lg font-bold">{Number(selectedRecipe.carbs).toFixed(1)}g</div>
+                                    <div className="text-lg font-bold">{Number(selectedRecipe.carbs * (selectedRecipe.servings || 1)).toFixed(1)}g</div>
                                 </div>
                                 <div className="text-center p-3 bg-muted rounded-lg">
                                     <div className="flex items-center justify-center gap-1 mb-1">
                                         <Droplet className="h-4 w-4 text-yellow-500" />
                                         <span className="text-xs text-muted-foreground">Fat</span>
                                     </div>
-                                    <div className="text-lg font-bold">{Number(selectedRecipe.fat).toFixed(1)}g</div>
+                                    <div className="text-lg font-bold">{Number(selectedRecipe.fat * (selectedRecipe.servings || 1)).toFixed(1)}g</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Servings Control */}
+                        <div className="p-6 border-b border-border bg-muted/20">
+                            <div className="flex items-center justify-between">
+                                <div className="space-y-1">
+                                    <h3 className="font-semibold flex items-center gap-2">
+                                        <Utensils className="h-5 w-5" />
+                                        Adjust Servings
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground">Scale ingredients and nutrition up or down.</p>
+                                </div>
+                                <div className="flex items-center gap-3 bg-background border rounded-xl p-1 shadow-sm">
+                                    <button
+                                        onClick={() => updateServings(selectedRecipe.id, Math.max(0.5, (selectedRecipe.servings || 1) - 0.5))}
+                                        className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-muted transition-colors text-lg font-bold"
+                                    >
+                                        -
+                                    </button>
+                                    <div className="w-12 text-center">
+                                        <span className="text-xl font-bold">{selectedRecipe.servings || 1}</span>
+                                        <span className="block text-[10px] uppercase font-bold text-muted-foreground">Servs</span>
+                                    </div>
+                                    <button
+                                        onClick={() => updateServings(selectedRecipe.id, (selectedRecipe.servings || 1) + 0.5)}
+                                        className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-muted transition-colors text-lg font-bold"
+                                    >
+                                        +
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1001,7 +1092,7 @@ export default function MealPlannerPage() {
                                         <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
                                         <div className="flex-1">
                                             <span className="font-medium">{ing.item}</span>
-                                            <span className="text-muted-foreground"> - {ing.amount}</span>
+                                            <span className="text-muted-foreground"> - {scaleIngredient(ing.amount, selectedRecipe.servings || 1)}</span>
                                             {ing.isMiracleProduct && (
                                                 <span className="ml-2 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded-full">
                                                     ✨ Miracle Product
@@ -1032,303 +1123,306 @@ export default function MealPlannerPage() {
                         </div>
                     </div>
                 </div>
-            )}
+            )
+            }
 
             {/* Nutritional Info Modal */}
-            {nutritionRecipe && (
-                <div
-                    className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
-                    onClick={() => {
-                        setNutritionRecipe(null);
-                        setNutritionData(null);
-                        setMoringaGrams(0);
-                    }}
-                >
+            {
+                nutritionRecipe && (
                     <div
-                        className="bg-background rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl"
-                        onClick={(e) => e.stopPropagation()}
+                        className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+                        onClick={() => {
+                            setNutritionRecipe(null);
+                            setNutritionData(null);
+                            setMoringaGrams(0);
+                        }}
                     >
-                        {/* Header */}
-                        <div className="sticky top-0 bg-green-700 text-white p-6 flex justify-between items-start z-10 rounded-t-2xl shadow-md">
-                            <div className="flex-1">
-                                <h2 className="text-xl font-bold mb-1">Nutritional Info</h2>
-                                <p className="text-green-100 opacity-90 text-sm">{nutritionRecipe.title}</p>
+                        <div
+                            className="bg-background rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Header */}
+                            <div className="sticky top-0 bg-green-700 text-white p-6 flex justify-between items-start z-10 rounded-t-2xl shadow-md">
+                                <div className="flex-1">
+                                    <h2 className="text-xl font-bold mb-1">Nutritional Info</h2>
+                                    <p className="text-green-100 opacity-90 text-sm">{nutritionRecipe.title}</p>
+                                </div>
+                                <button
+                                    onClick={() => {
+                                        setNutritionRecipe(null);
+                                        setNutritionData(null);
+                                        setMoringaGrams(0);
+                                    }}
+                                    className="p-2 hover:bg-green-600 rounded-lg transition-colors text-white"
+                                >
+                                    <X className="h-5 w-5" />
+                                </button>
                             </div>
-                            <button
-                                onClick={() => {
-                                    setNutritionRecipe(null);
-                                    setNutritionData(null);
-                                    setMoringaGrams(0);
-                                }}
-                                className="p-2 hover:bg-green-600 rounded-lg transition-colors text-white"
-                            >
-                                <X className="h-5 w-5" />
-                            </button>
-                        </div>
 
-                        {loadingNutrition ? (
-                            <div className="p-12 text-center">
-                                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                                <p className="mt-4 text-muted-foreground">Calculating nutrition...</p>
-                            </div>
-                        ) : nutritionData ? (() => {
-                            // Calculate current nutrition based on spoon count
-                            const spoonsRatio = moringaGrams / 2;
-                            const current = moringaGrams > 0 ? {
-                                energy_kcal: nutritionData.energy_kcal + (MORINGA_TSP.energy_kcal * spoonsRatio),
-                                energy_kj: nutritionData.energy_kj + (MORINGA_TSP.energy_kj * spoonsRatio),
-                                protein_g: nutritionData.protein_g + (MORINGA_TSP.protein_g * spoonsRatio),
-                                carbs_g: nutritionData.carbs_g + (MORINGA_TSP.carbs_g * spoonsRatio),
-                                fat_g: nutritionData.fat_g + (MORINGA_TSP.fat_g * spoonsRatio),
-                                micronutrients: { ...nutritionData.micronutrients }
-                            } : { ...nutritionData };
+                            {loadingNutrition ? (
+                                <div className="p-12 text-center">
+                                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                    <p className="mt-4 text-muted-foreground">Calculating nutrition...</p>
+                                </div>
+                            ) : nutritionData ? (() => {
+                                // Calculate current nutrition based on spoon count
+                                const spoonsRatio = moringaGrams / 2;
+                                const current = moringaGrams > 0 ? {
+                                    energy_kcal: nutritionData.energy_kcal + (MORINGA_TSP.energy_kcal * spoonsRatio),
+                                    energy_kj: nutritionData.energy_kj + (MORINGA_TSP.energy_kj * spoonsRatio),
+                                    protein_g: nutritionData.protein_g + (MORINGA_TSP.protein_g * spoonsRatio),
+                                    carbs_g: nutritionData.carbs_g + (MORINGA_TSP.carbs_g * spoonsRatio),
+                                    fat_g: nutritionData.fat_g + (MORINGA_TSP.fat_g * spoonsRatio),
+                                    micronutrients: { ...nutritionData.micronutrients }
+                                } : { ...nutritionData };
 
-                            // Add moringa micros if shown
-                            if (moringaGrams > 0) {
-                                for (const [key, value] of Object.entries(MORINGA_TSP.micronutrients)) {
-                                    current.micronutrients[key] = (current.micronutrients[key] || 0) + (value * spoonsRatio);
+                                // Add moringa micros if shown
+                                if (moringaGrams > 0) {
+                                    for (const [key, value] of Object.entries(MORINGA_TSP.micronutrients)) {
+                                        current.micronutrients[key] = (current.micronutrients[key] || 0) + (value * spoonsRatio);
+                                    }
                                 }
-                            }
 
-                            return (
-                                <div className="p-5 space-y-6">
-                                    <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 p-4 rounded-xl flex flex-col gap-4 transition-all">
+                                return (
+                                    <div className="p-5 space-y-6">
+                                        <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 p-4 rounded-xl flex flex-col gap-4 transition-all">
 
-                                        <div className="flex-1">
-                                            <div className="font-bold text-green-800 dark:text-green-300 flex items-center flex-wrap gap-2 mb-1">
-                                                ✨ Miracle Boost
-                                                {moringaGrams > 0 && (
-                                                    <span className="text-xs bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200 px-2 py-0.5 rounded-full">
-                                                        +{Number(moringaGrams / 2).toFixed(1)} tsp ({moringaGrams}g)
-                                                    </span>
-                                                )}
+                                            <div className="flex-1">
+                                                <div className="font-bold text-green-800 dark:text-green-300 flex items-center flex-wrap gap-2 mb-1">
+                                                    ✨ Miracle Boost
+                                                    {moringaGrams > 0 && (
+                                                        <span className="text-xs bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200 px-2 py-0.5 rounded-full">
+                                                            +{Number(moringaGrams / 2).toFixed(1)} tsp ({moringaGrams}g)
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p className="text-xs text-green-700 dark:text-green-400">
+                                                    Add moringa to supercharge this meal.
+                                                </p>
                                             </div>
-                                            <p className="text-xs text-green-700 dark:text-green-400">
-                                                Add moringa to supercharge this meal.
-                                            </p>
+
+                                            <div className="flex items-center gap-2 w-full">
+                                                <div className="flex items-center bg-white dark:bg-black/20 rounded-lg p-1 border border-green-200 dark:border-green-800 flex-1 justify-between gap-1 overflow-x-auto">
+                                                    {[0, 1, 2, 3, 4, 5].map(spoons => {
+                                                        const g = spoons * 2;
+                                                        const isActive = moringaGrams === g;
+                                                        return (
+                                                            <button
+                                                                key={spoons}
+                                                                onClick={() => setMoringaGrams(g)}
+                                                                className={cn(
+                                                                    "min-w-[32px] w-8 h-8 rounded-md flex items-center justify-center text-sm font-bold transition-all flex-shrink-0",
+                                                                    isActive
+                                                                        ? "bg-green-600 text-white shadow-sm"
+                                                                        : "hover:bg-green-100 dark:hover:bg-green-900/40 text-green-700 dark:text-green-400"
+                                                                )}
+                                                                title={`${g}g`}
+                                                            >
+                                                                {spoons}
+                                                            </button>
+                                                        );
+                                                    })}
+                                                </div>
+
+                                                <div className="relative flex items-center">
+                                                    <Input
+                                                        type="number"
+                                                        min="0"
+                                                        value={moringaGrams}
+                                                        onChange={(e) => setMoringaGrams(Number(e.target.value))}
+                                                        className="w-16 h-10 text-center font-bold border-green-200 focus:ring-green-500 pr-5"
+                                                        placeholder="0"
+                                                    />
+                                                    <span className="absolute right-2 text-xs text-green-600 font-bold pointer-events-none">g</span>
+                                                </div>
+                                            </div>
                                         </div>
 
-                                        <div className="flex items-center gap-2 w-full">
-                                            <div className="flex items-center bg-white dark:bg-black/20 rounded-lg p-1 border border-green-200 dark:border-green-800 flex-1 justify-between gap-1 overflow-x-auto">
-                                                {[0, 1, 2, 3, 4, 5].map(spoons => {
-                                                    const g = spoons * 2;
-                                                    const isActive = moringaGrams === g;
-                                                    return (
-                                                        <button
-                                                            key={spoons}
-                                                            onClick={() => setMoringaGrams(g)}
-                                                            className={cn(
-                                                                "min-w-[32px] w-8 h-8 rounded-md flex items-center justify-center text-sm font-bold transition-all flex-shrink-0",
-                                                                isActive
-                                                                    ? "bg-green-600 text-white shadow-sm"
-                                                                    : "hover:bg-green-100 dark:hover:bg-green-900/40 text-green-700 dark:text-green-400"
-                                                            )}
-                                                            title={`${g}g`}
-                                                        >
-                                                            {spoons}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-
-                                            <div className="relative flex items-center">
-                                                <Input
-                                                    type="number"
-                                                    min="0"
-                                                    value={moringaGrams}
-                                                    onChange={(e) => setMoringaGrams(Number(e.target.value))}
-                                                    className="w-16 h-10 text-center font-bold border-green-200 focus:ring-green-500 pr-5"
-                                                    placeholder="0"
-                                                />
-                                                <span className="absolute right-2 text-xs text-green-600 font-bold pointer-events-none">g</span>
+                                        {/* Macronutrients */}
+                                        <div>
+                                            <h3 className="font-semibold text-base mb-3">Macronutrients</h3>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div className="p-3 bg-muted rounded-lg relative overflow-hidden group">
+                                                    {moringaGrams > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{(MORINGA_TSP.energy_kj * (moringaGrams / 2)).toFixed(0)}</div>}
+                                                    <div className="flex items-center gap-1.5 mb-0.5">
+                                                        <Flame className="w-3.5 h-3.5 text-orange-500" />
+                                                        <div className="text-xs text-muted-foreground">Energy</div>
+                                                    </div>
+                                                    <div className={`text-lg font-bold transition-colors ${moringaGrams > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.energy_kj.toFixed(0)} kJ</div>
+                                                </div>
+                                                <div className="p-3 bg-muted rounded-lg relative overflow-hidden">
+                                                    {moringaGrams > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{(MORINGA_TSP.protein_g * (moringaGrams / 2)).toFixed(1)}</div>}
+                                                    <div className="flex items-center gap-1.5 mb-0.5">
+                                                        <Beef className="w-3.5 h-3.5 text-red-500" />
+                                                        <div className="text-xs text-muted-foreground">Protein</div>
+                                                    </div>
+                                                    <div className={`text-lg font-bold transition-colors ${moringaGrams > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.protein_g.toFixed(1)}g</div>
+                                                </div>
+                                                <div className="p-3 bg-muted rounded-lg relative overflow-hidden group">
+                                                    {moringaGrams > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{(MORINGA_TSP.carbs_g * (moringaGrams / 2)).toFixed(1)}</div>}
+                                                    <div className="flex items-center gap-1.5 mb-0.5">
+                                                        <Wheat className="w-3.5 h-3.5 text-yellow-500" />
+                                                        <div className="text-xs text-muted-foreground">Carbs</div>
+                                                    </div>
+                                                    <div className={`text-lg font-bold transition-colors ${moringaGrams > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.carbs_g.toFixed(1)}g</div>
+                                                </div>
+                                                <div className="p-3 bg-muted rounded-lg relative overflow-hidden">
+                                                    <div className="flex items-center gap-1.5 mb-0.5">
+                                                        <Droplet className="w-3.5 h-3.5 text-blue-500" />
+                                                        <div className="text-xs text-muted-foreground">Fat</div>
+                                                    </div>
+                                                    <div className="text-lg font-bold">{current.fat_g.toFixed(1)}g</div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    {/* Macronutrients */}
-                                    <div>
-                                        <h3 className="font-semibold text-base mb-3">Macronutrients</h3>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div className="p-3 bg-muted rounded-lg relative overflow-hidden group">
-                                                {moringaGrams > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{(MORINGA_TSP.energy_kj * (moringaGrams / 2)).toFixed(0)}</div>}
-                                                <div className="flex items-center gap-1.5 mb-0.5">
-                                                    <Flame className="w-3.5 h-3.5 text-orange-500" />
-                                                    <div className="text-xs text-muted-foreground">Energy</div>
-                                                </div>
-                                                <div className={`text-lg font-bold transition-colors ${moringaGrams > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.energy_kj.toFixed(0)} kJ</div>
-                                            </div>
-                                            <div className="p-3 bg-muted rounded-lg relative overflow-hidden">
-                                                {moringaGrams > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{(MORINGA_TSP.protein_g * (moringaGrams / 2)).toFixed(1)}</div>}
-                                                <div className="flex items-center gap-1.5 mb-0.5">
-                                                    <Beef className="w-3.5 h-3.5 text-red-500" />
-                                                    <div className="text-xs text-muted-foreground">Protein</div>
-                                                </div>
-                                                <div className={`text-lg font-bold transition-colors ${moringaGrams > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.protein_g.toFixed(1)}g</div>
-                                            </div>
-                                            <div className="p-3 bg-muted rounded-lg relative overflow-hidden group">
-                                                {moringaGrams > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{(MORINGA_TSP.carbs_g * (moringaGrams / 2)).toFixed(1)}</div>}
-                                                <div className="flex items-center gap-1.5 mb-0.5">
-                                                    <Wheat className="w-3.5 h-3.5 text-yellow-500" />
-                                                    <div className="text-xs text-muted-foreground">Carbs</div>
-                                                </div>
-                                                <div className={`text-lg font-bold transition-colors ${moringaGrams > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.carbs_g.toFixed(1)}g</div>
-                                            </div>
-                                            <div className="p-3 bg-muted rounded-lg relative overflow-hidden">
-                                                <div className="flex items-center gap-1.5 mb-0.5">
-                                                    <Droplet className="w-3.5 h-3.5 text-blue-500" />
-                                                    <div className="text-xs text-muted-foreground">Fat</div>
-                                                </div>
-                                                <div className="text-lg font-bold">{current.fat_g.toFixed(1)}g</div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                        {/* Micronutrients - Categorized */}
+                                        {current.micronutrients && (() => {
+                                            const m = current.micronutrients;
 
-                                    {/* Micronutrients - Categorized */}
-                                    {current.micronutrients && (() => {
-                                        const m = current.micronutrients;
+                                            // Categorize nutrients
+                                            const electrolytes = {
+                                                'Potassium': m.potassium_mg,
+                                                'Magnesium': m.magnesium_mg,
+                                                'Calcium': m.calcium_mg,
+                                                'Phosphorus': m.phosphorus_mg,
+                                                'Sodium': m.sodium_mg,
+                                                'Chloride': m.chloride_mg,
+                                            };
 
-                                        // Categorize nutrients
-                                        const electrolytes = {
-                                            'Potassium': m.potassium_mg,
-                                            'Magnesium': m.magnesium_mg,
-                                            'Calcium': m.calcium_mg,
-                                            'Phosphorus': m.phosphorus_mg,
-                                            'Sodium': m.sodium_mg,
-                                            'Chloride': m.chloride_mg,
-                                        };
+                                            const traceMinerals = {
+                                                'Iron': m.iron_mg,
+                                                'Zinc': m.zinc_mg,
+                                                'Selenium': m.selenium_ug,
+                                                'Copper': m.copper_mg,
+                                                'Manganese': m.manganese_mg,
+                                            };
 
-                                        const traceMinerals = {
-                                            'Iron': m.iron_mg,
-                                            'Zinc': m.zinc_mg,
-                                            'Selenium': m.selenium_ug,
-                                            'Copper': m.copper_mg,
-                                            'Manganese': m.manganese_mg,
-                                        };
+                                            const vitamins = {
+                                                'Vitamin A': m.vitamin_a_ug,
+                                                'B1 (Thiamine)': m.thiamine_mg,
+                                                'B2 (Riboflavin)': m.riboflavin_mg,
+                                                'B3 (Niacin)': m.niacin_mg,
+                                                'B5 (Pantothenic Acid)': m.pantothenic_acid_mg,
+                                                'B6 (Pyridoxine)': m.vitamin_b6_mg,
+                                                'B7 (Biotin)': m.biotin_ug,
+                                                'B9 (Folate)': m.folate_ug,
+                                                'B12 (Cobalamin)': m.vitamin_b12_ug,
+                                                'Vitamin C': m.vitamin_c_mg,
+                                                'Vitamin D': m.vitamin_d_iu,
+                                                'Vitamin E': m.vitamin_e_mg,
+                                                'Vitamin K': m.vitamin_k_ug,
+                                            };
 
-                                        const vitamins = {
-                                            'Vitamin A': m.vitamin_a_ug,
-                                            'B1 (Thiamine)': m.thiamine_mg,
-                                            'B2 (Riboflavin)': m.riboflavin_mg,
-                                            'B3 (Niacin)': m.niacin_mg,
-                                            'B5 (Pantothenic Acid)': m.pantothenic_acid_mg,
-                                            'B6 (Pyridoxine)': m.vitamin_b6_mg,
-                                            'B7 (Biotin)': m.biotin_ug,
-                                            'B9 (Folate)': m.folate_ug,
-                                            'B12 (Cobalamin)': m.vitamin_b12_ug,
-                                            'Vitamin C': m.vitamin_c_mg,
-                                            'Vitamin D': m.vitamin_d_iu,
-                                            'Vitamin E': m.vitamin_e_mg,
-                                            'Vitamin K': m.vitamin_k_ug,
-                                        };
+                                            const other = {
+                                                'Choline': m.choline_mg,
+                                                'Fiber': m.fiber_g,
+                                            };
 
-                                        const other = {
-                                            'Choline': m.choline_mg,
-                                            'Fiber': m.fiber_g,
-                                        };
+                                            const labelsToMoringaKey: Record<string, string> = {
+                                                'Vitamin A': 'vitamin_a_ug',
+                                                'Vitamin C': 'vitamin_c_mg',
+                                                'B1 (Thiamine)': 'thiamine_mg',
+                                                'B2 (Riboflavin)': 'riboflavin_mg',
+                                                'B3 (Niacin)': 'niacin_mg',
+                                                'Calcium': 'calcium_mg',
+                                                'Iron': 'iron_mg',
+                                                'Magnesium': 'magnesium_mg',
+                                                'Potassium': 'potassium_mg',
+                                                'Sodium': 'sodium_mg',
+                                                'Fiber': 'fiber_g',
+                                            };
 
-                                        const labelsToMoringaKey: Record<string, string> = {
-                                            'Vitamin A': 'vitamin_a_ug',
-                                            'Vitamin C': 'vitamin_c_mg',
-                                            'B1 (Thiamine)': 'thiamine_mg',
-                                            'B2 (Riboflavin)': 'riboflavin_mg',
-                                            'B3 (Niacin)': 'niacin_mg',
-                                            'Calcium': 'calcium_mg',
-                                            'Iron': 'iron_mg',
-                                            'Magnesium': 'magnesium_mg',
-                                            'Potassium': 'potassium_mg',
-                                            'Sodium': 'sodium_mg',
-                                            'Fiber': 'fiber_g',
-                                        };
+                                            const NutrientGrid = ({ nutrients, title }: { nutrients: Record<string, any>, title: string }) => {
+                                                // Only show if at least one value is non-zero/non-null
+                                                const filtered = Object.entries(nutrients).filter(([_, val]) => val !== undefined && val !== null && val !== 0);
+                                                if (filtered.length === 0) return null;
 
-                                        const NutrientGrid = ({ nutrients, title }: { nutrients: Record<string, any>, title: string }) => {
-                                            // Only show if at least one value is non-zero/non-null
-                                            const filtered = Object.entries(nutrients).filter(([_, val]) => val !== undefined && val !== null && val !== 0);
-                                            if (filtered.length === 0) return null;
+                                                return (
+                                                    <div className="space-y-3 w-full max-w-[340px]">
+                                                        <h4 className="font-black text-xs text-foreground tracking-wide border-b-2 border-primary/10 pb-1.5 flex items-center">
+                                                            <span>{title}</span>
+                                                        </h4>
+                                                        <div className="flex flex-col gap-px">
+                                                            {filtered.map(([label, value], idx) => {
+                                                                const mKey = labelsToMoringaKey[label];
+                                                                const boostValue = (mKey && moringaGrams > 0) ? (MORINGA_TSP.micronutrients as any)[mKey] * (moringaGrams / 2) : 0;
 
-                                            return (
-                                                <div className="space-y-3 w-full max-w-[340px]">
-                                                    <h4 className="font-black text-xs text-foreground tracking-wide border-b-2 border-primary/10 pb-1.5 flex items-center">
-                                                        <span>{title}</span>
-                                                    </h4>
-                                                    <div className="flex flex-col gap-px">
-                                                        {filtered.map(([label, value], idx) => {
-                                                            const mKey = labelsToMoringaKey[label];
-                                                            const boostValue = (mKey && moringaGrams > 0) ? (MORINGA_TSP.micronutrients as any)[mKey] * (moringaGrams / 2) : 0;
+                                                                // Determine unit
+                                                                let unit = 'mg';
+                                                                const labelLower = label.toLowerCase();
+                                                                if (labelLower.includes('vitamin a') || labelLower.includes('folate') || labelLower.includes('selenium') || labelLower.includes('iodine') || labelLower.includes('b12') || labelLower.includes('vitamin k')) unit = 'µg';
+                                                                if (labelLower.includes('vitamin d')) unit = 'IU';
+                                                                if (labelLower.includes('fiber') || labelLower.includes('fat') || labelLower.includes('carbs') || labelLower.includes('protein')) unit = 'g';
 
-                                                            // Determine unit
-                                                            let unit = 'mg';
-                                                            const labelLower = label.toLowerCase();
-                                                            if (labelLower.includes('vitamin a') || labelLower.includes('folate') || labelLower.includes('selenium') || labelLower.includes('iodine') || labelLower.includes('b12') || labelLower.includes('vitamin k')) unit = 'µg';
-                                                            if (labelLower.includes('vitamin d')) unit = 'IU';
-                                                            if (labelLower.includes('fiber') || labelLower.includes('fat') || labelLower.includes('carbs') || labelLower.includes('protein')) unit = 'g';
+                                                                // Calculate RDA percentage
+                                                                const rdaValue = userRDAs?.[label];
+                                                                const percentage = (rdaValue && typeof value === 'number')
+                                                                    ? Math.round(((value + boostValue) / rdaValue) * 100)
+                                                                    : null;
 
-                                                            // Calculate RDA percentage
-                                                            const rdaValue = userRDAs?.[label];
-                                                            const percentage = (rdaValue && typeof value === 'number')
-                                                                ? Math.round(((value + boostValue) / rdaValue) * 100)
-                                                                : null;
+                                                                return (
+                                                                    <div key={label} className={cn(
+                                                                        "group flex items-center gap-2 py-1.5 px-2 transition-all rounded hover:bg-muted/50",
+                                                                        idx % 2 === 0 ? "bg-muted/5" : "bg-transparent",
+                                                                        boostValue > 0 ? "bg-green-500/5 ring-1 ring-inset ring-green-500/20" : ""
+                                                                    )}>
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className="text-sm font-medium text-foreground/90 tracking-tight whitespace-nowrap">{label}</span>
+                                                                            {percentage !== null && (
+                                                                                <span className={cn(
+                                                                                    "text-xs font-bold px-1.5 py-0.5 rounded-sm leading-none",
+                                                                                    getPercentageColor(percentage, label)
+                                                                                )}>
+                                                                                    {percentage}%
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
 
-                                                            return (
-                                                                <div key={label} className={cn(
-                                                                    "group flex items-center gap-2 py-1.5 px-2 transition-all rounded hover:bg-muted/50",
-                                                                    idx % 2 === 0 ? "bg-muted/5" : "bg-transparent",
-                                                                    boostValue > 0 ? "bg-green-500/5 ring-1 ring-inset ring-green-500/20" : ""
-                                                                )}>
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-sm font-medium text-foreground/90 tracking-tight whitespace-nowrap">{label}</span>
-                                                                        {percentage !== null && (
-                                                                            <span className={cn(
-                                                                                "text-xs font-bold px-1.5 py-0.5 rounded-sm leading-none",
-                                                                                getPercentageColor(percentage, label)
-                                                                            )}>
-                                                                                {percentage}%
-                                                                            </span>
-                                                                        )}
-                                                                    </div>
+                                                                        {/* Dotted Leader */}
+                                                                        <div className="flex-1 border-b border-dotted border-border/40 mb-1 group-hover:border-primary/20 transition-colors" />
 
-                                                                    {/* Dotted Leader */}
-                                                                    <div className="flex-1 border-b border-dotted border-border/40 mb-1 group-hover:border-primary/20 transition-colors" />
-
-                                                                    <div className="flex items-center justify-end gap-2">
-                                                                        {boostValue > 0 && (
-                                                                            <span className="text-xs font-bold text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400 px-1.5 py-0.5 rounded-sm whitespace-nowrap">
-                                                                                +{boostValue >= 1 ? boostValue.toFixed(1) : boostValue.toFixed(2)}
-                                                                            </span>
-                                                                        )}
-                                                                        <div className="flex items-baseline justify-end gap-1 min-w-[60px] text-right">
-                                                                            <span className="text-base font-bold tabular-nums tracking-tight text-foreground">
-                                                                                {typeof value === 'number' ? (value >= 1 ? value.toFixed(1) : value.toFixed(2)) : value}
-                                                                            </span>
-                                                                            <span className="text-xs font-medium text-muted-foreground w-[14px]">{unit}</span>
+                                                                        <div className="flex items-center justify-end gap-2">
+                                                                            {boostValue > 0 && (
+                                                                                <span className="text-xs font-bold text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400 px-1.5 py-0.5 rounded-sm whitespace-nowrap">
+                                                                                    +{boostValue >= 1 ? boostValue.toFixed(1) : boostValue.toFixed(2)}
+                                                                                </span>
+                                                                            )}
+                                                                            <div className="flex items-baseline justify-end gap-1 min-w-[60px] text-right">
+                                                                                <span className="text-base font-bold tabular-nums tracking-tight text-foreground">
+                                                                                    {typeof value === 'number' ? (value >= 1 ? value.toFixed(1) : value.toFixed(2)) : value}
+                                                                                </span>
+                                                                                <span className="text-xs font-medium text-muted-foreground w-[14px]">{unit}</span>
+                                                                            </div>
                                                                         </div>
                                                                     </div>
-                                                                </div>
-                                                            );
-                                                        })}
+                                                                );
+                                                            })}
+                                                        </div>
                                                     </div>
+                                                );
+                                            };
+
+                                            return (
+                                                <div className="space-y-10 mt-6 pt-8 border-t border-border">
+                                                    <NutrientGrid nutrients={electrolytes} title="Electrolytes" />
+                                                    <NutrientGrid nutrients={traceMinerals} title="Trace Minerals" />
+                                                    <NutrientGrid nutrients={vitamins} title="Vitamins" />
+                                                    <NutrientGrid nutrients={other} title="Other Essential Nutrients" />
                                                 </div>
                                             );
-                                        };
-
-                                        return (
-                                            <div className="space-y-10 mt-6 pt-8 border-t border-border">
-                                                <NutrientGrid nutrients={electrolytes} title="Electrolytes" />
-                                                <NutrientGrid nutrients={traceMinerals} title="Trace Minerals" />
-                                                <NutrientGrid nutrients={vitamins} title="Vitamins" />
-                                                <NutrientGrid nutrients={other} title="Other Essential Nutrients" />
-                                            </div>
-                                        );
-                                    })()}
+                                        })()}
+                                    </div>
+                                );
+                            })() : (
+                                <div className="p-12 text-center text-muted-foreground">
+                                    No detailed nutritional data available for this recipe.
                                 </div>
-                            );
-                        })() : (
-                            <div className="p-12 text-center text-muted-foreground">
-                                No detailed nutritional data available for this recipe.
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
         </main >
     );
 }

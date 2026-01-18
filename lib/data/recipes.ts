@@ -21,4 +21,5 @@ export interface Recipe {
     prepTime: number; // in minutes
     ingredients: Ingredient[];
     instructions: string[];
+    servings?: number;
 }
