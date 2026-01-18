@@ -17,7 +17,7 @@ const journeySteps = [
     name: 'Next: We Grow',
     description: 'Our own sustainable moringa farm',
     detail:
-      "With your help, we'll establish our own moringa plantation — giving us full control over the process and the ability to scale our impact exponentially.",
+      "With your help, we are looking forward to establishing our own moringa plantation — giving us full control over the process and the ability to scale our impact exponentially.",
     image: '/moringa-tree-farm-plantation-sustainable-agricultu.jpg',
   },
   {
