@@ -975,6 +975,21 @@ export default function MealPlannerPage() {
                                 </div>
                             </div>
 
+                            {/* Total Weight Display */}
+                            {(() => {
+                                const totalWeight = selectedRecipe.ingredients.reduce((acc, ing) => acc + (ing.weightG || 0), 0) * (selectedRecipe.servings || 1) + recipeMoringaGrams;
+                                if (totalWeight > 0) {
+                                    return (
+                                        <div className="mt-4 flex items-center justify-center gap-2 py-1.5 px-3 bg-primary/5 border border-primary/10 rounded-full w-fit mx-auto animate-in fade-in zoom-in-95 duration-300">
+                                            <Activity className="h-3.5 w-3.5 text-primary" />
+                                            <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Total Serving Weight:</span>
+                                            <span className="text-sm font-black text-primary">{Math.round(totalWeight)}g</span>
+                                        </div>
+                                    );
+                                }
+                                return null;
+                            })()}
+
                             {/* Detailed Nutrition Expandable Section */}
                             {showRecipeNutrients && plan?.recipeMicronutrients?.[selectedRecipe.id] && (() => {
                                 const m = { ...plan?.recipeMicronutrients[selectedRecipe.id] };

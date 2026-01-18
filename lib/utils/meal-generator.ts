@@ -104,7 +104,8 @@ export const getRandomRecipeByType = async (
                         item: i.item,
                         amount: i.amount,
                         isMiracleProduct: i.is_miracle_product,
-                        baseIngredient: i.base_ingredient
+                        baseIngredient: i.base_ingredient,
+                        weightG: i.weight_g
                     })),
                     instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
                     servings: 1
@@ -207,7 +208,8 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
                 item: i.item,
                 amount: i.amount,
                 isMiracleProduct: i.is_miracle_product,
-                baseIngredient: i.base_ingredient
+                baseIngredient: i.base_ingredient,
+                weightG: i.weight_g
             })),
             instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
             servings: 1
