@@ -187,7 +187,7 @@ const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onClick, onRegenerate }: {
                         onClick?.();
                     }}
                 >
-                    View Recipe & Nutrition
+                    View Recipe
                     <ChevronRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-0.5" />
                 </button>
                 {onRegenerate && (
@@ -749,7 +749,7 @@ export default function MealPlannerPage() {
                                                 className="flex-1 gap-2"
                                             >
                                                 <ChevronDown className={cn("h-4 w-4 transition-transform", showDailyNutrients && "rotate-180")} />
-                                                {showDailyNutrients ? "Hide" : "Show"} Micronutrients
+                                                {showDailyNutrients ? "Hide" : "Show"} Nutrients
                                             </Button>
                                             <Button onClick={() => setStep(1)} className="flex-1 gap-2">
                                                 Start Over
