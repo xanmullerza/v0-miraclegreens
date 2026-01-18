@@ -1088,16 +1088,16 @@ export default function MealPlannerPage() {
 
                                                             return (
                                                                 <div key={label} className={cn(
-                                                                    "group flex items-center gap-1.5 py-1 px-1.5 transition-all rounded hover:bg-muted/50",
+                                                                    "group flex items-center gap-2 py-1.5 px-2 transition-all rounded hover:bg-muted/50",
                                                                     idx % 2 === 0 ? "bg-muted/5" : "bg-transparent",
                                                                     boostValue > 0 ? "bg-green-500/5 ring-1 ring-inset ring-green-500/20" : ""
                                                                 )}>
-                                                                    <div className="flex items-center gap-1.5">
-                                                                        <span className="text-xs font-bold text-foreground/80 uppercase tracking-tight whitespace-nowrap">{label}</span>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-sm font-medium text-foreground/90 uppercase tracking-tight whitespace-nowrap">{label}</span>
                                                                         {percentage !== null && (
                                                                             <span className={cn(
-                                                                                "text-[9px] font-black px-1 py-px rounded leading-none",
-                                                                                percentage >= 100 ? "bg-green-500 text-white" : "bg-primary/10 text-primary"
+                                                                                "text-[10px] px-1.5 py-0.5 rounded-sm leading-none",
+                                                                                percentage >= 100 ? "bg-green-500 text-white" : "bg-primary/5 text-primary/70"
                                                                             )}>
                                                                                 {percentage}%
                                                                             </span>
@@ -1107,17 +1107,17 @@ export default function MealPlannerPage() {
                                                                     {/* Dotted Leader */}
                                                                     <div className="flex-1 border-b border-dotted border-border/40 mb-1 group-hover:border-primary/20 transition-colors" />
 
-                                                                    <div className="flex items-center justify-end gap-1.5">
+                                                                    <div className="flex items-center justify-end gap-2">
                                                                         {boostValue > 0 && (
-                                                                            <span className="text-[9px] font-bold text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400 px-1 rounded-sm whitespace-nowrap">
+                                                                            <span className="text-[10px] font-bold text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400 px-1.5 py-0.5 rounded-sm whitespace-nowrap">
                                                                                 +{boostValue >= 1 ? boostValue.toFixed(1) : boostValue.toFixed(2)}
                                                                             </span>
                                                                         )}
-                                                                        <div className="flex items-baseline justify-end gap-0.5 min-w-[50px] text-right">
-                                                                            <span className="text-sm font-mono font-black tabular-nums tracking-tighter text-foreground">
+                                                                        <div className="flex items-baseline justify-end gap-1 min-w-[60px] text-right">
+                                                                            <span className="text-base font-bold tabular-nums tracking-tight text-foreground">
                                                                                 {typeof value === 'number' ? (value >= 1 ? value.toFixed(1) : value.toFixed(2)) : value}
                                                                             </span>
-                                                                            <span className="text-[9px] font-bold text-muted-foreground w-[12px]">{unit}</span>
+                                                                            <span className="text-[10px] font-medium text-muted-foreground w-[14px]">{unit}</span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
