@@ -816,7 +816,7 @@ export default function MealPlannerPage() {
                                             return (
                                                 <div className="space-y-2">
                                                     <h4 className="font-bold text-sm text-foreground border-b border-primary/10 pb-1">{title}</h4>
-                                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
                                                         {filtered.map(([label, value]) => {
                                                             let unit = 'mg';
                                                             const labelLower = label.toLowerCase();
