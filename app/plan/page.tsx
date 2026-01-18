@@ -884,14 +884,14 @@ export default function MealPlannerPage() {
                     }}
                 >
                     <div
-                        className="bg-background rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+                        className="bg-background rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Header */}
                         <div className="sticky top-0 bg-green-700 text-white p-6 flex justify-between items-start z-10 rounded-t-2xl shadow-md">
                             <div className="flex-1">
-                                <h2 className="text-2xl font-bold mb-1">Complete Nutritional Information</h2>
-                                <p className="text-green-100 opacity-90">{nutritionRecipe.title}</p>
+                                <h2 className="text-xl font-bold mb-1">Nutritional Info</h2>
+                                <p className="text-green-100 opacity-90 text-sm">{nutritionRecipe.title}</p>
                             </div>
                             <button
                                 onClick={() => {
@@ -929,54 +929,36 @@ export default function MealPlannerPage() {
                             }
 
                             return (
-                                <div className="p-6 space-y-6">
+                                <div className="p-5 space-y-6">
                                     {/* Moringa Boost Selector */}
-                                    <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 p-5 rounded-xl flex flex-col sm:flex-row sm:items-center gap-6 transition-all">
+                                    <div className="bg-green-50 dark:bg-green-900/10 border border-green-200 dark:border-green-900/30 p-4 rounded-xl flex flex-col gap-4 transition-all">
 
                                         <div className="flex-1">
-                                            <div className="font-bold text-green-800 dark:text-green-300 flex items-center gap-2 mb-1">
-                                                ✨ Miracle Boost: Moringa Powder
+                                            <div className="font-bold text-green-800 dark:text-green-300 flex items-center flex-wrap gap-2 mb-1">
+                                                ✨ Miracle Boost
                                                 {moringaSpoons > 0 && (
                                                     <span className="text-xs bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200 px-2 py-0.5 rounded-full">
                                                         +{moringaSpoons} tsp ({moringaSpoons * 2}g)
                                                     </span>
                                                 )}
                                             </div>
-                                            <p className="text-sm text-green-700 dark:text-green-400">
-                                                Need a nutritional boost? Add multiple spoons to supercharge this meal.
+                                            <p className="text-xs text-green-700 dark:text-green-400">
+                                                Add moringa to supercharge this meal.
                                             </p>
                                         </div>
 
-                                        <div className="flex flex-col items-center gap-3">
-                                            {/* Interactive Spoons */}
-                                            <div className="flex items-center gap-1">
-                                                {[1, 2, 3, 4, 5].map((num) => (
+                                        <div className="flex items-center gap-2 w-full">
+                                            <div className="flex items-center bg-white dark:bg-black/20 rounded-lg p-1 border border-green-200 dark:border-green-800 flex-1 justify-between">
+                                                {[0, 1, 2, 3].map(spoons => (
                                                     <button
-                                                        key={num}
-                                                        onClick={() => setMoringaSpoons(num === moringaSpoons ? num - 1 : num)}
-                                                        className={`p-2 rounded-full transition-all transform hover:scale-110 ${num <= moringaSpoons
-                                                            ? 'text-green-600 bg-green-200 dark:bg-green-800 scale-105 ring-2 ring-green-500 ring-offset-2 dark:ring-offset-black'
-                                                            : 'text-gray-300 hover:text-green-400'
+                                                        key={spoons}
+                                                        onClick={() => setMoringaSpoons(spoons)}
+                                                        className={`w-8 h-8 rounded-md flex items-center justify-center text-sm font-bold transition-all ${moringaSpoons === spoons
+                                                            ? 'bg-green-600 text-white shadow-sm'
+                                                            : 'hover:bg-green-100 dark:hover:bg-green-900/40 text-green-700 dark:text-green-400'
                                                             }`}
-                                                        title={`Add ${num} teaspoon${num > 1 ? 's' : ''}`}
                                                     >
-                                                        {/* Spoon SVG Icon */}
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            width="24"
-                                                            height="24"
-                                                            viewBox="0 0 24 24"
-                                                            fill="currentColor"
-                                                            stroke="currentColor"
-                                                            strokeWidth="1.5"
-                                                            strokeLinecap="round"
-                                                            strokeLinejoin="round"
-                                                        >
-                                                            <path d="M3 21c0-2.5 1.5-5 4-5s4 2.5 4 5" fill="none" />
-                                                            <path d="M11 16a4 4 0 0 0-8 0v-1a4 4 0 0 1 8 0v1z" />
-                                                            <line x1="7" y1="11" x2="17" y2="3" />
-                                                            <path d="M15 5l2 2" strokeWidth="2" />
-                                                        </svg>
+                                                        {spoons > 0 ? spoons : '-'}
                                                     </button>
                                                 ))}
                                             </div>
@@ -984,35 +966,35 @@ export default function MealPlannerPage() {
                                             {/* Main Action Button */}
                                             <button
                                                 onClick={() => setMoringaSpoons(prev => Math.min(prev + 1, 5))}
-                                                className="w-full bg-green-600 hover:bg-green-700 text-white text-xs font-bold py-1.5 px-4 rounded-full shadow-sm transition-colors flex items-center justify-center gap-1"
+                                                className="bg-green-600 hover:bg-green-700 text-white text-xs font-bold h-10 px-4 rounded-lg shadow-sm transition-colors whitespace-nowrap"
                                             >
-                                                Boost +1 Spoon
+                                                +1 Spoon
                                             </button>
                                         </div>
                                     </div>
 
                                     {/* Macronutrients */}
                                     <div>
-                                        <h3 className="font-semibold text-lg mb-3">Macronutrients</h3>
-                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                            <div className="p-4 bg-muted rounded-lg relative overflow-hidden group">
-                                                {moringaSpoons > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-2 py-1 rounded-bl-lg font-bold">+{(MORINGA_TSP.energy_kj * moringaSpoons).toFixed(0)} kJ</div>}
-                                                <div className="text-sm text-muted-foreground mb-1">Energy</div>
-                                                <div className={`text-xl font-bold transition-colors ${moringaSpoons > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.energy_kj.toFixed(0)} kJ</div>
+                                        <h3 className="font-semibold text-base mb-3">Macronutrients</h3>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="p-3 bg-muted rounded-lg relative overflow-hidden group">
+                                                {moringaSpoons > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{(MORINGA_TSP.energy_kj * moringaSpoons).toFixed(0)}</div>}
+                                                <div className="text-xs text-muted-foreground mb-0.5">Energy</div>
+                                                <div className={`text-lg font-bold transition-colors ${moringaSpoons > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.energy_kj.toFixed(0)} kJ</div>
                                             </div>
-                                            <div className="p-4 bg-muted rounded-lg relative overflow-hidden">
-                                                {moringaSpoons > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-2 py-1 rounded-bl-lg font-bold">+{(MORINGA_TSP.protein_g * moringaSpoons).toFixed(1)}g</div>}
-                                                <div className="text-sm text-muted-foreground mb-1">Protein</div>
-                                                <div className={`text-xl font-bold transition-colors ${moringaSpoons > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.protein_g.toFixed(1)}g</div>
+                                            <div className="p-3 bg-muted rounded-lg relative overflow-hidden">
+                                                {moringaSpoons > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{(MORINGA_TSP.protein_g * moringaSpoons).toFixed(1)}</div>}
+                                                <div className="text-xs text-muted-foreground mb-0.5">Protein</div>
+                                                <div className={`text-lg font-bold transition-colors ${moringaSpoons > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.protein_g.toFixed(1)}g</div>
                                             </div>
-                                            <div className="p-4 bg-muted rounded-lg relative overflow-hidden">
-                                                {moringaSpoons > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-xs px-2 py-1 rounded-bl-lg font-bold">+{(MORINGA_TSP.carbs_g * moringaSpoons).toFixed(1)}g</div>}
-                                                <div className="text-sm text-muted-foreground mb-1">Carbohydrates</div>
-                                                <div className={`text-xl font-bold transition-colors ${moringaSpoons > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.carbs_g.toFixed(1)}g</div>
+                                            <div className="p-3 bg-muted rounded-lg relative overflow-hidden group">
+                                                {moringaSpoons > 0 && <div className="absolute top-0 right-0 bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-bl-lg font-bold">+{(MORINGA_TSP.carbs_g * moringaSpoons).toFixed(1)}</div>}
+                                                <div className="text-xs text-muted-foreground mb-0.5">Carbs</div>
+                                                <div className={`text-lg font-bold transition-colors ${moringaSpoons > 0 ? 'text-green-600 dark:text-green-400' : ''}`}>{current.carbs_g.toFixed(1)}g</div>
                                             </div>
-                                            <div className="p-4 bg-muted rounded-lg relative overflow-hidden">
-                                                <div className="text-sm text-muted-foreground mb-1">Fat</div>
-                                                <div className="text-xl font-bold">{current.fat_g.toFixed(1)}g</div>
+                                            <div className="p-3 bg-muted rounded-lg relative overflow-hidden">
+                                                <div className="text-xs text-muted-foreground mb-0.5">Fat</div>
+                                                <div className="text-lg font-bold">{current.fat_g.toFixed(1)}g</div>
                                             </div>
                                         </div>
                                     </div>
@@ -1082,10 +1064,9 @@ export default function MealPlannerPage() {
                                             if (filtered.length === 0) return null;
 
                                             return (
-                                                <div className="space-y-3">
-                                                    <h4 className="font-black text-xs text-foreground uppercase tracking-wider border-b-2 border-primary/10 pb-1.5 flex justify-between items-center">
+                                                <div className="space-y-3 w-full max-w-[340px]">
+                                                    <h4 className="font-black text-xs text-foreground uppercase tracking-wider border-b-2 border-primary/10 pb-1.5 flex items-center">
                                                         <span>{title}</span>
-                                                        <span className="text-[9px] font-bold text-muted-foreground/50 bg-muted px-1.5 py-0.5 rounded">ITEMIZED RECEIPT</span>
                                                     </h4>
                                                     <div className="flex flex-col gap-px">
                                                         {filtered.map(([label, value], idx) => {
@@ -1107,7 +1088,7 @@ export default function MealPlannerPage() {
 
                                                             return (
                                                                 <div key={label} className={cn(
-                                                                    "group flex items-center gap-2 py-1 px-2 transition-all rounded hover:bg-muted/50",
+                                                                    "group flex items-center gap-1.5 py-1 px-1.5 transition-all rounded hover:bg-muted/50",
                                                                     idx % 2 === 0 ? "bg-muted/5" : "bg-transparent",
                                                                     boostValue > 0 ? "bg-green-500/5 ring-1 ring-inset ring-green-500/20" : ""
                                                                 )}>
@@ -1132,7 +1113,7 @@ export default function MealPlannerPage() {
                                                                                 +{boostValue >= 1 ? boostValue.toFixed(1) : boostValue.toFixed(2)}
                                                                             </span>
                                                                         )}
-                                                                        <div className="flex items-baseline justify-end gap-0.5 min-w-[60px] text-right">
+                                                                        <div className="flex items-baseline justify-end gap-0.5 min-w-[50px] text-right">
                                                                             <span className="text-sm font-mono font-black tabular-nums tracking-tighter text-foreground">
                                                                                 {typeof value === 'number' ? (value >= 1 ? value.toFixed(1) : value.toFixed(2)) : value}
                                                                             </span>
