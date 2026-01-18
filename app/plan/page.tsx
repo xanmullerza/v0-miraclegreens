@@ -1082,12 +1082,12 @@ export default function MealPlannerPage() {
                                             if (filtered.length === 0) return null;
 
                                             return (
-                                                <div className="space-y-4">
-                                                    <h4 className="font-bold text-sm text-primary uppercase tracking-wider border-b border-primary/20 pb-2 flex justify-between items-center">
+                                                <div className="space-y-3">
+                                                    <h4 className="font-black text-xs text-foreground uppercase tracking-wider border-b-2 border-primary/10 pb-1.5 flex justify-between items-center">
                                                         <span>{title}</span>
-                                                        <span className="text-[10px] opacity-40">ITEMIZED</span>
+                                                        <span className="text-[9px] font-bold text-muted-foreground/50 bg-muted px-1.5 py-0.5 rounded">ITEMIZED RECEIPT</span>
                                                     </h4>
-                                                    <div className="flex flex-col">
+                                                    <div className="flex flex-col gap-px">
                                                         {filtered.map(([label, value], idx) => {
                                                             const mKey = labelsToMoringaKey[label];
                                                             const boostValue = (mKey && moringaSpoons > 0) ? (MORINGA_TSP.micronutrients as any)[mKey] * moringaSpoons : 0;
@@ -1107,31 +1107,36 @@ export default function MealPlannerPage() {
 
                                                             return (
                                                                 <div key={label} className={cn(
-                                                                    "flex items-center gap-2 py-2 px-3 transition-colors rounded-md",
-                                                                    idx % 2 === 0 ? "bg-muted/10" : "bg-transparent",
-                                                                    boostValue > 0 ? "bg-green-500/10 text-green-900 dark:text-green-100 ring-1 ring-green-500/20" : ""
+                                                                    "group flex items-center gap-2 py-1 px-2 transition-all rounded hover:bg-muted/50",
+                                                                    idx % 2 === 0 ? "bg-muted/5" : "bg-transparent",
+                                                                    boostValue > 0 ? "bg-green-500/5 ring-1 ring-inset ring-green-500/20" : ""
                                                                 )}>
-                                                                    <div className="flex flex-col gap-0.5">
-                                                                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-tight whitespace-nowrap">{label}</span>
+                                                                    <div className="flex items-center gap-1.5">
+                                                                        <span className="text-xs font-bold text-foreground/80 uppercase tracking-tight whitespace-nowrap">{label}</span>
                                                                         {percentage !== null && (
-                                                                            <span className="text-[10px] font-black text-primary/60">{percentage}% of daily</span>
+                                                                            <span className={cn(
+                                                                                "text-[9px] font-black px-1 py-px rounded leading-none",
+                                                                                percentage >= 100 ? "bg-green-500 text-white" : "bg-primary/10 text-primary"
+                                                                            )}>
+                                                                                {percentage}%
+                                                                            </span>
                                                                         )}
                                                                     </div>
 
                                                                     {/* Dotted Leader */}
-                                                                    <div className="flex-1 border-b border-dotted border-border/60 mb-1.5" />
+                                                                    <div className="flex-1 border-b border-dotted border-border/40 mb-1 group-hover:border-primary/20 transition-colors" />
 
-                                                                    <div className="flex items-center gap-2">
+                                                                    <div className="flex items-center justify-end gap-1.5">
                                                                         {boostValue > 0 && (
-                                                                            <span className="bg-green-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded shadow-sm">
+                                                                            <span className="text-[9px] font-bold text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400 px-1 rounded-sm whitespace-nowrap">
                                                                                 +{boostValue >= 1 ? boostValue.toFixed(1) : boostValue.toFixed(2)}
                                                                             </span>
                                                                         )}
-                                                                        <div className="flex items-baseline gap-0.5 min-w-[70px] justify-end">
-                                                                            <span className="text-base font-mono font-black tabular-nums tracking-tighter">
+                                                                        <div className="flex items-baseline justify-end gap-0.5 min-w-[60px] text-right">
+                                                                            <span className="text-sm font-mono font-black tabular-nums tracking-tighter text-foreground">
                                                                                 {typeof value === 'number' ? (value >= 1 ? value.toFixed(1) : value.toFixed(2)) : value}
                                                                             </span>
-                                                                            <span className="text-[10px] font-bold opacity-40">{unit}</span>
+                                                                            <span className="text-[9px] font-bold text-muted-foreground w-[12px]">{unit}</span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
