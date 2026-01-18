@@ -19,6 +19,8 @@ export interface DailyPlan {
         fat: number;
     };
     micronutrients: Record<string, number>;
+    // Store individual recipe micronutrients keyed by recipe ID for dynamic recalculation
+    recipeMicronutrients: Record<string, Record<string, number>>;
 }
 
 /**
@@ -29,12 +31,13 @@ const getRandom = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)
 /**
  * Get a random recipe of a specific type (for individual meal regeneration).
  * Optionally exclude a specific recipe ID to ensure variety.
+ * Returns both the recipe and its calculated micronutrients.
  */
 export const getRandomRecipeByType = async (
     mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack',
     diet: DietType,
     excludeId?: string
-): Promise<Recipe | null> => {
+): Promise<{ recipe: Recipe; micronutrients: Record<string, number> } | null> => {
     const { data: recipesData, error } = await supabase
         .from('recipes')
         .select(`
@@ -51,9 +54,11 @@ export const getRandomRecipeByType = async (
         return null;
     }
 
-    // Helper function to calculate nutrition
+    // Helper function to calculate nutrition including micronutrients
     const calculateNutrition = (ingredients: any[]) => {
         let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0;
+        const micronutrients: Record<string, number> = {};
+
         for (const ing of ingredients) {
             if (ing.food_items && ing.weight_g) {
                 const foodItem = ing.food_items;
@@ -62,40 +67,52 @@ export const getRandomRecipeByType = async (
                 totalProtein += (foodItem.protein_g || 0) * ratio;
                 totalCarbs += (foodItem.carbs_g || 0) * ratio;
                 totalFat += (foodItem.fat_g || 0) * ratio;
+
+                // Aggregate micronutrients
+                if (foodItem.micronutrients && typeof foodItem.micronutrients === 'object') {
+                    Object.entries(foodItem.micronutrients).forEach(([key, val]) => {
+                        if (typeof val === 'number') {
+                            micronutrients[key] = (micronutrients[key] || 0) + val * ratio;
+                        }
+                    });
+                }
             }
         }
-        return { calories: totalCalories, protein: totalProtein, carbs: totalCarbs, fat: totalFat };
+        return { calories: totalCalories, protein: totalProtein, carbs: totalCarbs, fat: totalFat, micronutrients };
     };
 
     // Transform and filter
-    const recipes: Recipe[] = recipesData
+    const recipesWithMicro: { recipe: Recipe; micronutrients: Record<string, number> }[] = recipesData
         .filter((r: any) => diet === 'anything' || r.diet.includes(diet))
         .filter((r: any) => r.id !== excludeId) // Exclude current recipe
         .map((r: any) => {
             const calculatedNutrition = calculateNutrition(r.ingredients);
             return {
-                id: r.id,
-                title: r.title,
-                type: r.type,
-                calories: calculatedNutrition.calories || r.calories || 0,
-                protein: calculatedNutrition.protein || r.protein || 0,
-                carbs: calculatedNutrition.carbs || r.carbs || 0,
-                fat: calculatedNutrition.fat || r.fat || 0,
-                diet: r.diet,
-                image: r.image,
-                prepTime: r.prep_time,
-                ingredients: r.ingredients.map((i: any) => ({
-                    item: i.item,
-                    amount: i.amount,
-                    isMiracleProduct: i.is_miracle_product,
-                    baseIngredient: i.base_ingredient
-                })),
-                instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text)
+                recipe: {
+                    id: r.id,
+                    title: r.title,
+                    type: r.type,
+                    calories: calculatedNutrition.calories || r.calories || 0,
+                    protein: calculatedNutrition.protein || r.protein || 0,
+                    carbs: calculatedNutrition.carbs || r.carbs || 0,
+                    fat: calculatedNutrition.fat || r.fat || 0,
+                    diet: r.diet,
+                    image: r.image,
+                    prepTime: r.prep_time,
+                    ingredients: r.ingredients.map((i: any) => ({
+                        item: i.item,
+                        amount: i.amount,
+                        isMiracleProduct: i.is_miracle_product,
+                        baseIngredient: i.base_ingredient
+                    })),
+                    instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text)
+                },
+                micronutrients: calculatedNutrition.micronutrients
             };
         });
 
-    if (recipes.length === 0) return null;
-    return getRandom(recipes);
+    if (recipesWithMicro.length === 0) return null;
+    return getRandom(recipesWithMicro);
 };
 
 /**
@@ -252,6 +269,12 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
         const allRecipeIds = [b.id, l.id, d.id, ...snacks.map(s => s.id)];
         const aggregatedMicro = aggregateMicronutrients(allRecipeIds);
 
+        // Build recipeMicronutrients map for this specific plan
+        const planRecipeMicros: Record<string, Record<string, number>> = {};
+        allRecipeIds.forEach(id => {
+            planRecipeMicros[id] = recipeMicronutrients[id] || {};
+        });
+
         const currentPlan: DailyPlan = {
             breakfast: b,
             lunch: l,
@@ -263,7 +286,8 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
                 carbs: b.carbs + l.carbs + d.carbs + snacks.reduce((acc, s) => acc + s.carbs, 0),
                 fat: b.fat + l.fat + d.fat + snacks.reduce((acc, s) => acc + s.fat, 0),
             },
-            micronutrients: aggregatedMicro
+            micronutrients: aggregatedMicro,
+            recipeMicronutrients: planRecipeMicros
         };
 
         if (diff < minDiff) {

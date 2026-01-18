@@ -342,23 +342,53 @@ export default function MealPlannerPage() {
     const handleRegenerateMeal = async (mealType: 'breakfast' | 'lunch' | 'dinner', currentId: string) => {
         if (!plan) return;
 
-        const newRecipe = await getRandomRecipeByType(mealType, diet, currentId);
-        if (newRecipe) {
+        const result = await getRandomRecipeByType(mealType, diet, currentId);
+        if (result) {
+            const { recipe: newRecipe, micronutrients: newMicros } = result;
+
             setPlan(prevPlan => {
                 if (!prevPlan) return prevPlan;
 
                 const updatedPlan = { ...prevPlan };
+                // Ensure recipeMicronutrients exists (handle legacy state)
+                updatedPlan.recipeMicronutrients = { ...(prevPlan.recipeMicronutrients || {}) };
+
+                // Update the changed meal
                 if (mealType === 'breakfast') updatedPlan.breakfast = newRecipe;
                 else if (mealType === 'lunch') updatedPlan.lunch = newRecipe;
                 else if (mealType === 'dinner') updatedPlan.dinner = newRecipe;
 
+                // Add the new recipe's micros to our storage
+                updatedPlan.recipeMicronutrients[newRecipe.id] = newMicros;
+
                 // Recalculate totals
                 updatedPlan.totalCalories = updatedPlan.breakfast.calories + updatedPlan.lunch.calories + updatedPlan.dinner.calories + updatedPlan.snacks.reduce((acc, s) => acc + s.calories, 0);
+
                 updatedPlan.macros = {
                     protein: updatedPlan.breakfast.protein + updatedPlan.lunch.protein + updatedPlan.dinner.protein + updatedPlan.snacks.reduce((acc, s) => acc + s.protein, 0),
                     carbs: updatedPlan.breakfast.carbs + updatedPlan.lunch.carbs + updatedPlan.dinner.carbs + updatedPlan.snacks.reduce((acc, s) => acc + s.carbs, 0),
                     fat: updatedPlan.breakfast.fat + updatedPlan.lunch.fat + updatedPlan.dinner.fat + updatedPlan.snacks.reduce((acc, s) => acc + s.fat, 0),
                 };
+
+                // Recalculate aggregated micronutrients
+                const newAggregatedMicros: Record<string, number> = {};
+
+                // Helper to add micros
+                const addMicros = (rId: string) => {
+                    const m = updatedPlan.recipeMicronutrients[rId];
+                    if (m) {
+                        Object.entries(m).forEach(([k, v]) => {
+                            newAggregatedMicros[k] = (newAggregatedMicros[k] || 0) + v;
+                        });
+                    }
+                };
+
+                addMicros(updatedPlan.breakfast.id);
+                addMicros(updatedPlan.lunch.id);
+                addMicros(updatedPlan.dinner.id);
+                updatedPlan.snacks.forEach(s => addMicros(s.id));
+
+                updatedPlan.micronutrients = newAggregatedMicros;
 
                 return updatedPlan;
             });
