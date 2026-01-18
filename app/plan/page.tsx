@@ -1065,7 +1065,7 @@ export default function MealPlannerPage() {
 
                                             return (
                                                 <div className="space-y-3 w-full max-w-[340px]">
-                                                    <h4 className="font-black text-xs text-foreground uppercase tracking-wider border-b-2 border-primary/10 pb-1.5 flex items-center">
+                                                    <h4 className="font-black text-xs text-foreground tracking-wide border-b-2 border-primary/10 pb-1.5 flex items-center">
                                                         <span>{title}</span>
                                                     </h4>
                                                     <div className="flex flex-col gap-px">
@@ -1093,10 +1093,10 @@ export default function MealPlannerPage() {
                                                                     boostValue > 0 ? "bg-green-500/5 ring-1 ring-inset ring-green-500/20" : ""
                                                                 )}>
                                                                     <div className="flex items-center gap-2">
-                                                                        <span className="text-sm font-medium text-foreground/90 uppercase tracking-tight whitespace-nowrap">{label}</span>
+                                                                        <span className="text-sm font-medium text-foreground/90 tracking-tight whitespace-nowrap">{label}</span>
                                                                         {percentage !== null && (
                                                                             <span className={cn(
-                                                                                "text-[10px] px-1.5 py-0.5 rounded-sm leading-none",
+                                                                                "text-xs font-bold px-1.5 py-0.5 rounded-sm leading-none",
                                                                                 percentage >= 100 ? "bg-green-500 text-white" : "bg-primary/5 text-primary/70"
                                                                             )}>
                                                                                 {percentage}%
@@ -1109,7 +1109,7 @@ export default function MealPlannerPage() {
 
                                                                     <div className="flex items-center justify-end gap-2">
                                                                         {boostValue > 0 && (
-                                                                            <span className="text-[10px] font-bold text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400 px-1.5 py-0.5 rounded-sm whitespace-nowrap">
+                                                                            <span className="text-xs font-bold text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400 px-1.5 py-0.5 rounded-sm whitespace-nowrap">
                                                                                 +{boostValue >= 1 ? boostValue.toFixed(1) : boostValue.toFixed(2)}
                                                                             </span>
                                                                         )}
@@ -1117,7 +1117,7 @@ export default function MealPlannerPage() {
                                                                             <span className="text-base font-bold tabular-nums tracking-tight text-foreground">
                                                                                 {typeof value === 'number' ? (value >= 1 ? value.toFixed(1) : value.toFixed(2)) : value}
                                                                             </span>
-                                                                            <span className="text-[10px] font-medium text-muted-foreground w-[14px]">{unit}</span>
+                                                                            <span className="text-xs font-medium text-muted-foreground w-[14px]">{unit}</span>
                                                                         </div>
                                                                     </div>
                                                                 </div>
