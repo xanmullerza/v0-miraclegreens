@@ -1165,18 +1165,27 @@ export default function MealPlannerPage() {
                                     <p className="mt-4 text-muted-foreground">Calculating nutrition...</p>
                                 </div>
                             ) : nutritionData ? (() => {
-                                // Calculate current nutrition based on spoon count
+                                // Calculate current nutrition based on servings and spoon count
+                                const servings = nutritionRecipe.servings || 1;
                                 const spoonsRatio = moringaGrams / 2;
-                                const current = moringaGrams > 0 ? {
-                                    energy_kcal: nutritionData.energy_kcal + (MORINGA_TSP.energy_kcal * spoonsRatio),
-                                    energy_kj: nutritionData.energy_kj + (MORINGA_TSP.energy_kj * spoonsRatio),
-                                    protein_g: nutritionData.protein_g + (MORINGA_TSP.protein_g * spoonsRatio),
-                                    carbs_g: nutritionData.carbs_g + (MORINGA_TSP.carbs_g * spoonsRatio),
-                                    fat_g: nutritionData.fat_g + (MORINGA_TSP.fat_g * spoonsRatio),
-                                    micronutrients: { ...nutritionData.micronutrients }
-                                } : { ...nutritionData };
 
-                                // Add moringa micros if shown
+                                const current = {
+                                    energy_kcal: (nutritionData.energy_kcal * servings) + (MORINGA_TSP.energy_kcal * spoonsRatio),
+                                    energy_kj: (nutritionData.energy_kj * servings) + (MORINGA_TSP.energy_kj * spoonsRatio),
+                                    protein_g: (nutritionData.protein_g * servings) + (MORINGA_TSP.protein_g * spoonsRatio),
+                                    carbs_g: (nutritionData.carbs_g * servings) + (MORINGA_TSP.carbs_g * spoonsRatio),
+                                    fat_g: (nutritionData.fat_g * servings) + (MORINGA_TSP.fat_g * spoonsRatio),
+                                    micronutrients: {} as Record<string, number>
+                                };
+
+                                // Scale base micronutrients
+                                Object.entries(nutritionData.micronutrients || {}).forEach(([key, value]) => {
+                                    if (typeof value === 'number') {
+                                        current.micronutrients[key] = value * servings;
+                                    }
+                                });
+
+                                // Add moringa boost micros
                                 if (moringaGrams > 0) {
                                     for (const [key, value] of Object.entries(MORINGA_TSP.micronutrients)) {
                                         current.micronutrients[key] = (current.micronutrients[key] || 0) + (value * spoonsRatio);
@@ -1358,7 +1367,7 @@ export default function MealPlannerPage() {
                                                                 // Calculate RDA percentage
                                                                 const rdaValue = userRDAs?.[label];
                                                                 const percentage = (rdaValue && typeof value === 'number')
-                                                                    ? Math.round(((value + boostValue) / rdaValue) * 100)
+                                                                    ? Math.round((value / rdaValue) * 100)
                                                                     : null;
 
                                                                 return (
