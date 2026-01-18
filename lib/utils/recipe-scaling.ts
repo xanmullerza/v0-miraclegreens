@@ -7,20 +7,16 @@ export function scaleIngredient(amount: string, factor: number): string {
     if (factor === 1) return amount;
     if (!amount) return "";
 
-    // Regex to find the leading number (integer, decimal, or fraction)
-    // Matches: "1.5", "1", "1/2", "1 1/2"
-    const numberRegex = /^(\d+(\.\d+)?|\d+\/\d+|\d+\s+\d+\/\d+)\s*(.*)$/;
-    const match = amount.trim().match(numberRegex);
+    // Regex to find all numbers (integer, decimal, or fraction)
+    // Matches: "1 1/2", "1/2", "1.5", "1"
+    const numRegex = /(\d+\s+\d+\/\d+|\d+\/\d+|\d+(\.\d+)?)/g;
 
-    if (match) {
-        const numericPart = match[1];
-        const textPart = match[3];
-
+    return amount.replace(numRegex, (match) => {
         let value = 0;
 
-        if (numericPart.includes('/')) {
+        if (match.includes('/')) {
             // Handle fractions like "1/2" or "1 1/2"
-            const parts = numericPart.split(' ');
+            const parts = match.split(/\s+/);
             if (parts.length === 2) {
                 // "1 1/2"
                 value = parseFloat(parts[0]) + parseFraction(parts[1]);
@@ -29,22 +25,16 @@ export function scaleIngredient(amount: string, factor: number): string {
                 value = parseFraction(parts[0]);
             }
         } else {
-            value = parseFloat(numericPart);
+            value = parseFloat(match);
         }
 
         if (!isNaN(value)) {
             const newValue = value * factor;
-            // Format nicely (e.g. 1.5 instead of 1.500000)
-            const formattedValue = formatNumber(newValue);
-            return `${formattedValue} ${textPart}`;
+            return formatNumber(newValue);
         }
-    }
 
-    // Fallback: If no leading number found (e.g. "Salt to taste"), verify if we can find a number embedded?
-    // Usually recipes are "Quantity Unit Item". The 'amount' field in this app seems to be just the quantity+unit part or similar.
-    // Based on previous view_file, 'amount' is mapped from DB.
-
-    return amount;
+        return match;
+    });
 }
 
 function parseFraction(fraction: string): number {
