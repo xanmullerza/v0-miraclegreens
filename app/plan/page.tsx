@@ -68,21 +68,34 @@ const formatEnergy = (calories: number, unit: UnitType) => {
     return `${calories.toLocaleString()} kcal`;
 };
 
-const getPercentageColor = (percentage: number, label?: string) => {
-    // Reverse logic for limits (like Sodium)
-    if (label?.toLowerCase().includes('sodium')) {
-        if (percentage <= 25) return "bg-green-500 text-white";
-        if (percentage <= 50) return "bg-blue-500 text-white";
-        if (percentage <= 75) return "bg-yellow-400 text-black";
-        if (percentage <= 100) return "bg-orange-500 text-white";
-        return "bg-red-500 text-white";
+const getNutrientLevelStyles = (percentage: number, label?: string) => {
+    const isLimit = label?.toLowerCase().includes('sodium') || label?.toLowerCase().includes('fat') || label?.toLowerCase().includes('sugar');
+
+    let color: 'green' | 'blue' | 'yellow' | 'orange' | 'red' = 'red';
+
+    if (isLimit) {
+        if (percentage <= 25) color = 'green';
+        else if (percentage <= 50) color = 'blue';
+        else if (percentage <= 75) color = 'yellow';
+        else if (percentage <= 100) color = 'orange';
+        else color = 'red';
+    } else {
+        if (percentage >= 100) color = 'green';
+        else if (percentage >= 75) color = 'blue';
+        else if (percentage >= 50) color = 'yellow';
+        else if (percentage >= 25) color = 'orange';
+        else color = 'red';
     }
 
-    if (percentage >= 100) return "bg-green-500 text-white";
-    if (percentage >= 75) return "bg-blue-500 text-white";
-    if (percentage >= 50) return "bg-yellow-400 text-black";
-    if (percentage >= 25) return "bg-orange-500 text-white";
-    return "bg-red-500 text-white";
+    const map = {
+        green: { bg: 'bg-green-500', border: 'border-green-500', borderLight: 'border-green-500/30', text: 'text-green-600', textFill: 'text-white', fade: 'bg-green-50' },
+        blue: { bg: 'bg-blue-500', border: 'border-blue-500', borderLight: 'border-blue-500/30', text: 'text-blue-600', textFill: 'text-white', fade: 'bg-blue-50' },
+        yellow: { bg: 'bg-yellow-400', border: 'border-yellow-400', borderLight: 'border-yellow-400/30', text: 'text-yellow-700', textFill: 'text-black', fade: 'bg-yellow-50' },
+        orange: { bg: 'bg-orange-500', border: 'border-orange-500', borderLight: 'border-orange-500/30', text: 'text-orange-600', textFill: 'text-white', fade: 'bg-orange-50' },
+        red: { bg: 'bg-red-500', border: 'border-red-500', borderLight: 'border-red-500/30', text: 'text-red-600', textFill: 'text-white', fade: 'bg-red-50' },
+    };
+
+    return map[color];
 };
 
 // --- COMPONENTS ---
@@ -813,11 +826,15 @@ export default function MealPlannerPage() {
 
                                                             const rdaValue = userRDAs?.[label];
                                                             const percentage = rdaValue ? Math.round((value / rdaValue) * 100) : null;
+                                                            const styles = getNutrientLevelStyles(percentage || 0, label);
 
                                                             return (
-                                                                <div key={label} className="flex flex-col justify-between gap-1 p-3 bg-background rounded-xl border border-border/50 hover:border-primary/20 transition-colors shadow-sm">
+                                                                <div key={label} className={cn(
+                                                                    "flex flex-col justify-between gap-1 p-3 rounded-xl border transition-all shadow-sm hover:shadow-md group/card",
+                                                                    percentage !== null ? `${styles.borderLight} ${styles.fade}` : "bg-background border-border/50"
+                                                                )}>
                                                                     <div className="min-w-0">
-                                                                        <p className="text-[10px] uppercase font-bold text-muted-foreground truncate tracking-tight">{label}</p>
+                                                                        <p className="text-[10px] uppercase font-bold text-muted-foreground truncate tracking-tight group-hover/card:text-foreground transition-colors">{label}</p>
                                                                         <div className="flex items-baseline flex-wrap gap-x-1">
                                                                             <span className="text-sm font-black">
                                                                                 {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
@@ -834,15 +851,16 @@ export default function MealPlannerPage() {
                                                                         <div className="mt-2 space-y-1.5">
                                                                             <div className="flex items-center justify-between text-[10px] font-black">
                                                                                 <span className={cn(
-                                                                                    "px-1 rounded-sm",
-                                                                                    getPercentageColor(percentage, label)
+                                                                                    "px-1.5 py-0.5 rounded-[4px] shadow-sm",
+                                                                                    styles.bg,
+                                                                                    styles.textFill
                                                                                 )}>
                                                                                     {percentage}%
                                                                                 </span>
                                                                             </div>
-                                                                            <div className="w-full bg-muted rounded-full h-1.5 overflow-hidden">
+                                                                            <div className="w-full bg-muted/50 rounded-full h-2 overflow-hidden border border-black/5">
                                                                                 <div
-                                                                                    className={cn("h-full transition-all duration-1000 ease-out", getPercentageColor(percentage, label).split(' ')[0])}
+                                                                                    className={cn("h-full transition-all duration-1000 ease-out shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]", styles.bg)}
                                                                                     style={{ width: `${Math.min(100, percentage)}%` }}
                                                                                 />
                                                                             </div>
@@ -1089,17 +1107,25 @@ export default function MealPlannerPage() {
 
                                                     const rdaValue = userRDAs?.[label];
                                                     const percentage = rdaValue ? Math.round((value / rdaValue) * 100) : null;
+                                                    const styles = getNutrientLevelStyles(percentage || 0, label);
 
                                                     return (
-                                                        <div key={label} className="flex items-center justify-between gap-1 p-2 bg-background rounded-lg border border-border/40 shadow-sm">
+                                                        <div key={label} className={cn(
+                                                            "flex items-center justify-between gap-1 p-2 rounded-lg border shadow-sm transition-all",
+                                                            percentage !== null ? `${styles.borderLight} ${styles.fade}` : "bg-background border-border/40"
+                                                        )}>
                                                             <div className="min-w-0">
-                                                                <p className="text-[10px] text-muted-foreground truncate font-medium">{label}</p>
-                                                                <p className="text-xs font-black tabular-nums">{value >= 1 ? value.toFixed(1) : value.toFixed(2)}<span className="ml-0.5 font-medium text-[10px] opacity-70">{u}</span></p>
+                                                                <p className="text-[10px] text-muted-foreground truncate font-semibold">{label}</p>
+                                                                <p className="text-xs font-black tabular-nums">
+                                                                    {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
+                                                                    <span className="ml-0.5 font-medium text-[10px] opacity-70">{u}</span>
+                                                                </p>
                                                             </div>
                                                             {percentage !== null && (
                                                                 <span className={cn(
-                                                                    "text-[10px] font-black px-1.5 py-0.5 rounded-[3px] shrink-0",
-                                                                    getPercentageColor(percentage, label)
+                                                                    "text-[10px] font-black px-1.5 py-0.5 rounded-[4px] shadow-sm",
+                                                                    styles.bg,
+                                                                    styles.textFill
                                                                 )}>
                                                                     {percentage}%
                                                                 </span>
