@@ -81,21 +81,20 @@ const formatEnergy = (calories: number, unit: UnitType) => {
 };
 
 const getNutrientLevelStyles = (percentage: number, label?: string) => {
-    const isLimit = label?.toLowerCase().includes('sodium') || label?.toLowerCase().includes('fat') || label?.toLowerCase().includes('sugar');
+    const isLimit = label?.toLowerCase().includes('sodium') || label?.toLowerCase().includes('sugar');
 
     let color: 'green' | 'blue' | 'yellow' | 'orange' | 'red' = 'red';
 
     if (isLimit) {
-        if (percentage <= 25) color = 'green';
-        else if (percentage <= 50) color = 'blue';
-        else if (percentage <= 75) color = 'yellow';
+        if (percentage <= 75) color = 'green';
+        else if (percentage <= 90) color = 'yellow';
         else if (percentage <= 100) color = 'orange';
         else color = 'red';
     } else {
         if (percentage >= 100) color = 'green';
-        else if (percentage >= 75) color = 'blue';
-        else if (percentage >= 50) color = 'yellow';
-        else if (percentage >= 25) color = 'orange';
+        else if (percentage >= 85) color = 'blue';
+        else if (percentage >= 70) color = 'yellow';
+        else if (percentage >= 50) color = 'orange';
         else color = 'red';
     }
 
