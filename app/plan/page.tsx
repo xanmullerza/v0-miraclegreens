@@ -61,7 +61,7 @@ const showShop = false;
 const BOOSTABLE_NUTRIENTS = [
     'Potassium', 'Magnesium', 'Calcium', 'Sodium', 'Iron',
     'Vitamin A', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)',
-    'Vitamin C', 'Fiber'
+    'Vitamin C', 'Fiber', 'Energy', 'Protein', 'Carbs', 'Fat'
 ];
 
 // --- HELPERS ---
@@ -789,8 +789,22 @@ export default function MealPlannerPage() {
                                                                         <macro.icon className={cn("h-4 w-4", macro.color)} />
                                                                         <span className="text-[10px] uppercase font-semibold text-foreground tracking-widest">{macro.label}</span>
                                                                     </div>
-                                                                    <div className="text-green-600 bg-green-50 rounded-full p-1 transition-all">
-                                                                        <Info className="h-4 w-4" />
+                                                                    <div className="flex items-center gap-1">
+                                                                        {BOOSTABLE_NUTRIENTS.includes(macro.label) && (
+                                                                            <button
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    setActiveBoostContext('daily');
+                                                                                }}
+                                                                                className="text-green-600 hover:text-green-700 bg-green-50 rounded-full p-1 transition-all border border-green-100 hover:scale-110 active:scale-95"
+                                                                                title="Add Miracle Boost"
+                                                                            >
+                                                                                <Sparkles className="h-4 w-4" />
+                                                                            </button>
+                                                                        )}
+                                                                        <div className="text-primary/40 bg-muted/50 rounded-full p-1 transition-all hover:text-primary hover:bg-primary/5">
+                                                                            <Info className="h-4 w-4" />
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                                 <div
