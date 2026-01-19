@@ -777,9 +777,20 @@ export default function MealPlannerPage() {
                                                                 )}
                                                                 onClick={isEnergy ? () => setUnit(unit === 'kcal' ? 'kJ' : 'kcal') : undefined}
                                                             >
-                                                                <div className="flex items-center gap-2 mb-2">
-                                                                    <macro.icon className={cn("h-4 w-4", macro.color)} />
-                                                                    <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-widest">{macro.label}</span>
+                                                                <div className="flex items-center justify-between gap-2 mb-2">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <macro.icon className={cn("h-4 w-4", macro.color)} />
+                                                                        <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-widest">{macro.label}</span>
+                                                                    </div>
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            setSelectedNutrientInfo(macro.label);
+                                                                        }}
+                                                                        className="text-muted-foreground/50 hover:text-primary transition-colors"
+                                                                    >
+                                                                        <Info className="h-3 w-3" />
+                                                                    </button>
                                                                 </div>
                                                                 <div className="flex items-baseline gap-1 mb-1">
                                                                     <span className="text-xl font-bold">

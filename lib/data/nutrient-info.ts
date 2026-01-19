@@ -207,5 +207,39 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         benefits: ["Digestive health", "Cholesterol control", "Blood sugar regulation", "Weight management"],
         deficiencySigns: ["Constipation", "Weight gain", "Blood sugar fluctuations", "Nausea/Tiredness"],
         sources: ["Whole grains", "Fruits", "Vegetables", "Beans", "Legumes"]
+    },
+
+    // Macros
+    'Energy': {
+        description: "The fuel your body needs to function, measured in calories or kilojoules.",
+        history: "The concept of calorie as a unit of heat was first introduced by Nicolas Clément in 1824.",
+        importance: "Provides the energy necessary for all biological processes, from breathing to strenuous exercise.",
+        benefits: ["Powers all body functions", "Maintains body temperature", "Enables physical movement", "Supports brain activity"],
+        deficiencySigns: ["Weight loss", "Fatigue", "Brain fog", "Weakness"],
+        sources: ["All foods containing macronutrients", "Fats", "Carbohydrates", "Proteins"]
+    },
+    'Protein': {
+        description: "The building blocks of body tissue.",
+        history: "Term coined by Jöns Jacob Berzelius in 1838 from the Greek 'protos' meaning first.",
+        importance: "Essential for growth, repair, and maintenance of all cells and tissues.",
+        benefits: ["Muscle building", "Tissue repair", "Enzyme production", "Hormone regulation"],
+        deficiencySigns: ["Muscle wasting", "Stunted growth", "Weakened immunity", "Thinning hair"],
+        sources: ["Meat", "Eggs", "Legumes", "Nuts", "Dairy", "Quinoa"]
+    },
+    'Carbs': {
+        description: "The body's primary source of energy.",
+        history: "Known as 'saccharides' from the Greek 'sakkharon' meaning sugar.",
+        importance: "Quickly converted to glucose to fuel your brain and muscles.",
+        benefits: ["Rapid energy source", "Spares protein for muscle repair", "Fuels the central nervous system", "Supports gut health (via fiber)"],
+        deficiencySigns: ["Low energy", "Hypoglycemia", "Headaches", "Difficulty concentrating"],
+        sources: ["Whole grains", "Fruits", "Vegetables", "Legumes", "Potatoes"]
+    },
+    'Fat': {
+        description: "A concentrated source of energy and essential fatty acids.",
+        history: "Humanity has been using fats for fuel and nutrition since prehistoric times.",
+        importance: "Crucial for absorption of fat-soluble vitamins (A, D, E, K), hormone production, and cell membrane integrity.",
+        benefits: ["Organ protection", "Vitamin absorption", "Long-term energy storage", "Skin and hair health"],
+        deficiencySigns: ["Dry skin", "Vitamin deficiencies", "Hormonal imbalances", "Feeling cold"],
+        sources: ["Avocados", "Nuts", "Seeds", "Olive oil", "Fatty fish"]
     }
 };
