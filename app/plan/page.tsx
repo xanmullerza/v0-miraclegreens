@@ -998,13 +998,8 @@ export default function MealPlannerPage() {
                                                                             percentage !== null ? `${styles.borderLight} ${styles.fade}` : "bg-background border-border/50"
                                                                         )}
                                                                     >
-                                                                        {boostValue > 0 && (
-                                                                            <div className="absolute top-0 right-0 bg-green-600 text-white text-xs font-black px-2.5 py-1.5 rounded-bl-xl shadow-lg animate-in fade-in slide-in-from-top-1 duration-500">
-                                                                                +{boostPct}%
-                                                                            </div>
-                                                                        )}
                                                                         <div className="min-w-0 pb-1">
-                                                                            <div className="flex items-center justify-between gap-2 mb-1">
+                                                                            <div className="flex items-center justify-between gap-2 mb-2">
                                                                                 <p className="text-[10px] uppercase font-bold text-foreground/80 truncate tracking-tight">{label}</p>
                                                                                 <div className="flex items-center gap-1">
                                                                                     {BOOSTABLE_NUTRIENTS.includes(label) && (
@@ -1025,28 +1020,29 @@ export default function MealPlannerPage() {
                                                                                 </div>
                                                                             </div>
                                                                             <div className="flex items-baseline flex-wrap gap-x-1">
-                                                                                <span className="text-base font-black">
+                                                                                <span className="text-xl font-bold">
                                                                                     {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
-                                                                                    <span className="text-[10px] font-bold text-foreground/50 ml-0.5">{unit}</span>
                                                                                 </span>
                                                                                 {rdaValue && (
-                                                                                    <span className="text-xs font-bold text-foreground/40">
-                                                                                        / {rdaValue >= 1 ? Math.round(rdaValue) : rdaValue.toFixed(1)}
+                                                                                    <span className="text-sm font-medium text-foreground/70">
+                                                                                        / {rdaValue >= 1 ? Math.round(rdaValue) : rdaValue.toFixed(1)}{unit}
                                                                                     </span>
                                                                                 )}
                                                                             </div>
                                                                         </div>
                                                                         {percentage !== null && (
-                                                                            <div className="mt-2 pt-2 border-t border-border/20">
-                                                                                <div className="flex items-center justify-between">
-                                                                                    <span className={cn(
-                                                                                        "px-2 py-0.5 rounded shadow-sm text-xs font-black",
-                                                                                        styles.bg,
-                                                                                        styles.textFill
-                                                                                    )}>
-                                                                                        {percentage}%
+                                                                            <div className="mt-auto pt-2 border-t border-border/10 flex items-center justify-between gap-2">
+                                                                                <span className={cn(
+                                                                                    "px-2 py-0.5 rounded bg-muted/50 text-xs font-black",
+                                                                                    styles.text
+                                                                                )}>
+                                                                                    {percentage}%
+                                                                                </span>
+                                                                                {boostValue > 0 && (
+                                                                                    <span className="text-sm font-black text-white bg-green-600 px-2.5 py-1 rounded-lg shadow-lg shadow-green-500/20 animate-in fade-in zoom-in-50">
+                                                                                        +{boostPct}%
                                                                                     </span>
-                                                                                </div>
+                                                                                )}
                                                                             </div>
                                                                         )}
                                                                     </div>
@@ -1397,18 +1393,13 @@ export default function MealPlannerPage() {
                                                             key={label}
                                                             onClick={() => setSelectedNutrientInfo(label)}
                                                             className={cn(
-                                                                "flex items-center justify-between gap-1 p-2 rounded-lg border shadow-sm transition-all relative overflow-hidden cursor-pointer hover:bg-muted/5",
+                                                                "flex flex-col justify-between gap-2 p-3 rounded-xl border shadow-sm transition-all relative overflow-hidden cursor-pointer hover:bg-muted/5",
                                                                 percentage !== null ? `${styles.borderLight} ${styles.fade}` : "bg-background border-border/40"
                                                             )}
                                                         >
-                                                            {boostValue > 0 && (
-                                                                <div className="absolute top-0 right-0 bg-green-600 text-white text-[7px] font-black px-1 py-0.5 rounded-bl-[4px] shadow-sm">
-                                                                    +{boostPct}%
-                                                                </div>
-                                                            )}
                                                             <div className="min-w-0">
-                                                                <div className="flex items-center justify-between gap-1.5 mb-0.5">
-                                                                    <p className="text-[10px] text-foreground/90 font-semibold truncate">{label}</p>
+                                                                <div className="flex items-center justify-between gap-1.5 mb-2">
+                                                                    <p className="text-[10px] text-foreground/90 font-bold uppercase tracking-tight truncate">{label}</p>
                                                                     <div className="flex items-center gap-1">
                                                                         {BOOSTABLE_NUTRIENTS.includes(label) && (
                                                                             <button
@@ -1422,24 +1413,36 @@ export default function MealPlannerPage() {
                                                                             </button>
                                                                         )}
                                                                         <div className="text-primary/40 transition-colors">
-                                                                            <Info className="h-2.5 w-2.5" />
+                                                                            <Info className="h-3 w-3" />
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                                <p className="text-xs font-bold tabular-nums">
-                                                                    {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
-                                                                    <span className="ml-0.5 font-medium text-[10px] text-foreground/60">{u}</span>
-                                                                </p>
+                                                                <div className="flex items-baseline flex-wrap gap-x-1">
+                                                                    <span className="text-lg font-bold tabular-nums">
+                                                                        {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
+                                                                    </span>
+                                                                    {rdaValue && (
+                                                                        <span className="text-[10px] font-medium text-foreground/60">
+                                                                            / {rdaValue >= 1 ? Math.round(rdaValue) : rdaValue.toFixed(1)}{u}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
                                                             </div>
-                                                            {percentage !== null && (
-                                                                <span className={cn(
-                                                                    "text-xs font-black px-1.5 py-0.5 rounded-[4px] shadow-sm",
-                                                                    styles.bg,
-                                                                    styles.textFill
-                                                                )}>
-                                                                    {percentage}%
-                                                                </span>
-                                                            )}
+                                                            <div className="mt-auto pt-2 border-t border-border/5 flex items-center justify-between gap-2">
+                                                                {percentage !== null && (
+                                                                    <span className={cn(
+                                                                        "text-[10px] font-black px-1.5 py-0.5 rounded bg-muted/50",
+                                                                        styles.text
+                                                                    )}>
+                                                                        {percentage}%
+                                                                    </span>
+                                                                )}
+                                                                {boostValue > 0 && (
+                                                                    <span className="text-[10px] font-black text-white bg-green-600 px-2 py-0.5 rounded shadow-sm animate-in fade-in zoom-in-50">
+                                                                        +{boostPct}%
+                                                                    </span>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     );
                                                 })}
