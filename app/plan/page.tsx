@@ -86,15 +86,16 @@ const getNutrientLevelStyles = (percentage: number, label?: string) => {
     let color: 'green' | 'blue' | 'yellow' | 'orange' | 'red' = 'red';
 
     if (isLimit) {
-        if (percentage <= 75) color = 'green';
+        if (percentage <= 50) color = 'green';
+        else if (percentage <= 75) color = 'blue';
         else if (percentage <= 90) color = 'yellow';
         else if (percentage <= 100) color = 'orange';
         else color = 'red';
     } else {
         if (percentage >= 100) color = 'green';
-        else if (percentage >= 85) color = 'blue';
-        else if (percentage >= 70) color = 'yellow';
-        else if (percentage >= 50) color = 'orange';
+        else if (percentage >= 70) color = 'blue';
+        else if (percentage >= 50) color = 'yellow';
+        else if (percentage >= 35) color = 'orange';
         else color = 'red';
     }
 
