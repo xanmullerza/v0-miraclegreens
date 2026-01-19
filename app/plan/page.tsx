@@ -888,15 +888,36 @@ export default function MealPlannerPage() {
                                             }
 
                                             // Categorize nutrients
-                                            const bComplex: Record<string, number> = {
+                                            const metabolicEnergy: Record<string, number> = {
                                                 'B1 (Thiamine)': m.thiamine_mg || 0,
                                                 'B2 (Riboflavin)': m.riboflavin_mg || 0,
                                                 'B3 (Niacin)': m.niacin_mg || 0,
                                                 'B5 (Pantothenic Acid)': m.pantothenic_acid_mg || 0,
                                                 'B6 (Pyridoxine)': m.vitamin_b6_mg || 0,
+                                                'Choline': m.choline_mg || 0,
+                                                'Magnesium': m.magnesium_mg || 0,
+                                                'Copper': m.copper_mg || 0,
+                                                'Manganese': m.manganese_mg || 0,
+                                            };
+
+                                            const bloodDNA: Record<string, number> = {
+                                                'Iron': m.iron_mg || 0,
                                                 'B9 (Folate)': m.folate_ug || 0,
                                                 'B12 (Cobalamin)': m.vitamin_b12_ug || 0,
-                                                'Choline': m.choline_mg || 0,
+                                            };
+
+                                            const skeletalHealth: Record<string, number> = {
+                                                'Calcium': m.calcium_mg || 0,
+                                                'Phosphorus': m.phosphorus_mg || 0,
+                                            };
+
+                                            const electrolytes: Record<string, number> = {
+                                                'Potassium': m.potassium_mg || 0,
+                                                'Sodium': m.sodium_mg || 0,
+                                            };
+
+                                            const bloodHealth: Record<string, number> = {
+                                                'Iron': m.iron_mg || 0,
                                             };
 
                                             const fatSoluble: Record<string, number> = {
@@ -910,17 +931,6 @@ export default function MealPlannerPage() {
                                                 'Vitamin C': m.vitamin_c_mg || 0,
                                                 'Zinc': m.zinc_mg || 0,
                                                 'Selenium': m.selenium_ug || 0,
-                                            };
-
-                                            const essentialMinerals: Record<string, number> = {
-                                                'Iron': m.iron_mg || 0,
-                                                'Calcium': m.calcium_mg || 0,
-                                                'Magnesium': m.magnesium_mg || 0,
-                                                'Potassium': m.potassium_mg || 0,
-                                                'Phosphorus': m.phosphorus_mg || 0,
-                                                'Sodium': m.sodium_mg || 0,
-                                                'Copper': m.copper_mg || 0,
-                                                'Manganese': m.manganese_mg || 0,
                                             };
 
                                             const other: Record<string, number> = {
@@ -1056,10 +1066,12 @@ export default function MealPlannerPage() {
 
                                             return (
                                                 <div className="mt-6 pt-6 border-t border-border space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
-                                                    <DailyNutrientGrid nutrients={bComplex} title="B-Complex Vitamins" icon={Battery} />
+                                                    <DailyNutrientGrid nutrients={metabolicEnergy} title="Brain & Metabolic Energy" icon={Battery} />
+                                                    <DailyNutrientGrid nutrients={bloodDNA} title="Blood Health & DNA Support" icon={Droplet} />
                                                     <DailyNutrientGrid nutrients={fatSoluble} title="Fat-Soluble Vitamins" icon={FlaskConical} />
                                                     <DailyNutrientGrid nutrients={immuneAntioxidant} title="Immune & Antioxidant Support" icon={Shield} />
-                                                    <DailyNutrientGrid nutrients={essentialMinerals} title="Essential Minerals" icon={Activity} />
+                                                    <DailyNutrientGrid nutrients={skeletalHealth} title="Skeletal & Bone Strength" icon={Dumbbell} />
+                                                    <DailyNutrientGrid nutrients={electrolytes} title="Essential Electrolytes" icon={Zap} />
                                                     <DailyNutrientGrid nutrients={other} title="Dietary Fiber" icon={Leaf} />
 
                                                     {/* Hide Detailed Nutrients Button at the bottom */}
@@ -1295,15 +1307,36 @@ export default function MealPlannerPage() {
                                     });
                                 }
 
-                                const bComplex: Record<string, number> = {
+                                const metabolicEnergy: Record<string, number> = {
                                     'B1 (Thiamine)': m.thiamine_mg || 0,
                                     'B2 (Riboflavin)': m.riboflavin_mg || 0,
                                     'B3 (Niacin)': m.niacin_mg || 0,
                                     'B5 (Pantothenic Acid)': m.pantothenic_acid_mg || 0,
                                     'B6 (Pyridoxine)': m.vitamin_b6_mg || 0,
+                                    'Choline': m.choline_mg || 0,
+                                    'Magnesium': m.magnesium_mg || 0,
+                                    'Copper': m.copper_mg || 0,
+                                    'Manganese': m.manganese_mg || 0,
+                                };
+
+                                const bloodDNA: Record<string, number> = {
+                                    'Iron': m.iron_mg || 0,
                                     'B9 (Folate)': m.folate_ug || 0,
                                     'B12 (Cobalamin)': m.vitamin_b12_ug || 0,
-                                    'Choline': m.choline_mg || 0,
+                                };
+
+                                const skeletalHealth: Record<string, number> = {
+                                    'Calcium': m.calcium_mg || 0,
+                                    'Phosphorus': m.phosphorus_mg || 0,
+                                };
+
+                                const electrolytes: Record<string, number> = {
+                                    'Potassium': m.potassium_mg || 0,
+                                    'Sodium': m.sodium_mg || 0,
+                                };
+
+                                const bloodHealth: Record<string, number> = {
+                                    'Iron': m.iron_mg || 0,
                                 };
 
                                 const fatSoluble: Record<string, number> = {
@@ -1317,17 +1350,6 @@ export default function MealPlannerPage() {
                                     'Vitamin C': m.vitamin_c_mg || 0,
                                     'Zinc': m.zinc_mg || 0,
                                     'Selenium': m.selenium_ug || 0,
-                                };
-
-                                const essentialMinerals: Record<string, number> = {
-                                    'Iron': m.iron_mg || 0,
-                                    'Calcium': m.calcium_mg || 0,
-                                    'Magnesium': m.magnesium_mg || 0,
-                                    'Potassium': m.potassium_mg || 0,
-                                    'Phosphorus': m.phosphorus_mg || 0,
-                                    'Sodium': m.sodium_mg || 0,
-                                    'Copper': m.copper_mg || 0,
-                                    'Manganese': m.manganese_mg || 0,
                                 };
 
                                 const other: Record<string, number> = {
@@ -1472,16 +1494,16 @@ export default function MealPlannerPage() {
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-                                                <div className="space-y-6">
-                                                    <ModalNutrientGrid nutrients={bComplex} title="B-Complex Vitamins" icon={Battery} />
-                                                    <ModalNutrientGrid nutrients={fatSoluble} title="Fat-Soluble Vitamins" icon={FlaskConical} />
-                                                    <ModalNutrientGrid nutrients={immuneAntioxidant} title="Immune & Antioxidant Support" icon={Shield} />
-                                                </div>
-                                                <div className="space-y-6">
-                                                    <ModalNutrientGrid nutrients={essentialMinerals} title="Essential Minerals" icon={Activity} />
-                                                    <ModalNutrientGrid nutrients={other} title="Dietary Fiber" icon={Leaf} />
-                                                </div>
+                                            <div className="space-y-6">
+                                                <ModalNutrientGrid nutrients={metabolicEnergy} title="Brain & Metabolic Energy" icon={Battery} />
+                                                <ModalNutrientGrid nutrients={bloodDNA} title="Blood Health & DNA Support" icon={Droplet} />
+                                                <ModalNutrientGrid nutrients={fatSoluble} title="Fat-Soluble Vitamins" icon={FlaskConical} />
+                                                <ModalNutrientGrid nutrients={immuneAntioxidant} title="Immune & Antioxidant Support" icon={Shield} />
+                                            </div>
+                                            <div className="space-y-6">
+                                                <ModalNutrientGrid nutrients={skeletalHealth} title="Skeletal & Bone Strength" icon={Dumbbell} />
+                                                <ModalNutrientGrid nutrients={electrolytes} title="Essential Electrolytes" icon={Zap} />
+                                                <ModalNutrientGrid nutrients={other} title="Dietary Fiber" icon={Leaf} />
                                             </div>
                                         </div>
                                     </div>
