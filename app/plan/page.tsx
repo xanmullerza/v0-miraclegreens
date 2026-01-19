@@ -1058,13 +1058,13 @@ export default function MealPlannerPage() {
 
                                             return (
                                                 <div className="mt-6 pt-6 border-t border-border space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
-                                                    <DailyNutrientGrid nutrients={metabolicFuel} title="Metabolic Fuel" icon={Flame} />
-                                                    <DailyNutrientGrid nutrients={immuneShield} title="Immune Shield" icon={Shield} />
-                                                    <DailyNutrientGrid nutrients={skeletalHealth} title="Bone & Strength" icon={Dumbbell} />
-                                                    <DailyNutrientGrid nutrients={cognitiveFocus} title="Cognitive Focus" icon={Activity} />
-                                                    <DailyNutrientGrid nutrients={bloodDNA} title="Blood & DNA" icon={Droplet} />
-                                                    <DailyNutrientGrid nutrients={electrolytes} title="Fluid Balance" icon={Zap} />
-                                                    <DailyNutrientGrid nutrients={other} title="Gut Health" icon={Leaf} />
+                                                    <DailyNutrientGrid nutrients={metabolicFuel} title="Energy & Vitality" icon={Flame} />
+                                                    <DailyNutrientGrid nutrients={immuneShield} title="Immune Defense" icon={Shield} />
+                                                    <DailyNutrientGrid nutrients={skeletalHealth} title="Strong Foundations" icon={Dumbbell} />
+                                                    <DailyNutrientGrid nutrients={cognitiveFocus} title="Mental Clarity" icon={Activity} />
+                                                    <DailyNutrientGrid nutrients={bloodDNA} title="Blood & Repair" icon={Droplet} />
+                                                    <DailyNutrientGrid nutrients={electrolytes} title="Hydration Balance" icon={Zap} />
+                                                    <DailyNutrientGrid nutrients={other} title="Daily Digestion" icon={Leaf} />
 
                                                     {/* Hide Detailed Nutrients Button at the bottom */}
                                                     <Button
@@ -1490,15 +1490,15 @@ export default function MealPlannerPage() {
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                                             <div className="space-y-6">
-                                                <ModalNutrientGrid nutrients={metabolicFuel} title="Metabolic Fuel" icon={Flame} />
-                                                <ModalNutrientGrid nutrients={immuneShield} title="Immune Shield" icon={Shield} />
-                                                <ModalNutrientGrid nutrients={skeletalHealth} title="Bone & Strength" icon={Dumbbell} />
+                                                <ModalNutrientGrid nutrients={metabolicFuel} title="Energy & Vitality" icon={Flame} />
+                                                <ModalNutrientGrid nutrients={immuneShield} title="Immune Defense" icon={Shield} />
+                                                <ModalNutrientGrid nutrients={skeletalHealth} title="Strong Foundations" icon={Dumbbell} />
                                             </div>
                                             <div className="space-y-6">
-                                                <ModalNutrientGrid nutrients={cognitiveFocus} title="Cognitive Focus" icon={Activity} />
-                                                <ModalNutrientGrid nutrients={bloodDNA} title="Blood & DNA" icon={Droplet} />
-                                                <ModalNutrientGrid nutrients={electrolytes} title="Fluid Balance" icon={Zap} />
-                                                <ModalNutrientGrid nutrients={other} title="Gut Health" icon={Leaf} />
+                                                <ModalNutrientGrid nutrients={cognitiveFocus} title="Mental Clarity" icon={Activity} />
+                                                <ModalNutrientGrid nutrients={bloodDNA} title="Blood & Repair" icon={Droplet} />
+                                                <ModalNutrientGrid nutrients={electrolytes} title="Hydration Balance" icon={Zap} />
+                                                <ModalNutrientGrid nutrients={other} title="Daily Digestion" icon={Leaf} />
                                             </div>
                                         </div>
                                     </div>
