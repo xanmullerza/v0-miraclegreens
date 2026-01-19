@@ -837,6 +837,20 @@ export default function MealPlannerPage() {
                                                                 <div className="space-y-1.5">
                                                                     <div className="flex items-center justify-between text-xs font-black">
                                                                         <span className={cn("px-1.5 py-0.5 rounded shadow-sm", styles.bg, styles.textFill)}>{pct}%</span>
+                                                                        {macro.label !== 'Energy' && (() => {
+                                                                            const grams = dailyMoringaGrams;
+                                                                            const ratio = grams / 2;
+                                                                            const boostVal = macro.label === 'Protein' ? 0.5 * ratio :
+                                                                                macro.label === 'Carbs' ? 0.8 * ratio :
+                                                                                    macro.label === 'Fat' ? 0.05 * ratio : 0;
+                                                                            const boostPct = Math.round((boostVal / macro.target) * 100);
+                                                                            if (boostPct > 0) return (
+                                                                                <span className="text-[8px] font-black text-green-600 bg-green-50 px-1 rounded animate-in fade-in zoom-in-50">
+                                                                                    +{boostPct}% BOOST
+                                                                                </span>
+                                                                            );
+                                                                            return null;
+                                                                        })()}
                                                                     </div>
                                                                     <div className="w-full bg-muted/50 rounded-full h-1.5 overflow-hidden border border-black/5">
                                                                         <div
@@ -948,22 +962,26 @@ export default function MealPlannerPage() {
                                                                 const getBoost = () => {
                                                                     if (dailyMoringaGrams <= 0) return 0;
                                                                     const ratio = dailyMoringaGrams / 2;
-                                                                    const mapping: Record<string, string> = {
-                                                                        'Potassium': 'potassium_mg',
-                                                                        'Magnesium': 'magnesium_mg',
-                                                                        'Calcium': 'calcium_mg',
-                                                                        'Sodium': 'sodium_mg',
-                                                                        'Iron': 'iron_mg',
-                                                                        'Vitamin A': 'vitamin_a_ug',
-                                                                        'B1 (Thiamine)': 'thiamine_mg',
-                                                                        'B2 (Riboflavin)': 'riboflavin_mg',
-                                                                        'B3 (Niacin)': 'niacin_mg',
-                                                                        'Vitamin C': 'vitamin_c_mg',
-                                                                        'Fiber': 'fiber_g'
+                                                                    const mapping: Record<string, any> = {
+                                                                        'Potassium': MORINGA_TSP.micronutrients.potassium_mg,
+                                                                        'Magnesium': MORINGA_TSP.micronutrients.magnesium_mg,
+                                                                        'Calcium': MORINGA_TSP.micronutrients.calcium_mg,
+                                                                        'Sodium': MORINGA_TSP.micronutrients.sodium_mg,
+                                                                        'Iron': MORINGA_TSP.micronutrients.iron_mg,
+                                                                        'Vitamin A': MORINGA_TSP.micronutrients.vitamin_a_ug,
+                                                                        'B1 (Thiamine)': MORINGA_TSP.micronutrients.thiamine_mg,
+                                                                        'B2 (Riboflavin)': MORINGA_TSP.micronutrients.riboflavin_mg,
+                                                                        'B3 (Niacin)': MORINGA_TSP.micronutrients.niacin_mg,
+                                                                        'Vitamin C': MORINGA_TSP.micronutrients.vitamin_c_mg,
+                                                                        'Fiber': MORINGA_TSP.micronutrients.fiber_g,
+                                                                        'Protein': MORINGA_TSP.protein_g,
+                                                                        'Carbs': MORINGA_TSP.carbs_g,
+                                                                        'Fat': MORINGA_TSP.fat_g,
+                                                                        'Energy': MORINGA_TSP.energy_kcal
                                                                     };
-                                                                    const key = mapping[label];
-                                                                    if (!key) return 0;
-                                                                    return (MORINGA_TSP.micronutrients as any)[key] * ratio;
+                                                                    const baseVal = mapping[label];
+                                                                    if (baseVal === undefined) return 0;
+                                                                    return baseVal * ratio;
                                                                 };
 
                                                                 const boostValue = getBoost();
@@ -1214,26 +1232,41 @@ export default function MealPlannerPage() {
                                     <div className="text-lg font-bold">{formatEnergy((selectedRecipe.calories * (selectedRecipe.servings || 1)) + ((recipeMoringaGrams / 2) * MORINGA_TSP.energy_kcal), unit).split(' ')[0]}</div>
                                     <div className="text-[10px] text-muted-foreground font-bold uppercase">{unit}</div>
                                 </div>
-                                <div className="text-center p-3 bg-muted rounded-lg border border-border/50">
+                                <div className="text-center p-3 bg-muted rounded-lg border border-border/50 relative group/macro-card cursor-pointer hover:bg-muted/80 transition-all" onClick={() => setActiveBoostContext('recipe')}>
                                     <div className="flex items-center justify-center gap-1 mb-1">
                                         <Beef className="h-4 w-4 text-red-500" />
                                         <span className="text-xs text-muted-foreground uppercase font-bold tracking-tighter">Protein</span>
                                     </div>
                                     <div className="text-lg font-bold">{(Number(selectedRecipe.protein * (selectedRecipe.servings || 1)) + ((recipeMoringaGrams / 2) * MORINGA_TSP.protein_g)).toFixed(1)}g</div>
+                                    {recipeMoringaGrams > 0 && (
+                                        <div className="absolute -top-2 -right-1 bg-green-600 text-white text-[7px] font-black px-1 py-0.5 rounded shadow-sm">
+                                            +{Math.round(((recipeMoringaGrams / 2) * MORINGA_TSP.protein_g))}g BOOST
+                                        </div>
+                                    )}
                                 </div>
-                                <div className="text-center p-3 bg-muted rounded-lg border border-border/50">
+                                <div className="text-center p-3 bg-muted rounded-lg border border-border/50 relative group/macro-card cursor-pointer hover:bg-muted/80 transition-all" onClick={() => setActiveBoostContext('recipe')}>
                                     <div className="flex items-center justify-center gap-1 mb-1">
                                         <Wheat className="h-4 w-4 text-amber-600" />
                                         <span className="text-xs text-muted-foreground uppercase font-bold tracking-tighter">Carbs</span>
                                     </div>
                                     <div className="text-lg font-bold">{(Number(selectedRecipe.carbs * (selectedRecipe.servings || 1)) + ((recipeMoringaGrams / 2) * MORINGA_TSP.carbs_g)).toFixed(1)}g</div>
+                                    {recipeMoringaGrams > 0 && (
+                                        <div className="absolute -top-2 -right-1 bg-green-600 text-white text-[7px] font-black px-1 py-0.5 rounded shadow-sm">
+                                            +{Math.round(((recipeMoringaGrams / 2) * MORINGA_TSP.carbs_g))}g BOOST
+                                        </div>
+                                    )}
                                 </div>
-                                <div className="text-center p-3 bg-muted rounded-lg border border-border/50">
+                                <div className="text-center p-3 bg-muted rounded-lg border border-border/50 relative group/macro-card cursor-pointer hover:bg-muted/80 transition-all" onClick={() => setActiveBoostContext('recipe')}>
                                     <div className="flex items-center justify-center gap-1 mb-1">
                                         <Droplet className="h-4 w-4 text-yellow-500" />
                                         <span className="text-xs text-muted-foreground uppercase font-bold tracking-tighter">Fat</span>
                                     </div>
                                     <div className="text-lg font-bold">{(Number(selectedRecipe.fat * (selectedRecipe.servings || 1)) + ((recipeMoringaGrams / 2) * MORINGA_TSP.fat_g)).toFixed(1)}g</div>
+                                    {recipeMoringaGrams > 0 && (
+                                        <div className="absolute -top-2 -right-1 bg-green-600 text-white text-[7px] font-black px-1 py-0.5 rounded shadow-sm">
+                                            +{Math.round(((recipeMoringaGrams / 2) * MORINGA_TSP.fat_g * 10)) / 10}g BOOST
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
@@ -1330,22 +1363,26 @@ export default function MealPlannerPage() {
                                                     const getBoost = () => {
                                                         if (recipeMoringaGrams <= 0) return 0;
                                                         const ratio = recipeMoringaGrams / 2;
-                                                        const mapping: Record<string, string> = {
-                                                            'Potassium': 'potassium_mg',
-                                                            'Magnesium': 'magnesium_mg',
-                                                            'Calcium': 'calcium_mg',
-                                                            'Sodium': 'sodium_mg',
-                                                            'Iron': 'iron_mg',
-                                                            'Vitamin A': 'vitamin_a_ug',
-                                                            'B1 (Thiamine)': 'thiamine_mg',
-                                                            'B2 (Riboflavin)': 'riboflavin_mg',
-                                                            'B3 (Niacin)': 'niacin_mg',
-                                                            'Vitamin C': 'vitamin_c_mg',
-                                                            'Fiber': 'fiber_g'
+                                                        const mapping: Record<string, any> = {
+                                                            'Potassium': MORINGA_TSP.micronutrients.potassium_mg,
+                                                            'Magnesium': MORINGA_TSP.micronutrients.magnesium_mg,
+                                                            'Calcium': MORINGA_TSP.micronutrients.calcium_mg,
+                                                            'Sodium': MORINGA_TSP.micronutrients.sodium_mg,
+                                                            'Iron': MORINGA_TSP.micronutrients.iron_mg,
+                                                            'Vitamin A': MORINGA_TSP.micronutrients.vitamin_a_ug,
+                                                            'B1 (Thiamine)': MORINGA_TSP.micronutrients.thiamine_mg,
+                                                            'B2 (Riboflavin)': MORINGA_TSP.micronutrients.riboflavin_mg,
+                                                            'B3 (Niacin)': MORINGA_TSP.micronutrients.niacin_mg,
+                                                            'Vitamin C': MORINGA_TSP.micronutrients.vitamin_c_mg,
+                                                            'Fiber': MORINGA_TSP.micronutrients.fiber_g,
+                                                            'Protein': MORINGA_TSP.protein_g,
+                                                            'Carbs': MORINGA_TSP.carbs_g,
+                                                            'Fat': MORINGA_TSP.fat_g,
+                                                            'Energy': MORINGA_TSP.energy_kcal
                                                         };
-                                                        const key = mapping[label];
-                                                        if (!key) return 0;
-                                                        return (MORINGA_TSP.micronutrients as any)[key] * ratio;
+                                                        const baseVal = mapping[label];
+                                                        if (baseVal === undefined) return 0;
+                                                        return baseVal * ratio;
                                                     };
 
                                                     const boostValue = getBoost();
