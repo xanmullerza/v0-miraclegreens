@@ -834,30 +834,28 @@ export default function MealPlannerPage() {
                                                                         <RefreshCw className="h-2 w-2 text-muted-foreground/30 group-hover/value:text-primary transition-colors ml-0.5" />
                                                                     )}
                                                                 </div>
-                                                                <div className="space-y-1.5">
-                                                                    <div className="flex items-center justify-between text-xs font-black">
-                                                                        <span className={cn("px-1.5 py-0.5 rounded shadow-sm", styles.bg, styles.textFill)}>{pct}%</span>
-                                                                        {macro.label !== 'Energy' && (() => {
-                                                                            const grams = dailyMoringaGrams;
-                                                                            const ratio = grams / 2;
-                                                                            const boostVal = macro.label === 'Protein' ? 0.5 * ratio :
-                                                                                macro.label === 'Carbs' ? 0.8 * ratio :
-                                                                                    macro.label === 'Fat' ? 0.05 * ratio : 0;
-                                                                            const boostPct = Math.round((boostVal / macro.target) * 100);
-                                                                            if (boostPct > 0) return (
-                                                                                <span className="text-[8px] font-black text-green-600 bg-green-50 px-1 rounded animate-in fade-in zoom-in-50">
-                                                                                    +{boostPct}% BOOST
+                                                                <div className="mt-auto pt-2 border-t border-border/10 flex items-center justify-between">
+                                                                    <div className="flex flex-col">
+                                                                        <span className="text-[10px] text-muted-foreground/60 uppercase font-black leading-none mb-1">Progress</span>
+                                                                        <span className={cn("text-xs font-black", styles.text)}>{pct}%</span>
+                                                                    </div>
+                                                                    {macro.label !== 'Energy' && (() => {
+                                                                        const grams = dailyMoringaGrams;
+                                                                        const ratio = grams / 2;
+                                                                        const boostVal = macro.label === 'Protein' ? 0.5 * ratio :
+                                                                            macro.label === 'Carbs' ? 0.8 * ratio :
+                                                                                macro.label === 'Fat' ? 0.05 * ratio : 0;
+                                                                        const boostPct = Math.round((boostVal / macro.target) * 100);
+                                                                        if (boostPct > 0) return (
+                                                                            <div className="flex flex-col items-end">
+                                                                                <span className="text-[10px] text-green-700 uppercase font-black leading-none mb-1">Boost</span>
+                                                                                <span className="text-xs font-black text-white bg-green-600 px-2 py-0.5 rounded shadow-lg shadow-green-500/20 animate-in fade-in zoom-in-50">
+                                                                                    +{boostPct}%
                                                                                 </span>
-                                                                            );
-                                                                            return null;
-                                                                        })()}
-                                                                    </div>
-                                                                    <div className="w-full bg-muted/50 rounded-full h-1.5 overflow-hidden border border-black/5">
-                                                                        <div
-                                                                            className={cn("h-full transition-all duration-1000", styles.bg)}
-                                                                            style={{ width: `${Math.min(100, pct)}%` }}
-                                                                        />
-                                                                    </div>
+                                                                            </div>
+                                                                        );
+                                                                        return null;
+                                                                    })()}
                                                                 </div>
                                                             </div>
                                                         );
@@ -997,13 +995,14 @@ export default function MealPlannerPage() {
                                                                         )}
                                                                     >
                                                                         {boostValue > 0 && (
-                                                                            <div className="absolute top-0 right-0 bg-green-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-bl-lg shadow-sm animate-in fade-in slide-in-from-top-1 duration-500">
-                                                                                +{boostPct}% BOOST
+                                                                            <div className="absolute top-0 right-0 bg-green-600 text-white text-[10px] font-black px-2 py-1 rounded-bl-xl shadow-lg animate-in fade-in slide-in-from-top-1 duration-500 flex flex-col items-center">
+                                                                                <span className="opacity-70 text-[7px] leading-tight uppercase">Boost</span>
+                                                                                <span className="leading-none">+{boostPct}%</span>
                                                                             </div>
                                                                         )}
-                                                                        <div className="min-w-0">
-                                                                            <div className="flex items-center justify-between gap-2 mb-0.5">
-                                                                                <p className="text-[10px] uppercase font-semibold text-foreground/80 truncate tracking-tight">{label}</p>
+                                                                        <div className="min-w-0 pb-1">
+                                                                            <div className="flex items-center justify-between gap-2 mb-1">
+                                                                                <p className="text-[10px] uppercase font-bold text-foreground/80 truncate tracking-tight">{label}</p>
                                                                                 <div className="flex items-center gap-1">
                                                                                     {BOOSTABLE_NUTRIENTS.includes(label) && (
                                                                                         <button
@@ -1023,33 +1022,28 @@ export default function MealPlannerPage() {
                                                                                 </div>
                                                                             </div>
                                                                             <div className="flex items-baseline flex-wrap gap-x-1">
-                                                                                <span className="text-sm font-bold">
+                                                                                <span className="text-base font-black">
                                                                                     {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
-                                                                                    <span className="text-[10px] font-medium text-foreground/50 ml-0.5">{unit}</span>
+                                                                                    <span className="text-[10px] font-bold text-foreground/50 ml-0.5">{unit}</span>
                                                                                 </span>
                                                                                 {rdaValue && (
-                                                                                    <span className="text-sm font-medium text-foreground/70">
-                                                                                        / {rdaValue >= 1 ? Math.round(rdaValue) : rdaValue.toFixed(1)}{unit}
+                                                                                    <span className="text-xs font-bold text-foreground/40">
+                                                                                        / {rdaValue >= 1 ? Math.round(rdaValue) : rdaValue.toFixed(1)}
                                                                                     </span>
                                                                                 )}
                                                                             </div>
                                                                         </div>
                                                                         {percentage !== null && (
-                                                                            <div className="mt-2 space-y-1.5">
-                                                                                <div className="flex items-center justify-between text-xs font-black">
+                                                                            <div className="mt-2 pt-2 border-t border-border/20">
+                                                                                <div className="flex items-center justify-between">
+                                                                                    <span className="text-[9px] uppercase font-black text-muted-foreground/60 leading-none">Total</span>
                                                                                     <span className={cn(
-                                                                                        "px-1.5 py-0.5 rounded-[4px] shadow-sm",
+                                                                                        "px-2 py-0.5 rounded shadow-sm text-xs font-black",
                                                                                         styles.bg,
                                                                                         styles.textFill
                                                                                     )}>
                                                                                         {percentage}%
                                                                                     </span>
-                                                                                </div>
-                                                                                <div className="w-full bg-muted/50 rounded-full h-2 overflow-hidden border border-black/5">
-                                                                                    <div
-                                                                                        className={cn("h-full transition-all duration-1000 ease-out shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]", styles.bg)}
-                                                                                        style={{ width: `${Math.min(100, percentage)}%` }}
-                                                                                    />
                                                                                 </div>
                                                                             </div>
                                                                         )}
