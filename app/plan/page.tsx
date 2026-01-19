@@ -834,10 +834,9 @@ export default function MealPlannerPage() {
                                                                         <RefreshCw className="h-2 w-2 text-muted-foreground/30 group-hover/value:text-primary transition-colors ml-0.5" />
                                                                     )}
                                                                 </div>
-                                                                <div className="mt-auto pt-2 border-t border-border/10 flex items-center justify-between">
-                                                                    <div className="flex flex-col">
-                                                                        <span className="text-[10px] text-muted-foreground/60 uppercase font-black leading-none mb-1">Progress</span>
-                                                                        <span className={cn("text-xs font-black", styles.text)}>{pct}%</span>
+                                                                <div className="mt-auto pt-2 border-t border-border/10 flex items-center justify-between gap-2">
+                                                                    <div className="flex items-center gap-1.5">
+                                                                        <span className={cn("text-xs font-black px-2 py-0.5 rounded bg-muted/50", styles.text)}>{pct}%</span>
                                                                     </div>
                                                                     {macro.label !== 'Energy' && (() => {
                                                                         const grams = dailyMoringaGrams;
@@ -847,12 +846,9 @@ export default function MealPlannerPage() {
                                                                                 macro.label === 'Fat' ? 0.05 * ratio : 0;
                                                                         const boostPct = Math.round((boostVal / macro.target) * 100);
                                                                         if (boostPct > 0) return (
-                                                                            <div className="flex flex-col items-end">
-                                                                                <span className="text-[10px] text-green-700 uppercase font-black leading-none mb-1">Boost</span>
-                                                                                <span className="text-xs font-black text-white bg-green-600 px-2 py-0.5 rounded shadow-lg shadow-green-500/20 animate-in fade-in zoom-in-50">
-                                                                                    +{boostPct}%
-                                                                                </span>
-                                                                            </div>
+                                                                            <span className="text-sm font-black text-white bg-green-600 px-2.5 py-1 rounded-lg shadow-lg shadow-green-500/20 animate-in fade-in zoom-in-50">
+                                                                                +{boostPct}%
+                                                                            </span>
                                                                         );
                                                                         return null;
                                                                     })()}
@@ -995,9 +991,8 @@ export default function MealPlannerPage() {
                                                                         )}
                                                                     >
                                                                         {boostValue > 0 && (
-                                                                            <div className="absolute top-0 right-0 bg-green-600 text-white text-[10px] font-black px-2 py-1 rounded-bl-xl shadow-lg animate-in fade-in slide-in-from-top-1 duration-500 flex flex-col items-center">
-                                                                                <span className="opacity-70 text-[7px] leading-tight uppercase">Boost</span>
-                                                                                <span className="leading-none">+{boostPct}%</span>
+                                                                            <div className="absolute top-0 right-0 bg-green-600 text-white text-xs font-black px-2.5 py-1.5 rounded-bl-xl shadow-lg animate-in fade-in slide-in-from-top-1 duration-500">
+                                                                                +{boostPct}%
                                                                             </div>
                                                                         )}
                                                                         <div className="min-w-0 pb-1">
@@ -1036,7 +1031,6 @@ export default function MealPlannerPage() {
                                                                         {percentage !== null && (
                                                                             <div className="mt-2 pt-2 border-t border-border/20">
                                                                                 <div className="flex items-center justify-between">
-                                                                                    <span className="text-[9px] uppercase font-black text-muted-foreground/60 leading-none">Total</span>
                                                                                     <span className={cn(
                                                                                         "px-2 py-0.5 rounded shadow-sm text-xs font-black",
                                                                                         styles.bg,
