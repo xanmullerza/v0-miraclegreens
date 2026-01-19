@@ -909,6 +909,8 @@ export default function MealPlannerPage() {
                                             const skeletalHealth: Record<string, number> = {
                                                 'Calcium': m.calcium_mg || 0,
                                                 'Phosphorus': m.phosphorus_mg || 0,
+                                                'Vitamin D': m.vitamin_d_iu || 0,
+                                                'Vitamin K': m.vitamin_k_ug || 0,
                                             };
 
                                             const electrolytes: Record<string, number> = {
@@ -916,19 +918,10 @@ export default function MealPlannerPage() {
                                                 'Sodium': m.sodium_mg || 0,
                                             };
 
-                                            const bloodHealth: Record<string, number> = {
-                                                'Iron': m.iron_mg || 0,
-                                            };
-
-                                            const fatSoluble: Record<string, number> = {
-                                                'Vitamin A': m.vitamin_a_ug || 0,
-                                                'Vitamin D': m.vitamin_d_iu || 0,
-                                                'Vitamin E': m.vitamin_e_mg || 0,
-                                                'Vitamin K': m.vitamin_k_ug || 0,
-                                            };
-
                                             const immuneAntioxidant: Record<string, number> = {
+                                                'Vitamin A': m.vitamin_a_ug || 0,
                                                 'Vitamin C': m.vitamin_c_mg || 0,
+                                                'Vitamin E': m.vitamin_e_mg || 0,
                                                 'Zinc': m.zinc_mg || 0,
                                                 'Selenium': m.selenium_ug || 0,
                                             };
@@ -1068,9 +1061,8 @@ export default function MealPlannerPage() {
                                                 <div className="mt-6 pt-6 border-t border-border space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
                                                     <DailyNutrientGrid nutrients={metabolicEnergy} title="Brain & Metabolic Energy" icon={Battery} />
                                                     <DailyNutrientGrid nutrients={bloodDNA} title="Blood Health & DNA Support" icon={Droplet} />
-                                                    <DailyNutrientGrid nutrients={fatSoluble} title="Fat-Soluble Vitamins" icon={FlaskConical} />
-                                                    <DailyNutrientGrid nutrients={immuneAntioxidant} title="Immune & Antioxidant Support" icon={Shield} />
-                                                    <DailyNutrientGrid nutrients={skeletalHealth} title="Skeletal & Bone Strength" icon={Dumbbell} />
+                                                    <DailyNutrientGrid nutrients={immuneAntioxidant} title="Immune & Antioxidant Defense" icon={Shield} />
+                                                    <DailyNutrientGrid nutrients={skeletalHealth} title="Bone & Structural Strength" icon={Dumbbell} />
                                                     <DailyNutrientGrid nutrients={electrolytes} title="Essential Electrolytes" icon={Zap} />
                                                     <DailyNutrientGrid nutrients={other} title="Dietary Fiber" icon={Leaf} />
 
@@ -1328,6 +1320,8 @@ export default function MealPlannerPage() {
                                 const skeletalHealth: Record<string, number> = {
                                     'Calcium': m.calcium_mg || 0,
                                     'Phosphorus': m.phosphorus_mg || 0,
+                                    'Vitamin D': m.vitamin_d_iu || 0,
+                                    'Vitamin K': m.vitamin_k_ug || 0,
                                 };
 
                                 const electrolytes: Record<string, number> = {
@@ -1335,19 +1329,10 @@ export default function MealPlannerPage() {
                                     'Sodium': m.sodium_mg || 0,
                                 };
 
-                                const bloodHealth: Record<string, number> = {
-                                    'Iron': m.iron_mg || 0,
-                                };
-
-                                const fatSoluble: Record<string, number> = {
-                                    'Vitamin A': m.vitamin_a_ug || 0,
-                                    'Vitamin D': m.vitamin_d_iu || 0,
-                                    'Vitamin E': m.vitamin_e_mg || 0,
-                                    'Vitamin K': m.vitamin_k_ug || 0,
-                                };
-
                                 const immuneAntioxidant: Record<string, number> = {
+                                    'Vitamin A': m.vitamin_a_ug || 0,
                                     'Vitamin C': m.vitamin_c_mg || 0,
+                                    'Vitamin E': m.vitamin_e_mg || 0,
                                     'Zinc': m.zinc_mg || 0,
                                     'Selenium': m.selenium_ug || 0,
                                 };
@@ -1497,11 +1482,10 @@ export default function MealPlannerPage() {
                                             <div className="space-y-6">
                                                 <ModalNutrientGrid nutrients={metabolicEnergy} title="Brain & Metabolic Energy" icon={Battery} />
                                                 <ModalNutrientGrid nutrients={bloodDNA} title="Blood Health & DNA Support" icon={Droplet} />
-                                                <ModalNutrientGrid nutrients={fatSoluble} title="Fat-Soluble Vitamins" icon={FlaskConical} />
-                                                <ModalNutrientGrid nutrients={immuneAntioxidant} title="Immune & Antioxidant Support" icon={Shield} />
+                                                <ModalNutrientGrid nutrients={immuneAntioxidant} title="Immune & Antioxidant Defense" icon={Shield} />
                                             </div>
                                             <div className="space-y-6">
-                                                <ModalNutrientGrid nutrients={skeletalHealth} title="Skeletal & Bone Strength" icon={Dumbbell} />
+                                                <ModalNutrientGrid nutrients={skeletalHealth} title="Bone & Structural Strength" icon={Dumbbell} />
                                                 <ModalNutrientGrid nutrients={electrolytes} title="Essential Electrolytes" icon={Zap} />
                                                 <ModalNutrientGrid nutrients={other} title="Dietary Fiber" icon={Leaf} />
                                             </div>
