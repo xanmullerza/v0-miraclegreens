@@ -780,7 +780,7 @@ export default function MealPlannerPage() {
                                                                 <div className="flex items-center justify-between gap-2 mb-2">
                                                                     <div className="flex items-center gap-2">
                                                                         <macro.icon className={cn("h-4 w-4", macro.color)} />
-                                                                        <span className="text-[10px] uppercase font-black text-foreground tracking-widest">{macro.label}</span>
+                                                                        <span className="text-[10px] uppercase font-semibold text-foreground tracking-widest">{macro.label}</span>
                                                                     </div>
                                                                     <div className="text-green-600 bg-green-50 rounded-full p-1 transition-all">
                                                                         <Info className="h-4 w-4" />
@@ -804,7 +804,7 @@ export default function MealPlannerPage() {
                                                                             ? Math.round(formatEnergyValue(macro.val, macro.unit))
                                                                             : macro.val.toFixed(0)}
                                                                     </span>
-                                                                    <span className="text-sm font-bold text-foreground/80">
+                                                                    <span className="text-sm font-medium text-foreground/70">
                                                                         / {macro.unit === 'kcal' || macro.unit === 'kJ'
                                                                             ? Math.round(formatEnergyValue(macro.target, macro.unit))
                                                                             : macro.target.toFixed(0)}{macro.unit}
@@ -956,7 +956,7 @@ export default function MealPlannerPage() {
                                                                         )}
                                                                         <div className="min-w-0">
                                                                             <div className="flex items-center justify-between gap-2 mb-0.5">
-                                                                                <p className="text-[10px] uppercase font-black text-foreground/90 truncate tracking-tight">{label}</p>
+                                                                                <p className="text-[10px] uppercase font-semibold text-foreground/80 truncate tracking-tight">{label}</p>
                                                                                 <div className="text-green-600 bg-green-50 rounded-full p-0.5 transition-all">
                                                                                     <Info className="h-4 w-4" />
                                                                                 </div>
@@ -964,10 +964,10 @@ export default function MealPlannerPage() {
                                                                             <div className="flex items-baseline flex-wrap gap-x-1">
                                                                                 <span className="text-sm font-bold">
                                                                                     {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
-                                                                                    <span className="text-[10px] font-bold text-foreground/70 ml-0.5">{unit}</span>
+                                                                                    <span className="text-[10px] font-medium text-foreground/50 ml-0.5">{unit}</span>
                                                                                 </span>
                                                                                 {rdaValue && (
-                                                                                    <span className="text-sm font-bold text-foreground/80">
+                                                                                    <span className="text-sm font-medium text-foreground/70">
                                                                                         / {rdaValue >= 1 ? Math.round(rdaValue) : rdaValue.toFixed(1)}{unit}
                                                                                     </span>
                                                                                 )}
@@ -1292,14 +1292,14 @@ export default function MealPlannerPage() {
                                                             )}
                                                             <div className="min-w-0">
                                                                 <div className="flex items-center gap-1.5 mb-0.5">
-                                                                    <p className="text-[10px] text-foreground font-black truncate">{label}</p>
+                                                                    <p className="text-[10px] text-foreground/90 font-semibold truncate">{label}</p>
                                                                     <div className="text-green-600 transition-colors">
                                                                         <Info className="h-2.5 w-2.5" />
                                                                     </div>
                                                                 </div>
                                                                 <p className="text-xs font-bold tabular-nums">
                                                                     {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
-                                                                    <span className="ml-0.5 font-bold text-[10px] text-foreground/70">{u}</span>
+                                                                    <span className="ml-0.5 font-medium text-[10px] text-foreground/60">{u}</span>
                                                                 </p>
                                                             </div>
                                                             {percentage !== null && (
