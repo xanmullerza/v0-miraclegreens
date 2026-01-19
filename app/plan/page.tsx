@@ -804,7 +804,7 @@ export default function MealPlannerPage() {
                                                                             ? Math.round(formatEnergyValue(macro.val, macro.unit))
                                                                             : macro.val.toFixed(0)}
                                                                     </span>
-                                                                    <span className="text-[10px] font-medium text-muted-foreground/60">
+                                                                    <span className="text-sm font-semibold text-muted-foreground/70">
                                                                         / {macro.unit === 'kcal' || macro.unit === 'kJ'
                                                                             ? Math.round(formatEnergyValue(macro.target, macro.unit))
                                                                             : macro.target.toFixed(0)}{macro.unit}
@@ -967,7 +967,7 @@ export default function MealPlannerPage() {
                                                                                     <span className="text-[10px] font-medium opacity-60 ml-0.5">{unit}</span>
                                                                                 </span>
                                                                                 {rdaValue && (
-                                                                                    <span className="text-[11px] font-medium text-muted-foreground/50">
+                                                                                    <span className="text-sm font-semibold text-muted-foreground/60">
                                                                                         / {rdaValue >= 1 ? Math.round(rdaValue) : rdaValue.toFixed(1)}{unit}
                                                                                     </span>
                                                                                 )}
