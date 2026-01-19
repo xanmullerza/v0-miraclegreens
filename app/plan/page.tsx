@@ -787,9 +787,9 @@ export default function MealPlannerPage() {
                                                                             e.stopPropagation();
                                                                             setSelectedNutrientInfo(macro.label);
                                                                         }}
-                                                                        className="text-muted-foreground/50 hover:text-primary transition-colors"
+                                                                        className="text-green-600 hover:text-green-700 bg-green-50 rounded-full p-1 transition-all"
                                                                     >
-                                                                        <Info className="h-3 w-3" />
+                                                                        <Info className="h-4 w-4" />
                                                                     </button>
                                                                 </div>
                                                                 <div className="flex items-baseline gap-1 mb-1">
@@ -949,9 +949,9 @@ export default function MealPlannerPage() {
                                                                                         e.stopPropagation();
                                                                                         setSelectedNutrientInfo(label);
                                                                                     }}
-                                                                                    className="text-muted-foreground/50 hover:text-primary transition-colors"
+                                                                                    className="text-green-600 hover:text-green-700 bg-green-50 rounded-full p-0.5 transition-all"
                                                                                 >
-                                                                                    <Info className="h-3 w-3" />
+                                                                                    <Info className="h-4 w-4" />
                                                                                 </button>
                                                                             </div>
                                                                             <div className="flex items-baseline flex-wrap gap-x-1">
@@ -1280,7 +1280,18 @@ export default function MealPlannerPage() {
                                                                 </div>
                                                             )}
                                                             <div className="min-w-0">
-                                                                <p className="text-[10px] text-muted-foreground truncate font-medium">{label}</p>
+                                                                <div className="flex items-center gap-1.5 mb-0.5">
+                                                                    <p className="text-[10px] text-muted-foreground truncate font-medium">{label}</p>
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            setSelectedNutrientInfo(label);
+                                                                        }}
+                                                                        className="text-green-600 hover:text-green-700 transition-colors"
+                                                                    >
+                                                                        <Info className="h-2.5 w-2.5" />
+                                                                    </button>
+                                                                </div>
                                                                 <p className="text-xs font-bold tabular-nums">
                                                                     {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
                                                                     <span className="ml-0.5 font-medium text-[10px] opacity-70">{u}</span>
@@ -1504,10 +1515,13 @@ export default function MealPlannerPage() {
                                     </div>
                                 </div>
 
-                                <div className="pt-4 border-t border-border">
-                                    <p className="text-[10px] text-muted-foreground italic">
-                                        <strong>Did you know?</strong> {nutrientInfo[selectedNutrientInfo].history}
-                                    </p>
+                                <div className="pt-6 border-t border-border">
+                                    <div className="bg-primary/5 p-4 rounded-xl border border-primary/10">
+                                        <h5 className="text-xs font-black uppercase tracking-widest text-primary mb-2">Did you know?</h5>
+                                        <p className="text-sm text-foreground/80 leading-relaxed font-medium">
+                                            {nutrientInfo[selectedNutrientInfo].history}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
