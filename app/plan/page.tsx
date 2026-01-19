@@ -36,7 +36,8 @@ import {
     FlaskConical,
     Dna,
     LayoutGrid,
-    Info
+    Info,
+    RefreshCw
 } from 'lucide-react';
 import {
     Sheet,
@@ -771,28 +772,33 @@ export default function MealPlannerPage() {
                                                             <div
                                                                 key={macro.label}
                                                                 className={cn(
-                                                                    "p-3 rounded-xl border transition-all shadow-sm",
-                                                                    styles.borderLight, styles.fade,
-                                                                    isEnergy && "cursor-pointer hover:shadow-md"
+                                                                    "p-3 rounded-xl border transition-all shadow-sm cursor-pointer hover:shadow-md",
+                                                                    styles.borderLight, styles.fade
                                                                 )}
-                                                                onClick={isEnergy ? () => setUnit(unit === 'kcal' ? 'kJ' : 'kcal') : undefined}
+                                                                onClick={() => setSelectedNutrientInfo(macro.label)}
                                                             >
                                                                 <div className="flex items-center justify-between gap-2 mb-2">
                                                                     <div className="flex items-center gap-2">
                                                                         <macro.icon className={cn("h-4 w-4", macro.color)} />
                                                                         <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-widest">{macro.label}</span>
                                                                     </div>
-                                                                    <button
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            setSelectedNutrientInfo(macro.label);
-                                                                        }}
-                                                                        className="text-green-600 hover:text-green-700 bg-green-50 rounded-full p-1 transition-all"
-                                                                    >
+                                                                    <div className="text-green-600 bg-green-50 rounded-full p-1 transition-all">
                                                                         <Info className="h-4 w-4" />
-                                                                    </button>
+                                                                    </div>
                                                                 </div>
-                                                                <div className="flex items-baseline gap-1 mb-1">
+                                                                <div
+                                                                    className={cn(
+                                                                        "flex items-baseline gap-1 mb-1 group/value relative",
+                                                                        isEnergy && "hover:bg-primary/5 rounded px-1 -mx-1 transition-colors"
+                                                                    )}
+                                                                    onClick={(e) => {
+                                                                        if (isEnergy) {
+                                                                            e.stopPropagation();
+                                                                            setUnit(unit === 'kcal' ? 'kJ' : 'kcal');
+                                                                        }
+                                                                    }}
+                                                                    title={isEnergy ? `Click to switch to ${unit === 'kcal' ? 'kJ' : 'kcal'}` : undefined}
+                                                                >
                                                                     <span className="text-xl font-bold">
                                                                         {macro.unit === 'kcal' || macro.unit === 'kJ'
                                                                             ? Math.round(formatEnergyValue(macro.val, macro.unit))
@@ -803,6 +809,9 @@ export default function MealPlannerPage() {
                                                                             ? Math.round(formatEnergyValue(macro.target, macro.unit))
                                                                             : macro.target.toFixed(0)}{macro.unit}
                                                                     </span>
+                                                                    {isEnergy && (
+                                                                        <RefreshCw className="h-2 w-2 text-muted-foreground/30 group-hover/value:text-primary transition-colors ml-0.5" />
+                                                                    )}
                                                                 </div>
                                                                 <div className="space-y-1.5">
                                                                     <div className="flex items-center justify-between text-[10px] font-semibold">
@@ -932,10 +941,14 @@ export default function MealPlannerPage() {
                                                                 const boostPct = boostValue > 0 && rdaValue ? Math.round((boostValue / rdaValue) * 100) : 0;
 
                                                                 return (
-                                                                    <div key={label} className={cn(
-                                                                        "flex flex-col justify-between gap-1 p-3 rounded-xl border transition-all shadow-sm hover:shadow-md group/card relative overflow-hidden",
-                                                                        percentage !== null ? `${styles.borderLight} ${styles.fade}` : "bg-background border-border/50"
-                                                                    )}>
+                                                                    <div
+                                                                        key={label}
+                                                                        onClick={() => setSelectedNutrientInfo(label)}
+                                                                        className={cn(
+                                                                            "flex flex-col justify-between gap-1 p-3 rounded-xl border transition-all shadow-sm hover:shadow-md group/card relative overflow-hidden cursor-pointer",
+                                                                            percentage !== null ? `${styles.borderLight} ${styles.fade}` : "bg-background border-border/50"
+                                                                        )}
+                                                                    >
                                                                         {boostValue > 0 && (
                                                                             <div className="absolute top-0 right-0 bg-green-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-bl-lg shadow-sm animate-in fade-in slide-in-from-top-1 duration-500">
                                                                                 +{boostPct}% BOOST
@@ -944,15 +957,9 @@ export default function MealPlannerPage() {
                                                                         <div className="min-w-0">
                                                                             <div className="flex items-center justify-between gap-2 mb-0.5">
                                                                                 <p className="text-[10px] uppercase font-semibold text-muted-foreground truncate tracking-tight group-hover/card:text-foreground transition-colors">{label}</p>
-                                                                                <button
-                                                                                    onClick={(e) => {
-                                                                                        e.stopPropagation();
-                                                                                        setSelectedNutrientInfo(label);
-                                                                                    }}
-                                                                                    className="text-green-600 hover:text-green-700 bg-green-50 rounded-full p-0.5 transition-all"
-                                                                                >
+                                                                                <div className="text-green-600 bg-green-50 rounded-full p-0.5 transition-all">
                                                                                     <Info className="h-4 w-4" />
-                                                                                </button>
+                                                                                </div>
                                                                             </div>
                                                                             <div className="flex items-baseline flex-wrap gap-x-1">
                                                                                 <span className="text-sm font-bold">
@@ -1270,10 +1277,14 @@ export default function MealPlannerPage() {
                                                     const boostPct = boostValue > 0 && rdaValue ? Math.round((boostValue / rdaValue) * 100) : 0;
 
                                                     return (
-                                                        <div key={label} className={cn(
-                                                            "flex items-center justify-between gap-1 p-2 rounded-lg border shadow-sm transition-all relative overflow-hidden",
-                                                            percentage !== null ? `${styles.borderLight} ${styles.fade}` : "bg-background border-border/40"
-                                                        )}>
+                                                        <div
+                                                            key={label}
+                                                            onClick={() => setSelectedNutrientInfo(label)}
+                                                            className={cn(
+                                                                "flex items-center justify-between gap-1 p-2 rounded-lg border shadow-sm transition-all relative overflow-hidden cursor-pointer hover:bg-muted/5",
+                                                                percentage !== null ? `${styles.borderLight} ${styles.fade}` : "bg-background border-border/40"
+                                                            )}
+                                                        >
                                                             {boostValue > 0 && (
                                                                 <div className="absolute top-0 right-0 bg-green-600 text-white text-[7px] font-black px-1 py-0.5 rounded-bl-[4px] shadow-sm">
                                                                     +{boostPct}%
@@ -1282,15 +1293,9 @@ export default function MealPlannerPage() {
                                                             <div className="min-w-0">
                                                                 <div className="flex items-center gap-1.5 mb-0.5">
                                                                     <p className="text-[10px] text-muted-foreground truncate font-medium">{label}</p>
-                                                                    <button
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            setSelectedNutrientInfo(label);
-                                                                        }}
-                                                                        className="text-green-600 hover:text-green-700 transition-colors"
-                                                                    >
+                                                                    <div className="text-green-600 transition-colors">
                                                                         <Info className="h-2.5 w-2.5" />
-                                                                    </button>
+                                                                    </div>
                                                                 </div>
                                                                 <p className="text-xs font-bold tabular-nums">
                                                                     {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
