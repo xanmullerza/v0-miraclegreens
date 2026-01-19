@@ -871,7 +871,7 @@ export default function MealPlannerPage() {
                                             };
 
                                             const DailyNutrientGrid = ({ nutrients, title, icon: Icon }: { nutrients: Record<string, number>, title: string, icon: any }) => {
-                                                const filtered = Object.entries(nutrients).filter(([_, val]) => val > 0);
+                                                const filtered = Object.entries(nutrients);
                                                 if (filtered.length === 0) return null;
 
                                                 return (
