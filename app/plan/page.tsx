@@ -58,6 +58,12 @@ import Link from 'next/link';
 
 const showShop = false;
 
+const BOOSTABLE_NUTRIENTS = [
+    'Potassium', 'Magnesium', 'Calcium', 'Sodium', 'Iron',
+    'Vitamin A', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)',
+    'Vitamin C', 'Fiber'
+];
+
 // --- HELPERS ---
 const CAL_TO_KJ = 4.184;
 type UnitType = 'kcal' | 'kJ';
@@ -272,6 +278,7 @@ export default function MealPlannerPage() {
     const [showDailyNutrients, setShowDailyNutrients] = useState(false);
     const [dailyMoringaGrams, setDailyMoringaGrams] = useState(0);
     const [selectedNutrientInfo, setSelectedNutrientInfo] = useState<string | null>(null);
+    const [activeBoostContext, setActiveBoostContext] = useState<'daily' | 'recipe' | null>(null);
 
     // Standard 1 tsp (2g) Moringa Nutrition (Calculated from 100g data)
     const MORINGA_TSP = {
@@ -899,10 +906,18 @@ export default function MealPlannerPage() {
 
                                                 return (
                                                     <div className="p-5 rounded-2xl border border-border bg-card/50 shadow-sm space-y-4">
-                                                        <h4 className="font-bold text-md text-foreground flex items-center gap-2 border-b border-border/50 pb-2">
-                                                            <Icon className="h-5 w-5 text-primary" />
-                                                            {title}
-                                                        </h4>
+                                                        <div className="flex items-center justify-between border-b border-border/50 pb-2">
+                                                            <h4 className="font-bold text-md text-foreground flex items-center gap-2">
+                                                                <Icon className="h-5 w-5 text-primary" />
+                                                                {title}
+                                                            </h4>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-[10px] font-bold text-green-600 uppercase tracking-tighter bg-green-50 px-2 py-0.5 rounded-full border border-green-100 flex items-center gap-1">
+                                                                    <Sparkles className="h-2.5 w-2.5" />
+                                                                    Boostable
+                                                                </span>
+                                                            </div>
+                                                        </div>
                                                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                                                             {filtered.map(([label, value]) => {
                                                                 let unit = 'mg';
@@ -957,8 +972,22 @@ export default function MealPlannerPage() {
                                                                         <div className="min-w-0">
                                                                             <div className="flex items-center justify-between gap-2 mb-0.5">
                                                                                 <p className="text-[10px] uppercase font-semibold text-foreground/80 truncate tracking-tight">{label}</p>
-                                                                                <div className="text-green-600 bg-green-50 rounded-full p-0.5 transition-all">
-                                                                                    <Info className="h-4 w-4" />
+                                                                                <div className="flex items-center gap-1">
+                                                                                    {BOOSTABLE_NUTRIENTS.includes(label) && (
+                                                                                        <button
+                                                                                            onClick={(e) => {
+                                                                                                e.stopPropagation();
+                                                                                                setActiveBoostContext('daily');
+                                                                                            }}
+                                                                                            className="text-green-600 hover:text-green-700 bg-green-50 rounded-full p-0.5 transition-all border border-green-100 hover:scale-110 active:scale-95"
+                                                                                            title="Add Miracle Boost"
+                                                                                        >
+                                                                                            <Sparkles className="h-3.5 w-3.5" />
+                                                                                        </button>
+                                                                                    )}
+                                                                                    <div className="text-primary/40 bg-muted/50 rounded-full p-0.5 transition-all hover:text-primary hover:bg-primary/5">
+                                                                                        <Info className="h-4 w-4" />
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
                                                                             <div className="flex items-baseline flex-wrap gap-x-1">
@@ -1023,50 +1052,8 @@ export default function MealPlannerPage() {
                                             );
                                         })()
                                     }
-                                    {/* Bridge Section: Miracle Boost + Start Over */}
-                                    <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-muted/20 rounded-2xl border border-border/50">
-                                        <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-                                            <div className="flex flex-col items-center sm:items-start gap-1">
-                                                <span className="text-[10px] uppercase tracking-wider font-bold text-green-800 dark:text-green-300 flex items-center gap-1">
-                                                    <Sparkles className="w-3 h-3" />
-                                                    Miracle Boost
-                                                </span>
-                                                <div className="flex items-center bg-white dark:bg-black/20 rounded-lg shadow-sm border border-green-100 dark:border-green-800/50 p-0.5">
-                                                    {[0, 1, 2, 3, 4, 5].map(spoons => {
-                                                        const g = spoons * 2;
-                                                        const isActive = dailyMoringaGrams === g;
-                                                        return (
-                                                            <button
-                                                                key={spoons}
-                                                                onClick={() => setDailyMoringaGrams(g)}
-                                                                className={cn(
-                                                                    "w-7 h-7 flex items-center justify-center text-xs font-bold transition-all rounded-md",
-                                                                    isActive
-                                                                        ? "bg-green-600 text-white shadow-sm"
-                                                                        : "text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/20"
-                                                                )}
-                                                                title={`${g}g`}
-                                                            >
-                                                                {spoons}
-                                                            </button>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                            <div className="relative flex items-center shrink-0">
-                                                <Input
-                                                    type="number"
-                                                    min="0"
-                                                    value={dailyMoringaGrams}
-                                                    onChange={(e) => setDailyMoringaGrams(Number(e.target.value))}
-                                                    className="w-16 h-8 text-center text-xs pr-4 border-green-200 focus:ring-green-500 bg-white"
-                                                    placeholder="0"
-                                                />
-                                                <span className="absolute right-1.5 text-[10px] text-green-600 font-bold pointer-events-none">g</span>
-                                            </div>
-                                        </div>
-
-                                        <Button onClick={() => setStep(1)} variant="outline" size="sm" className="w-full md:w-auto gap-2 border-muted-foreground/20 text-muted-foreground">
+                                    <div className="flex items-center justify-center p-6 bg-muted/10 rounded-2xl border border-dashed border-border/50">
+                                        <Button onClick={() => setStep(1)} variant="outline" size="sm" className="gap-2 border-muted-foreground/20 text-muted-foreground hover:bg-background">
                                             Start Over
                                         </Button>
                                     </div>
@@ -1077,6 +1064,80 @@ export default function MealPlannerPage() {
                 </div>
             </div>
             <Footer />
+
+            {/* Miracle Boost Overlay */}
+            {activeBoostContext && (
+                <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-300" onClick={() => setActiveBoostContext(null)}>
+                    <div
+                        className="bg-background rounded-[32px] max-w-sm w-full p-8 shadow-2xl border border-border animate-in zoom-in-95 slide-in-from-bottom-4 duration-300"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="text-center space-y-4">
+                            <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-4">
+                                <Sparkles className="w-8 h-8 text-green-600" />
+                            </div>
+                            <h3 className="text-2xl font-black text-foreground">
+                                {activeBoostContext === 'daily' ? "Daily Miracle Boost" : "Recipe Miracle Boost"}
+                            </h3>
+                            <p className="text-sm text-balance text-muted-foreground px-4">
+                                {activeBoostContext === 'daily'
+                                    ? "Supercharge your entire day with Miracle Greens Moringa powder."
+                                    : "Supercharge this specific meal with a concentrated nutrients boost."}
+                            </p>
+
+                            <div className="py-6">
+                                <div className="flex flex-col items-center gap-6">
+                                    <div className="flex items-center bg-muted/50 p-1.5 rounded-2xl border border-border/50">
+                                        {[0, 1, 2, 3, 4, 5].map(spoons => {
+                                            const g = spoons * 2;
+                                            const contextGrams = activeBoostContext === 'daily' ? dailyMoringaGrams : recipeMoringaGrams;
+                                            const isActive = contextGrams === g;
+                                            return (
+                                                <button
+                                                    key={spoons}
+                                                    onClick={() => activeBoostContext === 'daily' ? setDailyMoringaGrams(g) : setRecipeMoringaGrams(g)}
+                                                    className={cn(
+                                                        "w-10 h-10 flex flex-col items-center justify-center transition-all rounded-xl",
+                                                        isActive
+                                                            ? "bg-green-600 text-white shadow-lg scale-110"
+                                                            : "text-muted-foreground hover:bg-muted"
+                                                    )}
+                                                >
+                                                    <span className="text-sm font-bold">{spoons}</span>
+                                                    <span className="text-[8px] uppercase font-black opacity-60">tsp</span>
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <div className="relative group">
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                value={activeBoostContext === 'daily' ? dailyMoringaGrams : recipeMoringaGrams}
+                                                onChange={(e) => {
+                                                    const val = Number(e.target.value);
+                                                    if (activeBoostContext === 'daily') setDailyMoringaGrams(val);
+                                                    else setRecipeMoringaGrams(val);
+                                                }}
+                                                className="w-24 h-12 text-center text-lg font-black border-2 border-green-100 focus:border-green-500 rounded-xl bg-background"
+                                            />
+                                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-black text-green-600">g</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <Button
+                                className="w-full h-12 rounded-2xl text-lg font-bold bg-green-600 hover:bg-green-700 text-white shadow-xl shadow-green-500/20 active:scale-[0.98] transition-all"
+                                onClick={() => setActiveBoostContext(null)}
+                            >
+                                Confirm Boost
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Recipe Detail Modal */}
             {selectedRecipe && (
@@ -1291,10 +1352,23 @@ export default function MealPlannerPage() {
                                                                 </div>
                                                             )}
                                                             <div className="min-w-0">
-                                                                <div className="flex items-center gap-1.5 mb-0.5">
+                                                                <div className="flex items-center justify-between gap-1.5 mb-0.5">
                                                                     <p className="text-[10px] text-foreground/90 font-semibold truncate">{label}</p>
-                                                                    <div className="text-green-600 transition-colors">
-                                                                        <Info className="h-2.5 w-2.5" />
+                                                                    <div className="flex items-center gap-1">
+                                                                        {BOOSTABLE_NUTRIENTS.includes(label) && (
+                                                                            <button
+                                                                                onClick={(e) => {
+                                                                                    e.stopPropagation();
+                                                                                    setActiveBoostContext('recipe');
+                                                                                }}
+                                                                                className="text-green-600 hover:text-green-700 bg-green-50 rounded-full p-0.5 transition-all border border-green-100"
+                                                                            >
+                                                                                <Sparkles className="h-3 w-3" />
+                                                                            </button>
+                                                                        )}
+                                                                        <div className="text-primary/40 transition-colors">
+                                                                            <Info className="h-2.5 w-2.5" />
+                                                                        </div>
                                                                     </div>
                                                                 </div>
                                                                 <p className="text-xs font-bold tabular-nums">
