@@ -84,7 +84,7 @@ const getNutrientLevelStyles = (percentage: number, label?: string) => {
     const l = label?.toLowerCase() || '';
     const isLimit = l.includes('sugar');
     const isBellCurve = l.includes('sodium') || l.includes('potassium') || l.includes('iron') ||
-        l.includes('vitamin a') || l.includes('vitamin d') || l.includes('vitamin k');
+        l.includes('vitamin a') || l.includes('vitamin d');
 
     let color: 'green' | 'blue' | 'yellow' | 'orange' | 'red' = 'red';
 
@@ -95,7 +95,7 @@ const getNutrientLevelStyles = (percentage: number, label?: string) => {
         else if (percentage <= 100) color = 'orange';
         else color = 'red';
     } else if (isBellCurve) {
-        // Essential but toxic in excess (Bell Curve logic)
+        // Essential but toxic in extreme excess (Bell Curve logic)
         if (percentage > 200) color = 'red';           // Extreme excess
         else if (percentage > 150) color = 'orange';    // Significant excess
         else if (percentage > 120) color = 'yellow';    // Approaching upper limit
@@ -105,7 +105,7 @@ const getNutrientLevelStyles = (percentage: number, label?: string) => {
         else if (percentage >= 35) color = 'orange';    // Very low
         else color = 'red';                             // Critical deficiency
     } else {
-        // Standard Nutrients (Reaching 100% is the goal)
+        // Standard Nutrients (Reaching 100% is the goal, excess from food is fine)
         if (percentage >= 100) color = 'green';
         else if (percentage >= 70) color = 'blue';
         else if (percentage >= 50) color = 'yellow';
