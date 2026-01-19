@@ -92,11 +92,11 @@ const getNutrientLevelStyles = (percentage: number, label?: string) => {
     }
 
     const map = {
-        green: { bg: 'bg-green-500', border: 'border-green-500', borderLight: 'border-green-500/30', text: 'text-green-600', textFill: 'text-white', fade: 'bg-green-50' },
-        blue: { bg: 'bg-blue-500', border: 'border-blue-500', borderLight: 'border-blue-500/30', text: 'text-blue-600', textFill: 'text-white', fade: 'bg-blue-50' },
-        yellow: { bg: 'bg-yellow-400', border: 'border-yellow-400', borderLight: 'border-yellow-400/30', text: 'text-yellow-700', textFill: 'text-black', fade: 'bg-yellow-50' },
-        orange: { bg: 'bg-orange-500', border: 'border-orange-500', borderLight: 'border-orange-500/30', text: 'text-orange-600', textFill: 'text-white', fade: 'bg-orange-50' },
-        red: { bg: 'bg-red-500', border: 'border-red-500', borderLight: 'border-red-500/30', text: 'text-red-600', textFill: 'text-white', fade: 'bg-red-50' },
+        green: { bg: 'bg-green-700', border: 'border-green-700', borderLight: 'border-green-700/30', text: 'text-green-800', textFill: 'text-white', fade: 'bg-green-50' },
+        blue: { bg: 'bg-blue-700', border: 'border-blue-700', borderLight: 'border-blue-700/30', text: 'text-blue-800', textFill: 'text-white', fade: 'bg-blue-50' },
+        yellow: { bg: 'bg-amber-500', border: 'border-amber-500', borderLight: 'border-amber-500/30', text: 'text-amber-800', textFill: 'text-white', fade: 'bg-amber-50' },
+        orange: { bg: 'bg-orange-700', border: 'border-orange-700', borderLight: 'border-orange-700/30', text: 'text-orange-800', textFill: 'text-white', fade: 'bg-orange-50' },
+        red: { bg: 'bg-red-700', border: 'border-red-700', borderLight: 'border-red-700/30', text: 'text-red-800', textFill: 'text-white', fade: 'bg-red-50' },
     };
 
     return map[color];
