@@ -676,9 +676,9 @@ export default function MealPlannerPage() {
 
                         {/* WIZARD STEP 3: RESULTS DASHBOARD */}
                         {step === 3 && plan && (
-                            <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-500">
+                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-500">
                                 {/* Meal Grid */}
-                                <div className="flex flex-wrap justify-center gap-6 pb-6">
+                                <div className="flex flex-wrap justify-center gap-6">
                                     <div className="w-full md:w-[calc(50%-0.75rem)] lg:w-[calc(33.33%-1rem)] animate-in fade-in slide-in-from-bottom-4 duration-500 delay-0 fill-mode-backwards">
                                         <RecipeCard
                                             recipe={plan.breakfast}
@@ -718,13 +718,8 @@ export default function MealPlannerPage() {
                                     ))}
                                 </div>
 
-                                {/* Daily Totals Section */}
-                                <div className="pt-8 border-t border-border/50 space-y-8">
-                                    <div className="text-center space-y-1">
-                                        <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-muted-foreground/60">Daily Nutrition Summary</h3>
-                                        <p className="text-[10px] text-muted-foreground animate-pulse">Adjust Miracle Boost to see totals update</p>
-                                    </div>
-
+                                {/* Daily Totals Content */}
+                                <div className="space-y-6">
                                     {/* Macros Section */}
                                     {(() => {
                                         const targetCals = calories;
@@ -998,7 +993,6 @@ export default function MealPlannerPage() {
                                 </div>
                             </div>
                         )}
-
                     </div>
                 </div>
             </div>
