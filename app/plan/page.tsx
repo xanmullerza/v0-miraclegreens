@@ -1059,12 +1059,12 @@ export default function MealPlannerPage() {
 
                                             return (
                                                 <div className="mt-6 pt-6 border-t border-border space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
-                                                    <DailyNutrientGrid nutrients={metabolicEnergy} title="Brain & Metabolic Energy" icon={Battery} />
-                                                    <DailyNutrientGrid nutrients={bloodDNA} title="Blood Health & DNA Support" icon={Droplet} />
-                                                    <DailyNutrientGrid nutrients={immuneAntioxidant} title="Immune & Antioxidant Defense" icon={Shield} />
-                                                    <DailyNutrientGrid nutrients={skeletalHealth} title="Bone & Structural Strength" icon={Dumbbell} />
-                                                    <DailyNutrientGrid nutrients={electrolytes} title="Essential Electrolytes" icon={Zap} />
-                                                    <DailyNutrientGrid nutrients={other} title="Dietary Fiber" icon={Leaf} />
+                                                    <DailyNutrientGrid nutrients={metabolicEnergy} title="Energy & Focus" icon={Battery} />
+                                                    <DailyNutrientGrid nutrients={bloodDNA} title="Blood & DNA" icon={Droplet} />
+                                                    <DailyNutrientGrid nutrients={immuneAntioxidant} title="Immune Shield" icon={Shield} />
+                                                    <DailyNutrientGrid nutrients={skeletalHealth} title="Bone & Strength" icon={Dumbbell} />
+                                                    <DailyNutrientGrid nutrients={electrolytes} title="Fluid Balance" icon={Zap} />
+                                                    <DailyNutrientGrid nutrients={other} title="Gut Health" icon={Leaf} />
 
                                                     {/* Hide Detailed Nutrients Button at the bottom */}
                                                     <Button
@@ -1480,14 +1480,14 @@ export default function MealPlannerPage() {
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                                             <div className="space-y-6">
-                                                <ModalNutrientGrid nutrients={metabolicEnergy} title="Brain & Metabolic Energy" icon={Battery} />
-                                                <ModalNutrientGrid nutrients={bloodDNA} title="Blood Health & DNA Support" icon={Droplet} />
-                                                <ModalNutrientGrid nutrients={immuneAntioxidant} title="Immune & Antioxidant Defense" icon={Shield} />
+                                                <ModalNutrientGrid nutrients={metabolicEnergy} title="Energy & Focus" icon={Battery} />
+                                                <ModalNutrientGrid nutrients={bloodDNA} title="Blood & DNA" icon={Droplet} />
+                                                <ModalNutrientGrid nutrients={immuneAntioxidant} title="Immune Shield" icon={Shield} />
                                             </div>
                                             <div className="space-y-6">
-                                                <ModalNutrientGrid nutrients={skeletalHealth} title="Bone & Structural Strength" icon={Dumbbell} />
-                                                <ModalNutrientGrid nutrients={electrolytes} title="Essential Electrolytes" icon={Zap} />
-                                                <ModalNutrientGrid nutrients={other} title="Dietary Fiber" icon={Leaf} />
+                                                <ModalNutrientGrid nutrients={skeletalHealth} title="Bone & Strength" icon={Dumbbell} />
+                                                <ModalNutrientGrid nutrients={electrolytes} title="Fluid Balance" icon={Zap} />
+                                                <ModalNutrientGrid nutrients={other} title="Gut Health" icon={Leaf} />
                                             </div>
                                         </div>
                                     </div>
