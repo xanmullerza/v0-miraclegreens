@@ -892,11 +892,41 @@ export default function MealPlannerPage() {
                                                                 const percentage = rdaValue ? Math.round((value / rdaValue) * 100) : null;
                                                                 const styles = getNutrientLevelStyles(percentage || 0, label);
 
+                                                                // Calculate Moringa Boost for this specific nutrient
+                                                                const getBoost = () => {
+                                                                    if (dailyMoringaGrams <= 0) return 0;
+                                                                    const ratio = dailyMoringaGrams / 2;
+                                                                    const mapping: Record<string, string> = {
+                                                                        'Potassium': 'potassium_mg',
+                                                                        'Magnesium': 'magnesium_mg',
+                                                                        'Calcium': 'calcium_mg',
+                                                                        'Sodium': 'sodium_mg',
+                                                                        'Iron': 'iron_mg',
+                                                                        'Vitamin A': 'vitamin_a_ug',
+                                                                        'B1 (Thiamine)': 'thiamine_mg',
+                                                                        'B2 (Riboflavin)': 'riboflavin_mg',
+                                                                        'B3 (Niacin)': 'niacin_mg',
+                                                                        'Vitamin C': 'vitamin_c_mg',
+                                                                        'Fiber': 'fiber_g'
+                                                                    };
+                                                                    const key = mapping[label];
+                                                                    if (!key) return 0;
+                                                                    return (MORINGA_TSP.micronutrients as any)[key] * ratio;
+                                                                };
+
+                                                                const boostValue = getBoost();
+                                                                const boostPct = boostValue > 0 && rdaValue ? Math.round((boostValue / rdaValue) * 100) : 0;
+
                                                                 return (
                                                                     <div key={label} className={cn(
-                                                                        "flex flex-col justify-between gap-1 p-3 rounded-xl border transition-all shadow-sm hover:shadow-md group/card",
+                                                                        "flex flex-col justify-between gap-1 p-3 rounded-xl border transition-all shadow-sm hover:shadow-md group/card relative overflow-hidden",
                                                                         percentage !== null ? `${styles.borderLight} ${styles.fade}` : "bg-background border-border/50"
                                                                     )}>
+                                                                        {boostValue > 0 && (
+                                                                            <div className="absolute top-0 right-0 bg-green-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-bl-lg shadow-sm animate-in fade-in slide-in-from-top-1 duration-500">
+                                                                                +{boostPct}% BOOST
+                                                                            </div>
+                                                                        )}
                                                                         <div className="min-w-0">
                                                                             <p className="text-[10px] uppercase font-semibold text-muted-foreground truncate tracking-tight group-hover/card:text-foreground transition-colors">{label}</p>
                                                                             <div className="flex items-baseline flex-wrap gap-x-1">
@@ -1189,11 +1219,41 @@ export default function MealPlannerPage() {
                                                     const percentage = rdaValue ? Math.round((value / rdaValue) * 100) : null;
                                                     const styles = getNutrientLevelStyles(percentage || 0, label);
 
+                                                    // Calculate Moringa Boost for this specific nutrient
+                                                    const getBoost = () => {
+                                                        if (recipeMoringaGrams <= 0) return 0;
+                                                        const ratio = recipeMoringaGrams / 2;
+                                                        const mapping: Record<string, string> = {
+                                                            'Potassium': 'potassium_mg',
+                                                            'Magnesium': 'magnesium_mg',
+                                                            'Calcium': 'calcium_mg',
+                                                            'Sodium': 'sodium_mg',
+                                                            'Iron': 'iron_mg',
+                                                            'Vitamin A': 'vitamin_a_ug',
+                                                            'B1 (Thiamine)': 'thiamine_mg',
+                                                            'B2 (Riboflavin)': 'riboflavin_mg',
+                                                            'B3 (Niacin)': 'niacin_mg',
+                                                            'Vitamin C': 'vitamin_c_mg',
+                                                            'Fiber': 'fiber_g'
+                                                        };
+                                                        const key = mapping[label];
+                                                        if (!key) return 0;
+                                                        return (MORINGA_TSP.micronutrients as any)[key] * ratio;
+                                                    };
+
+                                                    const boostValue = getBoost();
+                                                    const boostPct = boostValue > 0 && rdaValue ? Math.round((boostValue / rdaValue) * 100) : 0;
+
                                                     return (
                                                         <div key={label} className={cn(
-                                                            "flex items-center justify-between gap-1 p-2 rounded-lg border shadow-sm transition-all",
+                                                            "flex items-center justify-between gap-1 p-2 rounded-lg border shadow-sm transition-all relative overflow-hidden",
                                                             percentage !== null ? `${styles.borderLight} ${styles.fade}` : "bg-background border-border/40"
                                                         )}>
+                                                            {boostValue > 0 && (
+                                                                <div className="absolute top-0 right-0 bg-green-600 text-white text-[7px] font-black px-1 py-0.5 rounded-bl-[4px] shadow-sm">
+                                                                    +{boostPct}%
+                                                                </div>
+                                                            )}
                                                             <div className="min-w-0">
                                                                 <p className="text-[10px] text-muted-foreground truncate font-medium">{label}</p>
                                                                 <p className="text-xs font-bold tabular-nums">
