@@ -713,14 +713,14 @@ export default function MealPlannerPage() {
                                                         )}>
                                                             <div className="flex items-center gap-2 mb-2">
                                                                 <Icon className={cn("h-4 w-4", colorClass)} />
-                                                                <span className="text-[10px] uppercase font-black text-muted-foreground tracking-widest">{label}</span>
+                                                                <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-widest">{label}</span>
                                                             </div>
                                                             <div className="flex items-baseline gap-1 mb-1">
-                                                                <span className="text-xl font-black">{u === 'kcal' || u === 'kJ' ? Math.round(formatEnergyValue(val, u)) : val.toFixed(0)}</span>
-                                                                <span className="text-[10px] font-bold text-muted-foreground/60">/ {u === 'kcal' || u === 'kJ' ? Math.round(formatEnergyValue(target, u)) : target.toFixed(0)}{u}</span>
+                                                                <span className="text-xl font-bold">{u === 'kcal' || u === 'kJ' ? Math.round(formatEnergyValue(val, u)) : val.toFixed(0)}</span>
+                                                                <span className="text-[10px] font-medium text-muted-foreground/60">/ {u === 'kcal' || u === 'kJ' ? Math.round(formatEnergyValue(target, u)) : target.toFixed(0)}{u}</span>
                                                             </div>
                                                             <div className="space-y-1.5">
-                                                                <div className="flex items-center justify-between text-[10px] font-black">
+                                                                <div className="flex items-center justify-between text-[10px] font-semibold">
                                                                     <span className={cn("px-1 rounded", styles.bg, styles.textFill)}>{pct}%</span>
                                                                 </div>
                                                                 <div className="w-full bg-muted/50 rounded-full h-1.5 overflow-hidden border border-black/5">
@@ -885,14 +885,14 @@ export default function MealPlannerPage() {
                                                                     percentage !== null ? `${styles.borderLight} ${styles.fade}` : "bg-background border-border/50"
                                                                 )}>
                                                                     <div className="min-w-0">
-                                                                        <p className="text-[10px] uppercase font-bold text-muted-foreground truncate tracking-tight group-hover/card:text-foreground transition-colors">{label}</p>
+                                                                        <p className="text-[10px] uppercase font-semibold text-muted-foreground truncate tracking-tight group-hover/card:text-foreground transition-colors">{label}</p>
                                                                         <div className="flex items-baseline flex-wrap gap-x-1">
-                                                                            <span className="text-sm font-black">
+                                                                            <span className="text-sm font-bold">
                                                                                 {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
                                                                                 <span className="text-[10px] font-medium opacity-60 ml-0.5">{unit}</span>
                                                                             </span>
                                                                             {rdaValue && (
-                                                                                <span className="text-[11px] font-bold text-muted-foreground/50">
+                                                                                <span className="text-[11px] font-medium text-muted-foreground/50">
                                                                                     / {rdaValue >= 1 ? Math.round(rdaValue) : rdaValue.toFixed(1)}{unit}
                                                                                 </span>
                                                                             )}
@@ -900,7 +900,7 @@ export default function MealPlannerPage() {
                                                                     </div>
                                                                     {percentage !== null && (
                                                                         <div className="mt-2 space-y-1.5">
-                                                                            <div className="flex items-center justify-between text-[10px] font-black">
+                                                                            <div className="flex items-center justify-between text-[10px] font-semibold">
                                                                                 <span className={cn(
                                                                                     "px-1.5 py-0.5 rounded-[4px] shadow-sm",
                                                                                     styles.bg,
@@ -1166,15 +1166,15 @@ export default function MealPlannerPage() {
                                                             percentage !== null ? `${styles.borderLight} ${styles.fade}` : "bg-background border-border/40"
                                                         )}>
                                                             <div className="min-w-0">
-                                                                <p className="text-[10px] text-muted-foreground truncate font-semibold">{label}</p>
-                                                                <p className="text-xs font-black tabular-nums">
+                                                                <p className="text-[10px] text-muted-foreground truncate font-medium">{label}</p>
+                                                                <p className="text-xs font-bold tabular-nums">
                                                                     {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
                                                                     <span className="ml-0.5 font-medium text-[10px] opacity-70">{u}</span>
                                                                 </p>
                                                             </div>
                                                             {percentage !== null && (
                                                                 <span className={cn(
-                                                                    "text-[10px] font-black px-1.5 py-0.5 rounded-[4px] shadow-sm",
+                                                                    "text-[10px] font-semibold px-1.5 py-0.5 rounded-[4px] shadow-sm",
                                                                     styles.bg,
                                                                     styles.textFill
                                                                 )}>
