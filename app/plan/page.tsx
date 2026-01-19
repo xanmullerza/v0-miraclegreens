@@ -888,16 +888,19 @@ export default function MealPlannerPage() {
                                             }
 
                                             // Categorize nutrients
-                                            const metabolicEnergy: Record<string, number> = {
+                                            const metabolicFuel: Record<string, number> = {
                                                 'B1 (Thiamine)': m.thiamine_mg || 0,
                                                 'B2 (Riboflavin)': m.riboflavin_mg || 0,
                                                 'B3 (Niacin)': m.niacin_mg || 0,
                                                 'B5 (Pantothenic Acid)': m.pantothenic_acid_mg || 0,
+                                                'Manganese': m.manganese_mg || 0,
+                                            };
+
+                                            const cognitiveFocus: Record<string, number> = {
                                                 'B6 (Pyridoxine)': m.vitamin_b6_mg || 0,
                                                 'Choline': m.choline_mg || 0,
                                                 'Magnesium': m.magnesium_mg || 0,
                                                 'Copper': m.copper_mg || 0,
-                                                'Manganese': m.manganese_mg || 0,
                                             };
 
                                             const bloodDNA: Record<string, number> = {
@@ -1055,9 +1058,10 @@ export default function MealPlannerPage() {
 
                                             return (
                                                 <div className="mt-6 pt-6 border-t border-border space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
-                                                    <DailyNutrientGrid nutrients={metabolicEnergy} title="Energy & Focus" icon={Battery} />
+                                                    <DailyNutrientGrid nutrients={metabolicFuel} title="Metabolic Fuel" icon={Flame} />
+                                                    <DailyNutrientGrid nutrients={cognitiveFocus} title="Cognitive Focus" icon={Activity} />
                                                     <DailyNutrientGrid nutrients={bloodDNA} title="Blood & DNA" icon={Droplet} />
-                                                    <DailyNutrientGrid nutrients={immuneAntioxidant} title="Immune Shield" icon={Shield} />
+                                                    <DailyNutrientGrid nutrients={immuneShield} title="Immune Shield" icon={Shield} />
                                                     <DailyNutrientGrid nutrients={skeletalHealth} title="Bone & Strength" icon={Dumbbell} />
                                                     <DailyNutrientGrid nutrients={electrolytes} title="Fluid Balance" icon={Zap} />
                                                     <DailyNutrientGrid nutrients={other} title="Gut Health" icon={Leaf} />
@@ -1295,16 +1299,19 @@ export default function MealPlannerPage() {
                                     });
                                 }
 
-                                const metabolicEnergy: Record<string, number> = {
+                                const metabolicFuel: Record<string, number> = {
                                     'B1 (Thiamine)': m.thiamine_mg || 0,
                                     'B2 (Riboflavin)': m.riboflavin_mg || 0,
                                     'B3 (Niacin)': m.niacin_mg || 0,
                                     'B5 (Pantothenic Acid)': m.pantothenic_acid_mg || 0,
+                                    'Manganese': m.manganese_mg || 0,
+                                };
+
+                                const cognitiveFocus: Record<string, number> = {
                                     'B6 (Pyridoxine)': m.vitamin_b6_mg || 0,
                                     'Choline': m.choline_mg || 0,
                                     'Magnesium': m.magnesium_mg || 0,
                                     'Copper': m.copper_mg || 0,
-                                    'Manganese': m.manganese_mg || 0,
                                 };
 
                                 const bloodDNA: Record<string, number> = {
@@ -1483,7 +1490,8 @@ export default function MealPlannerPage() {
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                                             <div className="space-y-6">
-                                                <ModalNutrientGrid nutrients={metabolicEnergy} title="Energy & Focus" icon={Battery} />
+                                                <ModalNutrientGrid nutrients={metabolicFuel} title="Metabolic Fuel" icon={Flame} />
+                                                <ModalNutrientGrid nutrients={cognitiveFocus} title="Cognitive Focus" icon={Activity} />
                                                 <ModalNutrientGrid nutrients={bloodDNA} title="Blood & DNA" icon={Droplet} />
                                                 <ModalNutrientGrid nutrients={immuneAntioxidant} title="Immune Shield" icon={Shield} />
                                             </div>
