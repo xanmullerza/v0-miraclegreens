@@ -507,12 +507,14 @@ export default function MealPlannerPage() {
                 <div className="max-w-5xl mx-auto">
 
                     {/* Header */}
-                    <div className="text-center mb-12">
-                        <h1 className="text-4xl font-serif font-bold mb-4">Miracle Meal Planner</h1>
-                        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                            Generate a personalized daily meal plan in seconds. Tailored to your goals, fueled by Miracle Greens.
-                        </p>
-                    </div>
+                    {step !== 3 && (
+                        <div className="text-center mb-12 animate-in fade-in slide-in-from-top-4 duration-500">
+                            <h1 className="text-4xl font-serif font-bold mb-4">Miracle Meal Planner</h1>
+                            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                                Generate a personalized daily meal plan in seconds. Tailored to your goals, fueled by Miracle Greens.
+                            </p>
+                        </div>
+                    )}
 
                     <div className="bg-card border border-border rounded-3xl p-6 sm:p-10 shadow-sm relative overflow-hidden min-h-[600px]">
 
