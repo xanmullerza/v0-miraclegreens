@@ -35,7 +35,8 @@ import {
     Microscope,
     FlaskConical,
     Dna,
-    LayoutGrid
+    LayoutGrid,
+    Info
 } from 'lucide-react';
 import {
     Sheet,
@@ -47,6 +48,7 @@ import {
 } from "@/components/ui/sheet"
 import { useRDA } from '@/hooks/use-rda';
 import { DietType, Recipe } from '@/lib/data/recipes';
+import { nutrientInfo, NutrientInfo } from '@/lib/data/nutrient-info';
 import { generateDailyPlan, DailyPlan, generateShoppingList, ShoppingItem, getRandomRecipeByType } from '@/lib/utils/meal-generator';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -268,6 +270,7 @@ export default function MealPlannerPage() {
     const [moringaGrams, setMoringaGrams] = useState(0);
     const [showDailyNutrients, setShowDailyNutrients] = useState(false);
     const [dailyMoringaGrams, setDailyMoringaGrams] = useState(0);
+    const [selectedNutrientInfo, setSelectedNutrientInfo] = useState<string | null>(null);
 
     // Standard 1 tsp (2g) Moringa Nutrition (Calculated from 100g data)
     const MORINGA_TSP = {
@@ -928,7 +931,18 @@ export default function MealPlannerPage() {
                                                                             </div>
                                                                         )}
                                                                         <div className="min-w-0">
-                                                                            <p className="text-[10px] uppercase font-semibold text-muted-foreground truncate tracking-tight group-hover/card:text-foreground transition-colors">{label}</p>
+                                                                            <div className="flex items-center justify-between gap-2 mb-0.5">
+                                                                                <p className="text-[10px] uppercase font-semibold text-muted-foreground truncate tracking-tight group-hover/card:text-foreground transition-colors">{label}</p>
+                                                                                <button
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        setSelectedNutrientInfo(label);
+                                                                                    }}
+                                                                                    className="text-muted-foreground/50 hover:text-primary transition-colors"
+                                                                                >
+                                                                                    <Info className="h-3 w-3" />
+                                                                                </button>
+                                                                            </div>
                                                                             <div className="flex items-baseline flex-wrap gap-x-1">
                                                                                 <span className="text-sm font-bold">
                                                                                     {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
@@ -1400,7 +1414,95 @@ export default function MealPlannerPage() {
             )
             }
 
-            {/* Nutritional Info Modal Removed and Integrated into Recipe Modal */}
+            {/* Nutritional Info Modal */}
+            {selectedNutrientInfo && nutrientInfo[selectedNutrientInfo] && (
+                <div
+                    className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4"
+                    onClick={() => setSelectedNutrientInfo(null)}
+                >
+                    <div
+                        className="bg-background rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-border animate-in fade-in zoom-in-95 duration-200"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="p-6">
+                            <div className="flex items-start justify-between mb-4">
+                                <div>
+                                    <h3 className="text-2xl font-bold text-primary">{selectedNutrientInfo}</h3>
+                                    <p className="text-sm text-muted-foreground mt-1">{nutrientInfo[selectedNutrientInfo].description}</p>
+                                </div>
+                                <button
+                                    onClick={() => setSelectedNutrientInfo(null)}
+                                    className="p-1 hover:bg-muted rounded-lg transition-colors text-muted-foreground"
+                                >
+                                    <X className="h-5 w-5" />
+                                </button>
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="bg-muted/30 p-4 rounded-xl border border-border/50">
+                                    <h4 className="font-semibold text-sm mb-2 flex items-center gap-2">
+                                        <Microscope className="h-4 w-4 text-secondary-foreground" />
+                                        Importance
+                                    </h4>
+                                    <p className="text-sm text-muted-foreground leading-relaxed">
+                                        {nutrientInfo[selectedNutrientInfo].importance}
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                                        <Sparkles className="h-4 w-4 text-yellow-500" />
+                                        Key Benefits
+                                    </h4>
+                                    <div className="grid grid-cols-1 gap-2">
+                                        {nutrientInfo[selectedNutrientInfo].benefits.map((benefit, i) => (
+                                            <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                                                <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-green-500 shrink-0" />
+                                                {benefit}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                                        <Activity className="h-4 w-4 text-red-500" />
+                                        Signs of Deficiency
+                                    </h4>
+                                    <div className="grid grid-cols-1 gap-2">
+                                        {nutrientInfo[selectedNutrientInfo].deficiencySigns.map((sign, i) => (
+                                            <div key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                                                <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-red-400 shrink-0" />
+                                                {sign}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+                                        <Utensils className="h-4 w-4 text-orange-500" />
+                                        Good Sources
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {nutrientInfo[selectedNutrientInfo].sources.map((source, i) => (
+                                            <span key={i} className="text-xs font-medium px-2.5 py-1 bg-muted rounded-full text-muted-foreground border border-border">
+                                                {source}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="pt-4 border-t border-border">
+                                    <p className="text-[10px] text-muted-foreground italic">
+                                        <strong>Did you know?</strong> {nutrientInfo[selectedNutrientInfo].history}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </main >
     );
 }
