@@ -814,8 +814,8 @@ export default function MealPlannerPage() {
                                                                     )}
                                                                 </div>
                                                                 <div className="space-y-1.5">
-                                                                    <div className="flex items-center justify-between text-[10px] font-semibold">
-                                                                        <span className={cn("px-1 rounded", styles.bg, styles.textFill)}>{pct}%</span>
+                                                                    <div className="flex items-center justify-between text-xs font-black">
+                                                                        <span className={cn("px-1.5 py-0.5 rounded shadow-sm", styles.bg, styles.textFill)}>{pct}%</span>
                                                                     </div>
                                                                     <div className="w-full bg-muted/50 rounded-full h-1.5 overflow-hidden border border-black/5">
                                                                         <div
@@ -975,7 +975,7 @@ export default function MealPlannerPage() {
                                                                         </div>
                                                                         {percentage !== null && (
                                                                             <div className="mt-2 space-y-1.5">
-                                                                                <div className="flex items-center justify-between text-[10px] font-semibold">
+                                                                                <div className="flex items-center justify-between text-xs font-black">
                                                                                     <span className={cn(
                                                                                         "px-1.5 py-0.5 rounded-[4px] shadow-sm",
                                                                                         styles.bg,
@@ -1304,7 +1304,7 @@ export default function MealPlannerPage() {
                                                             </div>
                                                             {percentage !== null && (
                                                                 <span className={cn(
-                                                                    "text-[10px] font-semibold px-1.5 py-0.5 rounded-[4px] shadow-sm",
+                                                                    "text-xs font-black px-1.5 py-0.5 rounded-[4px] shadow-sm",
                                                                     styles.bg,
                                                                     styles.textFill
                                                                 )}>
