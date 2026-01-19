@@ -81,8 +81,10 @@ const formatEnergy = (calories: number, unit: UnitType) => {
 };
 
 const getNutrientLevelStyles = (percentage: number, label?: string) => {
-    const isLimit = label?.toLowerCase().includes('sugar');
-    const isSodium = label?.toLowerCase().includes('sodium');
+    const l = label?.toLowerCase() || '';
+    const isLimit = l.includes('sugar');
+    const isBellCurve = l.includes('sodium') || l.includes('potassium') || l.includes('iron') ||
+        l.includes('vitamin a') || l.includes('vitamin d') || l.includes('vitamin k');
 
     let color: 'green' | 'blue' | 'yellow' | 'orange' | 'red' = 'red';
 
@@ -92,11 +94,11 @@ const getNutrientLevelStyles = (percentage: number, label?: string) => {
         else if (percentage <= 90) color = 'yellow';
         else if (percentage <= 100) color = 'orange';
         else color = 'red';
-    } else if (isSodium) {
-        // Essential Electrolyte Logic (Too low or too high is bad)
-        if (percentage > 150) color = 'red';           // Dangerously high
-        else if (percentage > 125) color = 'orange';    // Over limit
-        else if (percentage > 110) color = 'yellow';    // Approaching limit
+    } else if (isBellCurve) {
+        // Essential but toxic in excess (Bell Curve logic)
+        if (percentage > 200) color = 'red';           // Extreme excess
+        else if (percentage > 150) color = 'orange';    // Significant excess
+        else if (percentage > 120) color = 'yellow';    // Approaching upper limit
         else if (percentage >= 100) color = 'green';    // Perfect
         else if (percentage >= 70) color = 'blue';      // Optimal zone (70-100%)
         else if (percentage >= 50) color = 'yellow';    // Low
