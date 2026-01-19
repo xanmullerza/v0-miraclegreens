@@ -921,7 +921,7 @@ export default function MealPlannerPage() {
                                                 'Sodium': m.sodium_mg || 0,
                                             };
 
-                                            const immuneAntioxidant: Record<string, number> = {
+                                            const immuneShield: Record<string, number> = {
                                                 'Vitamin A': m.vitamin_a_ug || 0,
                                                 'Vitamin C': m.vitamin_c_mg || 0,
                                                 'Vitamin E': m.vitamin_e_mg || 0,
@@ -1332,7 +1332,7 @@ export default function MealPlannerPage() {
                                     'Sodium': m.sodium_mg || 0,
                                 };
 
-                                const immuneAntioxidant: Record<string, number> = {
+                                const immuneShield: Record<string, number> = {
                                     'Vitamin A': m.vitamin_a_ug || 0,
                                     'Vitamin C': m.vitamin_c_mg || 0,
                                     'Vitamin E': m.vitamin_e_mg || 0,
@@ -1493,7 +1493,7 @@ export default function MealPlannerPage() {
                                                 <ModalNutrientGrid nutrients={metabolicFuel} title="Metabolic Fuel" icon={Flame} />
                                                 <ModalNutrientGrid nutrients={cognitiveFocus} title="Cognitive Focus" icon={Activity} />
                                                 <ModalNutrientGrid nutrients={bloodDNA} title="Blood & DNA" icon={Droplet} />
-                                                <ModalNutrientGrid nutrients={immuneAntioxidant} title="Immune Shield" icon={Shield} />
+                                                <ModalNutrientGrid nutrients={immuneShield} title="Immune Shield" icon={Shield} />
                                             </div>
                                             <div className="space-y-6">
                                                 <ModalNutrientGrid nutrients={skeletalHealth} title="Bone & Strength" icon={Dumbbell} />
