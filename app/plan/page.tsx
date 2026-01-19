@@ -34,7 +34,8 @@ import {
     Gem,
     Microscope,
     FlaskConical,
-    Dna
+    Dna,
+    LayoutGrid
 } from 'lucide-react';
 import {
     Sheet,
@@ -675,49 +676,74 @@ export default function MealPlannerPage() {
 
                         {/* WIZARD STEP 3: RESULTS DASHBOARD */}
                         {step === 3 && plan && (
-                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-500">
-                                {/* Dashboard Header */}
-                                <div className="p-6 bg-muted/30 rounded-2xl border border-border/50">
-                                    <div className="flex flex-col xl:flex-row items-center justify-between gap-6">
-                                        <div className="flex flex-col md:flex-row items-center gap-6 w-full xl:w-auto">
-                                            {/* Totals */}
-                                            {/* Daily Totals Cards */}
-                                            {(() => {
-                                                const targetCals = calories;
-                                                const pRatio = goal === 'lose-fat' ? 0.30 : goal === 'build-muscle' ? 0.25 : 0.20;
-                                                const cRatio = goal === 'lose-fat' ? 0.40 : goal === 'build-muscle' ? 0.50 : 0.50;
-                                                const fRatio = goal === 'lose-fat' ? 0.30 : goal === 'build-muscle' ? 0.25 : 0.30;
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-500">
+                                {/* Macros Section */}
+                                {(() => {
+                                    const targetCals = calories;
+                                    const pRatio = goal === 'lose-fat' ? 0.30 : goal === 'build-muscle' ? 0.25 : 0.20;
+                                    const cRatio = goal === 'lose-fat' ? 0.40 : goal === 'build-muscle' ? 0.50 : 0.50;
+                                    const fRatio = goal === 'lose-fat' ? 0.30 : goal === 'build-muscle' ? 0.25 : 0.30;
 
-                                                const targets = {
-                                                    energy: targetCals,
-                                                    protein: (targetCals * pRatio) / 4,
-                                                    carbs: (targetCals * cRatio) / 4,
-                                                    fat: (targetCals * fRatio) / 9
-                                                };
+                                    const targets = {
+                                        energy: targetCals,
+                                        protein: (targetCals * pRatio) / 4,
+                                        carbs: (targetCals * cRatio) / 4,
+                                        fat: (targetCals * fRatio) / 9
+                                    };
 
-                                                const current = {
-                                                    energy: plan.totalCalories + ((dailyMoringaGrams / 2) * MORINGA_TSP.energy_kcal),
-                                                    protein: plan.macros.protein + ((dailyMoringaGrams / 2) * MORINGA_TSP.protein_g),
-                                                    carbs: plan.macros.carbs + ((dailyMoringaGrams / 2) * MORINGA_TSP.carbs_g),
-                                                    fat: plan.macros.fat + ((dailyMoringaGrams / 2) * MORINGA_TSP.fat_g)
-                                                };
+                                    const current = {
+                                        energy: plan.totalCalories + ((dailyMoringaGrams / 2) * MORINGA_TSP.energy_kcal),
+                                        protein: plan.macros.protein + ((dailyMoringaGrams / 2) * MORINGA_TSP.protein_g),
+                                        carbs: plan.macros.carbs + ((dailyMoringaGrams / 2) * MORINGA_TSP.carbs_g),
+                                        fat: plan.macros.fat + ((dailyMoringaGrams / 2) * MORINGA_TSP.fat_g)
+                                    };
 
-                                                const MacroCard = ({ label, val, target, icon: Icon, colorClass, unit: u }: { label: string, val: number, target: number, icon: any, colorClass: string, unit: string }) => {
-                                                    const pct = Math.round((val / target) * 100);
-                                                    const styles = getNutrientLevelStyles(pct, label);
+                                    const formatEnergyValue = (kcal: number, u: string) => {
+                                        return u === 'kJ' ? kcal * 4.184 : kcal;
+                                    };
+
+                                    return (
+                                        <div className="p-5 rounded-2xl border border-border bg-card/50 shadow-sm space-y-4">
+                                            <h4 className="font-bold text-md text-foreground flex items-center gap-2 border-b border-border/50 pb-2">
+                                                <LayoutGrid className="h-5 w-5 text-primary" />
+                                                Macros
+                                            </h4>
+                                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                                                {[
+                                                    { label: 'Energy', val: current.energy, target: targets.energy, icon: Flame, color: 'text-orange-500', unit: unit },
+                                                    { label: 'Protein', val: current.protein, target: targets.protein, icon: Beef, color: 'text-red-500', unit: 'g' },
+                                                    { label: 'Carbs', val: current.carbs, target: targets.carbs, icon: Wheat, color: 'text-amber-600', unit: 'g' },
+                                                    { label: 'Fat', val: current.fat, target: targets.fat, icon: Droplet, color: 'text-yellow-500', unit: 'g' }
+                                                ].map((macro) => {
+                                                    const pct = Math.round((macro.val / macro.target) * 100);
+                                                    const styles = getNutrientLevelStyles(pct, macro.label);
+                                                    const isEnergy = macro.label === 'Energy';
 
                                                     return (
-                                                        <div className={cn(
-                                                            "flex-1 min-w-[140px] p-3 rounded-2xl border transition-all shadow-sm",
-                                                            styles.borderLight, styles.fade
-                                                        )}>
+                                                        <div
+                                                            key={macro.label}
+                                                            className={cn(
+                                                                "p-3 rounded-xl border transition-all shadow-sm",
+                                                                styles.borderLight, styles.fade,
+                                                                isEnergy && "cursor-pointer hover:shadow-md"
+                                                            )}
+                                                            onClick={isEnergy ? () => setUnit(unit === 'kcal' ? 'kJ' : 'kcal') : undefined}
+                                                        >
                                                             <div className="flex items-center gap-2 mb-2">
-                                                                <Icon className={cn("h-4 w-4", colorClass)} />
-                                                                <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-widest">{label}</span>
+                                                                <macro.icon className={cn("h-4 w-4", macro.color)} />
+                                                                <span className="text-[10px] uppercase font-semibold text-muted-foreground tracking-widest">{macro.label}</span>
                                                             </div>
                                                             <div className="flex items-baseline gap-1 mb-1">
-                                                                <span className="text-xl font-bold">{u === 'kcal' || u === 'kJ' ? Math.round(formatEnergyValue(val, u)) : val.toFixed(0)}</span>
-                                                                <span className="text-[10px] font-medium text-muted-foreground/60">/ {u === 'kcal' || u === 'kJ' ? Math.round(formatEnergyValue(target, u)) : target.toFixed(0)}{u}</span>
+                                                                <span className="text-xl font-bold">
+                                                                    {macro.unit === 'kcal' || macro.unit === 'kJ'
+                                                                        ? Math.round(formatEnergyValue(macro.val, macro.unit))
+                                                                        : macro.val.toFixed(0)}
+                                                                </span>
+                                                                <span className="text-[10px] font-medium text-muted-foreground/60">
+                                                                    / {macro.unit === 'kcal' || macro.unit === 'kJ'
+                                                                        ? Math.round(formatEnergyValue(macro.target, macro.unit))
+                                                                        : macro.target.toFixed(0)}{macro.unit}
+                                                                </span>
                                                             </div>
                                                             <div className="space-y-1.5">
                                                                 <div className="flex items-center justify-between text-[10px] font-semibold">
@@ -725,216 +751,202 @@ export default function MealPlannerPage() {
                                                                 </div>
                                                                 <div className="w-full bg-muted/50 rounded-full h-1.5 overflow-hidden border border-black/5">
                                                                     <div
-                                                                        className={cn("h-full transition-all duration-1000 shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]", styles.bg)}
+                                                                        className={cn("h-full transition-all duration-1000", styles.bg)}
                                                                         style={{ width: `${Math.min(100, pct)}%` }}
                                                                     />
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     );
-                                                };
-
-                                                const formatEnergyValue = (kcal: number, u: string) => {
-                                                    return u === 'kJ' ? kcal * 4.184 : kcal;
-                                                };
-
-                                                return (
-                                                    <div className="flex flex-wrap items-center gap-3 w-full">
-                                                        <div className="cursor-pointer flex-1 min-w-[140px]" onClick={() => setUnit(unit === 'kcal' ? 'kJ' : 'kcal')}>
-                                                            <MacroCard label="Energy" val={current.energy} target={targets.energy} icon={Flame} colorClass="text-orange-500" unit={unit} />
-                                                        </div>
-                                                        <MacroCard label="Protein" val={current.protein} target={targets.protein} icon={Beef} colorClass="text-red-500" unit="g" />
-                                                        <MacroCard label="Carbs" val={current.carbs} target={targets.carbs} icon={Wheat} colorClass="text-amber-600" unit="g" />
-                                                        <MacroCard label="Fat" val={current.fat} target={targets.fat} icon={Droplet} colorClass="text-yellow-500" unit="g" />
-                                                    </div>
-                                                );
-                                            })()}
-
-                                            {/* Miracle Boost Selector */}
-                                            <div className="flex flex-col items-center gap-1.5 bg-green-50 dark:bg-green-900/10 p-2 rounded-xl border border-green-200 dark:border-green-800/30">
-                                                <span className="text-[10px] uppercase tracking-wider font-bold text-green-800 dark:text-green-300 flex items-center gap-1">
-                                                    <Sparkles className="w-3 h-3" />
-                                                    Miracle Boost
-                                                </span>
-                                                <div className="flex items-center gap-2">
-                                                    <div className="flex items-center bg-white dark:bg-black/20 rounded-lg shadow-sm border border-green-100 dark:border-green-800/50 p-0.5">
-                                                        {[0, 1, 2, 3, 4, 5].map(spoons => {
-                                                            const g = spoons * 2;
-                                                            const isActive = dailyMoringaGrams === g;
-                                                            return (
-                                                                <button
-                                                                    key={spoons}
-                                                                    onClick={() => setDailyMoringaGrams(g)}
-                                                                    className={cn(
-                                                                        "w-7 h-7 flex items-center justify-center text-xs font-bold transition-all rounded-md",
-                                                                        isActive
-                                                                            ? "bg-green-600 text-white shadow-sm"
-                                                                            : "text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/20"
-                                                                    )}
-                                                                    title={`${g}g`}
-                                                                >
-                                                                    {spoons}
-                                                                </button>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                    <div className="relative flex items-center">
-                                                        <Input
-                                                            type="number"
-                                                            min="0"
-                                                            value={dailyMoringaGrams}
-                                                            onChange={(e) => setDailyMoringaGrams(Number(e.target.value))}
-                                                            className="w-16 h-8 text-center text-xs pr-4 border-green-200 focus:ring-green-500"
-                                                            placeholder="0"
-                                                        />
-                                                        <span className="absolute right-1.5 text-[10px] text-green-600 font-bold pointer-events-none">g</span>
-                                                    </div>
-                                                </div>
+                                                })}
                                             </div>
                                         </div>
+                                    );
+                                })()}
 
-                                        <div className="flex gap-3 w-full xl:w-auto">
-                                            <Button
-                                                variant={showDailyNutrients ? "default" : "outline"}
-                                                onClick={() => setShowDailyNutrients(!showDailyNutrients)}
-                                                className="flex-1 gap-2"
-                                            >
-                                                <ChevronDown className={cn("h-4 w-4 transition-transform", showDailyNutrients && "rotate-180")} />
-                                                {showDailyNutrients ? "Hide" : "Show"} Nutrients
-                                            </Button>
-                                            <Button onClick={() => setStep(1)} className="flex-1 gap-2">
-                                                Start Over
-                                            </Button>
+                                {/* Bridge Section: Miracle Boost + Start Over */}
+                                <div className="flex flex-col md:flex-row items-center justify-between gap-4 p-4 bg-muted/20 rounded-2xl border border-border/50">
+                                    <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                                        <div className="flex flex-col items-center sm:items-start gap-1">
+                                            <span className="text-[10px] uppercase tracking-wider font-bold text-green-800 dark:text-green-300 flex items-center gap-1">
+                                                <Sparkles className="w-3 h-3" />
+                                                Miracle Boost
+                                            </span>
+                                            <div className="flex items-center bg-white dark:bg-black/20 rounded-lg shadow-sm border border-green-100 dark:border-green-800/50 p-0.5">
+                                                {[0, 1, 2, 3, 4, 5].map(spoons => {
+                                                    const g = spoons * 2;
+                                                    const isActive = dailyMoringaGrams === g;
+                                                    return (
+                                                        <button
+                                                            key={spoons}
+                                                            onClick={() => setDailyMoringaGrams(g)}
+                                                            className={cn(
+                                                                "w-7 h-7 flex items-center justify-center text-xs font-bold transition-all rounded-md",
+                                                                isActive
+                                                                    ? "bg-green-600 text-white shadow-sm"
+                                                                    : "text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/20"
+                                                            )}
+                                                            title={`${g}g`}
+                                                        >
+                                                            {spoons}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                        <div className="relative flex items-center shrink-0">
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                value={dailyMoringaGrams}
+                                                onChange={(e) => setDailyMoringaGrams(Number(e.target.value))}
+                                                className="w-16 h-8 text-center text-xs pr-4 border-green-200 focus:ring-green-500 bg-white"
+                                                placeholder="0"
+                                            />
+                                            <span className="absolute right-1.5 text-[10px] text-green-600 font-bold pointer-events-none">g</span>
                                         </div>
                                     </div>
 
-                                    {/* Expandable Micronutrients Section */}
-                                    {showDailyNutrients && plan.micronutrients && (() => {
-                                        const m = { ...plan.micronutrients };
+                                    <Button onClick={() => setStep(1)} variant="outline" size="sm" className="w-full md:w-auto gap-2 border-muted-foreground/20 text-muted-foreground">
+                                        Start Over
+                                    </Button>
+                                </div>
 
-                                        // Apply Daily Moringa Boost
-                                        if (dailyMoringaGrams > 0) {
-                                            const ratio = dailyMoringaGrams / 2;
-                                            Object.entries(MORINGA_TSP.micronutrients).forEach(([key, value]) => {
-                                                m[key] = (m[key] || 0) + (value * ratio);
-                                            });
-                                        }
+                                {/* Show/Hide Toggle */}
+                                <Button
+                                    variant="ghost"
+                                    onClick={() => setShowDailyNutrients(!showDailyNutrients)}
+                                    className="w-full py-2 hover:bg-muted/50 text-muted-foreground gap-2 text-xs uppercase tracking-widest font-bold"
+                                >
+                                    <ChevronDown className={cn("h-4 w-4 transition-transform", showDailyNutrients && "rotate-180")} />
+                                    {showDailyNutrients ? "Hide" : "Show"} Detailed Nutrients
+                                </Button>
 
-                                        // Categorize nutrients
-                                        const electrolytes: Record<string, number> = {
-                                            'Potassium': m.potassium_mg || 0,
-                                            'Magnesium': m.magnesium_mg || 0,
-                                            'Calcium': m.calcium_mg || 0,
-                                            'Phosphorus': m.phosphorus_mg || 0,
-                                            'Sodium': m.sodium_mg || 0,
-                                        };
+                                {showDailyNutrients && plan.micronutrients && (() => {
+                                    const m = { ...plan.micronutrients };
 
-                                        const traceMinerals: Record<string, number> = {
-                                            'Iron': m.iron_mg || 0,
-                                            'Zinc': m.zinc_mg || 0,
-                                            'Selenium': m.selenium_ug || 0,
-                                            'Copper': m.copper_mg || 0,
-                                            'Manganese': m.manganese_mg || 0,
-                                        };
+                                    // Apply Daily Moringa Boost
+                                    if (dailyMoringaGrams > 0) {
+                                        const ratio = dailyMoringaGrams / 2;
+                                        Object.entries(MORINGA_TSP.micronutrients).forEach(([key, value]) => {
+                                            m[key] = (m[key] || 0) + (value * ratio);
+                                        });
+                                    }
 
-                                        const vitamins: Record<string, number> = {
-                                            'Vitamin A': m.vitamin_a_ug || 0,
-                                            'B1 (Thiamine)': m.thiamine_mg || 0,
-                                            'B2 (Riboflavin)': m.riboflavin_mg || 0,
-                                            'B3 (Niacin)': m.niacin_mg || 0,
-                                            'B5 (Pantothenic Acid)': m.pantothenic_acid_mg || 0,
-                                            'B6 (Pyridoxine)': m.vitamin_b6_mg || 0,
-                                            'B9 (Folate)': m.folate_ug || 0,
-                                            'B12 (Cobalamin)': m.vitamin_b12_ug || 0,
-                                            'Vitamin C': m.vitamin_c_mg || 0,
-                                            'Vitamin D': m.vitamin_d_iu || 0,
-                                            'Vitamin E': m.vitamin_e_mg || 0,
-                                            'Vitamin K': m.vitamin_k_ug || 0,
-                                        };
+                                    // Categorize nutrients
+                                    const electrolytes: Record<string, number> = {
+                                        'Potassium': m.potassium_mg || 0,
+                                        'Magnesium': m.magnesium_mg || 0,
+                                        'Calcium': m.calcium_mg || 0,
+                                        'Phosphorus': m.phosphorus_mg || 0,
+                                        'Sodium': m.sodium_mg || 0,
+                                    };
 
-                                        const other: Record<string, number> = {
-                                            'Choline': m.choline_mg || 0,
-                                            'Fiber': m.fiber_g || 0,
-                                        };
+                                    const traceMinerals: Record<string, number> = {
+                                        'Iron': m.iron_mg || 0,
+                                        'Zinc': m.zinc_mg || 0,
+                                        'Selenium': m.selenium_ug || 0,
+                                        'Copper': m.copper_mg || 0,
+                                        'Manganese': m.manganese_mg || 0,
+                                    };
 
-                                        const DailyNutrientGrid = ({ nutrients, title, icon: Icon }: { nutrients: Record<string, number>, title: string, icon: any }) => {
-                                            const filtered = Object.entries(nutrients).filter(([_, val]) => val > 0);
-                                            if (filtered.length === 0) return null;
+                                    const vitamins: Record<string, number> = {
+                                        'Vitamin A': m.vitamin_a_ug || 0,
+                                        'B1 (Thiamine)': m.thiamine_mg || 0,
+                                        'B2 (Riboflavin)': m.riboflavin_mg || 0,
+                                        'B3 (Niacin)': m.niacin_mg || 0,
+                                        'B5 (Pantothenic Acid)': m.pantothenic_acid_mg || 0,
+                                        'B6 (Pyridoxine)': m.vitamin_b6_mg || 0,
+                                        'B9 (Folate)': m.folate_ug || 0,
+                                        'B12 (Cobalamin)': m.vitamin_b12_ug || 0,
+                                        'Vitamin C': m.vitamin_c_mg || 0,
+                                        'Vitamin D': m.vitamin_d_iu || 0,
+                                        'Vitamin E': m.vitamin_e_mg || 0,
+                                        'Vitamin K': m.vitamin_k_ug || 0,
+                                    };
 
-                                            return (
-                                                <div className="p-5 rounded-2xl border border-border bg-card/50 shadow-sm space-y-4">
-                                                    <h4 className="font-bold text-md text-foreground flex items-center gap-2 border-b border-border/50 pb-2">
-                                                        <Icon className="h-5 w-5 text-primary" />
-                                                        {title}
-                                                    </h4>
-                                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                                                        {filtered.map(([label, value]) => {
-                                                            let unit = 'mg';
-                                                            const labelLower = label.toLowerCase();
-                                                            if (labelLower.includes('vitamin a') || labelLower.includes('folate') || labelLower.includes('selenium') || labelLower.includes('b12') || labelLower.includes('vitamin k')) unit = 'µg';
-                                                            if (labelLower.includes('vitamin d')) unit = 'IU';
-                                                            if (labelLower.includes('fiber')) unit = 'g';
+                                    const other: Record<string, number> = {
+                                        'Choline': m.choline_mg || 0,
+                                        'Fiber': m.fiber_g || 0,
+                                    };
 
-                                                            const rdaValue = userRDAs?.[label];
-                                                            const percentage = rdaValue ? Math.round((value / rdaValue) * 100) : null;
-                                                            const styles = getNutrientLevelStyles(percentage || 0, label);
-
-                                                            return (
-                                                                <div key={label} className={cn(
-                                                                    "flex flex-col justify-between gap-1 p-3 rounded-xl border transition-all shadow-sm hover:shadow-md group/card",
-                                                                    percentage !== null ? `${styles.borderLight} ${styles.fade}` : "bg-background border-border/50"
-                                                                )}>
-                                                                    <div className="min-w-0">
-                                                                        <p className="text-[10px] uppercase font-semibold text-muted-foreground truncate tracking-tight group-hover/card:text-foreground transition-colors">{label}</p>
-                                                                        <div className="flex items-baseline flex-wrap gap-x-1">
-                                                                            <span className="text-sm font-bold">
-                                                                                {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
-                                                                                <span className="text-[10px] font-medium opacity-60 ml-0.5">{unit}</span>
-                                                                            </span>
-                                                                            {rdaValue && (
-                                                                                <span className="text-[11px] font-medium text-muted-foreground/50">
-                                                                                    / {rdaValue >= 1 ? Math.round(rdaValue) : rdaValue.toFixed(1)}{unit}
-                                                                                </span>
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-                                                                    {percentage !== null && (
-                                                                        <div className="mt-2 space-y-1.5">
-                                                                            <div className="flex items-center justify-between text-[10px] font-semibold">
-                                                                                <span className={cn(
-                                                                                    "px-1.5 py-0.5 rounded-[4px] shadow-sm",
-                                                                                    styles.bg,
-                                                                                    styles.textFill
-                                                                                )}>
-                                                                                    {percentage}%
-                                                                                </span>
-                                                                            </div>
-                                                                            <div className="w-full bg-muted/50 rounded-full h-2 overflow-hidden border border-black/5">
-                                                                                <div
-                                                                                    className={cn("h-full transition-all duration-1000 ease-out shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]", styles.bg)}
-                                                                                    style={{ width: `${Math.min(100, percentage)}%` }}
-                                                                                />
-                                                                            </div>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                </div>
-                                            );
-                                        };
+                                    const DailyNutrientGrid = ({ nutrients, title, icon: Icon }: { nutrients: Record<string, number>, title: string, icon: any }) => {
+                                        const filtered = Object.entries(nutrients).filter(([_, val]) => val > 0);
+                                        if (filtered.length === 0) return null;
 
                                         return (
-                                            <div className="mt-6 pt-6 border-t border-border space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
-                                                <DailyNutrientGrid nutrients={electrolytes} title="Electrolytes" icon={Zap} />
-                                                <DailyNutrientGrid nutrients={traceMinerals} title="Trace Minerals" icon={Gem} />
-                                                <DailyNutrientGrid nutrients={vitamins} title="Vitamins" icon={FlaskConical} />
-                                                <DailyNutrientGrid nutrients={other} title="Other Essentials" icon={Dna} />
+                                            <div className="p-5 rounded-2xl border border-border bg-card/50 shadow-sm space-y-4">
+                                                <h4 className="font-bold text-md text-foreground flex items-center gap-2 border-b border-border/50 pb-2">
+                                                    <Icon className="h-5 w-5 text-primary" />
+                                                    {title}
+                                                </h4>
+                                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                                                    {filtered.map(([label, value]) => {
+                                                        let unit = 'mg';
+                                                        const labelLower = label.toLowerCase();
+                                                        if (labelLower.includes('vitamin a') || labelLower.includes('folate') || labelLower.includes('selenium') || labelLower.includes('b12') || labelLower.includes('vitamin k')) unit = 'µg';
+                                                        if (labelLower.includes('vitamin d')) unit = 'IU';
+                                                        if (labelLower.includes('fiber')) unit = 'g';
+
+                                                        const rdaValue = userRDAs?.[label];
+                                                        const percentage = rdaValue ? Math.round((value / rdaValue) * 100) : null;
+                                                        const styles = getNutrientLevelStyles(percentage || 0, label);
+
+                                                        return (
+                                                            <div key={label} className={cn(
+                                                                "flex flex-col justify-between gap-1 p-3 rounded-xl border transition-all shadow-sm hover:shadow-md group/card",
+                                                                percentage !== null ? `${styles.borderLight} ${styles.fade}` : "bg-background border-border/50"
+                                                            )}>
+                                                                <div className="min-w-0">
+                                                                    <p className="text-[10px] uppercase font-semibold text-muted-foreground truncate tracking-tight group-hover/card:text-foreground transition-colors">{label}</p>
+                                                                    <div className="flex items-baseline flex-wrap gap-x-1">
+                                                                        <span className="text-sm font-bold">
+                                                                            {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
+                                                                            <span className="text-[10px] font-medium opacity-60 ml-0.5">{unit}</span>
+                                                                        </span>
+                                                                        {rdaValue && (
+                                                                            <span className="text-[11px] font-medium text-muted-foreground/50">
+                                                                                / {rdaValue >= 1 ? Math.round(rdaValue) : rdaValue.toFixed(1)}{unit}
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                                {percentage !== null && (
+                                                                    <div className="mt-2 space-y-1.5">
+                                                                        <div className="flex items-center justify-between text-[10px] font-semibold">
+                                                                            <span className={cn(
+                                                                                "px-1.5 py-0.5 rounded-[4px] shadow-sm",
+                                                                                styles.bg,
+                                                                                styles.textFill
+                                                                            )}>
+                                                                                {percentage}%
+                                                                            </span>
+                                                                        </div>
+                                                                        <div className="w-full bg-muted/50 rounded-full h-2 overflow-hidden border border-black/5">
+                                                                            <div
+                                                                                className={cn("h-full transition-all duration-1000 ease-out shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]", styles.bg)}
+                                                                                style={{ width: `${Math.min(100, percentage)}%` }}
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
                                             </div>
                                         );
-                                    })()}
-                                </div>
+                                    };
+
+                                    return (
+                                        <div className="mt-6 pt-6 border-t border-border space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                                            <DailyNutrientGrid nutrients={electrolytes} title="Electrolytes" icon={Zap} />
+                                            <DailyNutrientGrid nutrients={traceMinerals} title="Trace Minerals" icon={Gem} />
+                                            <DailyNutrientGrid nutrients={vitamins} title="Vitamins" icon={FlaskConical} />
+                                            <DailyNutrientGrid nutrients={other} title="Other Essentials" icon={Dna} />
+                                        </div>
+                                    );
+                                })()}
 
                                 {/* Meal Grid */}
                                 <div className="flex flex-wrap justify-center gap-6 pb-24 md:pb-0">
@@ -976,15 +988,13 @@ export default function MealPlannerPage() {
                                         </div>
                                     ))}
                                 </div>
-
-
-
                             </div>
-                        )}
+                        )
+                        }
 
                     </div>
                 </div>
-            </div >
+            </div>
             <Footer />
 
             {/* Recipe Detail Modal */}
