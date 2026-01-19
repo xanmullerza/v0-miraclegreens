@@ -809,15 +809,17 @@ export default function MealPlannerPage() {
                                         );
                                     })()}
 
-                                    {/* Show/Hide Toggle */}
-                                    <Button
-                                        variant="ghost"
-                                        onClick={() => setShowDailyNutrients(!showDailyNutrients)}
-                                        className="w-full py-2 hover:bg-muted/50 text-muted-foreground gap-2 text-xs uppercase tracking-widest font-bold"
-                                    >
-                                        <ChevronDown className={cn("h-4 w-4 transition-transform", showDailyNutrients && "rotate-180")} />
-                                        {showDailyNutrients ? "Hide" : "Show"} Detailed Nutrients
-                                    </Button>
+                                    {/* Show Detailed Nutrients Toggle (Only shown when hidden) */}
+                                    {!showDailyNutrients && (
+                                        <Button
+                                            variant="ghost"
+                                            onClick={() => setShowDailyNutrients(true)}
+                                            className="w-full py-2 hover:bg-muted/50 text-muted-foreground gap-2 text-xs uppercase tracking-widest font-bold"
+                                        >
+                                            <ChevronDown className="h-4 w-4" />
+                                            Show Detailed Nutrients
+                                        </Button>
+                                    )}
 
                                     {
                                         showDailyNutrients && plan.micronutrients && (() => {
@@ -942,6 +944,19 @@ export default function MealPlannerPage() {
                                                     <DailyNutrientGrid nutrients={traceMinerals} title="Trace Minerals" icon={Gem} />
                                                     <DailyNutrientGrid nutrients={vitamins} title="Vitamins" icon={FlaskConical} />
                                                     <DailyNutrientGrid nutrients={other} title="Other Essentials" icon={Dna} />
+
+                                                    {/* Hide Detailed Nutrients Button at the bottom */}
+                                                    <Button
+                                                        variant="ghost"
+                                                        onClick={() => {
+                                                            setShowDailyNutrients(false);
+                                                            // Optional: Scroll back up to the macros if needed, but simple toggle for now
+                                                        }}
+                                                        className="w-full py-2 mt-4 hover:bg-muted/50 text-muted-foreground gap-2 text-xs uppercase tracking-widest font-bold border-t border-border/50 rounded-none"
+                                                    >
+                                                        <ChevronDown className="h-4 w-4 rotate-180" />
+                                                        Hide Detailed Nutrients
+                                                    </Button>
                                                 </div>
                                             );
                                         })()
