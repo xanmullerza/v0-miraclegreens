@@ -1621,17 +1621,22 @@ export default function MealPlannerPage() {
                                     }
 
                                     // 3. Weight Display
-                                    const weightDisp = ing.weightG ? `${Math.round(ing.weightG * servingsFactor)}g` : null;
+                                    const rawWeight = ing.weightG * servingsFactor;
+                                    const weightDisp = rawWeight > 0
+                                        ? (rawWeight < 1 ? `${rawWeight.toFixed(1)}g` : `${Math.round(rawWeight)}g`)
+                                        : null;
+
+                                    const hasAmountOrUnit = scaledAmount.trim() || unitDisp.trim();
 
                                     return (
                                         <li key={i} className="flex items-start gap-3">
                                             <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
                                             <div className="flex-1">
                                                 <span className="font-medium capitalize">{displayName}</span>
-                                                <span className="text-muted-foreground italic ml-1">
-                                                    {" "} - {scaledAmount} {unitDisp}
+                                                <span className="text-muted-foreground italic ml-1 text-sm">
+                                                    {hasAmountOrUnit ? ` - ${scaledAmount} ${unitDisp}` : " - "}
                                                     {weightDisp && (
-                                                        <span className="ml-1 text-[11px] opacity-70 font-mono">({weightDisp})</span>
+                                                        <span className="ml-1 text-[11px] opacity-70 font-mono not-italic">({weightDisp})</span>
                                                     )}
                                                 </span>
                                                 {ing.isMiracleProduct && (
