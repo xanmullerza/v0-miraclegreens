@@ -223,15 +223,12 @@ function RecipeUploaderContent() {
         else if (amountStr.includes('g')) autoWeight = parseFloat(amountStr);
         else if (amountStr.includes('ml')) autoWeight = parseFloat(amountStr);
 
-        // If we found a weight in the string (like "90g"), the new "quantity" should be 1
-        // to avoid multiplying 90 * measure_weight later.
-        const cleanAmount = autoWeight > 0 ? "1" : currentIng.amount;
-
+        // If we found a weight in the string (like "90g"), 
+        // keep that as the base reality.
         newIngs[activeIngredientIndex] = {
             ...currentIng,
             matchedFood: food,
             baseIngredient: food.name,
-            amount: cleanAmount,
             weightG: autoWeight || currentIng.weightG
         };
         setIngredients(newIngs);
@@ -243,9 +240,19 @@ function RecipeUploaderContent() {
         const newIngs = [...ingredients];
         const ing = newIngs[activeIngredientIndex];
 
-        // Calculate total weight (quantity * measure weight)
+        // If amount contains 'g', it's a fixed weight override. 
+        // Dont multiply by the measure weight again.
+        let weightG = 0;
+        const amountStr = (ing.amount || "").toLowerCase();
         const qtyValue = evaluateAmount(ing.amount);
-        const weightG = qtyValue * measure.weight_g;
+
+        if (amountStr.includes('g') && !amountStr.includes('/')) {
+            // It's a manual weight like "90g". Just use it.
+            weightG = parseFloat(amountStr);
+        } else {
+            // It's a quantity like "1/2" or "2". Multiply by measure.
+            weightG = qtyValue * measure.weight_g;
+        }
 
         newIngs[activeIngredientIndex] = {
             ...ing,
