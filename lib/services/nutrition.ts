@@ -18,8 +18,8 @@ export interface FoodMeasure {
     weight_g: number;
 }
 
-// USDA API Key - using DEMO_KEY for initial development
-const USDA_API_KEY = 'DEMO_KEY';
+// USDA API Key - Uses environment variable with fallback to DEMO_KEY
+const USDA_API_KEY = process.env.NEXT_PUBLIC_USDA_API_KEY || 'DEMO_KEY';
 const USDA_BASE_URL = 'https://api.nal.usda.gov/fdc/v1';
 
 /**
@@ -52,33 +52,38 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
 export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
     if (!query || query.trim().length < 2) return [];
 
+    // Debugging: log key presence (do NOT log full key for security)
+    console.log(`[USDA Search] Query: "${query}", Using Key: ${USDA_API_KEY === 'DEMO_KEY' ? 'DEMO_KEY' : 'Custom Key (Set)'}`);
+
     try {
-        const response = await fetch(`${USDA_BASE_URL}/foods/search?api_key=${USDA_API_KEY}&query=${encodeURIComponent(query)}&pageSize=5`);
+        const url = `${USDA_BASE_URL}/foods/search?api_key=${USDA_API_KEY}&query=${encodeURIComponent(query)}&pageSize=5`;
+        const response = await fetch(url);
 
         if (!response.ok) {
-            console.error(`USDA API Error: ${response.status} ${response.statusText}`);
+            const errText = await response.text();
+            console.error(`[USDA API Error] Status: ${response.status} ${response.statusText}`, errText);
             return [];
         }
 
         const data = await response.json();
 
         if (!data.foods || data.foods.length === 0) {
-            console.warn("USDA API: No foods found for query:", query);
+            console.warn("[USDA Search] No foods found in response:", data);
             return [];
         }
 
+        console.log(`[USDA Search] Found ${data.foods.length} items`);
+
         return data.foods.map((food: any) => {
             const getNutrient = (name: string) => {
-                const n = food.foodNutrients.find((nut: any) => nut.nutrientName.toLowerCase().includes(name.toLowerCase()));
+                if (!food.foodNutrients) return 0;
+                const n = food.foodNutrients.find((nut: any) =>
+                    nut.nutrientName && nut.nutrientName.toLowerCase().includes(name.toLowerCase())
+                );
                 return n ? n.value : 0;
             };
 
-            // Map USDA nutrients to our internal names
-            // USDA identifies nutrients by ID or Name. 
-            // Common IDs: Protein=1003, Fat=1004, Carbs=1005, Energy=1008
             const micronutrients: Record<string, number> = {};
-
-            // Mapping for common micros we track
             const microMap: Record<string, string> = {
                 'Potassium, K': 'Potassium',
                 'Magnesium, Mg': 'Magnesium',
@@ -106,13 +111,15 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
                 'Fiber, total dietary': 'Fiber'
             };
 
-            food.foodNutrients.forEach((nut: any) => {
-                Object.entries(microMap).forEach(([usdaName, ourName]) => {
-                    if (nut.nutrientName.includes(usdaName)) {
-                        micronutrients[ourName] = nut.value;
-                    }
+            if (food.foodNutrients) {
+                food.foodNutrients.forEach((nut: any) => {
+                    Object.entries(microMap).forEach(([usdaName, ourName]) => {
+                        if (nut.nutrientName && nut.nutrientName.includes(usdaName)) {
+                            micronutrients[ourName] = nut.value;
+                        }
+                    });
                 });
-            });
+            }
 
             return {
                 fdcId: food.fdcId,
@@ -126,7 +133,7 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
             };
         });
     } catch (error) {
-        console.error("USDA API Error:", error);
+        console.error("[USDA Search Exception] Catch Block:", error);
         return [];
     }
 }
@@ -136,7 +143,8 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
  */
 export async function getUSDAMeasures(fdcId: number): Promise<FoodMeasure[]> {
     try {
-        const response = await fetch(`${USDA_BASE_URL}/food/${fdcId}?api_key=${USDA_API_KEY}`);
+        const url = `${USDA_BASE_URL}/food/${fdcId}?api_key=${USDA_API_KEY}`;
+        const response = await fetch(url);
         const data = await response.json();
 
         if (!data.foodPortions) return [];
