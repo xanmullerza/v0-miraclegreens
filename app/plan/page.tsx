@@ -1621,7 +1621,7 @@ export default function MealPlannerPage() {
                                     }
 
                                     // 3. Weight Display
-                                    const rawWeight = ing.weightG * servingsFactor;
+                                    const rawWeight = (ing.weightG || 0) * servingsFactor;
                                     const weightDisp = rawWeight > 0
                                         ? (rawWeight < 1 ? `${rawWeight.toFixed(1)}g` : `${Math.round(rawWeight)}g`)
                                         : null;
