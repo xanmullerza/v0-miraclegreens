@@ -44,6 +44,17 @@ const Card = ({ children, className }: { children: React.ReactNode, className?: 
     </div>
 );
 
+// Helper to handle "1/2", "1.5", etc.
+const evaluateAmount = (amt: string): number => {
+    if (!amt) return 1;
+    if (amt.includes('/')) {
+        const [num, den] = amt.split('/').map(n => parseFloat(n.trim()));
+        if (den && !isNaN(num)) return num / den;
+    }
+    const parsed = parseFloat(amt);
+    return isNaN(parsed) ? 1 : parsed;
+};
+
 export default function RecipeUploaderPage() {
     return (
         <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>}>
@@ -202,23 +213,26 @@ function RecipeUploaderContent() {
         setMeasures(foodMeasures);
 
         const newIngs = [...ingredients];
+        const currentIng = newIngs[activeIngredientIndex];
 
         // Auto-detect weight from amount string (e.g., "200g", "0.5kg")
         let autoWeight = 0;
-        const amount = (newIngs[activeIngredientIndex].amount || "").toLowerCase();
-        if (amount.includes('kg')) {
-            autoWeight = parseFloat(amount) * 1000;
-        } else if (amount.includes('g')) {
-            autoWeight = parseFloat(amount);
-        } else if (amount.includes('ml')) {
-            autoWeight = parseFloat(amount); // Estimate 1:1 for now
-        }
+        const amountStr = (currentIng.amount || "").toLowerCase();
+
+        if (amountStr.includes('kg')) autoWeight = parseFloat(amountStr) * 1000;
+        else if (amountStr.includes('g')) autoWeight = parseFloat(amountStr);
+        else if (amountStr.includes('ml')) autoWeight = parseFloat(amountStr);
+
+        // If we found a weight in the string (like "90g"), the new "quantity" should be 1
+        // to avoid multiplying 90 * measure_weight later.
+        const cleanAmount = autoWeight > 0 ? "1" : currentIng.amount;
 
         newIngs[activeIngredientIndex] = {
-            ...newIngs[activeIngredientIndex],
+            ...currentIng,
             matchedFood: food,
             baseIngredient: food.name,
-            weightG: autoWeight || newIngs[activeIngredientIndex].weightG
+            amount: cleanAmount,
+            weightG: autoWeight || currentIng.weightG
         };
         setIngredients(newIngs);
         setLoading(false);
@@ -230,8 +244,8 @@ function RecipeUploaderContent() {
         const ing = newIngs[activeIngredientIndex];
 
         // Calculate total weight (quantity * measure weight)
-        const quantity = parseFloat(ing.amount) || 1;
-        const weightG = quantity * measure.weight_g;
+        const qtyValue = evaluateAmount(ing.amount);
+        const weightG = qtyValue * measure.weight_g;
 
         newIngs[activeIngredientIndex] = {
             ...ing,
@@ -329,10 +343,10 @@ function RecipeUploaderContent() {
             if (instError) throw instError;
 
             alert(editId ? 'Recipe updated successfully!' : 'Recipe uploaded successfully!');
-            router.push('/upload'); // Clear edit mode or just refresh
-        } catch (err) {
-            console.error(err);
-            alert('Error saving recipe');
+            router.push('/upload');
+        } catch (err: any) {
+            console.error('Save Error:', err);
+            alert(`Error saving recipe: ${err.message || 'Unknown error'}`);
         } finally {
             setLoading(false);
         }
