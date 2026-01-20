@@ -83,10 +83,10 @@ const formatEnergy = (calories: number, unit: UnitType) => {
 const getNutrientLevelStyles = (percentage: number, label?: string) => {
     const l = label?.toLowerCase() || '';
     const isLimit = l.includes('sugar');
-    const isBellCurve = l.includes('sodium') || l.includes('potassium') || l.includes('iron') ||
-        l.includes('vitamin a') || l.includes('vitamin d');
+    const isStrictCurve = l.includes('sodium') || l.includes('vitamin d');
+    const isAbundance = l.includes('potassium') || l.includes('iron') || l.includes('vitamin a');
 
-    let color: 'green' | 'blue' | 'yellow' | 'orange' | 'red' = 'red';
+    let color: 'green' | 'emerald' | 'blue' | 'yellow' | 'orange' | 'red' = 'red';
 
     if (isLimit) {
         if (percentage <= 50) color = 'green';
@@ -94,8 +94,17 @@ const getNutrientLevelStyles = (percentage: number, label?: string) => {
         else if (percentage <= 90) color = 'yellow';
         else if (percentage <= 100) color = 'orange';
         else color = 'red';
-    } else if (isBellCurve) {
-        // Essential but toxic in extreme excess (Bell Curve logic)
+    } else if (isAbundance) {
+        // Safe plant nutrients - excess is rewarded, not penalized
+        if (percentage >= 150) color = 'emerald';       // Super-Optimal abundance
+        else if (percentage >= 120) color = 'emerald';  // Abundance
+        else if (percentage >= 100) color = 'green';    // Perfect baseline
+        else if (percentage >= 70) color = 'blue';      // Optimal zone (70-100%)
+        else if (percentage >= 50) color = 'yellow';    // Low
+        else if (percentage >= 35) color = 'orange';    // Very low
+        else color = 'red';                             // Critical deficiency
+    } else if (isStrictCurve) {
+        // Essential but toxic in excess (Strict Bell Curve logic for Sodium/VitD)
         if (percentage > 200) color = 'red';           // Extreme excess
         else if (percentage > 150) color = 'orange';    // Significant excess
         else if (percentage > 120) color = 'yellow';    // Approaching upper limit
@@ -105,8 +114,9 @@ const getNutrientLevelStyles = (percentage: number, label?: string) => {
         else if (percentage >= 35) color = 'orange';    // Very low
         else color = 'red';                             // Critical deficiency
     } else {
-        // Standard Nutrients (Reaching 100% is the goal, excess from food is fine)
-        if (percentage >= 100) color = 'green';
+        // Standard Nutrients (Reaching 100% is the goal, excess is fine)
+        if (percentage >= 150) color = 'emerald';
+        else if (percentage >= 100) color = 'green';
         else if (percentage >= 70) color = 'blue';
         else if (percentage >= 50) color = 'yellow';
         else if (percentage >= 35) color = 'orange';
@@ -114,6 +124,7 @@ const getNutrientLevelStyles = (percentage: number, label?: string) => {
     }
 
     const map = {
+        emerald: { bg: 'bg-emerald-800', border: 'border-emerald-800', borderLight: 'border-emerald-800/30', text: 'text-emerald-900', textFill: 'text-white', fade: 'bg-emerald-50' },
         green: { bg: 'bg-green-700', border: 'border-green-700', borderLight: 'border-green-700/30', text: 'text-green-800', textFill: 'text-white', fade: 'bg-green-50' },
         blue: { bg: 'bg-blue-700', border: 'border-blue-700', borderLight: 'border-blue-700/30', text: 'text-blue-800', textFill: 'text-white', fade: 'bg-blue-50' },
         yellow: { bg: 'bg-amber-500', border: 'border-amber-500', borderLight: 'border-amber-500/30', text: 'text-amber-800', textFill: 'text-white', fade: 'bg-amber-50' },
