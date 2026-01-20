@@ -299,13 +299,28 @@ function RecipeUploaderContent() {
             if (ing.matchedFood || !ing.item || ing.item.length < 2) continue;
 
             try {
-                const local = await searchLocalFood(ing.item);
-                const usda = await searchUSDAFood(ing.item);
+                // Two-Step: Split by parenthesis to get a cleaner search name
+                const parenIndex = ing.item.indexOf('(');
+                let coreName = parenIndex !== -1 ? ing.item.substring(0, parenIndex).trim() : ing.item;
+                const hints = parenIndex !== -1 ? ing.item.substring(parenIndex).toLowerCase() : "";
+
+                // Clean core name of trailing commas or special chars
+                coreName = coreName.replace(/[,;:]\s*$/, '').trim();
+
+                let local = await searchLocalFood(coreName);
+                let usda = await searchUSDAFood(coreName);
+
+                // Fallback: If no results for core name, try full item
+                if (local.length === 0 && usda.length === 0 && coreName !== ing.item) {
+                    local = await searchLocalFood(ing.item);
+                    usda = await searchUSDAFood(ing.item);
+                }
+
                 const combined = [...local, ...usda];
 
                 if (combined.length > 0) {
                     // Smart Selection: Find result that has the most word matches with the query
-                    const queryWords = ing.item.toLowerCase().split(/\s+/).filter((w: string) => w.length > 2);
+                    const queryWords = coreName.toLowerCase().split(/\s+/).filter((w: string) => w.length > 2);
                     let bestMatch = combined[0];
                     let maxMatches = 0;
 
@@ -315,8 +330,9 @@ function RecipeUploaderContent() {
                         queryWords.forEach((word: string) => {
                             if (candName.includes(word)) matches++;
                         });
-                        // Bonus for exact word matches or starting with the query
-                        if (candName.startsWith(ing.item.toLowerCase())) matches += 2;
+                        // Bonus for exact core name match or starting with it
+                        if (candName.startsWith(coreName.toLowerCase())) matches += 2;
+                        if (candName === coreName.toLowerCase()) matches += 5;
 
                         if (matches > maxMatches) {
                             maxMatches = matches;
@@ -338,10 +354,16 @@ function RecipeUploaderContent() {
 
                     if (foodMeasures.length > 0) {
                         const amountLower = ing.amount.toLowerCase();
-                        // Try to find a measure that matches the unit in the amount string
+                        const searchSpace = amountLower + " " + hints + " " + ing.item.toLowerCase();
+
+                        // Try to find a measure that matches the unit in the amount string OR Hints
                         const matchedMeasure = foodMeasures.find(m => {
                             const labelLower = m.label.toLowerCase();
-                            return amountLower.includes(labelLower) || labelLower.includes(amountLower.split(' ').pop() || '!!!');
+                            // Check for plural/singular
+                            const singular = labelLower.replace(/s$/, '');
+                            return searchSpace.includes(labelLower) ||
+                                searchSpace.includes(singular) ||
+                                labelLower.includes(amountLower.split(' ').pop() || '!!!');
                         }) || foodMeasures[0];
 
                         newIngs[i].selectedMeasure = matchedMeasure;

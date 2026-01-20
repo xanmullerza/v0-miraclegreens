@@ -223,10 +223,13 @@ function isProbablyInstruction(line: string): boolean {
 }
 
 function parseIngredientLine(line: string): ParsedIngredient {
-    // 1. Remove artifacts like catenated "or" or "original" often found in scaled recipes
-    // e.g. "shreddedor", "tbspor" -> "shredded", "tbsp"
     let cleanLine = line.replace(/^[*•\-+]\s+/, '').trim();
+    // Remove "or", "original", "scaled", "serving" artifacts at the end of lines or words
+    // Especially after numbers or punctuation like "long,or" -> "long"
+    cleanLine = cleanLine.replace(/(\W)(?:or|original|scaled|serving)\s*$/gi, '$1').trim();
     cleanLine = cleanLine.replace(/([a-zA-Z]{3,})(or|original|scaled|serving)\b/gi, '$1').trim();
+    // Catch cases like "1/2 cupor" or "long,or"
+    cleanLine = cleanLine.replace(/(?:,|"|'|\d)(or|original|scaled|serving)\s*$/gi, (m, p1) => m.slice(0, -p1.length)).trim();
 
     // Regex to match quantity
     // Matches: "1 1/2", "1/2", "1.5", "1", "250"
