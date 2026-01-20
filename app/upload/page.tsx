@@ -178,7 +178,7 @@ function RecipeUploaderContent() {
 
         for (let i = 0; i < newIngs.length; i++) {
             const ing = newIngs[i];
-            if (ing.matchedFood || !ing.item) continue;
+            if (ing.matchedFood || !ing.item || ing.item.length < 2) continue;
 
             try {
                 const local = await searchLocalFood(ing.item);
@@ -186,7 +186,27 @@ function RecipeUploaderContent() {
                 const combined = [...local, ...usda];
 
                 if (combined.length > 0) {
-                    const best = combined[0]; // Heuristic: Pick first result
+                    // Smart Selection: Find result that has the most word matches with the query
+                    const queryWords = ing.item.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+                    let bestMatch = combined[0];
+                    let maxMatches = 0;
+
+                    for (const cand of combined) {
+                        const candName = cand.name.toLowerCase();
+                        let matches = 0;
+                        queryWords.forEach(word => {
+                            if (candName.includes(word)) matches++;
+                        });
+                        // Bonus for exact word matches or starting with the query
+                        if (candName.startsWith(ing.item.toLowerCase())) matches += 2;
+
+                        if (matches > maxMatches) {
+                            maxMatches = matches;
+                            bestMatch = cand;
+                        }
+                    }
+
+                    const best = bestMatch;
 
                     let foodMeasures: FoodMeasure[] = [];
                     if (best.source === 'usda' && best.fdcId) {
@@ -200,13 +220,18 @@ function RecipeUploaderContent() {
 
                     if (foodMeasures.length > 0) {
                         const amountLower = ing.amount.toLowerCase();
-                        const matchedMeasure = foodMeasures.find(m => amountLower.includes(m.label.toLowerCase())) || foodMeasures[0];
+                        // Try to find a measure that matches the unit in the amount string
+                        const matchedMeasure = foodMeasures.find(m => {
+                            const labelLower = m.label.toLowerCase();
+                            return amountLower.includes(labelLower) || labelLower.includes(amountLower.split(' ').pop() || '!!!');
+                        }) || foodMeasures[0];
+
                         newIngs[i].selectedMeasure = matchedMeasure;
 
                         // Recalculate weight if not already a manual gram override
                         if (!ing.weightG) {
                             const qty = evaluateAmount(ing.amount);
-                            newIngs[i].weightG = qty * matchedMeasure.weight_g;
+                            newIngs[i].weightG = qty * (matchedMeasure.weight_g || 1);
                         }
                     }
                 }

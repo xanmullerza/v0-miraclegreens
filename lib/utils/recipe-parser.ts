@@ -31,7 +31,7 @@ export function parseRecipeText(text: string): ParsedRecipe {
         const line = lines[i];
         const lowerLine = line.toLowerCase();
 
-        // 1. Title Heuristic: First line that isn't a section header
+        // 1. Title Heuristic
         if (!title && !lowerLine.includes('ingredient') && !lowerLine.includes('instruction') && !lowerLine.includes('method') && !lowerLine.includes('servings')) {
             title = line;
             continue;
@@ -60,9 +60,20 @@ export function parseRecipeText(text: string): ParsedRecipe {
 
         // 4. Content Parsing
         if (currentSection === 'ingredients' || (currentSection === 'none' && isProbablyIngredient(line))) {
-            ingredients.push(parseIngredientLine(line));
+            const parsed = parseIngredientLine(line);
+
+            // Handle multi-line ingredients: "1 cup \n Chopped Onion"
+            // If the item is effectively the same as the unit/amount, check the next line
+            if ((!parsed.item || parsed.item === parsed.amount.split(' ').pop()) && i + 1 < lines.length) {
+                const nextLine = lines[i + 1];
+                if (!isProbablyIngredient(nextLine) && !isProbablyInstruction(nextLine)) {
+                    parsed.item = nextLine;
+                    i++; // Skip the next line
+                }
+            }
+
+            if (parsed.item) ingredients.push(parsed);
         } else if (currentSection === 'instructions' || (currentSection === 'none' && isProbablyInstruction(line))) {
-            // Clean up numbered lists (e.g. "1. Mix flour")
             const cleanInstruction = line.replace(/^\d+[\s.)]+/, '').trim();
             instructions.push(cleanInstruction);
         }
@@ -76,41 +87,68 @@ export function parseRecipeText(text: string): ParsedRecipe {
     };
 }
 
+const COMMON_UNITS = [
+    'cup', 'cups', 'c.', 'tbsp', 'tablespoon', 'tablespoons', 'tsp', 'teaspoon', 'teaspoons',
+    'oz', 'ounce', 'ounces', 'lb', 'pound', 'pounds', 'g', 'gram', 'grams', 'kg', 'kilogram', 'kilograms',
+    'ml', 'milliliter', 'milliliters', 'l', 'liter', 'liters', 'clove', 'cloves', 'pinch', 'pinches',
+    'dash', 'dashes', 'slice', 'slices', 'can', 'cans', 'bottle', 'bottles', 'package', 'packages', 'pkg'
+];
+
 function isProbablyIngredient(line: string): boolean {
+    const lower = line.toLowerCase();
+    // Exclude common instruction-like patterns
+    if (lower.includes('minutes') || lower.includes('hours') || lower.includes('degrees') || lower.includes('cook')) {
+        return false;
+    }
     // Starts with a number, fraction, or bullet
     return /^[\d¼½¾⅛⅜⅝⅞.\-\s*•]+/.test(line);
 }
 
 function isProbablyInstruction(line: string): boolean {
-    // Longer lines, starting with caps, or numbered
-    return line.length > 20 || /^\d+[.)]/.test(line);
+    const lower = line.toLowerCase();
+    // Longer lines, starting with caps, or numbered, or contains instruction verbs
+    return line.length > 25 || /^\d+[.)]/.test(line) || lower.includes('minutes') || lower.includes('heat') || lower.includes('mix');
 }
 
 function parseIngredientLine(line: string): ParsedIngredient {
-    // Regex to match quantity + unit + item
-    // Matches: "2 cups", "1/2 tsp", "1.5 lbs", "1", "250g"
-    const qtyRegex = /^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?))\s*([a-zA-Z.]+(?:\s+[a-zA-Z.]+)?\b)?\s*(?:of\s+)?(.*)/i;
-
-    // Remove bullets
+    // Remove bullets and trim
     const cleanLine = line.replace(/^[*•\-+]\s+/, '').trim();
+
+    // Regex to match quantity
+    // Matches: "1 1/2", "1/2", "1.5", "1", "250"
+    const qtyRegex = /^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?))\s*(.*)/i;
 
     const match = cleanLine.match(qtyRegex);
     if (match) {
         const amount = match[1].trim();
-        const unit = match[2]?.trim() || "";
-        const item = match[3]?.trim() || "";
+        let rest = match[2].trim();
+
+        // Check if the "rest" starts with a known unit
+        let unit = "";
+        const words = rest.split(/\s+/);
+        const firstWord = words[0].toLowerCase().replace(/[.,]$/, '');
+
+        if (COMMON_UNITS.includes(firstWord)) {
+            unit = words[0];
+            rest = words.slice(1).join(' ').trim();
+            // Handle cases like "cup of"
+            if (rest.toLowerCase().startsWith('of ')) {
+                rest = rest.slice(3).trim();
+            }
+        }
 
         // If 'g' is the unit, set weightG
         let weightG: number | undefined = undefined;
-        if (unit.toLowerCase() === 'g' || unit.toLowerCase() === 'ml') {
+        const lowerUnit = unit.toLowerCase();
+        if (lowerUnit === 'g' || lowerUnit === 'ml') {
             weightG = parseFloat(amount);
-        } else if (unit.toLowerCase() === 'kg') {
+        } else if (lowerUnit === 'kg') {
             weightG = parseFloat(amount) * 1000;
         }
 
         return {
             amount: unit ? `${amount} ${unit}` : amount,
-            item: item || unit || amount, // Fallback if parsing fails
+            item: rest || unit || amount,
             weightG
         };
     }
