@@ -87,16 +87,24 @@ export const getRandomRecipeByType = async (
         .filter((r: any) => diet === 'anything' || r.diet.includes(diet))
         .filter((r: any) => r.id !== excludeId) // Exclude current recipe
         .map((r: any) => {
+            const servings = r.servings || 1;
             const calculatedNutrition = calculateNutrition(r.ingredients);
+
+            // Scale micros to per-serving
+            const perServingMicros: Record<string, number> = {};
+            Object.entries(calculatedNutrition.micronutrients).forEach(([k, v]) => {
+                perServingMicros[k] = v / servings;
+            });
+
             return {
                 recipe: {
                     id: r.id,
                     title: r.title,
                     type: r.type,
-                    calories: calculatedNutrition.calories || r.calories || 0,
-                    protein: calculatedNutrition.protein || r.protein || 0,
-                    carbs: calculatedNutrition.carbs || r.carbs || 0,
-                    fat: calculatedNutrition.fat || r.fat || 0,
+                    calories: (calculatedNutrition.calories / servings) || r.calories || 0,
+                    protein: (calculatedNutrition.protein / servings) || r.protein || 0,
+                    carbs: (calculatedNutrition.carbs / servings) || r.carbs || 0,
+                    fat: (calculatedNutrition.fat / servings) || r.fat || 0,
                     diet: r.diet,
                     image: r.image,
                     prepTime: r.prep_time,
@@ -108,9 +116,9 @@ export const getRandomRecipeByType = async (
                         weightG: i.weight_g
                     })),
                     instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
-                    servings: 1
+                    servings: servings
                 },
-                micronutrients: calculatedNutrition.micronutrients
+                micronutrients: perServingMicros
             };
         });
 
@@ -187,20 +195,25 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
     const recipeMicronutrients: Record<string, Record<string, number>> = {};
 
     const allRecipes: Recipe[] = recipesData.map((r: any) => {
+        const servings = r.servings || 1;
         const calculatedNutrition = calculateNutrition(r.ingredients);
 
-        // Store micronutrients keyed by recipe ID
-        recipeMicronutrients[r.id] = calculatedNutrition.micronutrients;
+        // Store micronutrients keyed by recipe ID (scaled to per-serving)
+        const perServingMicros: Record<string, number> = {};
+        Object.entries(calculatedNutrition.micronutrients).forEach(([k, v]) => {
+            perServingMicros[k] = v / servings;
+        });
+        recipeMicronutrients[r.id] = perServingMicros;
 
         return {
             id: r.id,
             title: r.title,
             type: r.type,
-            // Use calculated values if available, otherwise fall back to stored values
-            calories: calculatedNutrition.calories || r.calories || 0,
-            protein: calculatedNutrition.protein || r.protein || 0,
-            carbs: calculatedNutrition.carbs || r.carbs || 0,
-            fat: calculatedNutrition.fat || r.fat || 0,
+            // Use calculated values divided by servings if available, otherwise fall back to stored values
+            calories: (calculatedNutrition.calories / servings) || r.calories || 0,
+            protein: (calculatedNutrition.protein / servings) || r.protein || 0,
+            carbs: (calculatedNutrition.carbs / servings) || r.carbs || 0,
+            fat: (calculatedNutrition.fat / servings) || r.fat || 0,
             diet: r.diet,
             image: r.image,
             prepTime: r.prep_time,
@@ -212,7 +225,7 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
                 weightG: i.weight_g
             })),
             instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
-            servings: 1
+            servings: servings
         };
     });
 
