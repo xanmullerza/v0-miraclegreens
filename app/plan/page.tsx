@@ -1605,23 +1605,44 @@ export default function MealPlannerPage() {
                                 Ingredients
                             </h3>
                             <ul className="space-y-2">
-                                {selectedRecipe.ingredients.map((ing, i) => (
-                                    <li key={i} className="flex items-start gap-3">
-                                        <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
-                                        <div className="flex-1">
-                                            <span className="font-medium">{ing.item}</span>
-                                            <span className="text-muted-foreground">
-                                                {" "} - {scaleIngredient(ing.amount, selectedRecipe.servings || 1)}
-                                                {ing.measureLabel && !ing.amount.toLowerCase().includes(ing.measureLabel.toLowerCase()) && ` ${ing.measureLabel}`}
-                                            </span>
-                                            {ing.isMiracleProduct && (
-                                                <span className="ml-2 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded-full">
-                                                    ✨ Miracle Product
+                                {selectedRecipe.ingredients.map((ing, i) => {
+                                    const servingsFactor = selectedRecipe.servings || 1;
+                                    const scaledAmount = scaleIngredient(ing.amount, servingsFactor);
+
+                                    // 1. Smart Name: If item is just digits, use the baseIngredient name
+                                    const displayName = /^\d+$/.test(ing.item) && ing.baseIngredient ? ing.baseIngredient : ing.item;
+
+                                    // 2. Smart Units: Handle pluralization
+                                    let unitDisp = ing.measureLabel || "";
+                                    const qtyNum = parseFloat(scaledAmount.replace(/[^\d./]/g, '')) || 1;
+                                    if (qtyNum > 1) {
+                                        if (unitDisp.toLowerCase() === 'slice') unitDisp = 'slices';
+                                        if (unitDisp.toLowerCase() === 'cup') unitDisp = 'cups';
+                                    }
+
+                                    // 3. Weight Display
+                                    const weightDisp = ing.weightG ? `${Math.round(ing.weightG * servingsFactor)}g` : null;
+
+                                    return (
+                                        <li key={i} className="flex items-start gap-3">
+                                            <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
+                                            <div className="flex-1">
+                                                <span className="font-medium capitalize">{displayName}</span>
+                                                <span className="text-muted-foreground italic ml-1">
+                                                    {" "} - {scaledAmount} {unitDisp}
+                                                    {weightDisp && (
+                                                        <span className="ml-1 text-[11px] opacity-70 font-mono">({weightDisp})</span>
+                                                    )}
                                                 </span>
-                                            )}
-                                        </div>
-                                    </li>
-                                ))}
+                                                {ing.isMiracleProduct && (
+                                                    <span className="ml-2 text-[10px] font-black uppercase tracking-tighter bg-green-600 text-white px-2 py-0.5 rounded-full shadow-sm">
+                                                        ✨ Miracle Boosted
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         </div>
 
