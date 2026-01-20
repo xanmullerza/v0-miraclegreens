@@ -129,18 +129,33 @@ const COMMON_UNITS = [
 
 function isProbablyIngredient(line: string): boolean {
     const lower = line.toLowerCase();
-    // Exclude common instruction-like patterns
-    if (lower.includes('minutes') || lower.includes('hours') || lower.includes('degrees') || lower.includes('cook')) {
+
+    // 1. Strict Exclusion: If it looks like an instruction step
+    // e.g. "1. Mix", "Step 1:", "4. Toss"
+    if (/^\d+[\s.)]/.test(line) && line.length > 20) {
+        // If it starts with a step-number and is long, it's likely an instruction
+        // UNLESS it also contains a common unit very early on
+        const firstFewWords = lower.split(/\s+/).slice(0, 4).join(' ');
+        const hasUnit = COMMON_UNITS.some(u => firstFewWords.includes(u));
+        if (!hasUnit) return false;
+    }
+
+    if (lower.includes('minutes') || lower.includes('hours') || lower.includes('degrees') ||
+        lower.includes('cook') || lower.includes('serve') || lower.includes('toss') ||
+        lower.includes('add ') || lower.includes('mix ') || lower.includes('salt and pepper')) {
         return false;
     }
-    // Starts with a number, fraction, or bullet
+
+    // 2. Inclusion: Starts with a quantity marker
     return /^[\d¼½¾⅛⅜⅝⅞.\-\s*•]+/.test(line);
 }
 
 function isProbablyInstruction(line: string): boolean {
     const lower = line.toLowerCase();
     // Longer lines, starting with caps, or numbered, or contains instruction verbs
-    return line.length > 30 || /^\d+[.)]/.test(line) || lower.includes('minutes') || lower.includes('heat') || lower.includes('mix') || lower.includes('cook');
+    return line.length > 30 || /^\d+[.)]/.test(line) || lower.startsWith('step') ||
+        lower.includes('minutes') || lower.includes('heat') || lower.includes('mix') ||
+        lower.includes('cook') || lower.includes('toss') || lower.includes('serve');
 }
 
 function parseIngredientLine(line: string): ParsedIngredient {

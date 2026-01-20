@@ -48,14 +48,39 @@ const Card = ({ children, className }: { children: React.ReactNode, className?: 
     </div>
 );
 
+// Helper to handle pluralization of units
+const pluralizeUnit = (qty: number, unit: string): string => {
+    if (qty <= 1 || !unit) return unit;
+    const lower = unit.toLowerCase();
+    const commonUnits = ['cup', 'tablespoon', 'teaspoon', 'ounce', 'pound', 'gram', 'kilogram', 'liter', 'milliliter', 'clove', 'pinch', 'dash', 'slice', 'can', 'bottle', 'package'];
+
+    if (commonUnits.includes(lower)) {
+        return unit + 's';
+    }
+    if (lower === 'inch') return unit + 'es';
+    if (lower === 'box') return unit + 'es';
+
+    return unit;
+};
+
 // Helper to handle "1/2", "1.5", etc.
 const evaluateAmount = (amt: string): number => {
     if (!amt) return 1;
-    if (amt.includes('/')) {
-        const [num, den] = amt.split('/').map(n => parseFloat(n.trim()));
+    // Extract numerical part from the start of the string
+    const match = amt.match(/^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?))/);
+    if (!match) return 1;
+
+    const val = match[1].trim();
+    if (val.includes('/')) {
+        if (val.includes(' ')) {
+            const [whole, fraction] = val.split(' ');
+            const [num, den] = fraction.split('/').map(n => parseFloat(n.trim()));
+            return parseFloat(whole) + (num / den);
+        }
+        const [num, den] = val.split('/').map(n => parseFloat(n.trim()));
         if (den && !isNaN(num)) return num / den;
     }
-    const parsed = parseFloat(amt);
+    const parsed = parseFloat(val);
     return isNaN(parsed) ? 1 : parsed;
 };
 
@@ -232,6 +257,10 @@ function RecipeUploaderContent() {
                         if (!ing.weightG) {
                             const qty = evaluateAmount(ing.amount);
                             newIngs[i].weightG = qty * (matchedMeasure.weight_g || 1);
+
+                            // Update the text to be pluralized if needed
+                            const pluralizedLabel = pluralizeUnit(qty, matchedMeasure.label);
+                            newIngs[i].amount = `${qty} ${pluralizedLabel}`;
                         }
                     }
                 }
@@ -342,6 +371,8 @@ function RecipeUploaderContent() {
         let weightG = 0;
         const amountStr = (ing.amount || "").toLowerCase();
         const qtyValue = evaluateAmount(ing.amount);
+        const pluralizedLabel = pluralizeUnit(qtyValue, measure.label);
+        const newAmount = `${qtyValue} ${pluralizedLabel}`;
 
         if (amountStr.includes('g') && !amountStr.includes('/')) {
             // It's a manual weight like "90g". Just use it.
@@ -353,6 +384,7 @@ function RecipeUploaderContent() {
 
         newIngs[activeIngredientIndex] = {
             ...ing,
+            amount: newAmount,
             selectedMeasure: measure,
             weightG: weightG
         };
@@ -701,7 +733,7 @@ function RecipeUploaderContent() {
                                                     />
                                                 </div>
 
-                                                <div className="md:col-span-3 space-y-1.5">
+                                                <div className="md:col-span-2 space-y-1.5">
                                                     <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Quantity/Unit</Label>
                                                     <div className="flex gap-2">
                                                         <Input
@@ -740,12 +772,12 @@ function RecipeUploaderContent() {
                                                     </div>
                                                 </div>
 
-                                                <div className="md:col-span-2 flex items-end pb-0.5 gap-2">
+                                                <div className="md:col-span-3 flex items-end pb-0.5 gap-2">
                                                     <Button
                                                         variant="outline"
                                                         size="icon"
                                                         className={cn(
-                                                            "shrink-0 transition-all",
+                                                            "shrink-0 transition-all h-10 w-10",
                                                             ing.isMiracleProduct ? "bg-emerald-600 border-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-100" : "bg-white text-slate-400 border-slate-200"
                                                         )}
                                                         onClick={() => {
@@ -760,7 +792,7 @@ function RecipeUploaderContent() {
                                                     <Button
                                                         variant="outline"
                                                         className={cn(
-                                                            "flex-grow transition-all",
+                                                            "flex-grow transition-all h-10",
                                                             ing.matchedFood ? "border-emerald-200 bg-emerald-50 text-emerald-700 font-bold" : "border-slate-200 text-slate-600"
                                                         )}
                                                         onClick={() => {
@@ -776,7 +808,13 @@ function RecipeUploaderContent() {
                                                         {ing.matchedFood ? <Check size={16} className="mr-2" /> : <Search size={16} className="mr-2" />}
                                                         {ing.matchedFood ? "Matched" : "Match Food"}
                                                     </Button>
-                                                    <Button variant="ghost" size="icon" onClick={() => removeIngredient(idx)} className="text-slate-400 hover:text-red-500">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => removeIngredient(idx)}
+                                                        className="h-10 w-10 text-slate-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+                                                        title="Remove Ingredient"
+                                                    >
                                                         <Trash2 size={18} />
                                                     </Button>
                                                 </div>
@@ -906,7 +944,7 @@ function RecipeUploaderContent() {
                                             <div className="space-y-4 pt-6 mt-6 border-t border-emerald-100">
                                                 <h3 className="text-emerald-800 font-bold text-sm uppercase">Key Micronutrients</h3>
                                                 <div className="flex flex-wrap gap-2">
-                                                    {Object.entries(calculateTotalNutrition().micronutrients).slice(0, 8).map(([key, val]) => (
+                                                    {Object.entries(calculateTotalNutrition().micronutrients).slice(0, 24).map(([key, val]) => (
                                                         <div key={key} className="bg-white px-3 py-1.5 rounded-lg border border-slate-100 text-xs flex justify-between gap-3 min-w-[120px]">
                                                             <span className="text-slate-500">{key}</span>
                                                             <span className="font-bold text-slate-800">{Math.round(val / servings * 10) / 10}</span>
