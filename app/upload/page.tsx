@@ -38,7 +38,7 @@ import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { Recipe, Ingredient, MealType, DietType } from '@/lib/data/recipes';
 import { parseRecipeText } from '@/lib/utils/recipe-parser';
-import { Textarea } from '@/components/ui/textarea';
+import { Textarea } from '@/components/ui/Textarea';
 import { Wand2, Sparkles, Zap } from 'lucide-react';
 
 // Simplified UI Components for the uploader
