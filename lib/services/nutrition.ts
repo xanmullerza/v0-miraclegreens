@@ -50,11 +50,22 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
  * Searches for food items using the USDA FoodData Central API.
  */
 export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
+    if (!query || query.trim().length < 2) return [];
+
     try {
         const response = await fetch(`${USDA_BASE_URL}/foods/search?api_key=${USDA_API_KEY}&query=${encodeURIComponent(query)}&pageSize=5`);
+
+        if (!response.ok) {
+            console.error(`USDA API Error: ${response.status} ${response.statusText}`);
+            return [];
+        }
+
         const data = await response.json();
 
-        if (!data.foods) return [];
+        if (!data.foods || data.foods.length === 0) {
+            console.warn("USDA API: No foods found for query:", query);
+            return [];
+        }
 
         return data.foods.map((food: any) => {
             const getNutrient = (name: string) => {

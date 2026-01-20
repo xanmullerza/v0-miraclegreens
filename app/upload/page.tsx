@@ -71,18 +71,41 @@ export default function RecipeUploaderPage() {
     const addInstruction = () => setInstructions([...instructions, '']);
     const removeInstruction = (idx: number) => setInstructions(instructions.filter((_, i) => i !== idx));
 
-    // Search logic
-    const handleSearch = async (query: string) => {
+    // Search logic with simple debounce
+    const [debouncedQuery, setDebouncedQuery] = useState('');
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (debouncedQuery) {
+                performSearch(debouncedQuery);
+            }
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [debouncedQuery]);
+
+    const performSearch = async (query: string) => {
+        if (!query || query.trim().length < 2) {
+            setSearchResults([]);
+            return;
+        }
+
         setSearching(true);
+        try {
+            // First search local
+            const local = await searchLocalFood(query);
+            // Then search USDA
+            const usda = await searchUSDAFood(query);
+            setSearchResults([...local, ...usda]);
+        } catch (err) {
+            console.error("Search failed:", err);
+        } finally {
+            setSearching(false);
+        }
+    };
+
+    const handleSearch = (query: string) => {
         setSearchQuery(query);
-
-        // First search local
-        const local = await searchLocalFood(query);
-        // Then search USDA
-        const usda = await searchUSDAFood(query);
-
-        setSearchResults([...local, ...usda]);
-        setSearching(false);
+        setDebouncedQuery(query);
     };
 
     const selectFood = async (food: FoodItemMatch) => {
@@ -425,8 +448,13 @@ export default function RecipeUploaderPage() {
                                                             ing.matchedFood ? "border-emerald-200 bg-emerald-50 text-emerald-700 font-bold" : "border-slate-200 text-slate-600"
                                                         )}
                                                         onClick={() => {
+                                                            // Clear previous context
+                                                            setSearchResults([]);
+                                                            setMeasures([]);
+                                                            setSearchQuery(ing.item || ing.amount);
+
                                                             setActiveIngredientIndex(idx);
-                                                            handleSearch(ing.item || ing.amount);
+                                                            performSearch(ing.item || ing.amount);
                                                         }}
                                                     >
                                                         {ing.matchedFood ? <Check size={16} className="mr-2" /> : <Search size={16} className="mr-2" />}
