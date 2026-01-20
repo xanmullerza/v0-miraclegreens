@@ -225,7 +225,8 @@ export default function RecipeUploaderPage() {
                 carbs: Math.round(carbs / servings),
                 fat: Math.round(fat / servings),
                 image,
-                prep_time: prepTime
+                prep_time: prepTime,
+                servings: servings
             });
 
             if (recipeError) throw recipeError;
