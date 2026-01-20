@@ -7,6 +7,7 @@ export interface Ingredient {
     isMiracleProduct?: boolean;
     baseIngredient?: string; // What you buy (e.g., "Egg" for "Egg, Scrambled")
     weightG?: number; // Structured weight in grams (base amount before scaling)
+    measureLabel?: string; // e.g., "cup", "slice"
 }
 
 export interface Recipe {

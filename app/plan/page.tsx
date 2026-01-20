@@ -1610,7 +1610,10 @@ export default function MealPlannerPage() {
                                         <div className="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
                                         <div className="flex-1">
                                             <span className="font-medium">{ing.item}</span>
-                                            <span className="text-muted-foreground"> - {scaleIngredient(ing.amount, selectedRecipe.servings || 1)}</span>
+                                            <span className="text-muted-foreground">
+                                                {" "} - {scaleIngredient(ing.amount, selectedRecipe.servings || 1)}
+                                                {ing.measureLabel && !ing.amount.toLowerCase().includes(ing.measureLabel.toLowerCase()) && ` ${ing.measureLabel}`}
+                                            </span>
                                             {ing.isMiracleProduct && (
                                                 <span className="ml-2 text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded-full">
                                                     ✨ Miracle Product

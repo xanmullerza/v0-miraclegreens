@@ -113,7 +113,8 @@ export const getRandomRecipeByType = async (
                         amount: i.amount,
                         isMiracleProduct: i.is_miracle_product,
                         baseIngredient: i.base_ingredient,
-                        weightG: i.weight_g
+                        weightG: i.weight_g,
+                        measureLabel: i.measure_label
                     })),
                     instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
                     servings: servings
@@ -222,7 +223,8 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
                 amount: i.amount,
                 isMiracleProduct: i.is_miracle_product,
                 baseIngredient: i.base_ingredient,
-                weightG: i.weight_g
+                weightG: i.weight_g,
+                measureLabel: i.measure_label
             })),
             instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
             servings: servings
@@ -331,10 +333,16 @@ export interface ShoppingItem {
 export const generateShoppingList = (plan: DailyPlan): ShoppingItem[] => {
     const getScaledIngredients = (recipe: Recipe) => {
         const factor = recipe.servings || 1;
-        return recipe.ingredients.map(ing => ({
-            ...ing,
-            amount: scaleIngredient(ing.amount, factor)
-        }));
+        return recipe.ingredients.map(ing => {
+            const scaledAmount = scaleIngredient(ing.amount, factor);
+            const fullAmount = (ing.measureLabel && !ing.amount.toLowerCase().includes(ing.measureLabel.toLowerCase()))
+                ? `${scaledAmount} ${ing.measureLabel}`
+                : scaledAmount;
+            return {
+                ...ing,
+                amount: fullAmount
+            };
+        });
     };
 
     const allIngredients = [
