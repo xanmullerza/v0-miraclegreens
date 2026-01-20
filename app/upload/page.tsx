@@ -182,57 +182,84 @@ function RecipeUploaderContent() {
     };
 
     const handleQuickDetails = (text: string) => {
-        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-        if (lines.length === 0) return;
+        setIsWizardProcessing(true);
+        try {
+            const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            if (lines.length === 0) return;
 
-        // Parse title (usually first line)
-        if (!title) setTitle(lines[0]);
+            // Parse title if missing
+            if (!title) setTitle(lines[0]);
 
-        // Look for servings and times
-        let totalTime = 0;
-        lines.forEach(line => {
-            const lower = line.toLowerCase();
-            // Servings
-            const servMatch = line.match(/(?:makes|servings|serves)\s*:?\s*(\d+)/i);
-            if (servMatch) setServings(parseInt(servMatch[1]));
+            let s = 1;
+            let t = 0;
+            let foundAny = false;
 
-            // Times (Prep/Cook) - sum them up
-            const timeMatches = line.matchAll(/(\d+)\s*(?:min|minute|hour)/gi);
-            for (const match of timeMatches) {
-                if (lower.includes('prep') || lower.includes('cook') || lower.includes('time')) {
-                    let mins = parseInt(match[1]);
-                    if (match[0].toLowerCase().includes('hour')) mins *= 60;
-                    totalTime += mins;
+            lines.forEach(line => {
+                const lower = line.toLowerCase();
+                // Servings
+                const servMatch = line.match(/(?:makes|servings|serves|yield|yields|yield:)\s*:?\s*(\d+)/i) ||
+                    line.match(/(\d+)\s*(?:servings|serves|portions)/i);
+                if (servMatch) {
+                    s = parseInt(servMatch[1]);
+                    foundAny = true;
                 }
-            }
-        });
 
-        if (totalTime > 0) setPrepTime(totalTime);
-        setShowMagicPaste(false);
-        setMagicPaste("");
+                // Time (sum all found durations)
+                const timeMatches = line.matchAll(/(\d+)\s*(?:min|minute|minutes|hour|hours|hr|hrs|h)\b/gi);
+                for (const match of timeMatches) {
+                    let val = parseInt(match[1]);
+                    const unit = match[0].toLowerCase();
+                    if (unit.includes('hour') || unit.includes('hr') || unit.endsWith('h')) val *= 60;
+                    t += val;
+                    foundAny = true;
+                }
+            });
+
+            if (foundAny) {
+                setServings(s);
+                setPrepTime(t);
+            }
+
+            setWizardProcessedData(true);
+        } catch (err) {
+            console.error("Wizard Parse Error:", err);
+        } finally {
+            setIsWizardProcessing(false);
+        }
     };
 
     const handleQuickIngredients = async (text: string) => {
-        const parsed = parseIngredientsOnly(text);
-        const newIngs = parsed.map(ing => ({
-            item: ing.item,
-            amount: ing.amount,
-            weightG: ing.weightG || 0,
-            isMiracleProduct: false
-        }));
-        setIngredients(newIngs);
-        setShowMagicPaste(false);
-        setMagicPaste("");
+        setIsWizardProcessing(true);
+        try {
+            const parsed = parseIngredientsOnly(text);
+            const newIngs = parsed.map(ing => ({
+                item: ing.item,
+                amount: ing.amount,
+                weightG: ing.weightG || 0,
+                isMiracleProduct: false
+            }));
+            setIngredients(newIngs);
 
-        // Auto-match attempt as requested
-        setTimeout(() => autoMatchAll(), 100);
+            // Auto-match attempt
+            await autoMatchAll(newIngs);
+
+            setWizardProcessedData(true);
+        } catch (err) {
+            console.error("Wizard Ing Error:", err);
+        } finally {
+            setIsWizardProcessing(false);
+        }
     };
 
     const handleQuickInstructions = (text: string) => {
-        const parsed = parseInstructionsOnly(text);
-        setInstructions(parsed);
-        setShowMagicPaste(false);
-        setMagicPaste("");
+        setIsWizardProcessing(true);
+        try {
+            const parsed = parseInstructionsOnly(text);
+            setInstructions(parsed);
+            setWizardProcessedData(true);
+        } finally {
+            setIsWizardProcessing(false);
+        }
     };
 
     const handleMagicImport = () => {
