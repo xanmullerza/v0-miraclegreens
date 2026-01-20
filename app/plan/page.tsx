@@ -304,20 +304,17 @@ export default function MealPlannerPage() {
         carbs_g: 0.80,
         fat_g: 0.05,
         micronutrients: {
-            // Vitamins
-            vitamin_a_ug: 112.50,
-            vitamin_c_mg: 4.50,
-            thiamine_mg: 0.05,
-            riboflavin_mg: 0.41,
-            niacin_mg: 0.20,
-            // Minerals
-            calcium_mg: 40.00,
-            iron_mg: 0.76,
-            magnesium_mg: 7.35,
-            potassium_mg: 26.50,
-            sodium_mg: 0.50,
-            // Fiber
-            fiber_g: 0.80
+            'Vitamin A': 112.50,
+            'Vitamin C': 4.50,
+            'B1 (Thiamine)': 0.05,
+            'B2 (Riboflavin)': 0.41,
+            'B3 (Niacin)': 0.20,
+            'Calcium': 40.00,
+            'Iron': 0.76,
+            'Magnesium': 7.35,
+            'Potassium': 26.50,
+            'Sodium': 0.50,
+            'Fiber': 0.80
         }
     };
 
@@ -926,7 +923,14 @@ export default function MealPlannerPage() {
                                                     if (dailyMoringaGrams > 0) {
                                                         const ratio = dailyMoringaGrams / 2;
                                                         Object.entries(MORINGA_TSP.micronutrients).forEach(([key, value]) => {
-                                                            m[key] = (m[key] || 0) + (value * ratio);
+                                                            // Find any matching key (e.g. 'Vitamin A' or 'vitamin_a_ug')
+                                                            const mKeys = Object.keys(m);
+                                                            const match = mKeys.find(mk => mk === key || mk.toLowerCase().includes(key.split(' ')[0].toLowerCase()));
+                                                            if (match) {
+                                                                m[match] = (m[match] || 0) + (value * ratio);
+                                                            } else {
+                                                                m[key] = value * ratio;
+                                                            }
                                                         });
                                                     }
 
@@ -1019,17 +1023,17 @@ export default function MealPlannerPage() {
                                                                             if (dailyMoringaGrams <= 0) return 0;
                                                                             const ratio = dailyMoringaGrams / 2;
                                                                             const mapping: Record<string, any> = {
-                                                                                'Potassium': MORINGA_TSP.micronutrients.potassium_mg,
-                                                                                'Magnesium': MORINGA_TSP.micronutrients.magnesium_mg,
-                                                                                'Calcium': MORINGA_TSP.micronutrients.calcium_mg,
-                                                                                'Sodium': MORINGA_TSP.micronutrients.sodium_mg,
-                                                                                'Iron': MORINGA_TSP.micronutrients.iron_mg,
-                                                                                'Vitamin A': MORINGA_TSP.micronutrients.vitamin_a_ug,
-                                                                                'B1 (Thiamine)': MORINGA_TSP.micronutrients.thiamine_mg,
-                                                                                'B2 (Riboflavin)': MORINGA_TSP.micronutrients.riboflavin_mg,
-                                                                                'B3 (Niacin)': MORINGA_TSP.micronutrients.niacin_mg,
-                                                                                'Vitamin C': MORINGA_TSP.micronutrients.vitamin_c_mg,
-                                                                                'Fiber': MORINGA_TSP.micronutrients.fiber_g,
+                                                                                'Potassium': MORINGA_TSP.micronutrients['Potassium'],
+                                                                                'Magnesium': MORINGA_TSP.micronutrients['Magnesium'],
+                                                                                'Calcium': MORINGA_TSP.micronutrients['Calcium'],
+                                                                                'Sodium': MORINGA_TSP.micronutrients['Sodium'],
+                                                                                'Iron': MORINGA_TSP.micronutrients['Iron'],
+                                                                                'Vitamin A': MORINGA_TSP.micronutrients['Vitamin A'],
+                                                                                'B1 (Thiamine)': MORINGA_TSP.micronutrients['B1 (Thiamine)'],
+                                                                                'B2 (Riboflavin)': MORINGA_TSP.micronutrients['B2 (Riboflavin)'],
+                                                                                'B3 (Niacin)': MORINGA_TSP.micronutrients['B3 (Niacin)'],
+                                                                                'Vitamin C': MORINGA_TSP.micronutrients['Vitamin C'],
+                                                                                'Fiber': MORINGA_TSP.micronutrients['Fiber'],
                                                                                 'Protein': MORINGA_TSP.protein_g,
                                                                                 'Carbs': MORINGA_TSP.carbs_g,
                                                                                 'Fat': MORINGA_TSP.fat_g,
@@ -1348,7 +1352,14 @@ export default function MealPlannerPage() {
                                 if (recipeMoringaGrams > 0) {
                                     const ratio = recipeMoringaGrams / 2;
                                     Object.entries(MORINGA_TSP.micronutrients).forEach(([key, value]) => {
-                                        m[key] = (m[key] || 0) + (value * ratio);
+                                        // Find any matching key (e.g. 'Vitamin A' or 'vitamin_a_ug')
+                                        const mKeys = Object.keys(m);
+                                        const match = mKeys.find(mk => mk === key || mk.toLowerCase().includes(key.split(' ')[0].toLowerCase()));
+                                        if (match) {
+                                            m[match] = (m[match] || 0) + (value * ratio);
+                                        } else {
+                                            m[key] = value * ratio;
+                                        }
                                     });
                                 }
 
@@ -1432,17 +1443,17 @@ export default function MealPlannerPage() {
                                                         if (recipeMoringaGrams <= 0) return 0;
                                                         const ratio = recipeMoringaGrams / 2;
                                                         const mapping: Record<string, any> = {
-                                                            'Potassium': MORINGA_TSP.micronutrients.potassium_mg,
-                                                            'Magnesium': MORINGA_TSP.micronutrients.magnesium_mg,
-                                                            'Calcium': MORINGA_TSP.micronutrients.calcium_mg,
-                                                            'Sodium': MORINGA_TSP.micronutrients.sodium_mg,
-                                                            'Iron': MORINGA_TSP.micronutrients.iron_mg,
-                                                            'Vitamin A': MORINGA_TSP.micronutrients.vitamin_a_ug,
-                                                            'B1 (Thiamine)': MORINGA_TSP.micronutrients.thiamine_mg,
-                                                            'B2 (Riboflavin)': MORINGA_TSP.micronutrients.riboflavin_mg,
-                                                            'B3 (Niacin)': MORINGA_TSP.micronutrients.niacin_mg,
-                                                            'Vitamin C': MORINGA_TSP.micronutrients.vitamin_c_mg,
-                                                            'Fiber': MORINGA_TSP.micronutrients.fiber_g,
+                                                            'Potassium': MORINGA_TSP.micronutrients['Potassium'],
+                                                            'Magnesium': MORINGA_TSP.micronutrients['Magnesium'],
+                                                            'Calcium': MORINGA_TSP.micronutrients['Calcium'],
+                                                            'Sodium': MORINGA_TSP.micronutrients['Sodium'],
+                                                            'Iron': MORINGA_TSP.micronutrients['Iron'],
+                                                            'Vitamin A': MORINGA_TSP.micronutrients['Vitamin A'],
+                                                            'B1 (Thiamine)': MORINGA_TSP.micronutrients['B1 (Thiamine)'],
+                                                            'B2 (Riboflavin)': MORINGA_TSP.micronutrients['B2 (Riboflavin)'],
+                                                            'B3 (Niacin)': MORINGA_TSP.micronutrients['B3 (Niacin)'],
+                                                            'Vitamin C': MORINGA_TSP.micronutrients['Vitamin C'],
+                                                            'Fiber': MORINGA_TSP.micronutrients['Fiber'],
                                                             'Protein': MORINGA_TSP.protein_g,
                                                             'Carbs': MORINGA_TSP.carbs_g,
                                                             'Fat': MORINGA_TSP.fat_g,
