@@ -930,50 +930,58 @@ export default function MealPlannerPage() {
                                                         });
                                                     }
 
+                                                    // Helper to extract nutrients from diverse JSONB structures
+                                                    const n = (data: Record<string, number>, keys: string[]) => {
+                                                        for (const k of keys) {
+                                                            if (data[k] !== undefined) return data[k];
+                                                        }
+                                                        return 0;
+                                                    };
+
                                                     // Categorize nutrients
                                                     const metabolicFuel: Record<string, number> = {
-                                                        'B1 (Thiamine)': m.thiamine_mg || 0,
-                                                        'B2 (Riboflavin)': m.riboflavin_mg || 0,
-                                                        'B3 (Niacin)': m.niacin_mg || 0,
-                                                        'B5 (Pantothenic Acid)': m.pantothenic_acid_mg || 0,
-                                                        'Manganese': m.manganese_mg || 0,
+                                                        'B1 (Thiamine)': n(m, ['B1 (Thiamine)', 'thiamine_mg']),
+                                                        'B2 (Riboflavin)': n(m, ['B2 (Riboflavin)', 'riboflavin_mg']),
+                                                        'B3 (Niacin)': n(m, ['B3 (Niacin)', 'niacin_mg']),
+                                                        'B5 (Pantothenic Acid)': n(m, ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg']),
+                                                        'Manganese': n(m, ['Manganese', 'manganese_mg']),
                                                     };
 
                                                     const cognitiveFocus: Record<string, number> = {
-                                                        'B6 (Pyridoxine)': m.vitamin_b6_mg || 0,
-                                                        'Choline': m.choline_mg || 0,
-                                                        'Magnesium': m.magnesium_mg || 0,
-                                                        'Copper': m.copper_mg || 0,
+                                                        'B6 (Pyridoxine)': n(m, ['B6 (Pyridoxine)', 'vitamin_b6_mg']),
+                                                        'Choline': n(m, ['Choline', 'choline_mg']),
+                                                        'Magnesium': n(m, ['Magnesium', 'magnesium_mg']),
+                                                        'Copper': n(m, ['Copper', 'copper_mg']),
                                                     };
 
                                                     const bloodDNA: Record<string, number> = {
-                                                        'Iron': m.iron_mg || 0,
-                                                        'B9 (Folate)': m.folate_ug || 0,
-                                                        'B12 (Cobalamin)': m.vitamin_b12_ug || 0,
+                                                        'Iron': n(m, ['Iron', 'iron_mg']),
+                                                        'B9 (Folate)': n(m, ['B9 (Folate)', 'folate_ug']),
+                                                        'B12 (Cobalamin)': n(m, ['B12 (Cobalamin)', 'vitamin_b12_ug']),
                                                     };
 
                                                     const skeletalHealth: Record<string, number> = {
-                                                        'Calcium': m.calcium_mg || 0,
-                                                        'Phosphorus': m.phosphorus_mg || 0,
-                                                        'Vitamin D': m.vitamin_d_iu || 0,
-                                                        'Vitamin K': m.vitamin_k_ug || 0,
+                                                        'Calcium': n(m, ['Calcium', 'calcium_mg']),
+                                                        'Phosphorus': n(m, ['Phosphorus', 'phosphorus_mg']),
+                                                        'Vitamin D': n(m, ['Vitamin D', 'vitamin_d_iu']),
+                                                        'Vitamin K': n(m, ['Vitamin K', 'vitamin_k_ug']),
                                                     };
 
                                                     const electrolytes: Record<string, number> = {
-                                                        'Potassium': m.potassium_mg || 0,
-                                                        'Sodium': m.sodium_mg || 0,
+                                                        'Potassium': n(m, ['Potassium', 'potassium_mg']),
+                                                        'Sodium': n(m, ['Sodium', 'sodium_mg', 'Sodium']),
                                                     };
 
                                                     const immuneShield: Record<string, number> = {
-                                                        'Vitamin A': m.vitamin_a_ug || 0,
-                                                        'Vitamin C': m.vitamin_c_mg || 0,
-                                                        'Vitamin E': m.vitamin_e_mg || 0,
-                                                        'Zinc': m.zinc_mg || 0,
-                                                        'Selenium': m.selenium_ug || 0,
+                                                        'Vitamin A': n(m, ['Vitamin A', 'vitamin_a_ug']),
+                                                        'Vitamin C': n(m, ['Vitamin C', 'vitamin_c_mg']),
+                                                        'Vitamin E': n(m, ['Vitamin E', 'vitamin_e_mg']),
+                                                        'Zinc': n(m, ['Zinc', 'zinc_mg']),
+                                                        'Selenium': n(m, ['Selenium', 'selenium_ug']),
                                                     };
 
                                                     const other: Record<string, number> = {
-                                                        'Fiber': m.fiber_g || 0,
+                                                        'Fiber': n(m, ['Fiber', 'fiber_g']),
                                                     };
 
                                                     const DailyNutrientGrid = ({ nutrients, title, icon: Icon }: { nutrients: Record<string, number>, title: string, icon: any }) => {
@@ -1344,49 +1352,57 @@ export default function MealPlannerPage() {
                                     });
                                 }
 
+                                // Helper for modal view nutrients
+                                const n = (data: Record<string, number>, keys: string[]) => {
+                                    for (const k of keys) {
+                                        if (data[k] !== undefined) return data[k];
+                                    }
+                                    return 0;
+                                };
+
                                 const metabolicFuel: Record<string, number> = {
-                                    'B1 (Thiamine)': m.thiamine_mg || 0,
-                                    'B2 (Riboflavin)': m.riboflavin_mg || 0,
-                                    'B3 (Niacin)': m.niacin_mg || 0,
-                                    'B5 (Pantothenic Acid)': m.pantothenic_acid_mg || 0,
-                                    'Manganese': m.manganese_mg || 0,
+                                    'B1 (Thiamine)': n(m, ['B1 (Thiamine)', 'thiamine_mg']),
+                                    'B2 (Riboflavin)': n(m, ['B2 (Riboflavin)', 'riboflavin_mg']),
+                                    'B3 (Niacin)': n(m, ['B3 (Niacin)', 'niacin_mg']),
+                                    'B5 (Pantothenic Acid)': n(m, ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg']),
+                                    'Manganese': n(m, ['Manganese', 'manganese_mg']),
                                 };
 
                                 const cognitiveFocus: Record<string, number> = {
-                                    'B6 (Pyridoxine)': m.vitamin_b6_mg || 0,
-                                    'Choline': m.choline_mg || 0,
-                                    'Magnesium': m.magnesium_mg || 0,
-                                    'Copper': m.copper_mg || 0,
+                                    'B6 (Pyridoxine)': n(m, ['B6 (Pyridoxine)', 'vitamin_b6_mg']),
+                                    'Choline': n(m, ['Choline', 'choline_mg']),
+                                    'Magnesium': n(m, ['Magnesium', 'magnesium_mg']),
+                                    'Copper': n(m, ['Copper', 'copper_mg']),
                                 };
 
                                 const bloodDNA: Record<string, number> = {
-                                    'Iron': m.iron_mg || 0,
-                                    'B9 (Folate)': m.folate_ug || 0,
-                                    'B12 (Cobalamin)': m.vitamin_b12_ug || 0,
+                                    'Iron': n(m, ['Iron', 'iron_mg']),
+                                    'B9 (Folate)': n(m, ['B9 (Folate)', 'folate_ug']),
+                                    'B12 (Cobalamin)': n(m, ['B12 (Cobalamin)', 'vitamin_b12_ug']),
                                 };
 
                                 const skeletalHealth: Record<string, number> = {
-                                    'Calcium': m.calcium_mg || 0,
-                                    'Phosphorus': m.phosphorus_mg || 0,
-                                    'Vitamin D': m.vitamin_d_iu || 0,
-                                    'Vitamin K': m.vitamin_k_ug || 0,
+                                    'Calcium': n(m, ['Calcium', 'calcium_mg']),
+                                    'Phosphorus': n(m, ['Phosphorus', 'phosphorus_mg']),
+                                    'Vitamin D': n(m, ['Vitamin D', 'vitamin_d_iu']),
+                                    'Vitamin K': n(m, ['Vitamin K', 'vitamin_k_ug']),
                                 };
 
                                 const electrolytes: Record<string, number> = {
-                                    'Potassium': m.potassium_mg || 0,
-                                    'Sodium': m.sodium_mg || 0,
+                                    'Potassium': n(m, ['Potassium', 'potassium_mg']),
+                                    'Sodium': n(m, ['Sodium', 'sodium_mg', 'Sodium']),
                                 };
 
                                 const immuneShield: Record<string, number> = {
-                                    'Vitamin A': m.vitamin_a_ug || 0,
-                                    'Vitamin C': m.vitamin_c_mg || 0,
-                                    'Vitamin E': m.vitamin_e_mg || 0,
-                                    'Zinc': m.zinc_mg || 0,
-                                    'Selenium': m.selenium_ug || 0,
+                                    'Vitamin A': n(m, ['Vitamin A', 'vitamin_a_ug']),
+                                    'Vitamin C': n(m, ['Vitamin C', 'vitamin_c_mg']),
+                                    'Vitamin E': n(m, ['Vitamin E', 'vitamin_e_mg']),
+                                    'Zinc': n(m, ['Zinc', 'zinc_mg']),
+                                    'Selenium': n(m, ['Selenium', 'selenium_ug']),
                                 };
 
                                 const other: Record<string, number> = {
-                                    'Fiber': m.fiber_g || 0,
+                                    'Fiber': n(m, ['Fiber', 'fiber_g']),
                                 };
 
                                 const ModalNutrientGrid = ({ nutrients, title, icon: Icon }: { nutrients: Record<string, number>, title: string, icon: any }) => {

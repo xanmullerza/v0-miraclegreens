@@ -13,6 +13,7 @@ create table public.recipes (
   diet text[] not null default '{}', -- Array of diet types e.g. ['vegan', 'vegetarian']
   image text,
   prep_time integer not null,
+  servings integer not null default 1,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 

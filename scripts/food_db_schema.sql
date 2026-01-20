@@ -11,7 +11,11 @@ create table public.food_items (
   fat_g numeric,
   
   -- Flexible JSON for all other micronutrients (Vitamins, Minerals, etc.)
-  -- Structure: { "vitamin_c_mg": 0, "cholesterol_mg": 373, ... }
+  -- STANDARD KEYS: 'Potassium', 'Magnesium', 'Calcium', 'Phosphorus', 'Sodium', 
+  -- 'Iron', 'Zinc', 'Selenium', 'Copper', 'Manganese', 'Vitamin A', 'Vitamin C', 
+  -- 'Vitamin D', 'Vitamin E', 'Vitamin K', 'B1 (Thiamine)', 'B2 (Riboflavin)', 
+  -- 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)', 
+  -- 'B12 (Cobalamin)', 'Choline', 'Fiber'
   micronutrients jsonb default '{}'::jsonb,
   
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
