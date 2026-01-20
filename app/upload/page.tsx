@@ -1,7 +1,8 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
@@ -44,6 +45,18 @@ const Card = ({ children, className }: { children: React.ReactNode, className?: 
 );
 
 export default function RecipeUploaderPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>}>
+            <RecipeUploaderContent />
+        </Suspense>
+    );
+}
+
+function RecipeUploaderContent() {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const editId = searchParams.get('edit');
+
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [title, setTitle] = useState('');
@@ -57,6 +70,70 @@ export default function RecipeUploaderPage() {
         { item: '', amount: '', weightG: 0, isMiracleProduct: false }
     ]);
     const [instructions, setInstructions] = useState<string[]>(['']);
+
+    // Load existing recipe for editing
+    useEffect(() => {
+        if (editId) {
+            loadRecipe(editId);
+        }
+    }, [editId]);
+
+    const loadRecipe = async (id: string) => {
+        setLoading(true);
+        try {
+            const { data: recipe, error } = await supabase
+                .from('recipes')
+                .select(`
+                    *,
+                    ingredients (
+                        *,
+                        food_items (*)
+                    ),
+                    instructions (*)
+                `)
+                .eq('id', id)
+                .single();
+
+            if (error || !recipe) throw error || new Error('Recipe not found');
+
+            setTitle(recipe.title);
+            setMealType(recipe.type as MealType);
+            setDiet(recipe.diet as DietType[]);
+            setPrepTime(recipe.prep_time);
+            setServings(recipe.servings || 1);
+            setImage(recipe.image || '');
+
+            setInstructions(recipe.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text));
+
+            // Hydrate ingredients
+            const hydratedIngs = recipe.ingredients.map((ing: any) => ({
+                item: ing.item,
+                amount: ing.amount,
+                weightG: ing.weight_g,
+                isMiracleProduct: ing.is_miracle_product,
+                baseIngredient: ing.base_ingredient,
+                matchedFood: ing.food_items ? {
+                    id: ing.food_items.id,
+                    name: ing.food_items.name,
+                    energy_kcal: ing.food_items.energy_kcal,
+                    energy_kj: ing.food_items.energy_kj,
+                    protein_g: ing.food_items.protein_g,
+                    carbs_g: ing.food_items.carbs_g,
+                    fat_g: ing.food_items.fat_g,
+                    micronutrients: ing.food_items.micronutrients,
+                    source: 'local' as const
+                } : undefined,
+                selectedMeasure: ing.measure_label ? { label: ing.measure_label, weight_g: 0 } : undefined // weight_g 0 here is fine as we have weight_g on the ing
+            }));
+            setIngredients(hydratedIngs);
+
+        } catch (err) {
+            console.error('Error loading recipe:', err);
+            alert('Could not load recipe for editing');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<FoodItemMatch[]>([]);
@@ -212,10 +289,10 @@ export default function RecipeUploaderPage() {
 
             const { calories, protein, carbs, fat } = calculateTotalNutrition();
 
-            const recipeId = title.toLowerCase().replace(/\s+/g, '-');
+            const recipeId = editId || title.toLowerCase().replace(/\s+/g, '-');
 
-            // 2. Insert Recipe
-            const { error: recipeError } = await supabase.from('recipes').insert({
+            // 2. Upsert Recipe
+            const { error: recipeError } = await supabase.from('recipes').upsert({
                 id: recipeId,
                 title,
                 type: mealType,
@@ -231,14 +308,16 @@ export default function RecipeUploaderPage() {
 
             if (recipeError) throw recipeError;
 
-            // 3. Insert Ingredients
+            // 3. Clear and Re-insert Ingredients
+            await supabase.from('ingredients').delete().eq('recipe_id', recipeId);
             const { error: ingError } = await supabase.from('ingredients').insert(
                 ingredientData.map(i => ({ ...i, recipe_id: recipeId }))
             );
 
             if (ingError) throw ingError;
 
-            // 4. Insert Instructions
+            // 4. Clear and Re-insert Instructions
+            await supabase.from('instructions').delete().eq('recipe_id', recipeId);
             const { error: instError } = await supabase.from('instructions').insert(
                 instructions.map((text, idx) => ({
                     recipe_id: recipeId,
@@ -249,8 +328,8 @@ export default function RecipeUploaderPage() {
 
             if (instError) throw instError;
 
-            alert('Recipe uploaded successfully!');
-            // Reset state or redirect
+            alert(editId ? 'Recipe updated successfully!' : 'Recipe uploaded successfully!');
+            router.push('/upload'); // Clear edit mode or just refresh
         } catch (err) {
             console.error(err);
             alert('Error saving recipe');
