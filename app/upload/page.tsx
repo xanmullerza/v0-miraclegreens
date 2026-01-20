@@ -114,6 +114,8 @@ function RecipeUploaderContent() {
     const [showMagicPaste, setShowMagicPaste] = useState(false);
     const [importMode, setImportMode] = useState<'none' | 'manual' | 'guided'>(editId ? 'manual' : 'none');
     const [wizardStep, setWizardStep] = useState(1);
+    const [isWizardProcessing, setIsWizardProcessing] = useState(false);
+    const [wizardProcessedData, setWizardProcessedData] = useState<any>(null);
 
     // Load existing recipe for editing
     useEffect(() => {
@@ -260,9 +262,10 @@ function RecipeUploaderContent() {
         setMagicPaste("");
     };
 
-    const autoMatchAll = async () => {
+    const autoMatchAll = async (targetIngs?: any[]) => {
         setLoading(true);
-        const newIngs = [...ingredients];
+        const listToProcess = targetIngs || ingredients;
+        const newIngs = [...listToProcess];
 
         for (let i = 0; i < newIngs.length; i++) {
             const ing = newIngs[i];
@@ -275,14 +278,14 @@ function RecipeUploaderContent() {
 
                 if (combined.length > 0) {
                     // Smart Selection: Find result that has the most word matches with the query
-                    const queryWords = ing.item.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+                    const queryWords = ing.item.toLowerCase().split(/\s+/).filter((w: string) => w.length > 2);
                     let bestMatch = combined[0];
                     let maxMatches = 0;
 
                     for (const cand of combined) {
                         const candName = cand.name.toLowerCase();
                         let matches = 0;
-                        queryWords.forEach(word => {
+                        queryWords.forEach((word: string) => {
                             if (candName.includes(word)) matches++;
                         });
                         // Bonus for exact word matches or starting with the query
@@ -661,7 +664,7 @@ function RecipeUploaderContent() {
                                         <div className="w-full space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
                                             <div className="text-center space-y-3">
                                                 <h2 className="text-4xl font-black text-slate-900 tracking-tight">What is this masterpiece called?</h2>
-                                                <p className="text-slate-500 text-lg">Just paste the recipe title below.</p>
+                                                <p className="text-slate-500 text-lg">Just type or paste the recipe title below.</p>
                                             </div>
                                             <Textarea
                                                 className="min-h-[120px] text-3xl font-black text-center border-emerald-100 bg-emerald-50/20 focus:border-emerald-500 rounded-3xl p-6 shadow-inner"
@@ -684,47 +687,54 @@ function RecipeUploaderContent() {
                                         <div className="w-full space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
                                             <div className="text-center space-y-3">
                                                 <h2 className="text-4xl font-black text-slate-900 tracking-tight">Set the foundation.</h2>
-                                                <p className="text-slate-500 text-lg">Paste the part with <span className="font-bold text-emerald-600">Servings</span> and <span className="font-bold text-emerald-600">Cook Time</span>.</p>
+                                                <p className="text-slate-500 text-lg">Paste the part with <span className="font-bold text-emerald-600">Servings</span> and <span className="font-bold text-emerald-600">Time</span>.</p>
                                             </div>
-                                            <Textarea
-                                                className="min-h-[150px] text-xl font-bold text-center border-emerald-100 bg-emerald-50/20 focus:border-emerald-500 rounded-3xl p-6 shadow-inner"
-                                                placeholder="e.g. Serves 4 | 20 mins prep | 40 mins cook"
-                                                value={magicPaste}
-                                                onChange={(e) => setMagicPaste(e.target.value)}
-                                                autoFocus
-                                            />
-                                            <div className="flex flex-col gap-4">
-                                                <Button
-                                                    onClick={() => {
-                                                        handleQuickDetails(magicPaste);
-                                                        setWizardStep(3);
-                                                    }}
-                                                    className="w-full h-20 text-xl font-black bg-emerald-600 hover:bg-emerald-700 rounded-3xl shadow-xl shadow-emerald-200/50 transition-all hover:scale-[1.02] active:scale-95 flex gap-3"
-                                                >
-                                                    Process & Add Ingredients <ArrowRight size={24} strokeWidth={3} />
-                                                </Button>
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                                                        <Label className="uppercase text-[10px] font-black text-slate-400 tracking-widest block mb-2">Current Servings</Label>
-                                                        <input
-                                                            type="number"
-                                                            value={servings}
-                                                            onChange={(e) => setServings(parseInt(e.target.value))}
-                                                            className="w-full bg-transparent text-2xl font-black text-slate-800 outline-none"
-                                                        />
+                                            {!wizardProcessedData ? (
+                                                <div className="w-full space-y-6">
+                                                    <Textarea
+                                                        className="min-h-[150px] text-xl font-bold text-center border-emerald-100 bg-emerald-50/20 focus:border-emerald-500 rounded-3xl p-6 shadow-inner"
+                                                        placeholder="e.g. Serves 4 | 20 mins prep | 40 mins cook"
+                                                        value={magicPaste}
+                                                        onChange={(e) => setMagicPaste(e.target.value)}
+                                                        autoFocus
+                                                    />
+                                                    <Button
+                                                        onClick={() => handleQuickDetails(magicPaste)}
+                                                        disabled={isWizardProcessing || !magicPaste.trim()}
+                                                        className="w-full h-20 text-xl font-black bg-emerald-600 hover:bg-emerald-700 rounded-3xl shadow-xl shadow-emerald-200/50 transition-all hover:scale-[1.02] flex gap-3"
+                                                    >
+                                                        {isWizardProcessing ? "Analyzing..." : "Process Details"} <Wand2 size={24} />
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <div className="w-full space-y-8 animate-in zoom-in-95 duration-500">
+                                                    <div className="grid grid-cols-2 gap-6">
+                                                        <div className="bg-emerald-50 p-8 rounded-[2rem] border-4 border-emerald-100 text-center space-y-2">
+                                                            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Servings</span>
+                                                            <div className="text-5xl font-black text-emerald-900">{servings}</div>
+                                                        </div>
+                                                        <div className="bg-emerald-50 p-8 rounded-[2rem] border-4 border-emerald-100 text-center space-y-2">
+                                                            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Total Minutes</span>
+                                                            <div className="text-5xl font-black text-emerald-900">{prepTime}</div>
+                                                        </div>
                                                     </div>
-                                                    <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                                                        <Label className="uppercase text-[10px] font-black text-slate-400 tracking-widest block mb-2">Total Time (Mins)</Label>
-                                                        <input
-                                                            type="number"
-                                                            value={prepTime}
-                                                            onChange={(e) => setPrepTime(parseInt(e.target.value))}
-                                                            className="w-full bg-transparent text-2xl font-black text-slate-800 outline-none"
-                                                        />
+                                                    <div className="flex flex-col gap-4">
+                                                        <Button
+                                                            onClick={() => {
+                                                                setWizardStep(3);
+                                                                setWizardProcessedData(null);
+                                                                setMagicPaste("");
+                                                            }}
+                                                            className="w-full h-20 text-xl font-black bg-emerald-600 hover:bg-emerald-700 rounded-3xl shadow-xl shadow-emerald-200/50 transition-all hover:scale-[1.02] flex gap-3"
+                                                        >
+                                                            Looks Good - On to Ingredients <ArrowRight size={24} />
+                                                        </Button>
+                                                        <Button variant="ghost" className="text-slate-400 font-bold" onClick={() => setWizardProcessedData(null)}>
+                                                            Not right? Re-paste text
+                                                        </Button>
                                                     </div>
                                                 </div>
-                                                <Button variant="ghost" className="text-slate-400 font-bold" onClick={() => setWizardStep(3)}>Skip to Ingredients</Button>
-                                            </div>
+                                            )}
                                         </div>
                                     )}
 
@@ -734,24 +744,65 @@ function RecipeUploaderContent() {
                                                 <h2 className="text-4xl font-black text-slate-900 tracking-tight">The secret sauce.</h2>
                                                 <p className="text-slate-500 text-lg">Paste your <span className="font-bold text-emerald-600">Ingredients list</span> here.</p>
                                             </div>
-                                            <Textarea
-                                                className="min-h-[250px] text-lg font-medium border-emerald-100 bg-emerald-50/20 focus:border-emerald-500 rounded-3xl p-6 shadow-inner font-mono"
-                                                placeholder="Paste ingredients here... (e.g. 2 cups flour, 1 tbsp salt...)"
-                                                value={magicPaste}
-                                                onChange={(e) => setMagicPaste(e.target.value)}
-                                                autoFocus
-                                            />
-                                            <Button
-                                                onClick={async () => {
-                                                    await handleQuickIngredients(magicPaste);
-                                                    setWizardStep(4);
-                                                }}
-                                                disabled={!magicPaste.trim()}
-                                                className="w-full h-20 text-xl font-black bg-emerald-600 hover:bg-emerald-700 rounded-3xl shadow-xl shadow-emerald-200/50 transition-all hover:scale-[1.02] active:scale-95 flex gap-3"
-                                            >
-                                                Extract & Match All <Zap size={24} />
-                                            </Button>
-                                            <Button variant="ghost" className="text-slate-400 font-bold w-full" onClick={() => setWizardStep(4)}>Skip to Instructions</Button>
+                                            {!wizardProcessedData ? (
+                                                <div className="w-full space-y-6">
+                                                    <Textarea
+                                                        className="min-h-[250px] text-lg font-medium border-emerald-100 bg-emerald-50/20 focus:border-emerald-500 rounded-3xl p-6 shadow-inner font-mono"
+                                                        placeholder="Paste ingredients here..."
+                                                        value={magicPaste}
+                                                        onChange={(e) => setMagicPaste(e.target.value)}
+                                                        autoFocus
+                                                    />
+                                                    <Button
+                                                        onClick={() => handleQuickIngredients(magicPaste)}
+                                                        disabled={isWizardProcessing || !magicPaste.trim()}
+                                                        className="w-full h-20 text-xl font-black bg-emerald-600 hover:bg-emerald-700 rounded-3xl shadow-xl shadow-emerald-200/50 transition-all hover:scale-[1.02] flex gap-3"
+                                                    >
+                                                        {isWizardProcessing ? "Feeding the AI..." : "Extract & Match Ingredients"} <Zap size={24} />
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <div className="w-full space-y-8 animate-in zoom-in-95 duration-500">
+                                                    <div className="max-h-[400px] overflow-y-auto space-y-3 p-4 bg-slate-50 rounded-[2rem] border-2 border-slate-100">
+                                                        {ingredients.length > 0 ? ingredients.map((ing, idx) => (
+                                                            <div key={idx} className="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                                                                <div className="flex flex-col">
+                                                                    <span className="font-black text-slate-900">{ing.item}</span>
+                                                                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">{ing.amount || 'as needed'}</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    {ing.matchedFood ? (
+                                                                        <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">✓ Matched</Badge>
+                                                                    ) : (
+                                                                        <Badge variant="outline" className="text-slate-400">? No Match</Badge>
+                                                                    )}
+                                                                    <button onClick={() => removeIngredient(idx)} className="text-slate-300 hover:text-red-500 transition-colors">
+                                                                        <Trash2 size={16} />
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        )) : (
+                                                            <div className="p-8 text-center text-slate-400 font-bold">No ingredients found. Try re-pasting?</div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex flex-col gap-4">
+                                                        <Button
+                                                            onClick={() => {
+                                                                setWizardStep(4);
+                                                                setWizardProcessedData(null);
+                                                                setMagicPaste("");
+                                                            }}
+                                                            disabled={ingredients.length === 0}
+                                                            className="w-full h-20 text-xl font-black bg-emerald-600 hover:bg-emerald-700 rounded-3xl shadow-xl shadow-emerald-200/50 transition-all hover:scale-[1.02] flex gap-3"
+                                                        >
+                                                            Ingredients Confirmed <ArrowRight size={24} />
+                                                        </Button>
+                                                        <Button variant="ghost" className="text-slate-400 font-bold" onClick={() => setWizardProcessedData(null)}>
+                                                            Missing something? Re-paste list
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
 
@@ -761,24 +812,51 @@ function RecipeUploaderContent() {
                                                 <h2 className="text-4xl font-black text-slate-900 tracking-tight">Final touch: Directions.</h2>
                                                 <p className="text-slate-500 text-lg">Paste the <span className="font-bold text-emerald-600">Cooking steps</span> below.</p>
                                             </div>
-                                            <Textarea
-                                                className="min-h-[250px] text-lg font-medium border-emerald-100 bg-emerald-50/20 focus:border-emerald-500 rounded-3xl p-6 shadow-inner"
-                                                placeholder="1. Preheat oven... 2. Mix ingredients..."
-                                                value={magicPaste}
-                                                onChange={(e) => setMagicPaste(e.target.value)}
-                                                autoFocus
-                                            />
-                                            <Button
-                                                onClick={() => {
-                                                    handleQuickInstructions(magicPaste);
-                                                    setImportMode('manual');
-                                                    setStep(2); // Jump to analysis verification
-                                                }}
-                                                disabled={!magicPaste.trim()}
-                                                className="w-full h-20 text-xl font-black bg-emerald-600 hover:bg-emerald-700 rounded-3xl shadow-xl shadow-emerald-200/50 transition-all hover:scale-[1.02] active:scale-95 flex gap-3"
-                                            >
-                                                Finalize & Review <Sparkles size={24} />
-                                            </Button>
+                                            {!wizardProcessedData ? (
+                                                <div className="w-full space-y-6">
+                                                    <Textarea
+                                                        className="min-h-[250px] text-lg font-medium border-emerald-100 bg-emerald-50/20 focus:border-emerald-500 rounded-3xl p-6 shadow-inner"
+                                                        placeholder="1. Preheat oven... 2. Mix ingredients..."
+                                                        value={magicPaste}
+                                                        onChange={(e) => setMagicPaste(e.target.value)}
+                                                        autoFocus
+                                                    />
+                                                    <Button
+                                                        onClick={() => handleQuickInstructions(magicPaste)}
+                                                        disabled={isWizardProcessing || !magicPaste.trim()}
+                                                        className="w-full h-20 text-xl font-black bg-emerald-600 hover:bg-emerald-700 rounded-3xl shadow-xl shadow-emerald-200/50 transition-all hover:scale-[1.02] flex gap-3"
+                                                    >
+                                                        {isWizardProcessing ? "Analyzing Steps..." : "Process Instructions"} <Sparkles size={24} />
+                                                    </Button>
+                                                </div>
+                                            ) : (
+                                                <div className="w-full space-y-8 animate-in zoom-in-95 duration-500">
+                                                    <div className="max-h-[400px] overflow-y-auto space-y-4 p-6 bg-slate-50 rounded-[2rem] border-2 border-slate-100">
+                                                        {instructions.map((step, idx) => (
+                                                            <div key={idx} className="flex gap-4 items-start">
+                                                                <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center font-black text-xs shrink-0 mt-1">
+                                                                    {idx + 1}
+                                                                </div>
+                                                                <p className="text-slate-700 font-medium leading-relaxed">{step}</p>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                    <div className="flex flex-col gap-4">
+                                                        <Button
+                                                            onClick={() => {
+                                                                setImportMode('manual');
+                                                                setStep(2); // Show the final analysis dashboard
+                                                            }}
+                                                            className="w-full h-24 text-2xl font-black bg-slate-900 hover:bg-black text-white rounded-[2rem] shadow-2xl shadow-slate-300 transition-all hover:scale-[1.02] flex gap-3"
+                                                        >
+                                                            Finalize Masterpiece <ChefHat size={32} />
+                                                        </Button>
+                                                        <Button variant="ghost" className="text-slate-400 font-bold" onClick={() => setWizardProcessedData(null)}>
+                                                            Not right? Re-paste steps
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -960,7 +1038,7 @@ function RecipeUploaderContent() {
                                         <Button
                                             size="sm"
                                             className="bg-emerald-600 border-emerald-600 text-white font-bold hover:bg-emerald-700 gap-2 h-9"
-                                            onClick={autoMatchAll}
+                                            onClick={() => autoMatchAll()}
                                             disabled={loading}
                                         >
                                             {loading ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}

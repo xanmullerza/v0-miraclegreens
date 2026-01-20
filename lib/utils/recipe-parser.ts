@@ -39,7 +39,7 @@ export function parseIngredientsOnly(text: string): ParsedIngredient[] {
             }
         }
 
-        const hasQuantity = /^[\d¼½¾⅛⅜⅝⅞]/.test(line);
+        const hasQuantity = /^[\d¼½¾⅛⅜⅝⅞*•\-]/.test(line) || lowerLine.startsWith('optional');
         if (!hasQuantity) {
             if (line.length < 100) nameBuffer.push(line);
             continue;
@@ -52,6 +52,13 @@ export function parseIngredientsOnly(text: string): ParsedIngredient[] {
         }
         ingredients.push(parsed);
     }
+
+    // Fallback: if we found NO ingredients but have items in nameBuffer, 
+    // treat each buffered item as a separate ingredient (for simple word lists)
+    if (ingredients.length === 0 && nameBuffer.length > 0) {
+        return nameBuffer.map(item => parseIngredientLine(item));
+    }
+
     return ingredients;
 }
 
