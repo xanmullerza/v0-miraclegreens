@@ -85,11 +85,25 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
                 return n ? n.value : 0;
             };
 
+            const protein = getNutrient('Protein');
+            const carbs = getNutrient('Carbohydrate');
+            const fat = getNutrient('Total lipid');
+
             // USDA sometimes labels Calories explicitly
-            const energyKcal = getNutrient('Energy') || getNutrient('Calories') || 0;
+            let energyKcal = getNutrient('Energy') || getNutrient('Calories') || 0;
+
+            // MATH CHECK: Sometimes USDA entries (like ID 169079) put kJ in the kcal field!
+            // If the stated calories are > 20% higher than what macros allow, recalculate.
+            const macroCals = (protein * 4) + (carbs * 4) + (fat * 9);
+            if (macroCals > 0 && energyKcal > (macroCals * 1.5)) {
+                console.warn(`[Nutrition Fix] Recalculating suspicious energy for ${food.description}: Stated ${energyKcal} vs Macro ${macroCals}`);
+                energyKcal = Math.round(macroCals);
+            }
+
             const energyKj = Math.round(energyKcal * 4.184);
 
             const micronutrients: Record<string, number> = {};
+            // ... (rest of the mapping code) ...
             const microMap: Record<string, string> = {
                 'Potassium, K': 'Potassium',
                 'Magnesium, Mg': 'Magnesium',
@@ -132,9 +146,9 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
                 name: food.description,
                 energy_kcal: energyKcal,
                 energy_kj: energyKj,
-                protein_g: getNutrient('Protein'),
-                carbs_g: getNutrient('Carbohydrate'),
-                fat_g: getNutrient('Total lipid'),
+                protein_g: protein,
+                carbs_g: carbs,
+                fat_g: fat,
                 micronutrients,
                 source: 'usda' as const
             };

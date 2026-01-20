@@ -611,11 +611,33 @@ function RecipeUploaderContent() {
                                             </div>
 
                                             {ing.matchedFood && (
-                                                <div className="mt-3 pl-4 border-l-2 border-emerald-500 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-                                                    <span className="font-medium text-emerald-700">✓ Linked to: {ing.matchedFood.name}</span>
-                                                    <span className="text-slate-500">{ing.weightG ? `${Math.round(ing.weightG)}g total` : "Weight not set"}</span>
-                                                    {ing.selectedMeasure && (
-                                                        <Badge variant="outline" className="bg-white">{ing.selectedMeasure.label}</Badge>
+                                                <div className="mt-3 space-y-3">
+                                                    <div className="pl-4 border-l-2 border-emerald-500 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+                                                        <span className="font-medium text-emerald-700">✓ Linked to: {ing.matchedFood.name}</span>
+                                                        <span className="text-slate-500">{ing.weightG ? `${Math.round(ing.weightG)}g total` : "Weight not set"}</span>
+                                                        {ing.selectedMeasure && (
+                                                            <Badge variant="outline" className="bg-white">{ing.selectedMeasure.label}</Badge>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Measure Selection Chips */}
+                                                    {activeIngredientIndex === idx && measures.length > 0 && (
+                                                        <div className="flex flex-wrap gap-2 animate-in fade-in slide-in-from-top-1">
+                                                            {measures.map((m, mi) => (
+                                                                <button
+                                                                    key={mi}
+                                                                    onClick={() => selectMeasure(m)}
+                                                                    className={cn(
+                                                                        "px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full transition-all border",
+                                                                        ing.selectedMeasure?.label === m.label
+                                                                            ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
+                                                                            : "bg-white text-slate-500 border-slate-200 hover:border-emerald-500 hover:text-emerald-500"
+                                                                    )}
+                                                                >
+                                                                    {m.label}
+                                                                </button>
+                                                            ))}
+                                                        </div>
                                                     )}
                                                 </div>
                                             )}
