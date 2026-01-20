@@ -513,32 +513,62 @@ function RecipeUploaderContent() {
                                 <div className="space-y-4">
                                     {ingredients.map((ing, idx) => (
                                         <div key={idx} className="group relative bg-slate-50/50 p-4 rounded-xl border border-slate-100 transition-all hover:bg-white hover:border-emerald-100">
-                                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                                                <div className="md:col-span-2">
-                                                    <Label className="text-xs text-slate-400 uppercase tracking-wider mb-1">Ingredient Item (Display Name)</Label>
+                                            {/* Ingredient Inputs */}
+                                            <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-4">
+                                                <div className="md:col-span-5 space-y-1.5">
+                                                    <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Ingredient Item (Display Name)</Label>
                                                     <Input
-                                                        placeholder="e.g., Large Ripe Avocado"
                                                         value={ing.item}
-                                                        onChange={e => {
+                                                        onChange={(e) => {
                                                             const newIngs = [...ingredients];
                                                             newIngs[idx].item = e.target.value;
                                                             setIngredients(newIngs);
                                                         }}
+                                                        placeholder="e.g. Whole wheat bread"
+                                                        className="rounded-xl border-slate-200 focus:border-primary focus:ring-primary/20"
                                                     />
                                                 </div>
-                                                <div>
-                                                    <Label className="text-xs text-slate-400 uppercase tracking-wider mb-1">Quantity/Unit</Label>
-                                                    <Input
-                                                        placeholder="e.g. 1, 1/2, 200g"
-                                                        value={ing.amount}
-                                                        onChange={e => {
-                                                            const newIngs = [...ingredients];
-                                                            newIngs[idx].amount = e.target.value;
-                                                            setIngredients(newIngs);
-                                                        }}
-                                                    />
+
+                                                <div className="md:col-span-3 space-y-1.5">
+                                                    <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Quantity/Unit</Label>
+                                                    <div className="flex gap-2">
+                                                        <Input
+                                                            value={ing.amount}
+                                                            onChange={(e) => {
+                                                                const newIngs = [...ingredients];
+                                                                newIngs[idx].amount = e.target.value;
+                                                                // Recalculate weight if measure selected
+                                                                if (newIngs[idx].selectedMeasure) {
+                                                                    const qty = evaluateAmount(e.target.value);
+                                                                    newIngs[idx].weightG = qty * newIngs[idx].selectedMeasure!.weight_g;
+                                                                }
+                                                                setIngredients(newIngs);
+                                                            }}
+                                                            placeholder="e.g. 2"
+                                                            className="rounded-xl border-slate-200 focus:border-primary focus:ring-primary/20"
+                                                        />
+                                                    </div>
                                                 </div>
-                                                <div className="flex gap-2">
+
+                                                <div className="md:col-span-2 space-y-1.5">
+                                                    <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-black text-primary">Weight (g)</Label>
+                                                    <div className="relative group">
+                                                        <Input
+                                                            type="number"
+                                                            value={ing.weightG || ''}
+                                                            onChange={(e) => {
+                                                                const newIngs = [...ingredients];
+                                                                newIngs[idx].weightG = parseFloat(e.target.value) || 0;
+                                                                setIngredients(newIngs);
+                                                            }}
+                                                            placeholder="0"
+                                                            className="rounded-xl border-primary/30 focus:border-primary bg-primary/5 font-bold"
+                                                        />
+                                                        <span className="absolute right-3 top-2.5 text-[10px] font-bold text-primary/40 group-hover:text-primary transition-colors">GRAMS</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="md:col-span-2 flex items-end pb-0.5 gap-2">
                                                     <Button
                                                         variant="outline"
                                                         size="icon"
