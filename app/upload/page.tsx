@@ -23,7 +23,8 @@ import {
     Clock,
     Beef,
     Utensils,
-    Leaf
+    Leaf,
+    X
 } from 'lucide-react';
 import {
     searchLocalFood,
@@ -36,6 +37,9 @@ import {
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { Recipe, Ingredient, MealType, DietType } from '@/lib/data/recipes';
+import { parseRecipeText } from '@/lib/utils/recipe-parser';
+import { Textarea } from '@/components/ui/textarea';
+import { Wand2, Sparkles, Zap } from 'lucide-react';
 
 // Simplified UI Components for the uploader
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
@@ -81,6 +85,8 @@ function RecipeUploaderContent() {
         { item: '', amount: '', weightG: 0, isMiracleProduct: false }
     ]);
     const [instructions, setInstructions] = useState<string[]>(['']);
+    const [magicPaste, setMagicPaste] = useState('');
+    const [showMagicPaste, setShowMagicPaste] = useState(false);
 
     // Load existing recipe for editing
     useEffect(() => {
@@ -134,7 +140,7 @@ function RecipeUploaderContent() {
                     micronutrients: ing.food_items.micronutrients,
                     source: 'local' as const
                 } : undefined,
-                selectedMeasure: ing.measure_label ? { label: ing.measure_label, weight_g: 0 } : undefined // weight_g 0 here is fine as we have weight_g on the ing
+                selectedMeasure: ing.measure_label ? { label: ing.measure_label, weight_g: 0 } : undefined
             }));
             setIngredients(hydratedIngs);
 
@@ -144,6 +150,73 @@ function RecipeUploaderContent() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleMagicImport = () => {
+        if (!magicPaste.trim()) return;
+
+        const parsed = parseRecipeText(magicPaste);
+        setTitle(parsed.title);
+        setServings(parsed.servings);
+
+        const newIngs = parsed.ingredients.map(ing => ({
+            item: ing.item,
+            amount: ing.amount,
+            weightG: ing.weightG || 0,
+            isMiracleProduct: false
+        }));
+
+        setIngredients(newIngs);
+        setInstructions(parsed.instructions);
+        setShowMagicPaste(false);
+        setStep(2); // Jump to analysis
+    };
+
+    const autoMatchAll = async () => {
+        setLoading(true);
+        const newIngs = [...ingredients];
+
+        for (let i = 0; i < newIngs.length; i++) {
+            const ing = newIngs[i];
+            if (ing.matchedFood || !ing.item) continue;
+
+            try {
+                const local = await searchLocalFood(ing.item);
+                const usda = await searchUSDAFood(ing.item);
+                const combined = [...local, ...usda];
+
+                if (combined.length > 0) {
+                    const best = combined[0]; // Heuristic: Pick first result
+
+                    let foodMeasures: FoodMeasure[] = [];
+                    if (best.source === 'usda' && best.fdcId) {
+                        foodMeasures = await getUSDAMeasures(best.fdcId);
+                    } else if (best.id) {
+                        const { data } = await supabase.from('food_measures').select('label, weight_g').eq('food_item_id', best.id);
+                        foodMeasures = (data || []).map(m => ({ label: m.label, weight_g: m.weight_g }));
+                    }
+
+                    newIngs[i].matchedFood = best;
+
+                    if (foodMeasures.length > 0) {
+                        const amountLower = ing.amount.toLowerCase();
+                        const matchedMeasure = foodMeasures.find(m => amountLower.includes(m.label.toLowerCase())) || foodMeasures[0];
+                        newIngs[i].selectedMeasure = matchedMeasure;
+
+                        // Recalculate weight if not already a manual gram override
+                        if (!ing.weightG) {
+                            const qty = evaluateAmount(ing.amount);
+                            newIngs[i].weightG = qty * matchedMeasure.weight_g;
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error(`Auto-match failed for ${ing.item}:`, err);
+            }
+        }
+
+        setIngredients(newIngs);
+        setLoading(false);
     };
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -190,7 +263,6 @@ function RecipeUploaderContent() {
             setSearching(false);
         }
     };
-
     const handleSearch = (query: string) => {
         setSearchQuery(query);
         setDebouncedQuery(query);
@@ -395,16 +467,45 @@ function RecipeUploaderContent() {
                             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <div className="space-y-4">
-                                        <div>
+                                        <div className="flex items-center justify-between mb-1">
                                             <Label htmlFor="title">Recipe Title</Label>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-emerald-600 h-7 text-xs font-bold gap-1 hover:bg-emerald-50"
+                                                onClick={() => setShowMagicPaste(!showMagicPaste)}
+                                            >
+                                                <Wand2 size={12} />
+                                                {showMagicPaste ? "Hide Magic Paste" : "Magic Import"}
+                                            </Button>
+                                        </div>
+
+                                        {showMagicPaste ? (
+                                            <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
+                                                <Textarea
+                                                    placeholder="Paste your whole recipe here (Title, Ingredients, Instructions...)"
+                                                    className="min-h-[200px] text-sm font-mono bg-slate-50 border-emerald-100 focus:border-emerald-500"
+                                                    value={magicPaste}
+                                                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMagicPaste(e.target.value)}
+                                                />
+                                                <Button
+                                                    onClick={handleMagicImport}
+                                                    className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold gap-2 py-6"
+                                                    disabled={!magicPaste.trim()}
+                                                >
+                                                    <Sparkles size={18} />
+                                                    Analyze & Import Recipe
+                                                </Button>
+                                            </div>
+                                        ) : (
                                             <Input
                                                 id="title"
                                                 placeholder="e.g., Avocado Toast with Poached Egg"
                                                 value={title}
-                                                onChange={e => setTitle(e.target.value)}
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
                                                 className="text-lg py-6"
                                             />
-                                        </div>
+                                        )}
 
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
@@ -413,7 +514,7 @@ function RecipeUploaderContent() {
                                                     id="mealType"
                                                     className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
                                                     value={mealType}
-                                                    onChange={e => setMealType(e.target.value as MealType)}
+                                                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setMealType(e.target.value as MealType)}
                                                 >
                                                     <option value="breakfast">Breakfast</option>
                                                     <option value="lunch">Lunch</option>
@@ -427,7 +528,7 @@ function RecipeUploaderContent() {
                                                     id="prepTime"
                                                     type="number"
                                                     value={prepTime}
-                                                    onChange={e => setPrepTime(parseInt(e.target.value))}
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPrepTime(parseInt(e.target.value))}
                                                 />
                                             </div>
                                         </div>
@@ -472,7 +573,7 @@ function RecipeUploaderContent() {
                                                 id="image"
                                                 placeholder="https://images.unsplash.com/..."
                                                 value={image}
-                                                onChange={e => setImage(e.target.value)}
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setImage(e.target.value)}
                                             />
                                         </div>
                                         {image && (
@@ -486,7 +587,7 @@ function RecipeUploaderContent() {
                                                 id="servings"
                                                 type="number"
                                                 value={servings}
-                                                onChange={e => setServings(parseInt(e.target.value))}
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setServings(parseInt(e.target.value))}
                                             />
                                         </div>
                                     </div>
@@ -507,7 +608,19 @@ function RecipeUploaderContent() {
                                         <Scale size={20} className="text-emerald-500" />
                                         Analyze Ingredients
                                     </h2>
-                                    <p className="text-sm text-slate-500 italic">Match items to the food database for precision logic.</p>
+                                    <div className="flex items-center gap-4">
+                                        <p className="text-sm text-slate-500 italic hidden md:block">Match items to the food database for precision logic.</p>
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            className="bg-emerald-50 border-emerald-200 text-emerald-700 font-bold hover:bg-emerald-100 gap-2"
+                                            onClick={autoMatchAll}
+                                            disabled={loading}
+                                        >
+                                            {loading ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
+                                            Smart Match All
+                                        </Button>
+                                    </div>
                                 </div>
 
                                 <div className="space-y-4">
@@ -519,7 +632,7 @@ function RecipeUploaderContent() {
                                                     <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Ingredient Item (Display Name)</Label>
                                                     <Input
                                                         value={ing.item}
-                                                        onChange={(e) => {
+                                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                                             const newIngs = [...ingredients];
                                                             newIngs[idx].item = e.target.value;
                                                             setIngredients(newIngs);
@@ -534,7 +647,7 @@ function RecipeUploaderContent() {
                                                     <div className="flex gap-2">
                                                         <Input
                                                             value={ing.amount}
-                                                            onChange={(e) => {
+                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                                                 const newIngs = [...ingredients];
                                                                 newIngs[idx].amount = e.target.value;
                                                                 // Recalculate weight if measure selected
@@ -556,7 +669,7 @@ function RecipeUploaderContent() {
                                                         <Input
                                                             type="number"
                                                             value={ing.weightG || ''}
-                                                            onChange={(e) => {
+                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                                                 const newIngs = [...ingredients];
                                                                 newIngs[idx].weightG = parseFloat(e.target.value) || 0;
                                                                 setIngredients(newIngs);
@@ -679,7 +792,7 @@ function RecipeUploaderContent() {
                                                 className="flex-grow min-h-[100px] p-4 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-200 outline-none transition-all resize-none"
                                                 placeholder="e.g., Mash the avocado in a small bowl with lemon juice and salt..."
                                                 value={text}
-                                                onChange={e => {
+                                                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
                                                     const next = [...instructions];
                                                     next[idx] = e.target.value;
                                                     setInstructions(next);
@@ -811,7 +924,7 @@ function RecipeUploaderContent() {
                                     className="pl-10 h-12"
                                     placeholder="Search global food database..."
                                     value={searchQuery}
-                                    onChange={e => handleSearch(e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value)}
                                 />
                             </div>
 
@@ -894,20 +1007,3 @@ function RecipeUploaderContent() {
     );
 }
 
-function X({ size }: { size?: number }) {
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width={size || 24}
-            height={size || 24}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="M18 6 6 18" /><path d="m6 6 12 12" />
-        </svg>
-    );
-}
