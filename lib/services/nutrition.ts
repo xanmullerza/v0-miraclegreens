@@ -58,7 +58,7 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
     console.log(`[USDA Search] Query: "${query}", Using Key: ${USDA_API_KEY === 'DEMO_KEY' ? 'DEMO_KEY' : 'Custom Key (Set)'}`);
 
     try {
-        const url = `${USDA_BASE_URL}/foods/search?api_key=${USDA_API_KEY}&query=${encodeURIComponent(query)}&pageSize=5`;
+        const url = `${USDA_BASE_URL}/foods/search?api_key=${USDA_API_KEY}&query=${encodeURIComponent(query)}&pageSize=15`;
         const response = await fetch(url);
 
         if (!response.ok) {
@@ -77,6 +77,12 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
         console.log(`[USDA Search] Found ${data.foods.length} items`);
 
         return data.foods.map((food: any) => {
+            // Check for strict exclusionary mismatches (e.g. searching for Chicken but getting Turkey)
+            const desc = (food.description || "").toLowerCase();
+            const lowerQuery = query.toLowerCase();
+            if (lowerQuery.startsWith('chicken') && desc.includes('turkey')) return null;
+            if (lowerQuery.startsWith('turkey') && desc.includes('chicken')) return null;
+
             const getNutrient = (name: string) => {
                 if (!food.foodNutrients) return 0;
                 const n = food.foodNutrients.find((nut: any) =>
@@ -152,7 +158,7 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
                 micronutrients,
                 source: 'usda' as const
             };
-        });
+        }).filter((f: any) => f !== null);
     } catch (error) {
         console.error("[USDA Search Exception] Catch Block:", error);
         return [];

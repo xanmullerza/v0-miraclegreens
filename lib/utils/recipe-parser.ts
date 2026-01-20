@@ -17,12 +17,15 @@ export interface ParsedRecipe {
 }
 
 export function parseRecipeText(text: string): ParsedRecipe {
-    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    // Normalize newlines and split
+    const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    const lines = normalized.split('\n').map(l => l.trim()).filter(l => l.length > 0);
 
     let title = "";
     let servings = 1;
     let ingredients: ParsedIngredient[] = [];
     let instructions: string[] = [];
+    let nameBuffer: string[] = [];
 
     let currentSection: 'none' | 'ingredients' | 'instructions' = 'none';
 
@@ -34,12 +37,13 @@ export function parseRecipeText(text: string): ParsedRecipe {
         // 1. Title Heuristic
         if (!title && !lowerLine.includes('ingredient') && !lowerLine.includes('instruction') && !lowerLine.includes('method') && !lowerLine.includes('servings')) {
             title = line;
-            continue;
+            // Don't continue, might also be a name buffer for the first ingredient
         }
 
         // 2. Section Switching
         if (lowerLine.includes('ingredient')) {
             currentSection = 'ingredients';
+            nameBuffer = []; // Clear buffer on section switch
             continue;
         }
         if (lowerLine.includes('instruction') || lowerLine.includes('method') || lowerLine.includes('preparation')) {
@@ -59,23 +63,52 @@ export function parseRecipeText(text: string): ParsedRecipe {
         }
 
         // 4. Content Parsing
-        if (currentSection === 'ingredients' || (currentSection === 'none' && isProbablyIngredient(line))) {
+        const isIng = currentSection === 'ingredients' || (currentSection === 'none' && isProbablyIngredient(line));
+
+        if (isIng) {
             const parsed = parseIngredientLine(line);
 
-            // Handle multi-line ingredients: "1 cup \n Chopped Onion"
-            // If the item is effectively the same as the unit/amount, check the next line
-            if ((!parsed.item || parsed.item === parsed.amount.split(' ').pop()) && i + 1 < lines.length) {
-                const nextLine = lines[i + 1];
-                if (!isProbablyIngredient(nextLine) && !isProbablyInstruction(nextLine)) {
-                    parsed.item = nextLine;
-                    i++; // Skip the next line
+            // A: If it's just a weight (e.g. "94g"), try to apply to the previous ingredient if it lacks weight
+            if (ingredients.length > 0 && parsed.weightG && (parsed.item.length <= 2 || parsed.item.toLowerCase() === 'g' || parsed.item === parsed.amount.split(' ').pop())) {
+                const lastIng = ingredients[ingredients.length - 1];
+                if (!lastIng.weightG || lastIng.weightG === 0) {
+                    lastIng.weightG = parsed.weightG;
+                    continue;
                 }
             }
 
-            if (parsed.item) ingredients.push(parsed);
-        } else if (currentSection === 'instructions' || (currentSection === 'none' && isProbablyInstruction(line))) {
-            const cleanInstruction = line.replace(/^\d+[\s.)]+/, '').trim();
-            instructions.push(cleanInstruction);
+            // B: If the item name is weak (e.g. "shredded" or just a unit), use the name buffer
+            const isWeakName = !parsed.item ||
+                parsed.item.length <= 2 ||
+                COMMON_UNITS.includes(parsed.item.toLowerCase()) ||
+                ['shredded', 'raw', 'cooked', 'diced', 'chopped', 'regular', 'skinless', 'serving', 'original'].includes(parsed.item.toLowerCase());
+
+            if (isWeakName && nameBuffer.length > 0) {
+                const bufferedName = nameBuffer.join(' ');
+                parsed.item = bufferedName + (parsed.item ? ', ' + parsed.item : '');
+                nameBuffer = []; // Used the buffer
+            }
+
+            if (parsed.item) {
+                ingredients.push(parsed);
+                nameBuffer = []; // Always clear buffer once an ingredient is pushed
+            }
+        } else {
+            const isInstructionSection = currentSection === 'instructions' || (currentSection === 'none' && isProbablyInstruction(line));
+
+            if (isInstructionSection) {
+                const cleanInstruction = line.replace(/^\d+[\s.)]+/, '').trim();
+                instructions.push(cleanInstruction);
+                nameBuffer = []; // Instructions break the name buffer
+            } else {
+                // Not an ingredient or instruction, likely a name or part of a name
+                if (!lowerLine.includes('servings') && !lowerLine.includes('ingredient')) {
+                    // If it's a short line, buffer it as a potential ingredient name
+                    if (line.length < 100) {
+                        nameBuffer.push(line);
+                    }
+                }
+            }
         }
     }
 
@@ -107,12 +140,14 @@ function isProbablyIngredient(line: string): boolean {
 function isProbablyInstruction(line: string): boolean {
     const lower = line.toLowerCase();
     // Longer lines, starting with caps, or numbered, or contains instruction verbs
-    return line.length > 25 || /^\d+[.)]/.test(line) || lower.includes('minutes') || lower.includes('heat') || lower.includes('mix');
+    return line.length > 30 || /^\d+[.)]/.test(line) || lower.includes('minutes') || lower.includes('heat') || lower.includes('mix') || lower.includes('cook');
 }
 
 function parseIngredientLine(line: string): ParsedIngredient {
-    // Remove bullets and trim
-    const cleanLine = line.replace(/^[*•\-+]\s+/, '').trim();
+    // 1. Remove artifacts like catenated "or" or "original" often found in scaled recipes
+    // e.g. "shreddedor", "tbspor" -> "shredded", "tbsp"
+    let cleanLine = line.replace(/^[*•\-+]\s+/, '').trim();
+    cleanLine = cleanLine.replace(/([a-zA-Z]{3,})(or|original|scaled|serving)\b/gi, '$1').trim();
 
     // Regex to match quantity
     // Matches: "1 1/2", "1/2", "1.5", "1", "250"
@@ -137,8 +172,16 @@ function parseIngredientLine(line: string): ParsedIngredient {
             }
         }
 
-        // If 'g' is the unit, set weightG
+        // Special case: check for weight in grams at the end of the line (e.g. "2 cups (94g)")
         let weightG: number | undefined = undefined;
+        const weightMatch = rest.match(/\(?(\d+(?:\.\d+)?)\s*g\)?$/i);
+        if (weightMatch) {
+            weightG = parseFloat(weightMatch[1]);
+            // Remove the weight from the item description
+            rest = rest.replace(/\(?(\d+(?:\.\d+)?)\s*g\)?$/i, '').trim();
+        }
+
+        // If 'g' is the unit, set weightG
         const lowerUnit = unit.toLowerCase();
         if (lowerUnit === 'g' || lowerUnit === 'ml') {
             weightG = parseFloat(amount);
