@@ -124,6 +124,8 @@ export default function RecipeUploaderPage() {
 
         setMeasures(foodMeasures);
 
+        const newIngs = [...ingredients];
+
         // Auto-detect weight from amount string (e.g., "200g", "0.5kg")
         let autoWeight = 0;
         const amount = (newIngs[activeIngredientIndex].amount || "").toLowerCase();
@@ -135,7 +137,6 @@ export default function RecipeUploaderPage() {
             autoWeight = parseFloat(amount); // Estimate 1:1 for now
         }
 
-        const newIngs = [...ingredients];
         newIngs[activeIngredientIndex] = {
             ...newIngs[activeIngredientIndex],
             matchedFood: food,
