@@ -16,6 +16,60 @@ export interface ParsedRecipe {
     instructions: string[];
 }
 
+export function parseIngredientsOnly(text: string): ParsedIngredient[] {
+    const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    const lines = normalized.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    const ingredients: ParsedIngredient[] = [];
+    let nameBuffer: string[] = [];
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const lowerLine = line.toLowerCase();
+
+        if (lowerLine.includes('ingredient') || lowerLine === 'original recipe' || lowerLine.includes('scaled to')) continue;
+
+        const parsed = parseIngredientLine(line);
+
+        // Merge trailing weight lines
+        if (ingredients.length > 0 && parsed.weightG && (!parsed.amount || parsed.item.length <= 2)) {
+            const lastIng = ingredients[ingredients.length - 1];
+            if (!lastIng.weightG || lastIng.weightG === 0) {
+                lastIng.weightG = parsed.weightG;
+                continue;
+            }
+        }
+
+        const hasQuantity = /^[\d¼½¾⅛⅜⅝⅞]/.test(line);
+        if (!hasQuantity) {
+            if (line.length < 100) nameBuffer.push(line);
+            continue;
+        }
+
+        if (nameBuffer.length > 0) {
+            const prefix = nameBuffer.join(' ');
+            parsed.item = prefix + (parsed.item ? ', ' + parsed.item : '');
+            nameBuffer = [];
+        }
+        ingredients.push(parsed);
+    }
+    return ingredients;
+}
+
+export function parseInstructionsOnly(text: string): string[] {
+    const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    const lines = normalized.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    const instructions: string[] = [];
+
+    for (let line of lines) {
+        const lower = line.toLowerCase();
+        if (lower.includes('direction') || lower.includes('method') || lower.includes('instruction') || lower === 'directions') continue;
+
+        const clean = line.replace(/^\d+[\s.)]+/, '').trim();
+        if (clean.length > 5) instructions.push(clean);
+    }
+    return instructions.length > 0 ? instructions : [""];
+}
+
 export function parseRecipeText(text: string): ParsedRecipe {
     const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     const lines = normalized.split('\n').map(l => l.trim()).filter(l => l.length > 0);

@@ -37,7 +37,7 @@ import {
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { Recipe, Ingredient, MealType, DietType } from '@/lib/data/recipes';
-import { parseRecipeText } from '@/lib/utils/recipe-parser';
+import { parseRecipeText, parseIngredientsOnly, parseInstructionsOnly } from '@/lib/utils/recipe-parser';
 import { Textarea } from '@/components/ui/textarea';
 import { Wand2, Sparkles, Zap } from 'lucide-react';
 
@@ -177,24 +177,83 @@ function RecipeUploaderContent() {
         }
     };
 
-    const handleMagicImport = () => {
-        if (!magicPaste.trim()) return;
+    const handleQuickDetails = (text: string) => {
+        const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        if (lines.length === 0) return;
 
-        const parsed = parseRecipeText(magicPaste);
-        setTitle(parsed.title);
-        setServings(parsed.servings);
+        // Parse title (usually first line)
+        if (!title) setTitle(lines[0]);
 
-        const newIngs = parsed.ingredients.map(ing => ({
+        // Look for servings and times
+        let totalTime = 0;
+        lines.forEach(line => {
+            const lower = line.toLowerCase();
+            // Servings
+            const servMatch = line.match(/(?:makes|servings|serves)\s*:?\s*(\d+)/i);
+            if (servMatch) setServings(parseInt(servMatch[1]));
+
+            // Times (Prep/Cook) - sum them up
+            const timeMatch = line.match(/(\d+)\s*(?:min|minute|hour)/i);
+            if (timeMatch && (lower.includes('prep') || lower.includes('cook') || lower.includes('time'))) {
+                let mins = parseInt(timeMatch[1]);
+                if (lower.includes('hour')) mins *= 60;
+                totalTime += mins;
+            }
+        });
+
+        if (totalTime > 0) setPrepTime(totalTime);
+        setShowMagicPaste(false);
+        setMagicPaste("");
+    };
+
+    const handleQuickIngredients = async (text: string) => {
+        const parsed = parseIngredientsOnly(text);
+        const newIngs = parsed.map(ing => ({
             item: ing.item,
             amount: ing.amount,
             weightG: ing.weightG || 0,
             isMiracleProduct: false
         }));
-
         setIngredients(newIngs);
-        setInstructions(parsed.instructions);
         setShowMagicPaste(false);
-        setStep(2); // Jump to analysis
+        setMagicPaste("");
+
+        // Auto-match attempt as requested
+        setTimeout(() => autoMatchAll(), 100);
+    };
+
+    const handleQuickInstructions = (text: string) => {
+        const parsed = parseInstructionsOnly(text);
+        setInstructions(parsed);
+        setShowMagicPaste(false);
+        setMagicPaste("");
+    };
+
+    const handleMagicImport = () => {
+        if (!magicPaste.trim()) return;
+
+        // If we are on Step 1, try to get everything
+        if (step === 1) {
+            const parsed = parseRecipeText(magicPaste);
+            setTitle(parsed.title);
+            setServings(parsed.servings);
+            const newIngs = parsed.ingredients.map(ing => ({
+                item: ing.item,
+                amount: ing.amount,
+                weightG: ing.weightG || 0,
+                isMiracleProduct: false
+            }));
+            setIngredients(newIngs);
+            setInstructions(parsed.instructions);
+            setStep(2);
+        } else if (step === 2) {
+            handleQuickIngredients(magicPaste);
+        } else if (step === 3) {
+            handleQuickInstructions(magicPaste);
+        }
+
+        setShowMagicPaste(false);
+        setMagicPaste("");
     };
 
     const autoMatchAll = async () => {
@@ -546,12 +605,21 @@ function RecipeUploaderContent() {
                                                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMagicPaste(e.target.value)}
                                                 />
                                                 <Button
-                                                    onClick={handleMagicImport}
-                                                    className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold gap-2 py-6"
+                                                    onClick={() => handleQuickDetails(magicPaste)}
+                                                    className="w-full bg-emerald-600 hover:bg-emerald-700 font-bold gap-2 py-6 mb-2"
                                                     disabled={!magicPaste.trim()}
                                                 >
                                                     <Sparkles size={18} />
-                                                    Analyze & Import Recipe
+                                                    Quick Detail Import
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={handleMagicImport}
+                                                    className="w-full text-slate-400 text-[10px] hover:text-emerald-600"
+                                                    disabled={!magicPaste.trim()}
+                                                >
+                                                    Try Full Recipe Scan Instead
                                                 </Button>
                                             </div>
                                         ) : (
@@ -702,13 +770,13 @@ function RecipeUploaderContent() {
                                         />
                                         <div className="mt-3 flex justify-end">
                                             <Button
-                                                onClick={handleMagicImport}
+                                                onClick={() => handleQuickIngredients(magicPaste)}
                                                 size="sm"
                                                 className="bg-emerald-600 hover:bg-emerald-700 font-bold gap-2"
                                                 disabled={!magicPaste.trim()}
                                             >
                                                 <Zap size={14} />
-                                                Process & Update Ingredients
+                                                Process & Auto-Match Ingredients
                                             </Button>
                                         </div>
                                     </div>
@@ -874,10 +942,47 @@ function RecipeUploaderContent() {
 
                         {step === 3 && (
                             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Utensils size={20} className="text-emerald-500" />
-                                    <h2 className="text-xl font-semibold text-slate-800">Cooking Instructions</h2>
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-2">
+                                        <Utensils size={20} className="text-emerald-500" />
+                                        <h2 className="text-xl font-semibold text-slate-800">Cooking Instructions</h2>
+                                    </div>
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="text-emerald-600 h-7 text-xs font-bold gap-1 hover:bg-emerald-50"
+                                        onClick={() => setShowMagicPaste(!showMagicPaste)}
+                                    >
+                                        <Wand2 size={12} />
+                                        {showMagicPaste ? "Hide Magic Paste" : "Magic Import"}
+                                    </Button>
                                 </div>
+
+                                {showMagicPaste && (
+                                    <div className="mb-6 p-6 bg-emerald-50/50 rounded-2xl border border-emerald-100 animate-in fade-in slide-in-from-top-4 duration-300">
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <Sparkles className="text-emerald-500" size={18} />
+                                            <h3 className="font-bold text-emerald-800 text-sm uppercase tracking-wider">Paste All Directions</h3>
+                                        </div>
+                                        <Textarea
+                                            placeholder="Paste the cooking steps here. We will split them into individual steps automatically."
+                                            className="min-h-[150px] text-sm font-mono bg-white border-emerald-200 focus:border-emerald-500"
+                                            value={magicPaste}
+                                            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMagicPaste(e.target.value)}
+                                        />
+                                        <div className="mt-3 flex justify-end">
+                                            <Button
+                                                onClick={() => handleQuickInstructions(magicPaste)}
+                                                size="sm"
+                                                className="bg-emerald-600 hover:bg-emerald-700 font-bold gap-2"
+                                                disabled={!magicPaste.trim()}
+                                            >
+                                                <Zap size={14} />
+                                                Process Instructions
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
 
                                 <div className="space-y-4">
                                     {instructions.map((text, idx) => (
