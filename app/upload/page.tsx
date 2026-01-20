@@ -633,12 +633,20 @@ function RecipeUploaderContent() {
                                         <Scale size={20} className="text-emerald-500" />
                                         Analyze Ingredients
                                     </h2>
-                                    <div className="flex items-center gap-4">
-                                        <p className="text-sm text-slate-500 italic hidden md:block">Match items to the food database for precision logic.</p>
+                                    <div className="flex items-center gap-2">
+                                        <p className="text-sm text-slate-500 italic hidden md:block mr-2">Match items to the food database for precision logic.</p>
                                         <Button
                                             size="sm"
-                                            variant="outline"
-                                            className="bg-emerald-50 border-emerald-200 text-emerald-700 font-bold hover:bg-emerald-100 gap-2"
+                                            variant="ghost"
+                                            className="text-emerald-600 h-9 text-xs font-bold gap-1 hover:bg-emerald-50 border border-emerald-100"
+                                            onClick={() => setShowMagicPaste(!showMagicPaste)}
+                                        >
+                                            <Wand2 size={14} />
+                                            {showMagicPaste ? "Hide Magic Paste" : "Magic Import"}
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            className="bg-emerald-600 border-emerald-600 text-white font-bold hover:bg-emerald-700 gap-2 h-9"
                                             onClick={autoMatchAll}
                                             disabled={loading}
                                         >
@@ -647,6 +655,32 @@ function RecipeUploaderContent() {
                                         </Button>
                                     </div>
                                 </div>
+
+                                {showMagicPaste && (
+                                    <div className="mb-8 p-6 bg-emerald-50/50 rounded-2xl border border-emerald-100 animate-in fade-in slide-in-from-top-4 duration-300">
+                                        <div className="flex items-center gap-2 mb-4">
+                                            <Sparkles className="text-emerald-500" size={18} />
+                                            <h3 className="font-bold text-emerald-800 text-sm uppercase tracking-wider">Magic Recipe Import</h3>
+                                        </div>
+                                        <Textarea
+                                            placeholder="Paste your whole recipe here... Our AI-lite parser will try to extract ingredients even if they are on separate lines."
+                                            className="min-h-[150px] text-sm font-mono bg-white border-emerald-200 focus:border-emerald-500"
+                                            value={magicPaste}
+                                            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMagicPaste(e.target.value)}
+                                        />
+                                        <div className="mt-3 flex justify-end">
+                                            <Button
+                                                onClick={handleMagicImport}
+                                                size="sm"
+                                                className="bg-emerald-600 hover:bg-emerald-700 font-bold gap-2"
+                                                disabled={!magicPaste.trim()}
+                                            >
+                                                <Zap size={14} />
+                                                Process & Update Ingredients
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
 
                                 <div className="space-y-4">
                                     {ingredients.map((ing, idx) => (
