@@ -124,11 +124,23 @@ export default function RecipeUploaderPage() {
 
         setMeasures(foodMeasures);
 
+        // Auto-detect weight from amount string (e.g., "200g", "0.5kg")
+        let autoWeight = 0;
+        const amount = (newIngs[activeIngredientIndex].amount || "").toLowerCase();
+        if (amount.includes('kg')) {
+            autoWeight = parseFloat(amount) * 1000;
+        } else if (amount.includes('g')) {
+            autoWeight = parseFloat(amount);
+        } else if (amount.includes('ml')) {
+            autoWeight = parseFloat(amount); // Estimate 1:1 for now
+        }
+
         const newIngs = [...ingredients];
         newIngs[activeIngredientIndex] = {
             ...newIngs[activeIngredientIndex],
             matchedFood: food,
-            baseIngredient: food.name
+            baseIngredient: food.name,
+            weightG: autoWeight || newIngs[activeIngredientIndex].weightG
         };
         setIngredients(newIngs);
         setLoading(false);
@@ -554,6 +566,7 @@ export default function RecipeUploaderPage() {
                                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                                 {[
                                                     { label: 'Energy', val: calculateTotalNutrition().calories / servings, unit: 'kcal' },
+                                                    { label: 'Energy (KJ)', val: (calculateTotalNutrition().calories / servings) * 4.184, unit: 'kJ' },
                                                     { label: 'Protein', val: calculateTotalNutrition().protein / servings, unit: 'g' },
                                                     { label: 'Carbs', val: calculateTotalNutrition().carbs / servings, unit: 'g' },
                                                     { label: 'Fat', val: calculateTotalNutrition().fat / servings, unit: 'g' },

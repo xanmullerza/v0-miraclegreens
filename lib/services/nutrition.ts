@@ -5,6 +5,7 @@ export interface FoodItemMatch {
     id?: string;
     name: string;
     energy_kcal: number;
+    energy_kj: number;
     protein_g: number;
     carbs_g: number;
     fat_g: number;
@@ -37,7 +38,8 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
     return data.map(item => ({
         id: item.id,
         name: item.name,
-        energy_kcal: item.energy_kcal,
+        energy_kcal: item.energy_kcal || Math.round((item.energy_kj || 0) / 4.184),
+        energy_kj: item.energy_kj || Math.round((item.energy_kcal || 0) * 4.184),
         protein_g: item.protein_g,
         carbs_g: item.carbs_g,
         fat_g: item.fat_g,
@@ -83,6 +85,10 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
                 return n ? n.value : 0;
             };
 
+            // USDA sometimes labels Calories explicitly
+            const energyKcal = getNutrient('Energy') || getNutrient('Calories') || 0;
+            const energyKj = Math.round(energyKcal * 4.184);
+
             const micronutrients: Record<string, number> = {};
             const microMap: Record<string, string> = {
                 'Potassium, K': 'Potassium',
@@ -124,7 +130,8 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
             return {
                 fdcId: food.fdcId,
                 name: food.description,
-                energy_kcal: getNutrient('Energy'),
+                energy_kcal: energyKcal,
+                energy_kj: energyKj,
                 protein_g: getNutrient('Protein'),
                 carbs_g: getNutrient('Carbohydrate'),
                 fat_g: getNutrient('Total lipid'),
@@ -169,6 +176,7 @@ export async function syncToLocal(food: FoodItemMatch, measures: FoodMeasure[]):
         .insert({
             name: food.name,
             energy_kcal: food.energy_kcal,
+            energy_kj: food.energy_kj,
             protein_g: food.protein_g,
             carbs_g: food.carbs_g,
             fat_g: food.fat_g,
