@@ -17,7 +17,6 @@ export interface ParsedRecipe {
 }
 
 export function parseRecipeText(text: string): ParsedRecipe {
-    // Normalize newlines and split
     const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     const lines = normalized.split('\n').map(l => l.trim()).filter(l => l.length > 0);
 
@@ -29,29 +28,31 @@ export function parseRecipeText(text: string): ParsedRecipe {
 
     let currentSection: 'none' | 'ingredients' | 'instructions' = 'none';
 
-    // Simple heuristic-based parsing
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
         const lowerLine = line.toLowerCase();
 
         // 1. Title Heuristic
-        if (!title && !lowerLine.includes('ingredient') && !lowerLine.includes('instruction') && !lowerLine.includes('method') && !lowerLine.includes('servings')) {
+        if (!title && !lowerLine.includes('ingredient') && !lowerLine.includes('direction') && !lowerLine.includes('method') && !lowerLine.includes('servings')) {
             title = line;
-            // Don't continue, might also be a name buffer for the first ingredient
         }
 
         // 2. Section Switching
         if (lowerLine.includes('ingredient')) {
             currentSection = 'ingredients';
-            nameBuffer = []; // Clear buffer on section switch
+            nameBuffer = [];
             continue;
         }
-        if (lowerLine.includes('instruction') || lowerLine.includes('method') || lowerLine.includes('preparation')) {
+        if (lowerLine.includes('instruction') || lowerLine.includes('method') || lowerLine.includes('preparation') || lowerLine === 'directions') {
             currentSection = 'instructions';
             continue;
         }
 
         // 3. Servings Detection
+        if (lowerLine === 'makes' && i + 1 < lines.length && /^\d+/.test(lines[i + 1])) {
+            servings = parseInt(lines[i + 1]);
+            i++; continue;
+        }
         if (lowerLine.includes('servings:')) {
             const match = line.match(/servings:\s*(\d+)/i);
             if (match) servings = parseInt(match[1]);
@@ -66,10 +67,13 @@ export function parseRecipeText(text: string): ParsedRecipe {
         const isIng = currentSection === 'ingredients' || (currentSection === 'none' && isProbablyIngredient(line));
 
         if (isIng) {
+            // IGNORE common junk lines that are definitely not ingredients
+            if (lowerLine === 'original recipe' || lowerLine.includes('scaled to')) continue;
+
             const parsed = parseIngredientLine(line);
 
-            // A: If it's just a weight (e.g. "94g"), try to apply to the previous ingredient if it lacks weight
-            if (ingredients.length > 0 && parsed.weightG && (parsed.item.length <= 2 || parsed.item.toLowerCase() === 'g' || parsed.item === parsed.amount.split(' ').pop())) {
+            // A: If it's just a weight (e.g. "472g"), merge it back
+            if (ingredients.length > 0 && parsed.weightG && (!parsed.amount || parsed.amount.toLowerCase() === 'g' || parsed.item === parsed.amount)) {
                 const lastIng = ingredients[ingredients.length - 1];
                 if (!lastIng.weightG || lastIng.weightG === 0) {
                     lastIng.weightG = parsed.weightG;
@@ -77,37 +81,36 @@ export function parseRecipeText(text: string): ParsedRecipe {
                 }
             }
 
-            // B: If the item name is weak (e.g. "shredded" or just a unit), use the name buffer
-            const isWeakName = !parsed.item ||
-                parsed.item.length <= 2 ||
-                COMMON_UNITS.includes(parsed.item.toLowerCase()) ||
-                ['shredded', 'raw', 'cooked', 'diced', 'chopped', 'regular', 'skinless', 'serving', 'original'].includes(parsed.item.toLowerCase());
+            // B: Fragment logic. If a line DOES NOT have a quantity, it's likely a name fragment.
+            const hasQuantity = /^[\d¼½¾⅛⅜⅝⅞]/.test(line);
 
-            if (isWeakName && nameBuffer.length > 0) {
-                const bufferedName = nameBuffer.join(' ');
-                parsed.item = bufferedName + (parsed.item ? ', ' + parsed.item : '');
-                nameBuffer = []; // Used the buffer
+            if (!hasQuantity && currentSection === 'ingredients') {
+                // Buffer the descriptive fragment
+                if (line.length < 100) nameBuffer.push(line);
+                continue;
             }
 
-            if (parsed.item) {
+            // C: If we have a quantity, this is the 'anchor' of the ingredient.
+            if (hasQuantity) {
+                if (nameBuffer.length > 0) {
+                    const prefix = nameBuffer.join(' ');
+                    parsed.item = prefix + (parsed.item ? ', ' + parsed.item : '');
+                    nameBuffer = [];
+                }
                 ingredients.push(parsed);
-                nameBuffer = []; // Always clear buffer once an ingredient is pushed
+            } else if (currentSection === 'none' && isProbablyIngredient(line)) {
+                // For 'none' section, we allow lines starting with bullets to be ingredients
+                ingredients.push(parsed);
             }
         } else {
             const isInstructionSection = currentSection === 'instructions' || (currentSection === 'none' && isProbablyInstruction(line));
 
             if (isInstructionSection) {
                 const cleanInstruction = line.replace(/^\d+[\s.)]+/, '').trim();
-                instructions.push(cleanInstruction);
-                nameBuffer = []; // Instructions break the name buffer
-            } else {
-                // Not an ingredient or instruction, likely a name or part of a name
-                if (!lowerLine.includes('servings') && !lowerLine.includes('ingredient')) {
-                    // If it's a short line, buffer it as a potential ingredient name
-                    if (line.length < 100) {
-                        nameBuffer.push(line);
-                    }
-                }
+                if (cleanInstruction.length > 5) instructions.push(cleanInstruction);
+                nameBuffer = [];
+            } else if (currentSection === 'none' && line.length < 100 && !lowerLine.includes('prep time') && !lowerLine.includes('cook time')) {
+                nameBuffer.push(line);
             }
         }
     }
