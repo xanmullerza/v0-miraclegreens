@@ -749,353 +749,384 @@ export default function MealPlannerPage() {
 
                                 {/* Daily Totals Content */}
                                 <div className="space-y-6">
-                                    {/* Macros Section */}
-                                    {(() => {
-                                        const targetCals = calories;
-                                        const pRatio = goal === 'lose-fat' ? 0.30 : goal === 'build-muscle' ? 0.25 : 0.20;
-                                        const cRatio = goal === 'lose-fat' ? 0.40 : goal === 'build-muscle' ? 0.50 : 0.50;
-                                        const fRatio = goal === 'lose-fat' ? 0.30 : goal === 'build-muscle' ? 0.25 : 0.30;
-
-                                        const targets = {
-                                            energy: targetCals,
-                                            protein: (targetCals * pRatio) / 4,
-                                            carbs: (targetCals * cRatio) / 4,
-                                            fat: (targetCals * fRatio) / 9
-                                        };
-
-                                        const current = {
-                                            energy: plan.totalCalories + ((dailyMoringaGrams / 2) * MORINGA_TSP.energy_kcal),
-                                            protein: plan.macros.protein + ((dailyMoringaGrams / 2) * MORINGA_TSP.protein_g),
-                                            carbs: plan.macros.carbs + ((dailyMoringaGrams / 2) * MORINGA_TSP.carbs_g),
-                                            fat: plan.macros.fat + ((dailyMoringaGrams / 2) * MORINGA_TSP.fat_g)
-                                        };
-
-                                        const formatEnergyValue = (kcal: number, u: string) => {
-                                            return u === 'kJ' ? kcal * 4.184 : kcal;
-                                        };
-
-                                        return (
-                                            <div className="p-5 rounded-2xl border border-border bg-card/50 shadow-sm space-y-4">
-                                                <h4 className="font-bold text-md text-foreground flex items-center gap-2 border-b border-border/50 pb-2">
-                                                    <LayoutGrid className="h-5 w-5 text-primary" />
-                                                    Macros
-                                                </h4>
-                                                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                                                    {[
-                                                        { label: 'Energy', val: current.energy, target: targets.energy, icon: Flame, color: 'text-orange-500', unit: unit },
-                                                        { label: 'Protein', val: current.protein, target: targets.protein, icon: Beef, color: 'text-red-500', unit: 'g' },
-                                                        { label: 'Carbs', val: current.carbs, target: targets.carbs, icon: Wheat, color: 'text-amber-600', unit: 'g' },
-                                                        { label: 'Fat', val: current.fat, target: targets.fat, icon: Droplet, color: 'text-yellow-500', unit: 'g' }
-                                                    ].map((macro) => {
-                                                        const pct = Math.round((macro.val / macro.target) * 100);
-                                                        const styles = getNutrientLevelStyles(pct, macro.label);
-                                                        const isEnergy = macro.label === 'Energy';
-
-                                                        return (
-                                                            <div
-                                                                key={macro.label}
-                                                                className={cn(
-                                                                    "p-3 rounded-xl border transition-all shadow-sm cursor-pointer hover:shadow-md",
-                                                                    styles.borderLight, styles.fade
-                                                                )}
-                                                                onClick={() => setSelectedNutrientInfo(macro.label)}
-                                                            >
-                                                                <div className="flex items-center justify-between gap-2 mb-2">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <macro.icon className={cn("h-4 w-4", macro.color)} />
-                                                                        <span className="text-[10px] uppercase font-semibold text-foreground tracking-widest">{macro.label}</span>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-1">
-                                                                        {BOOSTABLE_NUTRIENTS.includes(macro.label) && (
-                                                                            <button
-                                                                                onClick={(e) => {
-                                                                                    e.stopPropagation();
-                                                                                    setActiveBoostContext('daily');
-                                                                                }}
-                                                                                className="text-green-600 hover:text-green-700 bg-green-50 rounded-full p-1 transition-all border border-green-100 hover:scale-110 active:scale-95"
-                                                                                title="Add Miracle Boost"
-                                                                            >
-                                                                                <Sparkles className="h-4 w-4" />
-                                                                            </button>
-                                                                        )}
-                                                                        <div className="text-primary/40 bg-muted/50 rounded-full p-1 transition-all hover:text-primary hover:bg-primary/5">
-                                                                            <Info className="h-4 w-4" />
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div
-                                                                    className={cn(
-                                                                        "flex items-baseline gap-1 mb-1 group/value relative",
-                                                                        isEnergy && "hover:bg-primary/5 rounded px-1 -mx-1 transition-colors"
-                                                                    )}
-                                                                    onClick={(e) => {
-                                                                        if (isEnergy) {
-                                                                            e.stopPropagation();
-                                                                            setUnit(unit === 'kcal' ? 'kJ' : 'kcal');
-                                                                        }
-                                                                    }}
-                                                                    title={isEnergy ? `Click to switch to ${unit === 'kcal' ? 'kJ' : 'kcal'}` : undefined}
-                                                                >
-                                                                    <span className="text-xl font-bold">
-                                                                        {macro.unit === 'kcal' || macro.unit === 'kJ'
-                                                                            ? Math.round(formatEnergyValue(macro.val, macro.unit))
-                                                                            : macro.val.toFixed(0)}
-                                                                    </span>
-                                                                    <span className="text-sm font-medium text-foreground/70">
-                                                                        / {macro.unit === 'kcal' || macro.unit === 'kJ'
-                                                                            ? Math.round(formatEnergyValue(macro.target, macro.unit))
-                                                                            : macro.target.toFixed(0)}{macro.unit}
-                                                                    </span>
-                                                                    {isEnergy && (
-                                                                        <RefreshCw className="h-2 w-2 text-muted-foreground/30 group-hover/value:text-primary transition-colors ml-0.5" />
-                                                                    )}
-                                                                </div>
-                                                                <div className="mt-auto pt-2 border-t border-border/10 flex items-center justify-between gap-2">
-                                                                    <div className="flex items-center gap-1.5">
-                                                                        <span className={cn("text-xs font-black px-2 py-0.5 rounded bg-muted/50", styles.text)}>{pct}%</span>
-                                                                    </div>
-                                                                    {macro.label !== 'Energy' && (() => {
-                                                                        const grams = dailyMoringaGrams;
-                                                                        const ratio = grams / 2;
-                                                                        const boostVal = macro.label === 'Protein' ? 0.5 * ratio :
-                                                                            macro.label === 'Carbs' ? 0.8 * ratio :
-                                                                                macro.label === 'Fat' ? 0.05 * ratio : 0;
-                                                                        const boostPct = Math.round((boostVal / macro.target) * 100);
-                                                                        if (boostPct > 0) return (
-                                                                            <span className="text-sm font-black text-white bg-green-600 px-2.5 py-1 rounded-lg shadow-lg shadow-green-500/20 animate-in fade-in zoom-in-50">
-                                                                                +{boostPct}%
-                                                                            </span>
-                                                                        );
-                                                                        return null;
-                                                                    })()}
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    })}
+                                    {/* Combined Essential Nutrients Report */}
+                                    <div className="space-y-4">
+                                        {!showDailyNutrients ? (
+                                            <div className="bg-card border border-border rounded-2xl p-8 text-center shadow-sm animate-in fade-in zoom-in-95 duration-500">
+                                                <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+                                                    <LayoutGrid className="h-8 w-8 text-primary" />
                                                 </div>
+                                                <h3 className="text-xl font-bold text-foreground mb-2">Essential Nutrient Report</h3>
+                                                <p className="text-muted-foreground text-sm max-w-sm mx-auto mb-6">
+                                                    Explore your complete daily nutritional breakdown, including macros and over 50 essential vitamins and minerals.
+                                                </p>
+                                                <Button
+                                                    onClick={() => setShowDailyNutrients(true)}
+                                                    className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 h-11 rounded-xl font-bold shadow-lg shadow-primary/20 gap-2"
+                                                >
+                                                    <Sparkles className="h-4 w-4" />
+                                                    Expand Daily Report
+                                                </Button>
                                             </div>
-                                        );
-                                    })()}
+                                        ) : (
+                                            <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
+                                                {/* Expanded Header */}
+                                                <div className="flex items-center justify-between border-b border-border pb-4">
+                                                    <div>
+                                                        <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
+                                                            <LayoutGrid className="h-6 w-6 text-primary" />
+                                                            Daily Essential Nutrients
+                                                        </h3>
+                                                        <p className="text-xs text-muted-foreground mt-1 uppercase tracking-widest font-bold">Comprehensive Daily Breakdown</p>
+                                                    </div>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => setShowDailyNutrients(false)}
+                                                        className="gap-2 border-border hover:bg-muted text-muted-foreground font-bold"
+                                                    >
+                                                        <ChevronDown className="h-4 w-4 rotate-180" />
+                                                        Collapse
+                                                    </Button>
+                                                </div>
 
-                                    {/* Show Detailed Nutrients Toggle (Only shown when hidden) */}
-                                    {!showDailyNutrients && (
-                                        <Button
-                                            variant="ghost"
-                                            onClick={() => setShowDailyNutrients(true)}
-                                            className="w-full py-2 hover:bg-muted/50 text-muted-foreground gap-2 text-xs uppercase tracking-widest font-bold"
-                                        >
-                                            <ChevronDown className="h-4 w-4" />
-                                            Show Detailed Nutrients
-                                        </Button>
-                                    )}
+                                                {/* Macros Section */}
+                                                {(() => {
+                                                    const targetCals = calories;
+                                                    const pRatio = goal === 'lose-fat' ? 0.30 : goal === 'build-muscle' ? 0.25 : 0.20;
+                                                    const cRatio = goal === 'lose-fat' ? 0.40 : goal === 'build-muscle' ? 0.50 : 0.50;
+                                                    const fRatio = goal === 'lose-fat' ? 0.30 : goal === 'build-muscle' ? 0.25 : 0.30;
 
-                                    {
-                                        showDailyNutrients && plan.micronutrients && (() => {
-                                            const m = { ...plan.micronutrients };
+                                                    const targets = {
+                                                        energy: targetCals,
+                                                        protein: (targetCals * pRatio) / 4,
+                                                        carbs: (targetCals * cRatio) / 4,
+                                                        fat: (targetCals * fRatio) / 9
+                                                    };
 
-                                            // Apply Daily Moringa Boost
-                                            if (dailyMoringaGrams > 0) {
-                                                const ratio = dailyMoringaGrams / 2;
-                                                Object.entries(MORINGA_TSP.micronutrients).forEach(([key, value]) => {
-                                                    m[key] = (m[key] || 0) + (value * ratio);
-                                                });
-                                            }
+                                                    const current = {
+                                                        energy: plan.totalCalories + ((dailyMoringaGrams / 2) * MORINGA_TSP.energy_kcal),
+                                                        protein: plan.macros.protein + ((dailyMoringaGrams / 2) * MORINGA_TSP.protein_g),
+                                                        carbs: plan.macros.carbs + ((dailyMoringaGrams / 2) * MORINGA_TSP.carbs_g),
+                                                        fat: plan.macros.fat + ((dailyMoringaGrams / 2) * MORINGA_TSP.fat_g)
+                                                    };
 
-                                            // Categorize nutrients
-                                            const metabolicFuel: Record<string, number> = {
-                                                'B1 (Thiamine)': m.thiamine_mg || 0,
-                                                'B2 (Riboflavin)': m.riboflavin_mg || 0,
-                                                'B3 (Niacin)': m.niacin_mg || 0,
-                                                'B5 (Pantothenic Acid)': m.pantothenic_acid_mg || 0,
-                                                'Manganese': m.manganese_mg || 0,
-                                            };
+                                                    const formatEnergyValue = (kcal: number, u: string) => {
+                                                        return u === 'kJ' ? kcal * 4.184 : kcal;
+                                                    };
 
-                                            const cognitiveFocus: Record<string, number> = {
-                                                'B6 (Pyridoxine)': m.vitamin_b6_mg || 0,
-                                                'Choline': m.choline_mg || 0,
-                                                'Magnesium': m.magnesium_mg || 0,
-                                                'Copper': m.copper_mg || 0,
-                                            };
-
-                                            const bloodDNA: Record<string, number> = {
-                                                'Iron': m.iron_mg || 0,
-                                                'B9 (Folate)': m.folate_ug || 0,
-                                                'B12 (Cobalamin)': m.vitamin_b12_ug || 0,
-                                            };
-
-                                            const skeletalHealth: Record<string, number> = {
-                                                'Calcium': m.calcium_mg || 0,
-                                                'Phosphorus': m.phosphorus_mg || 0,
-                                                'Vitamin D': m.vitamin_d_iu || 0,
-                                                'Vitamin K': m.vitamin_k_ug || 0,
-                                            };
-
-                                            const electrolytes: Record<string, number> = {
-                                                'Potassium': m.potassium_mg || 0,
-                                                'Sodium': m.sodium_mg || 0,
-                                            };
-
-                                            const immuneShield: Record<string, number> = {
-                                                'Vitamin A': m.vitamin_a_ug || 0,
-                                                'Vitamin C': m.vitamin_c_mg || 0,
-                                                'Vitamin E': m.vitamin_e_mg || 0,
-                                                'Zinc': m.zinc_mg || 0,
-                                                'Selenium': m.selenium_ug || 0,
-                                            };
-
-                                            const other: Record<string, number> = {
-                                                'Fiber': m.fiber_g || 0,
-                                            };
-
-                                            const DailyNutrientGrid = ({ nutrients, title, icon: Icon }: { nutrients: Record<string, number>, title: string, icon: any }) => {
-                                                const filtered = Object.entries(nutrients);
-                                                if (filtered.length === 0) return null;
-
-                                                return (
-                                                    <div className="p-5 rounded-2xl border border-border bg-card/50 shadow-sm space-y-4">
-                                                        <div className="flex items-center justify-between border-b border-border/50 pb-2">
-                                                            <h4 className="font-bold text-md text-foreground flex items-center gap-2">
-                                                                <Icon className="h-5 w-5 text-primary" />
-                                                                {title}
+                                                    return (
+                                                        <div className="p-5 rounded-2xl border border-border bg-card/50 shadow-sm space-y-4">
+                                                            <h4 className="font-bold text-md text-foreground flex items-center gap-2 border-b border-border/50 pb-2">
+                                                                <Activity className="h-5 w-5 text-primary" />
+                                                                Main Macronutrients
                                                             </h4>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-[10px] font-bold text-green-600 uppercase tracking-tighter bg-green-50 px-2 py-0.5 rounded-full border border-green-100 flex items-center gap-1">
-                                                                    <Sparkles className="h-2.5 w-2.5" />
-                                                                    Boostable
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                                                            {filtered.map(([label, value]) => {
-                                                                let unit = 'mg';
-                                                                const labelLower = label.toLowerCase();
-                                                                if (labelLower.includes('vitamin a') || labelLower.includes('folate') || labelLower.includes('selenium') || labelLower.includes('b12') || labelLower.includes('vitamin k')) unit = 'µg';
-                                                                if (labelLower.includes('vitamin d')) unit = 'IU';
-                                                                if (labelLower.includes('fiber')) unit = 'g';
+                                                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                                                                {[
+                                                                    { label: 'Energy', val: current.energy, target: targets.energy, icon: Flame, color: 'text-orange-500', unit: unit },
+                                                                    { label: 'Protein', val: current.protein, target: targets.protein, icon: Beef, color: 'text-red-500', unit: 'g' },
+                                                                    { label: 'Carbs', val: current.carbs, target: targets.carbs, icon: Wheat, color: 'text-amber-600', unit: 'g' },
+                                                                    { label: 'Fat', val: current.fat, target: targets.fat, icon: Droplet, color: 'text-yellow-500', unit: 'g' }
+                                                                ].map((macro) => {
+                                                                    const pct = Math.round((macro.val / macro.target) * 100);
+                                                                    const styles = getNutrientLevelStyles(pct, macro.label);
+                                                                    const isEnergy = macro.label === 'Energy';
 
-                                                                const rdaValue = userRDAs?.[label];
-                                                                const percentage = rdaValue ? Math.round((value / rdaValue) * 100) : null;
-                                                                const styles = getNutrientLevelStyles(percentage || 0, label);
-
-                                                                // Calculate Moringa Boost for this specific nutrient
-                                                                const getBoost = () => {
-                                                                    if (dailyMoringaGrams <= 0) return 0;
-                                                                    const ratio = dailyMoringaGrams / 2;
-                                                                    const mapping: Record<string, any> = {
-                                                                        'Potassium': MORINGA_TSP.micronutrients.potassium_mg,
-                                                                        'Magnesium': MORINGA_TSP.micronutrients.magnesium_mg,
-                                                                        'Calcium': MORINGA_TSP.micronutrients.calcium_mg,
-                                                                        'Sodium': MORINGA_TSP.micronutrients.sodium_mg,
-                                                                        'Iron': MORINGA_TSP.micronutrients.iron_mg,
-                                                                        'Vitamin A': MORINGA_TSP.micronutrients.vitamin_a_ug,
-                                                                        'B1 (Thiamine)': MORINGA_TSP.micronutrients.thiamine_mg,
-                                                                        'B2 (Riboflavin)': MORINGA_TSP.micronutrients.riboflavin_mg,
-                                                                        'B3 (Niacin)': MORINGA_TSP.micronutrients.niacin_mg,
-                                                                        'Vitamin C': MORINGA_TSP.micronutrients.vitamin_c_mg,
-                                                                        'Fiber': MORINGA_TSP.micronutrients.fiber_g,
-                                                                        'Protein': MORINGA_TSP.protein_g,
-                                                                        'Carbs': MORINGA_TSP.carbs_g,
-                                                                        'Fat': MORINGA_TSP.fat_g,
-                                                                        'Energy': MORINGA_TSP.energy_kcal
-                                                                    };
-                                                                    const baseVal = mapping[label];
-                                                                    if (baseVal === undefined) return 0;
-                                                                    return baseVal * ratio;
-                                                                };
-
-                                                                const boostValue = getBoost();
-                                                                const boostPct = boostValue > 0 && rdaValue ? Math.round((boostValue / rdaValue) * 100) : 0;
-
-                                                                return (
-                                                                    <div
-                                                                        key={label}
-                                                                        onClick={() => setSelectedNutrientInfo(label)}
-                                                                        className={cn(
-                                                                            "flex flex-col justify-between gap-1 p-3 rounded-xl border transition-all shadow-sm hover:shadow-md group/card relative overflow-hidden cursor-pointer",
-                                                                            percentage !== null ? `${styles.borderLight} ${styles.fade}` : "bg-background border-border/50"
-                                                                        )}
-                                                                    >
-                                                                        <div className="min-w-0 pb-1">
+                                                                    return (
+                                                                        <div
+                                                                            key={macro.label}
+                                                                            className={cn(
+                                                                                "p-3 rounded-xl border transition-all shadow-sm cursor-pointer hover:shadow-md",
+                                                                                styles.borderLight, styles.fade
+                                                                            )}
+                                                                            onClick={() => setSelectedNutrientInfo(macro.label)}
+                                                                        >
                                                                             <div className="flex items-center justify-between gap-2 mb-2">
-                                                                                <p className="text-[10px] uppercase font-bold text-foreground/80 truncate tracking-tight">{label}</p>
+                                                                                <div className="flex items-center gap-2">
+                                                                                    <macro.icon className={cn("h-4 w-4", macro.color)} />
+                                                                                    <span className="text-[10px] uppercase font-semibold text-foreground tracking-widest">{macro.label}</span>
+                                                                                </div>
                                                                                 <div className="flex items-center gap-1">
-                                                                                    {BOOSTABLE_NUTRIENTS.includes(label) && (
+                                                                                    {BOOSTABLE_NUTRIENTS.includes(macro.label) && (
                                                                                         <button
                                                                                             onClick={(e) => {
                                                                                                 e.stopPropagation();
                                                                                                 setActiveBoostContext('daily');
                                                                                             }}
-                                                                                            className="text-green-600 hover:text-green-700 bg-green-50 rounded-full p-0.5 transition-all border border-green-100 hover:scale-110 active:scale-95"
+                                                                                            className="text-green-600 hover:text-green-700 bg-green-50 rounded-full p-1 transition-all border border-green-100 hover:scale-110 active:scale-95"
                                                                                             title="Add Miracle Boost"
                                                                                         >
-                                                                                            <Sparkles className="h-3.5 w-3.5" />
+                                                                                            <Sparkles className="h-4 w-4" />
                                                                                         </button>
                                                                                     )}
-                                                                                    <div className="text-primary/40 bg-muted/50 rounded-full p-0.5 transition-all hover:text-primary hover:bg-primary/5">
+                                                                                    <div className="text-primary/40 bg-muted/50 rounded-full p-1 transition-all hover:text-primary hover:bg-primary/5">
                                                                                         <Info className="h-4 w-4" />
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
-                                                                            <div className="flex items-baseline flex-wrap gap-x-1">
-                                                                                <span className="text-xl font-bold">
-                                                                                    {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
-                                                                                </span>
-                                                                                {rdaValue && (
-                                                                                    <span className="text-sm font-medium text-foreground/70">
-                                                                                        / {rdaValue >= 1 ? Math.round(rdaValue) : rdaValue.toFixed(1)}{unit}
-                                                                                    </span>
+                                                                            <div
+                                                                                className={cn(
+                                                                                    "flex items-baseline gap-1 mb-1 group/value relative",
+                                                                                    isEnergy && "hover:bg-primary/5 rounded px-1 -mx-1 transition-colors"
                                                                                 )}
+                                                                                onClick={(e) => {
+                                                                                    if (isEnergy) {
+                                                                                        e.stopPropagation();
+                                                                                        setUnit(unit === 'kcal' ? 'kJ' : 'kcal');
+                                                                                    }
+                                                                                }}
+                                                                                title={isEnergy ? `Click to switch to ${unit === 'kcal' ? 'kJ' : 'kcal'}` : undefined}
+                                                                            >
+                                                                                <span className="text-xl font-bold">
+                                                                                    {macro.unit === 'kcal' || macro.unit === 'kJ'
+                                                                                        ? Math.round(formatEnergyValue(macro.val, macro.unit))
+                                                                                        : macro.val.toFixed(0)}
+                                                                                </span>
+                                                                                <span className="text-sm font-medium text-foreground/70">
+                                                                                    / {macro.unit === 'kcal' || macro.unit === 'kJ'
+                                                                                        ? Math.round(formatEnergyValue(macro.target, macro.unit))
+                                                                                        : macro.target.toFixed(0)}{macro.unit}
+                                                                                </span>
+                                                                                {isEnergy && (
+                                                                                    <RefreshCw className="h-2 w-2 text-muted-foreground/30 group-hover/value:text-primary transition-colors ml-0.5" />
+                                                                                )}
+                                                                            </div>
+                                                                            <div className="mt-auto pt-2 border-t border-border/10 flex items-center justify-between gap-2">
+                                                                                <div className="flex items-center gap-1.5">
+                                                                                    <span className={cn("text-xs font-black px-2 py-0.5 rounded bg-muted/50", styles.text)}>{pct}%</span>
+                                                                                </div>
+                                                                                {macro.label !== 'Energy' && (() => {
+                                                                                    const grams = dailyMoringaGrams;
+                                                                                    const ratio = grams / 2;
+                                                                                    const boostVal = macro.label === 'Protein' ? 0.5 * ratio :
+                                                                                        macro.label === 'Carbs' ? 0.8 * ratio :
+                                                                                            macro.label === 'Fat' ? 0.05 * ratio : 0;
+                                                                                    const boostPct = Math.round((boostVal / macro.target) * 100);
+                                                                                    if (boostPct > 0) return (
+                                                                                        <span className="text-sm font-black text-white bg-green-600 px-2.5 py-1 rounded-lg shadow-lg shadow-green-500/20 animate-in fade-in zoom-in-50">
+                                                                                            +{boostPct}%
+                                                                                        </span>
+                                                                                    );
+                                                                                    return null;
+                                                                                })()}
                                                                             </div>
                                                                         </div>
-                                                                        {percentage !== null && (
-                                                                            <div className="mt-auto pt-2 border-t border-border/10 flex items-center justify-between gap-2">
-                                                                                <span className={cn(
-                                                                                    "px-2 py-0.5 rounded bg-muted/50 text-xs font-black",
-                                                                                    styles.text
-                                                                                )}>
-                                                                                    {percentage}%
-                                                                                </span>
-                                                                                {boostValue > 0 && (
-                                                                                    <span className="text-sm font-black text-white bg-green-600 px-2.5 py-1 rounded-lg shadow-lg shadow-green-500/20 animate-in fade-in zoom-in-50">
-                                                                                        +{boostPct}%
-                                                                                    </span>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })()}
+
+                                                {/* Micros Content */}
+                                                {plan.micronutrients && (() => {
+                                                    const m = { ...plan.micronutrients };
+
+                                                    // Apply Daily Moringa Boost
+                                                    if (dailyMoringaGrams > 0) {
+                                                        const ratio = dailyMoringaGrams / 2;
+                                                        Object.entries(MORINGA_TSP.micronutrients).forEach(([key, value]) => {
+                                                            m[key] = (m[key] || 0) + (value * ratio);
+                                                        });
+                                                    }
+
+                                                    // Categorize nutrients
+                                                    const metabolicFuel: Record<string, number> = {
+                                                        'B1 (Thiamine)': m.thiamine_mg || 0,
+                                                        'B2 (Riboflavin)': m.riboflavin_mg || 0,
+                                                        'B3 (Niacin)': m.niacin_mg || 0,
+                                                        'B5 (Pantothenic Acid)': m.pantothenic_acid_mg || 0,
+                                                        'Manganese': m.manganese_mg || 0,
+                                                    };
+
+                                                    const cognitiveFocus: Record<string, number> = {
+                                                        'B6 (Pyridoxine)': m.vitamin_b6_mg || 0,
+                                                        'Choline': m.choline_mg || 0,
+                                                        'Magnesium': m.magnesium_mg || 0,
+                                                        'Copper': m.copper_mg || 0,
+                                                    };
+
+                                                    const bloodDNA: Record<string, number> = {
+                                                        'Iron': m.iron_mg || 0,
+                                                        'B9 (Folate)': m.folate_ug || 0,
+                                                        'B12 (Cobalamin)': m.vitamin_b12_ug || 0,
+                                                    };
+
+                                                    const skeletalHealth: Record<string, number> = {
+                                                        'Calcium': m.calcium_mg || 0,
+                                                        'Phosphorus': m.phosphorus_mg || 0,
+                                                        'Vitamin D': m.vitamin_d_iu || 0,
+                                                        'Vitamin K': m.vitamin_k_ug || 0,
+                                                    };
+
+                                                    const electrolytes: Record<string, number> = {
+                                                        'Potassium': m.potassium_mg || 0,
+                                                        'Sodium': m.sodium_mg || 0,
+                                                    };
+
+                                                    const immuneShield: Record<string, number> = {
+                                                        'Vitamin A': m.vitamin_a_ug || 0,
+                                                        'Vitamin C': m.vitamin_c_mg || 0,
+                                                        'Vitamin E': m.vitamin_e_mg || 0,
+                                                        'Zinc': m.zinc_mg || 0,
+                                                        'Selenium': m.selenium_ug || 0,
+                                                    };
+
+                                                    const other: Record<string, number> = {
+                                                        'Fiber': m.fiber_g || 0,
+                                                    };
+
+                                                    const DailyNutrientGrid = ({ nutrients, title, icon: Icon }: { nutrients: Record<string, number>, title: string, icon: any }) => {
+                                                        const filtered = Object.entries(nutrients);
+                                                        if (filtered.length === 0) return null;
+
+                                                        return (
+                                                            <div className="p-5 rounded-2xl border border-border bg-card/50 shadow-sm space-y-4">
+                                                                <div className="flex items-center justify-between border-b border-border/50 pb-2">
+                                                                    <h4 className="font-bold text-md text-foreground flex items-center gap-2">
+                                                                        <Icon className="h-5 w-5 text-primary" />
+                                                                        {title}
+                                                                    </h4>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-[10px] font-bold text-green-600 uppercase tracking-tighter bg-green-50 px-2 py-0.5 rounded-full border border-green-100 flex items-center gap-1">
+                                                                            <Sparkles className="h-2.5 w-2.5" />
+                                                                            Boostable
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                                                                    {filtered.map(([label, value]) => {
+                                                                        let unit = 'mg';
+                                                                        const labelLower = label.toLowerCase();
+                                                                        if (labelLower.includes('vitamin a') || labelLower.includes('folate') || labelLower.includes('selenium') || labelLower.includes('b12') || labelLower.includes('vitamin k')) unit = 'µg';
+                                                                        if (labelLower.includes('vitamin d')) unit = 'IU';
+                                                                        if (labelLower.includes('fiber')) unit = 'g';
+
+                                                                        const rdaValue = userRDAs?.[label];
+                                                                        const percentage = rdaValue ? Math.round((value / rdaValue) * 100) : null;
+                                                                        const styles = getNutrientLevelStyles(percentage || 0, label);
+
+                                                                        // Calculate Moringa Boost for this specific nutrient
+                                                                        const getBoost = () => {
+                                                                            if (dailyMoringaGrams <= 0) return 0;
+                                                                            const ratio = dailyMoringaGrams / 2;
+                                                                            const mapping: Record<string, any> = {
+                                                                                'Potassium': MORINGA_TSP.micronutrients.potassium_mg,
+                                                                                'Magnesium': MORINGA_TSP.micronutrients.magnesium_mg,
+                                                                                'Calcium': MORINGA_TSP.micronutrients.calcium_mg,
+                                                                                'Sodium': MORINGA_TSP.micronutrients.sodium_mg,
+                                                                                'Iron': MORINGA_TSP.micronutrients.iron_mg,
+                                                                                'Vitamin A': MORINGA_TSP.micronutrients.vitamin_a_ug,
+                                                                                'B1 (Thiamine)': MORINGA_TSP.micronutrients.thiamine_mg,
+                                                                                'B2 (Riboflavin)': MORINGA_TSP.micronutrients.riboflavin_mg,
+                                                                                'B3 (Niacin)': MORINGA_TSP.micronutrients.niacin_mg,
+                                                                                'Vitamin C': MORINGA_TSP.micronutrients.vitamin_c_mg,
+                                                                                'Fiber': MORINGA_TSP.micronutrients.fiber_g,
+                                                                                'Protein': MORINGA_TSP.protein_g,
+                                                                                'Carbs': MORINGA_TSP.carbs_g,
+                                                                                'Fat': MORINGA_TSP.fat_g,
+                                                                                'Energy': MORINGA_TSP.energy_kcal
+                                                                            };
+                                                                            const baseVal = mapping[label];
+                                                                            if (baseVal === undefined) return 0;
+                                                                            return baseVal * ratio;
+                                                                        };
+
+                                                                        const boostValue = getBoost();
+                                                                        const boostPct = boostValue > 0 && rdaValue ? Math.round((boostValue / rdaValue) * 100) : 0;
+
+                                                                        return (
+                                                                            <div
+                                                                                key={label}
+                                                                                onClick={() => setSelectedNutrientInfo(label)}
+                                                                                className={cn(
+                                                                                    "flex flex-col justify-between gap-1 p-3 rounded-xl border transition-all shadow-sm hover:shadow-md group/card relative overflow-hidden cursor-pointer",
+                                                                                    percentage !== null ? `${styles.borderLight} ${styles.fade}` : "bg-background border-border/50"
+                                                                                )}
+                                                                            >
+                                                                                <div className="min-w-0 pb-1">
+                                                                                    <div className="flex items-center justify-between gap-2 mb-2">
+                                                                                        <p className="text-[10px] uppercase font-bold text-foreground/80 truncate tracking-tight">{label}</p>
+                                                                                        <div className="flex items-center gap-1">
+                                                                                            {BOOSTABLE_NUTRIENTS.includes(label) && (
+                                                                                                <button
+                                                                                                    onClick={(e) => {
+                                                                                                        e.stopPropagation();
+                                                                                                        setActiveBoostContext('daily');
+                                                                                                    }}
+                                                                                                    className="text-green-600 hover:text-green-700 bg-green-50 rounded-full p-0.5 transition-all border border-green-100 hover:scale-110 active:scale-95"
+                                                                                                    title="Add Miracle Boost"
+                                                                                                >
+                                                                                                    <Sparkles className="h-3.5 w-3.5" />
+                                                                                                </button>
+                                                                                            )}
+                                                                                            <div className="text-primary/40 bg-muted/50 rounded-full p-0.5 transition-all hover:text-primary hover:bg-primary/5">
+                                                                                                <Info className="h-4 w-4" />
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div className="flex items-baseline flex-wrap gap-x-1">
+                                                                                        <span className="text-xl font-bold">
+                                                                                            {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
+                                                                                        </span>
+                                                                                        {rdaValue && (
+                                                                                            <span className="text-sm font-medium text-foreground/70">
+                                                                                                / {rdaValue >= 1 ? Math.round(rdaValue) : rdaValue.toFixed(1)}{unit}
+                                                                                            </span>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </div>
+                                                                                {percentage !== null && (
+                                                                                    <div className="mt-auto pt-2 border-t border-border/10 flex items-center justify-between gap-2">
+                                                                                        <span className={cn(
+                                                                                            "px-2 py-0.5 rounded bg-muted/50 text-xs font-black",
+                                                                                            styles.text
+                                                                                        )}>
+                                                                                            {percentage}%
+                                                                                        </span>
+                                                                                        {boostValue > 0 && (
+                                                                                            <span className="text-sm font-black text-white bg-green-600 px-2.5 py-1 rounded-lg shadow-lg shadow-green-500/20 animate-in fade-in zoom-in-50">
+                                                                                                +{boostPct}%
+                                                                                            </span>
+                                                                                        )}
+                                                                                    </div>
                                                                                 )}
                                                                             </div>
-                                                                        )}
-                                                                    </div>
-                                                                );
-                                                            })}
+                                                                        );
+                                                                    })}
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    };
+
+                                                    return (
+                                                        <div className="space-y-6">
+                                                            <DailyNutrientGrid nutrients={metabolicFuel} title="Energy & Vitality" icon={Flame} />
+                                                            <DailyNutrientGrid nutrients={immuneShield} title="Immune Defense" icon={Shield} />
+                                                            <DailyNutrientGrid nutrients={skeletalHealth} title="Strong Foundations" icon={Dumbbell} />
+                                                            <DailyNutrientGrid nutrients={cognitiveFocus} title="Mental Clarity" icon={Activity} />
+                                                            <DailyNutrientGrid nutrients={bloodDNA} title="Blood & Repair" icon={Droplet} />
+                                                            <DailyNutrientGrid nutrients={electrolytes} title="Hydration Balance" icon={Zap} />
+                                                            <DailyNutrientGrid nutrients={other} title="Daily Digestion" icon={Leaf} />
+
+                                                            {/* Collapse Report Button at the bottom */}
+                                                            <Button
+                                                                variant="ghost"
+                                                                onClick={() => {
+                                                                    setShowDailyNutrients(false);
+                                                                    // Scroll up to the combined section header if needed
+                                                                }}
+                                                                className="w-full py-2 mt-4 hover:bg-muted/50 text-muted-foreground gap-2 text-xs uppercase tracking-widest font-bold border-t border-border/50 rounded-none"
+                                                            >
+                                                                <ChevronDown className="h-4 w-4 rotate-180" />
+                                                                Collapse Essential Report
+                                                            </Button>
                                                         </div>
-                                                    </div>
-                                                );
-                                            };
-
-                                            return (
-                                                <div className="mt-6 pt-6 border-t border-border space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
-                                                    <DailyNutrientGrid nutrients={metabolicFuel} title="Energy & Vitality" icon={Flame} />
-                                                    <DailyNutrientGrid nutrients={immuneShield} title="Immune Defense" icon={Shield} />
-                                                    <DailyNutrientGrid nutrients={skeletalHealth} title="Strong Foundations" icon={Dumbbell} />
-                                                    <DailyNutrientGrid nutrients={cognitiveFocus} title="Mental Clarity" icon={Activity} />
-                                                    <DailyNutrientGrid nutrients={bloodDNA} title="Blood & Repair" icon={Droplet} />
-                                                    <DailyNutrientGrid nutrients={electrolytes} title="Hydration Balance" icon={Zap} />
-                                                    <DailyNutrientGrid nutrients={other} title="Daily Digestion" icon={Leaf} />
-
-                                                    {/* Hide Detailed Nutrients Button at the bottom */}
-                                                    <Button
-                                                        variant="ghost"
-                                                        onClick={() => {
-                                                            setShowDailyNutrients(false);
-                                                            // Optional: Scroll back up to the macros if needed, but simple toggle for now
-                                                        }}
-                                                        className="w-full py-2 mt-4 hover:bg-muted/50 text-muted-foreground gap-2 text-xs uppercase tracking-widest font-bold border-t border-border/50 rounded-none"
-                                                    >
-                                                        <ChevronDown className="h-4 w-4 rotate-180" />
-                                                        Hide Detailed Nutrients
-                                                    </Button>
-                                                </div>
-                                            );
-                                        })()
-                                    }
+                                                    );
+                                                })()}
+                                            </div>
+                                        )}
+                                    </div>
                                     <div className="flex items-center justify-center p-6 bg-muted/10 rounded-2xl border border-dashed border-border/50">
                                         <Button onClick={() => setStep(1)} variant="outline" size="sm" className="gap-2 border-muted-foreground/20 text-muted-foreground hover:bg-background">
                                             Start Over
