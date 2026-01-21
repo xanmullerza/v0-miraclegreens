@@ -1,0 +1,295 @@
+"use client";
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
+import IngredientBuilder, { RecipeIngredient } from '@/components/recipe/ingredient-builder';
+import { ChefHat, Clock, Users, Save } from 'lucide-react';
+
+export default function CreateRecipePage() {
+    const router = useRouter();
+    // const supabase = createClient();
+
+    const [title, setTitle] = useState('');
+    const [type, setType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('dinner');
+    const [prepTime, setPrepTime] = useState(30);
+    const [servings, setServings] = useState(4);
+    const [diet, setDiet] = useState<string[]>([]);
+    const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
+    const [instructions, setInstructions] = useState<string[]>(['']);
+    const [saving, setSaving] = useState(false);
+
+    const handleAddInstruction = () => {
+        setInstructions([...instructions, '']);
+    };
+
+    const handleUpdateInstruction = (index: number, value: string) => {
+        const updated = [...instructions];
+        updated[index] = value;
+        setInstructions(updated);
+    };
+
+    const handleRemoveInstruction = (index: number) => {
+        setInstructions(instructions.filter((_, i) => i !== index));
+    };
+
+    const toggleDiet = (dietType: string) => {
+        setDiet(prev =>
+            prev.includes(dietType)
+                ? prev.filter(d => d !== dietType)
+                : [...prev, dietType]
+        );
+    };
+
+    const handleSave = async () => {
+        if (!title || ingredients.length === 0 || instructions.filter(i => i.trim()).length === 0) {
+            alert('Please fill in all required fields');
+            return;
+        }
+
+        setSaving(true);
+
+        try {
+            // Calculate total nutrition
+            const totals = ingredients.reduce(
+                (acc, ing) => ({
+                    calories: acc.calories + ing.calories,
+                    protein: acc.protein + ing.protein,
+                    fat: acc.fat + ing.fat,
+                    carbs: acc.carbs + ing.carbs,
+                }),
+                { calories: 0, protein: 0, fat: 0, carbs: 0 }
+            );
+
+            // Create recipe
+            const recipeId = `recipe-${Date.now()}`;
+            const { error: recipeError } = await supabase
+                .from('recipes')
+                .insert({
+                    id: recipeId,
+                    title,
+                    type,
+                    calories: Math.round(totals.calories),
+                    protein: Math.round(totals.protein),
+                    fat: Math.round(totals.fat),
+                    carbs: Math.round(totals.carbs),
+                    diet,
+                    prep_time: prepTime,
+                    servings,
+                });
+
+            if (recipeError) throw recipeError;
+
+            // Insert ingredients
+            const ingredientsData = ingredients.map(ing => ({
+                recipe_id: recipeId,
+                food_item_id: ing.food_item_id,
+                item: ing.food_item_name,
+                amount: `${ing.weight_g}g`,
+                weight_g: ing.weight_g,
+                quantity: ing.quantity,
+                measure_label: ing.measure_label,
+            }));
+
+            const { error: ingredientsError } = await supabase
+                .from('ingredients')
+                .insert(ingredientsData);
+
+            if (ingredientsError) throw ingredientsError;
+
+            // Insert instructions
+            const instructionsData = instructions
+                .filter(step => step.trim())
+                .map((step, index) => ({
+                    recipe_id: recipeId,
+                    step_text: step,
+                    step_order: index + 1,
+                }));
+
+            const { error: instructionsError } = await supabase
+                .from('instructions')
+                .insert(instructionsData);
+
+            if (instructionsError) throw instructionsError;
+
+            // Success!
+            alert('Recipe created successfully!');
+            router.push('/plan');
+        } catch (error) {
+            console.error('Error creating recipe:', error);
+            alert('Failed to create recipe. Please try again.');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    return (
+        <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+            <div className="max-w-4xl mx-auto px-4 py-8">
+                {/* Header */}
+                <div className="mb-8">
+                    <div className="flex items-center gap-3 mb-2">
+                        <ChefHat className="w-8 h-8 text-green-600" />
+                        <h1 className="text-3xl font-bold text-gray-900">Create New Recipe</h1>
+                    </div>
+                    <p className="text-gray-600">
+                        Build your recipe with precise nutrition tracking using our food database
+                    </p>
+                </div>
+
+                <div className="space-y-6">
+                    {/* Basic Info */}
+                    <div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
+                        <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Recipe Title *
+                            </label>
+                            <input
+                                type="text"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                placeholder="e.g., Grilled Chicken with Roasted Vegetables"
+                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Meal Type *
+                                </label>
+                                <select
+                                    value={type}
+                                    onChange={(e) => setType(e.target.value as any)}
+                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                >
+                                    <option value="breakfast">Breakfast</option>
+                                    <option value="lunch">Lunch</option>
+                                    <option value="dinner">Dinner</option>
+                                    <option value="snack">Snack</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                    <Clock className="w-4 h-4" />
+                                    Prep Time (min)
+                                </label>
+                                <input
+                                    type="number"
+                                    value={prepTime}
+                                    onChange={(e) => setPrepTime(Number(e.target.value))}
+                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    min="1"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                    <Users className="w-4 h-4" />
+                                    Servings
+                                </label>
+                                <input
+                                    type="number"
+                                    value={servings}
+                                    onChange={(e) => setServings(Number(e.target.value))}
+                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    min="1"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Diet Tags
+                            </label>
+                            <div className="flex flex-wrap gap-2">
+                                {['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'low-carb'].map(dietType => (
+                                    <button
+                                        key={dietType}
+                                        type="button"
+                                        onClick={() => toggleDiet(dietType)}
+                                        className={`px-4 py-2 rounded-full text-sm font-medium transition ${diet.includes(dietType)
+                                            ? 'bg-green-600 text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
+                                    >
+                                        {dietType}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Ingredients */}
+                    <div className="bg-white rounded-lg shadow-sm p-6">
+                        <IngredientBuilder
+                            ingredients={ingredients}
+                            onChange={setIngredients}
+                        />
+                    </div>
+
+                    {/* Instructions */}
+                    <div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-semibold">Instructions</h3>
+                            <button
+                                type="button"
+                                onClick={handleAddInstruction}
+                                className="text-sm text-green-600 hover:text-green-700 font-medium"
+                            >
+                                + Add Step
+                            </button>
+                        </div>
+
+                        <div className="space-y-3">
+                            {instructions.map((step, index) => (
+                                <div key={index} className="flex gap-3">
+                                    <div className="flex-shrink-0 w-8 h-8 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-semibold text-sm">
+                                        {index + 1}
+                                    </div>
+                                    <textarea
+                                        value={step}
+                                        onChange={(e) => handleUpdateInstruction(index, e.target.value)}
+                                        placeholder={`Step ${index + 1}...`}
+                                        className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                                        rows={2}
+                                    />
+                                    {instructions.length > 1 && (
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveInstruction(index)}
+                                            className="text-red-600 hover:text-red-700"
+                                        >
+                                            ×
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Save Button */}
+                    <div className="flex gap-4">
+                        <button
+                            onClick={() => router.back()}
+                            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleSave}
+                            disabled={saving}
+                            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <Save className="w-5 h-5" />
+                            {saving ? 'Saving...' : 'Save Recipe'}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
