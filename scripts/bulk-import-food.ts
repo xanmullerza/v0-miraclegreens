@@ -310,15 +310,15 @@ async function main() {
     // We process in chunks to avoid overwhelming anything locally, though rate limit is key.
     // Start from index 1 (skip header)
 
-    const BATCH_SIZE = 100; // Next 100 items
+    const BATCH_SIZE = 300; // Large batch - 300 items
     let processedCount = 0;
 
-    console.log(`Found ${lines.length - 1} items. Starting Items 201-300 | WHOLE FOODS & STAPLES PRIORITY...`);
+    console.log(`Found ${lines.length - 1} items. Starting Items 541-840 (Batch of 300) | WHOLE FOODS & STAPLES...`);
 
-    // Resume from index 201 (Process 201-300)
-    for (let i = 201; i < lines.length; i++) {
+    // Resume from index 541 (Process 541-840)
+    for (let i = 541; i < lines.length; i++) {
         if (processedCount >= BATCH_SIZE) {
-            console.log('--- Batch limit (100) reached. ---');
+            console.log('--- Batch limit (300) reached. ---');
             break;
         }
 
