@@ -313,10 +313,10 @@ async function main() {
     const BATCH_SIZE = 300; // Large batch - 300 items
     let processedCount = 0;
 
-    console.log(`Found ${lines.length - 1} items. Starting Items 841-1140 (Batch of 300) | WHOLE FOODS & STAPLES...`);
+    console.log(`Found ${lines.length - 1} items. Starting Items 1441-1740 (FINAL 300) | COMPLETING FULL DATASET...`);
 
-    // Resume from index 841 (Process 841-1140)
-    for (let i = 841; i < lines.length; i++) {
+    // Resume from index 1441 (Process 1441-1740 - FINAL BATCH)
+    for (let i = 1441; i < lines.length; i++) {
         if (processedCount >= BATCH_SIZE) {
             console.log('--- Batch limit (300) reached. ---');
             break;
