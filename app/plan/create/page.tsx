@@ -229,25 +229,59 @@ export default function CreateRecipePage() {
                         </div>
 
                         <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-3">
+                                Dietary Suitability *
+                            </label>
+                            <div className="grid grid-cols-3 gap-3 mb-4">
+                                {[
+                                    { id: 'balanced', label: 'Balanced (Omnivore)', tags: [] },
+                                    { id: 'vegetarian', label: 'Vegetarian', tags: ['vegetarian'] },
+                                    { id: 'vegan', label: 'Vegan', tags: ['vegan', 'vegetarian'] }
+                                ].map(option => {
+                                    const isSelected = option.id === 'balanced'
+                                        ? (!diet.includes('vegan') && !diet.includes('vegetarian'))
+                                        : (option.id === 'vegan' ? diet.includes('vegan') : (diet.includes('vegetarian') && !diet.includes('vegan')));
+
+                                    return (
+                                        <button
+                                            key={option.id}
+                                            type="button"
+                                            onClick={() => {
+                                                // Clear primary tags and set new ones
+                                                const others = diet.filter(d => d !== 'vegan' && d !== 'vegetarian');
+                                                setDiet([...others, ...option.tags]);
+                                            }}
+                                            className={`p-3 rounded-lg border-2 text-sm font-bold transition flex items-center justify-center text-center ${isSelected
+                                                ? 'border-green-600 bg-green-50 text-green-700'
+                                                : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
+                                                }`}
+                                        >
+                                            {option.label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Diet Tags
+                                Additional Tags (Optional)
                             </label>
                             <div className="flex flex-wrap gap-2">
-                                {['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'low-carb'].map(dietType => (
+                                {['gluten-free', 'dairy-free', 'low-carb', 'nut-free', 'high-protein'].map(tag => (
                                     <button
-                                        key={dietType}
+                                        key={tag}
                                         type="button"
-                                        onClick={() => toggleDiet(dietType)}
-                                        className={`px-4 py-2 rounded-full text-sm font-medium transition ${diet.includes(dietType)
-                                            ? 'bg-green-600 text-white'
+                                        onClick={() => toggleDiet(tag)}
+                                        className={`px-4 py-2 rounded-full text-sm font-medium transition ${diet.includes(tag)
+                                            ? 'bg-blue-600 text-white'
                                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                     >
-                                        {dietType}
+                                        {tag}
                                     </button>
                                 ))}
                             </div>
                         </div>
+
                     </div>
 
                     {/* Ingredients */}
