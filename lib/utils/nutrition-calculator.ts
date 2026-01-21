@@ -4,6 +4,7 @@ export interface FoodItemNutrition {
     id: string;
     name: string;
     energy_kcal: number;
+    energy_kj?: number;
     protein_g: number;
     fat_g: number;
     carbs_g: number;
@@ -12,6 +13,7 @@ export interface FoodItemNutrition {
 
 export interface CalculatedNutrition {
     calories: number;
+    energy_kj: number;
     protein: number;
     fat: number;
     carbs: number;
@@ -32,6 +34,7 @@ export function calculateNutrition(
 
     const result: CalculatedNutrition = {
         calories: Math.round(foodItem.energy_kcal * multiplier),
+        energy_kj: Math.round((foodItem.energy_kj || (foodItem.energy_kcal * 4.184)) * multiplier),
         protein: Math.round(foodItem.protein_g * multiplier * 10) / 10,
         fat: Math.round(foodItem.fat_g * multiplier * 10) / 10,
         carbs: Math.round(foodItem.carbs_g * multiplier * 10) / 10,
@@ -66,12 +69,13 @@ export function calculateRecipeNutrition(
             const nutrition = calculateNutrition(ing.food_item, ing.weight_g);
             return {
                 calories: total.calories + nutrition.calories,
+                energy_kj: total.energy_kj + nutrition.energy_kj,
                 protein: total.protein + nutrition.protein,
                 fat: total.fat + nutrition.fat,
                 carbs: total.carbs + nutrition.carbs,
             };
         },
-        { calories: 0, protein: 0, fat: 0, carbs: 0 }
+        { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0 }
     );
 }
 
@@ -81,7 +85,6 @@ export function calculateRecipeNutrition(
  * @returns Recipe with ingredients and calculated nutrition
  */
 export async function fetchRecipeWithNutrition(recipeId: string) {
-
     const { data, error } = await supabase
         .from('recipes')
         .select(`
@@ -132,6 +135,7 @@ export function scaleNutrition(
 
     return {
         calories: Math.round(nutrition.calories * multiplier),
+        energy_kj: Math.round(nutrition.energy_kj * multiplier),
         protein: Math.round(nutrition.protein * multiplier * 10) / 10,
         fat: Math.round(nutrition.fat * multiplier * 10) / 10,
         carbs: Math.round(nutrition.carbs * multiplier * 10) / 10,
@@ -139,22 +143,22 @@ export function scaleNutrition(
 }
 
 export interface FoodMeasure {
-  id: string;
-  label: string;
-  weight_g: number;
+    id: string;
+    label: string;
+    weight_g: number;
 }
 
 export async function fetchFoodMeasures(foodItemId: string): Promise<FoodMeasure[]> {
-  const { data, error } = await supabase
-    .from('food_measures')
-    .select('*')
-    .eq('food_item_id', foodItemId)
-    .order('label');
-    
-  if (error) {
-    console.error('Error fetching measures:', error);
-    return [];
-  }
-  
-  return data || [];
+    const { data, error } = await supabase
+        .from('food_measures')
+        .select('*')
+        .eq('food_item_id', foodItemId)
+        .order('label');
+
+    if (error) {
+        console.error('Error fetching measures:', error);
+        return [];
+    }
+
+    return data || [];
 }

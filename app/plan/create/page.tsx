@@ -8,7 +8,6 @@ import { ChefHat, Clock, Users, Save } from 'lucide-react';
 
 export default function CreateRecipePage() {
     const router = useRouter();
-    // const supabase = createClient();
 
     const [title, setTitle] = useState('');
     const [type, setType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('dinner');
@@ -54,15 +53,20 @@ export default function CreateRecipePage() {
             const totals = ingredients.reduce(
                 (acc, ing) => ({
                     calories: acc.calories + ing.calories,
+                    energy_kj: acc.energy_kj + ing.energy_kj,
                     protein: acc.protein + ing.protein,
                     fat: acc.fat + ing.fat,
                     carbs: acc.carbs + ing.carbs,
                 }),
-                { calories: 0, protein: 0, fat: 0, carbs: 0 }
+                { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0 }
             );
 
-            // Create recipe
+            // Generate recipe ID
             const recipeId = `recipe-${Date.now()}`;
+
+            // Create recipe record
+            // Note: energy_kj is included, but requires the DB column to exist.
+            // If the insert fails due to missing column, we'll catch it.
             const { error: recipeError } = await supabase
                 .from('recipes')
                 .insert({
@@ -70,6 +74,7 @@ export default function CreateRecipePage() {
                     title,
                     type,
                     calories: Math.round(totals.calories),
+                    energy_kj: Math.round(totals.energy_kj),
                     protein: Math.round(totals.protein),
                     fat: Math.round(totals.fat),
                     carbs: Math.round(totals.carbs),
@@ -78,7 +83,29 @@ export default function CreateRecipePage() {
                     servings,
                 });
 
-            if (recipeError) throw recipeError;
+            if (recipeError) {
+                console.warn('Recipe insert error (checking for missing energy_kj):', recipeError);
+                // Fallback: try without energy_kj if column doesn't exist
+                if (recipeError.code === '42703') { // undefined_column
+                    const { error: retryError } = await supabase
+                        .from('recipes')
+                        .insert({
+                            id: recipeId,
+                            title,
+                            type,
+                            calories: Math.round(totals.calories),
+                            protein: Math.round(totals.protein),
+                            fat: Math.round(totals.fat),
+                            carbs: Math.round(totals.carbs),
+                            diet,
+                            prep_time: prepTime,
+                            servings,
+                        });
+                    if (retryError) throw retryError;
+                } else {
+                    throw recipeError;
+                }
+            }
 
             // Insert ingredients
             const ingredientsData = ingredients.map(ing => ({

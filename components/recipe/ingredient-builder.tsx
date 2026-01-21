@@ -12,6 +12,7 @@ interface FoodItem {
     protein_g: number;
     fat_g: number;
     carbs_g: number;
+    energy_kj?: number;
 }
 
 export interface RecipeIngredient {
@@ -22,6 +23,7 @@ export interface RecipeIngredient {
     measure_label: string;
     // Calculated nutrition
     calories: number;
+    energy_kj: number;
     protein: number;
     fat: number;
     carbs: number;
@@ -36,6 +38,7 @@ interface IngredientBuilderProps {
 
 export default function IngredientBuilder({ ingredients, onChange }: IngredientBuilderProps) {
     const [showPicker, setShowPicker] = useState(false);
+    const [useKilojoules, setUseKilojoules] = useState(false);
 
     const handleAddIngredient = async (foodItem: FoodItem) => {
         // Fetch available measures
@@ -52,6 +55,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             quantity: 100,
             measure_label: 'g',
             calories: Math.round(foodItem.energy_kcal * multiplier),
+            energy_kj: Math.round((foodItem.energy_kj || (foodItem.energy_kcal * 4.184)) * multiplier),
             protein: Math.round(foodItem.protein_g * multiplier * 10) / 10,
             fat: Math.round(foodItem.fat_g * multiplier * 10) / 10,
             carbs: Math.round(foodItem.carbs_g * multiplier * 10) / 10,
@@ -82,6 +86,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             quantity: newQuantity,
             weight_g: newWeight,
             calories: Math.round(ing.calories * ratio),
+            energy_kj: Math.round(ing.energy_kj * ratio),
             protein: Math.round(ing.protein * ratio * 10) / 10,
             fat: Math.round(ing.fat * ratio * 10) / 10,
             carbs: Math.round(ing.carbs * ratio * 10) / 10,
@@ -104,32 +109,11 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             }
         }
 
-        // If switching FROM a measure TO grams, update quantity to match weight
-        if (newUnit === 'g' && ing.measure_label !== 'g') {
-            // e.g. 1 cup (240g) -> select 'g' -> shows 240
-            // Wait, normally quantity should become the weight.
-        }
-
-        // Actually, keeping quantity constant is standard (1 cup -> 1 tbsp), 
-        // but switching to grams usually implies we want to see the weight.
-        // Let's keep quantity constant for unit->unit, but maybe reset for unit->g?
-        // User preference often varies. Let's keep quantity constant for simplicity.
-        // Exception: 1 cup -> 'g' -> 1g is weird.
-        // Improved Logic:
-        // If switching to 'g', set quantity = current weight_g
-        // If switching from 'g' to unit, set quantity = 1? Or keep weight constant?
-        // Let's keep it simple: quantity stays, weight updates. User can adjust quantity.
-        // Actually, 1 cup -> select 'g' -> 1g is annoying.
-        // Let's make 'g' behave like "Custom Weight".
-
         if (newUnit === 'g') {
-            // Switching to grams: set quantity to current weight
-            // e.g. 1 cup (240g) -> 240g
             updated[index] = {
                 ...ing,
                 measure_label: newUnit,
                 quantity: Math.round(ing.weight_g),
-                // weight stays same, nutrition stays same
             };
             onChange(updated);
             return;
@@ -140,23 +124,6 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             const measure = ing.available_measures.find(m => m.label === newUnit);
             if (measure) {
                 newWeight = ing.quantity * measure.weight_g;
-
-                // Recalculate nutrition from scratch (to avoid precision drift)
-                // We need original multiplier... basically:
-                // We need access to unit nutrition. 
-                // We don't have the original foodItem here (only name).
-                // But we have current calories and current weight.
-                // calories per gram = ing.calories / ing.weight_g (if weight > 0)
-
-                const calPerG = ing.calories / ing.weight_g;
-                const protPerG = ing.protein / ing.weight_g;
-                const fatPerG = ing.fat / ing.weight_g;
-                const carbPerG = ing.carbs / ing.weight_g;
-
-                // If weight is 0 or NaN, we have a problem. 
-                // Ideally we should store base nutrition in the state, but we simplified.
-                // Let's rely on ratio from OLD weight.
-
                 const ratio = newWeight / ing.weight_g;
 
                 updated[index] = {
@@ -164,6 +131,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                     measure_label: newUnit,
                     weight_g: newWeight,
                     calories: Math.round(ing.calories * ratio),
+                    energy_kj: Math.round(ing.energy_kj * ratio),
                     protein: Math.round(ing.protein * ratio * 10) / 10,
                     fat: Math.round(ing.fat * ratio * 10) / 10,
                     carbs: Math.round(ing.carbs * ratio * 10) / 10,
@@ -182,17 +150,38 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
     const totals = ingredients.reduce(
         (acc, ing) => ({
             calories: acc.calories + ing.calories,
+            energy_kj: acc.energy_kj + ing.energy_kj,
             protein: acc.protein + ing.protein,
             fat: acc.fat + ing.fat,
             carbs: acc.carbs + ing.carbs,
         }),
-        { calories: 0, protein: 0, fat: 0, carbs: 0 }
+        { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0 }
     );
 
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Ingredients</h3>
+                <div className="flex items-center gap-4">
+                    <h3 className="text-lg font-semibold">Ingredients</h3>
+                    <div className="flex items-center bg-gray-100 p-1 rounded-lg">
+                        <button
+                            type="button"
+                            onClick={() => setUseKilojoules(false)}
+                            className={`px-3 py-1 rounded-md text-xs font-medium transition ${!useKilojoules ? 'bg-white shadow-sm text-green-700' : 'text-gray-500'
+                                }`}
+                        >
+                            kcal
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setUseKilojoules(true)}
+                            className={`px-3 py-1 rounded-md text-xs font-medium transition ${useKilojoules ? 'bg-white shadow-sm text-green-700' : 'text-gray-500'
+                                }`}
+                        >
+                            kJ
+                        </button>
+                    </div>
+                </div>
                 <button
                     type="button"
                     onClick={() => setShowPicker(true)}
@@ -216,7 +205,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                             <div className="flex-1 min-w-0">
                                 <div className="font-medium text-gray-900 truncate">{ing.food_item_name}</div>
                                 <div className="text-sm text-gray-500 mt-1">
-                                    {ing.calories} kcal • P: {ing.protein}g • F: {ing.fat}g • C: {ing.carbs}g
+                                    {useKilojoules ? ing.energy_kj : ing.calories} {useKilojoules ? 'kJ' : 'kcal'} • P: {ing.protein}g • F: {ing.fat}g • C: {ing.carbs}g
                                 </div>
                             </div>
 
@@ -261,8 +250,13 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                     <div className="font-semibold text-green-900 mb-2">Total Nutrition</div>
                     <div className="grid grid-cols-4 gap-4 text-sm">
                         <div>
-                            <div className="text-gray-600">Calories</div>
-                            <div className="font-semibold text-lg">{totals.calories}</div>
+                            <div className="text-gray-600">{useKilojoules ? 'Kilojoules' : 'Calories'}</div>
+                            <div className="font-semibold text-lg">
+                                {useKilojoules ? totals.energy_kj : totals.calories}
+                                <span className="text-xs ml-1 font-normal opacity-70">
+                                    {useKilojoules ? 'kJ' : 'kcal'}
+                                </span>
+                            </div>
                         </div>
                         <div>
                             <div className="text-gray-600">Protein</div>
