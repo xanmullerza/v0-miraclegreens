@@ -137,3 +137,24 @@ export function scaleNutrition(
         carbs: Math.round(nutrition.carbs * multiplier * 10) / 10,
     };
 }
+
+export interface FoodMeasure {
+  id: string;
+  label: string;
+  weight_g: number;
+}
+
+export async function fetchFoodMeasures(foodItemId: string): Promise<FoodMeasure[]> {
+  const { data, error } = await supabase
+    .from('food_measures')
+    .select('*')
+    .eq('food_item_id', foodItemId)
+    .order('label');
+    
+  if (error) {
+    console.error('Error fetching measures:', error);
+    return [];
+  }
+  
+  return data || [];
+}
