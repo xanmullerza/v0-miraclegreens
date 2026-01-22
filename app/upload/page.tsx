@@ -134,11 +134,11 @@ function RecipeUploaderContent() {
             // Generate a unique filename
             const fileExt = file.name.split('.').pop();
             const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
-            const filePath = `recipe-pics/${fileName}`;
+            const filePath = fileName; // Upload to root of 'recipes' bucket
 
             // Upload to Supabase Storage
             const { data, error: uploadError } = await supabase.storage
-                .from('recipe-images')
+                .from('recipes')
                 .upload(filePath, file, {
                     cacheControl: '3600',
                     upsert: false
@@ -147,7 +147,7 @@ function RecipeUploaderContent() {
             if (uploadError) {
                 // If it fails because bucket doesn't exist, fallback to Base64 but warn
                 if (uploadError.message.includes('bucket not found')) {
-                    console.warn("Storage bucket 'recipe-images' not found. Falling back to local preview. Please create the bucket in Supabase.");
+                    console.warn("Storage bucket 'recipes' not found. Falling back to local preview. Please create the bucket in Supabase.");
                     const reader = new FileReader();
                     reader.onloadend = () => {
                         setImage(reader.result as string);
@@ -161,7 +161,7 @@ function RecipeUploaderContent() {
 
             // Get Public URL
             const { data: { publicUrl } } = supabase.storage
-                .from('recipe-images')
+                .from('recipes')
                 .getPublicUrl(filePath);
 
             setImage(publicUrl);

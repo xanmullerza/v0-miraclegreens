@@ -20,17 +20,59 @@ export default function CreateRecipePage() {
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
         setUploading(true);
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImage(reader.result as string);
+        try {
+            // Generate a unique filename
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+            const filePath = fileName; // Upload to root of 'recipes' bucket
+
+            // Upload to Supabase Storage
+            const { data, error: uploadError } = await supabase.storage
+                .from('recipes')
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+
+            if (uploadError) {
+                // If it fails because bucket doesn't exist, fallback to Base64 but warn
+                if (uploadError.message.includes('bucket not found')) {
+                    console.warn("Storage bucket 'recipes' not found. Falling back to local preview. Please create the bucket in Supabase.");
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        setImage(reader.result as string);
+                        setUploading(false);
+                    };
+                    reader.readAsDataURL(file);
+                    return;
+                }
+                throw uploadError;
+            }
+
+            // Get Public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('recipes')
+                .getPublicUrl(filePath);
+
+            setImage(publicUrl);
             setUploading(false);
-        };
-        reader.readAsDataURL(file);
+        } catch (err: any) {
+            console.error("Upload error:", err);
+            alert(`Error uploading image: ${err.message}. Falling back to preview.`);
+
+            // Fallback to Base64 so the user isn't blocked
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImage(reader.result as string);
+                setUploading(false);
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleAddInstruction = () => {
