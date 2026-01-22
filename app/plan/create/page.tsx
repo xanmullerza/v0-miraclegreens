@@ -74,6 +74,7 @@ export default function CreateRecipePage() {
                     title,
                     type,
                     calories: Math.round(totals.calories),
+                    energy_kilojoules: Math.round(totals.energy_kj),
                     protein: Math.round(totals.protein),
                     fat: Math.round(totals.fat),
                     carbs: Math.round(totals.carbs),

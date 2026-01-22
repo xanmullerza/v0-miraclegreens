@@ -73,11 +73,12 @@ type UnitType = 'kcal' | 'kJ';
 type GoalType = 'lose-fat' | 'maintain' | 'build-muscle';
 type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'active';
 
-const formatEnergy = (calories: number, unit: UnitType) => {
+const formatEnergy = (calories: number, unit: UnitType, energyKj?: number) => {
     if (unit === 'kJ') {
-        return `${Math.round(calories * CAL_TO_KJ).toLocaleString()} kJ`;
+        const value = energyKj !== undefined ? energyKj : calories * CAL_TO_KJ;
+        return `${Math.round(value).toLocaleString()} kJ`;
     }
-    return `${calories.toLocaleString()} kcal`;
+    return `${Math.round(calories).toLocaleString()} kcal`;
 };
 
 const getNutrientLevelStyles = (percentage: number, label?: string) => {
@@ -430,6 +431,7 @@ export default function MealPlannerPage() {
 
                 // Recalculate totals
                 updatedPlan.totalCalories = updatedPlan.breakfast.calories + updatedPlan.lunch.calories + updatedPlan.dinner.calories + updatedPlan.snacks.reduce((acc, s) => acc + s.calories, 0);
+                updatedPlan.totalEnergyKj = updatedPlan.breakfast.energyKj + updatedPlan.lunch.energyKj + updatedPlan.dinner.energyKj + updatedPlan.snacks.reduce((acc, s) => acc + s.energyKj, 0);
 
                 updatedPlan.macros = {
                     protein: updatedPlan.breakfast.protein + updatedPlan.lunch.protein + updatedPlan.dinner.protein + updatedPlan.snacks.reduce((acc, s) => acc + s.protein, 0),
@@ -806,21 +808,23 @@ export default function MealPlannerPage() {
                                                     const fRatio = goal === 'lose-fat' ? 0.30 : goal === 'build-muscle' ? 0.25 : 0.30;
 
                                                     const targets = {
-                                                        energy: targetCals,
+                                                        energy: unit === 'kJ' ? targetCals * CAL_TO_KJ : targetCals,
                                                         protein: (targetCals * pRatio) / 4,
                                                         carbs: (targetCals * cRatio) / 4,
                                                         fat: (targetCals * fRatio) / 9
                                                     };
 
                                                     const current = {
-                                                        energy: plan.totalCalories + ((dailyMoringaGrams / 2) * MORINGA_TSP.energy_kcal),
+                                                        energy: unit === 'kJ'
+                                                            ? plan.totalEnergyKj + ((dailyMoringaGrams / 2) * MORINGA_TSP.energy_kj)
+                                                            : plan.totalCalories + ((dailyMoringaGrams / 2) * MORINGA_TSP.energy_kcal),
                                                         protein: plan.macros.protein + ((dailyMoringaGrams / 2) * MORINGA_TSP.protein_g),
                                                         carbs: plan.macros.carbs + ((dailyMoringaGrams / 2) * MORINGA_TSP.carbs_g),
                                                         fat: plan.macros.fat + ((dailyMoringaGrams / 2) * MORINGA_TSP.fat_g)
                                                     };
 
-                                                    const formatEnergyValue = (kcal: number, u: string) => {
-                                                        return u === 'kJ' ? kcal * 4.184 : kcal;
+                                                    const formatEnergyValue = (val: number, u: string) => {
+                                                        return val; // current object already handles unit conversion
                                                     };
 
                                                     return (
@@ -1295,7 +1299,12 @@ export default function MealPlannerPage() {
                                         <Flame className="h-4 w-4 text-orange-500" />
                                         <span className="text-xs text-muted-foreground uppercase font-bold tracking-tighter">Energy</span>
                                     </div>
-                                    <div className="text-lg font-bold">{formatEnergy((selectedRecipe.calories * (selectedRecipe.servings || 1)) + ((recipeMoringaGrams / 2) * MORINGA_TSP.energy_kcal), unit).split(' ')[0]}</div>
+                                    <div className="text-lg font-bold">
+                                        {unit === 'kJ'
+                                            ? Math.round((selectedRecipe.energyKj * (selectedRecipe.servings || 1)) + ((recipeMoringaGrams / 2) * MORINGA_TSP.energy_kj)).toLocaleString()
+                                            : Math.round((selectedRecipe.calories * (selectedRecipe.servings || 1)) + ((recipeMoringaGrams / 2) * MORINGA_TSP.energy_kcal)).toLocaleString()
+                                        }
+                                    </div>
                                     <div className="text-[10px] text-muted-foreground font-bold uppercase">{unit}</div>
                                 </div>
                                 <div className="text-center p-3 bg-muted rounded-lg border border-border/50 relative group/macro-card cursor-pointer hover:bg-muted/80 transition-all" onClick={() => setActiveBoostContext('recipe')}>

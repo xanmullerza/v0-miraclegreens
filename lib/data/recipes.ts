@@ -18,6 +18,7 @@ export interface Recipe {
     protein: number;
     carbs: number;
     fat: number;
+    energyKj: number;
     diet: DietType[];
     image: string;
     prepTime: number; // in minutes
