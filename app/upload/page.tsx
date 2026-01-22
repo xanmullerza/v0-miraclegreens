@@ -49,7 +49,7 @@ const CAL_TO_KJ = 4.184;
 
 // Simplified UI Components for the uploader
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
-    <div className={cn("bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden", className)}>
+    <div className={cn("bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden", className)}>
         {children}
     </div>
 );
@@ -805,11 +805,11 @@ function RecipeUploaderContent() {
                                     {wizardStep === 1 && (
                                         <div className="w-full space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
                                             <div className="text-center space-y-3">
-                                                <h2 className="text-4xl font-black text-slate-900 tracking-tight">What is this masterpiece called?</h2>
+                                                <h2 className="text-4xl font-black text-slate-900 dark:text-slate-50 tracking-tight">What is this masterpiece called?</h2>
                                                 <p className="text-slate-500 text-lg">Just type or paste the recipe title below.</p>
                                             </div>
                                             <Textarea
-                                                className="min-h-[120px] text-3xl font-black text-center border-emerald-100 bg-emerald-50/20 focus:border-emerald-500 rounded-3xl p-6 shadow-inner"
+                                                className="min-h-[120px] text-3xl font-black text-center border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/20 dark:bg-emerald-950/20 text-slate-900 dark:text-emerald-50 focus:border-emerald-500 rounded-3xl p-6 shadow-inner"
                                                 placeholder="e.g. Garlic & Herb Smoked Salmon"
                                                 value={title}
                                                 onChange={(e) => setTitle(e.target.value)}
@@ -828,13 +828,13 @@ function RecipeUploaderContent() {
                                     {wizardStep === 2 && (
                                         <div className="w-full space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
                                             <div className="text-center space-y-3">
-                                                <h2 className="text-4xl font-black text-slate-900 tracking-tight">Set the foundation.</h2>
+                                                <h2 className="text-4xl font-black text-slate-900 dark:text-slate-50 tracking-tight">Set the foundation.</h2>
                                                 <p className="text-slate-500 text-lg">Paste the part with <span className="font-bold text-emerald-600">Servings</span> and <span className="font-bold text-emerald-600">Time</span>.</p>
                                             </div>
                                             {!wizardProcessedData ? (
                                                 <div className="w-full space-y-6">
                                                     <Textarea
-                                                        className="min-h-[150px] text-xl font-bold text-center border-emerald-100 bg-emerald-50/20 focus:border-emerald-500 rounded-3xl p-6 shadow-inner"
+                                                        className="min-h-[150px] text-xl font-bold text-center border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/20 dark:bg-emerald-950/20 text-slate-900 dark:text-emerald-50 focus:border-emerald-500 rounded-3xl p-6 shadow-inner"
                                                         placeholder="e.g. Serves 4 | 20 mins prep | 40 mins cook"
                                                         value={magicPaste}
                                                         onChange={(e) => setMagicPaste(e.target.value)}
@@ -883,13 +883,13 @@ function RecipeUploaderContent() {
                                     {wizardStep === 3 && (
                                         <div className="w-full space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
                                             <div className="text-center space-y-3">
-                                                <h2 className="text-4xl font-black text-slate-900 tracking-tight">The secret sauce.</h2>
+                                                <h2 className="text-4xl font-black text-slate-900 dark:text-slate-50 tracking-tight">The secret sauce.</h2>
                                                 <p className="text-slate-500 text-lg">Paste your <span className="font-bold text-emerald-600">Ingredients list</span> here.</p>
                                             </div>
                                             {!wizardProcessedData ? (
                                                 <div className="w-full space-y-6">
                                                     <Textarea
-                                                        className="min-h-[250px] text-lg font-medium border-emerald-100 bg-emerald-50/20 focus:border-emerald-500 rounded-3xl p-6 shadow-inner font-mono"
+                                                        className="min-h-[250px] text-lg font-medium border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/20 dark:bg-emerald-950/20 text-slate-900 dark:text-emerald-50 focus:border-emerald-500 rounded-3xl p-6 shadow-inner font-mono"
                                                         placeholder="Paste ingredients here..."
                                                         value={magicPaste}
                                                         onChange={(e) => setMagicPaste(e.target.value)}
@@ -905,11 +905,11 @@ function RecipeUploaderContent() {
                                                 </div>
                                             ) : (
                                                 <div className="w-full space-y-8 animate-in zoom-in-95 duration-500">
-                                                    <div className="max-h-[400px] overflow-y-auto space-y-3 p-4 bg-slate-50 rounded-[2rem] border-2 border-slate-100">
+                                                    <div className="max-h-[400px] overflow-y-auto space-y-3 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-[2rem] border-2 border-slate-100 dark:border-slate-800">
                                                         {ingredients.length > 0 ? ingredients.map((ing, idx) => (
-                                                            <div key={idx} className="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                                                            <div key={idx} className="flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
                                                                 <div className="flex flex-col">
-                                                                    <span className="font-black text-slate-900">{ing.item}</span>
+                                                                    <span className="font-black text-slate-900 dark:text-slate-100">{ing.item}</span>
                                                                     <div className="flex items-center gap-2">
                                                                         <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">{ing.amount || 'as needed'}</span>
                                                                         {(ing.weightG ?? 0) > 0 && (
@@ -958,13 +958,13 @@ function RecipeUploaderContent() {
                                     {wizardStep === 4 && (
                                         <div className="w-full space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
                                             <div className="text-center space-y-3">
-                                                <h2 className="text-4xl font-black text-slate-900 tracking-tight">Final touch: Directions.</h2>
+                                                <h2 className="text-4xl font-black text-slate-900 dark:text-slate-50 tracking-tight">Final touch: Directions.</h2>
                                                 <p className="text-slate-500 text-lg">Paste the <span className="font-bold text-emerald-600">Cooking steps</span> below.</p>
                                             </div>
                                             {!wizardProcessedData ? (
                                                 <div className="w-full space-y-6">
                                                     <Textarea
-                                                        className="min-h-[250px] text-lg font-medium border-emerald-100 bg-emerald-50/20 focus:border-emerald-500 rounded-3xl p-6 shadow-inner"
+                                                        className="min-h-[250px] text-lg font-medium border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/20 dark:bg-emerald-950/20 text-slate-900 dark:text-emerald-50 focus:border-emerald-500 rounded-3xl p-6 shadow-inner"
                                                         placeholder="1. Preheat oven... 2. Mix ingredients..."
                                                         value={magicPaste}
                                                         onChange={(e) => setMagicPaste(e.target.value)}
@@ -1120,8 +1120,8 @@ function RecipeUploaderContent() {
                                                         className={cn(
                                                             "px-4 py-1.5 rounded-full text-sm font-medium border transition-all",
                                                             diet.includes(d as any)
-                                                                ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-                                                                : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
+                                                                ? "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400"
+                                                                : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600"
                                                         )}
                                                     >
                                                         {d.charAt(0) + d.slice(1)}
@@ -1265,7 +1265,7 @@ function RecipeUploaderContent() {
                                         </div>
                                         <Textarea
                                             placeholder="Paste your whole recipe here... Our AI-lite parser will try to extract ingredients even if they are on separate lines."
-                                            className="min-h-[150px] text-sm font-mono bg-white border-emerald-200 focus:border-emerald-500"
+                                            className="min-h-[150px] text-sm font-mono bg-white dark:bg-slate-950 border-emerald-200 dark:border-emerald-900 focus:border-emerald-500 text-foreground"
                                             value={magicPaste}
                                             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMagicPaste(e.target.value)}
                                         />
@@ -1285,7 +1285,7 @@ function RecipeUploaderContent() {
 
                                 <div className="space-y-4">
                                     {ingredients.map((ing, idx) => (
-                                        <div key={idx} className="group relative bg-slate-50/50 p-4 rounded-xl border border-slate-100 transition-all hover:bg-white hover:border-emerald-100">
+                                        <div key={idx} className="group relative bg-slate-50/50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800 transition-all hover:bg-white dark:hover:bg-slate-800 hover:border-emerald-100 dark:hover:border-emerald-900">
                                             {/* Ingredient Inputs */}
                                             <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-4">
                                                 <div className="md:col-span-5 space-y-1.5">

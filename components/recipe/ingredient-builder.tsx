@@ -448,7 +448,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                                 value={magicText}
                                 onChange={(e) => setMagicText(e.target.value)}
                                 placeholder="Example:&#10;2 cups raw spinach&#10;500g chicken breast"
-                                className="w-full h-32 p-4 text-sm border border-amber-200 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                className="w-full h-32 p-4 text-sm border border-amber-200 dark:border-amber-900/30 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-amber-50 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500"
                             />
                             <div className="flex justify-end">
                                 <button
