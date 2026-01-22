@@ -170,7 +170,7 @@ export default function CreateRecipePage() {
                         <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-muted-foreground mb-2">
                                 Recipe Title *
                             </label>
                             <input
@@ -178,19 +178,19 @@ export default function CreateRecipePage() {
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
                                 placeholder="e.g., Grilled Chicken with Roasted Vegetables"
-                                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                className="w-full px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                             />
                         </div>
 
                         <div className="grid grid-cols-3 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-muted-foreground mb-2">
                                     Meal Type *
                                 </label>
                                 <select
                                     value={type}
                                     onChange={(e) => setType(e.target.value as any)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    className="w-full px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                 >
                                     <option value="breakfast">Breakfast</option>
                                     <option value="lunch">Lunch</option>
@@ -200,7 +200,7 @@ export default function CreateRecipePage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                <label className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
                                     <Clock className="w-4 h-4" />
                                     Prep Time (min)
                                 </label>
@@ -208,13 +208,13 @@ export default function CreateRecipePage() {
                                     type="number"
                                     value={prepTime}
                                     onChange={(e) => setPrepTime(Number(e.target.value))}
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    className="w-full px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                     min="1"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                <label className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
                                     <Users className="w-4 h-4" />
                                     Servings
                                 </label>
@@ -222,14 +222,14 @@ export default function CreateRecipePage() {
                                     type="number"
                                     value={servings}
                                     onChange={(e) => setServings(Number(e.target.value))}
-                                    className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    className="w-full px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                     min="1"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-3">
+                            <label className="block text-sm font-medium text-muted-foreground mb-3">
                                 Dietary Suitability *
                             </label>
                             <div className="grid grid-cols-3 gap-3 mb-4">
@@ -262,7 +262,7 @@ export default function CreateRecipePage() {
                                 })}
                             </div>
 
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium text-muted-foreground mb-2">
                                 Additional Tags (Optional)
                             </label>
                             <div className="flex flex-wrap gap-2">
@@ -273,7 +273,7 @@ export default function CreateRecipePage() {
                                         onClick={() => toggleDiet(tag)}
                                         className={`px-4 py-2 rounded-full text-sm font-medium transition ${diet.includes(tag)
                                             ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            : 'bg-muted text-muted-foreground hover:bg-muted/80'
                                             }`}
                                     >
                                         {tag}
@@ -293,7 +293,7 @@ export default function CreateRecipePage() {
                     </div>
 
                     {/* Instructions */}
-                    <div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
+                    <div className="bg-card border border-border rounded-lg shadow-sm p-6 space-y-4 text-foreground">
                         <div className="flex items-center justify-between">
                             <h3 className="text-lg font-semibold">Instructions</h3>
                             <button
@@ -308,14 +308,14 @@ export default function CreateRecipePage() {
                         <div className="space-y-3">
                             {instructions.map((step, index) => (
                                 <div key={index} className="flex gap-3">
-                                    <div className="flex-shrink-0 w-8 h-8 bg-green-100 text-green-700 rounded-full flex items-center justify-center font-semibold text-sm">
+                                    <div className="flex-shrink-0 w-8 h-8 bg-primary/10 text-primary rounded-full flex items-center justify-center font-semibold text-sm">
                                         {index + 1}
                                     </div>
                                     <textarea
                                         value={step}
                                         onChange={(e) => handleUpdateInstruction(index, e.target.value)}
                                         placeholder={`Step ${index + 1}...`}
-                                        className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                                        className="flex-1 px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
                                         rows={2}
                                     />
                                     {instructions.length > 1 && (

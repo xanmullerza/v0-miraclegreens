@@ -162,12 +162,12 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    <h3 className="text-lg font-semibold">Ingredients</h3>
-                    <div className="flex items-center bg-gray-100 p-1 rounded-lg">
+                    <h3 className="text-lg font-semibold text-foreground">Ingredients</h3>
+                    <div className="flex items-center bg-muted p-1 rounded-lg">
                         <button
                             type="button"
                             onClick={() => setUseKilojoules(false)}
-                            className={`px-3 py-1 rounded-md text-xs font-medium transition ${!useKilojoules ? 'bg-white shadow-sm text-green-700' : 'text-gray-500'
+                            className={`px-3 py-1 rounded-md text-xs font-medium transition ${!useKilojoules ? 'bg-background shadow-sm text-green-700 dark:text-green-400' : 'text-muted-foreground'
                                 }`}
                         >
                             kcal
@@ -175,7 +175,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                         <button
                             type="button"
                             onClick={() => setUseKilojoules(true)}
-                            className={`px-3 py-1 rounded-md text-xs font-medium transition ${useKilojoules ? 'bg-white shadow-sm text-green-700' : 'text-gray-500'
+                            className={`px-3 py-1 rounded-md text-xs font-medium transition ${useKilojoules ? 'bg-background shadow-sm text-green-700 dark:text-green-400' : 'text-muted-foreground'
                                 }`}
                         >
                             kJ
@@ -193,7 +193,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             </div>
 
             {ingredients.length === 0 && (
-                <div className="text-center py-8 border-2 border-dashed rounded-lg text-gray-500">
+                <div className="text-center py-8 border-2 border-dashed border-border rounded-lg text-muted-foreground">
                     No ingredients added yet. Click "Add Ingredient" to get started.
                 </div>
             )}
@@ -201,10 +201,10 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             {ingredients.length > 0 && (
                 <div className="space-y-3">
                     {ingredients.map((ing, index) => (
-                        <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 border rounded-lg bg-gray-50">
+                        <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 border border-border rounded-lg bg-card/50">
                             <div className="flex-1 min-w-0">
-                                <div className="font-medium text-gray-900 truncate">{ing.food_item_name}</div>
-                                <div className="text-sm text-gray-500 mt-1">
+                                <div className="font-medium text-foreground truncate">{ing.food_item_name}</div>
+                                <div className="text-sm text-muted-foreground mt-1">
                                     {useKilojoules ? ing.energy_kj : ing.calories} {useKilojoules ? 'kJ' : 'kcal'} • P: {ing.protein}g • F: {ing.fat}g • C: {ing.carbs}g
                                 </div>
                             </div>
@@ -214,7 +214,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                                     type="number"
                                     value={ing.quantity}
                                     onChange={(e) => handleUpdateQuantity(index, Number(e.target.value))}
-                                    className="w-20 px-2 py-2 border rounded text-center"
+                                    className="w-20 px-2 py-2 border border-border bg-background text-foreground rounded text-center"
                                     min="0"
                                     step="0.1"
                                 />
@@ -222,7 +222,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                                 <select
                                     value={ing.measure_label}
                                     onChange={(e) => handleUpdateUnit(index, e.target.value)}
-                                    className="max-w-[140px] px-2 py-2 border rounded bg-white text-sm"
+                                    className="max-w-[140px] px-2 py-2 border border-border bg-background text-foreground text-sm"
                                 >
                                     <option value="g">grams (g)</option>
                                     {ing.available_measures?.map(m => (
@@ -236,7 +236,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                             <button
                                 type="button"
                                 onClick={() => handleRemoveIngredient(index)}
-                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                                className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition"
                             >
                                 <Trash2 className="w-4 h-4" />
                             </button>
@@ -246,12 +246,12 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             )}
 
             {ingredients.length > 0 && (
-                <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <div className="font-semibold text-green-900 mb-2">Total Nutrition</div>
+                <div className="p-4 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800/30 rounded-lg">
+                    <div className="font-semibold text-green-900 dark:text-green-400 mb-2">Total Nutrition</div>
                     <div className="grid grid-cols-4 gap-4 text-sm">
                         <div>
-                            <div className="text-gray-600">{useKilojoules ? 'Kilojoules' : 'Calories'}</div>
-                            <div className="font-semibold text-lg">
+                            <div className="text-muted-foreground">{useKilojoules ? 'Kilojoules' : 'Calories'}</div>
+                            <div className="font-semibold text-lg text-foreground">
                                 {useKilojoules ? totals.energy_kj : totals.calories}
                                 <span className="text-xs ml-1 font-normal opacity-70">
                                     {useKilojoules ? 'kJ' : 'kcal'}
@@ -259,16 +259,16 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                             </div>
                         </div>
                         <div>
-                            <div className="text-gray-600">Protein</div>
-                            <div className="font-semibold text-lg">{totals.protein.toFixed(1)}g</div>
+                            <div className="text-muted-foreground">Protein</div>
+                            <div className="font-semibold text-lg text-foreground">{totals.protein.toFixed(1)}g</div>
                         </div>
                         <div>
-                            <div className="text-gray-600">Fat</div>
-                            <div className="font-semibold text-lg">{totals.fat.toFixed(1)}g</div>
+                            <div className="text-muted-foreground">Fat</div>
+                            <div className="font-semibold text-lg text-foreground">{totals.fat.toFixed(1)}g</div>
                         </div>
                         <div>
-                            <div className="text-gray-600">Carbs</div>
-                            <div className="font-semibold text-lg">{totals.carbs.toFixed(1)}g</div>
+                            <div className="text-muted-foreground">Carbs</div>
+                            <div className="font-semibold text-lg text-foreground">{totals.carbs.toFixed(1)}g</div>
                         </div>
                     </div>
                 </div>
