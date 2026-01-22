@@ -431,7 +431,7 @@ export default function MealPlannerPage() {
 
                 // Recalculate totals
                 updatedPlan.totalCalories = updatedPlan.breakfast.calories + updatedPlan.lunch.calories + updatedPlan.dinner.calories + updatedPlan.snacks.reduce((acc, s) => acc + s.calories, 0);
-                updatedPlan.totalEnergyKj = updatedPlan.breakfast.energyKj + updatedPlan.lunch.energyKj + updatedPlan.dinner.energyKj + updatedPlan.snacks.reduce((acc, s) => acc + s.energyKj, 0);
+                updatedPlan.totalEnergyKj = (updatedPlan.breakfast.energyKj || 0) + (updatedPlan.lunch.energyKj || 0) + (updatedPlan.dinner.energyKj || 0) + updatedPlan.snacks.reduce((acc, s) => acc + (s.energyKj || 0), 0);
 
                 updatedPlan.macros = {
                     protein: updatedPlan.breakfast.protein + updatedPlan.lunch.protein + updatedPlan.dinner.protein + updatedPlan.snacks.reduce((acc, s) => acc + s.protein, 0),
@@ -1301,7 +1301,7 @@ export default function MealPlannerPage() {
                                     </div>
                                     <div className="text-lg font-bold">
                                         {unit === 'kJ'
-                                            ? Math.round((selectedRecipe.energyKj * (selectedRecipe.servings || 1)) + ((recipeMoringaGrams / 2) * MORINGA_TSP.energy_kj)).toLocaleString()
+                                            ? Math.round(((selectedRecipe.energyKj || 0) * (selectedRecipe.servings || 1)) + ((recipeMoringaGrams / 2) * MORINGA_TSP.energy_kj)).toLocaleString()
                                             : Math.round((selectedRecipe.calories * (selectedRecipe.servings || 1)) + ((recipeMoringaGrams / 2) * MORINGA_TSP.energy_kcal)).toLocaleString()
                                         }
                                     </div>

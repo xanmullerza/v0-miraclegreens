@@ -104,7 +104,7 @@ export const getRandomRecipeByType = async (
                     title: r.title,
                     type: r.type,
                     calories: (calculatedNutrition.calories / servings) || r.calories || 0,
-                    energyKj: (calculatedNutrition.energyKj / servings) || r.energy_kilojoules || 0,
+                    energyKj: (calculatedNutrition.energyKj / servings) || r.energy_kj || 0,
                     protein: (calculatedNutrition.protein / servings) || r.protein || 0,
                     carbs: (calculatedNutrition.carbs / servings) || r.carbs || 0,
                     fat: (calculatedNutrition.fat / servings) || r.fat || 0,
@@ -218,7 +218,7 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
             type: r.type,
             // Use calculated values divided by servings if available, otherwise fall back to stored values
             calories: (calculatedNutrition.calories / servings) || r.calories || 0,
-            energyKj: (calculatedNutrition.energyKj / servings) || r.energy_kilojoules || 0,
+            energyKj: (calculatedNutrition.energyKj / servings) || r.energy_kj || 0,
             protein: (calculatedNutrition.protein / servings) || r.protein || 0,
             carbs: (calculatedNutrition.carbs / servings) || r.carbs || 0,
             fat: (calculatedNutrition.fat / servings) || r.fat || 0,
@@ -290,7 +290,7 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
         }
 
         const totalCalories = b.calories + l.calories + d.calories + snacks.reduce((acc, s) => acc + s.calories, 0);
-        const totalEnergyKj = b.energyKj + l.energyKj + d.energyKj + snacks.reduce((acc, s) => acc + s.energyKj, 0);
+        const totalEnergyKj = (b.energyKj || 0) + (l.energyKj || 0) + (d.energyKj || 0) + snacks.reduce((acc, s) => acc + (s.energyKj || 0), 0);
         const diff = Math.abs(targetCalories - totalCalories);
 
         // Aggregate micronutrients for all selected recipes
