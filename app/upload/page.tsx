@@ -129,7 +129,11 @@ function RecipeUploaderContent() {
     const [servings, setServings] = useState(1);
     const [image, setImage] = useState('');
 
-    const [ingredients, setIngredients] = useState<(Ingredient & { matchedFood?: FoodItemMatch, selectedMeasure?: FoodMeasure })[]>([
+    const [ingredients, setIngredients] = useState<(Ingredient & {
+        matchedFood?: FoodItemMatch,
+        selectedMeasure?: FoodMeasure,
+        availableMeasures?: FoodMeasure[]
+    })[]>([
         { item: '', amount: '', weightG: 0, isMiracleProduct: false }
     ]);
     const [instructions, setInstructions] = useState<string[]>(['']);
@@ -449,6 +453,7 @@ function RecipeUploaderContent() {
                                 (amountUnit.length > 1 && labelLower.startsWith(amountUnit));
                         }) || foodMeasures[0];
 
+                        newIngs[i].availableMeasures = foodMeasures;
                         newIngs[i].selectedMeasure = matchedMeasure;
 
                         // Recalculate weight if not already a manual gram override
@@ -564,7 +569,8 @@ function RecipeUploaderContent() {
             ...currentIng,
             matchedFood: food,
             baseIngredient: food.name,
-            weightG: autoWeight || currentIng.weightG
+            weightG: autoWeight || currentIng.weightG,
+            availableMeasures: foodMeasures
         };
         setIngredients(newIngs);
         setLoading(false);
@@ -627,23 +633,44 @@ function RecipeUploaderContent() {
     const saveRecipe = async () => {
         setLoading(true);
         try {
-            // 1. Ensure all USDA foods are synced to local
+            // 1. Ensure all foods are synced to local and organic measures are saved
             const ingredientData = [];
             for (const ing of ingredients) {
                 if (!ing.matchedFood) continue;
 
-                let foodItemId = ing.matchedFood.id;
-                if (ing.matchedFood.source === 'usda') {
-                    // Sync to local first
-                    const syncedId = await syncToLocal(ing.matchedFood, measures);
-                    if (syncedId) foodItemId = syncedId;
+                // Organic measurement logic:
+                // If we have an amount like "2 tsp" and a weight like "9g"
+                // We should add a measure for "tsp" with weight_g = 4.5
+                const currentMeasures = [...(ing.availableMeasures || [])];
+
+                // Extract unit label from amount string
+                // e.g. "2 tsp (9g)" -> look for the unit after the quantity
+                const qtyVal = evaluateAmount(ing.amount);
+                const unitPart = ing.amount.replace(/^[\d\s¼½¾⅛⅜⅝⅞/.]+/, '').split('(')[0].trim().toLowerCase();
+                const unitLabel = unitPart.match(/[a-z]+/)?.[0] || unitPart;
+
+                // Only add if it's not a direct gram measurement itself
+                if (unitLabel && !['g', 'gram', 'grams', 'ml', 'kcal', 'cal'].includes(unitLabel) && ing.weightG && qtyVal > 0) {
+                    const unitWeight = ing.weightG / qtyVal;
+                    // Check if we already have this measure
+                    const existingIdx = currentMeasures.findIndex(m => m.label.toLowerCase() === unitLabel);
+                    if (existingIdx !== -1) {
+                        // Update existing measure with this recipe's weight (more specific data)
+                        currentMeasures[existingIdx].weight_g = unitWeight;
+                    } else {
+                        currentMeasures.push({ label: unitLabel, weight_g: unitWeight });
+                    }
                 }
+
+                // Sync to local to preserve organic growth of measurement data library
+                const syncedId = await syncToLocal(ing.matchedFood, currentMeasures);
+                const foodItemId = syncedId || ing.matchedFood.id;
 
                 ingredientData.push({
                     item: ing.item,
                     amount: ing.amount,
                     food_item_id: foodItemId,
-                    measure_label: ing.selectedMeasure?.label,
+                    measure_label: ing.selectedMeasure?.label || unitLabel,
                     weight_g: ing.weightG,
                     base_ingredient: ing.baseIngredient
                 });
