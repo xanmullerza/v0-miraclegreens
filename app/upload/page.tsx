@@ -1394,29 +1394,45 @@ function RecipeUploaderContent() {
                                             </div>
 
                                             {ing.matchedFood && (
-                                                <div className="mt-3 space-y-3">
-                                                    <div className="pl-4 border-l-4 border-emerald-500 flex flex-wrap items-center gap-x-6 gap-y-2 text-lg">
-                                                        <span className="font-black text-emerald-600 dark:text-emerald-400 tracking-tight">✓ {ing.matchedFood.name}</span>
-                                                        <span className="text-slate-600 dark:text-slate-400 font-bold">{ing.weightG ? `${Math.round(ing.weightG)}g total` : "Weight not set"}</span>
-                                                        {ing.selectedMeasure && (
-                                                            <Badge variant="outline" className="bg-white dark:bg-slate-900 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 font-black px-3 py-1">
-                                                                {ing.selectedMeasure.label}
-                                                            </Badge>
-                                                        )}
+                                                <div className="mt-4 p-6 bg-emerald-50/40 dark:bg-emerald-950/20 rounded-[2rem] border-2 border-emerald-100 dark:border-emerald-900/50 shadow-inner">
+                                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-xl shadow-emerald-200 dark:shadow-none">
+                                                                <Check size={28} strokeWidth={4} />
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <span className="text-[12px] font-black text-emerald-600/50 uppercase tracking-[0.2em]">Matched Recipe Item</span>
+                                                                <span className="text-3xl font-black text-emerald-900 dark:text-emerald-300 tracking-tighter uppercase leading-none">
+                                                                    {ing.matchedFood.name}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="flex items-center gap-6 bg-white dark:bg-slate-900 px-8 py-4 rounded-3xl border-2 border-emerald-100 dark:border-emerald-800 shadow-sm">
+                                                            <span className="text-5xl font-black text-slate-900 dark:text-white flex items-baseline gap-2">
+                                                                {Math.round(ing.weightG || 0)}
+                                                                <span className="text-sm font-black text-emerald-600 dark:text-emerald-500 uppercase tracking-widest leading-none">G</span>
+                                                            </span>
+                                                            {ing.selectedMeasure && (
+                                                                <Badge className="bg-emerald-600 text-white border-none font-black text-xs px-3 py-1.5 rounded-xl uppercase">
+                                                                    {ing.selectedMeasure.label}
+                                                                </Badge>
+                                                            )}
+                                                        </div>
                                                     </div>
 
-                                                    {/* Measure Selection Chips */}
+                                                    {/* Measure Selection Chips moved inside this pretty container */}
                                                     {activeIngredientIndex === idx && measures.length > 0 && (
-                                                        <div className="flex flex-wrap gap-2 animate-in fade-in slide-in-from-top-1">
+                                                        <div className="mt-6 flex flex-wrap gap-2 animate-in fade-in slide-in-from-top-1 pt-4 border-t border-emerald-100/50 dark:border-emerald-800/50">
                                                             {measures.map((m, mi) => (
                                                                 <button
                                                                     key={mi}
                                                                     onClick={() => selectMeasure(m)}
                                                                     className={cn(
-                                                                        "px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full transition-all border",
+                                                                        "px-4 py-2 text-[11px] font-black uppercase tracking-widest rounded-full transition-all border-2",
                                                                         ing.selectedMeasure?.label === m.label
-                                                                            ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
-                                                                            : "bg-white text-slate-500 border-slate-200 hover:border-emerald-500 hover:text-emerald-500"
+                                                                            ? "bg-emerald-600 text-white border-emerald-600 shadow-md"
+                                                                            : "bg-white dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:text-emerald-500"
                                                                     )}
                                                                 >
                                                                     {m.label}
@@ -1609,114 +1625,116 @@ function RecipeUploaderContent() {
                         )}
                     </Card>
                 </div>
-            </main>
+            </main >
 
             {/* Slide-over for matching ingredients */}
-            {activeIngredientIndex !== null && (
-                <div className="fixed inset-0 z-50 flex justify-end">
-                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setActiveIngredientIndex(null)} />
-                    <div className="relative w-full max-w-lg bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
-                        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                            <div>
-                                <h3 className="text-lg font-bold text-slate-800">Match Ingredient</h3>
-                                <p className="text-sm text-slate-500 italic">Searching for "{searchQuery || ingredients[activeIngredientIndex].item}"</p>
-                            </div>
-                            <Button variant="ghost" size="icon" onClick={() => setActiveIngredientIndex(null)}>
-                                <X size={20} />
-                            </Button>
-                        </div>
-
-                        <div className="p-6 space-y-4 overflow-y-auto flex-grow">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                                <Input
-                                    className="pl-10 h-12"
-                                    placeholder="Search global food database..."
-                                    value={searchQuery}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value)}
-                                />
+            {
+                activeIngredientIndex !== null && (
+                    <div className="fixed inset-0 z-50 flex justify-end">
+                        <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setActiveIngredientIndex(null)} />
+                        <div className="relative w-full max-w-lg bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+                            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-lg font-bold text-slate-800">Match Ingredient</h3>
+                                    <p className="text-sm text-slate-500 italic">Searching for "{searchQuery || ingredients[activeIngredientIndex].item}"</p>
+                                </div>
+                                <Button variant="ghost" size="icon" onClick={() => setActiveIngredientIndex(null)}>
+                                    <X size={20} />
+                                </Button>
                             </div>
 
-                            {searching ? (
-                                <div className="flex flex-col items-center py-12 text-slate-400">
-                                    <Loader2 className="animate-spin mb-2" />
-                                    Searching...
+                            <div className="p-6 space-y-4 overflow-y-auto flex-grow">
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                    <Input
+                                        className="pl-10 h-12"
+                                        placeholder="Search global food database..."
+                                        value={searchQuery}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleSearch(e.target.value)}
+                                    />
                                 </div>
-                            ) : (
-                                <div className="space-y-3">
-                                    {searchResults.map((f, i) => (
-                                        <button
-                                            key={i}
-                                            onClick={() => selectFood(f)}
-                                            className={cn(
-                                                "w-full text-left p-4 rounded-xl border transition-all hover:shadow-md",
-                                                ingredients[activeIngredientIndex].matchedFood?.name === f.name
-                                                    ? "border-emerald-500 bg-emerald-50"
-                                                    : "border-slate-100 bg-white hover:border-emerald-200"
-                                            )}
-                                        >
-                                            <div className="flex items-center justify-between mb-1">
-                                                <span className="font-bold text-slate-800 line-clamp-1">{f.name}</span>
-                                                <Badge variant="outline" className={f.source === 'local' ? 'bg-amber-50 text-amber-700' : 'bg-blue-50 text-blue-700'}>
-                                                    {f.source.toUpperCase()}
-                                                </Badge>
-                                            </div>
-                                            <div className="flex gap-4 text-xs text-slate-500">
-                                                <span>
-                                                    {energyUnit === 'kJ'
-                                                        ? Math.round(f.energy_kcal * CAL_TO_KJ)
-                                                        : Math.round(f.energy_kcal)} {energyUnit}
-                                                </span>
-                                                <span>P: {Math.round(f.protein_g)}g</span>
-                                                <span>C: {Math.round(f.carbs_g)}g</span>
-                                                <span>F: {Math.round(f.fat_g)}g</span>
-                                            </div>
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
 
-                            {measures.length > 0 && ingredients[activeIngredientIndex].matchedFood && (
-                                <div className="mt-8 pt-8 border-t border-slate-100">
-                                    <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                                        <Scale size={18} className="text-emerald-500" />
-                                        Pick a Conversion Measure
-                                    </h4>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        {measures.map((m, i) => (
+                                {searching ? (
+                                    <div className="flex flex-col items-center py-12 text-slate-400">
+                                        <Loader2 className="animate-spin mb-2" />
+                                        Searching...
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {searchResults.map((f, i) => (
                                             <button
                                                 key={i}
-                                                onClick={() => selectMeasure(m)}
+                                                onClick={() => selectFood(f)}
                                                 className={cn(
-                                                    "p-3 rounded-lg border text-sm transition-all",
-                                                    ingredients[activeIngredientIndex].selectedMeasure?.label === m.label
-                                                        ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-                                                        : "border-slate-100 hover:border-slate-200 text-slate-600"
+                                                    "w-full text-left p-4 rounded-xl border transition-all hover:shadow-md",
+                                                    ingredients[activeIngredientIndex].matchedFood?.name === f.name
+                                                        ? "border-emerald-500 bg-emerald-50"
+                                                        : "border-slate-100 bg-white hover:border-emerald-200"
                                                 )}
                                             >
-                                                {m.label} ({m.weight_g}g)
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <span className="font-bold text-slate-800 line-clamp-1">{f.name}</span>
+                                                    <Badge variant="outline" className={f.source === 'local' ? 'bg-amber-50 text-amber-700' : 'bg-blue-50 text-blue-700'}>
+                                                        {f.source.toUpperCase()}
+                                                    </Badge>
+                                                </div>
+                                                <div className="flex gap-4 text-xs text-slate-500">
+                                                    <span>
+                                                        {energyUnit === 'kJ'
+                                                            ? Math.round(f.energy_kcal * CAL_TO_KJ)
+                                                            : Math.round(f.energy_kcal)} {energyUnit}
+                                                    </span>
+                                                    <span>P: {Math.round(f.protein_g)}g</span>
+                                                    <span>C: {Math.round(f.carbs_g)}g</span>
+                                                    <span>F: {Math.round(f.fat_g)}g</span>
+                                                </div>
                                             </button>
                                         ))}
                                     </div>
-                                </div>
-                            )}
-                        </div>
+                                )}
 
-                        <div className="p-6 border-t border-slate-100">
-                            <Button
-                                className="w-full py-6 bg-emerald-600 hover:bg-emerald-700"
-                                onClick={() => setActiveIngredientIndex(null)}
-                                disabled={!ingredients[activeIngredientIndex].matchedFood}
-                            >
-                                Confirm Match
-                            </Button>
+                                {measures.length > 0 && ingredients[activeIngredientIndex].matchedFood && (
+                                    <div className="mt-8 pt-8 border-t border-slate-100">
+                                        <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                            <Scale size={18} className="text-emerald-500" />
+                                            Pick a Conversion Measure
+                                        </h4>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            {measures.map((m, i) => (
+                                                <button
+                                                    key={i}
+                                                    onClick={() => selectMeasure(m)}
+                                                    className={cn(
+                                                        "p-3 rounded-lg border text-sm transition-all",
+                                                        ingredients[activeIngredientIndex].selectedMeasure?.label === m.label
+                                                            ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                                                            : "border-slate-100 hover:border-slate-200 text-slate-600"
+                                                    )}
+                                                >
+                                                    {m.label} ({m.weight_g}g)
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="p-6 border-t border-slate-100">
+                                <Button
+                                    className="w-full py-6 bg-emerald-600 hover:bg-emerald-700"
+                                    onClick={() => setActiveIngredientIndex(null)}
+                                    disabled={!ingredients[activeIngredientIndex].matchedFood}
+                                >
+                                    Confirm Match
+                                </Button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             <Footer />
-        </div>
+        </div >
     );
 }
 
