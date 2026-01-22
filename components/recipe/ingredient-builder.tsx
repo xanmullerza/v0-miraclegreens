@@ -102,18 +102,20 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             } else if (unitLower === 'kg' || unitLower === 'kilogram' || unitLower === 'kilograms') {
                 weight_g = quantity * 1000;
                 unit = 'kg';
-            } else if (!unit || unit === 'g') {
-                // No specific unit parsed. Try to find a "natural" count measure
+            } else if (!unit || unit === 'g' || unit === 'unit' || unit === 'item' || unit === 'whole') {
+                // Try harder to find a "count" measure for things like produce/eggs
                 const natural = measures.find(m => {
                     const l = m.label.toLowerCase();
-                    return l === 'unit' || l === 'item' || l === 'whole' || l === 'large' || l === 'medium' || l === 'large egg' || l === 'each' || l === 'portion';
+                    return l.includes('whole') || l.includes('item') || l.includes('unit') ||
+                        l.includes('medium') || l.includes('large') || l.includes('each') ||
+                        l.includes('portion');
                 });
 
                 if (natural) {
                     unit = natural.label;
                     weight_g = quantity * natural.weight_g;
                 } else {
-                    // Safety: only use first measure if it's small (like a portion) or if we are forced
+                    // Safety fallback: only use first measure if it's small (like a portion) or if we are forced
                     const first = measures[0];
                     if (first && (first.weight_g < 100 || quantity < 1)) {
                         unit = first.label;
@@ -124,7 +126,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                     }
                 }
             } else {
-                // Unknown unit provided, use first measure as fallback
+                // Fallback for unknown unit
                 const first = measures[0];
                 if (first) {
                     unit = first.label;
@@ -323,7 +325,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             const measure = ing.available_measures.find(m => m.label === newUnit);
             if (measure) {
                 newWeight = ing.quantity * measure.weight_g;
-                const ratio = newWeight / ing.weight_g;
+                const ratio = newWeight / (ing.weight_g || 1);
 
                 updated[index] = {
                     ...ing,
@@ -339,6 +341,23 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                 return;
             }
         }
+    };
+
+    const handleUpdateWeight = (index: number, newWeight: number) => {
+        const updated = [...ingredients];
+        const ing = updated[index];
+        const ratio = newWeight / (ing.weight_g || 1);
+
+        updated[index] = {
+            ...ing,
+            weight_g: newWeight,
+            calories: Math.round(ing.calories * ratio),
+            energy_kj: Math.round(ing.energy_kj * ratio),
+            protein: Math.round(ing.protein * ratio * 10) / 10,
+            fat: Math.round(ing.fat * ratio * 10) / 10,
+            carbs: Math.round(ing.carbs * ratio * 10) / 10,
+        };
+        onChange(updated);
     };
 
     const handleRemoveIngredient = (index: number) => {
@@ -521,45 +540,70 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             {ingredients.length > 0 && (
                 <div className="space-y-3">
                     {ingredients.map((ing, index) => (
-                        <div key={index} className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 border border-border rounded-lg bg-card/50">
+                        <div key={index} className="flex flex-col md:flex-row items-start md:items-center gap-4 p-4 border border-border rounded-xl bg-card/50 shadow-sm transition-all hover:border-green-200">
                             <div className="flex-1 min-w-0">
-                                <div className="font-medium text-foreground truncate">{ing.food_item_name}</div>
-                                <div className="text-sm text-muted-foreground mt-1">
-                                    {useKilojoules ? ing.energy_kj : ing.calories} {useKilojoules ? 'kJ' : 'kcal'} • P: {ing.protein}g • F: {ing.fat}g • C: {ing.carbs}g
+                                <div className="font-bold text-foreground truncate text-base">{ing.food_item_name}</div>
+                                <div className="text-xs text-muted-foreground mt-1 flex flex-wrap gap-x-3 gap-y-1">
+                                    <span className="font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/30 px-1.5 py-0.5 rounded">
+                                        {useKilojoules ? ing.energy_kj : ing.calories} {useKilojoules ? 'kJ' : 'kcal'}
+                                    </span>
+                                    <span>P: {ing.protein}g</span>
+                                    <span>F: {ing.fat}g</span>
+                                    <span>C: {ing.carbs}g</span>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="number"
-                                    value={ing.quantity}
-                                    onChange={(e) => handleUpdateQuantity(index, Number(e.target.value))}
-                                    className="w-20 px-2 py-2 border border-border bg-background text-foreground rounded text-center"
-                                    min="0"
-                                    step="0.1"
-                                />
+                            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-tighter ml-1">Qty</span>
+                                    <input
+                                        type="number"
+                                        value={ing.quantity}
+                                        onChange={(e) => handleUpdateQuantity(index, Number(e.target.value))}
+                                        className="w-14 px-1.5 py-2 border border-border bg-background text-foreground rounded-lg text-center text-sm font-bold focus:ring-2 focus:ring-green-500/20 outline-none"
+                                        min="0"
+                                        step="0.1"
+                                    />
+                                </div>
 
-                                <select
-                                    value={ing.measure_label}
-                                    onChange={(e) => handleUpdateUnit(index, e.target.value)}
-                                    className="max-w-[140px] px-2 py-2 border border-border bg-background text-foreground text-sm"
+                                <div className="flex flex-col gap-1 flex-1 md:flex-none">
+                                    <span className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-tighter ml-1">Unit</span>
+                                    <select
+                                        value={ing.measure_label}
+                                        onChange={(e) => handleUpdateUnit(index, e.target.value)}
+                                        className="min-w-[100px] max-w-[160px] px-2 py-2 border border-border bg-background text-foreground text-sm rounded-lg font-medium focus:ring-2 focus:ring-green-500/20 outline-none"
+                                    >
+                                        <option value="g">grams (g)</option>
+                                        {ing.available_measures?.map((m, mi) => (
+                                            <option key={mi} value={m.label}>
+                                                {m.label} ({Math.round(m.weight_g)}g)
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-tighter ml-1">Weight</span>
+                                    <div className="flex items-center gap-1.5 px-3 py-2 bg-muted/30 border border-border rounded-lg group hover:border-green-500/50 transition-colors">
+                                        <input
+                                            type="number"
+                                            value={Math.round(ing.weight_g)}
+                                            onChange={(e) => handleUpdateWeight(index, Number(e.target.value))}
+                                            className="w-10 bg-transparent border-none text-sm font-black text-center focus:ring-0 p-0 outline-none"
+                                        />
+                                        <span className="text-[10px] font-black opacity-30 group-hover:opacity-100 transition-opacity">G</span>
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemoveIngredient(index)}
+                                    className="p-2.5 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-all self-end mb-0.5"
+                                    title="Remove"
                                 >
-                                    <option value="g">grams (g)</option>
-                                    {ing.available_measures?.map(m => (
-                                        <option key={m.id} value={m.label}>
-                                            {m.label} ({Math.round(m.weight_g)}g)
-                                        </option>
-                                    ))}
-                                </select>
+                                    <Trash2 className="w-4 h-4" />
+                                </button>
                             </div>
-
-                            <button
-                                type="button"
-                                onClick={() => handleRemoveIngredient(index)}
-                                className="p-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                            </button>
                         </div>
                     ))}
                 </div>
