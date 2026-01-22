@@ -435,23 +435,35 @@ function RecipeUploaderContent() {
                         // Try to find a measure that matches the unit in the amount string OR Hints
                         const matchedMeasure = foodMeasures.find(m => {
                             const labelLower = m.label.toLowerCase();
-                            // Check for plural/singular
                             const singular = labelLower.replace(/s$/, '');
+                            const amountLowerArr = amountLower.split(' ');
+                            const amountUnit = amountLowerArr.pop() || '';
+
                             return searchSpace.includes(labelLower) ||
                                 searchSpace.includes(singular) ||
-                                labelLower.includes(amountLower.split(' ').pop() || '!!!');
+                                labelLower.includes(amountUnit) ||
+                                (amountUnit.length > 1 && labelLower.startsWith(amountUnit));
                         }) || foodMeasures[0];
 
                         newIngs[i].selectedMeasure = matchedMeasure;
 
                         // Recalculate weight if not already a manual gram override
                         if (!ing.weightG) {
+                            const amountStr = ing.amount.toLowerCase();
                             const qty = evaluateAmount(ing.amount);
-                            newIngs[i].weightG = qty * (matchedMeasure.weight_g || 1);
 
-                            // Update the text to be pluralized if needed
-                            const pluralizedLabel = pluralizeUnit(qty, matchedMeasure.label);
-                            newIngs[i].amount = `${qty} ${pluralizedLabel}`;
+                            if (amountStr.match(/\d+\s*(?:g|gram|grams|ml)/)) {
+                                newIngs[i].weightG = qty;
+                                newIngs[i].selectedMeasure = foodMeasures.find(m => m.label.toLowerCase() === 'g') || matchedMeasure;
+                            } else if (amountStr.match(/\d+\s*(?:kg|kilogram|kilograms)/)) {
+                                newIngs[i].weightG = qty * 1000;
+                            } else {
+                                newIngs[i].weightG = qty * (matchedMeasure.weight_g || 1);
+
+                                // Update the text to be pluralized if needed
+                                const pluralizedLabel = pluralizeUnit(qty, matchedMeasure.label);
+                                newIngs[i].amount = `${qty} ${pluralizedLabel}`;
+                            }
                         }
                     }
                 }

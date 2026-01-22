@@ -50,7 +50,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
     const { energyUnit, setEnergyUnit } = useUserPreferences();
     const useKilojoules = energyUnit === 'kJ';
 
-    const handleAddIngredient = async (foodItem: FoodItem | FoodItemMatch) => {
+    const handleAddIngredient = async (foodItem: FoodItem | FoodItemMatch, initialValues?: { weightG?: number, quantity?: number, unit?: string }) => {
         // Fetch available measures
         let measures: FoodMeasure[] = [];
         let finalFoodItem = foodItem as any;
@@ -69,16 +69,47 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             measures = await fetchFoodMeasures(foodItem.id);
         }
 
-        // Default weight from 100g
-        const weight_g = 100;
+        // Determine initial weight and unit
+        let weight_g = initialValues?.weightG || 100;
+        let quantity = initialValues?.quantity || weight_g;
+        let unit = initialValues?.unit || 'g';
+
+        // If we have a unit but no weightG, try to find the measure
+        if (unit && !initialValues?.weightG && measures.length > 0) {
+            const unitLower = unit.toLowerCase();
+            const matchedMeasure = measures.find(m => {
+                const labelLower = m.label.toLowerCase();
+                const singular = labelLower.replace(/s$/, '');
+                return labelLower.includes(unitLower) ||
+                    unitLower.includes(labelLower) ||
+                    unitLower.includes(singular);
+            });
+
+            if (matchedMeasure) {
+                unit = matchedMeasure.label;
+                weight_g = quantity * matchedMeasure.weight_g;
+            } else if (unitLower === 'g' || unitLower === 'gram' || unitLower === 'grams' || unitLower === 'ml') {
+                weight_g = quantity;
+            } else if (unitLower === 'kg' || unitLower === 'kilogram' || unitLower === 'kilograms') {
+                weight_g = quantity * 1000;
+            } else {
+                // Unknown unit, fallback to the first measure if it exists, otherwise keep as is
+                const first = measures[0];
+                if (first) {
+                    unit = first.label;
+                    weight_g = quantity * (first.weight_g || 100);
+                }
+            }
+        }
+
         const multiplier = weight_g / 100;
 
         const newIngredient: RecipeIngredient = {
             food_item_id: finalFoodItem.id || 'temp-id',
             food_item_name: finalFoodItem.name,
             weight_g,
-            quantity: 100,
-            measure_label: 'g',
+            quantity,
+            measure_label: unit,
             calories: Math.round(finalFoodItem.energy_kcal * multiplier),
             energy_kj: Math.round((finalFoodItem.energy_kj || (finalFoodItem.energy_kcal * 4.184)) * multiplier),
             protein: Math.round(finalFoodItem.protein_g * multiplier * 10) / 10,
@@ -144,14 +175,49 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
         if (!item.selectedMatch) return;
 
         // Resolve weight/quantity from raw parsing
-        let weightG = item.raw.weightG || 100;
-        let displayQty = weightG;
-        let displayUnit = 'g';
+        let weightG = item.raw.weightG;
+        let amountStr = item.raw.amount || "";
 
-        // If it was parsed as something like "1 cup", handle that
-        // (Simplified for now, matching the parsed amount)
+        // Basic amount evaluator for local use
+        const evaluateLocalQty = (amt: string): number => {
+            if (!amt) return 1;
 
-        await handleAddIngredient(item.selectedMatch);
+            // Handle unicode fractions
+            const unicodeFractions: Record<string, number> = {
+                '¼': 0.25, '½': 0.5, '¾': 0.75, '⅛': 0.125, '⅜': 0.375, '⅝': 0.625, '⅞': 0.875
+            };
+            for (const [char, val] of Object.entries(unicodeFractions)) {
+                if (amt.includes(char)) {
+                    const parts = amt.split(char);
+                    const whole = parseFloat(parts[0].trim()) || 0;
+                    return whole + val;
+                }
+            }
+
+            const match = amt.match(/^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?))/);
+            if (!match) return 1;
+            const val = match[1].trim();
+            if (val.includes('/')) {
+                if (val.includes(' ')) {
+                    const [whole, frac] = val.split(' ');
+                    const [num, den] = frac.split('/').map(n => parseFloat(n.trim()));
+                    return parseFloat(whole) + (num / den);
+                }
+                const [num, den] = val.split('/').map(n => parseFloat(n.trim()));
+                if (den) return num / den;
+            }
+            return parseFloat(val) || 1;
+        };
+
+        const qty = evaluateLocalQty(amountStr);
+        // Better unit extraction: remove the quantity part and keep the rest
+        const unit = amountStr.replace(/^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?|[\d\s¼½¾⅛⅜⅝⅞/.]+))\s*/, '').trim();
+
+        await handleAddIngredient(item.selectedMatch, {
+            weightG: weightG,
+            quantity: qty,
+            unit: unit
+        });
 
         // Remove from pending
         setPendingIngredients(prev => prev.filter((_, i) => i !== index));

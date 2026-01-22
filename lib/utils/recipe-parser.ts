@@ -287,5 +287,24 @@ function parseIngredientLine(line: string): ParsedIngredient {
         };
     }
 
+    // If no match at start, try to find a weight/amount anywhere
+    if (!match) {
+        const anyWeightMatch = cleanLine.match(/\b(\d+(?:\.\d+)?)\s*(?:g|gram|grams|ml|kg|kilogram|kilograms)\b/i);
+        if (anyWeightMatch) {
+            const amount = anyWeightMatch[1];
+            const unitPart = anyWeightMatch[0].replace(amount, '').trim();
+            const item = cleanLine.replace(anyWeightMatch[0], '').trim();
+
+            let weightG = parseFloat(amount);
+            if (unitPart.toLowerCase().startsWith('kg')) weightG *= 1000;
+
+            return {
+                amount: `${amount} ${unitPart}`,
+                item: item || cleanLine,
+                weightG
+            };
+        }
+    }
+
     return { amount: "", item: cleanLine };
 }
