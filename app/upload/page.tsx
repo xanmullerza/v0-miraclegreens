@@ -73,15 +73,20 @@ const pluralizeUnit = (qty: number, unit: string): string => {
 const evaluateAmount = (amt: string): number => {
     if (!amt) return 1;
 
+    // Pre-clean internal "or" artifacts (e.g. "1 or 2" -> "1.5" or just "1") 
+    // but here we specifically want to handle "2 tspor" cases if they leak in
+    let normalized = amt.toLowerCase().replace(/or\b/g, '').trim();
+
     // Handle unicode fractions
     const unicodeFractions: Record<string, number> = {
         '¼': 0.25, '½': 0.5, '¾': 0.75, '⅛': 0.125, '⅜': 0.375, '⅝': 0.625, '⅞': 0.875
     };
 
-    let normalized = amt.trim();
     for (const [char, val] of Object.entries(unicodeFractions)) {
-        if (normalized.startsWith(char)) {
-            return val;
+        if (normalized.includes(char)) {
+            const parts = normalized.split(char);
+            const whole = parseFloat(parts[0].trim()) || 0;
+            return whole + val;
         }
     }
 
@@ -99,8 +104,7 @@ const evaluateAmount = (amt: string): number => {
         const [num, den] = val.split('/').map(n => parseFloat(n.trim()));
         if (den && !isNaN(num)) return num / den;
     }
-    const parsed = parseFloat(val);
-    return isNaN(parsed) ? 1 : parsed;
+    return parseFloat(val) || 1;
 };
 
 export default function RecipeUploaderPage() {

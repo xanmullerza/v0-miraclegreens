@@ -189,10 +189,10 @@ const COMMON_UNITS = [
     'tsp', 'teaspoon', 'teaspoons', 't', 't.', 'oz', 'ounce', 'ounces', 'fl oz',
     'lb', 'pound', 'pounds', 'g', 'gram', 'grams', 'gr', 'kg', 'kilogram', 'kilograms', 'kilo',
     'ml', 'milliliter', 'milliliters', 'l', 'liter', 'liters', 'litre', 'litres',
-    'clove', 'cloves', 'pinch', 'pinches', 'dash', 'dashes', 'slice', 'slices',
-    'can', 'cans', 'bottle', 'bottles', 'package', 'packages', 'pkg', 'tin', 'tins',
+    'clove', 'cloves', 'pinch', 'pinches', 'dash', 'dashes', 'slice', 'slices', 'ring', 'rings',
+    'can', 'cans', 'bottle', 'bottles', 'package', 'packages', 'pkg', 'tin', 'tins', 'box', 'boxes',
     'large', 'medium', 'small', 'bunch', 'bunches', 'head', 'heads', 'sprig', 'sprigs',
-    'stalk', 'stalks', 'bulb', 'bulbs', 'item', 'unit'
+    'stalk', 'stalks', 'bulb', 'bulbs', 'item', 'unit', 'portion', 'piece', 'pieces'
 ];
 
 function isProbablyIngredient(line: string): boolean {
@@ -228,11 +228,25 @@ function isProbablyInstruction(line: string): boolean {
 
 function parseIngredientLine(line: string): ParsedIngredient {
     let cleanLine = line.replace(/^[*•\-+]\s+/, '').trim();
-    // Remove "or", "original", "scaled", "serving" artifacts at the end of lines or words
-    // Especially after numbers or punctuation like "long,or" -> "long"
+
+    // Aggressive cleanup for "or", "original", etc. artifacts
+    // Strategy: if a word ends in "or/scaled/etc" and the part before it is a known unit or short word, strip it.
+    const artifacts = ['or', 'original', 'scaled', 'serving'];
+    const artifactRegex = new RegExp(`(\\w+)(?:${artifacts.join('|')})\\b`, 'gi');
+
+    cleanLine = cleanLine.replace(artifactRegex, (match, p1) => {
+        const lowerP1 = p1.toLowerCase();
+        if (COMMON_UNITS.includes(lowerP1) || lowerP1.length <= 4) {
+            // Keep real words like "floor", "door"
+            const exceptions = ['flo', 'doo', 'po', 'arm', 'col', 'flav', 'tail'];
+            if (exceptions.includes(lowerP1)) return match;
+            return p1;
+        }
+        return match;
+    }).trim();
+
+    // Catch trailing punctuation + artifact like "long,or"
     cleanLine = cleanLine.replace(/(\W)(?:or|original|scaled|serving)\s*$/gi, '$1').trim();
-    cleanLine = cleanLine.replace(/([a-zA-Z]{3,})(or|original|scaled|serving)\b/gi, '$1').trim();
-    // Catch cases like "1/2 cupor" or "long,or"
     cleanLine = cleanLine.replace(/(?:,|"|'|\d)(or|original|scaled|serving)\s*$/gi, (m, p1) => m.slice(0, -p1.length)).trim();
 
     // Regex to match quantity
