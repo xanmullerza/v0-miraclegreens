@@ -185,10 +185,14 @@ export function parseRecipeText(text: string): ParsedRecipe {
 }
 
 const COMMON_UNITS = [
-    'cup', 'cups', 'c.', 'tbsp', 'tablespoon', 'tablespoons', 'tsp', 'teaspoon', 'teaspoons',
-    'oz', 'ounce', 'ounces', 'lb', 'pound', 'pounds', 'g', 'gram', 'grams', 'kg', 'kilogram', 'kilograms',
-    'ml', 'milliliter', 'milliliters', 'l', 'liter', 'liters', 'clove', 'cloves', 'pinch', 'pinches',
-    'dash', 'dashes', 'slice', 'slices', 'can', 'cans', 'bottle', 'bottles', 'package', 'packages', 'pkg'
+    'cup', 'cups', 'c.', 'tbsp', 'tablespoon', 'tablespoons', 'tbs', 'tbs.', 'tb.', 'T',
+    'tsp', 'teaspoon', 'teaspoons', 't', 't.', 'oz', 'ounce', 'ounces', 'fl oz',
+    'lb', 'pound', 'pounds', 'g', 'gram', 'grams', 'gr', 'kg', 'kilogram', 'kilograms', 'kilo',
+    'ml', 'milliliter', 'milliliters', 'l', 'liter', 'liters', 'litre', 'litres',
+    'clove', 'cloves', 'pinch', 'pinches', 'dash', 'dashes', 'slice', 'slices',
+    'can', 'cans', 'bottle', 'bottles', 'package', 'packages', 'pkg', 'tin', 'tins',
+    'large', 'medium', 'small', 'bunch', 'bunches', 'head', 'heads', 'sprig', 'sprigs',
+    'stalk', 'stalks', 'bulb', 'bulbs', 'item', 'unit'
 ];
 
 function isProbablyIngredient(line: string): boolean {
