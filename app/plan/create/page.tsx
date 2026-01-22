@@ -74,7 +74,6 @@ export default function CreateRecipePage() {
                     title,
                     type,
                     calories: Math.round(totals.calories),
-                    energy_kj: Math.round(totals.energy_kj),
                     protein: Math.round(totals.protein),
                     fat: Math.round(totals.fat),
                     carbs: Math.round(totals.carbs),
@@ -84,27 +83,8 @@ export default function CreateRecipePage() {
                 });
 
             if (recipeError) {
-                console.warn('Recipe insert error (checking for missing energy_kj):', recipeError);
-                // Fallback: try without energy_kj if column doesn't exist
-                if (recipeError.code === '42703') { // undefined_column
-                    const { error: retryError } = await supabase
-                        .from('recipes')
-                        .insert({
-                            id: recipeId,
-                            title,
-                            type,
-                            calories: Math.round(totals.calories),
-                            protein: Math.round(totals.protein),
-                            fat: Math.round(totals.fat),
-                            carbs: Math.round(totals.carbs),
-                            diet,
-                            prep_time: prepTime,
-                            servings,
-                        });
-                    if (retryError) throw new Error(`Recipes error (retry): ${retryError.message}`);
-                } else {
-                    throw new Error(`Recipes error: ${recipeError.message}`);
-                }
+                console.error('Recipe insert error:', recipeError);
+                throw new Error(`Recipes error: ${recipeError.message}`);
             }
 
             // Insert ingredients
