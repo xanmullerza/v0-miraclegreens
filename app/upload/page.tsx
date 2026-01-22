@@ -24,7 +24,10 @@ import {
     Beef,
     Utensils,
     Leaf,
-    X
+    X,
+    Image as ImageIcon,
+    Camera,
+    Upload
 } from 'lucide-react';
 import {
     searchLocalFood,
@@ -120,6 +123,62 @@ function RecipeUploaderContent() {
     const [isWizardProcessing, setIsWizardProcessing] = useState(false);
     const [wizardProcessedData, setWizardProcessedData] = useState<any>(null);
     const { energyUnit } = useUserPreferences();
+    const [uploading, setUploading] = useState(false);
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(true);
+        try {
+            // Generate a unique filename
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+            const filePath = `recipe-pics/${fileName}`;
+
+            // Upload to Supabase Storage
+            const { data, error: uploadError } = await supabase.storage
+                .from('recipe-images')
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+
+            if (uploadError) {
+                // If it fails because bucket doesn't exist, fallback to Base64 but warn
+                if (uploadError.message.includes('bucket not found')) {
+                    console.warn("Storage bucket 'recipe-images' not found. Falling back to local preview. Please create the bucket in Supabase.");
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        setImage(reader.result as string);
+                        setUploading(false);
+                    };
+                    reader.readAsDataURL(file);
+                    return;
+                }
+                throw uploadError;
+            }
+
+            // Get Public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('recipe-images')
+                .getPublicUrl(filePath);
+
+            setImage(publicUrl);
+            setUploading(false);
+        } catch (err: any) {
+            console.error("Upload error:", err);
+            alert(`Error uploading image: ${err.message}. Falling back to preview.`);
+
+            // Fallback to Base64 so the user isn't blocked
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImage(reader.result as string);
+                setUploading(false);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     // Load existing recipe for editing
     useEffect(() => {
@@ -1036,20 +1095,81 @@ function RecipeUploaderContent() {
                                     </div>
 
                                     <div className="space-y-4">
-                                        <div>
-                                            <Label htmlFor="image">Image URL</Label>
-                                            <Input
-                                                id="image"
-                                                placeholder="https://images.unsplash.com/..."
-                                                value={image}
-                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setImage(e.target.value)}
-                                            />
-                                        </div>
-                                        {image && (
-                                            <div className="aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-100">
-                                                <img src={image} alt="Preview" className="w-full h-full object-cover" />
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <Label htmlFor="image">Recipe Photo</Label>
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        type="file"
+                                                        id="image-upload"
+                                                        className="hidden"
+                                                        accept="image/*"
+                                                        onChange={handleImageUpload}
+                                                    />
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="h-8 text-xs font-bold gap-2 border-emerald-100 text-emerald-600 hover:bg-emerald-50"
+                                                        onClick={() => document.getElementById('image-upload')?.click()}
+                                                        disabled={uploading}
+                                                    >
+                                                        {uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
+                                                        Upload Picture
+                                                    </Button>
+                                                </div>
                                             </div>
-                                        )}
+
+                                            <div className="relative group aspect-video rounded-2xl overflow-hidden border-2 border-slate-100 bg-slate-50 flex flex-col items-center justify-center transition-all hover:border-emerald-200">
+                                                {image ? (
+                                                    <>
+                                                        <img src={image} alt="Preview" className="w-full h-full object-cover" />
+                                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                                                            <Button
+                                                                size="sm"
+                                                                variant="secondary"
+                                                                className="h-8 rounded-full"
+                                                                onClick={() => document.getElementById('image-upload')?.click()}
+                                                            >
+                                                                Change Photo
+                                                            </Button>
+                                                            <Button
+                                                                size="sm"
+                                                                variant="destructive"
+                                                                className="h-8 rounded-full"
+                                                                onClick={() => setImage('')}
+                                                            >
+                                                                <Trash2 size={14} />
+                                                            </Button>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <div
+                                                        className="cursor-pointer flex flex-col items-center gap-3 text-slate-400 group-hover:text-emerald-500 transition-colors"
+                                                        onClick={() => document.getElementById('image-upload')?.click()}
+                                                    >
+                                                        <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-emerald-50 transition-colors">
+                                                            <Camera size={32} strokeWidth={1.5} />
+                                                        </div>
+                                                        <div className="text-center">
+                                                            <p className="font-bold text-sm">Add a recipe photo</p>
+                                                            <p className="text-[10px] uppercase font-black tracking-widest opacity-60">PNG, JPG or WEBP</p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <Label htmlFor="imageUrl" className="text-[10px] uppercase font-black text-slate-400">Or use a web URL</Label>
+                                                <Input
+                                                    id="imageUrl"
+                                                    placeholder="https://images.unsplash.com/..."
+                                                    value={image.startsWith('data:') ? 'Local file selected' : image}
+                                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setImage(e.target.value)}
+                                                    className="h-9 text-xs"
+                                                />
+                                            </div>
+                                        </div>
                                         <div>
                                             <Label htmlFor="servings">Servings</Label>
                                             <Input

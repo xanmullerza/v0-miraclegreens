@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import IngredientBuilder, { RecipeIngredient } from '@/components/recipe/ingredient-builder';
-import { ChefHat, Clock, Users, Save } from 'lucide-react';
+import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2 } from 'lucide-react';
 
 export default function CreateRecipePage() {
     const router = useRouter();
@@ -16,7 +16,22 @@ export default function CreateRecipePage() {
     const [diet, setDiet] = useState<string[]>([]);
     const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
     const [instructions, setInstructions] = useState<string[]>(['']);
+    const [image, setImage] = useState('');
     const [saving, setSaving] = useState(false);
+    const [uploading, setUploading] = useState(false);
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(true);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setImage(reader.result as string);
+            setUploading(false);
+        };
+        reader.readAsDataURL(file);
+    };
 
     const handleAddInstruction = () => {
         setInstructions([...instructions, '']);
@@ -81,6 +96,7 @@ export default function CreateRecipePage() {
                     diet,
                     prep_time: prepTime,
                     servings,
+                    image,
                 });
 
             if (recipeError) {
@@ -211,6 +227,89 @@ export default function CreateRecipePage() {
                                     className="w-full px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                     min="1"
                                 />
+                            </div>
+                        </div>
+
+                        {/* Image Upload Section */}
+                        <div className="pt-4 border-t border-border/50">
+                            <label className="block text-sm font-medium text-muted-foreground mb-3">
+                                Recipe Photo
+                            </label>
+                            <div className="flex flex-col md:flex-row gap-6">
+                                <div className="hidden">
+                                    <input
+                                        type="file"
+                                        id="recipe-image-upload"
+                                        accept="image/*"
+                                        onChange={handleImageUpload}
+                                    />
+                                </div>
+                                <div
+                                    className="relative group w-full md:w-64 aspect-video md:aspect-square rounded-xl border-2 border-dashed border-border overflow-hidden bg-muted/30 flex flex-col items-center justify-center cursor-pointer hover:border-green-500 transition-all"
+                                    onClick={() => document.getElementById('recipe-image-upload')?.click()}
+                                >
+                                    {image ? (
+                                        <>
+                                            <img src={image} alt="Recipe Preview" className="w-full h-full object-cover" />
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                                <button
+                                                    type="button"
+                                                    className="p-2 bg-white rounded-full text-foreground hover:bg-green-50"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        document.getElementById('recipe-image-upload')?.click();
+                                                    }}
+                                                >
+                                                    <Camera size={18} />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="p-2 bg-white rounded-full text-red-600 hover:bg-red-50"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setImage('');
+                                                    }}
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="text-center p-4">
+                                            <div className="w-12 h-12 rounded-full bg-background flex items-center justify-center mx-auto mb-2 text-muted-foreground group-hover:text-green-600 transition-colors">
+                                                {uploading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Camera className="w-6 h-6" />}
+                                            </div>
+                                            <p className="text-xs font-bold text-muted-foreground group-hover:text-green-700">Add Photo</p>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="flex-1 space-y-3">
+                                    <p className="text-xs text-muted-foreground leading-relaxed">
+                                        Adding a photo makes your recipe more engaging. Upload a clear, bright picture of the finished dish for best results.
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={() => document.getElementById('recipe-image-upload')?.click()}
+                                        disabled={uploading}
+                                        className="flex items-center gap-2 text-sm font-bold text-green-600 hover:text-green-700 transition"
+                                    >
+                                        <Upload size={16} />
+                                        {uploading ? 'Processing...' : (image ? 'Change Picture' : 'Select File')}
+                                    </button>
+
+                                    <div className="pt-2">
+                                        <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1.5">
+                                            Or Image URL
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={image.startsWith('data:') ? '' : image}
+                                            onChange={(e) => setImage(e.target.value)}
+                                            placeholder="https://images.unsplash.com/..."
+                                            className="w-full px-3 py-1.5 text-sm border border-border bg-background text-foreground rounded focus:outline-none focus:ring-1 focus:ring-green-500"
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
