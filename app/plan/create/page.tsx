@@ -101,9 +101,9 @@ export default function CreateRecipePage() {
                             prep_time: prepTime,
                             servings,
                         });
-                    if (retryError) throw retryError;
+                    if (retryError) throw new Error(`Recipes error (retry): ${retryError.message}`);
                 } else {
-                    throw recipeError;
+                    throw new Error(`Recipes error: ${recipeError.message}`);
                 }
             }
 
@@ -116,13 +116,16 @@ export default function CreateRecipePage() {
                 weight_g: ing.weight_g,
                 quantity: ing.quantity,
                 measure_label: ing.measure_label,
+                base_ingredient: ing.food_item_name,
             }));
 
             const { error: ingredientsError } = await supabase
                 .from('ingredients')
                 .insert(ingredientsData);
 
-            if (ingredientsError) throw ingredientsError;
+            if (ingredientsError) {
+                throw new Error(`Ingredients error: ${ingredientsError.message}`);
+            }
 
             // Insert instructions
             const instructionsData = instructions
@@ -137,14 +140,16 @@ export default function CreateRecipePage() {
                 .from('instructions')
                 .insert(instructionsData);
 
-            if (instructionsError) throw instructionsError;
+            if (instructionsError) {
+                throw new Error(`Instructions error: ${instructionsError.message}`);
+            }
 
             // Success!
             alert('Recipe created successfully!');
             router.push('/plan');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error creating recipe:', error);
-            alert('Failed to create recipe. Please try again.');
+            alert(`Failed to create recipe: ${error.message || 'Unknown error'}. Please try again.`);
         } finally {
             setSaving(false);
         }
