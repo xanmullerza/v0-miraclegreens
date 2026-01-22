@@ -308,6 +308,50 @@ export default function MealPlannerPage() {
     const [selectedNutrientInfo, setSelectedNutrientInfo] = useState<string | null>(null);
     const [activeBoostContext, setActiveBoostContext] = useState<'daily' | 'recipe' | null>(null);
 
+    /**
+     * Helper to find a matching nutrient key in a record, 
+     * handling full names, snake_case, and common abbreviations.
+     */
+    const findNutrientMatch = (record: Record<string, any>, key: string) => {
+        const mKeys = Object.keys(record);
+        const kL = key.toLowerCase();
+
+        // 1. Exact match (case insensitive)
+        const exact = mKeys.find(mk => mk.toLowerCase() === kL);
+        if (exact) return exact;
+
+        // 2. Specific Vitamin Handling (Strict Regex to avoid "Vitamin A" matching "Vitamin C")
+        if (kL.includes('vitamin')) {
+            const letter = kL.split(' ')[1]?.toLowerCase(); // "a", "c", "d", etc.
+            if (letter && letter.length === 1) {
+                const match = mKeys.find(mk => {
+                    const mkL = mk.toLowerCase();
+                    return mkL.includes('vitamin') && new RegExp(`\\b${letter}\\b`, 'i').test(mkL);
+                });
+                if (match) return match;
+            }
+        }
+
+        // 3. B-Vitamins (B1, B2, B3, etc. or names like Thiamine)
+        if (kL.startsWith('b') && /\b[b]\d+\b/.test(kL)) {
+            const bNum = kL.split(' ')[0].toLowerCase(); // "b1", "b2"
+            const match = mKeys.find(mk => {
+                const mkL = mk.toLowerCase();
+                return mkL.includes(bNum) || (kL.includes('thiamine') && mkL.includes('thiamine')) || (kL.includes('riboflavin') && mkL.includes('riboflavin'));
+            });
+            if (match) return match;
+        }
+
+        // 4. Substring match for minerals (e.g. 'calcium' matches 'calcium_mg')
+        const firstWord = kL.split(' ')[0];
+        if (firstWord.length > 3) {
+            const fuzzy = mKeys.find(mk => mk.toLowerCase().includes(firstWord));
+            if (fuzzy) return fuzzy;
+        }
+
+        return null;
+    };
+
     // Standard 1 tsp (2g) Moringa Nutrition (Calculated from 100g data)
     const MORINGA_TSP = {
         energy_kcal: 5.00,
@@ -938,9 +982,7 @@ export default function MealPlannerPage() {
                                                     if (dailyMoringaGrams > 0) {
                                                         const ratio = dailyMoringaGrams / 2;
                                                         Object.entries(MORINGA_TSP.micronutrients).forEach(([key, value]) => {
-                                                            // Find any matching key (e.g. 'Vitamin A' or 'vitamin_a_ug')
-                                                            const mKeys = Object.keys(m);
-                                                            const match = mKeys.find(mk => mk === key || mk.toLowerCase().includes(key.split(' ')[0].toLowerCase()));
+                                                            const match = findNutrientMatch(m, key);
                                                             if (match) {
                                                                 m[match] = (m[match] || 0) + (value * ratio);
                                                             } else {
@@ -980,14 +1022,14 @@ export default function MealPlannerPage() {
                                                     };
 
                                                     const skeletalHealth: Record<string, number> = {
-                                                        'Calcium': n(m, ['Calcium', 'calcium_mg']),
-                                                        'Phosphorus': n(m, ['Phosphorus', 'phosphorus_mg']),
-                                                        'Vitamin D': n(m, ['Vitamin D', 'vitamin_d_iu']),
-                                                        'Vitamin K': n(m, ['Vitamin K', 'vitamin_k_ug']),
+                                                        'Calcium': n(m, ['Calcium', 'calcium_mg', 'calcium_ca']),
+                                                        'Phosphorus': n(m, ['Phosphorus', 'phosphorus_mg', 'phosphorus_p']),
+                                                        'Vitamin D': n(m, ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug', 'vitamin_d3_ug']),
+                                                        'Vitamin K': n(m, ['Vitamin K', 'vitamin_k_ug', 'vitamin_k1_ug']),
                                                     };
 
                                                     const electrolytes: Record<string, number> = {
-                                                        'Potassium': n(m, ['Potassium', 'potassium_mg']),
+                                                        'Potassium': n(m, ['Potassium', 'potassium_mg', 'potassium_k']),
                                                         'Sodium': n(m, ['Sodium', 'sodium_mg', 'Sodium']),
                                                     };
 
@@ -1372,9 +1414,7 @@ export default function MealPlannerPage() {
                                 if (recipeMoringaGrams > 0) {
                                     const ratio = recipeMoringaGrams / 2;
                                     Object.entries(MORINGA_TSP.micronutrients).forEach(([key, value]) => {
-                                        // Find any matching key (e.g. 'Vitamin A' or 'vitamin_a_ug')
-                                        const mKeys = Object.keys(m);
-                                        const match = mKeys.find(mk => mk === key || mk.toLowerCase().includes(key.split(' ')[0].toLowerCase()));
+                                        const match = findNutrientMatch(m, key);
                                         if (match) {
                                             m[match] = (m[match] || 0) + (value * ratio);
                                         } else {
@@ -1413,14 +1453,14 @@ export default function MealPlannerPage() {
                                 };
 
                                 const skeletalHealth: Record<string, number> = {
-                                    'Calcium': n(m, ['Calcium', 'calcium_mg']),
-                                    'Phosphorus': n(m, ['Phosphorus', 'phosphorus_mg']),
-                                    'Vitamin D': n(m, ['Vitamin D', 'vitamin_d_iu']),
-                                    'Vitamin K': n(m, ['Vitamin K', 'vitamin_k_ug']),
+                                    'Calcium': n(m, ['Calcium', 'calcium_mg', 'calcium_ca']),
+                                    'Phosphorus': n(m, ['Phosphorus', 'phosphorus_mg', 'phosphorus_p']),
+                                    'Vitamin D': n(m, ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug', 'vitamin_d3_ug']),
+                                    'Vitamin K': n(m, ['Vitamin K', 'vitamin_k_ug', 'vitamin_k1_ug']),
                                 };
 
                                 const electrolytes: Record<string, number> = {
-                                    'Potassium': n(m, ['Potassium', 'potassium_mg']),
+                                    'Potassium': n(m, ['Potassium', 'potassium_mg', 'potassium_k']),
                                     'Sodium': n(m, ['Sodium', 'sodium_mg', 'Sodium']),
                                 };
 
