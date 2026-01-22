@@ -1293,7 +1293,7 @@ function RecipeUploaderContent() {
                                             {/* Ingredient Inputs */}
                                             <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-4">
                                                 <div className="md:col-span-5 space-y-1.5">
-                                                    <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Ingredient Item (Display Name)</Label>
+                                                    <Label className="text-[12px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Ingredient Item</Label>
                                                     <Input
                                                         value={ing.item}
                                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1302,12 +1302,12 @@ function RecipeUploaderContent() {
                                                             setIngredients(newIngs);
                                                         }}
                                                         placeholder="e.g. Whole wheat bread"
-                                                        className="rounded-xl border-slate-200 focus:border-primary focus:ring-primary/20"
+                                                        className="text-lg font-bold rounded-xl border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-primary/20 bg-white dark:bg-slate-900"
                                                     />
                                                 </div>
 
                                                 <div className="md:col-span-2 space-y-1.5">
-                                                    <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Quantity/Unit</Label>
+                                                    <Label className="text-[12px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Qty/Unit</Label>
                                                     <div className="flex gap-2">
                                                         <Input
                                                             value={ing.amount}
@@ -1322,13 +1322,13 @@ function RecipeUploaderContent() {
                                                                 setIngredients(newIngs);
                                                             }}
                                                             placeholder="e.g. 2"
-                                                            className="rounded-xl border-slate-200 focus:border-primary focus:ring-primary/20"
+                                                            className="text-lg font-bold rounded-xl border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-primary/20 bg-white dark:bg-slate-900"
                                                         />
                                                     </div>
                                                 </div>
 
                                                 <div className="md:col-span-2 space-y-1.5">
-                                                    <Label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-black text-primary">Weight (g)</Label>
+                                                    <Label className="text-[12px] font-black uppercase tracking-wider text-primary">Weight (g)</Label>
                                                     <div className="relative group">
                                                         <Input
                                                             type="number"
@@ -1339,9 +1339,9 @@ function RecipeUploaderContent() {
                                                                 setIngredients(newIngs);
                                                             }}
                                                             placeholder="0"
-                                                            className="rounded-xl border-primary/30 focus:border-primary bg-primary/5 font-bold"
+                                                            className="text-lg rounded-xl border-primary/30 focus:border-primary bg-primary/5 dark:bg-primary/10 font-black text-primary"
                                                         />
-                                                        <span className="absolute right-3 top-2.5 text-[10px] font-bold text-primary/40 group-hover:text-primary transition-colors">GRAMS</span>
+                                                        <span className="absolute right-3 top-3 text-[10px] font-black text-primary/40 group-hover:text-primary transition-colors">G</span>
                                                     </div>
                                                 </div>
 
@@ -1395,11 +1395,13 @@ function RecipeUploaderContent() {
 
                                             {ing.matchedFood && (
                                                 <div className="mt-3 space-y-3">
-                                                    <div className="pl-4 border-l-2 border-emerald-500 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-                                                        <span className="font-medium text-emerald-700">✓ Linked to: {ing.matchedFood.name}</span>
-                                                        <span className="text-slate-500">{ing.weightG ? `${Math.round(ing.weightG)}g total` : "Weight not set"}</span>
+                                                    <div className="pl-4 border-l-4 border-emerald-500 flex flex-wrap items-center gap-x-6 gap-y-2 text-lg">
+                                                        <span className="font-black text-emerald-600 dark:text-emerald-400 tracking-tight">✓ {ing.matchedFood.name}</span>
+                                                        <span className="text-slate-600 dark:text-slate-400 font-bold">{ing.weightG ? `${Math.round(ing.weightG)}g total` : "Weight not set"}</span>
                                                         {ing.selectedMeasure && (
-                                                            <Badge variant="outline" className="bg-white">{ing.selectedMeasure.label}</Badge>
+                                                            <Badge variant="outline" className="bg-white dark:bg-slate-900 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 font-black px-3 py-1">
+                                                                {ing.selectedMeasure.label}
+                                                            </Badge>
                                                         )}
                                                     </div>
 
