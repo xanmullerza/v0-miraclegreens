@@ -151,22 +151,22 @@ export default function CreateRecipePage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+        <div className="min-h-screen bg-gradient-to-b from-green-50 to-white dark:from-green-950/20 dark:to-background">
             <div className="max-w-4xl mx-auto px-4 py-8">
                 {/* Header */}
                 <div className="mb-8">
                     <div className="flex items-center gap-3 mb-2">
                         <ChefHat className="w-8 h-8 text-green-600" />
-                        <h1 className="text-3xl font-bold text-gray-900">Create New Recipe</h1>
+                        <h1 className="text-3xl font-bold text-foreground">Create New Recipe</h1>
                     </div>
-                    <p className="text-gray-600">
+                    <p className="text-muted-foreground">
                         Build your recipe with precise nutrition tracking using our food database
                     </p>
                 </div>
 
                 <div className="space-y-6">
                     {/* Basic Info */}
-                    <div className="bg-white rounded-lg shadow-sm p-6 space-y-4">
+                    <div className="bg-card border border-border rounded-lg shadow-sm p-6 space-y-4 text-foreground">
                         <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
 
                         <div>
@@ -252,8 +252,8 @@ export default function CreateRecipePage() {
                                                 setDiet([...others, ...option.tags]);
                                             }}
                                             className={`p-3 rounded-lg border-2 text-sm font-bold transition flex items-center justify-center text-center ${isSelected
-                                                ? 'border-green-600 bg-green-50 text-green-700'
-                                                : 'border-gray-200 bg-white text-gray-500 hover:border-gray-300'
+                                                ? 'border-green-600 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400'
+                                                : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/30'
                                                 }`}
                                         >
                                             {option.label}

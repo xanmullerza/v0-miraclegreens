@@ -124,12 +124,12 @@ const getNutrientLevelStyles = (percentage: number, label?: string) => {
     }
 
     const map = {
-        emerald: { bg: 'bg-emerald-800', border: 'border-emerald-800', borderLight: 'border-emerald-800/30', text: 'text-emerald-900', textFill: 'text-white', fade: 'bg-emerald-50' },
-        green: { bg: 'bg-green-700', border: 'border-green-700', borderLight: 'border-green-700/30', text: 'text-green-800', textFill: 'text-white', fade: 'bg-green-50' },
-        blue: { bg: 'bg-blue-700', border: 'border-blue-700', borderLight: 'border-blue-700/30', text: 'text-blue-800', textFill: 'text-white', fade: 'bg-blue-50' },
-        yellow: { bg: 'bg-amber-500', border: 'border-amber-500', borderLight: 'border-amber-500/30', text: 'text-amber-800', textFill: 'text-white', fade: 'bg-amber-50' },
-        orange: { bg: 'bg-orange-700', border: 'border-orange-700', borderLight: 'border-orange-700/30', text: 'text-orange-800', textFill: 'text-white', fade: 'bg-orange-50' },
-        red: { bg: 'bg-red-700', border: 'border-red-700', borderLight: 'border-red-700/30', text: 'text-red-800', textFill: 'text-white', fade: 'bg-red-50' },
+        emerald: { bg: 'bg-emerald-800', border: 'border-emerald-800', borderLight: 'border-emerald-800/30 dark:border-emerald-400/20', text: 'text-emerald-900 dark:text-emerald-400', textFill: 'text-white', fade: 'bg-emerald-50 dark:bg-emerald-950/20' },
+        green: { bg: 'bg-green-700', border: 'border-green-700', borderLight: 'border-green-700/30 dark:border-green-400/20', text: 'text-green-800 dark:text-green-400', textFill: 'text-white', fade: 'bg-green-50 dark:bg-green-950/20' },
+        blue: { bg: 'bg-blue-700', border: 'border-blue-700', borderLight: 'border-blue-700/30 dark:border-blue-400/20', text: 'text-blue-800 dark:text-blue-400', textFill: 'text-white', fade: 'bg-blue-50 dark:bg-blue-950/20' },
+        yellow: { bg: 'bg-amber-500', border: 'border-amber-500', borderLight: 'border-amber-500/30 dark:border-amber-400/20', text: 'text-amber-800 dark:text-amber-400', textFill: 'text-white', fade: 'bg-amber-50 dark:bg-amber-950/20' },
+        orange: { bg: 'bg-orange-700', border: 'border-orange-700', borderLight: 'border-orange-700/30 dark:border-orange-400/20', text: 'text-orange-800 dark:text-orange-400', textFill: 'text-white', fade: 'bg-orange-50 dark:bg-orange-950/20' },
+        red: { bg: 'bg-red-700', border: 'border-red-700', borderLight: 'border-red-700/30 dark:border-red-400/20', text: 'text-red-800 dark:text-red-400', textFill: 'text-white', fade: 'bg-red-50 dark:bg-red-950/20' },
     };
 
     return map[color];
@@ -861,7 +861,7 @@ export default function MealPlannerPage() {
                                                                                                 e.stopPropagation();
                                                                                                 setActiveBoostContext('daily');
                                                                                             }}
-                                                                                            className="text-green-600 hover:text-green-700 bg-green-50 rounded-full p-1 transition-all border border-green-100 hover:scale-110 active:scale-95"
+                                                                                            className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 bg-green-50 dark:bg-green-900/30 rounded-full p-1 transition-all border border-green-100 dark:border-green-800/30 hover:scale-110 active:scale-95"
                                                                                             title="Add Miracle Boost"
                                                                                         >
                                                                                             <Sparkles className="h-4 w-4" />
@@ -1011,7 +1011,7 @@ export default function MealPlannerPage() {
                                                                         {title}
                                                                     </h4>
                                                                     <div className="flex items-center gap-2">
-                                                                        <span className="text-[10px] font-bold text-green-600 uppercase tracking-tighter bg-green-50 px-2 py-0.5 rounded-full border border-green-100 flex items-center gap-1">
+                                                                        <span className="text-[10px] font-bold text-green-600 dark:text-green-400 uppercase tracking-tighter bg-green-50 dark:bg-green-900/30 px-2 py-0.5 rounded-full border border-green-100 dark:border-green-800/30 flex items-center gap-1">
                                                                             <Sparkles className="h-2.5 w-2.5" />
                                                                             Boostable
                                                                         </span>
@@ -1077,7 +1077,7 @@ export default function MealPlannerPage() {
                                                                                                         e.stopPropagation();
                                                                                                         setActiveBoostContext('daily');
                                                                                                     }}
-                                                                                                    className="text-green-600 hover:text-green-700 bg-green-50 rounded-full p-0.5 transition-all border border-green-100 hover:scale-110 active:scale-95"
+                                                                                                    className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 bg-green-50 dark:bg-green-900/30 rounded-full p-0.5 transition-all border border-green-100 dark:border-green-800/30 hover:scale-110 active:scale-95"
                                                                                                     title="Add Miracle Boost"
                                                                                                 >
                                                                                                     <Sparkles className="h-3.5 w-3.5" />
@@ -1497,7 +1497,7 @@ export default function MealPlannerPage() {
                                                                                     e.stopPropagation();
                                                                                     setActiveBoostContext('recipe');
                                                                                 }}
-                                                                                className="text-green-600 hover:text-green-700 bg-green-50 rounded-full p-0.5 transition-all border border-green-100"
+                                                                                className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 bg-green-50 dark:bg-green-900/30 rounded-full p-0.5 transition-all border border-green-100 dark:border-green-800/30"
                                                                             >
                                                                                 <Sparkles className="h-3 w-3" />
                                                                             </button>
@@ -1558,14 +1558,14 @@ export default function MealPlannerPage() {
                                                             onClick={() => setRecipeMoringaGrams(s * 2)}
                                                             className={cn(
                                                                 "w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold transition-all",
-                                                                recipeMoringaGrams === s * 2 ? "bg-green-600 text-white" : "hover:bg-green-50 text-green-700"
+                                                                recipeMoringaGrams === s * 2 ? "bg-green-600 text-white" : "hover:bg-green-50 dark:hover:bg-green-900/30 text-green-700 dark:text-green-400"
                                                             )}
                                                         >
                                                             {s}
                                                         </button>
                                                     ))}
                                                 </div>
-                                                <div className="flex items-baseline gap-0.5 bg-green-100 px-2 py-1 rounded text-green-800 font-bold text-xs">
+                                                <div className="flex items-baseline gap-0.5 bg-green-100 dark:bg-green-900/40 px-2 py-1 rounded text-green-800 dark:text-green-300 font-bold text-xs">
                                                     {recipeMoringaGrams}g
                                                 </div>
                                             </div>
