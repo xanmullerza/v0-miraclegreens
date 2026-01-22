@@ -174,10 +174,22 @@ export async function getUSDAMeasures(fdcId: number): Promise<FoodMeasure[]> {
 
         if (!data.foodPortions) return [];
 
-        return data.foodPortions.map((p: any) => ({
-            label: p.modifier || p.measureUnitName || 'portion',
-            weight_g: p.gramWeight || 0
-        })).filter((p: any) => p.weight_g > 0);
+        return data.foodPortions.map((p: any) => {
+            let label = (p.modifier || '').trim();
+            const unitName = (p.measureUnitName || '').trim();
+
+            // If modifier is a number or looks like an ID, prefer unitName
+            if (!label || /^\d+$/.test(label) || label.length > 20) {
+                label = unitName || label || 'portion';
+            } else if (unitName && !label.toLowerCase().includes(unitName.toLowerCase())) {
+                label = `${label} ${unitName}`;
+            }
+
+            return {
+                label: label.toLowerCase(),
+                weight_g: p.gramWeight || 0
+            };
+        }).filter((p: any) => p.weight_g > 0);
     } catch (error) {
         console.error("USDA Measures Error:", error);
         return [];

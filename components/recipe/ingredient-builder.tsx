@@ -81,8 +81,8 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
 
         // Matching logic
         if (measures.length > 0) {
-            const unitLower = unit.toLowerCase();
-            const matchedMeasure = unit ? measures.find(m => {
+            const unitLower = unit.toLowerCase().replace(/\s*\(.*\)$/, '').trim();
+            const matchedMeasure = unitLower ? measures.find(m => {
                 const labelLower = m.label.toLowerCase();
                 const singularLabel = labelLower.replace(/s$/, '');
                 const singularUnit = unitLower.replace(/s$/, '');
@@ -98,21 +98,30 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                 weight_g = quantity * matchedMeasure.weight_g;
             } else if (unitLower === 'g' || unitLower === 'gram' || unitLower === 'grams' || unitLower === 'ml') {
                 weight_g = quantity;
+                unit = 'g';
             } else if (unitLower === 'kg' || unitLower === 'kilogram' || unitLower === 'kilograms') {
                 weight_g = quantity * 1000;
+                unit = 'kg';
             } else if (!unit || unit === 'g') {
-                // No unit or defaulting to g, but maybe there's a better default in measures
+                // No specific unit parsed. Try to find a "natural" count measure
                 const natural = measures.find(m => {
                     const l = m.label.toLowerCase();
-                    return l === 'unit' || l === 'item' || l === 'whole' || l === 'large' || l === 'medium' || l === 'large egg';
-                }) || measures[0];
+                    return l === 'unit' || l === 'item' || l === 'whole' || l === 'large' || l === 'medium' || l === 'large egg' || l === 'each' || l === 'portion';
+                });
 
-                if (natural && natural.label.toLowerCase() !== 'g') {
+                if (natural) {
                     unit = natural.label;
                     weight_g = quantity * natural.weight_g;
                 } else {
-                    unit = 'g';
-                    weight_g = weight_g || quantity || 100;
+                    // Safety: only use first measure if it's small (like a portion) or if we are forced
+                    const first = measures[0];
+                    if (first && (first.weight_g < 100 || quantity < 1)) {
+                        unit = first.label;
+                        weight_g = quantity * first.weight_g;
+                    } else {
+                        unit = 'g';
+                        weight_g = weight_g || quantity || 100;
+                    }
                 }
             } else {
                 // Unknown unit provided, use first measure as fallback
