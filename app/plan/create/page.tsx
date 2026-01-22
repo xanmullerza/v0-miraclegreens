@@ -285,7 +285,7 @@ export default function CreateRecipePage() {
                     </div>
 
                     {/* Ingredients */}
-                    <div className="bg-white rounded-lg shadow-sm p-6">
+                    <div className="bg-card border border-border rounded-lg shadow-sm p-6">
                         <IngredientBuilder
                             ingredients={ingredients}
                             onChange={setIngredients}
@@ -336,7 +336,7 @@ export default function CreateRecipePage() {
                     <div className="flex gap-4">
                         <button
                             onClick={() => router.back()}
-                            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                            className="px-6 py-3 border border-border text-foreground rounded-lg hover:bg-muted transition"
                         >
                             Cancel
                         </button>
