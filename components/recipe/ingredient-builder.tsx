@@ -581,11 +581,20 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                                         className="min-w-[100px] max-w-[160px] px-2 py-2 border border-border bg-background text-foreground text-sm rounded-lg font-medium focus:ring-2 focus:ring-green-500/20 outline-none"
                                     >
                                         <option value="g">grams (g)</option>
-                                        {ing.available_measures?.map((m, mi) => (
-                                            <option key={mi} value={m.label}>
-                                                {m.label && (/^\d+$/.test(m.label) || m.label.toLowerCase() === 'undetermined') ? 'portion' : m.label} ({Math.round(m.weight_g)}g)
-                                            </option>
-                                        ))}
+                                        {ing.available_measures?.map((m, mi) => {
+                                            const label = m.label.toLowerCase();
+                                            let displayLabel = m.label;
+
+                                            if (label === 'portion' || /^\d+$/.test(label)) {
+                                                displayLabel = m.weight_g >= 100 ? 'Standard Serving' : 'Small Portion';
+                                            }
+
+                                            return (
+                                                <option key={mi} value={m.label}>
+                                                    {displayLabel} ({Math.round(m.weight_g)}g)
+                                                </option>
+                                            );
+                                        })}
                                     </select>
                                 </div>
 

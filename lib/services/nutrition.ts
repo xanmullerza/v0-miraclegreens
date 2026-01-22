@@ -200,25 +200,38 @@ export async function getUSDAMeasures(fdcId: number): Promise<FoodMeasure[]> {
 
 /**
  * Syncs a USDA food item to our local database.
- * Prevents duplicates by checking existing names.
+ * Uses UPSERT to prevent duplicates and preserve existing data.
  */
 export async function syncToLocal(food: FoodItemMatch, measures: FoodMeasure[]): Promise<string | null> {
-    // 1. Check if name already exists locally
-    const { data: existing } = await supabase
-        .from('food_items')
-        .select('id')
-        .ilike('name', food.name)
-        .limit(1)
-        .single();
+    // 1. Clean and standardize measures before sync
+    const standardizeLabel = (l: string) => {
+        let clean = l.toLowerCase().trim();
 
-    if (existing) {
-        return existing.id;
-    }
+        // Remove parenthetical weights like " (224g)" but keep the name
+        if (clean.includes(' (')) {
+            clean = clean.split(' (')[0].trim();
+        }
 
-    // 2. Insert into food_items if not found
+        // Only turn it into 'portion' if it's literally empty, "undetermined", or a pure ID that we can't use
+        if (!clean || clean === 'undetermined') return 'portion';
+
+        // If it's a number, it might be a measurement unit count (e.g. "1") 
+        // We'll keep it for now and let the UI handle the "humanizing"
+        if (/^\d+$/.test(clean) && clean.length > 3) return 'portion'; // Likely a USDA ID
+
+        // Common standardizations
+        if (['cup', 'cups', 'c.'].includes(clean)) return 'cup';
+        if (['tbsp', 'tablespoon', 'tbs'].includes(clean)) return 'tbsp';
+        if (['tsp', 'teaspoon'].includes(clean)) return 'tsp';
+        if (['unit', 'item', 'each', 'whole', 'piece'].includes(clean)) return 'piece';
+
+        return clean;
+    };
+
+    // 2. Insert or get Food Item
     const { data: itemData, error: itemError } = await supabase
         .from('food_items')
-        .insert({
+        .upsert({
             name: food.name,
             energy_kcal: food.energy_kcal,
             energy_kj: food.energy_kj,
@@ -226,22 +239,31 @@ export async function syncToLocal(food: FoodItemMatch, measures: FoodMeasure[]):
             carbs_g: food.carbs_g,
             fat_g: food.fat_g,
             micronutrients: food.micronutrients
-        })
+        }, { onConflict: 'name' })
         .select()
         .single();
 
-    if (itemError || !itemData) return null;
+    if (itemError || !itemData) {
+        console.error("Sync Item Error:", itemError);
+        return null;
+    }
 
-    // 3. Insert measures
+    // 3. Insert or Update measures
     if (measures.length > 0) {
-        // Clean labels again just in case existing data has them
         const measuresToInsert = measures.map(m => ({
             food_item_id: itemData.id,
-            label: m.label,
+            label: standardizeLabel(m.label),
             weight_g: m.weight_g
-        }));
+        })).filter(m => m.weight_g > 0);
 
-        await supabase.from('food_measures').insert(measuresToInsert);
+        // Filter out internal duplicates in the payload before sending to Supabase
+        const uniqueMeasures = Array.from(new Map(measuresToInsert.map(m => [m.label, m])).values());
+
+        const { error: measError } = await supabase
+            .from('food_measures')
+            .upsert(uniqueMeasures, { onConflict: 'food_item_id, label' });
+
+        if (measError) console.warn("Sync Measures Warning:", measError);
     }
 
     return itemData.id;
