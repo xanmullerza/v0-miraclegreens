@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import IngredientBuilder, { RecipeIngredient } from '@/components/recipe/ingredient-builder';
-import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2 } from 'lucide-react';
+import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap } from 'lucide-react';
+import { parseInstructionsOnly } from '@/lib/utils/recipe-parser';
 
 export default function CreateRecipePage() {
     const router = useRouter();
@@ -19,6 +20,8 @@ export default function CreateRecipePage() {
     const [image, setImage] = useState('');
     const [saving, setSaving] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const [showMagicInstructions, setShowMagicInstructions] = useState(false);
+    const [magicInstructionsText, setMagicInstructionsText] = useState('');
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -87,6 +90,19 @@ export default function CreateRecipePage() {
 
     const handleRemoveInstruction = (index: number) => {
         setInstructions(instructions.filter((_, i) => i !== index));
+    };
+
+    const handleMagicPasteInstructions = () => {
+        if (!magicInstructionsText.trim()) return;
+        const parsed = parseInstructionsOnly(magicInstructionsText);
+        // If we only have one empty instruction, replace it. Otherwise append.
+        if (instructions.length === 1 && !instructions[0].trim()) {
+            setInstructions(parsed);
+        } else {
+            setInstructions([...instructions, ...parsed]);
+        }
+        setMagicInstructionsText('');
+        setShowMagicInstructions(false);
     };
 
     const toggleDiet = (dietType: string) => {
@@ -422,15 +438,57 @@ export default function CreateRecipePage() {
                     {/* Instructions */}
                     <div className="bg-card border border-border rounded-lg shadow-sm p-6 space-y-4 text-foreground">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold">Instructions</h3>
-                            <button
-                                type="button"
-                                onClick={handleAddInstruction}
-                                className="text-sm text-green-600 hover:text-green-700 font-medium"
-                            >
-                                + Add Step
-                            </button>
+                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                <Zap className="w-5 h-5 text-amber-500 fill-amber-500" />
+                                Instructions
+                            </h3>
+                            <div className="flex gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowMagicInstructions(!showMagicInstructions)}
+                                    className="text-xs flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 font-bold hover:bg-amber-100 transition-all"
+                                >
+                                    <Wand2 size={14} />
+                                    Magic Paste
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleAddInstruction}
+                                    className="text-sm text-green-600 hover:text-green-700 font-medium"
+                                >
+                                    + Add Step
+                                </button>
+                            </div>
                         </div>
+
+                        {showMagicInstructions && (
+                            <div className="p-4 rounded-xl border-2 border-dashed border-amber-200 bg-amber-50/30 animate-in fade-in slide-in-from-top-4 duration-300">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <Sparkles className="w-4 h-4 text-amber-500" />
+                                    <span className="text-xs font-black uppercase tracking-widest text-amber-800">Paste Full Method Below</span>
+                                </div>
+                                <textarea
+                                    value={magicInstructionsText}
+                                    onChange={(e) => setMagicInstructionsText(e.target.value)}
+                                    placeholder="Paste multiple steps here... We'll automatically split them by line numbers or paragraphs."
+                                    className="w-full h-32 p-4 text-sm border border-amber-200 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 mb-3"
+                                />
+                                <div className="flex justify-end gap-2">
+                                    <button
+                                        onClick={() => setShowMagicInstructions(false)}
+                                        className="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleMagicPasteInstructions}
+                                        className="px-4 py-2 bg-amber-500 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-lg shadow-amber-200 hover:bg-amber-600 active:scale-95 transition-all"
+                                    >
+                                        Break Into Steps
+                                    </button>
+                                </div>
+                            </div>
+                        )}
 
                         <div className="space-y-3">
                             {instructions.map((step, index) => (
