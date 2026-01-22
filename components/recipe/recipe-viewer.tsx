@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react';
 import { fetchRecipeWithNutrition, scaleNutrition, CalculatedNutrition } from '@/lib/utils/nutrition-calculator';
 import { Clock, Users, Flame, Beef, Wheat, Droplet } from 'lucide-react';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
+
+const CAL_TO_KJ = 4.184;
 
 interface RecipeViewerProps {
     recipeId: string;
@@ -12,6 +15,7 @@ export default function RecipeViewer({ recipeId }: RecipeViewerProps) {
     const [recipe, setRecipe] = useState<any>(null);
     const [servings, setServings] = useState(1);
     const [loading, setLoading] = useState(true);
+    const { energyUnit } = useUserPreferences();
 
     useEffect(() => {
         const loadRecipe = async () => {
@@ -104,9 +108,17 @@ export default function RecipeViewer({ recipeId }: RecipeViewerProps) {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="bg-white rounded-lg p-4 text-center">
                         <Flame className="w-6 h-6 text-orange-500 mx-auto mb-2" />
-                        <div className="text-2xl font-bold text-gray-900">{forSelectedServings.calories}</div>
-                        <div className="text-xs text-gray-600">Calories</div>
-                        <div className="text-xs text-gray-500 mt-1">{perServing.calories}/serving</div>
+                        <div className="text-2xl font-bold text-gray-900">
+                            {energyUnit === 'kJ'
+                                ? Math.round(forSelectedServings.calories * CAL_TO_KJ).toLocaleString()
+                                : forSelectedServings.calories.toLocaleString()}
+                        </div>
+                        <div className="text-xs text-gray-600">{energyUnit === 'kJ' ? 'Kilojoules' : 'Calories'}</div>
+                        <div className="text-xs text-gray-500 mt-1">
+                            {energyUnit === 'kJ'
+                                ? Math.round(perServing.calories * CAL_TO_KJ)
+                                : perServing.calories} {energyUnit}/serving
+                        </div>
                     </div>
 
                     <div className="bg-white rounded-lg p-4 text-center">

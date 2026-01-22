@@ -3,6 +3,7 @@ import { DM_Sans, Playfair_Display } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 import { ThemeProvider } from "@/components/theme-provider"
+import { UserPreferencesProvider } from "@/lib/context/user-preferences-context";
 
 const _dmSans = DM_Sans({ subsets: ['latin'] });
 const _playfair = Playfair_Display({ subsets: ['latin'] });
@@ -45,7 +46,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          <UserPreferencesProvider>
+            {children}
+          </UserPreferencesProvider>
         </ThemeProvider>
         <Analytics />
       </body>

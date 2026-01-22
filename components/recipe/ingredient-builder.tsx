@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Trash2, Scale } from 'lucide-react';
 import FoodItemPicker from './food-item-picker';
 import { fetchFoodMeasures, FoodMeasure } from '@/lib/utils/nutrition-calculator';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 interface FoodItem {
     id: string;
@@ -38,7 +39,8 @@ interface IngredientBuilderProps {
 
 export default function IngredientBuilder({ ingredients, onChange }: IngredientBuilderProps) {
     const [showPicker, setShowPicker] = useState(false);
-    const [useKilojoules, setUseKilojoules] = useState(false);
+    const { energyUnit, setEnergyUnit } = useUserPreferences();
+    const useKilojoules = energyUnit === 'kJ';
 
     const handleAddIngredient = async (foodItem: FoodItem) => {
         // Fetch available measures
@@ -166,16 +168,16 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                     <div className="flex items-center bg-muted p-1 rounded-lg">
                         <button
                             type="button"
-                            onClick={() => setUseKilojoules(false)}
-                            className={`px-3 py-1 rounded-md text-xs font-medium transition ${!useKilojoules ? 'bg-background shadow-sm text-green-700 dark:text-green-400' : 'text-muted-foreground'
+                            onClick={() => setEnergyUnit('kcal')}
+                            className={`px-3 py-1 rounded-md text-xs font-medium transition ${energyUnit === 'kcal' ? 'bg-background shadow-sm text-green-700 dark:text-green-400' : 'text-muted-foreground'
                                 }`}
                         >
                             kcal
                         </button>
                         <button
                             type="button"
-                            onClick={() => setUseKilojoules(true)}
-                            className={`px-3 py-1 rounded-md text-xs font-medium transition ${useKilojoules ? 'bg-background shadow-sm text-green-700 dark:text-green-400' : 'text-muted-foreground'
+                            onClick={() => setEnergyUnit('kJ')}
+                            className={`px-3 py-1 rounded-md text-xs font-medium transition ${energyUnit === 'kJ' ? 'bg-background shadow-sm text-green-700 dark:text-green-400' : 'text-muted-foreground'
                                 }`}
                         >
                             kJ

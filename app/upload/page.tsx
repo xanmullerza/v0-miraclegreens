@@ -40,6 +40,9 @@ import { Recipe, Ingredient, MealType, DietType } from '@/lib/data/recipes';
 import { parseRecipeText, parseIngredientsOnly, parseInstructionsOnly } from '@/lib/utils/recipe-parser';
 import { Textarea } from '@/components/ui/textarea';
 import { Wand2, Sparkles, Zap } from 'lucide-react';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
+
+const CAL_TO_KJ = 4.184;
 
 // Simplified UI Components for the uploader
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
@@ -116,6 +119,7 @@ function RecipeUploaderContent() {
     const [wizardStep, setWizardStep] = useState(1);
     const [isWizardProcessing, setIsWizardProcessing] = useState(false);
     const [wizardProcessedData, setWizardProcessedData] = useState<any>(null);
+    const { energyUnit } = useUserPreferences();
 
     // Load existing recipe for editing
     useEffect(() => {
@@ -1495,7 +1499,11 @@ function RecipeUploaderContent() {
                                                 </Badge>
                                             </div>
                                             <div className="flex gap-4 text-xs text-slate-500">
-                                                <span>{Math.round(f.energy_kcal)} kcal</span>
+                                                <span>
+                                                    {energyUnit === 'kJ'
+                                                        ? Math.round(f.energy_kcal * CAL_TO_KJ)
+                                                        : Math.round(f.energy_kcal)} {energyUnit}
+                                                </span>
                                                 <span>P: {Math.round(f.protein_g)}g</span>
                                                 <span>C: {Math.round(f.carbs_g)}g</span>
                                                 <span>F: {Math.round(f.fat_g)}g</span>

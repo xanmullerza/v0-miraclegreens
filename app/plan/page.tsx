@@ -57,6 +57,7 @@ import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import Link from 'next/link';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 const showShop = false;
 
@@ -378,7 +379,7 @@ export default function MealPlannerPage() {
     const [calories, setCalories] = useState(2000);
     const [diet, setDiet] = useState<DietType>('anything');
     const [mealsCount, setMealsCount] = useState(3);
-    const [unit, setUnit] = useState<UnitType>('kJ');
+    const { energyUnit: unit, setEnergyUnit: setUnit } = useUserPreferences();
 
     // New Fields
     const [goal, setGoal] = useState<GoalType>('maintain');
@@ -705,6 +706,34 @@ export default function MealPlannerPage() {
                                         <DietCard type="anything" selected={diet === 'anything'} onClick={() => setDiet('anything')} icon={Utensils} label="Balanced" />
                                         <DietCard type="vegetarian" selected={diet === 'vegetarian'} onClick={() => setDiet('vegetarian')} icon={Egg} label="Vegetarian" />
                                         <DietCard type="vegan" selected={diet === 'vegan'} onClick={() => setDiet('vegan')} icon={Leaf} label="Vegan" />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Energy Unit</Label>
+                                    <div className="flex w-full bg-muted rounded-lg p-1 h-10 border border-muted-foreground/10">
+                                        <button
+                                            onClick={() => setUnit('kJ')}
+                                            className={cn(
+                                                "flex-1 text-xs font-bold rounded-md transition-all",
+                                                unit === 'kJ'
+                                                    ? "bg-primary text-primary-foreground shadow-md"
+                                                    : "text-muted-foreground hover:bg-background/50"
+                                            )}
+                                        >
+                                            Kilojoules (kJ)
+                                        </button>
+                                        <button
+                                            onClick={() => setUnit('kcal')}
+                                            className={cn(
+                                                "flex-1 text-xs font-bold rounded-md transition-all",
+                                                unit === 'kcal'
+                                                    ? "bg-primary text-primary-foreground shadow-md"
+                                                    : "text-muted-foreground hover:bg-background/50"
+                                            )}
+                                        >
+                                            Calories (kcal)
+                                        </button>
                                     </div>
                                 </div>
 
@@ -1065,11 +1094,17 @@ export default function MealPlannerPage() {
                                                                 </div>
                                                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                                                                     {filtered.map(([label, value]) => {
-                                                                        let unit = 'mg';
+                                                                        let unitDisplay = 'mg';
                                                                         const labelLower = label.toLowerCase();
-                                                                        if (labelLower.includes('vitamin a') || labelLower.includes('folate') || labelLower.includes('selenium') || labelLower.includes('b12') || labelLower.includes('vitamin k')) unit = 'µg';
-                                                                        if (labelLower.includes('vitamin d')) unit = 'IU';
-                                                                        if (labelLower.includes('fiber')) unit = 'g';
+                                                                        if (labelLower.includes('vitamin a') || labelLower.includes('folate') || labelLower.includes('selenium') || labelLower.includes('b12') || labelLower.includes('vitamin k')) unitDisplay = 'µg';
+                                                                        if (labelLower.includes('vitamin d')) unitDisplay = 'IU';
+                                                                        if (labelLower.includes('fiber')) unitDisplay = 'g';
+                                                                        if (labelLower.includes('energy')) unitDisplay = unit === 'kJ' ? 'kJ' : 'kcal';
+
+                                                                        let valueDisplay = value;
+                                                                        if (labelLower.includes('energy') && unit === 'kJ') {
+                                                                            valueDisplay = value * CAL_TO_KJ;
+                                                                        }
 
                                                                         const rdaValue = userRDAs?.[label];
                                                                         const percentage = rdaValue ? Math.round((value / rdaValue) * 100) : null;
@@ -1094,7 +1129,7 @@ export default function MealPlannerPage() {
                                                                                 'Protein': MORINGA_TSP.protein_g,
                                                                                 'Carbs': MORINGA_TSP.carbs_g,
                                                                                 'Fat': MORINGA_TSP.fat_g,
-                                                                                'Energy': MORINGA_TSP.energy_kcal
+                                                                                'Energy': unit === 'kJ' ? MORINGA_TSP.energy_kj : MORINGA_TSP.energy_kcal
                                                                             };
                                                                             const baseVal = mapping[label];
                                                                             if (baseVal === undefined) return 0;
@@ -1136,11 +1171,12 @@ export default function MealPlannerPage() {
                                                                                     </div>
                                                                                     <div className="flex items-baseline flex-wrap gap-x-1">
                                                                                         <span className="text-xl font-bold">
-                                                                                            {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
+                                                                                            {valueDisplay >= 1 ? valueDisplay.toFixed(1) : valueDisplay.toFixed(2)}
                                                                                         </span>
+                                                                                        <span className="text-[10px] font-medium text-muted-foreground">{unitDisplay}</span>
                                                                                         {rdaValue && (
                                                                                             <span className="text-sm font-medium text-foreground/70">
-                                                                                                / {rdaValue >= 1 ? Math.round(rdaValue) : rdaValue.toFixed(1)}{unit}
+                                                                                                / {rdaValue >= 1 ? Math.round(rdaValue) : rdaValue.toFixed(1)}{unitDisplay}
                                                                                             </span>
                                                                                         )}
                                                                                     </div>
@@ -1488,11 +1524,17 @@ export default function MealPlannerPage() {
                                             </h4>
                                             <div className="grid grid-cols-2 gap-2">
                                                 {filtered.map(([label, value]) => {
-                                                    let u = 'mg';
+                                                    let uDisplay = 'mg';
                                                     const labelLower = label.toLowerCase();
-                                                    if (labelLower.includes('vitamin a') || labelLower.includes('folate') || labelLower.includes('selenium') || labelLower.includes('b12') || labelLower.includes('vitamin k')) u = 'µg';
-                                                    if (labelLower.includes('vitamin d')) u = 'IU';
-                                                    if (labelLower.includes('fiber')) u = 'g';
+                                                    if (labelLower.includes('vitamin a') || labelLower.includes('folate') || labelLower.includes('selenium') || labelLower.includes('b12') || labelLower.includes('vitamin k')) uDisplay = 'µg';
+                                                    if (labelLower.includes('vitamin d')) uDisplay = 'IU';
+                                                    if (labelLower.includes('fiber')) uDisplay = 'g';
+                                                    if (labelLower.includes('energy')) uDisplay = unit === 'kJ' ? 'kJ' : 'kcal';
+
+                                                    let vDisplay = value;
+                                                    if (labelLower.includes('energy') && unit === 'kJ') {
+                                                        vDisplay = value * CAL_TO_KJ;
+                                                    }
 
                                                     const rdaValue = userRDAs?.[label];
                                                     const percentage = rdaValue ? Math.round((value / rdaValue) * 100) : null;
@@ -1517,7 +1559,7 @@ export default function MealPlannerPage() {
                                                             'Protein': MORINGA_TSP.protein_g,
                                                             'Carbs': MORINGA_TSP.carbs_g,
                                                             'Fat': MORINGA_TSP.fat_g,
-                                                            'Energy': MORINGA_TSP.energy_kcal
+                                                            'Energy': unit === 'kJ' ? MORINGA_TSP.energy_kj : MORINGA_TSP.energy_kcal
                                                         };
                                                         const baseVal = mapping[label];
                                                         if (baseVal === undefined) return 0;
@@ -1558,11 +1600,12 @@ export default function MealPlannerPage() {
                                                                 </div>
                                                                 <div className="flex items-baseline flex-wrap gap-x-1">
                                                                     <span className="text-lg font-bold tabular-nums">
-                                                                        {value >= 1 ? value.toFixed(1) : value.toFixed(2)}
+                                                                        {vDisplay >= 1 ? vDisplay.toFixed(1) : vDisplay.toFixed(2)}
                                                                     </span>
+                                                                    <span className="text-[10px] font-medium text-muted-foreground">{uDisplay}</span>
                                                                     {rdaValue && (
                                                                         <span className="text-[10px] font-medium text-foreground/60">
-                                                                            / {rdaValue >= 1 ? Math.round(rdaValue) : rdaValue.toFixed(1)}{u}
+                                                                            / {rdaValue >= 1 ? Math.round(rdaValue) : rdaValue.toFixed(1)}{uDisplay}
                                                                         </span>
                                                                     )}
                                                                 </div>
