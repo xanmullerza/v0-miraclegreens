@@ -81,14 +81,11 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
 
         // Matching logic
         if (measures.length > 0) {
-            const unitLower = unit.toLowerCase().replace(/\s*\(.*\)$/, '').trim();
-            const matchedMeasure = unitLower ? measures.find(m => {
-                const labelLower = m.label.toLowerCase();
-                const singularLabel = labelLower.replace(/s$/, '');
-                const singularUnit = unitLower.replace(/s$/, '');
+            const unitLower = unit.toLowerCase().replace(/\s*\(.*\)$/, '').replace(/s$/, '').trim(); // singularized unit
 
+            const matchedMeasure = unitLower ? measures.find(m => {
+                const labelLower = m.label.toLowerCase().replace(/s$/, '');
                 return labelLower === unitLower ||
-                    singularLabel === singularUnit ||
                     labelLower.includes(unitLower) ||
                     unitLower.includes(labelLower);
             }) : null;
@@ -96,37 +93,39 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             if (matchedMeasure) {
                 unit = matchedMeasure.label;
                 weight_g = quantity * matchedMeasure.weight_g;
-            } else if (unitLower === 'g' || unitLower === 'gram' || unitLower === 'grams' || unitLower === 'ml') {
+            } else if (unitLower === 'g' || unitLower === 'gram' || unitLower === 'ml') {
                 weight_g = quantity;
                 unit = 'g';
-            } else if (unitLower === 'kg' || unitLower === 'kilogram' || unitLower === 'kilograms') {
+            } else if (unitLower === 'kg' || unitLower === 'kilogram') {
                 weight_g = quantity * 1000;
                 unit = 'kg';
-            } else if (!unit || unit === 'g' || unit === 'unit' || unit === 'item' || unit === 'whole') {
-                // Try harder to find a "count" measure for things like produce/eggs
+            } else if (!unit || ['g', 'item', 'whole', 'unit'].includes(unitLower)) {
+                // Try harder to find a "natural" count measure
+                // Check for labels that mean "1 item"
                 const natural = measures.find(m => {
                     const l = m.label.toLowerCase();
                     return l.includes('whole') || l.includes('item') || l.includes('unit') ||
                         l.includes('medium') || l.includes('large') || l.includes('each') ||
-                        l.includes('portion');
+                        l.includes('portion') || l.includes('fruit') || l.includes('vegetable') ||
+                        l.includes('clove');
                 });
 
                 if (natural) {
                     unit = natural.label;
                     weight_g = quantity * natural.weight_g;
                 } else {
-                    // Safety fallback: only use first measure if it's small (like a portion) or if we are forced
+                    // Safety fallback: only use first measure if it looks like a single portion
                     const first = measures[0];
-                    if (first && (first.weight_g < 100 || quantity < 1)) {
+                    if (first && (first.weight_g < 150 || quantity < 1)) {
                         unit = first.label;
-                        weight_g = quantity * first.weight_g;
+                        weight_g = quantity * (first.weight_g || 1);
                     } else {
                         unit = 'g';
-                        weight_g = weight_g || quantity || 100;
+                        weight_g = weight_g || (quantity > 10 ? quantity : 100);
                     }
                 }
             } else {
-                // Fallback for unknown unit
+                // Unknown unit provided (e.g. "handful"), fallback to first measure
                 const first = measures[0];
                 if (first) {
                     unit = first.label;
@@ -140,6 +139,14 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                 weight_g = (unit === 'g' || unit === 'ml') ? quantity : (quantity * 100);
             }
         }
+
+        // Final UI cleanup: humanize ID-like labels if any leaked in
+        const cleanLabel = (l: string) => {
+            if (/^\d+$/.test(l)) return 'portion';
+            if (l.toLowerCase() === 'undetermined') return 'portion';
+            return l;
+        };
+        unit = cleanLabel(unit);
 
         const multiplier = weight_g / 100;
 
@@ -576,7 +583,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                                         <option value="g">grams (g)</option>
                                         {ing.available_measures?.map((m, mi) => (
                                             <option key={mi} value={m.label}>
-                                                {m.label} ({Math.round(m.weight_g)}g)
+                                                {m.label && (/^\d+$/.test(m.label) || m.label.toLowerCase() === 'undetermined') ? 'portion' : m.label} ({Math.round(m.weight_g)}g)
                                             </option>
                                         ))}
                                     </select>

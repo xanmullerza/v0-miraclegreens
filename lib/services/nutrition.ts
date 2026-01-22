@@ -176,12 +176,14 @@ export async function getUSDAMeasures(fdcId: number): Promise<FoodMeasure[]> {
 
         return data.foodPortions.map((p: any) => {
             let label = (p.modifier || '').trim();
-            const unitName = (p.measureUnitName || '').trim();
+            let unitName = (p.measureUnitName || '').trim();
 
-            // If modifier is a number or looks like an ID, prefer unitName
-            if (!label || /^\d+$/.test(label) || label.length > 20) {
-                label = unitName || label || 'portion';
-            } else if (unitName && !label.toLowerCase().includes(unitName.toLowerCase())) {
+            const isBad = (s: string) => !s || /^\d+$/.test(s) || s.toLowerCase() === 'undetermined' || s.length > 25;
+
+            // If modifier is bad, try unitName. If both bad, use 'portion'
+            if (isBad(label)) {
+                label = isBad(unitName) ? 'portion' : unitName;
+            } else if (!isBad(unitName) && !label.toLowerCase().includes(unitName.toLowerCase())) {
                 label = `${label} ${unitName}`;
             }
 
@@ -198,9 +200,22 @@ export async function getUSDAMeasures(fdcId: number): Promise<FoodMeasure[]> {
 
 /**
  * Syncs a USDA food item to our local database.
+ * Prevents duplicates by checking existing names.
  */
 export async function syncToLocal(food: FoodItemMatch, measures: FoodMeasure[]): Promise<string | null> {
-    // 1. Insert into food_items
+    // 1. Check if name already exists locally
+    const { data: existing } = await supabase
+        .from('food_items')
+        .select('id')
+        .ilike('name', food.name)
+        .limit(1)
+        .single();
+
+    if (existing) {
+        return existing.id;
+    }
+
+    // 2. Insert into food_items if not found
     const { data: itemData, error: itemError } = await supabase
         .from('food_items')
         .insert({
@@ -217,8 +232,9 @@ export async function syncToLocal(food: FoodItemMatch, measures: FoodMeasure[]):
 
     if (itemError || !itemData) return null;
 
-    // 2. Insert measures
+    // 3. Insert measures
     if (measures.length > 0) {
+        // Clean labels again just in case existing data has them
         const measuresToInsert = measures.map(m => ({
             food_item_id: itemData.id,
             label: m.label,
