@@ -2,6 +2,7 @@ import type React from 'react';
 import { DM_Sans, Playfair_Display } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
+import { ThemeProvider } from "@/components/theme-provider"
 
 const _dmSans = DM_Sans({ subsets: ['latin'] });
 const _playfair = Playfair_Display({ subsets: ['latin'] });
@@ -38,7 +39,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${_dmSans.className} ${_playfair.className} font-sans antialiased`}>
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>

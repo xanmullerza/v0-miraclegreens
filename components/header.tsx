@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Menu, TreeDeciduous, ShoppingBag, LayoutGrid, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { ModeToggle } from '@/components/mode-toggle';
 
 const showShop = false;
 
@@ -58,6 +59,11 @@ export function Header() {
 										Donate
 									</Link>
 								</Button>
+
+								<div className="flex items-center gap-2 mt-2">
+									<ModeToggle />
+									<span className="text-muted-foreground text-sm">Switch Theme</span>
+								</div>
 							</div>
 						</SheetContent>
 					</Sheet>
@@ -114,6 +120,7 @@ export function Header() {
 							</Link>
 						</Button>
 					</div>
+					<ModeToggle className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground ml-2" />
 				</div>
 			</div>
 		</header>
