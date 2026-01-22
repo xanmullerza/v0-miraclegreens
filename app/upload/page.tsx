@@ -72,8 +72,21 @@ const pluralizeUnit = (qty: number, unit: string): string => {
 // Helper to handle "1/2", "1.5", etc.
 const evaluateAmount = (amt: string): number => {
     if (!amt) return 1;
+
+    // Handle unicode fractions
+    const unicodeFractions: Record<string, number> = {
+        '¼': 0.25, '½': 0.5, '¾': 0.75, '⅛': 0.125, '⅜': 0.375, '⅝': 0.625, '⅞': 0.875
+    };
+
+    let normalized = amt.trim();
+    for (const [char, val] of Object.entries(unicodeFractions)) {
+        if (normalized.startsWith(char)) {
+            return val;
+        }
+    }
+
     // Extract numerical part from the start of the string
-    const match = amt.match(/^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?))/);
+    const match = normalized.match(/^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?))/);
     if (!match) return 1;
 
     const val = match[1].trim();
@@ -519,13 +532,15 @@ function RecipeUploaderContent() {
         const newIngs = [...ingredients];
         const currentIng = newIngs[activeIngredientIndex];
 
-        // Auto-detect weight from amount string (e.g., "200g", "0.5kg")
+        // Auto-detect weight from amount string (e.g., "200g", "0.5kg", "100 grams")
         let autoWeight = 0;
-        const amountStr = (currentIng.amount || "").toLowerCase();
+        const amountStr = (currentIng.amount || "").toLowerCase().trim();
 
-        if (amountStr.includes('kg')) autoWeight = parseFloat(amountStr) * 1000;
-        else if (amountStr.includes('g')) autoWeight = parseFloat(amountStr);
-        else if (amountStr.includes('ml')) autoWeight = parseFloat(amountStr);
+        if (amountStr.match(/\d+\s*(?:kg|kilogram|kilograms)/)) {
+            autoWeight = parseFloat(amountStr) * 1000;
+        } else if (amountStr.match(/\d+\s*(?:g|gram|grams|ml)/)) {
+            autoWeight = parseFloat(amountStr);
+        }
 
         // If we found a weight in the string (like "90g"), 
         // keep that as the base reality.
@@ -552,9 +567,12 @@ function RecipeUploaderContent() {
         const pluralizedLabel = pluralizeUnit(qtyValue, measure.label);
         const newAmount = `${qtyValue} ${pluralizedLabel}`;
 
-        if (amountStr.includes('g') && !amountStr.includes('/')) {
+        if (amountStr.match(/\d+\s*(?:g|gram|grams|ml)/) && !amountStr.includes('/')) {
             // It's a manual weight like "90g". Just use it.
             weightG = parseFloat(amountStr);
+        } else if (amountStr.match(/\d+\s*(?:kg|kilogram|kilograms)/) && !amountStr.includes('/')) {
+            // It's a manual weight like "1.5kg".
+            weightG = parseFloat(amountStr) * 1000;
         } else {
             // It's a quantity like "1/2" or "2". Multiply by measure.
             weightG = qtyValue * measure.weight_g;
@@ -880,7 +898,14 @@ function RecipeUploaderContent() {
                                                             <div key={idx} className="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
                                                                 <div className="flex flex-col">
                                                                     <span className="font-black text-slate-900">{ing.item}</span>
-                                                                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">{ing.amount || 'as needed'}</span>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">{ing.amount || 'as needed'}</span>
+                                                                        {(ing.weightG ?? 0) > 0 && (
+                                                                            <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-black">
+                                                                                {Math.round(ing.weightG || 0)}G
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
                                                                 </div>
                                                                 <div className="flex items-center gap-2">
                                                                     {ing.matchedFood ? (

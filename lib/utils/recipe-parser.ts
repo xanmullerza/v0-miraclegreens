@@ -254,20 +254,29 @@ function parseIngredientLine(line: string): ParsedIngredient {
             }
         }
 
-        // Special case: check for weight in grams at the end of the line (e.g. "2 cups (94g)")
+        // Special case: check for weight in grams anywhere in the line (e.g. "2 cups (94g) flour" or "100g chicken")
         let weightG: number | undefined = undefined;
-        const weightMatch = rest.match(/\(?(\d+(?:\.\d+)?)\s*g\)?$/i);
-        if (weightMatch) {
-            weightG = parseFloat(weightMatch[1]);
-            // Remove the weight from the item description
-            rest = rest.replace(/\(?(\d+(?:\.\d+)?)\s*g\)?$/i, '').trim();
+
+        // 1. Check for weight in parenthesis: (100g) or (100 grams)
+        const parenWeightMatch = rest.match(/\((\d+(?:\.\d+)?)\s*(?:g|gram|grams)\)/i);
+        if (parenWeightMatch) {
+            weightG = parseFloat(parenWeightMatch[1]);
+            rest = rest.replace(parenWeightMatch[0], '').trim();
+        }
+        // 2. Check for weight at the end: 100g or 100 grams
+        else {
+            const endWeightMatch = rest.match(/\b(\d+(?:\.\d+)?)\s*(?:g|gram|grams)\b$/i);
+            if (endWeightMatch) {
+                weightG = parseFloat(endWeightMatch[1]);
+                rest = rest.replace(endWeightMatch[0], '').trim();
+            }
         }
 
-        // If 'g' is the unit, set weightG
+        // If 'g' is the unit, set weightG (priority over the above if it was the main unit)
         const lowerUnit = unit.toLowerCase();
-        if (lowerUnit === 'g' || lowerUnit === 'ml') {
+        if (lowerUnit === 'g' || lowerUnit === 'gram' || lowerUnit === 'grams' || lowerUnit === 'ml') {
             weightG = parseFloat(amount);
-        } else if (lowerUnit === 'kg') {
+        } else if (lowerUnit === 'kg' || lowerUnit === 'kilogram' || lowerUnit === 'kilograms') {
             weightG = parseFloat(amount) * 1000;
         }
 
