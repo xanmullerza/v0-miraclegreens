@@ -143,7 +143,7 @@ export function scaleNutrition(
 }
 
 export interface FoodMeasure {
-    id: string;
+    id?: string;
     label: string;
     weight_g: number;
 }

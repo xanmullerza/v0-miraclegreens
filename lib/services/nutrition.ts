@@ -14,10 +14,8 @@ export interface FoodItemMatch {
     fdcId?: number;
 }
 
-export interface FoodMeasure {
-    label: string;
-    weight_g: number;
-}
+import { FoodMeasure } from '@/lib/utils/nutrition-calculator';
+export type { FoodMeasure };
 
 // USDA API Key - Uses environment variable with fallback to DEMO_KEY
 const USDA_API_KEY = process.env.NEXT_PUBLIC_USDA_API_KEY || 'DEMO_KEY';
