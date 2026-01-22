@@ -132,7 +132,8 @@ function RecipeUploaderContent() {
     const [ingredients, setIngredients] = useState<(Ingredient & {
         matchedFood?: FoodItemMatch,
         selectedMeasure?: FoodMeasure,
-        availableMeasures?: FoodMeasure[]
+        availableMeasures?: FoodMeasure[],
+        parsedGrams?: number // The grams parsed from the original text, never overwritten
     })[]>([
         { item: '', amount: '', weightG: 0, isMiracleProduct: false }
     ]);
@@ -320,6 +321,7 @@ function RecipeUploaderContent() {
                 item: ing.item,
                 amount: ing.amount,
                 weightG: ing.weightG || 0,
+                parsedGrams: ing.weightG, // Store original parsed grams separately
                 isMiracleProduct: false
             }));
             setIngredients(newIngs);
@@ -358,6 +360,7 @@ function RecipeUploaderContent() {
                 item: ing.item,
                 amount: ing.amount,
                 weightG: ing.weightG || 0,
+                parsedGrams: ing.weightG, // Store original parsed grams
                 isMiracleProduct: false
             }));
             setIngredients(newIngs);
@@ -456,8 +459,15 @@ function RecipeUploaderContent() {
                         newIngs[i].availableMeasures = foodMeasures;
                         newIngs[i].selectedMeasure = matchedMeasure;
 
-                        // Recalculate weight if not already a manual gram override
-                        if (!ing.weightG) {
+                        // Use parsed grams from the text if available (e.g. "2 tbsp (30g)")
+                        // Otherwise calculate from the measure
+                        const hasParsedGrams = (ing as any).parsedGrams && (ing as any).parsedGrams > 0;
+
+                        if (hasParsedGrams) {
+                            // Trust the grams from the recipe text
+                            newIngs[i].weightG = (ing as any).parsedGrams;
+                            newIngs[i].parsedGrams = (ing as any).parsedGrams;
+                        } else if (!ing.weightG) {
                             const amountStr = ing.amount.toLowerCase();
                             const qty = evaluateAmount(ing.amount);
 
@@ -1366,10 +1376,22 @@ function RecipeUploaderContent() {
                                                                 setIngredients(newIngs);
                                                             }}
                                                             placeholder="0"
-                                                            className="text-lg rounded-xl border-primary/30 focus:border-primary bg-primary/5 dark:bg-primary/10 font-black text-primary"
+                                                            className={cn(
+                                                                "text-lg rounded-xl focus:border-primary font-black",
+                                                                ing.parsedGrams
+                                                                    ? "border-amber-400 bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400"
+                                                                    : "border-primary/30 bg-primary/5 dark:bg-primary/10 text-primary"
+                                                            )}
                                                         />
                                                         <span className="absolute right-3 top-3 text-[10px] font-black text-primary/40 group-hover:text-primary transition-colors">G</span>
                                                     </div>
+                                                    {ing.parsedGrams && (
+                                                        <div className="flex items-center gap-1 mt-1">
+                                                            <Badge className="bg-amber-500 text-white text-[9px] px-1.5 py-0 font-black uppercase tracking-wider">
+                                                                PARSED: {ing.parsedGrams}g
+                                                            </Badge>
+                                                        </div>
+                                                    )}
                                                 </div>
 
                                                 <div className="md:col-span-3 flex items-end pb-0.5 gap-2">
