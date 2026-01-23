@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ModeToggle } from '@/components/mode-toggle';
 
 const showShop = false;
+const showPlan = false;
 
 const navigation = [
 	{ name: 'Our Story', href: '#story' },
@@ -39,12 +40,14 @@ export function Header() {
 										Browse Resources
 									</Link>
 								</Button>
-								<Button className="gap-2 mt-2" asChild>
-									<Link href="/plan">
-										<Calendar className="h-4 w-4" />
-										Plan Meals
-									</Link>
-								</Button>
+								{showPlan && (
+									<Button className="gap-2 mt-2" asChild>
+										<Link href="/plan">
+											<Calendar className="h-4 w-4" />
+											Plan Meals
+										</Link>
+									</Button>
+								)}
 								{showShop && (
 									<Button className="gap-2 mt-2" asChild>
 										<Link href="/shop">
@@ -83,12 +86,14 @@ export function Header() {
 								Browse
 							</Link>
 						</Button>
-						<Button variant="secondary" size="sm" className="hidden sm:flex gap-2" asChild>
-							<Link href="/plan">
-								<Calendar className="h-4 w-4" />
-								Plan
-							</Link>
-						</Button>
+						{showPlan && (
+							<Button variant="secondary" size="sm" className="hidden sm:flex gap-2" asChild>
+								<Link href="/plan">
+									<Calendar className="h-4 w-4" />
+									Plan
+								</Link>
+							</Button>
+						)}
 						{showShop && (
 							<Button variant="secondary" size="sm" className="hidden sm:flex gap-2" asChild>
 								<Link href="/shop">
