@@ -182,6 +182,27 @@ export default function CreateRecipePage() {
                 throw new Error(`Ingredients error: ${ingredientsError.message}`);
             }
 
+            // Optional: Save new measures to the global database if they don't exist
+            // This allows the system to "learn" that "1 cup spinach = 30g"
+            const newMeasures = ingredients
+                .filter(ing => ing.food_item_id !== 'temp-id' && ing.measure_label && ing.measure_label !== 'g' && ing.quantity > 0 && ing.weight_g > 0)
+                .map(ing => ({
+                    food_item_id: ing.food_item_id,
+                    label: ing.measure_label.toLowerCase().trim(),
+                    weight_g: ing.weight_g / ing.quantity // Calculate unit weight
+                }));
+
+            if (newMeasures.length > 0) {
+                // Use upsert to avoid errors if it already exists, but key collision might block insert
+                // The unique constraint is likely (food_item_id, label)
+                await supabase
+                    .from('food_measures')
+                    .upsert(newMeasures, { onConflict: 'food_item_id, label', ignoreDuplicates: true })
+                    .then(({ error }) => {
+                        if (error) console.warn("Auto-save measures warning:", error.message);
+                    });
+            }
+
             // Insert instructions
             const instructionsData = instructions
                 .filter(step => step.trim())
