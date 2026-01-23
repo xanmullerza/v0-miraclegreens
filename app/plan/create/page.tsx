@@ -167,7 +167,7 @@ export default function CreateRecipePage() {
                 recipe_id: recipeId,
                 food_item_id: ing.food_item_id === 'temp-id' ? null : ing.food_item_id,
                 item: ing.food_item_name,
-                amount: `${ing.weight_g}g`,
+                amount: `${ing.quantity} ${ing.measure_label || 'g'}`,
                 weight_g: ing.weight_g,
                 quantity: ing.quantity,
                 measure_label: ing.measure_label,
