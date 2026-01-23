@@ -25,6 +25,7 @@ export interface RecipeIngredient {
     weight_g: number;
     quantity: number;
     measure_label: string;
+    modifier?: string; // New field for prep state
     // Calculated nutrition
     calories: number;
     energy_kj: number;
@@ -53,7 +54,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
     const { energyUnit, setEnergyUnit } = useUserPreferences();
     const useKilojoules = energyUnit === 'kJ';
 
-    const handleAddIngredient = async (foodItem: FoodItem | FoodItemMatch, initialValues?: { weightG?: number, quantity?: number, unit?: string }) => {
+    const handleAddIngredient = async (foodItem: FoodItem | FoodItemMatch, initialValues?: { weightG?: number, quantity?: number, unit?: string, modifier?: string }) => {
         // Fetch available measures
         let measures: FoodMeasure[] = [];
         let finalFoodItem = foodItem as any;
@@ -76,6 +77,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
         let weight_g = initialValues?.weightG || 0;
         let quantity = initialValues?.quantity || (weight_g > 0 ? weight_g : 1);
         let unit = initialValues?.unit?.trim() || '';
+        let modifier = initialValues?.modifier?.trim() || '';
 
         // KEY: If weightG was provided from parsing, it is the source of truth
         // We should NOT overwrite it with measure calculations
@@ -200,7 +202,8 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             carbs: Math.round(finalFoodItem.carbs_g * multiplier * 10) / 10,
             available_measures: measures,
             parsedGrams: hasParsedWeight ? weight_g : undefined,
-            customUnitWeight: (hasParsedWeight && quantity > 0) ? (weight_g / quantity) : undefined
+            customUnitWeight: (hasParsedWeight && quantity > 0) ? (weight_g / quantity) : undefined,
+            modifier: modifier
         };
 
         onChange([...ingredients, newIngredient]);
@@ -345,7 +348,8 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
         await handleAddIngredient(item.selectedMatch, {
             weightG: weightG,
             quantity: qty,
-            unit: unit
+            unit: unit,
+            modifier: item.raw.modifier
         });
 
         // Remove from pending
@@ -396,6 +400,15 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
         updated[index] = {
             ...ing,
             measure_label: newUnit
+        };
+        onChange(updated);
+    };
+
+    const handleUpdateModifier = (index: number, newModifier: string) => {
+        const updated = [...ingredients];
+        updated[index] = {
+            ...updated[index],
+            modifier: newModifier
         };
         onChange(updated);
     };
@@ -634,6 +647,17 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                                     />
                                 </div>
 
+                                <div className="flex flex-col gap-1 flex-1 md:flex-none">
+                                    <span className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-tighter ml-1">Prep</span>
+                                    <input
+                                        type="text"
+                                        value={ing.modifier || ''}
+                                        onChange={(e) => handleUpdateModifier(index, e.target.value)}
+                                        className="min-w-[80px] w-full px-2 py-2 border border-border bg-background text-foreground text-sm rounded-lg font-medium focus:ring-2 focus:ring-green-500/20 outline-none truncate text-amber-700 dark:text-amber-400"
+                                        placeholder="e.g. chopped"
+                                    />
+                                </div>
+
                                 <div className="flex flex-col gap-1">
                                     <span className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-tighter ml-1">Weight</span>
                                     <div className="flex items-center gap-1.5 px-3 py-2 bg-muted/30 border border-border rounded-lg group hover:border-green-500/50 transition-colors">
@@ -661,41 +685,45 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                 </div>
             )}
 
-            {ingredients.length > 0 && (
-                <div className="p-4 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800/30 rounded-lg">
-                    <div className="font-semibold text-green-900 dark:text-green-400 mb-2">Total Nutrition</div>
-                    <div className="grid grid-cols-4 gap-4 text-sm">
-                        <div>
-                            <div className="text-muted-foreground">{useKilojoules ? 'Kilojoules' : 'Calories'}</div>
-                            <div className="font-semibold text-lg text-foreground">
-                                {useKilojoules ? totals.energy_kj : totals.calories}
-                                <span className="text-xs ml-1 font-normal opacity-70">
-                                    {useKilojoules ? 'kJ' : 'kcal'}
-                                </span>
+            {
+                ingredients.length > 0 && (
+                    <div className="p-4 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800/30 rounded-lg">
+                        <div className="font-semibold text-green-900 dark:text-green-400 mb-2">Total Nutrition</div>
+                        <div className="grid grid-cols-4 gap-4 text-sm">
+                            <div>
+                                <div className="text-muted-foreground">{useKilojoules ? 'Kilojoules' : 'Calories'}</div>
+                                <div className="font-semibold text-lg text-foreground">
+                                    {useKilojoules ? totals.energy_kj : totals.calories}
+                                    <span className="text-xs ml-1 font-normal opacity-70">
+                                        {useKilojoules ? 'kJ' : 'kcal'}
+                                    </span>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-muted-foreground">Protein</div>
+                                <div className="font-semibold text-lg text-foreground">{totals.protein.toFixed(1)}g</div>
+                            </div>
+                            <div>
+                                <div className="text-muted-foreground">Fat</div>
+                                <div className="font-semibold text-lg text-foreground">{totals.fat.toFixed(1)}g</div>
+                            </div>
+                            <div>
+                                <div className="text-muted-foreground">Carbs</div>
+                                <div className="font-semibold text-lg text-foreground">{totals.carbs.toFixed(1)}g</div>
                             </div>
                         </div>
-                        <div>
-                            <div className="text-muted-foreground">Protein</div>
-                            <div className="font-semibold text-lg text-foreground">{totals.protein.toFixed(1)}g</div>
-                        </div>
-                        <div>
-                            <div className="text-muted-foreground">Fat</div>
-                            <div className="font-semibold text-lg text-foreground">{totals.fat.toFixed(1)}g</div>
-                        </div>
-                        <div>
-                            <div className="text-muted-foreground">Carbs</div>
-                            <div className="font-semibold text-lg text-foreground">{totals.carbs.toFixed(1)}g</div>
-                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
-            {showPicker && (
-                <FoodItemPicker
-                    onSelect={handleAddIngredient}
-                    onClose={() => setShowPicker(false)}
-                />
-            )}
-        </div>
+            {
+                showPicker && (
+                    <FoodItemPicker
+                        onSelect={handleAddIngredient}
+                        onClose={() => setShowPicker(false)}
+                    />
+                )
+            }
+        </div >
     );
 }

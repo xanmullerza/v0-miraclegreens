@@ -167,11 +167,12 @@ export default function CreateRecipePage() {
                 recipe_id: recipeId,
                 food_item_id: ing.food_item_id === 'temp-id' ? null : ing.food_item_id,
                 item: ing.food_item_name,
-                amount: `${ing.quantity} ${ing.measure_label || 'g'}`,
+                amount: `${ing.quantity} ${ing.measure_label || 'g'}${ing.modifier ? ' ' + ing.modifier : ''}`.trim(),
                 weight_g: ing.weight_g,
                 quantity: ing.quantity,
                 measure_label: ing.measure_label,
                 base_ingredient: ing.food_item_name,
+                modifier: ing.modifier,
             }));
 
             const { error: ingredientsError } = await supabase

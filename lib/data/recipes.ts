@@ -8,6 +8,7 @@ export interface Ingredient {
     baseIngredient?: string; // What you buy (e.g., "Egg" for "Egg, Scrambled")
     weightG?: number; // Structured weight in grams (base amount before scaling)
     measureLabel?: string; // e.g., "cup", "slice"
+    modifier?: string; // e.g. "chopped", "shredded"
 }
 
 export interface Recipe {

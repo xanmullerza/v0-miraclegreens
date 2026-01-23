@@ -7,6 +7,7 @@ export interface ParsedIngredient {
     item: string;
     amount: string;
     weightG?: number;
+    modifier?: string;
 }
 
 export interface ParsedRecipe {
@@ -252,6 +253,57 @@ function isProbablyInstruction(line: string): boolean {
         lower.includes('cook') || lower.includes('toss') || lower.includes('serve');
 }
 
+const COMMON_MODIFIERS = [
+    'chopped', 'diced', 'minced', 'shredded', 'grated', 'sliced', 'crushed', 'pureed', 'mashed', 'ground',
+    'melted', 'softened', 'beaten', 'whisked', 'sifted',
+    'peeled', 'seeded', 'cored', 'zested', 'juiced', 'skinless', 'boneless',
+    'cooked', 'boiled', 'fried', 'baked', 'roasted', 'steamed', 'blanched', 'sautéed', 'grilled', 'smoked',
+    'dried', 'fresh', 'frozen', 'raw', 'canned',
+    'warm', 'hot', 'cold', 'chilled',
+    'crumbled', 'cubed', 'halved', 'quartered', 'whole',
+    'finely', 'coarsely', 'thinly', 'thickly', 'roughly'
+];
+
+function extractModifier(text: string): { modifier?: string, cleanText: string } {
+    const words = text.split(/\s+/);
+    const potentialModifiers: string[] = [];
+    let cleanTextParts: string[] = [];
+
+    // Check first few words for modifiers
+    let i = 0;
+    while (i < words.length) {
+        let wordRaw = words[i].toLowerCase().replace(/,$/, '');
+        // handle composite like "finely chopped"
+        if (COMMON_MODIFIERS.includes(wordRaw)) {
+            potentialModifiers.push(words[i].replace(/,$/, ''));
+            i++;
+        } else {
+            // Check next word if current is an adverb like 'finely'
+            if ((wordRaw === 'finely' || wordRaw === 'coarsely' || wordRaw === 'thinly' || wordRaw === 'roughly') && i + 1 < words.length) {
+                const nextWord = words[i + 1].toLowerCase().replace(/,$/, '');
+                if (COMMON_MODIFIERS.includes(nextWord)) {
+                    potentialModifiers.push(words[i] + ' ' + words[i + 1].replace(/,$/, ''));
+                    i += 2;
+                    continue;
+                }
+            }
+            break; // Stop at first non-modifier
+        }
+    }
+
+    cleanTextParts = words.slice(i);
+
+    // Also check for comma-separated modifiers at the end? e.g. "Spinach, chopped"
+    // For now, let's stick to the prefix "Chopped Spinach" pattern as requested by "between measure and item" structure usually imply.
+    // If the user pasted "Spinach, chopped", the parser might leave "Spinach, chopped" as item.
+
+    if (potentialModifiers.length > 0) {
+        return { modifier: potentialModifiers.join(', '), cleanText: cleanTextParts.join(' ') };
+    }
+
+    return { cleanText: text };
+}
+
 function parseIngredientLine(line: string): ParsedIngredient {
     let cleanLine = line.replace(/^[*•\-+]\s+/, '').trim();
 
@@ -337,7 +389,9 @@ function parseIngredientLine(line: string): ParsedIngredient {
                 }
             }
 
-            return { amount, item, weightG };
+            const { modifier, cleanText } = extractModifier(item);
+
+            return { amount, item: cleanText, weightG, modifier };
         }
     }
 
@@ -378,10 +432,13 @@ function parseIngredientLine(line: string): ParsedIngredient {
             weightG = parseFloat(amount) * 1000;
         }
 
+        const { modifier, cleanText } = extractModifier(rest);
+
         return {
             amount: unit ? `${amount} ${unit}` : amount,
-            item: rest || unit || amount,
-            weightG
+            item: cleanText || unit || amount,
+            weightG,
+            modifier
         };
     }
 
@@ -396,10 +453,13 @@ function parseIngredientLine(line: string): ParsedIngredient {
             let weightG = parseFloat(amount);
             if (unitPart.toLowerCase().startsWith('kg')) weightG *= 1000;
 
+            const { modifier, cleanText } = extractModifier(item);
+
             return {
                 amount: `${amount} ${unitPart}`,
-                item: item || cleanLine,
-                weightG
+                item: cleanText || cleanLine,
+                weightG,
+                modifier
             };
         }
     }
