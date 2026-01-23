@@ -106,7 +106,9 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             }) : null;
 
             if (matchedMeasure) {
-                unit = matchedMeasure.label;
+                // If we DON'T have a specific unit string already (manual add), use the matched label
+                if (!unit) unit = matchedMeasure.label;
+
                 // Only calculate weight from measure if we don't have parsed grams
                 if (!hasParsedWeight) {
                     weight_g = quantity * matchedMeasure.weight_g;
@@ -133,7 +135,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                 });
 
                 if (natural) {
-                    unit = natural.label;
+                    if (!unit) unit = natural.label;
                     if (!hasParsedWeight) {
                         weight_g = quantity * natural.weight_g;
                     }
@@ -141,23 +143,28 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                     // Safety fallback: only use first measure if it looks like a single portion
                     const first = measures[0];
                     if (first && (first.weight_g < 150 || quantity < 1)) {
-                        unit = first.label;
+                        if (!unit) unit = first.label;
                         if (!hasParsedWeight) {
                             weight_g = quantity * (first.weight_g || 1);
                         }
                     } else {
-                        unit = 'g';
+                        if (!unit) unit = 'g';
                         if (!hasParsedWeight) {
                             weight_g = weight_g || (quantity > 10 ? quantity : 100);
                         }
                     }
                 }
             } else {
-                // Unknown unit provided (e.g. "handful"), fallback to first measure
+                // Unknown unit provided (e.g. "handful"), fallback to first measure logic for WEIGHT but keep label
                 const first = measures[0];
                 if (first) {
-                    unit = first.label;
                     if (!hasParsedWeight) {
+                        // We have a unit string (e.g. "cup"), but we need a weight.
+                        // Try to see if our unit string matches any measure label loosely again?
+                        // actually matchedMeasure above handles the fuzzy match.
+                        // If we are here, we have a unit string but it didn't match a measure.
+                        // Just default to first measure weight? Or 0?
+                        // Let's use first measure weight as a best guess
                         weight_g = quantity * (first.weight_g || 1);
                     }
                 }
@@ -385,51 +392,12 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
         const updated = [...ingredients];
         const ing = updated[index];
 
-        // Calculate new weight
-        let newWeight = ing.quantity; // Default if switching to grams (quantity = weight)
-
-        if (newUnit !== 'g' && ing.available_measures) {
-            const measure = ing.available_measures.find(m => m.label === newUnit);
-            if (measure) {
-                newWeight = ing.quantity * measure.weight_g;
-            }
-        }
-
-        if (newUnit === 'g') {
-            updated[index] = {
-                ...ing,
-                measure_label: newUnit,
-                quantity: Math.round(ing.weight_g),
-                customUnitWeight: undefined, // Clear custom weight as specific unit is now chosen
-                parsedGrams: undefined
-            };
-            onChange(updated);
-            return;
-        }
-
-        // Switching to a unit
-        if (ing.available_measures) {
-            const measure = ing.available_measures.find(m => m.label === newUnit);
-            if (measure) {
-                newWeight = ing.quantity * measure.weight_g;
-                const ratio = newWeight / (ing.weight_g || 1);
-
-                updated[index] = {
-                    ...ing,
-                    measure_label: newUnit,
-                    weight_g: newWeight,
-                    calories: Math.round(ing.calories * ratio),
-                    energy_kj: Math.round(ing.energy_kj * ratio),
-                    protein: Math.round(ing.protein * ratio * 10) / 10,
-                    fat: Math.round(ing.fat * ratio * 10) / 10,
-                    carbs: Math.round(ing.carbs * ratio * 10) / 10,
-                    customUnitWeight: undefined, // Clear custom weight
-                    parsedGrams: undefined
-                };
-                onChange(updated);
-                return;
-            }
-        }
+        // Just update the label, do NOT change weight or quantity
+        updated[index] = {
+            ...ing,
+            measure_label: newUnit
+        };
+        onChange(updated);
     };
 
     const handleUpdateWeight = (index: number, newWeight: number) => {
@@ -657,27 +625,14 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
 
                                 <div className="flex flex-col gap-1 flex-1 md:flex-none">
                                     <span className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-tighter ml-1">Unit</span>
-                                    <select
+                                    <span className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-tighter ml-1">Unit</span>
+                                    <input
+                                        type="text"
                                         value={ing.measure_label}
                                         onChange={(e) => handleUpdateUnit(index, e.target.value)}
-                                        className="min-w-[100px] max-w-[160px] px-2 py-2 border border-border bg-background text-foreground text-sm rounded-lg font-medium focus:ring-2 focus:ring-green-500/20 outline-none"
-                                    >
-                                        <option value="g">grams (g)</option>
-                                        {ing.available_measures?.map((m, mi) => {
-                                            const label = m.label.toLowerCase();
-                                            let displayLabel = m.label;
-
-                                            if (label === 'portion' || /^\d+$/.test(label)) {
-                                                displayLabel = m.weight_g >= 100 ? 'Standard Serving' : 'Small Portion';
-                                            }
-
-                                            return (
-                                                <option key={mi} value={m.label}>
-                                                    {displayLabel} ({Math.round(m.weight_g)}g)
-                                                </option>
-                                            );
-                                        })}
-                                    </select>
+                                        className="min-w-[80px] w-full px-2 py-2 border border-border bg-background text-foreground text-sm rounded-lg font-medium focus:ring-2 focus:ring-green-500/20 outline-none truncate"
+                                        placeholder="Unit (e.g. cup)"
+                                    />
                                 </div>
 
                                 <div className="flex flex-col gap-1">
