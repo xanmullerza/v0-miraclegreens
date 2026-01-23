@@ -133,9 +133,11 @@ function RecipeUploaderContent() {
         matchedFood?: FoodItemMatch,
         selectedMeasure?: FoodMeasure,
         availableMeasures?: FoodMeasure[],
-        parsedGrams?: number // The grams parsed from the original text, never overwritten
+        parsedGrams?: number, // The grams parsed from the original text, never overwritten
+        qty?: number, // Separate quantity field for multiplier
+        unit?: string // Separate unit field
     })[]>([
-        { item: '', amount: '', weightG: 0, isMiracleProduct: false }
+        { item: '', amount: '', weightG: 0, isMiracleProduct: false, qty: 1, unit: '' }
     ]);
     const [instructions, setInstructions] = useState<string[]>(['']);
     const [magicPaste, setMagicPaste] = useState('');
@@ -317,13 +319,21 @@ function RecipeUploaderContent() {
         setIsWizardProcessing(true);
         try {
             const parsed = parseIngredientsOnly(text);
-            const newIngs = parsed.map(ing => ({
-                item: ing.item,
-                amount: ing.amount,
-                weightG: ing.weightG || 0,
-                parsedGrams: ing.weightG, // Store original parsed grams separately
-                isMiracleProduct: false
-            }));
+            const newIngs = parsed.map(ing => {
+                // Extract qty and unit from amount string like "1 cup" or "2 tbsp"
+                const qtyVal = evaluateAmount(ing.amount);
+                const unitStr = ing.amount.replace(/^[\d\s¼½¾⅛⅜⅝⅞/.]+/, '').trim();
+
+                return {
+                    item: ing.item,
+                    amount: ing.amount,
+                    weightG: ing.weightG || 0,
+                    parsedGrams: ing.weightG, // Store original parsed grams separately
+                    qty: qtyVal,
+                    unit: unitStr,
+                    isMiracleProduct: false
+                };
+            });
             setIngredients(newIngs);
 
             // Auto-match attempt
@@ -356,13 +366,20 @@ function RecipeUploaderContent() {
             const parsed = parseRecipeText(magicPaste);
             setTitle(parsed.title);
             setServings(parsed.servings);
-            const newIngs = parsed.ingredients.map(ing => ({
-                item: ing.item,
-                amount: ing.amount,
-                weightG: ing.weightG || 0,
-                parsedGrams: ing.weightG, // Store original parsed grams
-                isMiracleProduct: false
-            }));
+            const newIngs = parsed.ingredients.map(ing => {
+                const qtyVal = evaluateAmount(ing.amount);
+                const unitStr = ing.amount.replace(/^[\d\s¼½¾⅛⅜⅝⅞/.]+/, '').trim();
+
+                return {
+                    item: ing.item,
+                    amount: ing.amount,
+                    weightG: ing.weightG || 0,
+                    parsedGrams: ing.weightG, // Store original parsed grams
+                    qty: qtyVal,
+                    unit: unitStr,
+                    isMiracleProduct: false
+                };
+            });
             setIngredients(newIngs);
             setInstructions(parsed.instructions);
             setStep(2);
@@ -502,7 +519,7 @@ function RecipeUploaderContent() {
     const [measures, setMeasures] = useState<FoodMeasure[]>([]);
 
     // Add/Remove dynamic rows
-    const addIngredient = () => setIngredients([...ingredients, { item: '', amount: '', weightG: 0, isMiracleProduct: false }]);
+    const addIngredient = () => setIngredients([...ingredients, { item: '', amount: '', weightG: 0, isMiracleProduct: false, qty: 1, unit: '' }]);
     const removeIngredient = (idx: number) => setIngredients(ingredients.filter((_, i) => i !== idx));
 
     const addInstruction = () => setInstructions([...instructions, '']);
@@ -1329,7 +1346,7 @@ function RecipeUploaderContent() {
                                         <div key={idx} className="group relative bg-slate-50/50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800 transition-all hover:bg-white dark:hover:bg-slate-800 hover:border-emerald-100 dark:hover:border-emerald-900">
                                             {/* Ingredient Inputs */}
                                             <div className="flex-1 grid grid-cols-1 md:grid-cols-12 gap-4">
-                                                <div className="md:col-span-5 space-y-1.5">
+                                                <div className="md:col-span-4 space-y-1.5">
                                                     <Label className="text-[12px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Ingredient Item</Label>
                                                     <Input
                                                         value={ing.item}
@@ -1343,25 +1360,48 @@ function RecipeUploaderContent() {
                                                     />
                                                 </div>
 
-                                                <div className="md:col-span-2 space-y-1.5">
-                                                    <Label className="text-[12px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Qty/Unit</Label>
-                                                    <div className="flex gap-2">
-                                                        <Input
-                                                            value={ing.amount}
-                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                                                const newIngs = [...ingredients];
-                                                                newIngs[idx].amount = e.target.value;
-                                                                // Recalculate weight if measure selected
-                                                                if (newIngs[idx].selectedMeasure) {
-                                                                    const qty = evaluateAmount(e.target.value);
-                                                                    newIngs[idx].weightG = qty * newIngs[idx].selectedMeasure!.weight_g;
-                                                                }
-                                                                setIngredients(newIngs);
-                                                            }}
-                                                            placeholder="e.g. 2"
-                                                            className="text-lg font-bold rounded-xl border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-primary/20 bg-white dark:bg-slate-900"
-                                                        />
-                                                    </div>
+                                                <div className="md:col-span-1 space-y-1.5">
+                                                    <Label className="text-[12px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Qty</Label>
+                                                    <Input
+                                                        type="number"
+                                                        step="0.5"
+                                                        min="0"
+                                                        value={ing.qty || 1}
+                                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                                            const newIngs = [...ingredients];
+                                                            const newQty = parseFloat(e.target.value) || 1;
+                                                            const oldQty = newIngs[idx].qty || 1;
+
+                                                            // Calculate new weight based on ratio
+                                                            if (newIngs[idx].parsedGrams && oldQty > 0) {
+                                                                // Use parsed grams as base for the original qty
+                                                                const unitWeight = newIngs[idx].parsedGrams! / oldQty;
+                                                                newIngs[idx].weightG = newQty * unitWeight;
+                                                            } else if (newIngs[idx].selectedMeasure) {
+                                                                newIngs[idx].weightG = newQty * newIngs[idx].selectedMeasure!.weight_g;
+                                                            }
+
+                                                            newIngs[idx].qty = newQty;
+                                                            newIngs[idx].amount = `${newQty} ${newIngs[idx].unit || ''}`.trim();
+                                                            setIngredients(newIngs);
+                                                        }}
+                                                        className="text-lg font-bold rounded-xl border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-primary/20 bg-white dark:bg-slate-900 text-center"
+                                                    />
+                                                </div>
+
+                                                <div className="md:col-span-1 space-y-1.5">
+                                                    <Label className="text-[12px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Unit</Label>
+                                                    <Input
+                                                        value={ing.unit || ''}
+                                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                                            const newIngs = [...ingredients];
+                                                            newIngs[idx].unit = e.target.value;
+                                                            newIngs[idx].amount = `${newIngs[idx].qty || 1} ${e.target.value}`.trim();
+                                                            setIngredients(newIngs);
+                                                        }}
+                                                        placeholder="cup"
+                                                        className="text-lg font-bold rounded-xl border-slate-200 dark:border-slate-700 focus:border-primary focus:ring-primary/20 bg-white dark:bg-slate-900"
+                                                    />
                                                 </div>
 
                                                 <div className="md:col-span-2 space-y-1.5">
