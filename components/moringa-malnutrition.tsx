@@ -39,11 +39,11 @@ export function MoringaMalnutrition() {
                     </div>
                 </div>
 
-                <div className="flex justify-center mt-12">
+                {/* <div className="flex justify-center mt-12">
                     <Button asChild size="lg" className="px-8">
                         <Link href="/donate">Support Our Mission</Link>
                     </Button>
-                </div>
+                </div> */}
             </div>
         </section>
     );

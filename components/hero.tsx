@@ -36,7 +36,8 @@ export function Hero() {
                   </a>
                 </Button>
               )}
-              <div className="flex flex-wrap gap-2 sm:gap-4">
+              {/* Hide Browse, Plan, and Donate buttons per user request */}
+              {/* <div className="flex flex-wrap gap-2 sm:gap-4">
                 <Button variant="outline" size="lg" className="h-12 px-6 text-base gap-2" asChild>
                   <a href="/browse">
                     <LayoutGrid className="h-5 w-5" />
@@ -55,7 +56,7 @@ export function Hero() {
                     Donate
                   </a>
                 </Button>
-              </div>
+              </div> */}
             </div>
           </div>
           <div className="relative">
