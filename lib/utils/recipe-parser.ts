@@ -40,24 +40,50 @@ export function parseIngredientsOnly(text: string): ParsedIngredient[] {
         }
 
         const hasQuantity = /^[\d¼½¾⅛⅜⅝⅞*•\-]/.test(line) || lowerLine.startsWith('optional');
-        if (!hasQuantity) {
-            if (line.length < 100) nameBuffer.push(line);
-            continue;
-        }
 
-        if (nameBuffer.length > 0) {
-            const prefix = nameBuffer.join(' ');
-            parsed.item = prefix + (parsed.item ? ', ' + parsed.item : '');
-            nameBuffer = [];
+        // If it has a quantity, flush buffer and start new
+        if (hasQuantity) {
+            // Check if this line actually has a meaningful name
+            // e.g. "1 cup" vs "1 cup spinach"
+            // If it's just "1 cup", we definitely want to check the buffer.
+
+            // Heuristic: If the parsed item name is very short OR is just the unit name
+            const isNameWeak = parsed.item.length < 2 || parsed.item === parsed.amount || COMMON_UNITS.includes(parsed.item);
+
+            if (nameBuffer.length > 0) {
+                if (isNameWeak) {
+                    // The buffer IS the name of this ingredient
+                    const prefix = nameBuffer.join(' ');
+                    parsed.item = prefix + (parsed.item && parsed.item !== prefix ? ' ' + parsed.item : '');
+                    nameBuffer = []; // Consumed
+                } else {
+                    // The buffer was likely a list of previous items (e.g. "Salt", "Pepper")
+                    // Flush them as their own items
+                    nameBuffer.forEach(bufferedItem => {
+                        ingredients.push(parseIngredientLine(bufferedItem));
+                    });
+                    nameBuffer = [];
+                }
+            }
+            ingredients.push(parsed);
+        } else {
+            // No quantity. Is it a continuation or a new item?
+            // If the buffer is empty, assume it's a new item (or part of one)
+            // If the buffer is NOT empty, we append? 
+            // Better logic: treat every line as a potential ingredient if it doesn't look like junk.
+            // If it's short and has no quantity, it might be "Salt" or "Pepper"
+            nameBuffer.push(line);
         }
-        ingredients.push(parsed);
     }
 
-    // Fallback: if we found NO ingredients but have items in nameBuffer, 
-    // treat each buffered item as a separate ingredient (for simple word lists)
-    if (ingredients.length === 0 && nameBuffer.length > 0) {
-        return nameBuffer.map(item => parseIngredientLine(item));
+    // Flush remaining buffer
+    if (nameBuffer.length > 0) {
+        nameBuffer.forEach(bufferedItem => {
+            ingredients.push(parseIngredientLine(bufferedItem));
+        });
     }
+
+
 
     return ingredients;
 }
@@ -235,12 +261,10 @@ function parseIngredientLine(line: string): ParsedIngredient {
 
     cleanLine = cleanLine.replace(artifactRegex, (match, p1) => {
         const lowerP1 = p1.toLowerCase();
-        if (COMMON_UNITS.includes(lowerP1) || lowerP1.length <= 4) {
-            const exceptions = ['flo', 'doo', 'po', 'arm', 'col', 'flav', 'tail'];
-            if (exceptions.includes(lowerP1)) return match;
-            return p1;
-        }
-        return match;
+        // Trust the exceptions list primarily. If NOT in exceptions, we strip it.
+        const exceptions = ['flo', 'doo', 'po', 'arm', 'col', 'flav', 'tail'];
+        if (exceptions.includes(lowerP1)) return match;
+        return p1;
     }).trim();
 
     cleanLine = cleanLine.replace(/(\W)(?:or|original|scaled|serving)\s*$/gi, '$1').trim();
