@@ -230,14 +230,12 @@ function parseIngredientLine(line: string): ParsedIngredient {
     let cleanLine = line.replace(/^[*•\-+]\s+/, '').trim();
 
     // Aggressive cleanup for "or", "original", etc. artifacts
-    // Strategy: if a word ends in "or/scaled/etc" and the part before it is a known unit or short word, strip it.
     const artifacts = ['or', 'original', 'scaled', 'serving'];
     const artifactRegex = new RegExp(`(\\w+)(?:${artifacts.join('|')})\\b`, 'gi');
 
     cleanLine = cleanLine.replace(artifactRegex, (match, p1) => {
         const lowerP1 = p1.toLowerCase();
         if (COMMON_UNITS.includes(lowerP1) || lowerP1.length <= 4) {
-            // Keep real words like "floor", "door"
             const exceptions = ['flo', 'doo', 'po', 'arm', 'col', 'flav', 'tail'];
             if (exceptions.includes(lowerP1)) return match;
             return p1;
@@ -245,17 +243,82 @@ function parseIngredientLine(line: string): ParsedIngredient {
         return match;
     }).trim();
 
-    // Catch trailing punctuation + artifact like "long,or"
     cleanLine = cleanLine.replace(/(\W)(?:or|original|scaled|serving)\s*$/gi, '$1').trim();
     cleanLine = cleanLine.replace(/(?:,|"|'|\d)(or|original|scaled|serving)\s*$/gi, (m, p1) => m.slice(0, -p1.length)).trim();
 
-    // Regex to match quantity
-    // Matches: "1 1/2", "1/2", "1.5", "1", "250"
-    const qtyRegex = /^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?))\s*(.*)/i;
+    // 1. Pre-process text-based fractions and comma-decimals
+    // Handle "quarter", "half", "third"
+    cleanLine = cleanLine.replace(/\bquarter\b/gi, '0.25');
+    cleanLine = cleanLine.replace(/\bhalf\b/gi, '0.5');
+    cleanLine = cleanLine.replace(/\bthird\b/gi, '0.33');
+    // Handle comma decimals "0,25" -> "0.25"
+    cleanLine = cleanLine.replace(/(\d+),(\d+)/g, '$1.$2');
 
-    const match = cleanLine.match(qtyRegex);
+    // 2. Try Standard Start-of-line Match
+    // Matches: "1 1/2", "1/2", "1.5", "1", "250", "0.25"
+    const qtyRegex = /^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?|[¼½¾⅛⅜⅝⅞]))\s*(.*)/i;
+
+    let match = cleanLine.match(qtyRegex);
+    let amount = "";
+    let item = cleanLine;
+    let weightG: number | undefined = undefined;
+
+    // 3. IF Start-of-line failed, try Embedded match
+    // Look for (Number/Fraction) followed explicitly by a (Unit)
+    if (!match) {
+        // Regex: (Start or space/punctuation) (Number) (Spaces) (Unit) (Boundary)
+        const embeddedRegex = new RegExp(`(?:^|[\\s,(])((?:\\d+(?:\\.\\d+)?|\\d+\\/\\d+|[¼½¾⅛⅜⅝⅞]))\\s*(${COMMON_UNITS.join('|')})\\b`, 'i');
+        const embeddedMatch = cleanLine.match(embeddedRegex);
+
+        if (embeddedMatch) {
+            // Reconstruct a "standard" structure to parse nicely
+            // We found "0.25 cup" inside "Onion, 0.25 cup chopped"
+            // We set amount="0.25", unit="cup"
+            // And we try to remove this part from the Item string to clean it up
+            const foundAmount = embeddedMatch[1];
+            const foundUnit = embeddedMatch[2];
+            amount = foundAmount.trim();
+
+            // Remove the found quantity entity from the item string
+            const fullMatch = embeddedMatch[0]; // e.g. ", 0.25 cup"
+            let rest = cleanLine.replace(fullMatch, ' ').replace(/\s+/g, ' ').trim();
+            // Clean up leading commas/spaces we might have left
+            rest = rest.replace(/^[,.\s]+/, '');
+
+            // Prepare for the unit-parsing logic below
+            // equivalent to `match` structure: match[1]=amount, match[2]=rest (which starts with unit now)
+            // But here we already extracted unit.
+            // Let's just create the formatted amount string directly.
+
+            amount = `${foundAmount} ${foundUnit}`;
+            item = rest;
+
+            // Check for weight in the REST of the string (parenthesis etc)
+            // Reuse the weight parsing logic below by passing `rest`
+            match = [fullMatch, foundAmount, rest]; // Fake match object to fall through? 
+            // Actually, better to just reuse the weight logic function or duplicate small logic.
+            // Let's just set the variables and let the code proceed if possible, 
+            // OR duplicated weight logic here for safety.
+
+            // Weight parsing logic (Duplicated for embedded case)
+            const parenWeightMatch = item.match(/\((\d+(?:\.\d+)?)\s*(?:g|gram|grams)\)/i);
+            if (parenWeightMatch) {
+                weightG = parseFloat(parenWeightMatch[1]);
+                item = item.replace(parenWeightMatch[0], '').trim();
+            } else {
+                const endWeightMatch = item.match(/\b(\d+(?:\.\d+)?)\s*(?:g|gram|grams)\b$/i);
+                if (endWeightMatch) {
+                    weightG = parseFloat(endWeightMatch[1]);
+                    item = item.replace(endWeightMatch[0], '').trim();
+                }
+            }
+
+            return { amount, item, weightG };
+        }
+    }
+
     if (match) {
-        const amount = match[1].trim();
+        amount = match[1].trim();
         let rest = match[2].trim();
 
         // Check if the "rest" starts with a known unit
@@ -266,23 +329,17 @@ function parseIngredientLine(line: string): ParsedIngredient {
         if (COMMON_UNITS.includes(firstWord)) {
             unit = words[0];
             rest = words.slice(1).join(' ').trim();
-            // Handle cases like "cup of"
             if (rest.toLowerCase().startsWith('of ')) {
                 rest = rest.slice(3).trim();
             }
         }
 
-        // Special case: check for weight in grams anywhere in the line (e.g. "2 cups (94g) flour" or "100g chicken")
-        let weightG: number | undefined = undefined;
-
-        // 1. Check for weight in parenthesis: (100g) or (100 grams)
+        // Weight parsing logic
         const parenWeightMatch = rest.match(/\((\d+(?:\.\d+)?)\s*(?:g|gram|grams)\)/i);
         if (parenWeightMatch) {
             weightG = parseFloat(parenWeightMatch[1]);
             rest = rest.replace(parenWeightMatch[0], '').trim();
-        }
-        // 2. Check for weight at the end: 100g or 100 grams
-        else {
+        } else {
             const endWeightMatch = rest.match(/\b(\d+(?:\.\d+)?)\s*(?:g|gram|grams)\b$/i);
             if (endWeightMatch) {
                 weightG = parseFloat(endWeightMatch[1]);
@@ -290,7 +347,6 @@ function parseIngredientLine(line: string): ParsedIngredient {
             }
         }
 
-        // If 'g' is the unit, set weightG (priority over the above if it was the main unit)
         const lowerUnit = unit.toLowerCase();
         if (lowerUnit === 'g' || lowerUnit === 'gram' || lowerUnit === 'grams' || lowerUnit === 'ml') {
             weightG = parseFloat(amount);
@@ -305,7 +361,7 @@ function parseIngredientLine(line: string): ParsedIngredient {
         };
     }
 
-    // If no match at start, try to find a weight/amount anywhere
+    // If no match at start OR embedded
     if (!match) {
         const anyWeightMatch = cleanLine.match(/\b(\d+(?:\.\d+)?)\s*(?:g|gram|grams|ml|kg|kilogram|kilograms)\b/i);
         if (anyWeightMatch) {
