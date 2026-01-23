@@ -134,6 +134,7 @@ function RecipeUploaderContent() {
         selectedMeasure?: FoodMeasure,
         availableMeasures?: FoodMeasure[],
         parsedGrams?: number, // The grams parsed from the original text, never overwritten
+        customUnitWeight?: number, // The weight of 1 unit as parsed from the original text (parsedGrams / originalQty)
         qty?: number, // Separate quantity field for multiplier
         unit?: string // Separate unit field
     })[]>([
@@ -256,7 +257,10 @@ function RecipeUploaderContent() {
                     micronutrients: ing.food_items.micronutrients,
                     source: 'local' as const
                 } : undefined,
-                selectedMeasure: ing.measure_label ? { label: ing.measure_label, weight_g: 0 } : undefined
+                selectedMeasure: ing.measure_label ? { label: ing.measure_label, weight_g: 0 } : undefined,
+                qty: evaluateAmount(ing.amount),
+                unit: ing.amount.replace(/^[\d\s¼½¾⅛⅜⅝⅞/.]+/, '').trim(),
+                customUnitWeight: ing.weightG && evaluateAmount(ing.amount) > 0 ? ing.weightG / evaluateAmount(ing.amount) : undefined
             }));
             setIngredients(hydratedIngs);
 
@@ -329,6 +333,7 @@ function RecipeUploaderContent() {
                     amount: ing.amount,
                     weightG: ing.weightG || 0,
                     parsedGrams: ing.weightG, // Store original parsed grams separately
+                    customUnitWeight: (ing.weightG && qtyVal > 0) ? (ing.weightG / qtyVal) : undefined,
                     qty: qtyVal,
                     unit: unitStr,
                     isMiracleProduct: false
@@ -375,6 +380,7 @@ function RecipeUploaderContent() {
                     amount: ing.amount,
                     weightG: ing.weightG || 0,
                     parsedGrams: ing.weightG, // Store original parsed grams
+                    customUnitWeight: (ing.weightG && qtyVal > 0) ? (ing.weightG / qtyVal) : undefined,
                     qty: qtyVal,
                     unit: unitStr,
                     isMiracleProduct: false
@@ -608,6 +614,11 @@ function RecipeUploaderContent() {
         const newIngs = [...ingredients];
         const ing = newIngs[activeIngredientIndex];
 
+        // Ensure we clear custom parsed weights when user manually selects a DB measure
+        const newIng = { ...ing };
+        delete newIng.parsedGrams;
+        delete newIng.customUnitWeight;
+
         // If amount contains 'g', it's a fixed weight override. 
         // Dont multiply by the measure weight again.
         let weightG = 0;
@@ -619,6 +630,7 @@ function RecipeUploaderContent() {
         if (amountStr.match(/\d+\s*(?:g|gram|grams|ml)/) && !amountStr.includes('/')) {
             // It's a manual weight like "90g". Just use it.
             weightG = parseFloat(amountStr);
+
         } else if (amountStr.match(/\d+\s*(?:kg|kilogram|kilograms)/) && !amountStr.includes('/')) {
             // It's a manual weight like "1.5kg".
             weightG = parseFloat(amountStr) * 1000;
@@ -628,7 +640,7 @@ function RecipeUploaderContent() {
         }
 
         newIngs[activeIngredientIndex] = {
-            ...ing,
+            ...newIng,
             amount: newAmount,
             selectedMeasure: measure,
             weightG: weightG
@@ -1369,16 +1381,22 @@ function RecipeUploaderContent() {
                                                         value={ing.qty || 1}
                                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                                             const newIngs = [...ingredients];
-                                                            const newQty = parseFloat(e.target.value) || 1;
-                                                            const oldQty = newIngs[idx].qty || 1;
+                                                            const newQty = parseFloat(e.target.value) || 0;
 
-                                                            // Calculate new weight based on ratio
-                                                            if (newIngs[idx].parsedGrams && oldQty > 0) {
-                                                                // Use parsed grams as base for the original qty
-                                                                const unitWeight = newIngs[idx].parsedGrams! / oldQty;
+                                                            // Calculate new weight based on unit weight
+                                                            let unitWeight = 0;
+                                                            const currentIng = newIngs[idx];
+
+                                                            if (currentIng.customUnitWeight) {
+                                                                // Priority 1: Use the parsed custom weight (e.g. from "1 cup (30g)" text)
+                                                                unitWeight = currentIng.customUnitWeight;
+                                                            } else if (currentIng.selectedMeasure && currentIng.selectedMeasure.weight_g) {
+                                                                // Priority 2: Use the selected database measure
+                                                                unitWeight = currentIng.selectedMeasure.weight_g;
+                                                            }
+
+                                                            if (unitWeight > 0) {
                                                                 newIngs[idx].weightG = newQty * unitWeight;
-                                                            } else if (newIngs[idx].selectedMeasure) {
-                                                                newIngs[idx].weightG = newQty * newIngs[idx].selectedMeasure!.weight_g;
                                                             }
 
                                                             newIngs[idx].qty = newQty;
