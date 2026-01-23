@@ -1748,7 +1748,7 @@ export default function MealPlannerPage() {
                                             <div className="flex-1">
                                                 <span className="font-medium capitalize">{displayName}</span>
                                                 <span className="text-muted-foreground italic ml-1 text-sm">
-                                                    {hasAmountOrUnit ? ` - ${scaledAmount} ${unitDisp}` : " - "}
+                                                    {hasAmountOrUnit ? ` - ${scaledAmount}` : ""}
                                                     {weightDisp && (
                                                         <span className="ml-1 text-[11px] opacity-70 font-mono not-italic">({weightDisp})</span>
                                                     )}
