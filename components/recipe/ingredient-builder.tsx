@@ -624,8 +624,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                                 </div>
 
                                 <div className="flex flex-col gap-1 flex-1 md:flex-none">
-                                    <span className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-tighter ml-1">Unit</span>
-                                    <span className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-tighter ml-1">Unit</span>
+                                    <span className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-tighter ml-1">Measure</span>
                                     <input
                                         type="text"
                                         value={ing.measure_label}
