@@ -165,7 +165,7 @@ export default function CreateRecipePage() {
             // Insert ingredients
             const ingredientsData = ingredients.map(ing => ({
                 recipe_id: recipeId,
-                food_item_id: ing.food_item_id,
+                food_item_id: ing.food_item_id === 'temp-id' ? null : ing.food_item_id,
                 item: ing.food_item_name,
                 amount: `${ing.weight_g}g`,
                 weight_g: ing.weight_g,
