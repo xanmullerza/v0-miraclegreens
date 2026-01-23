@@ -222,21 +222,55 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             const updatedPending = [...pending];
             for (let i = 0; i < updatedPending.length; i++) {
                 const item = updatedPending[i];
-                const query = item.raw.item;
 
-                // 1. Local Search
-                const localMatches = await searchLocalFood(query);
+                // 1. Prepare Query (Core Name Logic)
+                const rawItem = item.raw.item;
+                const parenIndex = rawItem.indexOf('(');
+                let coreName = parenIndex !== -1 ? rawItem.substring(0, parenIndex).trim() : rawItem;
+                coreName = coreName.replace(/[,;:]\s*$/, '').trim();
 
-                // 2. Global Search if needed
+                // 2. Search
+                let localMatches = await searchLocalFood(coreName);
                 let globalMatches: FoodItemMatch[] = [];
-                if (localMatches.length === 0) {
-                    globalMatches = await searchUSDAFood(query);
+
+                // Fallback: If no results for core name, try full item if different
+                if (localMatches.length === 0 && coreName !== rawItem) {
+                    localMatches = await searchLocalFood(rawItem);
                 }
 
-                item.matches = [...localMatches, ...globalMatches];
-                item.status = item.matches.length > 0 ? 'matched' : 'no-match';
-                if (item.matches.length > 0) {
-                    item.selectedMatch = item.matches[0];
+                if (localMatches.length === 0) {
+                    globalMatches = await searchUSDAFood(coreName);
+                    if (globalMatches.length === 0 && coreName !== rawItem) {
+                        globalMatches = await searchUSDAFood(rawItem);
+                    }
+                }
+
+                const allMatches = [...localMatches, ...globalMatches];
+                item.matches = allMatches;
+                item.status = allMatches.length > 0 ? 'matched' : 'no-match';
+
+                // 3. Smart Selection (Scoring)
+                if (allMatches.length > 0) {
+                    const queryWords = coreName.toLowerCase().split(/\s+/).filter((w: string) => w.length > 2);
+                    let bestMatch = allMatches[0];
+                    let maxMatches = 0;
+
+                    for (const cand of allMatches) {
+                        const candName = cand.name.toLowerCase();
+                        let matches = 0;
+                        queryWords.forEach((word: string) => {
+                            if (candName.includes(word)) matches++;
+                        });
+                        // Bonus for exact core name match or starting with it
+                        if (candName.startsWith(coreName.toLowerCase())) matches += 2;
+                        if (candName === coreName.toLowerCase()) matches += 5;
+
+                        if (matches > maxMatches) {
+                            maxMatches = matches;
+                            bestMatch = cand;
+                        }
+                    }
+                    item.selectedMatch = bestMatch;
                 }
 
                 setPendingIngredients([...updatedPending]);
@@ -255,6 +289,9 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
         // Resolve weight/quantity from raw parsing
         let weightG = item.raw.weightG;
         let amountStr = item.raw.amount || "";
+
+        // Pre-clean internal "or" artifacts (e.g. "1 or 2" -> "1.5", "2 tspor" -> "2 tsp")
+        amountStr = amountStr.replace(/or\b/gi, '').trim();
 
         // Basic amount evaluator for local use
         const evaluateLocalQty = (amt: string): number => {
@@ -288,7 +325,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
         };
 
         const qty = evaluateLocalQty(amountStr);
-        // Better unit extraction: remove the quantity part and keep the rest
+        // Better unit extraction: use cleaner string
         const unit = amountStr.replace(/^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?|[\d\s¼½¾⅛⅜⅝⅞/.]+))\s*/, '').trim();
 
         console.log(`[IngredientBuilder] Confirming: "${item.raw.item}"`, {
