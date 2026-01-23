@@ -33,6 +33,9 @@ export interface RecipeIngredient {
     carbs: number;
     // Available measures
     available_measures?: FoodMeasure[];
+    // Parsing state
+    parsedGrams?: number;
+    customUnitWeight?: number;
 }
 
 interface IngredientBuilderProps {
@@ -188,7 +191,9 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             protein: Math.round(finalFoodItem.protein_g * multiplier * 10) / 10,
             fat: Math.round(finalFoodItem.fat_g * multiplier * 10) / 10,
             carbs: Math.round(finalFoodItem.carbs_g * multiplier * 10) / 10,
-            available_measures: measures
+            available_measures: measures,
+            parsedGrams: hasParsedWeight ? weight_g : undefined,
+            customUnitWeight: (hasParsedWeight && quantity > 0) ? (weight_g / quantity) : undefined
         };
 
         onChange([...ingredients, newIngredient]);
@@ -311,10 +316,12 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
         const updated = [...ingredients];
         const ing = updated[index];
 
-        // Calculate new weight based on current measure
+        // Calculate new weight based on current measure or custom unit weight
         let newWeight = newQuantity;
 
-        if (ing.measure_label !== 'g' && ing.available_measures) {
+        if (ing.customUnitWeight) {
+            newWeight = newQuantity * ing.customUnitWeight;
+        } else if (ing.measure_label !== 'g' && ing.available_measures) {
             const measure = ing.available_measures.find(m => m.label === ing.measure_label);
             if (measure) {
                 newWeight = newQuantity * measure.weight_g;
@@ -356,6 +363,8 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                 ...ing,
                 measure_label: newUnit,
                 quantity: Math.round(ing.weight_g),
+                customUnitWeight: undefined, // Clear custom weight as specific unit is now chosen
+                parsedGrams: undefined
             };
             onChange(updated);
             return;
@@ -377,6 +386,8 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                     protein: Math.round(ing.protein * ratio * 10) / 10,
                     fat: Math.round(ing.fat * ratio * 10) / 10,
                     carbs: Math.round(ing.carbs * ratio * 10) / 10,
+                    customUnitWeight: undefined, // Clear custom weight
+                    parsedGrams: undefined
                 };
                 onChange(updated);
                 return;
@@ -603,7 +614,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                                         onChange={(e) => handleUpdateQuantity(index, Number(e.target.value))}
                                         className="w-14 px-1.5 py-2 border border-border bg-background text-foreground rounded-lg text-center text-sm font-bold focus:ring-2 focus:ring-green-500/20 outline-none"
                                         min="0"
-                                        step="0.1"
+                                        step="0.25"
                                     />
                                 </div>
 
