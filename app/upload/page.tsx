@@ -1376,7 +1376,7 @@ function RecipeUploaderContent() {
                                                     <Label className="text-[12px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Qty</Label>
                                                     <Input
                                                         type="number"
-                                                        step="0.5"
+                                                        step="0.25"
                                                         min="0"
                                                         value={ing.qty || 1}
                                                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
