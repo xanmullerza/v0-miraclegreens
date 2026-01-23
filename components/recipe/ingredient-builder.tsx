@@ -74,12 +74,24 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
         let quantity = initialValues?.quantity || (weight_g > 0 ? weight_g : 1);
         let unit = initialValues?.unit?.trim() || '';
 
+        // KEY: If weightG was provided from parsing, it is the source of truth
+        // We should NOT overwrite it with measure calculations
+        const hasParsedWeight = initialValues?.weightG && initialValues.weightG > 0;
+
+        console.log(`[handleAddIngredient] "${(foodItem as any).name}"`, {
+            initialWeightG: initialValues?.weightG,
+            hasParsedWeight,
+            quantity,
+            unit,
+            measuresCount: measures.length
+        });
+
         // If no unit provided, default to 'g' if we have weightG, otherwise try to find a natural measure
         if (!unit && weight_g > 0) {
             unit = 'g';
         }
 
-        // Matching logic
+        // Matching logic - only calculate weight from measures if we DON'T have a parsed weight
         if (measures.length > 0) {
             const unitLower = unit.toLowerCase().replace(/\s*\(.*\)$/, '').replace(/s$/, '').trim(); // singularized unit
 
@@ -92,12 +104,19 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
 
             if (matchedMeasure) {
                 unit = matchedMeasure.label;
-                weight_g = quantity * matchedMeasure.weight_g;
+                // Only calculate weight from measure if we don't have parsed grams
+                if (!hasParsedWeight) {
+                    weight_g = quantity * matchedMeasure.weight_g;
+                }
             } else if (unitLower === 'g' || unitLower === 'gram' || unitLower === 'ml') {
-                weight_g = quantity;
+                if (!hasParsedWeight) {
+                    weight_g = quantity;
+                }
                 unit = 'g';
             } else if (unitLower === 'kg' || unitLower === 'kilogram') {
-                weight_g = quantity * 1000;
+                if (!hasParsedWeight) {
+                    weight_g = quantity * 1000;
+                }
                 unit = 'kg';
             } else if (!unit || ['g', 'item', 'whole', 'unit'].includes(unitLower)) {
                 // Try harder to find a "natural" count measure
@@ -112,16 +131,22 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
 
                 if (natural) {
                     unit = natural.label;
-                    weight_g = quantity * natural.weight_g;
+                    if (!hasParsedWeight) {
+                        weight_g = quantity * natural.weight_g;
+                    }
                 } else {
                     // Safety fallback: only use first measure if it looks like a single portion
                     const first = measures[0];
                     if (first && (first.weight_g < 150 || quantity < 1)) {
                         unit = first.label;
-                        weight_g = quantity * (first.weight_g || 1);
+                        if (!hasParsedWeight) {
+                            weight_g = quantity * (first.weight_g || 1);
+                        }
                     } else {
                         unit = 'g';
-                        weight_g = weight_g || (quantity > 10 ? quantity : 100);
+                        if (!hasParsedWeight) {
+                            weight_g = weight_g || (quantity > 10 ? quantity : 100);
+                        }
                     }
                 }
             } else {
@@ -129,13 +154,15 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                 const first = measures[0];
                 if (first) {
                     unit = first.label;
-                    weight_g = quantity * (first.weight_g || 1);
+                    if (!hasParsedWeight) {
+                        weight_g = quantity * (first.weight_g || 1);
+                    }
                 }
             }
         } else {
             // No measures in DB
             if (!unit) unit = 'g';
-            if (weight_g === 0) {
+            if (!hasParsedWeight && weight_g === 0) {
                 weight_g = (unit === 'g' || unit === 'ml') ? quantity : (quantity * 100);
             }
         }
@@ -258,6 +285,13 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
         const qty = evaluateLocalQty(amountStr);
         // Better unit extraction: remove the quantity part and keep the rest
         const unit = amountStr.replace(/^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?|[\d\s¼½¾⅛⅜⅝⅞/.]+))\s*/, '').trim();
+
+        console.log(`[IngredientBuilder] Confirming: "${item.raw.item}"`, {
+            rawWeightG: weightG,
+            qty,
+            unit,
+            rawAmount: amountStr
+        });
 
         await handleAddIngredient(item.selectedMatch, {
             weightG: weightG,
