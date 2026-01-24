@@ -611,7 +611,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             )}
 
             {ingredients.length === 0 && (
-                <div className="text-center py-8 border-2 border-dashed border-border rounded-lg text-muted-foreground">
+                <div className="text-center py-12 bg-muted/20 rounded-xl text-muted-foreground font-medium italic">
                     No ingredients added yet. Click "Add Ingredient" to get started.
                 </div>
             )}
