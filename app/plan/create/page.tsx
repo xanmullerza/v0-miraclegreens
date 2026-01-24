@@ -31,6 +31,7 @@ export default function CreateRecipePage() {
     const [showAutoImport, setShowAutoImport] = useState(false);
     const [autoImportText, setAutoImportText] = useState('');
     const [isImporting, setIsImporting] = useState(false);
+    const [activeStep, setActiveStep] = useState<1 | 2>(1);
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -339,6 +340,28 @@ export default function CreateRecipePage() {
         );
     };
 
+    const goToNextStep = () => {
+        if (prepTime < 1) {
+            alert('Please enter a valid prep time');
+            return;
+        }
+        if (ingredients.length === 0) {
+            alert('Please add at least one ingredient');
+            return;
+        }
+        if (instructions.filter(i => i.trim()).length === 0) {
+            alert('Please add instructions');
+            return;
+        }
+        setActiveStep(2);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const goToPrevStep = () => {
+        setActiveStep(1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     const handleSave = async () => {
         if (!title || ingredients.length === 0 || instructions.filter(i => i.trim()).length === 0) {
             alert('Please fill in all required fields');
@@ -463,333 +486,529 @@ export default function CreateRecipePage() {
             <Header />
             <div className="max-w-4xl mx-auto px-4 py-8">
                 {/* Header */}
-                <div className="mb-8 flex flex-col items-center text-center">
+                <div className="mb-10 flex flex-col items-center text-center">
                     <div className="flex items-center gap-3 mb-2">
                         <ChefHat className="w-8 h-8 text-green-600" />
                         <h1 className="text-3xl font-bold text-foreground">Create New Recipe</h1>
                     </div>
-                    <p className="text-muted-foreground max-w-lg mb-4">
-                        Build your recipe with precise nutrition tracking using our food database
-                    </p>
-                    <Button
-                        onClick={() => setShowAutoImport(true)}
-                        className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-none shadow-md group transition-all"
-                    >
-                        <Zap className="w-4 h-4 mr-2 text-yellow-300 group-hover:scale-125 transition-transform" />
-                        One-Shot Auto Import
-                    </Button>
                 </div>
 
-                <div className="space-y-6">
-                    {/* Basic Info */}
-                    <div className="bg-card border border-border rounded-lg shadow-sm p-6 space-y-4 text-foreground">
-                        <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
-
-                        <div>
-                            <label className="block text-sm font-medium text-muted-foreground mb-2">
-                                Recipe Title *
-                            </label>
-                            <input
-                                type="text"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                placeholder="e.g., Grilled Chicken with Roasted Vegetables"
-                                className="w-full px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                            />
+                {/* Step Indicator */}
+                <div className="mb-12">
+                    <div className="flex items-center justify-center gap-4 max-w-md mx-auto relative">
+                        <div className="absolute top-[20px] left-0 right-0 h-0.5 bg-border -translate-y-1/2 z-0"></div>
+                        <div className={`relative z-10 flex flex-col items-center gap-2 px-6 bg-[#fcfdfc] dark:bg-[#0c140c] transition-all duration-500 ${activeStep === 1 ? 'scale-110' : 'opacity-60'}`}>
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${activeStep === 1 ? 'bg-green-600 text-white shadow-lg shadow-green-200' : 'bg-muted text-muted-foreground'}`}>1</div>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Recipe Builder</span>
                         </div>
-
-                        <div className="grid grid-cols-3 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-muted-foreground mb-2">
-                                    Meal Type *
-                                </label>
-                                <select
-                                    value={type}
-                                    onChange={(e) => setType(e.target.value as any)}
-                                    className="w-full px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                >
-                                    <option value="breakfast">Breakfast</option>
-                                    <option value="lunch">Lunch</option>
-                                    <option value="dinner">Dinner</option>
-                                    <option value="snack">Snack</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                                    <Clock className="w-4 h-4" />
-                                    Prep Time (min)
-                                </label>
-                                <input
-                                    type="number"
-                                    value={prepTime}
-                                    onChange={(e) => setPrepTime(Number(e.target.value))}
-                                    className="w-full px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    min="1"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                                    <Users className="w-4 h-4" />
-                                    Servings
-                                </label>
-                                <input
-                                    type="number"
-                                    value={servings}
-                                    onChange={(e) => setServings(Number(e.target.value))}
-                                    className="w-full px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    min="1"
-                                />
-                            </div>
+                        <div className={`relative z-10 flex flex-col items-center gap-2 px-6 bg-[#fcfdfc] dark:bg-[#0c140c] transition-all duration-500 ${activeStep === 2 ? 'scale-110' : 'opacity-60'}`}>
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${activeStep === 2 ? 'bg-blue-600 text-white shadow-lg shadow-blue-200' : 'bg-muted text-muted-foreground'}`}>2</div>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Final Details</span>
                         </div>
+                    </div>
+                </div>
 
-                        {/* Image Upload Section */}
-                        <div className="pt-4 border-t border-border/50">
-                            <label className="block text-sm font-medium text-muted-foreground mb-3">
-                                Recipe Photo
-                            </label>
-                            <div className="flex flex-col md:flex-row gap-6">
-                                <div className="hidden">
-                                    <input
-                                        type="file"
-                                        id="recipe-image-upload"
-                                        accept="image/*"
-                                        onChange={handleImageUpload}
-                                    />
-                                </div>
-                                <div
-                                    className="relative group w-full md:w-64 aspect-video md:aspect-square rounded-xl border-2 border-dashed border-border overflow-hidden bg-muted/30 flex flex-col items-center justify-center cursor-pointer hover:border-green-500 transition-all"
-                                    onClick={() => document.getElementById('recipe-image-upload')?.click()}
+                <div className="space-y-8">
+                    {activeStep === 1 ? (
+                        <>
+                            {/* Part 1: Recipe Content */}
+                            <div className="bg-card border border-border rounded-xl shadow-sm p-6 text-center">
+                                <p className="text-sm text-muted-foreground mb-4">
+                                    Start by pasting your recipe text for magic auto-matching
+                                </p>
+                                <Button
+                                    onClick={() => setShowAutoImport(true)}
+                                    className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white border-none shadow-lg group px-8 py-6 rounded-xl scale-110"
                                 >
-                                    {image ? (
-                                        <>
-                                            <img src={image} alt="Recipe Preview" className="w-full h-full object-cover" />
-                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                                <button
-                                                    type="button"
-                                                    className="p-2 bg-white rounded-full text-foreground hover:bg-green-50"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        document.getElementById('recipe-image-upload')?.click();
-                                                    }}
-                                                >
-                                                    <Camera size={18} />
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className="p-2 bg-white rounded-full text-red-600 hover:bg-red-50"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setImage('');
-                                                    }}
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <div className="text-center p-4">
-                                            <div className="w-12 h-12 rounded-full bg-background flex items-center justify-center mx-auto mb-2 text-muted-foreground group-hover:text-green-600 transition-colors">
-                                                {uploading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Camera className="w-6 h-6" />}
-                                            </div>
-                                            <p className="text-xs font-bold text-muted-foreground group-hover:text-green-700">Add Photo</p>
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="flex-1 space-y-3">
-                                    <p className="text-xs text-muted-foreground leading-relaxed">
-                                        Adding a photo makes your recipe more engaging. Upload a clear, bright picture of the finished dish for best results.
-                                    </p>
-                                    <button
-                                        type="button"
-                                        onClick={() => document.getElementById('recipe-image-upload')?.click()}
-                                        disabled={uploading}
-                                        className="flex items-center gap-2 text-sm font-bold text-green-600 hover:text-green-700 transition"
-                                    >
-                                        <Upload size={16} />
-                                        {uploading ? 'Processing...' : (image ? 'Change Picture' : 'Select File')}
-                                    </button>
+                                    <Sparkles className="w-5 h-5 mr-2 text-yellow-300 group-hover:scale-125 transition-transform" />
+                                    One-Shot Auto Import
+                                </Button>
+                            </div>
 
-                                    <div className="pt-2">
-                                        <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1.5">
-                                            Or Image URL
+                            {/* Yield & Timing - PART 1 as requested */}
+                            <div className="bg-card border border-border rounded-xl shadow-sm p-6 space-y-4">
+                                <h3 className="text-sm font-black uppercase tracking-widest text-muted-foreground mb-4">Yield & Timing</h3>
+                                <div className="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase text-muted-foreground mb-2 flex items-center gap-2">
+                                            <Clock className="w-3 h-3" />
+                                            Prep Time (min)
                                         </label>
                                         <input
-                                            type="text"
-                                            value={image.startsWith('data:') ? '' : image}
-                                            onChange={(e) => setImage(e.target.value)}
-                                            placeholder="https://images.unsplash.com/..."
-                                            className="w-full px-3 py-1.5 text-sm border border-border bg-background text-foreground rounded focus:outline-none focus:ring-1 focus:ring-green-500"
+                                            type="number"
+                                            value={prepTime}
+                                            onChange={(e) => setPrepTime(Number(e.target.value))}
+                                            className="w-full px-4 py-3 border border-border bg-background text-foreground rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 font-bold"
+                                            min="1"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase text-muted-foreground mb-2 flex items-center gap-2">
+                                            <Users className="w-3 h-3" />
+                                            Servings
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={servings}
+                                            onChange={(e) => setServings(Number(e.target.value))}
+                                            className="w-full px-4 py-3 border border-border bg-background text-foreground rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 font-bold"
+                                            min="1"
                                         />
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                            {/* Basic Info */}
+                            <div className="bg-card border border-border rounded-lg shadow-sm p-6 space-y-4 text-foreground">
+                                <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
 
-                        <div>
-                            <label className="block text-sm font-medium text-muted-foreground mb-3">
-                                Dietary Suitability *
-                            </label>
-                            <div className="grid grid-cols-3 gap-3 mb-4">
-                                {[
-                                    { id: 'balanced', label: 'Balanced (Omnivore)', tags: [] },
-                                    { id: 'vegetarian', label: 'Vegetarian', tags: ['vegetarian'] },
-                                    { id: 'vegan', label: 'Vegan', tags: ['vegan', 'vegetarian'] }
-                                ].map(option => {
-                                    const isSelected = option.id === 'balanced'
-                                        ? (!diet.includes('vegan') && !diet.includes('vegetarian'))
-                                        : (option.id === 'vegan' ? diet.includes('vegan') : (diet.includes('vegetarian') && !diet.includes('vegan')));
-
-                                    return (
-                                        <button
-                                            key={option.id}
-                                            type="button"
-                                            onClick={() => {
-                                                // Clear primary tags and set new ones
-                                                const others = diet.filter(d => d !== 'vegan' && d !== 'vegetarian');
-                                                setDiet([...others, ...option.tags]);
-                                            }}
-                                            className={`p-3 rounded-lg border-2 text-sm font-bold transition flex items-center justify-center text-center ${isSelected
-                                                ? 'border-green-600 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400'
-                                                : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/30'
-                                                }`}
-                                        >
-                                            {option.label}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-
-                            <label className="block text-sm font-medium text-muted-foreground mb-2">
-                                Additional Tags (Optional)
-                            </label>
-                            <div className="flex flex-wrap gap-2">
-                                {['gluten-free', 'dairy-free', 'low-carb', 'nut-free', 'high-protein'].map(tag => (
-                                    <button
-                                        key={tag}
-                                        type="button"
-                                        onClick={() => toggleDiet(tag)}
-                                        className={`px-4 py-2 rounded-full text-sm font-medium transition ${diet.includes(tag)
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                                            }`}
-                                    >
-                                        {tag}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                    </div>
-
-                    {/* Ingredients */}
-                    <div className="bg-card border border-border rounded-lg shadow-sm p-6">
-                        <IngredientBuilder
-                            ingredients={ingredients}
-                            onChange={setIngredients}
-                        />
-                    </div>
-
-                    {/* Instructions */}
-                    <div className="bg-card border border-border rounded-lg shadow-sm p-6 space-y-4 text-foreground">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-lg font-semibold flex items-center gap-2">
-                                <Zap className="w-5 h-5 text-amber-500 fill-amber-500" />
-                                Instructions
-                            </h3>
-                            <div className="flex gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowMagicInstructions(!showMagicInstructions)}
-                                    className="text-xs flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 font-bold hover:bg-amber-100 transition-all"
-                                >
-                                    <Wand2 size={14} />
-                                    Magic Paste
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={handleAddInstruction}
-                                    className="text-sm text-green-600 hover:text-green-700 font-medium"
-                                >
-                                    + Add Step
-                                </button>
-                            </div>
-                        </div>
-
-                        {showMagicInstructions && (
-                            <div className="p-4 rounded-xl border-2 border-dashed border-amber-200 bg-amber-50/30 animate-in fade-in slide-in-from-top-4 duration-300">
-                                <div className="flex items-center gap-2 mb-3">
-                                    <Sparkles className="w-4 h-4 text-amber-500" />
-                                    <span className="text-xs font-black uppercase tracking-widest text-amber-800">Paste Full Method Below</span>
-                                </div>
-                                <textarea
-                                    value={magicInstructionsText}
-                                    onChange={(e) => setMagicInstructionsText(e.target.value)}
-                                    placeholder="Paste multiple steps here... We'll automatically split them by line numbers or paragraphs."
-                                    className="w-full h-32 p-4 text-sm border border-amber-200 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 mb-3"
-                                />
-                                <div className="flex justify-end gap-2">
-                                    <button
-                                        onClick={() => setShowMagicInstructions(false)}
-                                        className="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={handleMagicPasteInstructions}
-                                        className="px-4 py-2 bg-amber-500 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-lg shadow-amber-200 hover:bg-amber-600 active:scale-95 transition-all"
-                                    >
-                                        Break Into Steps
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="space-y-3">
-                            {instructions.map((step, index) => (
-                                <div key={index} className="flex gap-3">
-                                    <div className="flex-shrink-0 w-8 h-8 bg-primary/10 text-primary rounded-full flex items-center justify-center font-semibold text-sm">
-                                        {index + 1}
-                                    </div>
-                                    <textarea
-                                        value={step}
-                                        onChange={(e) => handleUpdateInstruction(index, e.target.value)}
-                                        placeholder={`Step ${index + 1}...`}
-                                        className="flex-1 px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
-                                        rows={2}
+                                <div>
+                                    <label className="block text-sm font-medium text-muted-foreground mb-2">
+                                        Recipe Title *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                        placeholder="e.g., Grilled Chicken with Roasted Vegetables"
+                                        className="w-full px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                     />
-                                    {instructions.length > 1 && (
+                                </div>
+
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-muted-foreground mb-2">
+                                            Meal Type *
+                                        </label>
+                                        <select
+                                            value={type}
+                                            onChange={(e) => setType(e.target.value as any)}
+                                            className="w-full px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        >
+                                            <option value="breakfast">Breakfast</option>
+                                            <option value="lunch">Lunch</option>
+                                            <option value="dinner">Dinner</option>
+                                            <option value="snack">Snack</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                                            <Clock className="w-4 h-4" />
+                                            Prep Time (min)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={prepTime}
+                                            onChange={(e) => setPrepTime(Number(e.target.value))}
+                                            className="w-full px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                            min="1"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
+                                            <Users className="w-4 h-4" />
+                                            Servings
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={servings}
+                                            onChange={(e) => setServings(Number(e.target.value))}
+                                            className="w-full px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                            min="1"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Image Upload Section */}
+                                <div className="pt-4 border-t border-border/50">
+                                    <label className="block text-sm font-medium text-muted-foreground mb-3">
+                                        Recipe Photo
+                                    </label>
+                                    <div className="flex flex-col md:flex-row gap-6">
+                                        <div className="hidden">
+                                            <input
+                                                type="file"
+                                                id="recipe-image-upload"
+                                                accept="image/*"
+                                                onChange={handleImageUpload}
+                                            />
+                                        </div>
+                                        <div
+                                            className="relative group w-full md:w-64 aspect-video md:aspect-square rounded-xl border-2 border-dashed border-border overflow-hidden bg-muted/30 flex flex-col items-center justify-center cursor-pointer hover:border-green-500 transition-all"
+                                            onClick={() => document.getElementById('recipe-image-upload')?.click()}
+                                        >
+                                            {image ? (
+                                                <>
+                                                    <img src={image} alt="Recipe Preview" className="w-full h-full object-cover" />
+                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                                        <button
+                                                            type="button"
+                                                            className="p-2 bg-white rounded-full text-foreground hover:bg-green-50"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                document.getElementById('recipe-image-upload')?.click();
+                                                            }}
+                                                        >
+                                                            <Camera size={18} />
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="p-2 bg-white rounded-full text-red-600 hover:bg-red-50"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setImage('');
+                                                            }}
+                                                        >
+                                                            <Trash2 size={18} />
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div className="text-center p-4">
+                                                    <div className="w-12 h-12 rounded-full bg-background flex items-center justify-center mx-auto mb-2 text-muted-foreground group-hover:text-green-600 transition-colors">
+                                                        {uploading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Camera className="w-6 h-6" />}
+                                                    </div>
+                                                    <p className="text-xs font-bold text-muted-foreground group-hover:text-green-700">Add Photo</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex-1 space-y-3">
+                                            <p className="text-xs text-muted-foreground leading-relaxed">
+                                                Adding a photo makes your recipe more engaging. Upload a clear, bright picture of the finished dish for best results.
+                                            </p>
+                                            <button
+                                                type="button"
+                                                onClick={() => document.getElementById('recipe-image-upload')?.click()}
+                                                disabled={uploading}
+                                                className="flex items-center gap-2 text-sm font-bold text-green-600 hover:text-green-700 transition"
+                                            >
+                                                <Upload size={16} />
+                                                {uploading ? 'Processing...' : (image ? 'Change Picture' : 'Select File')}
+                                            </button>
+
+                                            <div className="pt-2">
+                                                <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1.5">
+                                                    Or Image URL
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={image.startsWith('data:') ? '' : image}
+                                                    onChange={(e) => setImage(e.target.value)}
+                                                    placeholder="https://images.unsplash.com/..."
+                                                    className="w-full px-3 py-1.5 text-sm border border-border bg-background text-foreground rounded focus:outline-none focus:ring-1 focus:ring-green-500"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-muted-foreground mb-3">
+                                        Dietary Suitability *
+                                    </label>
+                                    <div className="grid grid-cols-3 gap-3 mb-4">
+                                        {[
+                                            { id: 'balanced', label: 'Balanced (Omnivore)', tags: [] },
+                                            { id: 'vegetarian', label: 'Vegetarian', tags: ['vegetarian'] },
+                                            { id: 'vegan', label: 'Vegan', tags: ['vegan', 'vegetarian'] }
+                                        ].map(option => {
+                                            const isSelected = option.id === 'balanced'
+                                                ? (!diet.includes('vegan') && !diet.includes('vegetarian'))
+                                                : (option.id === 'vegan' ? diet.includes('vegan') : (diet.includes('vegetarian') && !diet.includes('vegan')));
+
+                                            return (
+                                                <button
+                                                    key={option.id}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        // Clear primary tags and set new ones
+                                                        const others = diet.filter(d => d !== 'vegan' && d !== 'vegetarian');
+                                                        setDiet([...others, ...option.tags]);
+                                                    }}
+                                                    className={`p-3 rounded-lg border-2 text-sm font-bold transition flex items-center justify-center text-center ${isSelected
+                                                        ? 'border-green-600 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400'
+                                                        : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/30'
+                                                        }`}
+                                                >
+                                                    {option.label}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+
+                                    <label className="block text-sm font-medium text-muted-foreground mb-2">
+                                        Additional Tags (Optional)
+                                    </label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {['gluten-free', 'dairy-free', 'low-carb', 'nut-free', 'high-protein'].map(tag => (
+                                            <button
+                                                key={tag}
+                                                type="button"
+                                                onClick={() => toggleDiet(tag)}
+                                                className={`px-4 py-2 rounded-full text-sm font-medium transition ${diet.includes(tag)
+                                                    ? 'bg-blue-600 text-white'
+                                                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                                    }`}
+                                            >
+                                                {tag}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            {/* Ingredients */}
+                            <div className="bg-card border border-border rounded-lg shadow-sm p-6">
+                                <IngredientBuilder
+                                    ingredients={ingredients}
+                                    onChange={setIngredients}
+                                />
+                            </div>
+
+                            {/* Instructions */}
+                            <div className="bg-card border border-border rounded-xl shadow-sm p-6 space-y-4 text-foreground">
+                                <div className="flex items-center justify-between mb-2">
+                                    <h3 className="text-sm font-black uppercase tracking-widest text-muted-foreground">Instructions</h3>
+                                    <div className="flex gap-3">
                                         <button
                                             type="button"
-                                            onClick={() => handleRemoveInstruction(index)}
-                                            className="text-red-600 hover:text-red-700"
+                                            onClick={() => setShowMagicInstructions(!showMagicInstructions)}
+                                            className="text-[10px] flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 font-black uppercase tracking-widest hover:bg-amber-100 transition-all"
                                         >
-                                            ×
+                                            <Wand2 size={12} />
+                                            Magic Paste
                                         </button>
-                                    )}
+                                        <button
+                                            type="button"
+                                            onClick={handleAddInstruction}
+                                            className="text-xs text-green-600 hover:text-green-700 font-black uppercase tracking-widest"
+                                        >
+                                            + Add Step
+                                        </button>
+                                    </div>
                                 </div>
-                            ))}
-                        </div>
-                    </div>
 
-                    {/* Save Button */}
-                    <div className="flex gap-4">
-                        <button
-                            onClick={() => router.back()}
-                            className="px-6 py-3 border border-border text-foreground rounded-lg hover:bg-muted transition"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={handleSave}
-                            disabled={saving}
-                            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <Save className="w-5 h-5" />
-                            {saving ? 'Saving...' : 'Save Recipe'}
-                        </button>
-                    </div>
+                                {showMagicInstructions && (
+                                    <div className="p-4 rounded-xl border-2 border-dashed border-amber-200 bg-amber-50/30 animate-in fade-in slide-in-from-top-4 duration-300">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <Sparkles className="w-4 h-4 text-amber-500" />
+                                            <span className="text-xs font-black uppercase tracking-widest text-amber-800">Paste Full Method Below</span>
+                                        </div>
+                                        <textarea
+                                            value={magicInstructionsText}
+                                            onChange={(e) => setMagicInstructionsText(e.target.value)}
+                                            placeholder="Paste multiple steps here... We'll automatically split them by line numbers or paragraphs."
+                                            className="w-full h-32 p-4 text-sm border border-amber-200 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 mb-3"
+                                        />
+                                        <div className="flex justify-end gap-2">
+                                            <button
+                                                onClick={() => setShowMagicInstructions(false)}
+                                                className="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={handleMagicPasteInstructions}
+                                                className="px-4 py-2 bg-amber-500 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-lg shadow-amber-200 hover:bg-amber-600 active:scale-95 transition-all"
+                                            >
+                                                Break Into Steps
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="space-y-3">
+                                    {instructions.map((step, index) => (
+                                        <div key={index} className="flex gap-3">
+                                            <div className="flex-shrink-0 w-8 h-8 bg-primary/10 text-primary rounded-full flex items-center justify-center font-semibold text-sm">
+                                                {index + 1}
+                                            </div>
+                                            <textarea
+                                                value={step}
+                                                onChange={(e) => handleUpdateInstruction(index, e.target.value)}
+                                                placeholder={`Step ${index + 1}...`}
+                                                className="flex-1 px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                                                rows={2}
+                                            />
+                                            {instructions.length > 1 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveInstruction(index)}
+                                                    className="text-red-600 hover:text-red-700"
+                                                >
+                                                    ×
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Part 1 Footer */}
+                            <div className="flex pt-4">
+                                <button
+                                    onClick={() => router.back()}
+                                    className="px-8 py-4 border border-border text-foreground rounded-xl hover:bg-muted font-bold transition mr-4"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={goToNextStep}
+                                    className="flex-1 flex items-center justify-center gap-2 px-8 py-4 bg-green-600 text-white rounded-xl hover:bg-green-700 font-bold shadow-lg shadow-green-100 transition"
+                                >
+                                    Next: Final Details
+                                    <Zap className="w-4 h-4" />
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            {/* Part 2: Manual Details */}
+                            <div className="bg-card border border-border rounded-xl shadow-sm p-6 space-y-6 text-foreground">
+                                <h2 className="text-sm font-black uppercase tracking-widest text-muted-foreground">Basic Information</h2>
+
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase text-muted-foreground mb-2">
+                                        Recipe Title *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={title}
+                                        onChange={(e) => setTitle(e.target.value)}
+                                        placeholder="e.g., Grilled Chicken with Roasted Vegetables"
+                                        className="w-full px-4 py-3 border border-border bg-background text-foreground rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 font-bold text-lg"
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase text-muted-foreground mb-2">
+                                            Meal Type *
+                                        </label>
+                                        <select
+                                            value={type}
+                                            onChange={(e) => setType(e.target.value as any)}
+                                            className="w-full px-4 py-3 border border-border bg-background text-foreground rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 font-bold"
+                                        >
+                                            <option value="breakfast">Breakfast</option>
+                                            <option value="lunch">Lunch</option>
+                                            <option value="dinner">Dinner</option>
+                                            <option value="snack">Snack</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase text-muted-foreground mb-2">
+                                            Dietary Suitability *
+                                        </label>
+                                        <div className="flex gap-2">
+                                            {[
+                                                { id: 'balanced', label: 'Balanced', tags: [] },
+                                                { id: 'vegetarian', label: 'Veggie', tags: ['vegetarian'] },
+                                                { id: 'vegan', label: 'Vegan', tags: ['vegan', 'vegetarian'] }
+                                            ].map(option => {
+                                                const isSelected = option.id === 'balanced'
+                                                    ? (!diet.includes('vegan') && !diet.includes('vegetarian'))
+                                                    : (option.id === 'vegan' ? diet.includes('vegan') : (diet.includes('vegetarian') && !diet.includes('vegan')));
+
+                                                return (
+                                                    <button
+                                                        key={option.id}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const others = diet.filter(d => d !== 'vegan' && d !== 'vegetarian');
+                                                            setDiet([...others, ...option.tags]);
+                                                        }}
+                                                        className={`flex-1 p-3 rounded-xl border-2 text-[10px] font-black uppercase tracking-widest transition ${isSelected
+                                                            ? 'border-green-600 bg-green-50 text-green-700'
+                                                            : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/30'
+                                                            }`}
+                                                    >
+                                                        {option.label}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Image Upload */}
+                                <div className="pt-6 border-t border-border/50">
+                                    <label className="block text-[10px] font-black uppercase text-muted-foreground mb-4">Recipe Photo</label>
+                                    <div className="flex flex-col md:flex-row gap-6">
+                                        <input type="file" id="recipe-image-upload" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                        <div
+                                            className="relative group w-full md:w-48 aspect-square rounded-2xl border-2 border-dashed border-border overflow-hidden bg-muted/30 flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 transition-all shadow-inner"
+                                            onClick={() => document.getElementById('recipe-image-upload')?.click()}
+                                        >
+                                            {image ? (
+                                                <img src={image} alt="Recipe Preview" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="text-center p-4">
+                                                    <Camera className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Add Photo</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex-1 space-y-4">
+                                            <p className="text-xs text-muted-foreground leading-relaxed">Choose a high-quality photo to represent your recipe.</p>
+                                            <div className="space-y-2">
+                                                <label className="block text-[10px] font-black uppercase tracking-tighter text-muted-foreground">Or Image URL</label>
+                                                <input
+                                                    type="text"
+                                                    value={image.startsWith('data:') ? '' : image}
+                                                    onChange={(e) => setImage(e.target.value)}
+                                                    placeholder="https://..."
+                                                    className="w-full px-4 py-2 text-sm border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 shadow-sm"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Tags */}
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase text-muted-foreground mb-3">Optional Tags</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {['gluten-free', 'dairy-free', 'low-carb', 'nut-free', 'high-protein'].map(tag => (
+                                            <button
+                                                key={tag}
+                                                type="button"
+                                                onClick={() => toggleDiet(tag)}
+                                                className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition ${diet.includes(tag)
+                                                    ? 'bg-blue-600 text-white shadow-md shadow-blue-100'
+                                                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                                    }`}
+                                            >
+                                                {tag}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Part 2 Footer */}
+                            <div className="flex pt-4 gap-4">
+                                <button
+                                    onClick={goToPrevStep}
+                                    className="px-8 py-4 border border-border text-foreground rounded-xl hover:bg-muted font-bold transition"
+                                >
+                                    Back to Editor
+                                </button>
+                                <button
+                                    onClick={handleSave}
+                                    disabled={saving}
+                                    className="flex-1 flex items-center justify-center gap-2 px-8 py-4 bg-green-600 text-white rounded-xl hover:bg-green-700 font-bold shadow-lg shadow-green-100 transition disabled:opacity-50"
+                                >
+                                    <Save className="w-5 h-5" />
+                                    {saving ? 'Saving...' : 'Finish & Save Recipe'}
+                                </button>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
             {/* Auto Import Sheet */}
