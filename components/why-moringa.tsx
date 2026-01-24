@@ -89,7 +89,7 @@ export function WhyMoringa() {
 					{benefits.map((benefit) => (
 						<div
 							key={benefit.title}
-							className="group bg-background rounded-xl p-6 border border-border hover:border-primary/50 hover:bg-primary/5 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
+							className="group bg-background rounded-xl p-6 border border-border hover:bg-primary/10 transition-all duration-300"
 						>
 							<div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white transition-colors">
 								<benefit.icon className="h-6 w-6 text-primary group-hover:text-white transition-colors" />

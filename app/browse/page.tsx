@@ -169,9 +169,9 @@ export default function BrowsePage() {
                                         key={res.id}
                                         id={`resource-${res.id}`}
                                         className={cn(
-                                            "group flex flex-col rounded-2xl border transition-all hover:bg-primary/5 hover:border-primary/40 hover:shadow-md hover:shadow-primary/5",
+                                            "group flex flex-col rounded-2xl border transition-all hover:bg-primary/10",
                                             (readingId === res.id || watchingId === res.id || listeningId === res.id)
-                                                ? "bg-primary/5 border-primary/20 shadow-sm"
+                                                ? "bg-primary/10 border-primary/20 shadow-sm"
                                                 : "bg-card border-border shadow-none"
                                         )}
                                     >
