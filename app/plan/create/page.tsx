@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import IngredientBuilder, { RecipeIngredient } from '@/components/recipe/ingredient-builder';
-import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus, ListOrdered } from 'lucide-react';
+import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus, ListOrdered, ChevronUp, ChevronDown } from 'lucide-react';
 import { Header } from '@/components/header';
 import { parseInstructionsOnly, parseRecipeText } from '@/lib/utils/recipe-parser';
 import { searchLocalFood, searchUSDAFood, getUSDAMeasures } from '@/lib/services/nutrition';
@@ -682,39 +682,51 @@ export default function CreateRecipePage() {
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-border/50">
-                                    <div className="bg-muted/30 p-4 rounded-xl flex items-center gap-4 border border-border/50">
-                                        <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-950/30 flex items-center justify-center text-green-600">
+                                    <div className="bg-muted/30 p-4 rounded-xl flex items-center gap-4 border border-border/50 group hover:border-green-500/30 transition-colors">
+                                        <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-950/30 flex items-center justify-center text-green-600 transition-transform group-hover:scale-110">
                                             <Clock className="w-6 h-6" />
                                         </div>
-                                        <div className="flex-1">
-                                            <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
-                                                Prep Time (min)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={prepTime}
-                                                onChange={(e) => setPrepTime(Number(e.target.value))}
-                                                className="w-full bg-transparent text-xl font-bold text-foreground focus:outline-none"
-                                                min="1"
-                                            />
+                                        <div className="flex-1 flex items-center gap-2">
+                                            <div className="flex-1">
+                                                <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
+                                                    Prep Time (min)
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    value={prepTime}
+                                                    onChange={(e) => setPrepTime(Number(e.target.value))}
+                                                    className="w-full bg-transparent text-xl font-bold text-foreground focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                    min="1"
+                                                />
+                                            </div>
+                                            <div className="flex flex-col gap-0.5 text-muted-foreground/30 group-hover:text-green-600/50 transition-colors">
+                                                <ChevronUp className="w-4 h-4 cursor-pointer hover:text-green-600" onClick={() => setPrepTime(prev => prev + 1)} />
+                                                <ChevronDown className="w-4 h-4 cursor-pointer hover:text-green-600" onClick={() => setPrepTime(prev => Math.max(1, prev - 1))} />
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div className="bg-muted/30 p-4 rounded-xl flex items-center gap-4 border border-border/50">
-                                        <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950/30 flex items-center justify-center text-blue-600">
+                                    <div className="bg-muted/30 p-4 rounded-xl flex items-center gap-4 border border-border/50 group hover:border-blue-500/30 transition-colors">
+                                        <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950/30 flex items-center justify-center text-blue-600 transition-transform group-hover:scale-110">
                                             <Users className="w-6 h-6" />
                                         </div>
-                                        <div className="flex-1">
-                                            <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
-                                                Yield / Servings
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={servings}
-                                                onChange={(e) => setServings(Number(e.target.value))}
-                                                className="w-full bg-transparent text-xl font-bold text-foreground focus:outline-none"
-                                                min="1"
-                                            />
+                                        <div className="flex-1 flex items-center gap-2">
+                                            <div className="flex-1">
+                                                <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
+                                                    Yield / Servings
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    value={servings}
+                                                    onChange={(e) => setServings(Number(e.target.value))}
+                                                    className="w-full bg-transparent text-xl font-bold text-foreground focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                                    min="1"
+                                                />
+                                            </div>
+                                            <div className="flex flex-col gap-0.5 text-muted-foreground/30 group-hover:text-blue-600/50 transition-colors">
+                                                <ChevronUp className="w-4 h-4 cursor-pointer hover:text-blue-600" onClick={() => setServings(prev => prev + 1)} />
+                                                <ChevronDown className="w-4 h-4 cursor-pointer hover:text-blue-600" onClick={() => setServings(prev => Math.max(1, prev - 1))} />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
