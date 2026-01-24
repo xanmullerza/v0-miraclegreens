@@ -199,17 +199,41 @@ export default function CreateRecipePage() {
 
                 const { quantity, unit } = parseAmount(ing.amount);
 
-                if (match) {
-                    // Clean name (e.g. "Spinach, raw" -> "Spinach") and move "raw" to prep
-                    let finalName = match.name;
-                    let finalModifier = ing.modifier || '';
+                const cleanFoodName = (name: string, existingModifier: string) => {
+                    let finalName = name.trim();
+                    let finalModifier = existingModifier;
 
-                    if (finalName.toLowerCase().includes(', raw')) {
-                        finalName = finalName.replace(/, raw/gi, '').trim();
-                        if (!finalModifier.toLowerCase().includes('raw')) {
-                            finalModifier = finalModifier ? `raw, ${finalModifier}` : 'raw';
+                    // 1. Handle common verbose USDA "Eggs" pattern
+                    if (finalName.toLowerCase().startsWith('eggs, grade a, large')) {
+                        finalName = 'Eggs';
+                    }
+
+                    // 2. Generic cleaning for trailing artifacts
+                    const artifacts = [', raw', ', fresh', ', dry', ', dried', ', frozen'];
+                    for (const art of artifacts) {
+                        if (finalName.toLowerCase().includes(art)) {
+                            finalName = finalName.replace(new RegExp(art, 'gi'), '').trim();
+                            const cleanArt = art.replace(/, /, '').trim();
+                            if (!finalModifier.toLowerCase().includes(cleanArt)) {
+                                finalModifier = finalModifier ? `${cleanArt}, ${finalModifier}` : cleanArt;
+                            }
                         }
                     }
+
+                    // 3. Remove trailing verbose list fragments if name is still long
+                    if (finalName.includes(',') && finalName.length > 20) {
+                        const parts = finalName.split(',');
+                        const secondPart = parts[1].trim().toLowerCase();
+                        if (['chopped', 'diced', 'minced', 'boiled', 'cooked', 'unprepared'].includes(secondPart)) {
+                            finalName = parts[0].trim();
+                        }
+                    }
+
+                    return { finalName, finalModifier };
+                };
+
+                if (match) {
+                    const { finalName, finalModifier } = cleanFoodName(match.name, ing.modifier || '');
 
                     // Calculate nutrients (simplified for now, using 100g base if gram-based)
                     const isGrams = unit.includes('g') && !unit.includes('cup');
@@ -233,15 +257,7 @@ export default function CreateRecipePage() {
                     });
                 } else {
                     // Placeholder ingredient if no match found
-                    let finalName = itemName;
-                    let finalModifier = ing.modifier || '';
-
-                    if (finalName.toLowerCase().includes(', raw')) {
-                        finalName = finalName.replace(/, raw/gi, '').trim();
-                        if (!finalModifier.toLowerCase().includes('raw')) {
-                            finalModifier = finalModifier ? `raw, ${finalModifier}` : 'raw';
-                        }
-                    }
+                    const { finalName, finalModifier } = cleanFoodName(itemName, ing.modifier || '');
 
                     rawIngredients.push({
                         food_item_id: 'temp-id',
