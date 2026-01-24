@@ -618,7 +618,6 @@ export default function CreateRecipePage() {
                                         <Zap className="w-5 h-5 text-amber-500" />
                                         Quick Facts
                                     </h2>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted px-2 py-1 rounded-md">Essential Data</span>
                                 </div>
 
                                 <div className="space-y-8">
