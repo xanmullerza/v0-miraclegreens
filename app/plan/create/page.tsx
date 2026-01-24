@@ -644,7 +644,7 @@ export default function CreateRecipePage() {
 
                                     <div>
                                         <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3">
-                                            Dietary Suitability *
+                                            Diet Type *
                                         </label>
                                         <div className="grid grid-cols-4 gap-3">
                                             {[
