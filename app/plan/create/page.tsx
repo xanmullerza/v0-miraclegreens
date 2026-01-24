@@ -238,12 +238,12 @@ export default function CreateRecipePage() {
             <Header />
             <div className="max-w-4xl mx-auto px-4 py-8">
                 {/* Header */}
-                <div className="mb-8">
+                <div className="mb-8 flex flex-col items-center text-center">
                     <div className="flex items-center gap-3 mb-2">
                         <ChefHat className="w-8 h-8 text-green-600" />
                         <h1 className="text-3xl font-bold text-foreground">Create New Recipe</h1>
                     </div>
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground max-w-lg">
                         Build your recipe with precise nutrition tracking using our food database
                     </p>
                 </div>
