@@ -613,6 +613,7 @@ export default function CreateRecipePage() {
                             <div className="bg-card rounded-xl shadow-sm p-6 space-y-4 text-foreground">
                                 <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
 
+                                {/* Meal Type moved to Quick Facts */}
                                 <div>
                                     <label className="block text-sm font-medium text-muted-foreground mb-2">
                                         Recipe Title *
@@ -624,24 +625,6 @@ export default function CreateRecipePage() {
                                         placeholder="e.g., Grilled Chicken with Roasted Vegetables"
                                         className="w-full px-4 py-2 bg-background/50 text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                     />
-                                </div>
-
-                                <div className="grid grid-cols-1 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-muted-foreground mb-2">
-                                            Meal Type *
-                                        </label>
-                                        <select
-                                            value={type}
-                                            onChange={(e) => setType(e.target.value as any)}
-                                            className="w-full px-4 py-2 bg-background/50 text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                        >
-                                            <option value="breakfast">Breakfast</option>
-                                            <option value="lunch">Lunch</option>
-                                            <option value="dinner">Dinner</option>
-                                            <option value="snack">Snack</option>
-                                        </select>
-                                    </div>
                                 </div>
 
                                 {/* Image Upload Section */}
@@ -787,6 +770,28 @@ export default function CreateRecipePage() {
                                     <Zap className="w-5 h-5 text-amber-500" />
                                     Quick Facts
                                 </h2>
+
+                                <div className="mb-8">
+                                    <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3">
+                                        Meal Type *
+                                    </label>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                        {['breakfast', 'lunch', 'dinner', 'snack'].map(m => (
+                                            <button
+                                                key={m}
+                                                type="button"
+                                                onClick={() => setType(m as any)}
+                                                className={`p-3 rounded-xl border-2 text-sm font-bold transition flex items-center justify-center text-center capitalize ${type === m
+                                                        ? 'border-green-600 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400'
+                                                        : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/30'
+                                                    }`}
+                                            >
+                                                {m}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="bg-muted/30 p-4 rounded-xl flex items-center gap-4">
                                         <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-950/30 flex items-center justify-center text-green-600">
