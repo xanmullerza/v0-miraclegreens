@@ -631,9 +631,9 @@ export default function CreateRecipePage() {
                                                     key={m}
                                                     type="button"
                                                     onClick={() => setType(m as any)}
-                                                    className={`p-3 rounded-xl border-2 text-[11px] md:text-xs font-black uppercase tracking-wider transition flex items-center justify-center text-center ${type === m
-                                                        ? 'border-green-600 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400'
-                                                        : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/30'
+                                                    className={`p-3 rounded-xl text-[11px] md:text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center text-center ${type === m
+                                                        ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 shadow-sm font-bold'
+                                                        : 'bg-muted/30 text-muted-foreground hover:bg-muted/50'
                                                         }`}
                                                 >
                                                     {m}
@@ -667,9 +667,9 @@ export default function CreateRecipePage() {
                                                             const others = diet.filter(d => d !== 'vegan' && d !== 'vegetarian' && d !== 'pescetarian');
                                                             setDiet([...others, ...option.tags]);
                                                         }}
-                                                        className={`p-3 rounded-xl border-2 text-[11px] md:text-xs font-black uppercase tracking-wider transition flex items-center justify-center text-center ${isSelected
-                                                            ? 'border-green-600 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400'
-                                                            : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/30'
+                                                        className={`p-3 rounded-xl text-[11px] md:text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center text-center ${isSelected
+                                                            ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 shadow-sm font-bold'
+                                                            : 'bg-muted/30 text-muted-foreground hover:bg-muted/50'
                                                             }`}
                                                     >
                                                         {option.label}
