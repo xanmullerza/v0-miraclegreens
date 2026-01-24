@@ -6,7 +6,12 @@ import { supabase } from '@/lib/supabase';
 import IngredientBuilder, { RecipeIngredient } from '@/components/recipe/ingredient-builder';
 import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap } from 'lucide-react';
 import { Header } from '@/components/header';
-import { parseInstructionsOnly } from '@/lib/utils/recipe-parser';
+import { parseInstructionsOnly, parseRecipeText } from '@/lib/utils/recipe-parser';
+import { searchLocalFood, searchUSDAFood, getUSDAMeasures } from '@/lib/services/nutrition';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 export default function CreateRecipePage() {
     const router = useRouter();
@@ -23,6 +28,9 @@ export default function CreateRecipePage() {
     const [uploading, setUploading] = useState(false);
     const [showMagicInstructions, setShowMagicInstructions] = useState(false);
     const [magicInstructionsText, setMagicInstructionsText] = useState('');
+    const [showAutoImport, setShowAutoImport] = useState(false);
+    const [autoImportText, setAutoImportText] = useState('');
+    const [isImporting, setIsImporting] = useState(false);
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -104,6 +112,113 @@ export default function CreateRecipePage() {
         }
         setMagicInstructionsText('');
         setShowMagicInstructions(false);
+    };
+
+    const handleAutoImport = async () => {
+        if (!autoImportText.trim()) return;
+        setIsImporting(true);
+
+        try {
+            const parsed = parseRecipeText(autoImportText);
+
+            // 1. Basic Info
+            setTitle(parsed.title);
+            setServings(parsed.servings || 4);
+            setInstructions(parsed.instructions);
+
+            // 2. Ingredients - This is more complex because we need nutrition data
+            const importedIngredients: RecipeIngredient[] = [];
+
+            for (const ing of parsed.ingredients) {
+                // Try to find nutrition data
+                const searchQuery = ing.item;
+                let match = null;
+
+                // Local search first
+                const localResults = await searchLocalFood(searchQuery);
+                if (localResults.length > 0) {
+                    match = localResults[0];
+                } else {
+                    // USDA search
+                    const usdaResults = await searchUSDAFood(searchQuery);
+                    if (usdaResults.length > 0) {
+                        match = usdaResults[0];
+                    }
+                }
+
+                if (match) {
+                    // Try to parse quantity and unit
+                    let quantity = 1;
+                    let unit = 'piece';
+
+                    const qtyMatch = ing.amount.match(/^(\d+(?:\.\d+)?|\d+\/\d+)/);
+                    if (qtyMatch) {
+                        const val = qtyMatch[1];
+                        if (val.includes('/')) {
+                            const [num, den] = val.split('/').map(Number);
+                            quantity = num / den;
+                        } else {
+                            quantity = Number(val);
+                        }
+                    }
+
+                    const unitPart = ing.amount.replace(/^(\d+(?:\.\d+)?|\d+\/\d+)\s*/, '').trim().toLowerCase();
+                    if (unitPart) unit = unitPart;
+
+                    // Calculate nutrients (simplified for now, using 100g base if gram-based)
+                    const isGrams = unit.includes('g') && !unit.includes('cup');
+                    const weight = ing.weightG || (isGrams ? quantity : 100); // 100g fallback if unknown volume
+
+                    const ratio = weight / 100;
+
+                    importedIngredients.push({
+                        food_item_id: match.id || 'temp-id',
+                        food_item_name: match.name,
+                        weight_g: weight,
+                        quantity: quantity,
+                        measure_label: unit,
+                        modifier: ing.modifier,
+                        calories: Math.round(match.energy_kcal * ratio),
+                        energy_kj: Math.round(match.energy_kj * ratio),
+                        protein: Number((match.protein_g * ratio).toFixed(1)),
+                        fat: Number((match.fat_g * ratio).toFixed(1)),
+                        carbs: Number((match.carbs_g * ratio).toFixed(1)),
+                    });
+                } else {
+                    // Placeholder ingredient if no match found
+                    importedIngredients.push({
+                        food_item_id: 'temp-id',
+                        food_item_name: ing.item,
+                        weight_g: ing.weightG || 0,
+                        quantity: 1,
+                        measure_label: ing.amount || 'as needed',
+                        modifier: ing.modifier,
+                        calories: 0,
+                        energy_kj: 0,
+                        protein: 0,
+                        fat: 0,
+                        carbs: 0,
+                    });
+                }
+            }
+
+            setIngredients(importedIngredients);
+
+            // 3. Image - One shot "add a picture"
+            // We'll use a high-quality placeholder based on the title
+            const keywords = parsed.title.toLowerCase().split(' ').filter(w => w.length > 3).slice(0, 3).join(',');
+            setImage(`https://loremflickr.com/1200/800/${encodeURIComponent(keywords || 'food')},recipe/all`);
+
+            // Cleanup
+            setAutoImportText('');
+            setShowAutoImport(false);
+            alert('Recipe imported! We have matched ingredients and added a placeholder image.');
+        } catch (error) {
+            console.error('Import error:', error);
+            alert('Failed to parse recipe. Please check the format.');
+        } finally {
+            setIsImporting(false);
+        }
     };
 
     const toggleDiet = (dietType: string) => {
@@ -243,9 +358,16 @@ export default function CreateRecipePage() {
                         <ChefHat className="w-8 h-8 text-green-600" />
                         <h1 className="text-3xl font-bold text-foreground">Create New Recipe</h1>
                     </div>
-                    <p className="text-muted-foreground max-w-lg">
+                    <p className="text-muted-foreground max-w-lg mb-4">
                         Build your recipe with precise nutrition tracking using our food database
                     </p>
+                    <Button
+                        onClick={() => setShowAutoImport(true)}
+                        className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-none shadow-md group transition-all"
+                    >
+                        <Zap className="w-4 h-4 mr-2 text-yellow-300 group-hover:scale-125 transition-transform" />
+                        One-Shot Auto Import
+                    </Button>
                 </div>
 
                 <div className="space-y-6">
@@ -560,6 +682,53 @@ export default function CreateRecipePage() {
                     </div>
                 </div>
             </div>
+            {/* Auto Import Sheet */}
+            <Sheet open={showAutoImport} onOpenChange={setShowAutoImport}>
+                <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
+                    <SheetHeader>
+                        <SheetTitle className="flex items-center gap-2">
+                            <Sparkles className="w-5 h-5 text-purple-600" />
+                            Magic Auto-Import
+                        </SheetTitle>
+                        <SheetDescription>
+                            Paste a full recipe (Title, Ingredients, and Instructions) and we'll structured it for you using AI-powered matching.
+                        </SheetDescription>
+                    </SheetHeader>
+
+                    <div className="py-6 space-y-4">
+                        <div className="space-y-2">
+                            <Label>Recipe Text</Label>
+                            <Textarea
+                                placeholder="Example:&#10;Moringa Smoothie&#10;&#10;Ingredients:&#10;1 cup almond milk&#10;1 tsp moringa powder&#10;1 frozen banana&#10;&#10;Instructions:&#10;1. Add all ingredients to blender...&#10;2. Mix until smooth..."
+                                className="min-h-[400px] font-mono text-sm"
+                                value={autoImportText}
+                                onChange={(e) => setAutoImportText(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    <SheetFooter>
+                        <Button
+                            className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                            onClick={handleAutoImport}
+                            disabled={isImporting || !autoImportText.trim()}
+                        >
+                            {isImporting ? (
+                                <>
+                                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                                    Analyzing Recipe...
+                                </>
+                            ) : (
+                                <>
+                                    <Sparkles className="w-5 h-5 mr-2" />
+                                    Import Magic
+                                </>
+                            )}
+                        </Button>
+                    </SheetFooter>
+                </SheetContent>
+            </Sheet>
         </div>
     );
 }
+
