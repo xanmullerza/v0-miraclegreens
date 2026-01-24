@@ -502,7 +502,7 @@ export default function CreateRecipePage() {
                                         <button
                                             type="button"
                                             onClick={() => setShowMagicInstructions(!showMagicInstructions)}
-                                            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white border-none shadow-md group transition-all px-3 py-2 rounded-lg flex items-center justify-center gap-2 w-36 text-[10px] uppercase font-black tracking-widest"
+                                            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white border-none shadow-md group transition-all px-3 h-10 rounded-lg flex items-center justify-center gap-2 w-40 text-[10px] uppercase font-black tracking-widest whitespace-nowrap"
                                         >
                                             <Wand2 className="w-3.5 h-3.5 group-hover:scale-125 transition-transform" />
                                             Magic Paste
@@ -510,7 +510,7 @@ export default function CreateRecipePage() {
                                         <button
                                             type="button"
                                             onClick={handleAddInstruction}
-                                            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-none shadow-md group transition-all px-3 py-2 rounded-lg flex items-center justify-center gap-2 w-36 text-[10px] uppercase font-black tracking-widest"
+                                            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-none shadow-md group transition-all px-3 h-10 rounded-lg flex items-center justify-center gap-2 w-40 text-[10px] uppercase font-black tracking-widest whitespace-nowrap"
                                         >
                                             <Plus className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform" />
                                             Add Instruction
