@@ -50,7 +50,10 @@ export function parseIngredientsOnly(text: string): ParsedIngredient[] {
             // If it's just "1 cup", we definitely want to check the buffer.
 
             // Heuristic: If the parsed item name is very short OR is just the unit name
-            const isNameWeak = parsed.item.length < 2 || parsed.item === parsed.amount || COMMON_UNITS.includes(parsed.item);
+            const lowerItem = parsed.item.toLowerCase();
+            const isNameWeak = parsed.item.length < 2 ||
+                parsed.item === parsed.amount ||
+                COMMON_UNITS.some(u => lowerItem === u || lowerItem === u + 's');
 
             if (nameBuffer.length > 0) {
                 if (isNameWeak) {
@@ -80,9 +83,16 @@ export function parseIngredientsOnly(text: string): ParsedIngredient[] {
 
     // Flush remaining buffer
     if (nameBuffer.length > 0) {
-        nameBuffer.forEach(bufferedItem => {
-            ingredients.push(parseIngredientLine(bufferedItem));
-        });
+        // If we have ingredients, check if the buffer is actually a modifier for the last one
+        // (Often "Salt" then "to taste" on next line)
+        const lastIng = ingredients[ingredients.length - 1];
+        if (lastIng && nameBuffer.length === 1 && nameBuffer[0].length < 20) {
+            lastIng.item += ', ' + nameBuffer[0];
+        } else {
+            nameBuffer.forEach(bufferedItem => {
+                ingredients.push(parseIngredientLine(bufferedItem));
+            });
+        }
     }
 
 
@@ -237,14 +247,15 @@ export function parseRecipeText(text: string): ParsedRecipe {
 }
 
 const COMMON_UNITS = [
+    'extra large', 'extra-large', 'xl', 'large', 'medium', 'small', 'jumbo', 'tiny',
     'cup', 'cups', 'c.', 'tbsp', 'tablespoon', 'tablespoons', 'tbs', 'tbs.', 'tb.', 'T',
-    'tsp', 'teaspoon', 'teaspoons', 't', 't.', 'oz', 'ounce', 'ounces', 'fl oz',
+    'tsp', 'teaspoon', 'teaspoons', 't', 't.', 'oz', 'ounce', 'ounces', 'fl oz', 'fluid ounce', 'fluid ounces',
     'lb', 'pound', 'pounds', 'g', 'gram', 'grams', 'gr', 'kg', 'kilogram', 'kilograms', 'kilo',
     'ml', 'milliliter', 'milliliters', 'l', 'liter', 'liters', 'litre', 'litres',
     'clove', 'cloves', 'pinch', 'pinches', 'dash', 'dashes', 'slice', 'slices', 'ring', 'rings',
     'can', 'cans', 'bottle', 'bottles', 'package', 'packages', 'pkg', 'tin', 'tins', 'box', 'boxes',
-    'large', 'medium', 'small', 'bunch', 'bunches', 'head', 'heads', 'sprig', 'sprigs',
-    'stalk', 'stalks', 'bulb', 'bulbs', 'item', 'unit', 'portion', 'piece', 'pieces'
+    'bunch', 'bunches', 'head', 'heads', 'sprig', 'sprigs',
+    'stalk', 'stalks', 'bulb', 'bulbs', 'each', 'item', 'unit', 'portion', 'piece', 'pieces', 'whole'
 ];
 
 function isProbablyIngredient(line: string): boolean {
@@ -339,7 +350,7 @@ function parseIngredientLine(line: string): ParsedIngredient {
     cleanLine = cleanLine.replace(artifactRegex, (match, p1) => {
         const lowerP1 = p1.toLowerCase();
         // Trust the exceptions list primarily. If NOT in exceptions, we strip it.
-        const exceptions = ['flo', 'doo', 'po', 'arm', 'col', 'flav', 'tail'];
+        const exceptions = ['flo', 'doo', 'po', 'arm', 'col', 'flav', 'tail', 'extra'];
         if (exceptions.includes(lowerP1)) return match;
         return p1;
     }).trim();
@@ -370,8 +381,9 @@ function parseIngredientLine(line: string): ParsedIngredient {
     // 3. IF Start-of-line failed, try Embedded match
     // Look for (Number/Fraction) followed explicitly by a (Unit)
     if (!match) {
-        // Regex: (Start or space/punctuation) (Number) (Spaces) (Unit) (Boundary)
-        const embeddedRegex = new RegExp(`(?:^|[\\s,(])((?:\\d+(?:\\.\\d+)?|\\d+\\/\\d+|[¼½¾⅛⅜⅝⅞]))\\s*(${COMMON_UNITS.join('|')})\\b`, 'i');
+        // Sort units by length descending to match longest first (e.g. "extra large" before "large")
+        const sortedUnits = [...COMMON_UNITS].sort((a, b) => b.length - a.length);
+        const embeddedRegex = new RegExp(`(?:^|[\\s,(])((?:\\d+(?:\\.\\d+)?|\\d+\\/\\d+|[¼½¾⅛⅜⅝⅞]))\\s*(${sortedUnits.join('|').replace(/\s+/g, '\\s+')})\\b`, 'i');
         const embeddedMatch = cleanLine.match(embeddedRegex);
 
         if (embeddedMatch) {
@@ -427,17 +439,30 @@ function parseIngredientLine(line: string): ParsedIngredient {
         amount = match[1].trim();
         let rest = match[2].trim();
 
-        // Check if the "rest" starts with a known unit
+        // Check for known units (up to 2 words, most common multi-word units)
         let unit = "";
         const words = rest.split(/\s+/);
-        const firstWord = words[0].toLowerCase().replace(/[.,]$/, '');
 
-        if (COMMON_UNITS.includes(firstWord)) {
-            unit = words[0];
-            rest = words.slice(1).join(' ').trim();
-            if (rest.toLowerCase().startsWith('of ')) {
-                rest = rest.slice(3).trim();
+        // Try 2-word match first
+        if (words.length >= 2) {
+            const twoWords = (words[0] + ' ' + words[1]).toLowerCase().replace(/[.,]$/, '');
+            if (COMMON_UNITS.includes(twoWords)) {
+                unit = words[0] + ' ' + words[1];
+                rest = words.slice(2).join(' ').trim();
             }
+        }
+
+        // Try 1-word match if no multi-word found
+        if (!unit && words.length >= 1) {
+            const firstWord = words[0].toLowerCase().replace(/[.,]$/, '');
+            if (COMMON_UNITS.includes(firstWord)) {
+                unit = words[0];
+                rest = words.slice(1).join(' ').trim();
+            }
+        }
+
+        if (unit && rest.toLowerCase().startsWith('of ')) {
+            rest = rest.slice(3).trim();
         }
 
         // Weight parsing logic
