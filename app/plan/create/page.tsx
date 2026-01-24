@@ -650,9 +650,9 @@ export default function CreateRecipePage() {
                                         <div className="grid grid-cols-4 gap-3">
                                             {[
                                                 { id: 'balanced', label: 'Balanced', tags: [] },
+                                                { id: 'pescetarian', label: 'Pescetarian', tags: ['pescetarian'] },
                                                 { id: 'vegetarian', label: 'Vegetarian', tags: ['vegetarian'] },
-                                                { id: 'vegan', label: 'Vegan', tags: ['vegan', 'vegetarian'] },
-                                                { id: 'pescetarian', label: 'Pescetarian', tags: ['pescetarian'] }
+                                                { id: 'vegan', label: 'Vegan', tags: ['vegan', 'vegetarian'] }
                                             ].map(option => {
                                                 const isSelected = option.id === 'balanced'
                                                     ? (!diet.includes('vegan') && !diet.includes('vegetarian') && !diet.includes('pescetarian'))
