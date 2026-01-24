@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import IngredientBuilder, { RecipeIngredient } from '@/components/recipe/ingredient-builder';
-import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft } from 'lucide-react';
+import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus } from 'lucide-react';
 import { Header } from '@/components/header';
 import { parseInstructionsOnly, parseRecipeText } from '@/lib/utils/recipe-parser';
 import { searchLocalFood, searchUSDAFood, getUSDAMeasures } from '@/lib/services/nutrition';
@@ -502,17 +502,18 @@ export default function CreateRecipePage() {
                                         <button
                                             type="button"
                                             onClick={() => setShowMagicInstructions(!showMagicInstructions)}
-                                            className="text-xs flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 font-bold hover:bg-amber-100 transition-all"
+                                            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white border-none shadow-md group transition-all px-4 py-2 rounded-lg flex items-center gap-2 text-xs font-bold"
                                         >
-                                            <Wand2 size={14} />
+                                            <Wand2 className="w-4 h-4 group-hover:scale-125 transition-transform" />
                                             Magic Paste
                                         </button>
                                         <button
                                             type="button"
                                             onClick={handleAddInstruction}
-                                            className="text-sm text-green-600 hover:text-green-700 font-medium"
+                                            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-none shadow-md group transition-all px-4 py-2 rounded-lg flex items-center gap-2 text-xs font-bold"
                                         >
-                                            + Add Step
+                                            <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
+                                            Add Instruction
                                         </button>
                                     </div>
                                 </div>
