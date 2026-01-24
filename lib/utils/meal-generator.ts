@@ -89,25 +89,19 @@ export const getRandomRecipeByType = async (
         .filter((r: any) => diet === 'anything' || r.diet.includes(diet))
         .filter((r: any) => r.id !== excludeId) // Exclude current recipe
         .map((r: any) => {
-            const servings = r.servings || 1;
             const calculatedNutrition = calculateNutrition(r.ingredients);
-
-            // Scale micros to per-serving
-            const perServingMicros: Record<string, number> = {};
-            Object.entries(calculatedNutrition.micronutrients).forEach(([k, v]) => {
-                perServingMicros[k] = v / servings;
-            });
 
             return {
                 recipe: {
                     id: r.id,
                     title: r.title,
                     type: r.type,
-                    calories: (calculatedNutrition.calories / servings) || r.calories || 0,
-                    energyKj: (calculatedNutrition.energyKj / servings) || r.energy_kj || 0,
-                    protein: (calculatedNutrition.protein / servings) || r.protein || 0,
-                    carbs: (calculatedNutrition.carbs / servings) || r.carbs || 0,
-                    fat: (calculatedNutrition.fat / servings) || r.fat || 0,
+                    // Values are assumed to be stored per-serving in the database now
+                    calories: calculatedNutrition.calories || r.calories || 0,
+                    energyKj: calculatedNutrition.energyKj || r.energy_kj || 0,
+                    protein: calculatedNutrition.protein || r.protein || 0,
+                    carbs: calculatedNutrition.carbs || r.carbs || 0,
+                    fat: calculatedNutrition.fat || r.fat || 0,
                     diet: r.diet,
                     image: r.image,
                     prepTime: r.prep_time,
@@ -120,9 +114,9 @@ export const getRandomRecipeByType = async (
                         measureLabel: i.measure_label
                     })),
                     instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
-                    servings: servings
+                    servings: 1 // Default to 1 serving for a meal plan, regardless of yield
                 },
-                micronutrients: perServingMicros
+                micronutrients: calculatedNutrition.micronutrients
             };
         });
 
@@ -205,23 +199,19 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
         const servings = r.servings || 1;
         const calculatedNutrition = calculateNutrition(r.ingredients);
 
-        // Store micronutrients keyed by recipe ID (scaled to per-serving)
-        const perServingMicros: Record<string, number> = {};
-        Object.entries(calculatedNutrition.micronutrients).forEach(([k, v]) => {
-            perServingMicros[k] = v / servings;
-        });
-        recipeMicronutrients[r.id] = perServingMicros;
+        // Store micronutrients keyed by recipe ID
+        recipeMicronutrients[r.id] = calculatedNutrition.micronutrients;
 
         return {
             id: r.id,
             title: r.title,
             type: r.type,
-            // Use calculated values divided by servings if available, otherwise fall back to stored values
-            calories: (calculatedNutrition.calories / servings) || r.calories || 0,
-            energyKj: (calculatedNutrition.energyKj / servings) || r.energy_kj || 0,
-            protein: (calculatedNutrition.protein / servings) || r.protein || 0,
-            carbs: (calculatedNutrition.carbs / servings) || r.carbs || 0,
-            fat: (calculatedNutrition.fat / servings) || r.fat || 0,
+            // Use per-serving values directly from the database
+            calories: calculatedNutrition.calories || r.calories || 0,
+            energyKj: calculatedNutrition.energyKj || r.energy_kj || 0,
+            protein: calculatedNutrition.protein || r.protein || 0,
+            carbs: calculatedNutrition.carbs || r.carbs || 0,
+            fat: calculatedNutrition.fat || r.fat || 0,
             diet: r.diet,
             image: r.image,
             prepTime: r.prep_time,
@@ -234,7 +224,7 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
                 measureLabel: i.measure_label
             })),
             instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
-            servings: servings
+            servings: 1 // Default to 1 serving for the generated meal plan
         };
     });
 

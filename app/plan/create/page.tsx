@@ -8,6 +8,7 @@ import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sp
 import { Header } from '@/components/header';
 import { parseInstructionsOnly, parseRecipeText } from '@/lib/utils/recipe-parser';
 import { searchLocalFood, searchUSDAFood, getUSDAMeasures } from '@/lib/services/nutrition';
+import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -373,11 +374,11 @@ export default function CreateRecipePage() {
                     id: recipeId,
                     title,
                     type,
-                    calories: Math.round(totals.calories),
-                    energy_kj: Math.round(totals.energy_kj),
-                    protein: Math.round(totals.protein),
-                    fat: Math.round(totals.fat),
-                    carbs: Math.round(totals.carbs),
+                    calories: Math.round(totals.calories / (servings || 1)),
+                    energy_kj: Math.round(totals.energy_kj / (servings || 1)),
+                    protein: Math.round((totals.protein / (servings || 1)) * 10) / 10,
+                    fat: Math.round((totals.fat / (servings || 1)) * 10) / 10,
+                    carbs: Math.round((totals.carbs / (servings || 1)) * 10) / 10,
                     diet,
                     prep_time: prepTime,
                     servings,
@@ -389,18 +390,27 @@ export default function CreateRecipePage() {
                 throw new Error(`Recipes error: ${recipeError.message}`);
             }
 
-            // Insert ingredients
-            const ingredientsData = ingredients.map(ing => ({
-                recipe_id: recipeId,
-                food_item_id: ing.food_item_id === 'temp-id' ? null : ing.food_item_id,
-                item: ing.food_item_name,
-                amount: `${ing.quantity} ${ing.measure_label || 'g'}${ing.modifier ? ' ' + ing.modifier : ''}`.trim(),
-                weight_g: ing.weight_g,
-                quantity: ing.quantity,
-                measure_label: ing.measure_label,
-                base_ingredient: ing.food_item_name,
-                modifier: ing.modifier,
-            }));
+            // Insert ingredients - Normalize to 1 serving for the database
+            const ingredientsData = ingredients.map(ing => {
+                const normalizedQty = ing.quantity / (servings || 1);
+                const normalizedWeight = ing.weight_g / (servings || 1);
+
+                // Scale the textual amount string to match 1 serving
+                const originalAmount = `${ing.quantity} ${ing.measure_label || 'g'}`.trim();
+                const normalizedAmount = scaleIngredient(originalAmount, 1 / (servings || 1));
+
+                return {
+                    recipe_id: recipeId,
+                    food_item_id: ing.food_item_id === 'temp-id' ? null : ing.food_item_id,
+                    item: ing.food_item_name,
+                    amount: `${normalizedAmount}${ing.modifier ? ' ' + ing.modifier : ''}`.trim(),
+                    weight_g: normalizedWeight,
+                    quantity: normalizedQty,
+                    measure_label: ing.measure_label,
+                    base_ingredient: ing.food_item_name,
+                    modifier: ing.modifier,
+                };
+            });
 
             const { error: ingredientsError } = await supabase
                 .from('ingredients')
