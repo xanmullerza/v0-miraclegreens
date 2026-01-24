@@ -384,7 +384,8 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             }
         }
 
-        const ratio = newWeight / ing.weight_g;
+        const safeOldWeight = ing.weight_g || 1;
+        const ratio = newWeight / safeOldWeight;
 
         updated[index] = {
             ...ing,
@@ -640,7 +641,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                                         onChange={(e) => handleUpdateQuantity(index, Number(e.target.value))}
                                         className="w-14 px-1.5 py-2 border border-border bg-background text-foreground rounded-lg text-center text-sm font-bold focus:ring-2 focus:ring-green-500/20 outline-none"
                                         min="0"
-                                        step="0.25"
+                                        step="0.125"
                                     />
                                 </div>
 
