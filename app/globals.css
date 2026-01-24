@@ -5,19 +5,19 @@
 
 :root {
   --background: #cfe8cf;
-  --foreground: oklch(0.205 0.015 60);
+  --foreground: #000000;
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.205 0.015 60);
+  --card-foreground: #000000;
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.205 0.015 60);
+  --popover-foreground: #000000;
   --primary: oklch(0.45 0.12 145);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: #b8dbb8;
-  --secondary-foreground: oklch(0.205 0.015 60);
+  --secondary-foreground: #000000;
   --muted: #c4e2c4;
-  --muted-foreground: oklch(0.5 0.01 60);
+  --muted-foreground: #000000;
   --accent: oklch(0.75 0.15 85);
-  --accent-foreground: oklch(0.205 0.015 60);
+  --accent-foreground: #000000;
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.577 0.245 27.325);
   --border: oklch(0.9 0.01 90);
