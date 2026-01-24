@@ -610,17 +610,13 @@ export default function CreateRecipePage() {
                     ) : (
                         <>
                             {/* Step 2 Content: Identity & Metadata */}
-                            {/* 1. Quick Facts & Identity */}
-                            <div className="bg-card rounded-xl shadow-sm p-6 space-y-8 text-foreground">
-                                <div className="flex items-center justify-between border-b border-border/50 pb-4">
-                                    <h2 className="text-xl font-bold flex items-center gap-2 text-foreground">
-                                        <Zap className="w-5 h-5 text-amber-500" />
-                                        Quick Facts
-                                    </h2>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted px-2 py-1 rounded-md">Essential Data</span>
-                                </div>
 
-                                {/* Recipe Title */}
+                            {/* 1. Recipe Identity */}
+                            <div className="bg-card rounded-xl shadow-sm p-6 space-y-4 text-foreground">
+                                <h2 className="text-xl font-bold flex items-center gap-2 text-foreground">
+                                    <ChefHat className="w-5 h-5 text-green-600" />
+                                    Recipe Identity
+                                </h2>
                                 <div>
                                     <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">
                                         Recipe Title *
@@ -632,6 +628,17 @@ export default function CreateRecipePage() {
                                         placeholder="e.g., Grilled Salmon with Chives"
                                         className="w-full px-4 py-3 bg-muted/20 border-2 border-transparent focus:border-green-500 text-lg font-bold text-foreground rounded-xl transition-all focus:outline-none"
                                     />
+                                </div>
+                            </div>
+
+                            {/* 2. Quick Facts */}
+                            <div className="bg-card rounded-xl shadow-sm p-6 space-y-8 text-foreground">
+                                <div className="flex items-center justify-between border-b border-border/50 pb-4">
+                                    <h2 className="text-xl font-bold flex items-center gap-2 text-foreground">
+                                        <Zap className="w-5 h-5 text-amber-500" />
+                                        Quick Facts
+                                    </h2>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted px-2 py-1 rounded-md">Essential Data</span>
                                 </div>
 
                                 <div className="space-y-8">
@@ -826,33 +833,6 @@ export default function CreateRecipePage() {
                                 </div>
                             </div>
 
-                            {/* 3. Additional Details */}
-                            <div className="bg-card rounded-xl shadow-sm p-6 text-foreground">
-                                <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-foreground">
-                                    <Sparkles className="w-5 h-5 text-blue-500" />
-                                    Extra Details
-                                </h2>
-                                <div>
-                                    <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4">
-                                        Additional Nutrients & Dietary Tags (Optional)
-                                    </label>
-                                    <div className="flex flex-wrap gap-2">
-                                        {['gluten-free', 'dairy-free', 'low-carb', 'nut-free', 'high-protein'].map(tag => (
-                                            <button
-                                                key={tag}
-                                                type="button"
-                                                onClick={() => toggleDiet(tag)}
-                                                className={`px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all ${diet.includes(tag)
-                                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
-                                                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                                                    }`}
-                                            >
-                                                {tag}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
 
                             <div className="flex gap-4">
                                 <button
