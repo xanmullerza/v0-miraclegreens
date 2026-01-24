@@ -699,7 +699,7 @@ export default function CreateRecipePage() {
                         <div className="space-y-2">
                             <Label>Recipe Text</Label>
                             <Textarea
-                                placeholder="Example:&#10;Moringa Smoothie&#10;&#10;Ingredients:&#10;1 cup almond milk&#10;1 tsp moringa powder&#10;1 frozen banana&#10;&#10;Instructions:&#10;1. Add all ingredients to blender...&#10;2. Mix until smooth..."
+                                placeholder=""
                                 className="min-h-[400px] font-mono text-sm"
                                 value={autoImportText}
                                 onChange={(e) => setAutoImportText(e.target.value)}
