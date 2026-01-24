@@ -200,19 +200,30 @@ export default function CreateRecipePage() {
                 const { quantity, unit } = parseAmount(ing.amount);
 
                 if (match) {
+                    // Clean name (e.g. "Spinach, raw" -> "Spinach") and move "raw" to prep
+                    let finalName = match.name;
+                    let finalModifier = ing.modifier || '';
+
+                    if (finalName.toLowerCase().includes(', raw')) {
+                        finalName = finalName.replace(/, raw/gi, '').trim();
+                        if (!finalModifier.toLowerCase().includes('raw')) {
+                            finalModifier = finalModifier ? `raw, ${finalModifier}` : 'raw';
+                        }
+                    }
+
                     // Calculate nutrients (simplified for now, using 100g base if gram-based)
                     const isGrams = unit.includes('g') && !unit.includes('cup');
-                    const weight = ing.weightG || (isGrams ? quantity : 100); // 100g fallback if unknown volume
+                    const weight = ing.weightG || (isGrams ? quantity : 100);
 
                     const ratio = weight / 100;
 
                     rawIngredients.push({
                         food_item_id: match.id || 'temp-id',
-                        food_item_name: match.name,
+                        food_item_name: finalName,
                         weight_g: weight,
                         quantity: quantity,
                         measure_label: unit,
-                        modifier: ing.modifier,
+                        modifier: finalModifier,
                         calories: Math.round(match.energy_kcal * ratio),
                         energy_kj: Math.round(match.energy_kj * ratio),
                         protein: Number((match.protein_g * ratio).toFixed(1)),
@@ -222,13 +233,23 @@ export default function CreateRecipePage() {
                     });
                 } else {
                     // Placeholder ingredient if no match found
+                    let finalName = itemName;
+                    let finalModifier = ing.modifier || '';
+
+                    if (finalName.toLowerCase().includes(', raw')) {
+                        finalName = finalName.replace(/, raw/gi, '').trim();
+                        if (!finalModifier.toLowerCase().includes('raw')) {
+                            finalModifier = finalModifier ? `raw, ${finalModifier}` : 'raw';
+                        }
+                    }
+
                     rawIngredients.push({
                         food_item_id: 'temp-id',
-                        food_item_name: itemName,
+                        food_item_name: finalName,
                         weight_g: ing.weightG || (unit.includes('g') ? quantity : 0),
                         quantity: quantity,
                         measure_label: unit,
-                        modifier: ing.modifier,
+                        modifier: finalModifier,
                         calories: 0,
                         energy_kj: 0,
                         protein: 0,
