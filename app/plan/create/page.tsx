@@ -610,136 +610,31 @@ export default function CreateRecipePage() {
                     ) : (
                         <>
                             {/* Step 2 Content: Identity & Metadata */}
-                            <div className="bg-card rounded-xl shadow-sm p-6 space-y-4 text-foreground">
-                                <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
+                            {/* 1. Quick Facts & Identity */}
+                            <div className="bg-card rounded-xl shadow-sm p-6 space-y-8 text-foreground">
+                                <div className="flex items-center justify-between border-b border-border/50 pb-4">
+                                    <h2 className="text-xl font-bold flex items-center gap-2 text-foreground">
+                                        <Zap className="w-5 h-5 text-amber-500" />
+                                        Quick Facts
+                                    </h2>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted px-2 py-1 rounded-md">Essential Data</span>
+                                </div>
 
-                                {/* Meal Type moved to Quick Facts */}
+                                {/* Recipe Title */}
                                 <div>
-                                    <label className="block text-sm font-medium text-muted-foreground mb-2">
+                                    <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">
                                         Recipe Title *
                                     </label>
                                     <input
                                         type="text"
                                         value={title}
                                         onChange={(e) => setTitle(e.target.value)}
-                                        placeholder="e.g., Grilled Chicken with Roasted Vegetables"
-                                        className="w-full px-4 py-2 bg-background/50 text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        placeholder="e.g., Grilled Salmon with Chives"
+                                        className="w-full px-4 py-3 bg-muted/20 border-2 border-transparent focus:border-green-500 text-lg font-bold text-foreground rounded-xl transition-all focus:outline-none"
                                     />
                                 </div>
 
-                                {/* Image Upload Only here now */}
-                                <div className="pt-4 border-t border-border/50">
-                                    <label className="block text-sm font-medium text-muted-foreground mb-3">
-                                        Recipe Photo
-                                    </label>
-                                    <div className="flex flex-col md:flex-row gap-6">
-                                        <div className="hidden">
-                                            <input
-                                                type="file"
-                                                id="recipe-image-upload"
-                                                accept="image/*"
-                                                onChange={handleImageUpload}
-                                            />
-                                        </div>
-                                        <div
-                                            className="relative group w-full md:w-64 aspect-video md:aspect-square rounded-xl border-2 border-dashed border-border/20 overflow-hidden bg-muted/30 flex flex-col items-center justify-center cursor-pointer hover:border-green-500 transition-all"
-                                            onClick={() => document.getElementById('recipe-image-upload')?.click()}
-                                        >
-                                            {image ? (
-                                                <>
-                                                    <img src={image} alt="Recipe Preview" className="w-full h-full object-cover" />
-                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                                        <button
-                                                            type="button"
-                                                            className="p-2 bg-white rounded-full text-foreground hover:bg-green-50"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                document.getElementById('recipe-image-upload')?.click();
-                                                            }}
-                                                        >
-                                                            <Camera size={18} />
-                                                        </button>
-                                                        <button
-                                                            type="button"
-                                                            className="p-2 bg-white rounded-full text-red-600 hover:bg-red-50"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setImage('');
-                                                            }}
-                                                        >
-                                                            <Trash2 size={18} />
-                                                        </button>
-                                                    </div>
-                                                </>
-                                            ) : (
-                                                <div className="text-center p-4">
-                                                    <div className="w-12 h-12 rounded-full bg-background flex items-center justify-center mx-auto mb-2 text-muted-foreground group-hover:text-green-600 transition-colors">
-                                                        {uploading ? <Loader2 className="w-6 h-6 animate-spin" /> : <Camera className="w-6 h-6" />}
-                                                    </div>
-                                                    <p className="text-xs font-bold text-muted-foreground group-hover:text-green-700">Add Photo</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="flex-1 space-y-3">
-                                            <p className="text-xs text-muted-foreground leading-relaxed">
-                                                Adding a photo makes your recipe more engaging. Upload a clear, bright picture of the finished dish for best results.
-                                            </p>
-                                            <button
-                                                type="button"
-                                                onClick={() => document.getElementById('recipe-image-upload')?.click()}
-                                                disabled={uploading}
-                                                className="flex items-center gap-2 text-sm font-bold text-green-600 hover:text-green-700 transition"
-                                            >
-                                                <Upload size={16} />
-                                                {uploading ? 'Processing...' : (image ? 'Change Picture' : 'Select File')}
-                                            </button>
-
-                                            <div className="pt-2">
-                                                <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1.5">
-                                                    Or Image URL
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    value={image.startsWith('data:') ? '' : image}
-                                                    onChange={(e) => setImage(e.target.value)}
-                                                    placeholder="https://images.unsplash.com/..."
-                                                    className="w-full px-3 py-1.5 text-sm bg-background/50 text-foreground rounded focus:outline-none focus:ring-1 focus:ring-green-500"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="pt-4 border-t border-border/50">
-                                    <label className="block text-sm font-medium text-muted-foreground mb-4">
-                                        Additional Nutrients (Optional)
-                                    </label>
-                                    <div className="flex flex-wrap gap-2">
-                                        {['gluten-free', 'dairy-free', 'low-carb', 'nut-free', 'high-protein'].map(tag => (
-                                            <button
-                                                key={tag}
-                                                type="button"
-                                                onClick={() => toggleDiet(tag)}
-                                                className={`px-4 py-2 rounded-full text-sm font-medium transition ${diet.includes(tag)
-                                                    ? 'bg-blue-600 text-white'
-                                                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                                                    }`}
-                                            >
-                                                {tag}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Quick Facts */}
-                            <div className="bg-card rounded-xl shadow-sm p-6">
-                                <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
-                                    <Zap className="w-5 h-5 text-amber-500" />
-                                    Quick Facts
-                                </h2>
-
-                                <div className="space-y-6 mb-8">
+                                <div className="space-y-8">
                                     <div>
                                         <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3">
                                             Meal Type *
@@ -799,9 +694,9 @@ export default function CreateRecipePage() {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="bg-muted/30 p-4 rounded-xl flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-950/30 flex items-center justify-center text-green-600">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-border/50">
+                                    <div className="bg-muted/30 p-4 rounded-xl flex items-center gap-4 border border-border/50">
+                                        <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-950/30 flex items-center justify-center text-green-600">
                                             <Clock className="w-6 h-6" />
                                         </div>
                                         <div className="flex-1">
@@ -818,8 +713,8 @@ export default function CreateRecipePage() {
                                         </div>
                                     </div>
 
-                                    <div className="bg-muted/30 p-4 rounded-xl flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-950/30 flex items-center justify-center text-blue-600">
+                                    <div className="bg-muted/30 p-4 rounded-xl flex items-center gap-4 border border-border/50">
+                                        <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950/30 flex items-center justify-center text-blue-600">
                                             <Users className="w-6 h-6" />
                                         </div>
                                         <div className="flex-1">
@@ -834,6 +729,127 @@ export default function CreateRecipePage() {
                                                 min="1"
                                             />
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 2. Recipe Photo */}
+                            <div className="bg-card rounded-xl shadow-sm p-6 text-foreground">
+                                <h2 className="text-xl font-bold mb-6 flex items-center gap-3 text-foreground">
+                                    <Camera className="w-5 h-5 text-green-600" />
+                                    Recipe Photo
+                                </h2>
+                                <div className="flex flex-col md:flex-row gap-8">
+                                    <div className="hidden">
+                                        <input
+                                            type="file"
+                                            id="recipe-image-upload"
+                                            accept="image/*"
+                                            onChange={handleImageUpload}
+                                        />
+                                    </div>
+                                    <div
+                                        className="relative group w-full md:w-72 aspect-[4/3] rounded-2xl border-2 border-dashed border-border/40 overflow-hidden bg-muted/20 flex flex-col items-center justify-center cursor-pointer hover:border-green-500 transition-all shadow-inner"
+                                        onClick={() => document.getElementById('recipe-image-upload')?.click()}
+                                    >
+                                        {image ? (
+                                            <>
+                                                <img src={image} alt="Recipe Preview" className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-3 backdrop-blur-[2px]">
+                                                    <button
+                                                        type="button"
+                                                        className="p-3 bg-white rounded-xl text-foreground hover:bg-green-50 shadow-lg"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            document.getElementById('recipe-image-upload')?.click();
+                                                        }}
+                                                    >
+                                                        <Camera size={20} />
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="p-3 bg-white rounded-xl text-red-600 hover:bg-red-50 shadow-lg"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setImage('');
+                                                        }}
+                                                    >
+                                                        <Trash2 size={20} />
+                                                    </button>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="text-center p-6 space-y-3">
+                                                <div className="w-16 h-16 rounded-full bg-background flex items-center justify-center mx-auto text-muted-foreground group-hover:text-green-600 group-hover:scale-110 transition-all shadow-sm">
+                                                    {uploading ? <Loader2 className="w-8 h-8 animate-spin" /> : <Camera className="w-8 h-8" />}
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-bold text-foreground">Click to upload photo</p>
+                                                    <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-black">JPG, PNG, WebP</p>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex-1 space-y-6 py-2">
+                                        <div className="space-y-2">
+                                            <p className="text-sm font-medium text-foreground">Visuals matter.</p>
+                                            <p className="text-xs text-muted-foreground leading-relaxed">
+                                                A clear photo of your dish helps users identify it in their meal plan and makes the recipe feel more authentic.
+                                            </p>
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                                                Or provide an Image URL
+                                            </label>
+                                            <div className="relative group">
+                                                <input
+                                                    type="text"
+                                                    value={image.startsWith('data:') ? '' : image}
+                                                    onChange={(e) => setImage(e.target.value)}
+                                                    placeholder="https://images.unsplash.com/..."
+                                                    className="w-full px-4 py-3 text-sm bg-muted/30 text-foreground border border-transparent focus:border-green-500 rounded-xl focus:outline-none transition-all"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => document.getElementById('recipe-image-upload')?.click()}
+                                            disabled={uploading}
+                                            className="w-full md:w-auto px-6 py-3 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 rounded-xl text-sm font-bold border border-green-200 dark:border-green-800/30 hover:bg-green-100 transition-all flex items-center justify-center gap-2"
+                                        >
+                                            <Upload size={18} />
+                                            {uploading ? 'Processing Image...' : (image ? 'Change Photo' : 'Upload from Device')}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 3. Additional Details */}
+                            <div className="bg-card rounded-xl shadow-sm p-6 text-foreground">
+                                <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-foreground">
+                                    <Sparkles className="w-5 h-5 text-blue-500" />
+                                    Extra Details
+                                </h2>
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-4">
+                                        Additional Nutrients & Dietary Tags (Optional)
+                                    </label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {['gluten-free', 'dairy-free', 'low-carb', 'nut-free', 'high-protein'].map(tag => (
+                                            <button
+                                                key={tag}
+                                                type="button"
+                                                onClick={() => toggleDiet(tag)}
+                                                className={`px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all ${diet.includes(tag)
+                                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                                                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                                    }`}
+                                            >
+                                                {tag}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
