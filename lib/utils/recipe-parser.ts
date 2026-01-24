@@ -13,6 +13,7 @@ export interface ParsedIngredient {
 export interface ParsedRecipe {
     title: string;
     servings: number;
+    prepTime: number;
     ingredients: ParsedIngredient[];
     instructions: string[];
 }
@@ -110,6 +111,7 @@ export function parseRecipeText(text: string): ParsedRecipe {
 
     let title = "";
     let servings = 1;
+    let prepTime = 30; // Default
     let ingredients: ParsedIngredient[] = [];
     let instructions: string[] = [];
     let nameBuffer: string[] = [];
@@ -120,27 +122,49 @@ export function parseRecipeText(text: string): ParsedRecipe {
         const line = lines[i];
         const lowerLine = line.toLowerCase();
 
-        // 1. Title Heuristic
-        if (!title && !lowerLine.includes('ingredient') && !lowerLine.includes('direction') && !lowerLine.includes('method') && !lowerLine.includes('servings')) {
-            title = line;
-        }
+        // 1. Skip Title Parsing (As requested: User should fill manually)
+        // We'll just ignore the first block of text that isn't a section or metadata
 
         // 2. Section Switching
-        if (lowerLine.includes('ingredient')) {
+        if (lowerLine === 'ingredients' || lowerLine.includes('ingredient list')) {
             currentSection = 'ingredients';
             nameBuffer = [];
             continue;
         }
-        if (lowerLine.includes('instruction') || lowerLine.includes('method') || lowerLine.includes('preparation') || lowerLine === 'directions') {
+        if (lowerLine === 'instructions' || lowerLine === 'directions' || lowerLine === 'method' || lowerLine.includes('preparation')) {
             currentSection = 'instructions';
             continue;
         }
 
-        // 3. Servings Detection
-        if (lowerLine === 'makes' && i + 1 < lines.length && /^\d+/.test(lines[i + 1])) {
-            servings = parseInt(lines[i + 1]);
-            i++; continue;
+        // 3. Metadata Detection (Servings, Prep Time, Cook Time)
+        // Handle "Makes \n 1 omelet"
+        if (lowerLine === 'makes' && i + 1 < lines.length) {
+            const nextLine = lines[i + 1];
+            const match = nextLine.match(/^(\d+)/);
+            if (match) {
+                servings = parseInt(match[1]);
+                i++; continue;
+            }
         }
+        // Handle "Prep Time \n 2 minutes"
+        if (lowerLine === 'prep time' && i + 1 < lines.length) {
+            const nextLine = lines[i + 1];
+            const match = nextLine.match(/^(\d+)/);
+            if (match) {
+                prepTime = parseInt(match[1]);
+                i++; continue;
+            }
+        }
+        // Handle "Cook Time \n 3 minutes" (Add to prep time for total)
+        if (lowerLine === 'cook time' && i + 1 < lines.length) {
+            const nextLine = lines[i + 1];
+            const match = nextLine.match(/^(\d+)/);
+            if (match) {
+                prepTime += parseInt(match[1]); // We sum prep+cook for the simple 'prepTime' field
+                i++; continue;
+            }
+        }
+
         if (lowerLine.includes('servings:')) {
             const match = line.match(/servings:\s*(\d+)/i);
             if (match) servings = parseInt(match[1]);
@@ -204,8 +228,9 @@ export function parseRecipeText(text: string): ParsedRecipe {
     }
 
     return {
-        title: title || "New Recipe",
+        title: "", // Manual entry required
         servings,
+        prepTime,
         ingredients,
         instructions: instructions.length > 0 ? instructions : [""]
     };
@@ -318,6 +343,9 @@ function parseIngredientLine(line: string): ParsedIngredient {
         if (exceptions.includes(lowerP1)) return match;
         return p1;
     }).trim();
+
+    // Remove artifacts from whole line
+    if (cleanLine.toLowerCase() === 'original recipe' || cleanLine.toLowerCase().includes('scaled to')) return { amount: "", item: "" };
 
     cleanLine = cleanLine.replace(/(\W)(?:or|original|scaled|serving)\s*$/gi, '$1').trim();
     cleanLine = cleanLine.replace(/(?:,|"|'|\d)(or|original|scaled|serving)\s*$/gi, (m, p1) => m.slice(0, -p1.length)).trim();

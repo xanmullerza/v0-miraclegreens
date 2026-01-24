@@ -122,8 +122,9 @@ export default function CreateRecipePage() {
             const parsed = parseRecipeText(autoImportText);
 
             // 1. Basic Info
-            setTitle(parsed.title);
+            if (parsed.title) setTitle(parsed.title);
             setServings(parsed.servings || 4);
+            setPrepTime(parsed.prepTime || 30);
             setInstructions(parsed.instructions);
 
             // 2. Ingredients - This is more complex because we need nutrition data
@@ -206,8 +207,8 @@ export default function CreateRecipePage() {
 
             // 3. Image - One shot "add a picture"
             // We'll use a high-quality placeholder based on the title
-            const keywords = parsed.title.toLowerCase().split(' ').filter(w => w.length > 3).slice(0, 3).join(',');
-            setImage(`https://loremflickr.com/1200/800/${encodeURIComponent(keywords || 'food')},recipe/all`);
+            const keywords = title.toLowerCase().split(' ').filter(w => w.length > 3).slice(0, 3).join(',');
+            setImage(`https://loremflickr.com/1200/800/${encodeURIComponent(keywords || 'healthy,food')},recipe/all`);
 
             // Cleanup
             setAutoImportText('');
