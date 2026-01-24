@@ -366,13 +366,21 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
 
         // Calculate new weight based on current measure or custom unit weight
         let newWeight = newQuantity;
+        const currentWeightPerUnit = (ing.weight_g > 0 && ing.quantity > 0) ? (ing.weight_g / ing.quantity) : 0;
 
         if (ing.customUnitWeight) {
             newWeight = newQuantity * ing.customUnitWeight;
-        } else if (ing.measure_label !== 'g' && ing.available_measures) {
-            const measure = ing.available_measures.find(m => m.label === ing.measure_label);
+        } else if (ing.measure_label !== 'g' && ing.measure_label !== 'gram') {
+            // Try to find in measures
+            const measure = ing.available_measures?.find(m => m.label === ing.measure_label);
             if (measure) {
                 newWeight = newQuantity * measure.weight_g;
+            } else if (currentWeightPerUnit > 0) {
+                // Use the weight-per-unit we already have
+                newWeight = newQuantity * currentWeightPerUnit;
+            } else {
+                // Fallback to 1:1 if we truly have nothing to go on
+                newWeight = newQuantity;
             }
         }
 

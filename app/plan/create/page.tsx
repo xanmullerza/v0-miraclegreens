@@ -218,6 +218,7 @@ export default function CreateRecipePage() {
                         protein: Number((match.protein_g * ratio).toFixed(1)),
                         fat: Number((match.fat_g * ratio).toFixed(1)),
                         carbs: Number((match.carbs_g * ratio).toFixed(1)),
+                        customUnitWeight: (weight > 0 && quantity > 0) ? (weight / quantity) : undefined,
                     });
                 } else {
                     // Placeholder ingredient if no match found
@@ -233,6 +234,7 @@ export default function CreateRecipePage() {
                         protein: 0,
                         fat: 0,
                         carbs: 0,
+                        customUnitWeight: (ing.weightG || 0) > 0 && quantity > 0 ? (ing.weightG! / quantity) : undefined,
                     });
                 }
             }
