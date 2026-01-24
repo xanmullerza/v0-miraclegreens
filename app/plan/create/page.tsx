@@ -806,11 +806,10 @@ export default function CreateRecipePage() {
                     </SheetHeader>
 
                     <div className="flex-1 min-h-0 py-6 overflow-hidden flex flex-col">
-                        <div className="flex-1 flex flex-col space-y-2 min-h-0">
-                            <Label className="flex-shrink-0">Recipe Text</Label>
+                        <div className="flex-1 flex flex-col min-h-0">
                             <Textarea
-                                placeholder="Paste recipe here..."
-                                className="flex-1 font-mono text-sm resize-none"
+                                placeholder="Paste the full recipe text here (Title, Ingredients, and Instructions)..."
+                                className="flex-1 font-mono text-sm resize-none bg-slate-950/50 border-none focus-visible:ring-1 focus-visible:ring-purple-500/30 text-slate-200 placeholder:text-slate-500 p-4 rounded-xl"
                                 value={autoImportText}
                                 onChange={(e) => setAutoImportText(e.target.value)}
                             />
