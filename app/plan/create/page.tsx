@@ -498,21 +498,21 @@ export default function CreateRecipePage() {
                                         <Zap className="w-5 h-5 text-amber-500 fill-amber-500" />
                                         Instructions
                                     </h3>
-                                    <div className="flex gap-3">
+                                    <div className="flex gap-2">
                                         <button
                                             type="button"
                                             onClick={() => setShowMagicInstructions(!showMagicInstructions)}
-                                            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white border-none shadow-md group transition-all px-4 py-2 rounded-lg flex items-center gap-2 text-xs font-bold"
+                                            className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white border-none shadow-md group transition-all px-3 py-2 rounded-lg flex items-center justify-center gap-2 w-36 text-[10px] uppercase font-black tracking-widest"
                                         >
-                                            <Wand2 className="w-4 h-4 group-hover:scale-125 transition-transform" />
+                                            <Wand2 className="w-3.5 h-3.5 group-hover:scale-125 transition-transform" />
                                             Magic Paste
                                         </button>
                                         <button
                                             type="button"
                                             onClick={handleAddInstruction}
-                                            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-none shadow-md group transition-all px-4 py-2 rounded-lg flex items-center gap-2 text-xs font-bold"
+                                            className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-none shadow-md group transition-all px-3 py-2 rounded-lg flex items-center justify-center gap-2 w-36 text-[10px] uppercase font-black tracking-widest"
                                         >
-                                            <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
+                                            <Plus className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform" />
                                             Add Instruction
                                         </button>
                                     </div>

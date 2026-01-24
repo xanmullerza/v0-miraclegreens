@@ -483,17 +483,17 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                     <button
                         type="button"
                         onClick={() => setShowMagicPaste(!showMagicPaste)}
-                        className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white border-none shadow-md group transition-all px-4 py-2 rounded-lg flex items-center gap-2"
+                        className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white border-none shadow-md group transition-all px-3 py-2 rounded-lg flex items-center justify-center gap-2 w-36 text-[10px] uppercase font-black tracking-widest"
                     >
-                        <Wand2 className="w-4 h-4 group-hover:scale-125 transition-transform" />
+                        <Wand2 className="w-3.5 h-3.5 group-hover:scale-125 transition-transform" />
                         Magic Paste
                     </button>
                     <button
                         type="button"
                         onClick={() => setShowPicker(true)}
-                        className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-none shadow-md group transition-all px-4 py-2 rounded-lg flex items-center gap-2"
+                        className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-none shadow-md group transition-all px-3 py-2 rounded-lg flex items-center justify-center gap-2 w-36 text-[10px] uppercase font-black tracking-widest"
                     >
-                        <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
+                        <Plus className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform" />
                         Add Ingredient
                     </button>
                 </div>
