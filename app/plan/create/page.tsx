@@ -498,7 +498,7 @@ export default function CreateRecipePage() {
                             />
                         </div>
 
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-muted-foreground mb-2">
                                     Meal Type *
@@ -513,34 +513,6 @@ export default function CreateRecipePage() {
                                     <option value="dinner">Dinner</option>
                                     <option value="snack">Snack</option>
                                 </select>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                                    <Clock className="w-4 h-4" />
-                                    Prep Time (min)
-                                </label>
-                                <input
-                                    type="number"
-                                    value={prepTime}
-                                    onChange={(e) => setPrepTime(Number(e.target.value))}
-                                    className="w-full px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    min="1"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-muted-foreground mb-2 flex items-center gap-2">
-                                    <Users className="w-4 h-4" />
-                                    Servings
-                                </label>
-                                <input
-                                    type="number"
-                                    value={servings}
-                                    onChange={(e) => setServings(Number(e.target.value))}
-                                    className="w-full px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    min="1"
-                                />
                             </div>
                         </div>
 
@@ -681,6 +653,51 @@ export default function CreateRecipePage() {
                             </div>
                         </div>
 
+                    </div>
+
+                    {/* Quick Facts */}
+                    <div className="bg-card border border-border rounded-lg shadow-sm p-6">
+                        <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+                            <Zap className="w-5 h-5 text-amber-500" />
+                            Quick Facts
+                        </h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="bg-muted/30 p-4 rounded-xl border border-border/50 flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-950/30 flex items-center justify-center text-green-600">
+                                    <Clock className="w-6 h-6" />
+                                </div>
+                                <div className="flex-1">
+                                    <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
+                                        Prep Time (min)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={prepTime}
+                                        onChange={(e) => setPrepTime(Number(e.target.value))}
+                                        className="w-full bg-transparent text-xl font-bold text-foreground focus:outline-none"
+                                        min="1"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="bg-muted/30 p-4 rounded-xl border border-border/50 flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-950/30 flex items-center justify-center text-blue-600">
+                                    <Users className="w-6 h-6" />
+                                </div>
+                                <div className="flex-1">
+                                    <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">
+                                        Yield / Servings
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={servings}
+                                        onChange={(e) => setServings(Number(e.target.value))}
+                                        className="w-full bg-transparent text-xl font-bold text-foreground focus:outline-none"
+                                        min="1"
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Ingredients */}
