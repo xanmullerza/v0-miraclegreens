@@ -519,16 +519,16 @@ export default function CreateRecipePage() {
                                 </div>
 
                                 {showMagicInstructions && (
-                                    <div className="p-4 rounded-xl border-2 border-dashed border-amber-200 bg-amber-50/30 animate-in fade-in slide-in-from-top-4 duration-300">
+                                    <div className="p-4 rounded-xl border-2 border-dashed border-slate-800 bg-slate-950/40 animate-in fade-in slide-in-from-top-4 duration-300">
                                         <div className="flex items-center gap-2 mb-3">
                                             <Sparkles className="w-4 h-4 text-amber-500" />
-                                            <span className="text-xs font-black uppercase tracking-widest text-amber-800">Paste Full Method Below</span>
+                                            <span className="text-xs font-black uppercase tracking-widest text-slate-300">Paste Full Method Below</span>
                                         </div>
                                         <textarea
                                             value={magicInstructionsText}
                                             onChange={(e) => setMagicInstructionsText(e.target.value)}
                                             placeholder="Paste multiple steps here... We'll automatically split them by line numbers or paragraphs."
-                                            className="w-full h-32 p-4 text-sm border border-amber-200 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 mb-3"
+                                            className="w-full h-32 p-4 text-sm border border-slate-800 bg-slate-950/60 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 mb-3 placeholder:text-slate-600"
                                         />
                                         <div className="flex justify-end gap-2">
                                             <button

@@ -500,27 +500,27 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             </div>
 
             {showMagicPaste && (
-                <div className="p-6 rounded-xl border-2 border-dashed border-amber-200 bg-amber-50/20 space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
+                <div className="p-6 rounded-xl border-2 border-dashed border-slate-800 bg-slate-950/40 space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-amber-800 font-bold uppercase tracking-widest text-xs">
-                            <Sparkles className="w-4 h-4" />
+                        <div className="flex items-center gap-2 text-slate-300 font-bold uppercase tracking-widest text-xs">
+                            <Sparkles className="w-4 h-4 text-amber-500" />
                             Magic Ingredient Import
                         </div>
-                        <button onClick={() => setShowMagicPaste(false)} className="text-amber-800/50 hover:text-amber-800">
+                        <button onClick={() => setShowMagicPaste(false)} className="text-slate-500 hover:text-slate-300">
                             <CloseIcon size={16} />
                         </button>
                     </div>
 
                     {pendingIngredients.length === 0 ? (
                         <div className="space-y-4">
-                            <p className="text-xs text-amber-900/60 leading-relaxed font-medium">
+                            <p className="text-xs text-slate-400 leading-relaxed font-medium">
                                 Paste your list of ingredients here. We'll attempt to match each one to our nutritional database automatically.
                             </p>
                             <textarea
                                 value={magicText}
                                 onChange={(e) => setMagicText(e.target.value)}
                                 placeholder="Example:&#10;2 cups raw spinach&#10;500g chicken breast"
-                                className="w-full h-32 p-4 text-sm border border-amber-200 dark:border-amber-900/30 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-amber-50 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500"
+                                className="w-full h-32 p-4 text-sm border border-slate-800 bg-slate-950/60 text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 placeholder:text-slate-600"
                             />
                             <div className="flex justify-end">
                                 <button
