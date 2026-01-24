@@ -485,14 +485,14 @@ export default function CreateRecipePage() {
                     {step === 1 ? (
                         <>
                             {/* Step 1 Content: The Recipe */}
-                            <div className="bg-card border border-border rounded-lg shadow-sm p-6">
+                            <div className="bg-card rounded-xl shadow-sm p-6">
                                 <IngredientBuilder
                                     ingredients={ingredients}
                                     onChange={setIngredients}
                                 />
                             </div>
 
-                            <div className="bg-card border border-border rounded-lg shadow-sm p-6 space-y-4 text-foreground">
+                            <div className="bg-card rounded-xl shadow-sm p-6 space-y-4 text-foreground">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-lg font-semibold flex items-center gap-2">
                                         <Zap className="w-5 h-5 text-amber-500 fill-amber-500" />
@@ -557,7 +557,7 @@ export default function CreateRecipePage() {
                                                 value={step}
                                                 onChange={(e) => handleUpdateInstruction(index, e.target.value)}
                                                 placeholder={`Step ${index + 1}...`}
-                                                className="flex-1 px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+                                                className="flex-1 px-4 py-2 bg-background/50 text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
                                                 rows={2}
                                             />
                                             {instructions.length > 1 && (
@@ -577,7 +577,7 @@ export default function CreateRecipePage() {
                             <div className="flex gap-4">
                                 <button
                                     onClick={() => router.back()}
-                                    className="px-6 py-3 border border-border text-foreground rounded-lg hover:bg-muted transition"
+                                    className="px-6 py-3 bg-background/50 text-foreground rounded-lg hover:bg-muted transition"
                                 >
                                     Cancel
                                 </button>
@@ -600,7 +600,7 @@ export default function CreateRecipePage() {
                     ) : (
                         <>
                             {/* Step 2 Content: Identity & Metadata */}
-                            <div className="bg-card border border-border rounded-lg shadow-sm p-6 space-y-4 text-foreground">
+                            <div className="bg-card rounded-xl shadow-sm p-6 space-y-4 text-foreground">
                                 <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
 
                                 <div>
@@ -612,7 +612,7 @@ export default function CreateRecipePage() {
                                         value={title}
                                         onChange={(e) => setTitle(e.target.value)}
                                         placeholder="e.g., Grilled Chicken with Roasted Vegetables"
-                                        className="w-full px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        className="w-full px-4 py-2 bg-background/50 text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                     />
                                 </div>
 
@@ -624,7 +624,7 @@ export default function CreateRecipePage() {
                                         <select
                                             value={type}
                                             onChange={(e) => setType(e.target.value as any)}
-                                            className="w-full px-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                            className="w-full px-4 py-2 bg-background/50 text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                         >
                                             <option value="breakfast">Breakfast</option>
                                             <option value="lunch">Lunch</option>
@@ -649,7 +649,7 @@ export default function CreateRecipePage() {
                                             />
                                         </div>
                                         <div
-                                            className="relative group w-full md:w-64 aspect-video md:aspect-square rounded-xl border-2 border-dashed border-border overflow-hidden bg-muted/30 flex flex-col items-center justify-center cursor-pointer hover:border-green-500 transition-all"
+                                            className="relative group w-full md:w-64 aspect-video md:aspect-square rounded-xl border-2 border-dashed border-border/20 overflow-hidden bg-muted/30 flex flex-col items-center justify-center cursor-pointer hover:border-green-500 transition-all"
                                             onClick={() => document.getElementById('recipe-image-upload')?.click()}
                                         >
                                             {image ? (
@@ -710,7 +710,7 @@ export default function CreateRecipePage() {
                                                     value={image.startsWith('data:') ? '' : image}
                                                     onChange={(e) => setImage(e.target.value)}
                                                     placeholder="https://images.unsplash.com/..."
-                                                    className="w-full px-3 py-1.5 text-sm border border-border bg-background text-foreground rounded focus:outline-none focus:ring-1 focus:ring-green-500"
+                                                    className="w-full px-3 py-1.5 text-sm bg-background/50 text-foreground rounded focus:outline-none focus:ring-1 focus:ring-green-500"
                                                 />
                                             </div>
                                         </div>
@@ -772,13 +772,13 @@ export default function CreateRecipePage() {
                             </div>
 
                             {/* Quick Facts */}
-                            <div className="bg-card border border-border rounded-lg shadow-sm p-6">
+                            <div className="bg-card rounded-xl shadow-sm p-6">
                                 <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
                                     <Zap className="w-5 h-5 text-amber-500" />
                                     Quick Facts
                                 </h2>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="bg-muted/30 p-4 rounded-xl border border-border/50 flex items-center gap-4">
+                                    <div className="bg-muted/30 p-4 rounded-xl flex items-center gap-4">
                                         <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-950/30 flex items-center justify-center text-green-600">
                                             <Clock className="w-6 h-6" />
                                         </div>
@@ -796,7 +796,7 @@ export default function CreateRecipePage() {
                                         </div>
                                     </div>
 
-                                    <div className="bg-muted/30 p-4 rounded-xl border border-border/50 flex items-center gap-4">
+                                    <div className="bg-muted/30 p-4 rounded-xl flex items-center gap-4">
                                         <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-950/30 flex items-center justify-center text-blue-600">
                                             <Users className="w-6 h-6" />
                                         </div>
@@ -822,7 +822,7 @@ export default function CreateRecipePage() {
                                         setStep(1);
                                         window.scrollTo(0, 0);
                                     }}
-                                    className="px-6 py-3 border border-border text-foreground rounded-lg hover:bg-muted transition flex items-center gap-2"
+                                    className="px-6 py-3 bg-background/50 text-foreground rounded-lg hover:bg-muted transition flex items-center gap-2"
                                 >
                                     <ArrowLeft className="w-5 h-5" />
                                     Back to Recipe

@@ -550,7 +550,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
 
                             <div className="max-h-80 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
                                 {pendingIngredients.map((item, idx) => (
-                                    <div key={idx} className="flex items-center gap-3 p-3 bg-white border border-amber-100 rounded-xl shadow-sm">
+                                    <div key={idx} className="flex items-center gap-3 p-3 bg-white/5 rounded-xl shadow-sm">
                                         <div className="flex-1 min-w-0">
                                             <div className="text-xs font-bold text-slate-800 truncate">
                                                 {item.raw.amount} {item.raw.item}
@@ -595,7 +595,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                             </div>
 
                             {pendingIngredients.every(i => i.status !== 'searching') && (
-                                <div className="pt-4 border-t border-amber-100 flex justify-between items-center">
+                                <div className="pt-4 flex justify-between items-center">
                                     <p className="text-[10px] text-amber-800/40 font-medium">Review and add individual items above</p>
                                     <button
                                         onClick={() => setShowMagicPaste(false)}
@@ -619,7 +619,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             {ingredients.length > 0 && (
                 <div className="space-y-3">
                     {ingredients.map((ing, index) => (
-                        <div key={index} className="flex flex-col md:flex-row items-start md:items-center gap-4 p-4 border border-border rounded-xl bg-card/50 shadow-sm transition-all hover:border-green-200">
+                        <div key={index} className="flex flex-col md:flex-row items-start md:items-center gap-4 p-4 rounded-xl bg-card/50 shadow-sm transition-all hover:bg-card/80">
                             <div className="flex-1 min-w-0">
                                 <div className="font-bold text-foreground truncate text-base">{ing.food_item_name}</div>
                                 <div className="text-xs text-muted-foreground mt-1 flex flex-wrap gap-x-3 gap-y-1">
@@ -639,7 +639,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                                         type="number"
                                         value={ing.quantity}
                                         onChange={(e) => handleUpdateQuantity(index, Number(e.target.value))}
-                                        className="w-14 px-1.5 py-2 border border-border bg-background text-foreground rounded-lg text-center text-sm font-bold focus:ring-2 focus:ring-green-500/20 outline-none"
+                                        className="w-14 px-1.5 py-2 bg-background/50 text-foreground rounded-lg text-center text-sm font-bold focus:ring-2 focus:ring-green-500/20 outline-none"
                                         min="0"
                                         step="0.125"
                                     />
@@ -651,7 +651,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                                         type="text"
                                         value={ing.measure_label}
                                         onChange={(e) => handleUpdateUnit(index, e.target.value)}
-                                        className="min-w-[80px] w-full px-2 py-2 border border-border bg-background text-foreground text-sm rounded-lg font-medium focus:ring-2 focus:ring-green-500/20 outline-none truncate"
+                                        className="min-w-[80px] w-full px-2 py-2 bg-background/50 text-foreground text-sm rounded-lg font-medium focus:ring-2 focus:ring-green-500/20 outline-none truncate"
                                         placeholder="Unit (e.g. cup)"
                                     />
                                 </div>
@@ -662,14 +662,14 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                                         type="text"
                                         value={ing.modifier || ''}
                                         onChange={(e) => handleUpdateModifier(index, e.target.value)}
-                                        className="min-w-[80px] w-full px-2 py-2 border border-border bg-background text-foreground text-sm rounded-lg font-medium focus:ring-2 focus:ring-green-500/20 outline-none truncate text-amber-700 dark:text-amber-400"
+                                        className="min-w-[80px] w-full px-2 py-2 bg-background/50 text-foreground text-sm rounded-lg font-medium focus:ring-2 focus:ring-green-500/20 outline-none truncate text-amber-700 dark:text-amber-400"
                                         placeholder="e.g. chopped"
                                     />
                                 </div>
 
                                 <div className="flex flex-col gap-1">
                                     <span className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-tighter ml-1">Weight</span>
-                                    <div className="flex items-center gap-1.5 px-3 py-2 bg-muted/30 border border-border rounded-lg group hover:border-green-500/50 transition-colors">
+                                    <div className="flex items-center gap-1.5 px-3 py-2 bg-muted/30 rounded-lg group hover:bg-green-500/10 transition-colors">
                                         <input
                                             type="number"
                                             value={Math.round(ing.weight_g)}
@@ -696,7 +696,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
 
             {
                 ingredients.length > 0 && (
-                    <div className="p-4 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800/30 rounded-lg">
+                    <div className="p-4 bg-green-50 dark:bg-green-950/20 rounded-lg">
                         <div className="font-semibold text-green-900 dark:text-green-400 mb-2">Total Nutrition</div>
                         <div className="grid grid-cols-4 gap-4 text-sm">
                             <div>
