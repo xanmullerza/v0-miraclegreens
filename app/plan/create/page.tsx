@@ -809,7 +809,7 @@ export default function CreateRecipePage() {
                         <div className="flex-1 flex flex-col min-h-0">
                             <Textarea
                                 placeholder="Paste the full recipe text here (Title, Ingredients, and Instructions)..."
-                                className="flex-1 font-mono text-sm resize-none bg-slate-950/50 border-none focus-visible:ring-1 focus-visible:ring-purple-500/30 text-slate-200 placeholder:text-slate-500 p-4 rounded-xl"
+                                className="flex-1 font-mono text-sm resize-none bg-slate-950/50 border-none focus-visible:ring-0 focus-visible:ring-offset-0 text-slate-200 placeholder:text-slate-500 p-4 rounded-xl"
                                 value={autoImportText}
                                 onChange={(e) => setAutoImportText(e.target.value)}
                             />
