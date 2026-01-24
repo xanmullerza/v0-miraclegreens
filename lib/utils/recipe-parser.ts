@@ -184,13 +184,13 @@ export function parseRecipeText(text: string): ParsedRecipe {
 
             const parsed = parseIngredientLine(line);
 
-            // A: If it's just a weight (e.g. "472g"), merge it back
-            if (ingredients.length > 0 && parsed.weightG && (!parsed.amount || parsed.amount.toLowerCase() === 'g' || parsed.item === parsed.amount)) {
+            // A: If it's just a weight (e.g. "472g" or "100g"), merge it back to the previous ingredient
+            const isWeightOnly = parsed.weightG && (!parsed.amount || parsed.amount.toLowerCase() === 'g' || parsed.item === parsed.amount || parsed.item.length <= 4);
+            if (ingredients.length > 0 && isWeightOnly) {
                 const lastIng = ingredients[ingredients.length - 1];
-                if (!lastIng.weightG || lastIng.weightG === 0) {
-                    lastIng.weightG = parsed.weightG;
-                    continue;
-                }
+                // Update weight if the new one is more specific (non-zero)
+                if (parsed.weightG) lastIng.weightG = parsed.weightG;
+                continue;
             }
 
             // B: Fragment logic. If a line DOES NOT have a quantity, it's likely a name fragment.

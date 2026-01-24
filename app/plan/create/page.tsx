@@ -128,11 +128,15 @@ export default function CreateRecipePage() {
             setInstructions(parsed.instructions);
 
             // 2. Ingredients - This is more complex because we need nutrition data
-            const importedIngredients: RecipeIngredient[] = [];
+            const rawIngredients: RecipeIngredient[] = [];
 
             for (const ing of parsed.ingredients) {
+                const itemName = ing.item.trim();
+                const STOP_WORDS = ['whole', 'large', 'medium', 'small', 'piece', 'unit', 'portion', 'slice', 'chopped', 'diced', 'minced'];
+                if (!itemName || itemName.length < 2 || /^\d+$/.test(itemName) || STOP_WORDS.includes(itemName.toLowerCase())) continue;
+
                 // Try to find nutrition data
-                const searchQuery = ing.item;
+                const searchQuery = itemName.replace(/[,;:]\s*$/, '').trim();
                 let match = null;
 
                 // Local search first
@@ -172,7 +176,7 @@ export default function CreateRecipePage() {
 
                     const ratio = weight / 100;
 
-                    importedIngredients.push({
+                    rawIngredients.push({
                         food_item_id: match.id || 'temp-id',
                         food_item_name: match.name,
                         weight_g: weight,
@@ -187,10 +191,10 @@ export default function CreateRecipePage() {
                     });
                 } else {
                     // Placeholder ingredient if no match found
-                    importedIngredients.push({
+                    rawIngredients.push({
                         food_item_id: 'temp-id',
                         food_item_name: ing.item,
-                        weight_g: ing.weightG || 0,
+                        weight_g: ing.weightG || (ing.amount.toLowerCase().includes('g') ? Number(ing.amount.match(/\d+/)?.[0] || 0) : 0),
                         quantity: 1,
                         measure_label: ing.amount || 'as needed',
                         modifier: ing.modifier,
@@ -203,7 +207,43 @@ export default function CreateRecipePage() {
                 }
             }
 
-            setIngredients(importedIngredients);
+            // Combine duplicates (e.g. Moringa Powder listed twice)
+            const mergedIngredients: RecipeIngredient[] = [];
+            const keyToIndex = new Map<string, number>();
+
+            for (const ing of rawIngredients) {
+                const key = ing.food_item_name.toLowerCase().replace(/[,:;]/g, '').trim();
+                if (keyToIndex.has(key)) {
+                    const idx = keyToIndex.get(key)!;
+                    const existing = mergedIngredients[idx];
+
+                    // Sum up weight and nutrition
+                    existing.weight_g += ing.weight_g;
+                    existing.calories += ing.calories;
+                    existing.energy_kj += ing.energy_kj;
+                    existing.protein = Number((existing.protein + ing.protein).toFixed(1));
+                    existing.fat = Number((existing.fat + ing.fat).toFixed(1));
+                    existing.carbs = Number((existing.carbs + ing.carbs).toFixed(1));
+
+                    // If units match, sum quantity. If not, switch to grams as final unit.
+                    if (existing.measure_label === ing.measure_label) {
+                        existing.quantity += ing.quantity;
+                    } else {
+                        existing.measure_label = 'g';
+                        existing.quantity = existing.weight_g;
+                    }
+
+                    // Append modifier if different
+                    if (ing.modifier && existing.modifier !== ing.modifier) {
+                        existing.modifier = existing.modifier ? `${existing.modifier}, ${ing.modifier}` : ing.modifier;
+                    }
+                } else {
+                    keyToIndex.set(key, mergedIngredients.length);
+                    mergedIngredients.push({ ...ing });
+                }
+            }
+
+            setIngredients(mergedIngredients);
 
             // 3. Image - One shot "add a picture"
             // We'll use a high-quality placeholder based on the title
