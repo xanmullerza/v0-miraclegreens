@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import IngredientBuilder, { RecipeIngredient } from '@/components/recipe/ingredient-builder';
-import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus } from 'lucide-react';
+import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus, ListOrdered } from 'lucide-react';
 import { Header } from '@/components/header';
 import { parseInstructionsOnly, parseRecipeText } from '@/lib/utils/recipe-parser';
 import { searchLocalFood, searchUSDAFood, getUSDAMeasures } from '@/lib/services/nutrition';
@@ -495,7 +495,7 @@ export default function CreateRecipePage() {
                             <div className="bg-card rounded-xl shadow-sm p-6 space-y-4 text-foreground">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-lg font-semibold flex items-center gap-2">
-                                        <Zap className="w-5 h-5 text-amber-500 fill-amber-500" />
+                                        <ListOrdered className="w-5 h-5 text-amber-500" />
                                         Instructions
                                     </h3>
                                     <div className="flex gap-2">

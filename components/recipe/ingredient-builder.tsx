@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, X as CloseIcon } from 'lucide-react';
+import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, X as CloseIcon } from 'lucide-react';
 import FoodItemPicker from './food-item-picker';
 import { fetchFoodMeasures, FoodMeasure } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -459,7 +459,10 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                    <h3 className="text-lg font-semibold text-foreground">Ingredients</h3>
+                    <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                        <Apple className="w-5 h-5 text-green-500 fill-green-500/20" />
+                        Ingredients
+                    </h3>
                     <div className="flex items-center bg-muted p-1 rounded-lg">
                         <button
                             type="button"
