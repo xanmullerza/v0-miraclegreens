@@ -1,4 +1,4 @@
-export type DietType = 'anything' | 'vegan' | 'vegetarian';
+export type DietType = 'anything' | 'vegan' | 'vegetarian' | 'pescetarian';
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
 export interface Ingredient {

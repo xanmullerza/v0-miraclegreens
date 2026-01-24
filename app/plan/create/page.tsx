@@ -627,7 +627,7 @@ export default function CreateRecipePage() {
                                     />
                                 </div>
 
-                                {/* Image Upload Section */}
+                                {/* Image Upload Only here now */}
                                 <div className="pt-4 border-t border-border/50">
                                     <label className="block text-sm font-medium text-muted-foreground mb-3">
                                         Recipe Photo
@@ -710,41 +710,9 @@ export default function CreateRecipePage() {
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-muted-foreground mb-3">
-                                        Dietary Suitability *
-                                    </label>
-                                    <div className="grid grid-cols-3 gap-3 mb-4">
-                                        {[
-                                            { id: 'balanced', label: 'Balanced (Omnivore)', tags: [] },
-                                            { id: 'vegetarian', label: 'Vegetarian', tags: ['vegetarian'] },
-                                            { id: 'vegan', label: 'Vegan', tags: ['vegan', 'vegetarian'] }
-                                        ].map(option => {
-                                            const isSelected = option.id === 'balanced'
-                                                ? (!diet.includes('vegan') && !diet.includes('vegetarian'))
-                                                : (option.id === 'vegan' ? diet.includes('vegan') : (diet.includes('vegetarian') && !diet.includes('vegan')));
-
-                                            return (
-                                                <button
-                                                    key={option.id}
-                                                    type="button"
-                                                    onClick={() => {
-                                                        const others = diet.filter(d => d !== 'vegan' && d !== 'vegetarian');
-                                                        setDiet([...others, ...option.tags]);
-                                                    }}
-                                                    className={`p-3 rounded-lg border-2 text-sm font-bold transition flex items-center justify-center text-center ${isSelected
-                                                        ? 'border-green-600 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400'
-                                                        : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/30'
-                                                        }`}
-                                                >
-                                                    {option.label}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-
-                                    <label className="block text-sm font-medium text-muted-foreground mb-2">
-                                        Additional Tags (Optional)
+                                <div className="pt-4 border-t border-border/50">
+                                    <label className="block text-sm font-medium text-muted-foreground mb-4">
+                                        Additional Nutrients (Optional)
                                     </label>
                                     <div className="flex flex-wrap gap-2">
                                         {['gluten-free', 'dairy-free', 'low-carb', 'nut-free', 'high-protein'].map(tag => (
@@ -771,24 +739,63 @@ export default function CreateRecipePage() {
                                     Quick Facts
                                 </h2>
 
-                                <div className="mb-8">
-                                    <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3">
-                                        Meal Type *
-                                    </label>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                        {['breakfast', 'lunch', 'dinner', 'snack'].map(m => (
-                                            <button
-                                                key={m}
-                                                type="button"
-                                                onClick={() => setType(m as any)}
-                                                className={`p-3 rounded-xl border-2 text-sm font-bold transition flex items-center justify-center text-center capitalize ${type === m
+                                <div className="space-y-6 mb-8">
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3">
+                                            Meal Type *
+                                        </label>
+                                        <div className="grid grid-cols-4 gap-3">
+                                            {['breakfast', 'lunch', 'dinner', 'snack'].map(m => (
+                                                <button
+                                                    key={m}
+                                                    type="button"
+                                                    onClick={() => setType(m as any)}
+                                                    className={`p-3 rounded-xl border-2 text-[11px] md:text-xs font-black uppercase tracking-wider transition flex items-center justify-center text-center ${type === m
                                                         ? 'border-green-600 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400'
                                                         : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/30'
-                                                    }`}
-                                            >
-                                                {m}
-                                            </button>
-                                        ))}
+                                                        }`}
+                                                >
+                                                    {m}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3">
+                                            Dietary Suitability *
+                                        </label>
+                                        <div className="grid grid-cols-4 gap-3">
+                                            {[
+                                                { id: 'balanced', label: 'Balanced', tags: [] },
+                                                { id: 'vegetarian', label: 'Vegetarian', tags: ['vegetarian'] },
+                                                { id: 'vegan', label: 'Vegan', tags: ['vegan', 'vegetarian'] },
+                                                { id: 'pescetarian', label: 'Pescetarian', tags: ['pescetarian'] }
+                                            ].map(option => {
+                                                const isSelected = option.id === 'balanced'
+                                                    ? (!diet.includes('vegan') && !diet.includes('vegetarian') && !diet.includes('pescetarian'))
+                                                    : (option.id === 'vegan' ? diet.includes('vegan') :
+                                                        option.id === 'vegetarian' ? (diet.includes('vegetarian') && !diet.includes('vegan')) :
+                                                            diet.includes('pescetarian'));
+
+                                                return (
+                                                    <button
+                                                        key={option.id}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const others = diet.filter(d => d !== 'vegan' && d !== 'vegetarian' && d !== 'pescetarian');
+                                                            setDiet([...others, ...option.tags]);
+                                                        }}
+                                                        className={`p-3 rounded-xl border-2 text-[11px] md:text-xs font-black uppercase tracking-wider transition flex items-center justify-center text-center ${isSelected
+                                                            ? 'border-green-600 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400'
+                                                            : 'border-border bg-background text-muted-foreground hover:border-muted-foreground/30'
+                                                            }`}
+                                                    >
+                                                        {option.label}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
                                 </div>
 
