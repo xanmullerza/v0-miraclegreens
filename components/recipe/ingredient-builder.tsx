@@ -675,9 +675,10 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                                     <div className="flex items-center gap-1.5 px-3 py-2 bg-muted/30 rounded-lg group hover:bg-green-500/10 transition-colors">
                                         <input
                                             type="number"
-                                            value={Math.round(ing.weight_g)}
+                                            value={ing.weight_g % 1 === 0 ? ing.weight_g : Math.round(ing.weight_g * 10) / 10}
                                             onChange={(e) => handleUpdateWeight(index, Number(e.target.value))}
-                                            className="w-10 bg-transparent border-none text-sm font-black text-center focus:ring-0 p-0 outline-none"
+                                            step="0.1"
+                                            className="w-14 bg-transparent border-none text-sm font-black text-center focus:ring-0 p-0 outline-none"
                                         />
                                         <span className="text-[10px] font-black opacity-30 group-hover:opacity-100 transition-opacity">G</span>
                                     </div>
