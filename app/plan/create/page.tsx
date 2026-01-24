@@ -611,27 +611,7 @@ export default function CreateRecipePage() {
                         <>
                             {/* Step 2 Content: Identity & Metadata */}
 
-                            {/* 1. Recipe Identity */}
-                            <div className="bg-card rounded-xl shadow-sm p-6 space-y-4 text-foreground">
-                                <h2 className="text-xl font-bold flex items-center gap-2 text-foreground">
-                                    <ChefHat className="w-5 h-5 text-green-600" />
-                                    Recipe Identity
-                                </h2>
-                                <div>
-                                    <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">
-                                        Recipe Title *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={title}
-                                        onChange={(e) => setTitle(e.target.value)}
-                                        placeholder="e.g., Grilled Salmon with Chives"
-                                        className="w-full px-4 py-3 bg-muted/20 border-2 border-transparent focus:border-green-500 text-lg font-bold text-foreground rounded-xl transition-all focus:outline-none"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* 2. Quick Facts */}
+                            {/* 1. Quick Facts (Technical Details) */}
                             <div className="bg-card rounded-xl shadow-sm p-6 space-y-8 text-foreground">
                                 <div className="flex items-center justify-between border-b border-border/50 pb-4">
                                     <h2 className="text-xl font-bold flex items-center gap-2 text-foreground">
@@ -740,98 +720,98 @@ export default function CreateRecipePage() {
                                 </div>
                             </div>
 
-                            {/* 2. Recipe Photo */}
+                            {/* 2. Recipe Showcase (Combined Title & Photo) */}
                             <div className="bg-card rounded-xl shadow-sm p-6 text-foreground">
-                                <h2 className="text-xl font-bold mb-6 flex items-center gap-3 text-foreground">
-                                    <Camera className="w-5 h-5 text-green-600" />
-                                    Recipe Photo
+                                <h2 className="text-xl font-bold mb-6 flex items-center gap-3 text-foreground border-b border-border/50 pb-4">
+                                    <Sparkles className="w-5 h-5 text-green-600" />
+                                    Final Showcase
                                 </h2>
-                                <div className="flex flex-col md:flex-row gap-8">
-                                    <div className="hidden">
-                                        <input
-                                            type="file"
-                                            id="recipe-image-upload"
-                                            accept="image/*"
-                                            onChange={handleImageUpload}
-                                        />
-                                    </div>
-                                    <div
-                                        className="relative group w-full md:w-72 aspect-[4/3] rounded-2xl border-2 border-dashed border-border/40 overflow-hidden bg-muted/20 flex flex-col items-center justify-center cursor-pointer hover:border-green-500 transition-all shadow-inner"
-                                        onClick={() => document.getElementById('recipe-image-upload')?.click()}
-                                    >
-                                        {image ? (
-                                            <>
-                                                <img src={image} alt="Recipe Preview" className="w-full h-full object-cover" />
-                                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-3 backdrop-blur-[2px]">
-                                                    <button
-                                                        type="button"
-                                                        className="p-3 bg-white rounded-xl text-foreground hover:bg-green-50 shadow-lg"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            document.getElementById('recipe-image-upload')?.click();
-                                                        }}
-                                                    >
-                                                        <Camera size={20} />
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        className="p-3 bg-white rounded-xl text-red-600 hover:bg-red-50 shadow-lg"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setImage('');
-                                                        }}
-                                                    >
-                                                        <Trash2 size={20} />
-                                                    </button>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <div className="text-center p-6 space-y-3">
-                                                <div className="w-16 h-16 rounded-full bg-background flex items-center justify-center mx-auto text-muted-foreground group-hover:text-green-600 group-hover:scale-110 transition-all shadow-sm">
-                                                    {uploading ? <Loader2 className="w-8 h-8 animate-spin" /> : <Camera className="w-8 h-8" />}
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm font-bold text-foreground">Click to upload photo</p>
-                                                    <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-black">JPG, PNG, WebP</p>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="flex-1 space-y-6 py-2">
-                                        <div className="space-y-2">
-                                            <p className="text-sm font-medium text-foreground">Visuals matter.</p>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    {/* Left Side: Title and Concept */}
+                                    <div className="space-y-6">
+                                        <div>
+                                            <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">
+                                                Recipe Title *
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={title}
+                                                onChange={(e) => setTitle(e.target.value)}
+                                                placeholder="e.g., Summer Garden Pasta"
+                                                className="w-full px-4 py-4 bg-muted/20 border-2 border-transparent focus:border-green-500 text-xl font-bold text-foreground rounded-2xl transition-all focus:outline-none shadow-inner"
+                                            />
+                                        </div>
+                                        <div className="bg-muted/10 p-5 rounded-2xl border border-border/30">
+                                            <p className="text-sm font-semibold text-foreground mb-2">A great first impression.</p>
                                             <p className="text-xs text-muted-foreground leading-relaxed">
-                                                A clear photo of your dish helps users identify it in their meal plan and makes the recipe feel more authentic.
+                                                A compelling name and a clear photo set the tone. Snap a shot of your masterpiece to show it off in the meal plan.
                                             </p>
                                         </div>
+                                    </div>
 
-                                        <div className="space-y-3">
-                                            <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                                                Or provide an Image URL
-                                            </label>
-                                            <div className="relative group">
-                                                <input
-                                                    type="text"
-                                                    value={image.startsWith('data:') ? '' : image}
-                                                    onChange={(e) => setImage(e.target.value)}
-                                                    placeholder="https://images.unsplash.com/..."
-                                                    className="w-full px-4 py-3 text-sm bg-muted/30 text-foreground border border-transparent focus:border-green-500 rounded-xl focus:outline-none transition-all"
-                                                />
-                                            </div>
+                                    {/* Right Side: Photo & Camera Upload */}
+                                    <div className="relative">
+                                        <div className="hidden">
+                                            <input
+                                                type="file"
+                                                id="recipe-image-upload"
+                                                accept="image/*"
+                                                onChange={handleImageUpload}
+                                            />
                                         </div>
 
-                                        <button
-                                            type="button"
+                                        <div
+                                            className="relative group w-full aspect-[16/9] rounded-3xl border-2 border-dashed border-border/40 overflow-hidden bg-muted/20 flex flex-col items-center justify-center cursor-pointer hover:border-green-500 transition-all shadow-xl"
                                             onClick={() => document.getElementById('recipe-image-upload')?.click()}
-                                            disabled={uploading}
-                                            className="w-full md:w-auto px-6 py-3 bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-400 rounded-xl text-sm font-bold border border-green-200 dark:border-green-800/30 hover:bg-green-100 transition-all flex items-center justify-center gap-2"
                                         >
-                                            <Upload size={18} />
-                                            {uploading ? 'Processing Image...' : (image ? 'Change Photo' : 'Upload from Device')}
-                                        </button>
+                                            {image ? (
+                                                <>
+                                                    <img src={image} alt="Preview" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-4 backdrop-blur-[2px]">
+                                                        <button
+                                                            type="button"
+                                                            className="p-3 bg-white rounded-xl text-foreground hover:bg-green-50 shadow-lg"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                document.getElementById('recipe-image-upload')?.click();
+                                                            }}
+                                                        >
+                                                            <Upload size={20} />
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="p-3 bg-white rounded-xl text-red-600 hover:bg-red-50 shadow-lg"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setImage('');
+                                                            }}
+                                                        >
+                                                            <Trash2 size={20} />
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div className="text-center p-8 space-y-4">
+                                                    <div className="flex justify-center gap-6 text-muted-foreground group-hover:text-green-600 transition-all group-hover:scale-110">
+                                                        <div className="p-4 bg-background rounded-2xl shadow-sm border border-border/50">
+                                                            <Camera size={32} />
+                                                        </div>
+                                                        <div className="p-4 bg-background rounded-2xl shadow-sm border border-border/50">
+                                                            <Upload size={32} />
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-bold text-foreground">Tap to take or upload a photo</p>
+                                                        <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-widest font-black">AI will process the plating</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
 
 
                             <div className="flex gap-4">
@@ -903,7 +883,7 @@ export default function CreateRecipePage() {
                     </SheetFooter>
                 </SheetContent>
             </Sheet>
-        </div>
+        </div >
     );
 }
 
