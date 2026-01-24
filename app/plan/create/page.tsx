@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import IngredientBuilder, { RecipeIngredient } from '@/components/recipe/ingredient-builder';
 import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap } from 'lucide-react';
+import { Header } from '@/components/header';
 import { parseInstructionsOnly } from '@/lib/utils/recipe-parser';
 
 export default function CreateRecipePage() {
@@ -234,6 +235,7 @@ export default function CreateRecipePage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-green-50 to-white dark:from-green-950/20 dark:to-background">
+            <Header />
             <div className="max-w-4xl mx-auto px-4 py-8">
                 {/* Header */}
                 <div className="mb-8">
