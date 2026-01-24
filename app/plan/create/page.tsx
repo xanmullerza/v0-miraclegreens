@@ -794,8 +794,8 @@ export default function CreateRecipePage() {
             </div>
             {/* Auto Import Sheet */}
             <Sheet open={showAutoImport} onOpenChange={setShowAutoImport}>
-                <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto">
-                    <SheetHeader>
+                <SheetContent side="right" className="w-full sm:max-w-xl flex flex-col h-full p-6">
+                    <SheetHeader className="flex-shrink-0">
                         <SheetTitle className="flex items-center gap-2">
                             <Sparkles className="w-5 h-5 text-purple-600" />
                             Magic Auto-Import
@@ -805,19 +805,19 @@ export default function CreateRecipePage() {
                         </SheetDescription>
                     </SheetHeader>
 
-                    <div className="py-6 space-y-4">
-                        <div className="space-y-2">
-                            <Label>Recipe Text</Label>
+                    <div className="flex-1 min-h-0 py-6 overflow-hidden flex flex-col">
+                        <div className="flex-1 flex flex-col space-y-2 min-h-0">
+                            <Label className="flex-shrink-0">Recipe Text</Label>
                             <Textarea
-                                placeholder=""
-                                className="min-h-[400px] font-mono text-sm"
+                                placeholder="Paste recipe here..."
+                                className="flex-1 font-mono text-sm resize-none"
                                 value={autoImportText}
                                 onChange={(e) => setAutoImportText(e.target.value)}
                             />
                         </div>
                     </div>
 
-                    <SheetFooter>
+                    <SheetFooter className="flex-shrink-0">
                         <Button
                             className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
                             onClick={handleAutoImport}
