@@ -121,6 +121,52 @@ export default function CreateRecipePage() {
         try {
             const parsed = parseRecipeText(autoImportText);
 
+            const parseAmount = (amountStr: string) => {
+                const unicodeFractions: Record<string, number> = {
+                    '¼': 0.25, '½': 0.5, '¾': 0.75, '⅛': 0.125, '⅜': 0.375, '⅝': 0.625, '⅞': 0.875
+                };
+                const rawAmount = amountStr.trim();
+                const qtyRegex = /^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?|[¼½¾⅛⅜⅝⅞]))/;
+                const qtyMatch = rawAmount.match(qtyRegex);
+
+                let quantity = 1;
+                let unit = 'piece';
+
+                if (qtyMatch) {
+                    const val = qtyMatch[1].trim();
+                    let handled = false;
+                    for (const [char, num] of Object.entries(unicodeFractions)) {
+                        if (val.includes(char)) {
+                            const parts = val.split(char);
+                            const whole = parseFloat(parts[0].trim()) || 0;
+                            quantity = whole + num;
+                            handled = true;
+                            break;
+                        }
+                    }
+
+                    if (!handled) {
+                        if (val.includes('/')) {
+                            if (val.includes(' ')) {
+                                const [whole, frac] = val.split(' ');
+                                const [n, d] = frac.split('/').map(Number);
+                                quantity = (Number(whole) || 0) + (n / d);
+                            } else {
+                                const [n, d] = val.split('/').map(Number);
+                                quantity = n / (d || 1);
+                            }
+                        } else {
+                            quantity = Number(val) || 1;
+                        }
+                    }
+                    const unitPart = rawAmount.slice(val.length).trim().replace(/[,:;]$/, '').toLowerCase();
+                    if (unitPart) unit = unitPart;
+                } else {
+                    unit = rawAmount.replace(/[,:;]$/, '').toLowerCase() || 'piece';
+                }
+                return { quantity, unit };
+            };
+
             // 1. Basic Info
             if (parsed.title) setTitle(parsed.title);
             setServings(parsed.servings || 4);
@@ -151,25 +197,9 @@ export default function CreateRecipePage() {
                     }
                 }
 
+                const { quantity, unit } = parseAmount(ing.amount);
+
                 if (match) {
-                    // Try to parse quantity and unit
-                    let quantity = 1;
-                    let unit = 'piece';
-
-                    const qtyMatch = ing.amount.match(/^(\d+(?:\.\d+)?|\d+\/\d+)/);
-                    if (qtyMatch) {
-                        const val = qtyMatch[1];
-                        if (val.includes('/')) {
-                            const [num, den] = val.split('/').map(Number);
-                            quantity = num / den;
-                        } else {
-                            quantity = Number(val);
-                        }
-                    }
-
-                    const unitPart = ing.amount.replace(/^(\d+(?:\.\d+)?|\d+\/\d+)\s*/, '').trim().toLowerCase();
-                    if (unitPart) unit = unitPart;
-
                     // Calculate nutrients (simplified for now, using 100g base if gram-based)
                     const isGrams = unit.includes('g') && !unit.includes('cup');
                     const weight = ing.weightG || (isGrams ? quantity : 100); // 100g fallback if unknown volume
@@ -193,10 +223,10 @@ export default function CreateRecipePage() {
                     // Placeholder ingredient if no match found
                     rawIngredients.push({
                         food_item_id: 'temp-id',
-                        food_item_name: ing.item,
-                        weight_g: ing.weightG || (ing.amount.toLowerCase().includes('g') ? Number(ing.amount.match(/\d+/)?.[0] || 0) : 0),
-                        quantity: 1,
-                        measure_label: ing.amount || 'as needed',
+                        food_item_name: itemName,
+                        weight_g: ing.weightG || (unit.includes('g') ? quantity : 0),
+                        quantity: quantity,
+                        measure_label: unit,
                         modifier: ing.modifier,
                         calories: 0,
                         energy_kj: 0,
