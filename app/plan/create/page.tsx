@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import IngredientBuilder, { RecipeIngredient } from '@/components/recipe/ingredient-builder';
-import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus, ListOrdered, ChevronUp, ChevronDown } from 'lucide-react';
+import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus, ListOrdered, ChevronUp, ChevronDown, ClipboardList } from 'lucide-react';
 import { Header } from '@/components/header';
 import { parseInstructionsOnly, parseRecipeText } from '@/lib/utils/recipe-parser';
 import { searchLocalFood, searchUSDAFood, getUSDAMeasures } from '@/lib/services/nutrition';
@@ -615,7 +615,7 @@ export default function CreateRecipePage() {
                             <div className="bg-card rounded-xl shadow-sm p-6 space-y-8 text-foreground">
                                 <div className="flex items-center justify-between border-b border-border/50 pb-4">
                                     <h2 className="text-xl font-bold flex items-center gap-2 text-foreground">
-                                        <Zap className="w-5 h-5 text-amber-500" />
+                                        <ClipboardList className="w-5 h-5 text-green-600" />
                                         Quick Facts
                                     </h2>
                                 </div>
@@ -731,11 +731,11 @@ export default function CreateRecipePage() {
                                 </div>
                             </div>
 
-                            {/* 2. Recipe Showcase (Combined Title & Photo) */}
+                            {/* 2. Final Touches (Combined Title & Photo) */}
                             <div className="bg-card rounded-xl shadow-sm p-6 text-foreground">
                                 <h2 className="text-xl font-bold mb-6 flex items-center gap-3 text-foreground border-b border-border/50 pb-4">
-                                    <Sparkles className="w-5 h-5 text-green-600" />
-                                    Final Showcase
+                                    <Wand2 className="w-5 h-5 text-purple-600" />
+                                    Final Touches
                                 </h2>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
