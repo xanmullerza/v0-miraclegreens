@@ -163,37 +163,37 @@ function FoodItemCreatorContent() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col transition-colors duration-300">
             <Header />
 
             <main className="flex-grow container mx-auto px-4 py-8">
                 <div className="max-w-4xl mx-auto">
                     <div className="flex items-center gap-4 mb-8">
-                        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+                        <Button variant="ghost" size="icon" onClick={() => router.back()} className="dark:text-slate-400 dark:hover:text-white">
                             <ArrowLeft className="w-5 h-5" />
                         </Button>
                         <div>
-                            <h1 className="text-3xl font-bold text-slate-900">Food Item Creator</h1>
-                            <p className="text-slate-500">Add new ingredients to the global database with full nutritional data.</p>
+                            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Food Item Creator</h1>
+                            <p className="text-slate-500 dark:text-slate-400">Add new ingredients to the global database with full nutritional data.</p>
                         </div>
                     </div>
 
                     {showParser && (
-                        <Card className="p-6 mb-8 border-emerald-100 bg-emerald-50/30">
-                            <div className="flex items-center gap-2 mb-4 text-emerald-700">
+                        <Card className="p-6 mb-8 border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/30 dark:bg-emerald-950/20">
+                            <div className="flex items-center gap-2 mb-4 text-emerald-700 dark:text-emerald-400">
                                 <Sparkles className="w-5 h-5" />
                                 <h3 className="font-semibold text-lg">Magic Parser</h3>
                             </div>
-                            <p className="text-sm text-slate-600 mb-4">
+                            <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
                                 Paste nutritional data (e.g. from USDA or NutritionFacts) and we'll automatically extract the macros and micros per 100g.
                             </p>
                             <Textarea
                                 placeholder="Paste nutritional data here..."
-                                className="min-h-[200px] mb-4 bg-white"
+                                className="min-h-[200px] mb-4 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:ring-emerald-500"
                                 value={rawText}
                                 onChange={(e) => setRawText(e.target.value)}
                             />
-                            <Button onClick={handleParse} className="bg-emerald-600 hover:bg-emerald-700 w-full lg:w-auto">
+                            <Button onClick={handleParse} className="bg-emerald-600 hover:bg-emerald-700 w-full lg:w-auto text-white shadow-lg shadow-emerald-200/20">
                                 <Zap className="w-4 h-4 mr-2" />
                                 Extract Data
                             </Button>
@@ -204,29 +204,31 @@ function FoodItemCreatorContent() {
                         {/* Basic Info & Macros */}
                         <div className="space-y-6">
                             <Card className="p-6">
-                                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-                                    <Beef className="w-5 h-5 text-emerald-600" />
+                                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
+                                    <Beef className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                                     Basic Information
                                 </h3>
                                 <div className="space-y-4">
                                     <div>
-                                        <Label>Scientific/Full Name</Label>
+                                        <Label className="dark:text-slate-300">Scientific/Full Name</Label>
                                         <Input
                                             placeholder="e.g. Peppers, sweet, green, raw"
+                                            className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500"
                                             value={name}
                                             onChange={(e) => setName(e.target.value)}
                                         />
                                     </div>
                                     <div>
-                                        <Label>Common Name (Short)</Label>
+                                        <Label className="dark:text-slate-300">Common Name (Short)</Label>
                                         <Input
                                             placeholder="e.g. Green Bell Pepper"
+                                            className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500"
                                             value={commonName}
                                             onChange={(e) => setCommonName(e.target.value)}
                                         />
                                     </div>
                                     <div>
-                                        <Label>Data Source</Label>
+                                        <Label className="dark:text-slate-300">Data Source</Label>
                                         <select
                                             className="w-full h-10 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-all cursor-pointer shadow-sm"
                                             value={source}
@@ -244,45 +246,45 @@ function FoodItemCreatorContent() {
                             </Card>
 
                             <Card className="p-6">
-                                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-                                    <Scale className="w-5 h-5 text-emerald-600" />
+                                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
+                                    <Scale className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                                     Macros (per 100g)
                                 </h3>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <Label>Calories (kcal)</Label>
-                                        <Input type="number" value={energyKcal} onChange={(e) => setEnergyKcal(e.target.value)} />
+                                        <Label className="dark:text-slate-300">Calories (kcal)</Label>
+                                        <Input type="number" value={energyKcal} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => setEnergyKcal(e.target.value)} />
                                     </div>
                                     <div>
-                                        <Label>Energy (kJ)</Label>
-                                        <Input type="number" value={energyKj} onChange={(e) => setEnergyKj(e.target.value)} />
+                                        <Label className="dark:text-slate-300">Energy (kJ)</Label>
+                                        <Input type="number" value={energyKj} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => setEnergyKj(e.target.value)} />
                                     </div>
                                     <div>
-                                        <Label>Protein (g)</Label>
-                                        <Input type="number" value={protein} onChange={(e) => setProtein(e.target.value)} />
+                                        <Label className="dark:text-slate-300">Protein (g)</Label>
+                                        <Input type="number" value={protein} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => setProtein(e.target.value)} />
                                     </div>
                                     <div>
-                                        <Label>Carbs (g)</Label>
-                                        <Input type="number" value={carbs} onChange={(e) => setCarbs(e.target.value)} />
+                                        <Label className="dark:text-slate-300">Carbs (g)</Label>
+                                        <Input type="number" value={carbs} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => setCarbs(e.target.value)} />
                                     </div>
                                     <div>
-                                        <Label>Fat (g)</Label>
-                                        <Input type="number" value={fat} onChange={(e) => setFat(e.target.value)} />
+                                        <Label className="dark:text-slate-300">Fat (g)</Label>
+                                        <Input type="number" value={fat} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => setFat(e.target.value)} />
                                     </div>
                                     <div>
-                                        <Label>Fiber (g)</Label>
-                                        <Input type="number" value={micronutrients['Fiber'] || ''} onChange={(e) => updateMicro('Fiber', e.target.value)} />
+                                        <Label className="dark:text-slate-300">Fiber (g)</Label>
+                                        <Input type="number" value={micronutrients['Fiber'] || ''} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => updateMicro('Fiber', e.target.value)} />
                                     </div>
                                 </div>
                             </Card>
 
                             <Card className="p-6">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className="font-semibold text-lg flex items-center gap-2">
-                                        <Scale className="w-5 h-5 text-emerald-600" />
+                                    <h3 className="font-semibold text-lg flex items-center gap-2 text-slate-900 dark:text-white">
+                                        <Scale className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                                         Common Measures
                                     </h3>
-                                    <Button variant="outline" size="sm" onClick={addMeasure}>
+                                    <Button variant="outline" size="sm" onClick={addMeasure} className="dark:border-slate-700 dark:hover:bg-slate-800 dark:text-slate-300">
                                         <Plus className="w-4 h-4 mr-1" /> Add
                                     </Button>
                                 </div>
@@ -290,23 +292,25 @@ function FoodItemCreatorContent() {
                                     {measures.map((m, i) => (
                                         <div key={i} className="flex gap-2 items-end">
                                             <div className="flex-grow">
-                                                <Label className="text-xs">Label (e.g. cup, large)</Label>
+                                                <Label className="text-xs dark:text-slate-400">Label (e.g. cup, large)</Label>
                                                 <Input
                                                     value={m.label}
+                                                    className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500"
                                                     onChange={(e) => updateMeasure(i, 'label', e.target.value)}
                                                     placeholder="Unit name"
                                                 />
                                             </div>
                                             <div className="w-24">
-                                                <Label className="text-xs">Weight (g)</Label>
+                                                <Label className="text-xs dark:text-slate-400">Weight (g)</Label>
                                                 <Input
                                                     type="number"
                                                     value={m.weight}
+                                                    className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500 text-center"
                                                     onChange={(e) => updateMeasure(i, 'weight', e.target.value)}
                                                     placeholder="Grams"
                                                 />
                                             </div>
-                                            <Button variant="ghost" size="icon" onClick={() => removeMeasure(i)} className="text-slate-400 hover:text-red-500">
+                                            <Button variant="ghost" size="icon" onClick={() => removeMeasure(i)} className="text-slate-400 hover:text-red-500 dark:hover:bg-red-500/10">
                                                 <Trash2 className="w-4 h-4" />
                                             </Button>
                                         </div>
@@ -318,18 +322,18 @@ function FoodItemCreatorContent() {
                         {/* Micronutrients */}
                         <div className="space-y-6">
                             <Card className="p-6">
-                                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-                                    <Zap className="w-5 h-5 text-emerald-600" />
+                                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
+                                    <Zap className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                                     Micronutrients (per 100g)
                                 </h3>
                                 <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                                     {STANDARD_MICROS.filter(m => m !== 'Fiber').map(micro => (
                                         <div key={micro}>
-                                            <Label className="text-xs whitespace-nowrap overflow-hidden text-ellipsis block">
+                                            <Label className="text-xs whitespace-nowrap overflow-hidden text-ellipsis block dark:text-slate-400">
                                                 {micro}
                                             </Label>
                                             <Input
-                                                className="h-8 text-sm"
+                                                className="h-8 text-sm bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500"
                                                 value={micronutrients[micro] || ''}
                                                 onChange={(e) => updateMicro(micro, e.target.value)}
                                                 placeholder="0.00"
@@ -342,9 +346,9 @@ function FoodItemCreatorContent() {
                     </div>
 
                     <div className="mt-12 flex justify-end gap-4">
-                        <Button variant="outline" onClick={() => router.back()}>Cancel</Button>
+                        <Button variant="outline" onClick={() => router.back()} className="dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">Cancel</Button>
                         <Button
-                            className="bg-emerald-600 hover:bg-emerald-700 min-w-[150px]"
+                            className="bg-emerald-600 hover:bg-emerald-700 min-w-[150px] text-white shadow-lg shadow-emerald-200/20"
                             onClick={handleSave}
                             disabled={loading}
                         >
