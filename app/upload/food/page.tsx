@@ -234,6 +234,7 @@ function FoodItemCreatorContent() {
                                         >
                                             <option value="manual">Manual Entry</option>
                                             <option value="usda">USDA FoodData Central</option>
+                                            <option value="nccdb">NCCDB (Clinical Grade)</option>
                                             <option value="nutritionfacts">NutritionFacts.org</option>
                                             <option value="cronometer">Cronometer</option>
                                             <option value="other">Other</option>
