@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { Menu, TreeDeciduous, ShoppingBag, LayoutGrid, Calendar, BarChart3 } from 'lucide-react';
+import { Menu, TreeDeciduous, ShoppingBag, LayoutGrid, Calendar, BarChart3, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ModeToggle } from '@/components/mode-toggle';
@@ -35,15 +35,15 @@ export function Header() {
 						<SheetContent side="left" className="w-[300px] bg-background">
 							<div className="flex flex-col gap-6 mt-8">
 								<Button className="gap-2 mt-4" asChild>
-									<Link href="/browse">
-										<LayoutGrid className="h-4 w-4" />
-										Browse Resources
+									<Link href="/dashboard">
+										<LayoutDashboard className="h-4 w-4" />
+										Lab Dashboard
 									</Link>
 								</Button>
 								<Button className="gap-2 mt-2" asChild>
-									<Link href="/compare">
-										<BarChart3 className="h-4 w-4" />
-										Compare Ingredients
+									<Link href="/browse">
+										<LayoutGrid className="h-4 w-4" />
+										Browse Resources
 									</Link>
 								</Button>
 								{showPlan && (
@@ -93,9 +93,9 @@ export function Header() {
 							</Link>
 						</Button>
 						<Button variant="secondary" size="sm" className="hidden lg:flex gap-2" asChild>
-							<Link href="/compare">
-								<BarChart3 className="h-4 w-4" />
-								Compare
+							<Link href="/dashboard">
+								<LayoutDashboard className="h-4 w-4" />
+								Lab Dashboard
 							</Link>
 						</Button>
 						{showPlan && (

@@ -12,6 +12,7 @@ interface FoodItem {
     fat_g: number;
     carbs_g: number;
     energy_kj?: number;
+    micronutrients?: Record<string, number>;
 }
 
 interface FoodItemPickerProps {
@@ -38,7 +39,7 @@ export default function FoodItemPicker({ onSelect, onClose }: FoodItemPickerProp
             setLoading(true);
             const { data, error } = await supabase
                 .from('food_items')
-                .select('id, name, common_name, energy_kcal, protein_g, fat_g, carbs_g, energy_kj')
+                .select('id, name, common_name, energy_kcal, protein_g, fat_g, carbs_g, energy_kj, micronutrients')
                 .or(`name.ilike.%${searchQuery}%,common_name.ilike.%${searchQuery}%`)
                 .limit(20);
 

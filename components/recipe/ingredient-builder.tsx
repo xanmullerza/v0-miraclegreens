@@ -12,11 +12,13 @@ import { cn } from '@/lib/utils';
 interface FoodItem {
     id?: string;
     name: string;
+    common_name?: string;
     energy_kcal: number;
     protein_g: number;
     fat_g: number;
     carbs_g: number;
     energy_kj?: number;
+    micronutrients?: Record<string, number>;
 }
 
 export interface RecipeIngredient {
@@ -32,6 +34,7 @@ export interface RecipeIngredient {
     protein: number;
     fat: number;
     carbs: number;
+    micronutrients: Record<string, number>;
     // Available measures
     available_measures?: FoodMeasure[];
     // Parsing state
@@ -201,6 +204,10 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             protein: Math.round(finalFoodItem.protein_g * multiplier * 10) / 10,
             fat: Math.round(finalFoodItem.fat_g * multiplier * 10) / 10,
             carbs: Math.round(finalFoodItem.carbs_g * multiplier * 10) / 10,
+            micronutrients: Object.entries(finalFoodItem.micronutrients || {}).reduce((acc, [key, val]) => {
+                acc[key] = (val as number) * multiplier;
+                return acc;
+            }, {} as Record<string, number>),
             available_measures: measures,
             parsedGrams: hasParsedWeight ? weight_g : undefined,
             customUnitWeight: (hasParsedWeight && quantity > 0) ? (weight_g / quantity) : undefined,
@@ -397,6 +404,10 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             protein: Math.round(ing.protein * ratio * 10) / 10,
             fat: Math.round(ing.fat * ratio * 10) / 10,
             carbs: Math.round(ing.carbs * ratio * 10) / 10,
+            micronutrients: Object.entries(ing.micronutrients || {}).reduce((acc, [key, val]) => {
+                acc[key] = (val as number) * ratio;
+                return acc;
+            }, {} as Record<string, number>),
         };
 
         onChange(updated);
@@ -436,6 +447,10 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             protein: Math.round(ing.protein * ratio * 10) / 10,
             fat: Math.round(ing.fat * ratio * 10) / 10,
             carbs: Math.round(ing.carbs * ratio * 10) / 10,
+            micronutrients: Object.entries(ing.micronutrients || {}).reduce((acc, [key, val]) => {
+                acc[key] = (val as number) * ratio;
+                return acc;
+            }, {} as Record<string, number>),
         };
         onChange(updated);
     };
