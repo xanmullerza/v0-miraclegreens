@@ -648,22 +648,26 @@ export default function DashboardRecipePage() {
                                             </div>
                                         </>
                                     ) : (
-                                        <div className="text-center p-4">
-                                            {uploading ? (
-                                                <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mx-auto" />
-                                            ) : (
-                                                <>
-                                                    <Upload size={20} className="text-slate-400 mx-auto mb-2" />
-                                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Upload Photo</p>
-                                                    <Input
-                                                        type="file"
-                                                        accept="image/*"
-                                                        className="absolute inset-0 opacity-0 cursor-pointer"
-                                                        onChange={handleImageUpload}
-                                                    />
-                                                </>
+                                        <>
+                                            <div className="text-center p-4 pointer-events-none">
+                                                {uploading ? (
+                                                    <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mx-auto" />
+                                                ) : (
+                                                    <>
+                                                        <Upload size={20} className="text-slate-400 mx-auto mb-2" />
+                                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Upload Photo</p>
+                                                    </>
+                                                )}
+                                            </div>
+                                            {!uploading && (
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                                    onChange={handleImageUpload}
+                                                />
                                             )}
-                                        </div>
+                                        </>
                                     )}
                                 </div>
                             </div>
