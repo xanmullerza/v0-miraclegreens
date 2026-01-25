@@ -18,6 +18,7 @@ export default function CreateRecipePage() {
     const router = useRouter();
 
     const [title, setTitle] = useState('');
+    const [source, setSource] = useState('');
     const [type, setType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('dinner');
     const [prepTime, setPrepTime] = useState(30);
     const [servings, setServings] = useState(4);
@@ -383,6 +384,7 @@ export default function CreateRecipePage() {
                     prep_time: prepTime,
                     servings,
                     image,
+                    source,
                 });
 
             if (recipeError) {
@@ -753,11 +755,17 @@ export default function CreateRecipePage() {
                                                 className="w-full px-4 py-4 bg-muted/20 border-2 border-transparent focus:border-green-500 text-xl font-bold text-foreground rounded-2xl transition-all focus:outline-none shadow-inner"
                                             />
                                         </div>
-                                        <div className="bg-muted/10 p-5 rounded-2xl border border-border/30">
-                                            <p className="text-sm font-semibold text-foreground mb-2">A great first impression.</p>
-                                            <p className="text-xs text-muted-foreground leading-relaxed">
-                                                A compelling name and a clear photo set the tone. Snap a shot of your masterpiece to show it off in the meal plan.
-                                            </p>
+                                        <div>
+                                            <label className="block text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">
+                                                Recipe Source (e.g., Website/Cookbook)
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={source}
+                                                onChange={(e) => setSource(e.target.value)}
+                                                placeholder="e.g., Gourmet Kitchen or URL"
+                                                className="w-full px-4 py-4 bg-muted/20 border-2 border-transparent focus:border-purple-500 text-lg font-bold text-foreground rounded-2xl transition-all focus:outline-none shadow-inner"
+                                            />
                                         </div>
                                     </div>
 
@@ -773,7 +781,7 @@ export default function CreateRecipePage() {
                                         </div>
 
                                         <div
-                                            className="relative group w-full aspect-[16/9] rounded-3xl border-2 border-dashed border-border/40 overflow-hidden bg-muted/20 flex flex-col items-center justify-center cursor-pointer hover:border-green-500 transition-all shadow-xl"
+                                            className="relative group w-full aspect-[16/9] rounded-3xl border-2 border-dashed border-muted-foreground/40 bg-muted/20 overflow-hidden flex flex-col items-center justify-center cursor-pointer hover:border-purple-500 transition-all shadow-xl"
                                             onClick={() => document.getElementById('recipe-image-upload')?.click()}
                                         >
                                             {image ? (
