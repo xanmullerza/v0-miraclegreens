@@ -103,11 +103,11 @@ export default function ComparisonPage() {
         selectedItems.forEach((item, idx) => {
             let val = 0;
             switch (base.subject) {
-                case 'Protein': val = item.protein_g; break;
-                case 'Carbs': val = item.carbs_g; break;
-                case 'Fat': val = item.fat_g; break;
-                case 'Fiber': val = item.micronutrients['Fiber'] || 0; break;
-                case 'Calories': val = item.energy_kcal / 10; break; // Scale calories down for viz
+                case 'Protein': val = parseFloat(item.protein_g as any) || 0; break;
+                case 'Carbs': val = parseFloat(item.carbs_g as any) || 0; break;
+                case 'Fat': val = parseFloat(item.fat_g as any) || 0; break;
+                case 'Fiber': val = parseFloat(item.micronutrients['Fiber'] as any) || 0; break;
+                case 'Calories': val = (parseFloat(item.energy_kcal as any) || 0) / 10; break;
             }
             entry[`item${idx}`] = val;
         });
@@ -283,7 +283,7 @@ export default function ComparisonPage() {
                                                             <td className="p-4 font-medium text-sm">{row.label}</td>
                                                             {selectedItems.map(item => (
                                                                 <td key={item.id} className="p-4 text-center text-sm font-semibold">
-                                                                    {(item as any)[row.key]?.toFixed(row.key === 'energy_kcal' ? 0 : 2) || 0}
+                                                                    {parseFloat((item as any)[row.key] || 0).toFixed(row.key === 'energy_kcal' ? 0 : 2)}
                                                                 </td>
                                                             ))}
                                                         </tr>
@@ -306,7 +306,7 @@ export default function ComparisonPage() {
                                                             </td>
                                                             {selectedItems.map(item => (
                                                                 <td key={item.id} className="p-4 text-center text-sm font-bold">
-                                                                    {item.micronutrients[row.key]?.toFixed(2) || '0.00'}
+                                                                    {parseFloat(item.micronutrients[row.key] as any || 0).toFixed(2)}
                                                                 </td>
                                                             ))}
                                                         </tr>
@@ -324,7 +324,7 @@ export default function ComparisonPage() {
                                                             <td className="p-4 font-medium text-sm">{row.label}</td>
                                                             {selectedItems.map(item => (
                                                                 <td key={item.id} className="p-4 text-center text-sm">
-                                                                    {item.micronutrients[row.key]?.toFixed(2) || '0'}
+                                                                    {parseFloat(item.micronutrients[row.key] as any || 0).toFixed(2)}
                                                                 </td>
                                                             ))}
                                                         </tr>
@@ -342,7 +342,7 @@ export default function ComparisonPage() {
                                                             <td className="p-4 font-medium text-sm">{amino}</td>
                                                             {selectedItems.map(item => (
                                                                 <td key={item.id} className="p-4 text-center text-sm">
-                                                                    {item.micronutrients[amino]?.toFixed(3) || '0.000'}
+                                                                    {parseFloat(item.micronutrients[amino] as any || 0).toFixed(3)}
                                                                 </td>
                                                             ))}
                                                         </tr>
