@@ -104,7 +104,32 @@ export function parseNutritionText(text: string): Partial<ParsedNutrition> {
         'B9 (Folate)': /Folate/i,
         'B12 (Cobalamin)': /Cobalamin|B12/i,
         'Choline': /Choline/i,
-        'Fiber': /Fiber/i
+        'Fiber': /Fiber/i,
+        'Sugars': /^Sugars$/i,
+        'Starch': /^Starch$/i,
+        'Saturated Fat': /Saturated/i,
+        'Monounsaturated Fat': /Monounsaturated/i,
+        'Polyunsaturated Fat': /Polyunsaturated/i,
+        'Trans Fat': /Trans/i,
+        'Omega-3': /Omega-3|Total omega 3/i,
+        'Omega-6': /Omega-6|Total omega 6/i,
+        'Alanine': /^Alanine$/i,
+        'Arginine': /^Arginine$/i,
+        'Aspartic acid': /Aspartic/i,
+        'Glutamic acid': /Glutamic/i,
+        'Glycine': /^Glycine$/i,
+        'Histidine': /^Histidine$/i,
+        'Isoleucine': /^Isoleucine$/i,
+        'Leucine': /^Leucine$/i,
+        'Lysine': /^Lysine$/i,
+        'Methionine': /^Methionine$/i,
+        'Phenylalanine': /^Phenylalanine$/i,
+        'Proline': /^Proline$/i,
+        'Serine': /^Serine$/i,
+        'Threonine': /^Threonine$/i,
+        'Tryptophan': /^Tryptophan$/i,
+        'Tyrosine': /^Tyrosine$/i,
+        'Valine': /^Valine$/i
     };
 
     Object.entries(microMap).forEach(([target, regex]) => {

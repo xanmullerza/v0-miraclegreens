@@ -17,7 +17,8 @@ import {
     Sparkles,
     Scale,
     Beef,
-    Zap
+    Zap,
+    Utensils
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -258,7 +259,7 @@ function FoodItemCreatorContent() {
                             <Card className="p-6">
                                 <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
                                     <Scale className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                                    Macros (per 100g)
+                                    Core Macros (per 100g)
                                 </h3>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
@@ -266,7 +267,7 @@ function FoodItemCreatorContent() {
                                         <Input
                                             type="number"
                                             value={energyKcal}
-                                            className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500"
+                                            className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500 font-bold"
                                             onChange={(e) => {
                                                 const val = e.target.value;
                                                 setEnergyKcal(val);
@@ -283,7 +284,7 @@ function FoodItemCreatorContent() {
                                         <Input
                                             type="number"
                                             value={energyKj}
-                                            className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500"
+                                            className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500 font-bold"
                                             onChange={(e) => {
                                                 const val = e.target.value;
                                                 setEnergyKj(val);
@@ -297,20 +298,95 @@ function FoodItemCreatorContent() {
                                     </div>
                                     <div>
                                         <Label className="dark:text-slate-300">Protein (g)</Label>
-                                        <Input type="number" value={protein} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => setProtein(e.target.value)} />
+                                        <Input type="number" value={protein} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500 font-bold" onChange={(e) => setProtein(e.target.value)} />
                                     </div>
                                     <div>
                                         <Label className="dark:text-slate-300">Carbs (g)</Label>
-                                        <Input type="number" value={carbs} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => setCarbs(e.target.value)} />
+                                        <Input type="number" value={carbs} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500 font-bold" onChange={(e) => setCarbs(e.target.value)} />
                                     </div>
                                     <div>
                                         <Label className="dark:text-slate-300">Fat (g)</Label>
-                                        <Input type="number" value={fat} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => setFat(e.target.value)} />
+                                        <Input type="number" value={fat} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500 font-bold" onChange={(e) => setFat(e.target.value)} />
                                     </div>
+                                </div>
+                            </Card>
+
+                            <Card className="p-6">
+                                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
+                                    <Utensils className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                                    Carbohydrate Breakdown
+                                </h3>
+                                <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <Label className="dark:text-slate-300">Fiber (g)</Label>
+                                        <Label className="dark:text-slate-300 text-xs text-slate-500">Fiber (g)</Label>
                                         <Input type="number" value={micronutrients['Fiber'] || ''} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => updateMicro('Fiber', e.target.value)} />
                                     </div>
+                                    <div>
+                                        <Label className="dark:text-slate-300 text-xs text-slate-500">Sugars (g)</Label>
+                                        <Input type="number" value={micronutrients['Sugars'] || ''} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => updateMicro('Sugars', e.target.value)} />
+                                    </div>
+                                    <div className="col-span-2">
+                                        <Label className="dark:text-slate-300 text-xs text-slate-500">Starch (g)</Label>
+                                        <Input type="number" value={micronutrients['Starch'] || ''} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => updateMicro('Starch', e.target.value)} />
+                                    </div>
+                                </div>
+                            </Card>
+
+                            <Card className="p-6">
+                                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
+                                    <Beef className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                                    Lipid Breakdown (g)
+                                </h3>
+                                <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                                    <div>
+                                        <Label className="dark:text-slate-400 text-xs">Saturated</Label>
+                                        <Input type="number" className="h-8" value={micronutrients['Saturated Fat'] || ''} onChange={(e) => updateMicro('Saturated Fat', e.target.value)} />
+                                    </div>
+                                    <div>
+                                        <Label className="dark:text-slate-400 text-xs">Trans-Fat</Label>
+                                        <Input type="number" className="h-8" value={micronutrients['Trans Fat'] || ''} onChange={(e) => updateMicro('Trans Fat', e.target.value)} />
+                                    </div>
+                                    <div>
+                                        <Label className="dark:text-slate-400 text-xs">Monounsaturated</Label>
+                                        <Input type="number" className="h-8" value={micronutrients['Monounsaturated Fat'] || ''} onChange={(e) => updateMicro('Monounsaturated Fat', e.target.value)} />
+                                    </div>
+                                    <div>
+                                        <Label className="dark:text-slate-400 text-xs">Polyunsaturated</Label>
+                                        <Input type="number" className="h-8" value={micronutrients['Polyunsaturated Fat'] || ''} onChange={(e) => updateMicro('Polyunsaturated Fat', e.target.value)} />
+                                    </div>
+                                    <div>
+                                        <Label className="dark:text-slate-400 text-xs">Omega-3</Label>
+                                        <Input type="number" className="h-8" value={micronutrients['Omega-3'] || ''} onChange={(e) => updateMicro('Omega-3', e.target.value)} />
+                                    </div>
+                                    <div>
+                                        <Label className="dark:text-slate-400 text-xs">Omega-6</Label>
+                                        <Input type="number" className="h-8" value={micronutrients['Omega-6'] || ''} onChange={(e) => updateMicro('Omega-6', e.target.value)} />
+                                    </div>
+                                </div>
+                            </Card>
+
+                            <Card className="p-6">
+                                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
+                                    <Sparkles className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                                    Amino Acid Breakdown (g)
+                                </h3>
+                                <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-2">
+                                    {[
+                                        'Alanine', 'Arginine', 'Aspartic acid', 'Glutamic acid', 'Glycine',
+                                        'Histidine', 'Isoleucine', 'Leucine', 'Lysine', 'Methionine',
+                                        'Phenylalanine', 'Proline', 'Serine', 'Threonine', 'Tryptophan',
+                                        'Tyrosine', 'Valine'
+                                    ].map(amino => (
+                                        <div key={amino}>
+                                            <Label className="dark:text-slate-400 text-[10px] uppercase font-bold tracking-tight">{amino}</Label>
+                                            <Input
+                                                type="number"
+                                                className="h-7 text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
+                                                value={micronutrients[amino] || ''}
+                                                onChange={(e) => updateMicro(amino, e.target.value)}
+                                            />
+                                        </div>
+                                    ))}
                                 </div>
                             </Card>
 
