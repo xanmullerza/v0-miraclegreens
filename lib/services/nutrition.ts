@@ -247,6 +247,7 @@ export async function syncToLocal(food: FoodItemMatch, measures: FoodMeasure[]):
             protein_g: food.protein_g,
             carbs_g: food.carbs_g,
             fat_g: food.fat_g,
+            source: food.source || 'usda',
             micronutrients: food.micronutrients
         }, { onConflict: 'name' })
         .select()

@@ -27,8 +27,10 @@ import {
     X,
     Image as ImageIcon,
     Camera,
-    Upload
+    Upload,
+    Apple
 } from 'lucide-react';
+import Link from 'next/link';
 import {
     searchLocalFood,
     searchUSDAFood,
@@ -834,9 +836,27 @@ function RecipeUploaderContent() {
                                         </div>
                                         <div>
                                             <h3 className="text-2xl font-black text-slate-900 mb-2">Manual Entry</h3>
-                                            <p className="text-slate-600 leading-relaxed font-medium">For the purists. Build your recipe from scratch, field by field, with total precision and no automated parsing.</p>
+                                            <p className="text-slate-600 leading-relaxed font-medium">For the purists. Build your recipe from scratch, field by field, with total precision.</p>
                                         </div>
                                     </button>
+
+                                    <Link
+                                        href="/upload/food"
+                                        className="group relative p-10 rounded-[2.5rem] border-4 border-amber-100 bg-amber-50/30 hover:bg-amber-50 hover:border-amber-500 transition-all text-left space-y-6 shadow-xl shadow-amber-100/20 active:scale-95 md:col-span-2"
+                                    >
+                                        <div className="flex items-center gap-6">
+                                            <div className="w-20 h-20 bg-amber-500 rounded-3xl flex items-center justify-center text-white shadow-xl shadow-amber-200 rotate-3 group-hover:rotate-0 transition-all duration-500 shrink-0">
+                                                <Apple size={40} />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-2xl font-black text-slate-900 mb-2">Food Item Creator</h3>
+                                                <p className="text-slate-600 leading-relaxed font-medium">Add new base ingredients, fruits, or vegetables with full nutritional profiles and measurements to our global library.</p>
+                                            </div>
+                                        </div>
+                                        <div className="absolute top-6 right-8 opacity-10 group-hover:opacity-100 transition-opacity">
+                                            <Scale size={40} className="text-amber-300" />
+                                        </div>
+                                    </Link>
                                 </div>
                             </div>
                         )}
