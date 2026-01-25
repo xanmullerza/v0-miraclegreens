@@ -251,20 +251,11 @@ function FoodItemCreatorContent() {
                 </div>
                 <div className="flex items-center gap-3">
                     <Button
-                        variant="outline"
-                        onClick={() => setShowParser(!showParser)}
-                        className="gap-2 border-slate-200 dark:border-slate-800 rounded-xl"
+                        variant="ghost"
+                        onClick={() => window.location.reload()}
+                        className="gap-2 text-slate-400 hover:text-rose-500 rounded-xl px-6"
                     >
-                        <Zap size={16} className="text-amber-500 fill-current" />
-                        {showParser ? 'Close Extraction' : 'Magic Extraction'}
-                    </Button>
-                    <Button
-                        className="bg-slate-950 hover:bg-slate-900 border-none min-w-[140px] text-white shadow-xl shadow-slate-950/20 gap-2 rounded-xl h-11"
-                        onClick={handleSave}
-                        disabled={loading}
-                    >
-                        {loading ? <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-r-white" /> : <Save size={18} />}
-                        Sync Library
+                        Reset System
                     </Button>
                 </div>
             </div>
@@ -273,44 +264,77 @@ function FoodItemCreatorContent() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 {/* Extraction Matrix */}
                 {showParser && (
-                    <Card className="lg:col-span-8 p-8 border-emerald-500/30 bg-emerald-500/[0.03] animate-in fade-in slide-in-from-top-4 duration-300">
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-600">
-                                <Sparkles size={24} />
+                    <div className="lg:col-span-8 space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
+                        <Card className="p-8 border-emerald-500/30 bg-emerald-500/[0.03]">
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-600">
+                                    <Sparkles size={24} />
+                                </div>
+                                <div>
+                                    <h3 className="font-black uppercase tracking-widest text-sm text-emerald-700">Dual-Stream Extraction</h3>
+                                    <p className="text-xs text-emerald-600/80 font-medium">Split your source data below. We'll synchronize servings and nutrients in one pass.</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="font-black uppercase tracking-widest text-sm text-emerald-700">Dual-Stream Extraction</h3>
-                                <p className="text-xs text-emerald-600/80 font-medium">Split your source data below. We'll synchronize servings and nutrients in one pass.</p>
-                            </div>
-                        </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Stream 01: Serving Data</Label>
-                                <Textarea
-                                    placeholder="Paste cup weights, portion sizes here..."
-                                    className="min-h-[180px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
-                                    value={servingText}
-                                    onChange={(e) => setServingText(e.target.value)}
-                                />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Stream 01: Serving Data</Label>
+                                    <Textarea
+                                        placeholder="Paste cup weights, portion sizes here..."
+                                        className="min-h-[180px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
+                                        value={servingText}
+                                        onChange={(e) => setServingText(e.target.value)}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Stream 02: Nutrient Matrix</Label>
+                                    <Textarea
+                                        placeholder="Paste the long list of vitamins/minerals here..."
+                                        className="min-h-[180px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
+                                        value={nutrientText}
+                                        onChange={(e) => setNutrientText(e.target.value)}
+                                    />
+                                </div>
                             </div>
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Stream 02: Nutrient Matrix</Label>
-                                <Textarea
-                                    placeholder="Paste the long list of vitamins/minerals here..."
-                                    className="min-h-[180px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
-                                    value={nutrientText}
-                                    onChange={(e) => setNutrientText(e.target.value)}
-                                />
-                            </div>
-                        </div>
 
-                        <div className="flex justify-end">
-                            <Button onClick={handleParse} className="h-12 bg-emerald-600 text-white hover:bg-emerald-700 text-xs font-black uppercase tracking-widest px-10 shadow-lg shadow-emerald-600/20 rounded-xl">
-                                Run Dual Neural Synthesis
+                            <div className="flex justify-end gap-3">
+                                <Button onClick={handleParse} className="h-12 bg-emerald-600 text-white hover:bg-emerald-700 text-xs font-black uppercase tracking-widest px-10 shadow-lg shadow-emerald-600/20 rounded-xl">
+                                    Run Dual Neural Synthesis
+                                </Button>
+                            </div>
+                        </Card>
+
+                        {/* Synthesis Control Bar */}
+                        <div className="flex items-center gap-4 p-2 bg-slate-100/50 dark:bg-slate-900/50 rounded-[24px] border border-slate-200 dark:border-slate-800">
+                            <Button
+                                variant="ghost"
+                                onClick={() => window.location.reload()}
+                                className="flex-1 h-14 rounded-[18px] text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-rose-500 hover:bg-rose-500/5 gap-2"
+                            >
+                                <Trash2 size={16} />
+                                Cancel Input
+                            </Button>
+                            <Button
+                                onClick={handleSave}
+                                disabled={loading}
+                                className="flex-[2] h-14 rounded-[18px] bg-slate-950 hover:bg-slate-900 text-white shadow-xl shadow-slate-950/20 text-[10px] font-black uppercase tracking-widest gap-2"
+                            >
+                                {loading ? <Loader2 className="animate-spin h-4 w-4" /> : <Save size={16} />}
+                                Sync to Global Library
+                            </Button>
+                            <Button
+                                variant="outline"
+                                onClick={() => setShowAdvanced(!showAdvanced)}
+                                className={cn(
+                                    "flex-1 h-14 rounded-[18px] text-[10px] font-black uppercase tracking-widest gap-2 transition-all",
+                                    showAdvanced ? "bg-blue-500 text-white border-blue-600" : "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800"
+                                )}
+                            >
+                                <Activity size={16} />
+                                {showAdvanced ? 'Hide Nutrients' : '81 Nutrients'}
                             </Button>
                         </div>
-                    </Card>
+                    </div>
                 )}
 
                 {/* Identity & Core Macros */}
@@ -393,25 +417,16 @@ function FoodItemCreatorContent() {
             <div className="grid grid-cols-1 gap-8">
                 {/* Main Content Area */}
                 <div className="space-y-8">
-                    {/* Advanced Markers Controller */}
-                    <div className="space-y-6">
-                        <div className="flex items-center justify-between">
-                            <h3 className="font-black text-sm uppercase tracking-widest flex items-center gap-3">
-                                <Activity className="text-blue-500" />
-                                Clinical Marker Matrix
-                                <span className="text-[10px] text-slate-400 font-medium normal-case tracking-normal">(Manually edit specific markers)</span>
-                            </h3>
-                            <Button
-                                variant="ghost"
-                                onClick={() => setShowAdvanced(!showAdvanced)}
-                                className="text-[10px] font-black uppercase tracking-widest gap-2"
-                            >
-                                {showAdvanced ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                                {showAdvanced ? 'Collapse Matrix' : 'Expand Matrix'}
-                            </Button>
-                        </div>
+                    {showAdvanced && (
+                        <div className="space-y-6 pt-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                            <div className="flex items-center justify-between border-b-2 border-slate-100 dark:border-slate-800 pb-4">
+                                <h3 className="font-black text-xl uppercase tracking-tighter flex items-center gap-3">
+                                    <Activity className="text-blue-500 h-6 w-6" />
+                                    Clinical Marker Matrix
+                                    <span className="text-xs text-slate-400 font-medium normal-case tracking-normal">(81 Validated High-Fidelity Markers)</span>
+                                </h3>
+                            </div>
 
-                        {showAdvanced && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 {Object.entries(CATEGORIZED_MARKERS).map(([category, markers]) => (
                                     <Card key={category} className="p-6">
@@ -449,20 +464,8 @@ function FoodItemCreatorContent() {
                                     </Card>
                                 ))}
                             </div>
-                        )}
-
-                        {!showAdvanced && (
-                            <button
-                                onClick={() => setShowAdvanced(true)}
-                                className="w-full h-32 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center group hover:border-blue-500/50 hover:bg-blue-500/[0.02] transition-all"
-                            >
-                                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover:text-blue-500 group-hover:bg-blue-500/10 transition-all mb-3">
-                                    <ChevronDown size={20} />
-                                </div>
-                                <span className="text-xs font-black uppercase tracking-widest text-slate-400 group-hover:text-blue-500 transition-colors">Expand Manual Marker Overrides</span>
-                            </button>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
