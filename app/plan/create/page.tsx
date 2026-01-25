@@ -752,7 +752,7 @@ export default function CreateRecipePage() {
                                                 value={title}
                                                 onChange={(e) => setTitle(e.target.value)}
                                                 placeholder="e.g., Summer Garden Pasta"
-                                                className="w-full px-4 py-4 bg-muted/20 border-2 border-transparent focus:border-green-500 text-xl font-bold text-foreground rounded-2xl transition-all focus:outline-none shadow-inner"
+                                                className="w-full px-4 py-4 bg-muted/20 border-2 border-transparent focus:border-purple-500 text-xl font-bold text-foreground rounded-2xl transition-all focus:outline-none shadow-inner"
                                             />
                                         </div>
                                         <div>
