@@ -644,99 +644,107 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             {ingredients.length > 0 && (
                 <div className="space-y-3">
                     {ingredients.map((ing, index) => (
-                        <div key={index} className="flex flex-col md:flex-row items-start md:items-center gap-4 p-4 rounded-xl bg-card/50 shadow-sm transition-all hover:bg-card/80">
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 group/name">
-                                    {editingNameIndex === index ? (
-                                        <input
-                                            type="text"
-                                            value={ing.food_item_name}
-                                            onChange={(e) => handleUpdateName(index, e.target.value)}
-                                            onBlur={() => setEditingNameIndex(null)}
-                                            onKeyDown={(e) => e.key === 'Enter' && setEditingNameIndex(null)}
-                                            autoFocus
-                                            className="bg-background border-b-2 border-green-500 font-bold text-foreground focus:outline-none px-1 py-0.5 text-base w-full max-w-sm"
-                                        />
-                                    ) : (
-                                        <>
-                                            <div className="font-bold text-foreground truncate text-base">{ing.food_item_name}</div>
-                                            <button
-                                                onClick={() => setEditingNameIndex(index)}
-                                                className="p-1 opacity-0 group-hover/name:opacity-100 transition-opacity text-slate-400 hover:text-green-600"
-                                                title="Rename to Friendly Name"
-                                            >
-                                                <Pencil size={14} />
-                                            </button>
-                                        </>
-                                    )}
-                                </div>
-                                <div className="text-xs text-muted-foreground mt-1 flex flex-wrap gap-x-3 gap-y-1">
-                                    <span className="font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/30 px-1.5 py-0.5 rounded">
-                                        {useKilojoules ? ing.energy_kj : ing.calories} {useKilojoules ? 'kJ' : 'kcal'}
-                                    </span>
-                                    <span>P: {ing.protein}g</span>
-                                    <span>F: {ing.fat}g</span>
-                                    <span>C: {ing.carbs}g</span>
-                                </div>
-                            </div>
+                        <div key={index} className="relative group p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
+                            {/* Remove Button - Absolute Positioned */}
+                            <button
+                                type="button"
+                                onClick={() => handleRemoveIngredient(index)}
+                                className="absolute top-4 right-4 p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-all opacity-0 group-hover:opacity-100"
+                                title="Remove"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </button>
 
-                            <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-tighter ml-1">Qty</span>
-                                    <input
-                                        type="number"
-                                        value={ing.quantity}
-                                        onChange={(e) => handleUpdateQuantity(index, Number(e.target.value))}
-                                        className="w-14 px-1.5 py-2 bg-background/50 text-foreground rounded-lg text-center text-sm font-bold focus:ring-2 focus:ring-green-500/20 outline-none"
-                                        min="0"
-                                        step="0.125"
-                                    />
-                                </div>
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                                {/* Left Section: Identity & Quick Macros */}
+                                <div className="lg:col-span-4 space-y-4">
+                                    <div className="flex items-center gap-2 group/name">
+                                        {editingNameIndex === index ? (
+                                            <input
+                                                type="text"
+                                                value={ing.food_item_name}
+                                                onChange={(e) => handleUpdateName(index, e.target.value)}
+                                                onBlur={() => setEditingNameIndex(null)}
+                                                onKeyDown={(e) => e.key === 'Enter' && setEditingNameIndex(null)}
+                                                autoFocus
+                                                className="bg-transparent border-b-2 border-emerald-500 font-black text-slate-900 dark:text-white px-0 py-1 text-lg w-full outline-none"
+                                            />
+                                        ) : (
+                                            <>
+                                                <h4 className="font-black text-slate-900 dark:text-white truncate text-lg">{ing.food_item_name}</h4>
+                                                <button
+                                                    onClick={() => setEditingNameIndex(index)}
+                                                    className="p-1 opacity-0 group-hover/name:opacity-100 transition-opacity text-slate-400 hover:text-emerald-500"
+                                                >
+                                                    <Pencil size={12} />
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
 
-                                <div className="flex flex-col gap-1 flex-1 md:flex-none">
-                                    <span className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-tighter ml-1">Measure</span>
-                                    <input
-                                        type="text"
-                                        value={ing.measure_label}
-                                        onChange={(e) => handleUpdateUnit(index, e.target.value)}
-                                        className="min-w-[80px] w-full px-2 py-2 bg-background/50 text-foreground text-sm rounded-lg font-medium focus:ring-2 focus:ring-green-500/20 outline-none truncate"
-                                        placeholder="Unit (e.g. cup)"
-                                    />
-                                </div>
-
-                                <div className="flex flex-col gap-1 flex-1 md:flex-none">
-                                    <span className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-tighter ml-1">Prep</span>
-                                    <input
-                                        type="text"
-                                        value={ing.modifier || ''}
-                                        onChange={(e) => handleUpdateModifier(index, e.target.value)}
-                                        className="min-w-[80px] w-full px-2 py-2 bg-background/50 text-foreground text-sm rounded-lg font-medium focus:ring-2 focus:ring-green-500/20 outline-none truncate text-amber-700 dark:text-amber-400"
-                                        placeholder="e.g. chopped"
-                                    />
-                                </div>
-
-                                <div className="flex flex-col gap-1">
-                                    <span className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-tighter ml-1">Weight</span>
-                                    <div className="flex items-center gap-1.5 px-3 py-2 bg-muted/30 rounded-lg group hover:bg-green-500/10 transition-colors">
-                                        <input
-                                            type="number"
-                                            value={ing.weight_g % 1 === 0 ? ing.weight_g : Math.round(ing.weight_g * 10) / 10}
-                                            onChange={(e) => handleUpdateWeight(index, Number(e.target.value))}
-                                            step="0.1"
-                                            className="w-14 bg-transparent border-none text-sm font-black text-center focus:ring-0 p-0 outline-none"
-                                        />
-                                        <span className="text-[10px] font-black opacity-30 group-hover:opacity-100 transition-opacity">G</span>
+                                    <div className="flex flex-wrap gap-2">
+                                        <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest flex items-center gap-2">
+                                            <Zap size={10} className="fill-current" />
+                                            {useKilojoules ? ing.energy_kj : ing.calories} {useKilojoules ? 'kJ' : 'kcal'}
+                                        </div>
+                                        <div className="flex gap-1">
+                                            <div className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">P: {ing.protein}g</div>
+                                            <div className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">F: {ing.fat}g</div>
+                                            <div className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">C: {ing.carbs}g</div>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <button
-                                    type="button"
-                                    onClick={() => handleRemoveIngredient(index)}
-                                    className="p-2.5 text-slate-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-all self-end mb-0.5"
-                                    title="Remove"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
+                                {/* Right Section: Controls */}
+                                <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                    <div className="space-y-1.5">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Quantity</Label>
+                                        <input
+                                            type="number"
+                                            value={ing.quantity}
+                                            onChange={(e) => handleUpdateQuantity(index, Number(e.target.value))}
+                                            className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl text-sm font-black focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                            min="0"
+                                            step="0.125"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Measure</Label>
+                                        <input
+                                            type="text"
+                                            value={ing.measure_label}
+                                            onChange={(e) => handleUpdateUnit(index, e.target.value)}
+                                            className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-sm rounded-xl font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                            placeholder="e.g. cup"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Preparation</Label>
+                                        <input
+                                            type="text"
+                                            value={ing.modifier || ''}
+                                            onChange={(e) => handleUpdateModifier(index, e.target.value)}
+                                            className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-400 text-xs rounded-xl font-bold focus:ring-2 focus:ring-amber-500/20 outline-none transition-all"
+                                            placeholder="e.g. chopped"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Weight (g)</Label>
+                                        <div className="relative">
+                                            <input
+                                                type="number"
+                                                value={ing.weight_g % 1 === 0 ? ing.weight_g : Math.round(ing.weight_g * 10) / 10}
+                                                onChange={(e) => handleUpdateWeight(index, Number(e.target.value))}
+                                                step="0.1"
+                                                className="w-full h-11 pl-4 pr-10 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-sm rounded-xl font-black focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                            />
+                                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 pointer-events-none">G</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     ))}
