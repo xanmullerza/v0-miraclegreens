@@ -317,15 +317,10 @@ export default function CreateRecipePage() {
 
             setIngredients(mergedIngredients);
 
-            // 3. Image - One shot "add a picture"
-            // We'll use a high-quality placeholder based on the title
-            const keywords = title.toLowerCase().split(' ').filter(w => w.length > 3).slice(0, 3).join(',');
-            setImage(`https://loremflickr.com/1200/800/${encodeURIComponent(keywords || 'healthy,food')},recipe/all`);
-
             // Cleanup
             setAutoImportText('');
             setShowAutoImport(false);
-            alert('Recipe imported! We have matched ingredients and added a placeholder image.');
+            alert('Recipe imported! We have matched ingredients and prepared the recipe for you.');
         } catch (error) {
             console.error('Import error:', error);
             alert('Failed to parse recipe. Please check the format.');
