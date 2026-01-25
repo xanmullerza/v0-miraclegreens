@@ -244,16 +244,16 @@ function FoodItemCreatorContent() {
             <div className="text-center py-4 space-y-4">
                 <h1 className="text-4xl font-black tracking-tighter flex items-center justify-center gap-4">
                     <Beef className="text-emerald-500 h-10 w-10" />
-                    Food Library Architect
+                    New Food Item
                 </h1>
                 <p className="text-slate-500 text-sm font-medium max-w-lg mx-auto">
-                    Add clinical-grade ingredients to the global synthesis engine with neural dual-stream extraction.
+                    Add accurate nutrition details for your ingredients using our smart copy-paste tool.
                 </p>
             </div>
 
-            {/* Top Row: Neural Mapping & Core Identity */}
+            {/* Top Row: Info Entry */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                {/* Extraction Matrix */}
+                {/* Extraction Section */}
                 {showParser && (
                     <div className="lg:col-span-8 space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
                         <Card className="p-8 border-emerald-500/30 bg-emerald-500/[0.03]">
@@ -262,25 +262,25 @@ function FoodItemCreatorContent() {
                                     <Sparkles size={24} />
                                 </div>
                                 <div>
-                                    <h3 className="font-black uppercase tracking-widest text-sm text-emerald-700">Dual-Stream Extraction</h3>
-                                    <p className="text-xs text-emerald-600/80 font-medium">Split your source data below. We'll synchronize servings and nutrients in one pass.</p>
+                                    <h3 className="font-black uppercase tracking-widest text-sm text-emerald-700">Nutrition Scanner</h3>
+                                    <p className="text-xs text-emerald-600/80 font-medium">Paste the text from a nutrition label or website below. We'll automatically fill in the details.</p>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Stream 01: Serving Data</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Servings & Sizes</Label>
                                     <Textarea
-                                        placeholder="Paste cup weights, portion sizes here..."
+                                        placeholder="Paste things like '1 cup = 240g' or serving info here..."
                                         className="min-h-[180px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
                                         value={servingText}
                                         onChange={(e) => setServingText(e.target.value)}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Stream 02: Nutrient Matrix</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Nutrient List</Label>
                                     <Textarea
-                                        placeholder="Paste the long list of vitamins/minerals here..."
+                                        placeholder="Paste the list of calories, vitamins, and minerals here..."
                                         className="min-h-[180px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
                                         value={nutrientText}
                                         onChange={(e) => setNutrientText(e.target.value)}
@@ -290,12 +290,12 @@ function FoodItemCreatorContent() {
 
                             <div className="flex justify-end gap-3">
                                 <Button onClick={handleParse} className="h-12 bg-emerald-600 text-white hover:bg-emerald-700 text-xs font-black uppercase tracking-widest px-10 shadow-lg shadow-emerald-600/20 rounded-xl">
-                                    Run Dual Neural Synthesis
+                                    Fill Details Automatically
                                 </Button>
                             </div>
                         </Card>
 
-                        {/* Synthesis Control Bar */}
+                        {/* Control Bar */}
                         <div className="flex items-center gap-4 p-2 bg-slate-100/50 dark:bg-slate-900/50 rounded-[24px] border border-slate-200 dark:border-slate-800">
                             <Button
                                 variant="ghost"
@@ -303,7 +303,7 @@ function FoodItemCreatorContent() {
                                 className="flex-1 h-14 rounded-[18px] text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-rose-500 hover:bg-rose-500/5 gap-2"
                             >
                                 <Trash2 size={16} />
-                                Cancel Input
+                                Start Over
                             </Button>
                             <Button
                                 onClick={handleSave}
@@ -311,7 +311,7 @@ function FoodItemCreatorContent() {
                                 className="flex-[2] h-14 rounded-[18px] bg-slate-950 hover:bg-slate-900 text-white shadow-xl shadow-slate-950/20 text-[10px] font-black uppercase tracking-widest gap-2"
                             >
                                 {loading ? <Loader2 className="animate-spin h-4 w-4" /> : <Save size={16} />}
-                                Sync to Global Library
+                                Save to My Foods
                             </Button>
                             <Button
                                 variant="outline"
@@ -322,23 +322,23 @@ function FoodItemCreatorContent() {
                                 )}
                             >
                                 <Activity size={16} />
-                                {showAdvanced ? 'Hide Nutrients' : '81 Nutrients'}
+                                {showAdvanced ? 'Hide Details' : 'Full Nutrition'}
                             </Button>
                         </div>
                     </div>
                 )}
 
-                {/* Identity & Core Macros */}
+                {/* Basic Details */}
                 <Card className={cn(showParser ? "lg:col-span-4" : "lg:col-span-12", "p-8 space-y-8")}>
-                    {/* Identity Section */}
+                    {/* Basic Info Section */}
                     <div className="space-y-6">
                         <div className="flex items-center gap-3 mb-2">
                             <Beef size={20} className="text-emerald-500" />
-                            <h3 className="font-black text-sm uppercase tracking-widest">Base Identity</h3>
+                            <h3 className="font-black text-sm uppercase tracking-widest">General Info</h3>
                         </div>
                         <div className="space-y-4">
                             <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">Scientific Designation</Label>
+                                <Label className="text-[10px] uppercase font-black text-slate-400">Official Name</Label>
                                 <Input
                                     placeholder="e.g. Potatoes, raw, white"
                                     className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm rounded-xl font-bold"
@@ -347,7 +347,7 @@ function FoodItemCreatorContent() {
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">Common Name</Label>
+                                <Label className="text-[10px] uppercase font-black text-slate-400">Common Name / Nickname</Label>
                                 <Input
                                     placeholder="e.g. White Potato"
                                     className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm rounded-xl"
@@ -413,8 +413,8 @@ function FoodItemCreatorContent() {
                             <div className="flex items-center justify-between border-b-2 border-slate-100 dark:border-slate-800 pb-4">
                                 <h3 className="font-black text-xl uppercase tracking-tighter flex items-center gap-3">
                                     <Activity className="text-blue-500 h-6 w-6" />
-                                    Clinical Marker Matrix
-                                    <span className="text-xs text-slate-400 font-medium normal-case tracking-normal">(81 Validated High-Fidelity Markers)</span>
+                                    Detailed Nutrition
+                                    <span className="text-xs text-slate-400 font-medium normal-case tracking-normal">(Full list of vitamins and minerals)</span>
                                 </h3>
                             </div>
 
