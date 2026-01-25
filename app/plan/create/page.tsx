@@ -354,8 +354,45 @@ export default function CreateRecipePage() {
         setSaving(true);
 
         try {
-            // Calculate total nutrition
-            const totals = ingredients.reduce(
+            // 1. Create Food Items for custom (temp-id) ingredients first
+            const tempIngredients = ingredients.filter(ing => ing.food_item_id === 'temp-id');
+            const updatedIngredients = [...ingredients];
+
+            if (tempIngredients.length > 0) {
+                for (const ing of tempIngredients) {
+                    const { data: newItem, error: itemError } = await supabase
+                        .from('food_items')
+                        .insert({
+                            name: ing.food_item_name,
+                            common_name: ing.food_item_name,
+                            energy_kcal: ing.calories,
+                            energy_kj: ing.energy_kj,
+                            protein_g: ing.protein,
+                            carbs_g: ing.carbs,
+                            fat_g: ing.fat,
+                            micronutrients: {} // No micros for custom items yet
+                        })
+                        .select()
+                        .single();
+
+                    if (!itemError && newItem) {
+                        const idx = updatedIngredients.findIndex(ui => ui === ing);
+                        if (idx !== -1) {
+                            updatedIngredients[idx] = { ...ing, food_item_id: newItem.id };
+                        }
+                    }
+                }
+            }
+
+            // Generate recipe ID
+            const recipeId = `recipe-${Date.now()}`;
+
+            // Create recipe record
+            // Note: energy_kj is included, but requires the DB column to exist.
+            // If the insert fails due to missing column, we'll catch it.
+            // Create recipe record
+            // Calculate total nutrition using the possibly updated IDs but same values
+            const totals = updatedIngredients.reduce(
                 (acc, ing) => ({
                     calories: acc.calories + ing.calories,
                     energy_kj: acc.energy_kj + ing.energy_kj,
@@ -366,12 +403,6 @@ export default function CreateRecipePage() {
                 { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0 }
             );
 
-            // Generate recipe ID
-            const recipeId = `recipe-${Date.now()}`;
-
-            // Create recipe record
-            // Note: energy_kj is included, but requires the DB column to exist.
-            // If the insert fails due to missing column, we'll catch it.
             const { error: recipeError } = await supabase
                 .from('recipes')
                 .insert({
@@ -396,7 +427,7 @@ export default function CreateRecipePage() {
             }
 
             // Insert ingredients - Normalize to 1 serving for the database
-            const ingredientsData = ingredients.map(ing => {
+            const ingredientsData = updatedIngredients.map(ing => {
                 const normalizedQty = ing.quantity / (servings || 1);
                 const normalizedWeight = ing.weight_g / (servings || 1);
 
@@ -406,7 +437,7 @@ export default function CreateRecipePage() {
 
                 return {
                     recipe_id: recipeId,
-                    food_item_id: ing.food_item_id === 'temp-id' ? null : ing.food_item_id,
+                    food_item_id: ing.food_item_id,
                     item: ing.food_item_name,
                     amount: `${normalizedAmount}${ing.modifier ? ' ' + ing.modifier : ''}`.trim(),
                     weight_g: normalizedWeight,
@@ -448,8 +479,8 @@ export default function CreateRecipePage() {
 
             // Update Friendly Names (Common Name) for food items
             // This makes the edited names searchable for everyone later
-            const namedItems = ingredients
-                .filter(ing => ing.food_item_id !== 'temp-id' && ing.food_item_name)
+            const namedItems = updatedIngredients
+                .filter(ing => ing.food_item_id && ing.food_item_name)
                 .map(ing => ({
                     id: ing.food_item_id,
                     common_name: ing.food_item_name
