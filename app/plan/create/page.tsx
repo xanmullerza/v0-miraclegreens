@@ -790,7 +790,7 @@ export default function CreateRecipePage() {
                                                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-4 backdrop-blur-[2px]">
                                                         <button
                                                             type="button"
-                                                            className="p-3 bg-white rounded-xl text-foreground hover:bg-green-50 shadow-lg"
+                                                            className="p-3 bg-white rounded-xl text-foreground hover:bg-purple-50 shadow-lg active:scale-95 transition-all"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 document.getElementById('recipe-image-upload')?.click();
@@ -812,7 +812,7 @@ export default function CreateRecipePage() {
                                                 </>
                                             ) : (
                                                 <div className="text-center p-8 space-y-4">
-                                                    <div className="flex justify-center gap-6 text-muted-foreground group-hover:text-green-600 transition-all group-hover:scale-110">
+                                                    <div className="flex justify-center gap-6 text-muted-foreground group-hover:text-purple-600 transition-all group-hover:scale-110 active:scale-95">
                                                         <div className="p-4 bg-background rounded-2xl shadow-sm border border-border/50">
                                                             <Camera size={32} />
                                                         </div>
