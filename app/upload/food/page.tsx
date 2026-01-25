@@ -29,12 +29,45 @@ const Card = ({ children, className }: { children: React.ReactNode, className?: 
     </div>
 );
 
+const MICRONUTRIENT_UNITS: Record<string, string> = {
+    'Potassium': 'mg',
+    'Magnesium': 'mg',
+    'Calcium': 'mg',
+    'Phosphorus': 'mg',
+    'Sodium': 'mg',
+    'Iron': 'mg',
+    'Zinc': 'mg',
+    'Selenium': 'µg',
+    'Copper': 'mg',
+    'Manganese': 'mg',
+    'Chromium': 'µg',
+    'Fluoride': 'µg',
+    'Iodine': 'µg',
+    'Molybdenum': 'µg',
+    'Vitamin A': 'µg',
+    'Vitamin C': 'mg',
+    'Vitamin D': 'µg',
+    'Vitamin E': 'mg',
+    'Vitamin K': 'µg',
+    'B1 (Thiamine)': 'mg',
+    'B2 (Riboflavin)': 'mg',
+    'B3 (Niacin)': 'mg',
+    'B5 (Pantothenic Acid)': 'mg',
+    'B6 (Pyridoxine)': 'mg',
+    'B9 (Folate)': 'µg',
+    'B12 (Cobalamin)': 'µg',
+    'Choline': 'mg',
+    'Fiber': 'g'
+};
+
 const STANDARD_MICROS = [
     'Potassium', 'Magnesium', 'Calcium', 'Phosphorus', 'Sodium',
-    'Iron', 'Zinc', 'Selenium', 'Copper', 'Manganese', 'Vitamin A', 'Vitamin C',
-    'Vitamin D', 'Vitamin E', 'Vitamin K', 'B1 (Thiamine)', 'B2 (Riboflavin)',
-    'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)',
-    'B12 (Cobalamin)', 'Choline', 'Fiber'
+    'Iron', 'Zinc', 'Selenium', 'Copper', 'Manganese',
+    'Chromium', 'Fluoride', 'Iodine', 'Molybdenum',
+    'Vitamin A', 'Vitamin C', 'Vitamin D', 'Vitamin E', 'Vitamin K',
+    'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)',
+    'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)',
+    'B12 (Cobalamin)', 'Choline'
 ];
 
 export default function FoodItemCreatorPage() {
@@ -319,15 +352,15 @@ function FoodItemCreatorContent() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <Label className="dark:text-slate-300 text-xs text-slate-500">Fiber (g)</Label>
-                                        <Input type="number" value={micronutrients['Fiber'] || ''} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => updateMicro('Fiber', e.target.value)} />
+                                        <Input type="number" value={micronutrients['Fiber'] !== undefined ? micronutrients['Fiber'] : ''} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => updateMicro('Fiber', e.target.value)} />
                                     </div>
                                     <div>
                                         <Label className="dark:text-slate-300 text-xs text-slate-500">Sugars (g)</Label>
-                                        <Input type="number" value={micronutrients['Sugars'] || ''} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => updateMicro('Sugars', e.target.value)} />
+                                        <Input type="number" value={micronutrients['Sugars'] !== undefined ? micronutrients['Sugars'] : ''} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => updateMicro('Sugars', e.target.value)} />
                                     </div>
                                     <div className="col-span-2">
                                         <Label className="dark:text-slate-300 text-xs text-slate-500">Starch (g)</Label>
-                                        <Input type="number" value={micronutrients['Starch'] || ''} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => updateMicro('Starch', e.target.value)} />
+                                        <Input type="number" value={micronutrients['Starch'] !== undefined ? micronutrients['Starch'] : ''} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => updateMicro('Starch', e.target.value)} />
                                     </div>
                                 </div>
                             </Card>
@@ -406,11 +439,11 @@ function FoodItemCreatorContent() {
                                         'Tyrosine', 'Valine'
                                     ].map(amino => (
                                         <div key={amino}>
-                                            <Label className="dark:text-slate-400 text-[10px] uppercase font-bold tracking-tight">{amino}</Label>
+                                            <Label className="dark:text-slate-400 text-[10px] uppercase font-bold tracking-tight">{amino} (g)</Label>
                                             <Input
                                                 type="number"
                                                 className="h-7 text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100"
-                                                value={micronutrients[amino] || ''}
+                                                value={micronutrients[amino] !== undefined ? micronutrients[amino] : ''}
                                                 onChange={(e) => updateMicro(amino, e.target.value)}
                                             />
                                         </div>
@@ -467,10 +500,10 @@ function FoodItemCreatorContent() {
                                     Micronutrients (per 100g)
                                 </h3>
                                 <div className="grid grid-cols-2 gap-x-6 gap-y-4">
-                                    {STANDARD_MICROS.filter(m => m !== 'Fiber').map(micro => (
+                                    {STANDARD_MICROS.map(micro => (
                                         <div key={micro}>
                                             <Label className="text-xs whitespace-nowrap overflow-hidden text-ellipsis block dark:text-slate-400">
-                                                {micro}
+                                                {micro} ({MICRONUTRIENT_UNITS[micro] || 'mg'})
                                             </Label>
                                             <Input
                                                 className="h-8 text-sm bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500"
