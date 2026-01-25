@@ -7,6 +7,7 @@ import { ModeToggle } from '@/components/mode-toggle';
 
 const showShop = false;
 const showPlan = false;
+const showDashboard = false;
 
 const navigation = [
 	{ name: 'Our Story', href: '#story' },
@@ -34,12 +35,14 @@ export function Header() {
 						</SheetTrigger>
 						<SheetContent side="left" className="w-[300px] bg-background">
 							<div className="flex flex-col gap-6 mt-8">
-								<Button className="gap-2 mt-4" asChild>
-									<Link href="/dashboard">
-										<LayoutDashboard className="h-4 w-4" />
-										Lab Dashboard
-									</Link>
-								</Button>
+								{showDashboard && (
+									<Button className="gap-2 mt-4" asChild>
+										<Link href="/dashboard">
+											<LayoutDashboard className="h-4 w-4" />
+											Lab Dashboard
+										</Link>
+									</Button>
+								)}
 								<Button className="gap-2 mt-2" asChild>
 									<Link href="/browse">
 										<LayoutGrid className="h-4 w-4" />
@@ -92,12 +95,14 @@ export function Header() {
 								Browse
 							</Link>
 						</Button>
-						<Button variant="secondary" size="sm" className="hidden lg:flex gap-2" asChild>
-							<Link href="/dashboard">
-								<LayoutDashboard className="h-4 w-4" />
-								Lab Dashboard
-							</Link>
-						</Button>
+						{showDashboard && (
+							<Button variant="secondary" size="sm" className="hidden lg:flex gap-2" asChild>
+								<Link href="/dashboard">
+									<LayoutDashboard className="h-4 w-4" />
+									Lab Dashboard
+								</Link>
+							</Button>
+						)}
 						{showPlan && (
 							<Button variant="secondary" size="sm" className="hidden sm:flex gap-2" asChild>
 								<Link href="/plan">
