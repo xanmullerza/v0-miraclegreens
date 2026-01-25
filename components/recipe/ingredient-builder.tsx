@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, X as CloseIcon } from 'lucide-react';
+import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, X as CloseIcon } from 'lucide-react';
 import FoodItemPicker from './food-item-picker';
 import { fetchFoodMeasures, FoodMeasure } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -50,6 +50,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
     const [magicText, setMagicText] = useState('');
     const [isParsing, setIsParsing] = useState(false);
     const [pendingIngredients, setPendingIngredients] = useState<any[]>([]);
+    const [editingNameIndex, setEditingNameIndex] = useState<number | null>(null);
 
     const { energyUnit, setEnergyUnit } = useUserPreferences();
     const useKilojoules = energyUnit === 'kJ';
@@ -443,6 +444,12 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
         onChange(ingredients.filter((_, i) => i !== index));
     };
 
+    const handleUpdateName = (index: number, newName: string) => {
+        const updated = [...ingredients];
+        updated[index] = { ...updated[index], food_item_name: newName };
+        onChange(updated);
+    };
+
     // Calculate totals
     const totals = ingredients.reduce(
         (acc, ing) => ({
@@ -624,7 +631,30 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                     {ingredients.map((ing, index) => (
                         <div key={index} className="flex flex-col md:flex-row items-start md:items-center gap-4 p-4 rounded-xl bg-card/50 shadow-sm transition-all hover:bg-card/80">
                             <div className="flex-1 min-w-0">
-                                <div className="font-bold text-foreground truncate text-base">{ing.food_item_name}</div>
+                                <div className="flex items-center gap-2 group/name">
+                                    {editingNameIndex === index ? (
+                                        <input
+                                            type="text"
+                                            value={ing.food_item_name}
+                                            onChange={(e) => handleUpdateName(index, e.target.value)}
+                                            onBlur={() => setEditingNameIndex(null)}
+                                            onKeyDown={(e) => e.key === 'Enter' && setEditingNameIndex(null)}
+                                            autoFocus
+                                            className="bg-background border-b-2 border-green-500 font-bold text-foreground focus:outline-none px-1 py-0.5 text-base w-full max-w-sm"
+                                        />
+                                    ) : (
+                                        <>
+                                            <div className="font-bold text-foreground truncate text-base">{ing.food_item_name}</div>
+                                            <button
+                                                onClick={() => setEditingNameIndex(index)}
+                                                className="p-1 opacity-0 group-hover/name:opacity-100 transition-opacity text-slate-400 hover:text-green-600"
+                                                title="Rename to Friendly Name"
+                                            >
+                                                <Pencil size={14} />
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
                                 <div className="text-xs text-muted-foreground mt-1 flex flex-wrap gap-x-3 gap-y-1">
                                     <span className="font-medium text-green-700 dark:text-green-400 bg-green-50 dark:bg-green-950/30 px-1.5 py-0.5 rounded">
                                         {useKilojoules ? ing.energy_kj : ing.calories} {useKilojoules ? 'kJ' : 'kcal'}
