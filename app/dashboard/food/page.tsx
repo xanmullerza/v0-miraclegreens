@@ -21,7 +21,7 @@ import {
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { parseNutritionText } from '@/lib/utils/nutrition-parser';
+import { parseNutritionText, parseMeasures } from '@/lib/utils/nutrition-parser';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden", className)}>
@@ -129,6 +129,15 @@ function FoodItemCreatorContent() {
                 newMicros[key] = val.toString();
             });
             setMicronutrients(prev => ({ ...prev, ...newMicros }));
+        }
+
+        // Logic for Measures (Unit Scaling)
+        const parsedMeasures = parseMeasures(rawText);
+        if (parsedMeasures.length > 0) {
+            setMeasures(parsedMeasures.map(m => ({
+                label: m.label,
+                weight: m.weight_g.toString()
+            })));
         }
 
         setShowParser(false);

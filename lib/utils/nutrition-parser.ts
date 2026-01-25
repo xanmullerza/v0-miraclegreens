@@ -170,3 +170,49 @@ export function parseNutritionText(text: string): Partial<ParsedNutrition> {
 
     return result;
 }
+
+export interface ParsedMeasure {
+    label: string;
+    weight_g: number;
+}
+
+export function parseMeasures(text: string): ParsedMeasure[] {
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    const measures: ParsedMeasure[] = [];
+
+    // USDA style pattern: 
+    // # 
+    // Measure 
+    // Grams 
+    // [QTY] 
+    // [LABEL] 
+    // [WEIGHT]
+
+    // We look for triples of lines: Number, Label, Number
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        // Skip headers
+        if (['#', 'Measure', 'Grams', 'Weight'].includes(line)) continue;
+
+        // Check if current line is a number (quantity, usually 1)
+        const qtyMatch = line.match(/^(\d+(?:\.\d+)?)$/);
+        if (qtyMatch && i + 2 < lines.length) {
+            const label = lines[i + 1];
+            const weightStr = lines[i + 2];
+
+            // Check if weightStr is a number
+            const weightMatch = weightStr.match(/^(\d+(?:\.\d+)?)$/);
+
+            if (weightMatch && !label.match(/^\d+$/)) {
+                measures.push({
+                    label: label.toLowerCase().replace(/,.*$/, '').trim(), // cup, whole pieces -> cup
+                    weight_g: parseFloat(weightMatch[1])
+                });
+                i += 2; // Skip the next two lines as we used them
+            }
+        }
+    }
+
+    return measures;
+}
