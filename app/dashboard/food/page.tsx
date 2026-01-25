@@ -90,7 +90,8 @@ function FoodItemCreatorContent() {
         { label: 'portion', weight: '' }
     ]);
 
-    const [rawText, setRawText] = useState('');
+    const [servingText, setServingText] = useState('');
+    const [nutrientText, setNutrientText] = useState('');
     const [showParser, setShowParser] = useState(true);
 
     const integrity = useMemo(() => {
@@ -114,9 +115,10 @@ function FoodItemCreatorContent() {
     }, [micronutrients, protein, fat, carbs]);
 
     const handleParse = () => {
-        if (!rawText.trim()) return;
+        const combinedText = `${servingText}\n${nutrientText}`.trim();
+        if (!combinedText) return;
 
-        const parsed = parseNutritionText(rawText);
+        const parsed = parseNutritionText(combinedText);
 
         if (parsed.energy_kcal) {
             setEnergyKcal(parsed.energy_kcal.toString());
@@ -142,8 +144,8 @@ function FoodItemCreatorContent() {
             setMicronutrients(prev => ({ ...prev, ...newMicros }));
         }
 
-        // Logic for Measures (Unit Scaling)
-        const parsedMeasures = parseMeasures(rawText);
+        // Logic for Measures (Unit Scaling) - Look specifically in serving text if nutrient text exists
+        const parsedMeasures = parseMeasures(servingText || combinedText);
         if (parsedMeasures.length > 0) {
             setMeasures(parsedMeasures.map(m => ({
                 label: m.label,
@@ -264,19 +266,35 @@ function FoodItemCreatorContent() {
                             <Sparkles size={24} />
                         </div>
                         <div>
-                            <h3 className="font-black uppercase tracking-widest text-sm text-emerald-700">Neural Mapping Engine</h3>
-                            <p className="text-xs text-emerald-600/80 font-medium">Paste raw clinical data below. We'll map all 79 markers instantly.</p>
+                            <h3 className="font-black uppercase tracking-widest text-sm text-emerald-700">Dual-Stream Extraction</h3>
+                            <p className="text-xs text-emerald-600/80 font-medium">Split your source data below. We'll synchronize servings and nutrients in one pass.</p>
                         </div>
                     </div>
-                    <Textarea
-                        placeholder="Paste USDA, NCCDB, or NutritionFacts data here..."
-                        className="min-h-[220px] mb-6 bg-white dark:bg-slate-950 border-emerald-500/20 text-sm focus:ring-emerald-500/20 rounded-2xl font-mono p-6"
-                        value={rawText}
-                        onChange={(e) => setRawText(e.target.value)}
-                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div className="space-y-2">
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Stream 01: Serving Data</Label>
+                            <Textarea
+                                placeholder="Paste cup weights, portion sizes here..."
+                                className="min-h-[180px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
+                                value={servingText}
+                                onChange={(e) => setServingText(e.target.value)}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Stream 02: Nutrient Matrix</Label>
+                            <Textarea
+                                placeholder="Paste the long list of vitamins/minerals here..."
+                                className="min-h-[180px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
+                                value={nutrientText}
+                                onChange={(e) => setNutrientText(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
                     <div className="flex justify-end">
                         <Button onClick={handleParse} className="h-12 bg-emerald-600 text-white hover:bg-emerald-700 text-xs font-black uppercase tracking-widest px-10 shadow-lg shadow-emerald-600/20 rounded-xl">
-                            Run Neural Synthesis
+                            Run Dual Neural Synthesis
                         </Button>
                     </div>
                 </Card>
