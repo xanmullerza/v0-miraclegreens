@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, X as CloseIcon } from 'lucide-react';
+import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, Zap, X as CloseIcon } from 'lucide-react';
 import FoodItemPicker from './food-item-picker';
 import { fetchFoodMeasures, FoodMeasure } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { parseIngredientsOnly } from '@/lib/utils/recipe-parser';
 import { searchLocalFood, searchUSDAFood, getUSDAMeasures, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
+import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
 interface FoodItem {
