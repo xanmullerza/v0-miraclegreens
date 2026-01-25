@@ -228,16 +228,16 @@ function FoodItemCreatorContent() {
                                     <div>
                                         <Label>Data Source</Label>
                                         <select
-                                            className="w-full h-10 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all"
+                                            className="w-full h-10 rounded-md border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-all cursor-pointer shadow-sm"
                                             value={source}
                                             onChange={(e) => setSource(e.target.value)}
                                         >
-                                            <option value="manual">Manual Entry</option>
-                                            <option value="usda">USDA FoodData Central</option>
-                                            <option value="nccdb">NCCDB (Clinical Grade)</option>
-                                            <option value="nutritionfacts">NutritionFacts.org</option>
-                                            <option value="cronometer">Cronometer</option>
-                                            <option value="other">Other</option>
+                                            <option value="manual" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Manual Entry</option>
+                                            <option value="usda" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">USDA FoodData Central</option>
+                                            <option value="nccdb" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">NCCDB (Clinical Grade)</option>
+                                            <option value="nutritionfacts" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">NutritionFacts.org</option>
+                                            <option value="cronometer" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Cronometer</option>
+                                            <option value="other" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Other</option>
                                         </select>
                                     </div>
                                 </div>
