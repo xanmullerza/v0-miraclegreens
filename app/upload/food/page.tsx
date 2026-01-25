@@ -360,27 +360,35 @@ function FoodItemCreatorContent() {
                                 <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                                     <div>
                                         <Label className="dark:text-slate-400 text-xs">Saturated</Label>
-                                        <Input type="number" className="h-8" value={micronutrients['Saturated Fat'] || ''} onChange={(e) => updateMicro('Saturated Fat', e.target.value)} />
+                                        <Input type="number" className="h-8" value={micronutrients['Saturated Fat'] !== undefined ? micronutrients['Saturated Fat'] : ''} onChange={(e) => updateMicro('Saturated Fat', e.target.value)} />
                                     </div>
                                     <div>
                                         <Label className="dark:text-slate-400 text-xs">Trans-Fat</Label>
-                                        <Input type="number" className="h-8" value={micronutrients['Trans Fat'] || ''} onChange={(e) => updateMicro('Trans Fat', e.target.value)} />
+                                        <Input type="number" className="h-8" value={micronutrients['Trans Fat'] !== undefined ? micronutrients['Trans Fat'] : ''} onChange={(e) => updateMicro('Trans Fat', e.target.value)} />
                                     </div>
                                     <div>
                                         <Label className="dark:text-slate-400 text-xs">Monounsaturated</Label>
-                                        <Input type="number" className="h-8" value={micronutrients['Monounsaturated Fat'] || ''} onChange={(e) => updateMicro('Monounsaturated Fat', e.target.value)} />
+                                        <Input type="number" className="h-8" value={micronutrients['Monounsaturated Fat'] !== undefined ? micronutrients['Monounsaturated Fat'] : ''} onChange={(e) => updateMicro('Monounsaturated Fat', e.target.value)} />
                                     </div>
                                     <div>
                                         <Label className="dark:text-slate-400 text-xs">Polyunsaturated</Label>
-                                        <Input type="number" className="h-8" value={micronutrients['Polyunsaturated Fat'] || ''} onChange={(e) => updateMicro('Polyunsaturated Fat', e.target.value)} />
+                                        <Input type="number" className="h-8" value={micronutrients['Polyunsaturated Fat'] !== undefined ? micronutrients['Polyunsaturated Fat'] : ''} onChange={(e) => updateMicro('Polyunsaturated Fat', e.target.value)} />
                                     </div>
                                     <div>
                                         <Label className="dark:text-slate-400 text-xs">Omega-3</Label>
-                                        <Input type="number" className="h-8" value={micronutrients['Omega-3'] || ''} onChange={(e) => updateMicro('Omega-3', e.target.value)} />
+                                        <Input type="number" className="h-8" value={micronutrients['Omega-3'] !== undefined ? micronutrients['Omega-3'] : ''} onChange={(e) => updateMicro('Omega-3', e.target.value)} />
                                     </div>
                                     <div>
                                         <Label className="dark:text-slate-400 text-xs">Omega-6</Label>
-                                        <Input type="number" className="h-8" value={micronutrients['Omega-6'] || ''} onChange={(e) => updateMicro('Omega-6', e.target.value)} />
+                                        <Input type="number" className="h-8" value={micronutrients['Omega-6'] !== undefined ? micronutrients['Omega-6'] : ''} onChange={(e) => updateMicro('Omega-6', e.target.value)} />
+                                    </div>
+                                    <div>
+                                        <Label className="dark:text-slate-400 text-xs">Cholesterol (mg)</Label>
+                                        <Input type="number" className="h-8" value={micronutrients['Cholesterol'] !== undefined ? micronutrients['Cholesterol'] : ''} onChange={(e) => updateMicro('Cholesterol', e.target.value)} />
+                                    </div>
+                                    <div className="col-span-2">
+                                        <Label className="dark:text-slate-400 text-xs">Phytosterol (mg)</Label>
+                                        <Input type="number" className="h-8" value={micronutrients['Phytosterol'] !== undefined ? micronutrients['Phytosterol'] : ''} onChange={(e) => updateMicro('Phytosterol', e.target.value)} />
                                     </div>
                                 </div>
                             </Card>
