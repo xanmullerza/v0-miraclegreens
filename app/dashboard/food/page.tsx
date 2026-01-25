@@ -333,33 +333,41 @@ function FoodItemCreatorContent() {
                         </div>
                     </div>
 
-                    {/* Energy Vectors */}
+                    {/* Unit Scaling (Portion Mapping) */}
                     <div className="space-y-6 pt-6 border-t border-slate-100 dark:border-slate-800">
                         <div className="flex items-center gap-3 mb-2">
                             <Scale size={20} className="text-emerald-500" />
-                            <h3 className="font-black text-sm uppercase tracking-widest">Energy Vectors (per 100g)</h3>
+                            <h3 className="font-black text-sm uppercase tracking-widest">Unit Scaling</h3>
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1.5 col-span-2">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">kcal</Label>
-                                <Input type="number" value={energyKcal} className="h-11 font-black text-center rounded-xl bg-emerald-500/5 border-emerald-500/20" onChange={(e) => setEnergyKcal(e.target.value)} />
-                            </div>
-                            <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">Protein</Label>
-                                <Input type="number" value={protein} className="h-11 text-center rounded-xl bg-slate-50 dark:bg-slate-950 font-bold" onChange={(e) => setProtein(e.target.value)} />
-                            </div>
-                            <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">Fat</Label>
-                                <Input type="number" value={fat} className="h-11 text-center rounded-xl bg-slate-50 dark:bg-slate-950 font-bold" onChange={(e) => setFat(e.target.value)} />
-                            </div>
-                            <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">Carbs</Label>
-                                <Input type="number" value={carbs} className="h-11 text-center rounded-xl bg-slate-50 dark:bg-slate-950 font-bold" onChange={(e) => setCarbs(e.target.value)} />
-                            </div>
-                            <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">kJ</Label>
-                                <Input type="number" value={energyKj} className="h-11 text-center rounded-xl bg-slate-50 dark:bg-slate-950 text-slate-500" onChange={(e) => setEnergyKj(e.target.value)} />
-                            </div>
+                        <div className="space-y-4">
+                            {measures.map((m, i) => (
+                                <div key={i} className="flex gap-2 items-end group">
+                                    <div className="flex-1">
+                                        <Label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Unit</Label>
+                                        <Input
+                                            value={m.label}
+                                            placeholder="e.g. cup"
+                                            className="h-9 text-xs bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-lg"
+                                            onChange={(e) => updateMeasure(i, 'label', e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="w-20">
+                                        <Label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Grams</Label>
+                                        <Input
+                                            type="number"
+                                            value={m.weight}
+                                            className="h-9 text-xs bg-slate-50 dark:bg-slate-950 font-bold text-center border-slate-200 dark:border-slate-800 rounded-lg"
+                                            onChange={(e) => updateMeasure(i, 'weight', e.target.value)}
+                                        />
+                                    </div>
+                                    <button onClick={() => removeMeasure(i)} className="h-9 w-9 flex items-center justify-center text-slate-300 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100 mb-0">
+                                        <Trash2 size={14} />
+                                    </button>
+                                </div>
+                            ))}
+                            <Button variant="outline" size="sm" onClick={addMeasure} className="w-full text-[9px] uppercase font-black tracking-widest h-9 border-dashed rounded-lg">
+                                <Plus size={12} className="mr-1" /> Add Portion Mapping
+                            </Button>
                         </div>
                     </div>
                 </Card>
@@ -421,37 +429,34 @@ function FoodItemCreatorContent() {
 
                     <Card className="p-6">
                         <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">
-                            <Utensils size={18} className="text-blue-500" />
-                            <h3 className="font-bold text-xs uppercase tracking-wider">Unit Scaling</h3>
+                            <Scale size={18} className="text-emerald-500" />
+                            <h3 className="font-bold text-xs uppercase tracking-wider">Energy Vectors</h3>
                         </div>
                         <div className="space-y-4">
-                            {measures.map((m, i) => (
-                                <div key={i} className="flex gap-2 items-end group">
-                                    <div className="flex-1">
-                                        <Label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Unit</Label>
-                                        <Input
-                                            value={m.label}
-                                            className="h-8 text-xs bg-slate-50 dark:bg-slate-950 rounded-lg"
-                                            onChange={(e) => updateMeasure(i, 'label', e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="w-16">
-                                        <Label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Grams</Label>
-                                        <Input
-                                            type="number"
-                                            value={m.weight}
-                                            className="h-8 text-xs bg-slate-50 dark:bg-slate-950 font-bold text-center rounded-lg"
-                                            onChange={(e) => updateMeasure(i, 'weight', e.target.value)}
-                                        />
-                                    </div>
-                                    <button onClick={() => removeMeasure(i)} className="h-8 w-8 text-slate-300 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100">
-                                        <Trash2 size={14} />
-                                    </button>
+                            <div className="space-y-1">
+                                <Label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Calories (kcal)</Label>
+                                <Input type="number" value={energyKcal} className="h-10 font-black text-center rounded-xl bg-emerald-500/5 border-emerald-500/10" onChange={(e) => setEnergyKcal(e.target.value)} />
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="space-y-1">
+                                    <Label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Protein (g)</Label>
+                                    <Input type="number" value={protein} className="h-9 text-center rounded-lg bg-slate-50 dark:bg-slate-950 font-bold" onChange={(e) => setProtein(e.target.value)} />
                                 </div>
-                            ))}
-                            <Button variant="outline" size="sm" onClick={addMeasure} className="w-full text-[9px] uppercase font-black tracking-widest h-8 border-dashed rounded-lg">
-                                <Plus size={12} className="mr-1" /> Add Marker
-                            </Button>
+                                <div className="space-y-1">
+                                    <Label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Carbs (g)</Label>
+                                    <Input type="number" value={carbs} className="h-9 text-center rounded-lg bg-slate-50 dark:bg-slate-950 font-bold" onChange={(e) => setCarbs(e.target.value)} />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="space-y-1">
+                                    <Label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Fat (g)</Label>
+                                    <Input type="number" value={fat} className="h-9 text-center rounded-lg bg-slate-50 dark:bg-slate-950 font-bold" onChange={(e) => setFat(e.target.value)} />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Energy (kJ)</Label>
+                                    <Input type="number" value={energyKj} className="h-9 text-center rounded-lg bg-slate-50 dark:bg-slate-950 text-slate-400" onChange={(e) => setEnergyKj(e.target.value)} />
+                                </div>
+                            </div>
                         </div>
                     </Card>
                 </div>
