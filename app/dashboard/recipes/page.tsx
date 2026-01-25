@@ -452,104 +452,102 @@ export default function DashboardRecipePage() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 space-y-8">
-                    {/* Step 1: Core Ingredients */}
-                    <Card className="p-8 space-y-6">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-bold flex items-center gap-3">
-                                <Plus className="w-5 h-5 text-emerald-500" />
-                                Ingredients
-                            </h3>
-                            <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-widest opacity-60">
-                                {ingredients.length} items added
-                            </Badge>
-                        </div>
-                        <IngredientBuilder
-                            ingredients={ingredients}
-                            onChange={setIngredients}
-                        />
-                    </Card>
+            <div className="space-y-8">
+                {/* Step 1: Core Ingredients */}
+                <Card className="p-8 space-y-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-bold flex items-center gap-3">
+                            <Plus className="w-5 h-5 text-emerald-500" />
+                            Ingredients
+                        </h3>
+                        <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-widest opacity-60">
+                            {ingredients.length} items added
+                        </Badge>
+                    </div>
+                    <IngredientBuilder
+                        ingredients={ingredients}
+                        onChange={setIngredients}
+                    />
+                </Card>
 
-                    {/* Step 2: Instructions */}
-                    <Card className="p-8 space-y-6">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-bold flex items-center gap-3">
-                                <ListOrdered className="w-5 h-5 text-amber-500" />
-                                Cooking Steps
-                            </h3>
-                            <div className="flex gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setShowMagicInstructions(!showMagicInstructions)}
-                                    className="text-[10px] uppercase font-black tracking-widest gap-2 bg-amber-500/5 text-amber-600 border-amber-500/20"
-                                >
-                                    <Wand2 size={14} /> Paste Steps
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={handleAddInstruction}
-                                    className="text-[10px] uppercase font-black tracking-widest gap-2"
-                                >
-                                    <Plus size={14} /> Add Step
-                                </Button>
+                {/* Step 2: Instructions */}
+                <Card className="p-8 space-y-6">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-bold flex items-center gap-3">
+                            <ListOrdered className="w-5 h-5 text-amber-500" />
+                            Cooking Steps
+                        </h3>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setShowMagicInstructions(!showMagicInstructions)}
+                                className="text-[10px] uppercase font-black tracking-widest gap-2 bg-amber-500/5 text-amber-600 border-amber-500/20"
+                            >
+                                <Wand2 size={14} /> Paste Steps
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={handleAddInstruction}
+                                className="text-[10px] uppercase font-black tracking-widest gap-2"
+                            >
+                                <Plus size={14} /> Add Step
+                            </Button>
+                        </div>
+                    </div>
+
+                    {showMagicInstructions && (
+                        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 animate-in fade-in slide-in-from-top-4 duration-300">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Paste Method Content Below</p>
+                            <textarea
+                                className="w-full h-40 bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all font-mono"
+                                placeholder="Paste multiple steps here..."
+                                value={magicInstructionsText}
+                                onChange={(e) => setMagicInstructionsText(e.target.value)}
+                            />
+                            <div className="flex justify-end gap-3 mt-4">
+                                <Button variant="ghost" className="text-xs text-slate-400" onClick={() => setShowMagicInstructions(false)}>Cancel</Button>
+                                <Button onClick={handleMagicPasteInstructions} className="bg-amber-500 text-white hover:bg-amber-600 text-[10px] font-black uppercase tracking-widest px-8 shadow-lg shadow-amber-500/20">Get Steps</Button>
                             </div>
                         </div>
+                    )}
 
-                        {showMagicInstructions && (
-                            <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 animate-in fade-in slide-in-from-top-4 duration-300">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Paste Method Content Below</p>
-                                <textarea
-                                    className="w-full h-40 bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all font-mono"
-                                    placeholder="Paste multiple steps here..."
-                                    value={magicInstructionsText}
-                                    onChange={(e) => setMagicInstructionsText(e.target.value)}
-                                />
-                                <div className="flex justify-end gap-3 mt-4">
-                                    <Button variant="ghost" className="text-xs text-slate-400" onClick={() => setShowMagicInstructions(false)}>Cancel</Button>
-                                    <Button onClick={handleMagicPasteInstructions} className="bg-amber-500 text-white hover:bg-amber-600 text-[10px] font-black uppercase tracking-widest px-8 shadow-lg shadow-amber-500/20">Get Steps</Button>
+                    <div className="space-y-4">
+                        {instructions.map((stepText, index) => (
+                            <div key={index} className="flex gap-4 group">
+                                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900/50 flex items-center justify-center font-black text-sm text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all cursor-move">
+                                    {index + 1}
+                                </div>
+                                <div className="flex-1 relative">
+                                    <textarea
+                                        value={stepText}
+                                        onChange={(e) => handleUpdateInstruction(index, e.target.value)}
+                                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 focus:border-emerald-500/50 rounded-xl p-4 text-sm min-h-[80px] transition-all resize-none"
+                                        placeholder={`Explain instruction step ${index + 1}...`}
+                                    />
+                                    {instructions.length > 1 && (
+                                        <button
+                                            onClick={() => handleRemoveInstruction(index)}
+                                            className="absolute top-2 right-2 text-slate-300 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
-                        )}
+                        ))}
+                    </div>
+                </Card>
 
-                        <div className="space-y-4">
-                            {instructions.map((stepText, index) => (
-                                <div key={index} className="flex gap-4 group">
-                                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900/50 flex items-center justify-center font-black text-sm text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all cursor-move">
-                                        {index + 1}
-                                    </div>
-                                    <div className="flex-1 relative">
-                                        <textarea
-                                            value={stepText}
-                                            onChange={(e) => handleUpdateInstruction(index, e.target.value)}
-                                            className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 focus:border-emerald-500/50 rounded-xl p-4 text-sm min-h-[80px] transition-all resize-none"
-                                            placeholder={`Explain instruction step ${index + 1}...`}
-                                        />
-                                        {instructions.length > 1 && (
-                                            <button
-                                                onClick={() => handleRemoveInstruction(index)}
-                                                className="absolute top-2 right-2 text-slate-300 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </Card>
-                </div>
+                {/* Metadata Section */}
+                <Card className="p-8 space-y-8">
+                    <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
+                        <ClipboardList size={20} className="text-emerald-500" />
+                        <h3 className="font-bold uppercase tracking-wider text-sm">Recipe Details</h3>
+                    </div>
 
-                <div className="lg:col-span-1 space-y-8">
-                    {/* Metadata Section */}
-                    <Card className="p-8 space-y-8 sticky top-24">
-                        <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
-                            <ClipboardList size={20} className="text-emerald-500" />
-                            <h3 className="font-bold uppercase tracking-wider text-sm">Recipe Details</h3>
-                        </div>
-
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Recipe Title</Label>
@@ -605,23 +603,23 @@ export default function DashboardRecipePage() {
                                     ))}
                                 </div>
                             </div>
-
-                            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-4">
-                                <Button
-                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20 h-14 rounded-2xl font-black uppercase tracking-widest group"
-                                    disabled={saving}
-                                    onClick={handleSave}
-                                >
-                                    {saving ? <Loader2 className="animate-spin" /> : <Save className="mr-2 group-hover:scale-125 transition-transform" />}
-                                    Save Recipe
-                                </Button>
-                                <p className="text-center text-[10px] text-slate-400 tracking-tighter uppercase px-8">
-                                    By saving, this recipe and its nutrition data will be added to your recipe box.
-                                </p>
-                            </div>
                         </div>
-                    </Card>
-                </div>
+
+                        <div className="flex flex-col justify-end pt-4 border-t md:border-t-0 md:border-l border-slate-100 dark:border-slate-800 md:pl-8 space-y-4">
+                            <Button
+                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20 h-16 rounded-2xl font-black uppercase tracking-widest group text-lg"
+                                disabled={saving}
+                                onClick={handleSave}
+                            >
+                                {saving ? <Loader2 className="animate-spin" /> : <Save className="mr-2 group-hover:scale-125 transition-transform" />}
+                                Save Recipe
+                            </Button>
+                            <p className="text-center text-[10px] text-slate-400 tracking-tighter uppercase px-4">
+                                By saving, this recipe and its nutrition data will be added to your recipe box.
+                            </p>
+                        </div>
+                    </div>
+                </Card>
             </div>
 
             {/* Auto-Import Drawer */}
