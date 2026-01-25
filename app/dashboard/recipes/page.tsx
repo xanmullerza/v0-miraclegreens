@@ -437,9 +437,9 @@ export default function DashboardRecipePage() {
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
                         <ChefHat className="text-emerald-600" />
-                        Culinary Engineer
+                        Recipe Builder
                     </h1>
-                    <p className="text-slate-500 mt-1 text-sm">Design high-fidelity recipes with precise clinical tracking.</p>
+                    <p className="text-slate-500 mt-1 text-sm">Create and manage your favorite recipes with accurate nutrition.</p>
                 </div>
                 <div className="flex gap-3">
                     <Button
@@ -447,7 +447,7 @@ export default function DashboardRecipePage() {
                         className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-none shadow-sm hover:bg-emerald-500/20 gap-2 px-6"
                     >
                         <Zap size={16} />
-                        Auto-Import Recipe
+                        Quick Import
                     </Button>
                 </div>
             </div>
@@ -459,7 +459,7 @@ export default function DashboardRecipePage() {
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-bold flex items-center gap-3">
                                 <Plus className="w-5 h-5 text-emerald-500" />
-                                Ingredient Architecture
+                                Ingredients
                             </h3>
                             <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-widest opacity-60">
                                 {ingredients.length} items added
@@ -476,7 +476,7 @@ export default function DashboardRecipePage() {
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-bold flex items-center gap-3">
                                 <ListOrdered className="w-5 h-5 text-amber-500" />
-                                Method & Technique
+                                Cooking Steps
                             </h3>
                             <div className="flex gap-2">
                                 <Button
@@ -485,7 +485,7 @@ export default function DashboardRecipePage() {
                                     onClick={() => setShowMagicInstructions(!showMagicInstructions)}
                                     className="text-[10px] uppercase font-black tracking-widest gap-2 bg-amber-500/5 text-amber-600 border-amber-500/20"
                                 >
-                                    <Wand2 size={14} /> Magic Paste
+                                    <Wand2 size={14} /> Paste Steps
                                 </Button>
                                 <Button
                                     variant="outline"
@@ -509,7 +509,7 @@ export default function DashboardRecipePage() {
                                 />
                                 <div className="flex justify-end gap-3 mt-4">
                                     <Button variant="ghost" className="text-xs text-slate-400" onClick={() => setShowMagicInstructions(false)}>Cancel</Button>
-                                    <Button onClick={handleMagicPasteInstructions} className="bg-amber-500 text-white hover:bg-amber-600 text-[10px] font-black uppercase tracking-widest px-8 shadow-lg shadow-amber-500/20">Extract Steps</Button>
+                                    <Button onClick={handleMagicPasteInstructions} className="bg-amber-500 text-white hover:bg-amber-600 text-[10px] font-black uppercase tracking-widest px-8 shadow-lg shadow-amber-500/20">Get Steps</Button>
                                 </div>
                             </div>
                         )}
@@ -547,7 +547,7 @@ export default function DashboardRecipePage() {
                     <Card className="p-8 space-y-8 sticky top-24">
                         <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
                             <ClipboardList size={20} className="text-emerald-500" />
-                            <h3 className="font-bold uppercase tracking-wider text-sm">Technical Specs</h3>
+                            <h3 className="font-bold uppercase tracking-wider text-sm">Recipe Details</h3>
                         </div>
 
                         <div className="space-y-6">
@@ -575,7 +575,7 @@ export default function DashboardRecipePage() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                                        <Users size={12} /> Yield
+                                        <Users size={12} /> Servings
                                     </Label>
                                     <Input
                                         type="number"
@@ -587,7 +587,7 @@ export default function DashboardRecipePage() {
                             </div>
 
                             <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Meal Classification</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Meal Type</Label>
                                 <div className="grid grid-cols-2 gap-2">
                                     {['breakfast', 'lunch', 'dinner', 'snack'].map(m => (
                                         <button
@@ -613,10 +613,10 @@ export default function DashboardRecipePage() {
                                     onClick={handleSave}
                                 >
                                     {saving ? <Loader2 className="animate-spin" /> : <Save className="mr-2 group-hover:scale-125 transition-transform" />}
-                                    Commit to Lab
+                                    Save Recipe
                                 </Button>
                                 <p className="text-center text-[10px] text-slate-400 tracking-tighter uppercase px-8">
-                                    By committing, this recipe and its associated nutritional data will be synced to your global library.
+                                    By saving, this recipe and its nutrition data will be added to your recipe box.
                                 </p>
                             </div>
                         </div>
@@ -631,10 +631,10 @@ export default function DashboardRecipePage() {
                         <div className="p-10 bg-emerald-500 text-white">
                             <div className="flex items-center gap-4 mb-2">
                                 <Zap size={40} className="text-yellow-300 fill-current" />
-                                <SheetTitle className="text-3xl font-black uppercase tracking-tighter text-white">Neural Import</SheetTitle>
+                                <SheetTitle className="text-3xl font-black uppercase tracking-tighter text-white">Smart Import</SheetTitle>
                             </div>
                             <SheetDescription className="text-emerald-50 opacity-80 text-lg">
-                                Paste any recipe text (ingredients & method) below. Our engine will map it to the clinical database.
+                                Paste any recipe text (ingredients & steps) below. Our tool will automatically find the nutrition details.
                             </SheetDescription>
                         </div>
                         <div className="flex-1 p-10 flex flex-col gap-6">
@@ -653,7 +653,7 @@ export default function DashboardRecipePage() {
                                 disabled={isImporting}
                             >
                                 {isImporting ? <Loader2 className="animate-spin mr-2" /> : <Sparkles className="mr-3" />}
-                                {isImporting ? 'Processing Architecture...' : 'Synthesize Recipe'}
+                                {isImporting ? 'Saving...' : 'Create Recipe'}
                             </Button>
                         </div>
                     </div>

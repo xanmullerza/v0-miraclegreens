@@ -54,24 +54,24 @@ export default function DashboardOverview() {
 
     const tools = [
         {
-            name: 'Food Architect',
-            desc: 'Map clinical-grade nutrient data into the global library.',
+            name: 'Food Manager',
+            desc: 'Add and manage food nutrition data in your library.',
             href: '/dashboard/food',
             icon: Beef,
             color: 'text-emerald-500',
             bg: 'bg-emerald-500/10'
         },
         {
-            name: 'Recipe Lab',
-            desc: 'Synthesize multi-ingredient recipes with deep insight tracking.',
+            name: 'Recipe Builder',
+            desc: 'Create and track recipes with automatic nutrition calculation.',
             href: '/dashboard/recipes',
             icon: Utensils,
             color: 'text-blue-500',
             bg: 'bg-blue-500/10'
         },
         {
-            name: 'Analysis Engine',
-            desc: 'Compare food chemistry side-by-side using the radar matrix.',
+            name: 'Comparison Tool',
+            desc: 'Compare nutritional values side-by-side using the radar chart.',
             href: '/dashboard/compare',
             icon: Scale,
             color: 'text-amber-500',
@@ -84,7 +84,7 @@ export default function DashboardOverview() {
             <div className="h-full flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 rounded-full border-4 border-emerald-500/30 border-t-emerald-500 animate-spin" />
-                    <p className="text-sm font-black uppercase tracking-widest text-slate-400">Initializing Lab...</p>
+                    <p className="text-sm font-black uppercase tracking-widest text-slate-400">Loading...</p>
                 </div>
             </div>
         );
@@ -101,25 +101,25 @@ export default function DashboardOverview() {
                 <div className="relative z-10 max-w-2xl">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-black uppercase tracking-widest mb-6">
                         <Zap size={12} className="fill-current" />
-                        Miracle Greens Lab Alpha
+                        Miracle Greens Pre-release
                     </div>
                     <h1 className="text-4xl lg:text-6xl font-black text-white tracking-tighter leading-[0.9] mb-6">
-                        Welcome to the <span className="text-emerald-500">Nutrition Lab.</span>
+                        Welcome to your <span className="text-emerald-500">Dashboard.</span>
                     </h1>
                     <p className="text-lg text-slate-400 leading-relaxed mb-8">
-                        The architect's suite for food chemistry. Manage your ingredients, build scientific recipes, and analyze metabolic data in one clinical-grade dashboard.
+                        A simple way to manage your food and recipes. Add ingredients, create healthy recipes, and check nutrition details in one easy dashboard.
                     </p>
                     <div className="flex flex-wrap gap-4">
                         <Button className="rounded-2xl h-14 px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-bold gap-3 shadow-xl shadow-emerald-500/20" asChild>
                             <Link href="/dashboard/recipes">
                                 <Plus size={18} />
-                                Start New Synthesis
+                                Create New Recipe
                             </Link>
                         </Button>
                         <Button variant="outline" className="rounded-2xl h-14 px-8 border-slate-700 text-white hover:bg-slate-800 gap-3" asChild>
                             <Link href="/dashboard/compare">
                                 <Activity size={18} />
-                                Launch Analysis
+                                Compare Foods
                             </Link>
                         </Button>
                     </div>
@@ -132,17 +132,17 @@ export default function DashboardOverview() {
                         <p className="text-3xl font-black text-white">{stats.foodItems}</p>
                     </div>
                     <div className="space-y-1">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Formulated Recipes</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Total Recipes</p>
                         <p className="text-3xl font-black text-white">{stats.recipes}</p>
                     </div>
                     <div className="space-y-1">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Database Uptime</p>
-                        <p className="text-3xl font-black text-white">99.9%</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">System Status</p>
+                        <p className="text-3xl font-black text-white">Online</p>
                     </div>
                     <div className="space-y-1">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Active Lab</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">System</p>
                         <p className="text-3xl font-black text-emerald-500 flex items-center gap-2">
-                            ON <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                            READY <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                         </p>
                     </div>
                 </div>
@@ -167,15 +167,15 @@ export default function DashboardOverview() {
                 ))}
             </div>
 
-            {/* Recent Lab Activity */}
+            {/* Recent Items */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <Card className="p-8">
                     <div className="flex items-center justify-between mb-8">
                         <h3 className="font-bold flex items-center gap-3">
                             <Database size={18} className="text-emerald-500" />
-                            Recent Library Additions
+                            Recently Added Foods
                         </h3>
-                        <Link href="/browse" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-500 transition-colors">View All Library</Link>
+                        <Link href="/browse" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-500 transition-colors">View All Foods</Link>
                     </div>
                     <div className="space-y-4">
                         {stats.recentAdditions.map((item) => (
@@ -202,13 +202,13 @@ export default function DashboardOverview() {
                     <div className="h-full flex flex-col">
                         <div className="flex items-center gap-3 mb-8">
                             <ChefHat size={18} className="text-emerald-500" />
-                            <h3 className="font-bold">Next Recommended Formulation</h3>
+                            <h3 className="font-bold">Recommended for You</h3>
                         </div>
                         <div className="flex-grow flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-emerald-500/20 rounded-[2rem] bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
                             <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 mb-6 font-black text-xl">?</div>
                             <h4 className="text-lg font-bold mb-2 italic text-slate-400">Experimental Feature</h4>
-                            <p className="text-sm text-slate-500 max-w-xs">Our AI engine is scanning your library to suggest your next high-performance recipe based on available micros.</p>
-                            <Button className="mt-8 rounded-full bg-slate-950 text-white hover:bg-slate-800 border-none px-10 font-bold" disabled>Scan Library</Button>
+                            <p className="text-sm text-slate-500 max-w-xs">Our system is looking at your recipes to suggest your next healthy recipe based on the nutrients you have.</p>
+                            <Button className="mt-8 rounded-full bg-slate-950 text-white hover:bg-slate-800 border-none px-10 font-bold" disabled>Get Suggestions</Button>
                         </div>
                     </div>
                 </Card>
