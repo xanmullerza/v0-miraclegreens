@@ -73,8 +73,18 @@ function FoodItemCreatorContent() {
 
         const parsed = parseNutritionText(rawText);
 
-        if (parsed.energy_kcal) setEnergyKcal(parsed.energy_kcal.toString());
-        if (parsed.energy_kj) setEnergyKj(parsed.energy_kj.toString());
+        if (parsed.energy_kcal) {
+            setEnergyKcal(parsed.energy_kcal.toString());
+            if (!parsed.energy_kj) {
+                setEnergyKj(Math.round(parsed.energy_kcal * 4.184).toString());
+            }
+        }
+        if (parsed.energy_kj) {
+            setEnergyKj(parsed.energy_kj.toString());
+            if (!parsed.energy_kcal) {
+                setEnergyKcal((parsed.energy_kj / 4.184).toFixed(1));
+            }
+        }
         if (parsed.protein_g) setProtein(parsed.protein_g.toString());
         if (parsed.carbs_g) setCarbs(parsed.carbs_g.toString());
         if (parsed.fat_g) setFat(parsed.fat_g.toString());
