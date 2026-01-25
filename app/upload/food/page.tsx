@@ -332,6 +332,26 @@ function FoodItemCreatorContent() {
                                 </div>
                             </Card>
 
+                            <Card className="p-6 shadow-md border-amber-100/50 dark:border-amber-900/20 bg-amber-50/10 dark:bg-amber-950/5">
+                                <h3 className="font-semibold text-base mb-4 flex items-center gap-2 text-amber-700 dark:text-amber-400">
+                                    <Sparkles className="w-4 h-4" />
+                                    Sugar Profile (g)
+                                </h3>
+                                <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                                    {['Fructose', 'Glucose', 'Sucrose', 'Lactose', 'Galactose', 'Maltose'].map(s => (
+                                        <div key={s}>
+                                            <Label className="dark:text-slate-400 text-[10px] uppercase font-bold tracking-tight">{s}</Label>
+                                            <Input
+                                                type="number"
+                                                className="h-7 text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+                                                value={micronutrients[s] || ''}
+                                                onChange={(e) => updateMicro(s, e.target.value)}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </Card>
+
                             <Card className="p-6">
                                 <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-slate-900 dark:text-white">
                                     <Beef className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
@@ -449,6 +469,53 @@ function FoodItemCreatorContent() {
                                                 value={micronutrients[micro] || ''}
                                                 onChange={(e) => updateMicro(micro, e.target.value)}
                                                 placeholder="0.00"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </Card>
+
+                            <Card className="p-6 border-blue-100 dark:border-blue-900/30 bg-blue-50/10 dark:bg-blue-950/5">
+                                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-blue-700 dark:text-blue-400">
+                                    <Sparkles className="w-5 h-5" />
+                                    Vitamin A Breakdown
+                                </h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                    {[
+                                        { key: 'Retinol', unit: 'µg' },
+                                        { key: 'Alpha-carotene', unit: 'µg' },
+                                        { key: 'Beta-carotene', unit: 'µg' },
+                                        { key: 'Beta-cryptoxanthin', unit: 'µg' },
+                                        { key: 'Lutein + Zeaxanthin', unit: 'µg' },
+                                        { key: 'Lycopene', unit: 'µg' }
+                                    ].map(v => (
+                                        <div key={v.key}>
+                                            <Label className="dark:text-slate-400 text-[10px] uppercase font-bold">{v.key} ({v.unit})</Label>
+                                            <Input
+                                                type="number"
+                                                className="h-8 text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+                                                value={micronutrients[v.key] || ''}
+                                                onChange={(e) => updateMicro(v.key, e.target.value)}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </Card>
+
+                            <Card className="p-6 border-purple-100 dark:border-purple-900/30 bg-purple-50/10 dark:bg-purple-950/5">
+                                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-purple-700 dark:text-purple-400">
+                                    <Sparkles className="w-5 h-5" />
+                                    Vitamin E Breakdown (mg)
+                                </h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                    {['Alpha-tocopherol', 'Beta-tocopherol', 'Gamma-tocopherol', 'Delta-tocopherol'].map(v => (
+                                        <div key={v}>
+                                            <Label className="dark:text-slate-400 text-[10px] uppercase font-bold">{v.split('-')[0]}</Label>
+                                            <Input
+                                                type="number"
+                                                className="h-8 text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+                                                value={micronutrients[v] || ''}
+                                                onChange={(e) => updateMicro(v, e.target.value)}
                                             />
                                         </div>
                                     ))}
