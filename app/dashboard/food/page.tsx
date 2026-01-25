@@ -259,46 +259,111 @@ function FoodItemCreatorContent() {
                 </div>
             </div>
 
-            {showParser && (
-                <Card className="p-8 border-emerald-500/30 bg-emerald-500/[0.03] animate-in fade-in slide-in-from-top-4 duration-300">
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-600">
-                            <Sparkles size={24} />
+            {/* Top Row: Neural Mapping & Core Identity */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                {/* Extraction Matrix */}
+                {showParser && (
+                    <Card className="lg:col-span-8 p-8 border-emerald-500/30 bg-emerald-500/[0.03] animate-in fade-in slide-in-from-top-4 duration-300">
+                        <div className="flex items-center gap-4 mb-6">
+                            <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-600">
+                                <Sparkles size={24} />
+                            </div>
+                            <div>
+                                <h3 className="font-black uppercase tracking-widest text-sm text-emerald-700">Dual-Stream Extraction</h3>
+                                <p className="text-xs text-emerald-600/80 font-medium">Split your source data below. We'll synchronize servings and nutrients in one pass.</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 className="font-black uppercase tracking-widest text-sm text-emerald-700">Dual-Stream Extraction</h3>
-                            <p className="text-xs text-emerald-600/80 font-medium">Split your source data below. We'll synchronize servings and nutrients in one pass.</p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Stream 01: Serving Data</Label>
+                                <Textarea
+                                    placeholder="Paste cup weights, portion sizes here..."
+                                    className="min-h-[180px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
+                                    value={servingText}
+                                    onChange={(e) => setServingText(e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Stream 02: Nutrient Matrix</Label>
+                                <Textarea
+                                    placeholder="Paste the long list of vitamins/minerals here..."
+                                    className="min-h-[180px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
+                                    value={nutrientText}
+                                    onChange={(e) => setNutrientText(e.target.value)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end">
+                            <Button onClick={handleParse} className="h-12 bg-emerald-600 text-white hover:bg-emerald-700 text-xs font-black uppercase tracking-widest px-10 shadow-lg shadow-emerald-600/20 rounded-xl">
+                                Run Dual Neural Synthesis
+                            </Button>
+                        </div>
+                    </Card>
+                )}
+
+                {/* Identity & Core Macros */}
+                <Card className={cn(showParser ? "lg:col-span-4" : "lg:col-span-12", "p-8 space-y-8")}>
+                    {/* Identity Section */}
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-3 mb-2">
+                            <Beef size={20} className="text-emerald-500" />
+                            <h3 className="font-black text-sm uppercase tracking-widest">Base Identity</h3>
+                        </div>
+                        <div className="space-y-4">
+                            <div className="space-y-1.5">
+                                <Label className="text-[10px] uppercase font-black text-slate-400">Scientific Designation</Label>
+                                <Input
+                                    placeholder="e.g. Potatoes, raw, white"
+                                    className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm rounded-xl font-bold"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label className="text-[10px] uppercase font-black text-slate-400">Common Name</Label>
+                                <Input
+                                    placeholder="e.g. White Potato"
+                                    className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm rounded-xl"
+                                    value={commonName}
+                                    onChange={(e) => setCommonName(e.target.value)}
+                                />
+                            </div>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Stream 01: Serving Data</Label>
-                            <Textarea
-                                placeholder="Paste cup weights, portion sizes here..."
-                                className="min-h-[180px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
-                                value={servingText}
-                                onChange={(e) => setServingText(e.target.value)}
-                            />
+                    {/* Energy Vectors */}
+                    <div className="space-y-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center gap-3 mb-2">
+                            <Scale size={20} className="text-emerald-500" />
+                            <h3 className="font-black text-sm uppercase tracking-widest">Energy Vectors (per 100g)</h3>
                         </div>
-                        <div className="space-y-2">
-                            <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Stream 02: Nutrient Matrix</Label>
-                            <Textarea
-                                placeholder="Paste the long list of vitamins/minerals here..."
-                                className="min-h-[180px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
-                                value={nutrientText}
-                                onChange={(e) => setNutrientText(e.target.value)}
-                            />
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1.5 col-span-2">
+                                <Label className="text-[10px] uppercase font-black text-slate-400">kcal</Label>
+                                <Input type="number" value={energyKcal} className="h-11 font-black text-center rounded-xl bg-emerald-500/5 border-emerald-500/20" onChange={(e) => setEnergyKcal(e.target.value)} />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label className="text-[10px] uppercase font-black text-slate-400">Protein</Label>
+                                <Input type="number" value={protein} className="h-11 text-center rounded-xl bg-slate-50 dark:bg-slate-950 font-bold" onChange={(e) => setProtein(e.target.value)} />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label className="text-[10px] uppercase font-black text-slate-400">Fat</Label>
+                                <Input type="number" value={fat} className="h-11 text-center rounded-xl bg-slate-50 dark:bg-slate-950 font-bold" onChange={(e) => setFat(e.target.value)} />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label className="text-[10px] uppercase font-black text-slate-400">Carbs</Label>
+                                <Input type="number" value={carbs} className="h-11 text-center rounded-xl bg-slate-50 dark:bg-slate-950 font-bold" onChange={(e) => setCarbs(e.target.value)} />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label className="text-[10px] uppercase font-black text-slate-400">kJ</Label>
+                                <Input type="number" value={energyKj} className="h-11 text-center rounded-xl bg-slate-50 dark:bg-slate-950 text-slate-500" onChange={(e) => setEnergyKj(e.target.value)} />
+                            </div>
                         </div>
-                    </div>
-
-                    <div className="flex justify-end">
-                        <Button onClick={handleParse} className="h-12 bg-emerald-600 text-white hover:bg-emerald-700 text-xs font-black uppercase tracking-widest px-10 shadow-lg shadow-emerald-600/20 rounded-xl">
-                            Run Dual Neural Synthesis
-                        </Button>
                     </div>
                 </Card>
-            )}
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 {/* Left Column: Data Integrity Summary */}
@@ -393,67 +458,6 @@ function FoodItemCreatorContent() {
 
                 {/* Main Content Area */}
                 <div className="lg:col-span-3 space-y-8">
-                    {/* Identity & Core Macros */}
-                    <Card className="p-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                            <div className="space-y-6">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <Beef size={20} className="text-emerald-500" />
-                                    <h3 className="font-black text-sm uppercase tracking-widest">Base Identity</h3>
-                                </div>
-                                <div className="space-y-5">
-                                    <div className="space-y-1.5">
-                                        <Label className="text-[10px] uppercase font-black text-slate-400">Scientific Designation</Label>
-                                        <Input
-                                            placeholder="e.g. Potatoes, raw, white"
-                                            className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm rounded-xl font-bold"
-                                            value={name}
-                                            onChange={(e) => setName(e.target.value)}
-                                        />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <Label className="text-[10px] uppercase font-black text-slate-400">Common Name</Label>
-                                        <Input
-                                            placeholder="e.g. White Potato"
-                                            className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm rounded-xl"
-                                            value={commonName}
-                                            onChange={(e) => setCommonName(e.target.value)}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-6">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <Scale size={20} className="text-emerald-500" />
-                                    <h3 className="font-black text-sm uppercase tracking-widest">Energy Vectors (per 100g)</h3>
-                                </div>
-                                <div className="grid grid-cols-3 gap-4">
-                                    <div className="space-y-1.5">
-                                        <Label className="text-[10px] uppercase font-black text-slate-400">kcal</Label>
-                                        <Input type="number" value={energyKcal} className="h-11 font-black text-center rounded-xl bg-emerald-500/5 border-emerald-500/20" onChange={(e) => setEnergyKcal(e.target.value)} />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <Label className="text-[10px] uppercase font-black text-slate-400">Protein</Label>
-                                        <Input type="number" value={protein} className="h-11 text-center rounded-xl bg-slate-50 dark:bg-slate-950 font-bold" onChange={(e) => setProtein(e.target.value)} />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <Label className="text-[10px] uppercase font-black text-slate-400">Fat</Label>
-                                        <Input type="number" value={fat} className="h-11 text-center rounded-xl bg-slate-50 dark:bg-slate-950 font-bold" onChange={(e) => setFat(e.target.value)} />
-                                    </div>
-                                    <div className="space-y-1.5">
-                                        <Label className="text-[10px] uppercase font-black text-slate-400">Carbs</Label>
-                                        <Input type="number" value={carbs} className="h-11 text-center rounded-xl bg-slate-50 dark:bg-slate-950 font-bold" onChange={(e) => setCarbs(e.target.value)} />
-                                    </div>
-                                    <div className="space-y-1.5 col-span-2">
-                                        <Label className="text-[10px] uppercase font-black text-slate-400">kJ (Calculated)</Label>
-                                        <Input type="number" value={energyKj} className="h-11 text-center rounded-xl bg-slate-50 dark:bg-slate-950 text-slate-500" onChange={(e) => setEnergyKj(e.target.value)} />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </Card>
-
                     {/* Advanced Markers Controller */}
                     <div className="space-y-6">
                         <div className="flex items-center justify-between">
