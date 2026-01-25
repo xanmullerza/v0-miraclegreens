@@ -448,16 +448,16 @@ export default function CreateRecipePage() {
                 }));
 
             if (namedItems.length > 0) {
-                // Update in background
-                for (const item of namedItems) {
+                // Update all items in parallel and wait for completion
+                await Promise.all(namedItems.map(item =>
                     supabase
                         .from('food_items')
                         .update({ common_name: item.common_name })
                         .eq('id', item.id)
                         .then(({ error }) => {
-                            if (error) console.warn(`Common name sync warning:`, error.message);
-                        });
-                }
+                            if (error) console.warn(`Common name sync error for ${item.id}:`, error.message);
+                        })
+                ));
             }
 
             // Insert instructions
