@@ -192,7 +192,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
 
         const newIngredient: RecipeIngredient = {
             food_item_id: finalFoodItem.id || 'temp-id',
-            food_item_name: finalFoodItem.name,
+            food_item_name: finalFoodItem.common_name || finalFoodItem.name,
             weight_g,
             quantity,
             measure_label: unit,

@@ -438,6 +438,28 @@ export default function CreateRecipePage() {
                     });
             }
 
+            // Update Friendly Names (Common Name) for food items
+            // This makes the edited names searchable for everyone later
+            const namedItems = ingredients
+                .filter(ing => ing.food_item_id !== 'temp-id' && ing.food_item_name)
+                .map(ing => ({
+                    id: ing.food_item_id,
+                    common_name: ing.food_item_name
+                }));
+
+            if (namedItems.length > 0) {
+                // Update in background
+                for (const item of namedItems) {
+                    supabase
+                        .from('food_items')
+                        .update({ common_name: item.common_name })
+                        .eq('id', item.id)
+                        .then(({ error }) => {
+                            if (error) console.warn(`Common name sync warning:`, error.message);
+                        });
+                }
+            }
+
             // Insert instructions
             const instructionsData = instructions
                 .filter(step => step.trim())

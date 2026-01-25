@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 export interface FoodItemMatch {
     id?: string;
     name: string;
+    common_name?: string;
     energy_kcal: number;
     energy_kj: number;
     protein_g: number;
@@ -28,22 +29,30 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
     const { data, error } = await supabase
         .from('food_items')
         .select('*')
-        .ilike('name', `%${query}%`)
-        .limit(5);
+        .or(`name.ilike.%${query}%,common_name.ilike.%${query}%`)
+        .limit(10);
 
     if (error || !data) return [];
 
     return data.map(item => ({
         id: item.id,
         name: item.name,
+        common_name: item.common_name,
         energy_kcal: item.energy_kcal || Math.round((item.energy_kj || 0) / 4.184),
         energy_kj: item.energy_kj || Math.round((item.energy_kcal || 0) * 4.184),
         protein_g: item.protein_g,
         carbs_g: item.carbs_g,
         fat_g: item.fat_g,
         micronutrients: item.micronutrients || {},
-        source: 'local'
-    }));
+        source: 'local' as const
+    })).sort((a, b) => {
+        // Prioritize common_name matches
+        const aHasCommonPrefix = a.common_name?.toLowerCase().startsWith(query.toLowerCase());
+        const bHasCommonPrefix = b.common_name?.toLowerCase().startsWith(query.toLowerCase());
+        if (aHasCommonPrefix && !bHasCommonPrefix) return -1;
+        if (!aHasCommonPrefix && bHasCommonPrefix) return 1;
+        return 0;
+    });
 }
 
 /**
