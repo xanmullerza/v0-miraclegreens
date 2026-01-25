@@ -338,13 +338,13 @@ function FoodItemCreatorContent() {
                                     Sugar Profile (g)
                                 </h3>
                                 <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                                    {['Fructose', 'Glucose', 'Sucrose', 'Lactose', 'Galactose', 'Maltose'].map(s => (
+                                    {['Fructose', 'Glucose', 'Sucrose', 'Lactose', 'Galactose', 'Maltose', 'Allulose'].map(s => (
                                         <div key={s}>
                                             <Label className="dark:text-slate-400 text-[10px] uppercase font-bold tracking-tight">{s}</Label>
                                             <Input
                                                 type="number"
                                                 className="h-7 text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
-                                                value={micronutrients[s] || ''}
+                                                value={micronutrients[s] !== undefined ? micronutrients[s] : ''}
                                                 onChange={(e) => updateMicro(s, e.target.value)}
                                             />
                                         </div>
@@ -466,7 +466,7 @@ function FoodItemCreatorContent() {
                                             </Label>
                                             <Input
                                                 className="h-8 text-sm bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500"
-                                                value={micronutrients[micro] || ''}
+                                                value={micronutrients[micro] !== undefined ? micronutrients[micro] : ''}
                                                 onChange={(e) => updateMicro(micro, e.target.value)}
                                                 placeholder="0.00"
                                             />
@@ -478,7 +478,7 @@ function FoodItemCreatorContent() {
                             <Card className="p-6 border-blue-100 dark:border-blue-900/30 bg-blue-50/10 dark:bg-blue-950/5">
                                 <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-blue-700 dark:text-blue-400">
                                     <Sparkles className="w-5 h-5" />
-                                    Vitamin A Breakdown
+                                    Vitamin A Breakdown (µg)
                                 </h3>
                                 <div className="grid grid-cols-2 gap-4">
                                     {[
@@ -490,11 +490,11 @@ function FoodItemCreatorContent() {
                                         { key: 'Lycopene', unit: 'µg' }
                                     ].map(v => (
                                         <div key={v.key}>
-                                            <Label className="dark:text-slate-400 text-[10px] uppercase font-bold">{v.key} ({v.unit})</Label>
+                                            <Label className="dark:text-slate-400 text-[10px] uppercase font-bold">{v.key}</Label>
                                             <Input
                                                 type="number"
                                                 className="h-8 text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
-                                                value={micronutrients[v.key] || ''}
+                                                value={micronutrients[v.key] !== undefined ? micronutrients[v.key] : ''}
                                                 onChange={(e) => updateMicro(v.key, e.target.value)}
                                             />
                                         </div>
@@ -514,7 +514,7 @@ function FoodItemCreatorContent() {
                                             <Input
                                                 type="number"
                                                 className="h-8 text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
-                                                value={micronutrients[v] || ''}
+                                                value={micronutrients[v] !== undefined ? micronutrients[v] : ''}
                                                 onChange={(e) => updateMicro(v, e.target.value)}
                                             />
                                         </div>
