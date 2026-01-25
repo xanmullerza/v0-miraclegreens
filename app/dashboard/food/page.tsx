@@ -21,7 +21,10 @@ import {
     AlertCircle,
     ChevronDown,
     ChevronUp,
-    Info
+    Info,
+    Camera,
+    Upload,
+    Loader2
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -83,12 +86,8 @@ function FoodItemCreatorContent() {
     const [fat, setFat] = useState<string>('');
     const [source, setSource] = useState<string>('manual');
     const [micronutrients, setMicronutrients] = useState<Record<string, string>>({});
-
-    // State for measures
-    const [measures, setMeasures] = useState<{ label: string; weight: string }[]>([
-        { label: 'cup', weight: '' },
-        { label: 'portion', weight: '' }
-    ]);
+    const [image, setImage] = useState('');
+    const [uploading, setUploading] = useState(false);
 
     const [servingText, setServingText] = useState('');
     const [nutrientText, setNutrientText] = useState('');
@@ -144,16 +143,55 @@ function FoodItemCreatorContent() {
             setMicronutrients(prev => ({ ...prev, ...newMicros }));
         }
 
-        // Logic for Measures (Unit Scaling) - Look specifically in serving text if nutrient text exists
-        const parsedMeasures = parseMeasures(servingText || combinedText);
-        if (parsedMeasures.length > 0) {
-            setMeasures(parsedMeasures.map(m => ({
-                label: m.label,
-                weight: m.weight_g.toString()
-            })));
-        }
-
+        // Measures are no longer handled in this view
         setShowParser(false);
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(true);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `food-${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+            const filePath = fileName;
+
+            const { data, error: uploadError } = await supabase.storage
+                .from('food-items')
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+
+            if (uploadError) {
+                if (uploadError.message.includes('bucket not found')) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        setImage(reader.result as string);
+                        setUploading(false);
+                    };
+                    reader.readAsDataURL(file);
+                    return;
+                }
+                throw uploadError;
+            }
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('food-items')
+                .getPublicUrl(filePath);
+
+            setImage(publicUrl);
+            setUploading(false);
+        } catch (err: any) {
+            console.error("Upload error:", err);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImage(reader.result as string);
+                setUploading(false);
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleSave = async () => {
@@ -173,6 +211,7 @@ function FoodItemCreatorContent() {
                 protein_g: parseFloat(protein) || 0,
                 carbs_g: parseFloat(carbs) || 0,
                 fat_g: parseFloat(fat) || 0,
+                image: image || null,
                 micronutrients: Object.entries(micronutrients).reduce((acc, [key, val]) => {
                     if (val) acc[key] = parseFloat(val);
                     return acc;
@@ -187,27 +226,6 @@ function FoodItemCreatorContent() {
 
             if (itemError) throw itemError;
 
-            const tempMeasures = measures
-                .filter(m => m.label && m.weight && parseFloat(m.weight) > 0)
-                .map(m => ({
-                    food_item_id: item.id,
-                    label: m.label.toLowerCase().trim(),
-                    weight_g: parseFloat(m.weight)
-                }));
-
-            // Deduplicate by label to prevent Postgres Error
-            const validMeasures = tempMeasures.filter((m, index, self) =>
-                index === self.findIndex((t) => t.label === m.label)
-            );
-
-            if (validMeasures.length > 0) {
-                const { error: measError } = await supabase
-                    .from('food_measures')
-                    .upsert(validMeasures, { onConflict: 'food_item_id, label' });
-
-                if (measError) throw measError;
-            }
-
             alert('Food item saved successfully!');
         } catch (err: any) {
             console.error('Error saving food item:', err);
@@ -219,14 +237,6 @@ function FoodItemCreatorContent() {
 
     const updateMicro = (name: string, value: string) => {
         setMicronutrients(prev => ({ ...prev, [name]: value }));
-    };
-
-    const addMeasure = () => setMeasures([...measures, { label: '', weight: '' }]);
-    const removeMeasure = (index: number) => setMeasures(measures.filter((_, i) => i !== index));
-    const updateMeasure = (index: number, field: 'label' | 'weight', value: string) => {
-        const newMeasures = [...measures];
-        newMeasures[index][field] = value;
-        setMeasures(newMeasures);
     };
 
     return (
@@ -333,41 +343,48 @@ function FoodItemCreatorContent() {
                         </div>
                     </div>
 
-                    {/* Unit Scaling (Portion Mapping) */}
+                    {/* Food Visualization */}
                     <div className="space-y-6 pt-6 border-t border-slate-100 dark:border-slate-800">
                         <div className="flex items-center gap-3 mb-2">
-                            <Scale size={20} className="text-emerald-500" />
-                            <h3 className="font-black text-sm uppercase tracking-widest">Unit Scaling</h3>
+                            <Camera size={20} className="text-emerald-500" />
+                            <h3 className="font-black text-sm uppercase tracking-widest">Food Visualization</h3>
                         </div>
                         <div className="space-y-4">
-                            {measures.map((m, i) => (
-                                <div key={i} className="flex gap-2 items-end group">
-                                    <div className="flex-1">
-                                        <Label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Unit</Label>
-                                        <Input
-                                            value={m.label}
-                                            placeholder="e.g. cup"
-                                            className="h-9 text-xs bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-lg"
-                                            onChange={(e) => updateMeasure(i, 'label', e.target.value)}
-                                        />
+                            <div className="relative aspect-video rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group hover:border-emerald-500/50 transition-all flex flex-col items-center justify-center">
+                                {image ? (
+                                    <>
+                                        <img src={image} alt="Food item" className="w-full h-full object-cover" />
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <Button variant="secondary" size="sm" className="gap-2" onClick={() => setImage('')}>
+                                                <Trash2 size={14} /> Remove Image
+                                            </Button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="text-center p-6">
+                                        {uploading ? (
+                                            <div className="space-y-3">
+                                                <Loader2 className="h-10 w-10 animate-spin text-emerald-500 mx-auto" />
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Uploading Item...</p>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 mx-auto mb-3">
+                                                    <Upload size={24} />
+                                                </div>
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Capture or Upload Reference</p>
+                                                <Input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                    onChange={handleImageUpload}
+                                                />
+                                            </>
+                                        )}
                                     </div>
-                                    <div className="w-20">
-                                        <Label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Grams</Label>
-                                        <Input
-                                            type="number"
-                                            value={m.weight}
-                                            className="h-9 text-xs bg-slate-50 dark:bg-slate-950 font-bold text-center border-slate-200 dark:border-slate-800 rounded-lg"
-                                            onChange={(e) => updateMeasure(i, 'weight', e.target.value)}
-                                        />
-                                    </div>
-                                    <button onClick={() => removeMeasure(i)} className="h-9 w-9 flex items-center justify-center text-slate-300 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100 mb-0">
-                                        <Trash2 size={14} />
-                                    </button>
-                                </div>
-                            ))}
-                            <Button variant="outline" size="sm" onClick={addMeasure} className="w-full text-[9px] uppercase font-black tracking-widest h-9 border-dashed rounded-lg">
-                                <Plus size={12} className="mr-1" /> Add Portion Mapping
-                            </Button>
+                                )}
+                            </div>
+                            <p className="text-[10px] text-slate-400 font-medium italic text-center">Reference images help with visual identification in the synthetic engine.</p>
                         </div>
                     </div>
                 </Card>
