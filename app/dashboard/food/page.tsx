@@ -390,96 +390,9 @@ function FoodItemCreatorContent() {
                 </Card>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                {/* Left Column: Data Integrity Summary */}
-                <div className="lg:col-span-1 space-y-6">
-                    <Card className="p-6 border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50">
-                        <div className="flex items-center gap-3 mb-6">
-                            <Activity size={18} className="text-blue-500" />
-                            <h3 className="font-black uppercase tracking-widest text-xs">Data Integrity</h3>
-                        </div>
-
-                        <div className="space-y-6">
-                            <div className="relative h-4 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
-                                <div
-                                    className={cn(
-                                        "h-full transition-all duration-1000 ease-out",
-                                        integrity.percent > 90 ? "bg-emerald-500" : integrity.percent > 50 ? "bg-amber-500" : "bg-rose-500"
-                                    )}
-                                    style={{ width: `${integrity.percent}%` }}
-                                />
-                            </div>
-
-                            <div className="flex justify-between items-end">
-                                <div>
-                                    <p className="text-[10px] uppercase font-black text-slate-400">Markers Mapped</p>
-                                    <p className="text-3xl font-black">{integrity.score} <span className="text-sm font-medium text-slate-400">/ {integrity.total}</span></p>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-xs font-black text-emerald-500">{integrity.percent}%</p>
-                                    <p className="text-[10px] uppercase font-bold text-slate-400">Complete</p>
-                                </div>
-                            </div>
-
-                            <button
-                                onClick={() => setShowMissing(!showMissing)}
-                                className="w-full py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
-                            >
-                                <Info size={14} />
-                                {showMissing ? 'Hide Missing Markers' : 'View Missing Markers'}
-                            </button>
-
-                            {showMissing && (
-                                <div className="p-4 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2 max-h-[400px] overflow-y-auto animate-in slide-in-from-top-2">
-                                    <p className="text-[10px] font-black uppercase text-rose-500 flex items-center gap-2 mb-3">
-                                        <AlertCircle size={10} /> {integrity.missing.length} Markers Remaining
-                                    </p>
-                                    <div className="flex flex-wrap gap-1.5">
-                                        {integrity.missing.map((m: string) => (
-                                            <span key={m} className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[9px] font-medium text-slate-500">{m}</span>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </Card>
-
-                    <Card className="p-6">
-                        <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">
-                            <Scale size={18} className="text-emerald-500" />
-                            <h3 className="font-bold text-xs uppercase tracking-wider">Energy Vectors</h3>
-                        </div>
-                        <div className="space-y-4">
-                            <div className="space-y-1">
-                                <Label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Calories (kcal)</Label>
-                                <Input type="number" value={energyKcal} className="h-10 font-black text-center rounded-xl bg-emerald-500/5 border-emerald-500/10" onChange={(e) => setEnergyKcal(e.target.value)} />
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="space-y-1">
-                                    <Label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Protein (g)</Label>
-                                    <Input type="number" value={protein} className="h-9 text-center rounded-lg bg-slate-50 dark:bg-slate-950 font-bold" onChange={(e) => setProtein(e.target.value)} />
-                                </div>
-                                <div className="space-y-1">
-                                    <Label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Carbs (g)</Label>
-                                    <Input type="number" value={carbs} className="h-9 text-center rounded-lg bg-slate-50 dark:bg-slate-950 font-bold" onChange={(e) => setCarbs(e.target.value)} />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="space-y-1">
-                                    <Label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Fat (g)</Label>
-                                    <Input type="number" value={fat} className="h-9 text-center rounded-lg bg-slate-50 dark:bg-slate-950 font-bold" onChange={(e) => setFat(e.target.value)} />
-                                </div>
-                                <div className="space-y-1">
-                                    <Label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Energy (kJ)</Label>
-                                    <Input type="number" value={energyKj} className="h-9 text-center rounded-lg bg-slate-50 dark:bg-slate-950 text-slate-400" onChange={(e) => setEnergyKj(e.target.value)} />
-                                </div>
-                            </div>
-                        </div>
-                    </Card>
-                </div>
-
+            <div className="grid grid-cols-1 gap-8">
                 {/* Main Content Area */}
-                <div className="lg:col-span-3 space-y-8">
+                <div className="space-y-8">
                     {/* Advanced Markers Controller */}
                     <div className="space-y-6">
                         <div className="flex items-center justify-between">
