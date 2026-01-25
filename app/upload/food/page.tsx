@@ -253,11 +253,37 @@ function FoodItemCreatorContent() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <Label className="dark:text-slate-300">Calories (kcal)</Label>
-                                        <Input type="number" value={energyKcal} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => setEnergyKcal(e.target.value)} />
+                                        <Input
+                                            type="number"
+                                            value={energyKcal}
+                                            className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500"
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                setEnergyKcal(val);
+                                                if (val) {
+                                                    setEnergyKj(Math.round(parseFloat(val) * 4.184).toString());
+                                                } else {
+                                                    setEnergyKj('');
+                                                }
+                                            }}
+                                        />
                                     </div>
                                     <div>
                                         <Label className="dark:text-slate-300">Energy (kJ)</Label>
-                                        <Input type="number" value={energyKj} className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500" onChange={(e) => setEnergyKj(e.target.value)} />
+                                        <Input
+                                            type="number"
+                                            value={energyKj}
+                                            className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 focus:ring-emerald-500"
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                setEnergyKj(val);
+                                                if (val) {
+                                                    setEnergyKcal((parseFloat(val) / 4.184).toFixed(1));
+                                                } else {
+                                                    setEnergyKcal('');
+                                                }
+                                            }}
+                                        />
                                     </div>
                                     <div>
                                         <Label className="dark:text-slate-300">Protein (g)</Label>
