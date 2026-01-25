@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,7 +16,12 @@ import {
     Beef,
     Zap,
     Utensils,
-    Activity
+    Activity,
+    CheckCircle2,
+    AlertCircle,
+    ChevronDown,
+    ChevronUp,
+    Info
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -29,46 +34,30 @@ const Card = ({ children, className }: { children: React.ReactNode, className?: 
     </div>
 );
 
-const MICRONUTRIENT_UNITS: Record<string, string> = {
-    'Potassium': 'mg',
-    'Magnesium': 'mg',
-    'Calcium': 'mg',
-    'Phosphorus': 'mg',
-    'Sodium': 'mg',
-    'Iron': 'mg',
-    'Zinc': 'mg',
-    'Selenium': 'µg',
-    'Copper': 'mg',
-    'Manganese': 'mg',
-    'Chromium': 'µg',
-    'Fluoride': 'µg',
-    'Iodine': 'µg',
-    'Molybdenum': 'µg',
-    'Vitamin A': 'µg',
-    'Vitamin C': 'mg',
-    'Vitamin D': 'µg',
-    'Vitamin E': 'mg',
-    'Vitamin K': 'µg',
-    'B1 (Thiamine)': 'mg',
-    'B2 (Riboflavin)': 'mg',
-    'B3 (Niacin)': 'mg',
-    'B5 (Pantothenic Acid)': 'mg',
-    'B6 (Pyridoxine)': 'mg',
-    'B9 (Folate)': 'µg',
-    'B12 (Cobalamin)': 'µg',
-    'Choline': 'mg',
-    'Fiber': 'g'
-};
-
-const STANDARD_MICROS = [
-    'Potassium', 'Magnesium', 'Calcium', 'Phosphorus', 'Sodium',
-    'Iron', 'Zinc', 'Selenium', 'Copper', 'Manganese',
-    'Chromium', 'Fluoride', 'Iodine', 'Molybdenum',
-    'Vitamin A', 'Vitamin C', 'Vitamin D', 'Vitamin E', 'Vitamin K',
-    'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)',
-    'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)',
-    'B12 (Cobalamin)', 'Choline'
+const ALL_79_MARKERS = [
+    'Ash', 'Water', 'Fiber', 'Alcohol', 'Protein', 'Fat', 'Saturated Fat', 'Monounsaturated Fat',
+    'Polyunsaturated Fat', 'Trans Fat', 'Cholesterol', 'Starch', 'Sugars', 'Glucose', 'Fructose',
+    'Sucrose', 'Lactose', 'Maltose', 'Allulose', 'Galactose', 'Sugar Alcohol', 'Vitamin A',
+    'Vitamin C', 'Vitamin D', 'Vitamin E', 'Vitamin K', 'B1 (Thiamine)', 'B2 (Riboflavin)',
+    'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)',
+    'Choline', 'Retinol', 'Beta-carotene', 'Alpha-carotene', 'Beta-cryptoxanthin', 'Alpha-tocopherol',
+    'Beta-tocopherol', 'Delta-tocopherol', 'Gamma-tocopherol', 'Calcium', 'Iron', 'Magnesium',
+    'Phosphorus', 'Potassium', 'Sodium', 'Zinc', 'Copper', 'Manganese', 'Selenium', 'Iodine',
+    'Chromium', 'Fluoride', 'Molybdenum', 'Alanine', 'Arginine', 'Aspartic acid', 'Glutamic acid',
+    'Glycine', 'Histidine', 'Isoleucine', 'Leucine', 'Lysine', 'Methionine', 'Phenylalanine',
+    'Proline', 'Serine', 'Threonine', 'Tryptophan', 'Tyrosine', 'Valine', 'Oxalate', 'Omega-3',
+    'Omega-6', 'Caffeine', 'Lycopene', 'Phytosterol', 'Beta-Hydroxybutyrate', 'Lutein + Zeaxanthin'
 ];
+
+const CATEGORIZED_MARKERS: Record<string, string[]> = {
+    'Proximate': ['Ash', 'Water', 'Fiber', 'Alcohol'],
+    'Carbohydrates': ['Starch', 'Sugars', 'Glucose', 'Fructose', 'Sucrose', 'Lactose', 'Maltose', 'Allulose', 'Galactose', 'Sugar Alcohol'],
+    'Vitamins': ['Vitamin A', 'Vitamin C', 'Vitamin D', 'Vitamin E', 'Vitamin K', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Choline', 'Retinol', 'Beta-carotene', 'Alpha-carotene', 'Beta-cryptoxanthin'],
+    'Vitamin E Derivatives': ['Alpha-tocopherol', 'Beta-tocopherol', 'Delta-tocopherol', 'Gamma-tocopherol'],
+    'Minerals': ['Calcium', 'Iron', 'Magnesium', 'Phosphorus', 'Potassium', 'Sodium', 'Zinc', 'Copper', 'Manganese', 'Selenium', 'Iodine', 'Chromium', 'Fluoride', 'Molybdenum'],
+    'Amino Acids': ['Alanine', 'Arginine', 'Aspartic acid', 'Glutamic acid', 'Glycine', 'Histidine', 'Isoleucine', 'Leucine', 'Lysine', 'Methionine', 'Phenylalanine', 'Proline', 'Serine', 'Threonine', 'Tryptophan', 'Tyrosine', 'Valine'],
+    'Lipids & Others': ['Saturated Fat', 'Monounsaturated Fat', 'Polyunsaturated Fat', 'Trans Fat', 'Cholesterol', 'Omega-3', 'Omega-6', 'Phytosterol', 'Oxalate', 'Caffeine', 'Lycopene', 'Beta-Hydroxybutyrate', 'Lutein + Zeaxanthin']
+};
 
 export default function DashboardFoodPage() {
     return (
@@ -81,6 +70,8 @@ export default function DashboardFoodPage() {
 function FoodItemCreatorContent() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [showAdvanced, setShowAdvanced] = useState(false);
+    const [showMissing, setShowMissing] = useState(false);
 
     // State for the food item
     const [name, setName] = useState('');
@@ -101,6 +92,27 @@ function FoodItemCreatorContent() {
 
     const [rawText, setRawText] = useState('');
     const [showParser, setShowParser] = useState(true);
+
+    const integrity = useMemo(() => {
+        const present = ALL_79_MARKERS.filter(m => {
+            // Check top-level macros first
+            if (m === 'Protein') return !!protein;
+            if (m === 'Fat') return !!fat;
+            if (m === 'Fiber') return !!micronutrients['Fiber'] || !!(micronutrients as any)['Fiber']; // handle naming variations
+
+            // Special check for carbs since it's a top level state
+            if (m === 'Carbohydrates' || m === 'Carbs') return !!carbs;
+
+            return !!micronutrients[m] && micronutrients[m] !== '0';
+        });
+        const missing = ALL_79_MARKERS.filter(m => !present.includes(m));
+        return {
+            score: present.length,
+            total: ALL_79_MARKERS.length,
+            missing,
+            percent: Math.round((present.length / ALL_79_MARKERS.length) * 100)
+        };
+    }, [micronutrients, protein, fat, carbs]);
 
     const handleParse = () => {
         if (!rawText.trim()) return;
@@ -151,7 +163,6 @@ function FoodItemCreatorContent() {
 
         setLoading(true);
         try {
-            // 1. Prepare data
             const foodData = {
                 name,
                 common_name: commonName || null,
@@ -167,7 +178,6 @@ function FoodItemCreatorContent() {
                 }, {} as Record<string, number>)
             };
 
-            // 2. Upsert food item
             const { data: item, error: itemError } = await supabase
                 .from('food_items')
                 .upsert(foodData, { onConflict: 'name' })
@@ -176,7 +186,6 @@ function FoodItemCreatorContent() {
 
             if (itemError) throw itemError;
 
-            // 3. Save measures
             const validMeasures = measures
                 .filter(m => m.label && m.weight && parseFloat(m.weight) > 0)
                 .map(m => ({
@@ -215,263 +224,284 @@ function FoodItemCreatorContent() {
     };
 
     return (
-        <div className="max-w-5xl mx-auto space-y-8">
+        <div className="max-w-6xl mx-auto space-y-8 pb-20">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Food Library Architect</h1>
-                    <p className="text-slate-500 mt-1 text-sm">Add or update clinical-grade ingredients with precision.</p>
+                    <h1 className="text-3xl font-black tracking-tighter flex items-center gap-3">
+                        <Beef className="text-emerald-500" />
+                        Food Library Architect
+                    </h1>
+                    <p className="text-slate-500 mt-1 text-sm font-medium">Add clinical-grade ingredients to the global synthesis engine.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <Button
                         variant="outline"
                         onClick={() => setShowParser(!showParser)}
-                        className="gap-2 border-slate-200 dark:border-slate-800"
+                        className="gap-2 border-slate-200 dark:border-slate-800 rounded-xl"
                     >
-                        <Sparkles size={16} className="text-amber-500" />
-                        {showParser ? 'Hide Parser' : 'Show Parser'}
+                        <Zap size={16} className="text-amber-500 fill-current" />
+                        {showParser ? 'Close Extraction' : 'Magic Extraction'}
                     </Button>
                     <Button
-                        className="bg-emerald-600 hover:bg-emerald-700 min-w-[140px] text-white shadow-lg shadow-emerald-500/10 gap-2"
+                        className="bg-slate-950 hover:bg-slate-900 border-none min-w-[140px] text-white shadow-xl shadow-slate-950/20 gap-2 rounded-xl h-11"
                         onClick={handleSave}
                         disabled={loading}
                     >
-                        {loading ? <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-r-white" /> : <Save size={16} />}
-                        Save Changes
+                        {loading ? <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-r-white" /> : <Save size={18} />}
+                        Sync Library
                     </Button>
                 </div>
             </div>
 
             {showParser && (
-                <Card className="p-6 border-emerald-500/20 bg-emerald-500/[0.02] animate-in fade-in slide-in-from-top-4 duration-300">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600">
-                            <Zap size={18} />
+                <Card className="p-8 border-emerald-500/30 bg-emerald-500/[0.03] animate-in fade-in slide-in-from-top-4 duration-300">
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-600">
+                            <Sparkles size={24} />
                         </div>
                         <div>
-                            <h3 className="font-bold text-sm">Magic Data Extraction</h3>
-                            <p className="text-xs text-slate-500">Paste raw nutritional text to automatically map clinical data.</p>
+                            <h3 className="font-black uppercase tracking-widest text-sm text-emerald-700">Neural Mapping Engine</h3>
+                            <p className="text-xs text-emerald-600/80 font-medium">Paste raw clinical data below. We'll map all 79 markers instantly.</p>
                         </div>
                     </div>
                     <Textarea
-                        placeholder="Paste nutritional data here..."
-                        className="min-h-[160px] mb-4 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-sm"
+                        placeholder="Paste USDA, NCCDB, or NutritionFacts data here..."
+                        className="min-h-[220px] mb-6 bg-white dark:bg-slate-950 border-emerald-500/20 text-sm focus:ring-emerald-500/20 rounded-2xl font-mono p-6"
                         value={rawText}
                         onChange={(e) => setRawText(e.target.value)}
                     />
                     <div className="flex justify-end">
-                        <Button onClick={handleParse} className="bg-emerald-500 text-white hover:bg-emerald-600 text-xs font-bold uppercase tracking-widest px-6">
-                            Run Extraction
+                        <Button onClick={handleParse} className="h-12 bg-emerald-600 text-white hover:bg-emerald-700 text-xs font-black uppercase tracking-widest px-10 shadow-lg shadow-emerald-600/20 rounded-xl">
+                            Run Neural Synthesis
                         </Button>
                     </div>
                 </Card>
             )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Left Column: Basics & Macros */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                {/* Left Column: Data Integrity Summary */}
                 <div className="lg:col-span-1 space-y-6">
-                    <Card className="p-6 space-y-6">
-                        <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
-                            <Beef size={18} className="text-emerald-500" />
-                            <h3 className="font-bold text-sm uppercase tracking-wider">Identity</h3>
+                    <Card className="p-6 border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50">
+                        <div className="flex items-center gap-3 mb-6">
+                            <Activity size={18} className="text-blue-500" />
+                            <h3 className="font-black uppercase tracking-widest text-xs">Data Integrity</h3>
                         </div>
 
+                        <div className="space-y-6">
+                            <div className="relative h-4 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+                                <div
+                                    className={cn(
+                                        "h-full transition-all duration-1000 ease-out",
+                                        integrity.percent > 90 ? "bg-emerald-500" : integrity.percent > 50 ? "bg-amber-500" : "bg-rose-500"
+                                    )}
+                                    style={{ width: `${integrity.percent}%` }}
+                                />
+                            </div>
+
+                            <div className="flex justify-between items-end">
+                                <div>
+                                    <p className="text-[10px] uppercase font-black text-slate-400">Markers Mapped</p>
+                                    <p className="text-3xl font-black">{integrity.score} <span className="text-sm font-medium text-slate-400">/ {integrity.total}</span></p>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-xs font-black text-emerald-500">{integrity.percent}%</p>
+                                    <p className="text-[10px] uppercase font-bold text-slate-400">Complete</p>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={() => setShowMissing(!showMissing)}
+                                className="w-full py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-[10px] font-black uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                            >
+                                <Info size={14} />
+                                {showMissing ? 'Hide Missing Markers' : 'View Missing Markers'}
+                            </button>
+
+                            {showMissing && (
+                                <div className="p-4 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2 max-h-[400px] overflow-y-auto animate-in slide-in-from-top-2">
+                                    <p className="text-[10px] font-black uppercase text-rose-500 flex items-center gap-2 mb-3">
+                                        <AlertCircle size={10} /> {integrity.missing.length} Markers Remaining
+                                    </p>
+                                    <div className="flex flex-wrap gap-1.5">
+                                        {integrity.missing.map(m => (
+                                            <span key={m} className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[9px] font-medium text-slate-500">{m}</span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </Card>
+
+                    <Card className="p-6">
+                        <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4 mb-6">
+                            <Utensils size={18} className="text-blue-500" />
+                            <h3 className="font-bold text-xs uppercase tracking-wider">Unit Scaling</h3>
+                        </div>
                         <div className="space-y-4">
-                            <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">Scientific Name</Label>
-                                <Input
-                                    placeholder="e.g. Peppers, sweet, green, raw"
-                                    className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">Common Name</Label>
-                                <Input
-                                    placeholder="e.g. Green Bell Pepper"
-                                    className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm"
-                                    value={commonName}
-                                    onChange={(e) => setCommonName(e.target.value)}
-                                />
-                            </div>
-                            <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">Authority Source</Label>
-                                <select
-                                    className="w-full h-9 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-xs px-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
-                                    value={source}
-                                    onChange={(e) => setSource(e.target.value)}
-                                >
-                                    <option value="manual">Manual Entry</option>
-                                    <option value="usda">USDA FoodData Central</option>
-                                    <option value="nccdb">NCCDB (Clinical)</option>
-                                    <option value="nutritionfacts">NutritionFacts.org</option>
-                                </select>
-                            </div>
-                        </div>
-                    </Card>
-
-                    <Card className="p-6 space-y-6">
-                        <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
-                            <Scale size={18} className="text-emerald-500" />
-                            <h3 className="font-bold text-sm uppercase tracking-wider">Base Macros (100g)</h3>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">kcal</Label>
-                                <Input type="number" value={energyKcal} className="font-bold text-center" onChange={(e) => setEnergyKcal(e.target.value)} />
-                            </div>
-                            <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">kJ</Label>
-                                <Input type="number" value={energyKj} className="font-bold text-center" onChange={(e) => setEnergyKj(e.target.value)} />
-                            </div>
-                            <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">Protein (g)</Label>
-                                <Input type="number" value={protein} className="text-center" onChange={(e) => setProtein(e.target.value)} />
-                            </div>
-                            <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">Carbs (g)</Label>
-                                <Input type="number" value={carbs} className="text-center" onChange={(e) => setCarbs(e.target.value)} />
-                            </div>
-                            <div className="space-y-1.5">
-                                <Label className="text-[10px] uppercase font-black text-slate-400">Fat (g)</Label>
-                                <Input type="number" value={fat} className="text-center" onChange={(e) => setFat(e.target.value)} />
-                            </div>
-                        </div>
-                    </Card>
-
-                    <Card className="p-6 shadow-md border-amber-100/50 dark:border-amber-900/20 bg-amber-50/10 dark:bg-amber-950/5">
-                        <h3 className="font-bold text-[10px] uppercase tracking-widest text-amber-700 dark:text-amber-400 mb-4 flex items-center gap-2">
-                            <Sparkles size={14} /> Sugar Dynamics (g)
-                        </h3>
-                        <div className="grid grid-cols-2 gap-3">
-                            {['Fructose', 'Glucose', 'Sucrose', 'Lactose', 'Sugar Alcohol'].map(s => (
-                                <div key={s} className="space-y-1">
-                                    <Label className="text-[9px] uppercase font-bold text-slate-400">{s}</Label>
-                                    <Input
-                                        type="number"
-                                        className="h-7 text-xs bg-white dark:bg-slate-900"
-                                        value={micronutrients[s] || ''}
-                                        onChange={(e) => updateMicro(s, e.target.value)}
-                                    />
+                            {measures.map((m, i) => (
+                                <div key={i} className="flex gap-2 items-end group">
+                                    <div className="flex-1">
+                                        <Label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Unit</Label>
+                                        <Input
+                                            value={m.label}
+                                            className="h-8 text-xs bg-slate-50 dark:bg-slate-950 rounded-lg"
+                                            onChange={(e) => updateMeasure(i, 'label', e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="w-16">
+                                        <Label className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Grams</Label>
+                                        <Input
+                                            type="number"
+                                            value={m.weight}
+                                            className="h-8 text-xs bg-slate-50 dark:bg-slate-950 font-bold text-center rounded-lg"
+                                            onChange={(e) => updateMeasure(i, 'weight', e.target.value)}
+                                        />
+                                    </div>
+                                    <button onClick={() => removeMeasure(i)} className="h-8 w-8 text-slate-300 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100">
+                                        <Trash2 size={14} />
+                                    </button>
                                 </div>
                             ))}
+                            <Button variant="outline" size="sm" onClick={addMeasure} className="w-full text-[9px] uppercase font-black tracking-widest h-8 border-dashed rounded-lg">
+                                <Plus size={12} className="mr-1" /> Add Marker
+                            </Button>
                         </div>
                     </Card>
                 </div>
 
-                {/* Right Area: Large Sections */}
-                <div className="lg:col-span-2 space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <Card className="p-6">
-                            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
-                                <div className="flex items-center gap-3">
-                                    <Zap size={18} className="text-emerald-500" />
-                                    <h3 className="font-bold text-sm uppercase tracking-wider">Clinical Micros</h3>
+                {/* Main Content Area */}
+                <div className="lg:col-span-3 space-y-8">
+                    {/* Identity & Core Macros */}
+                    <Card className="p-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                            <div className="space-y-6">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <Beef size={20} className="text-emerald-500" />
+                                    <h3 className="font-black text-sm uppercase tracking-widest">Base Identity</h3>
                                 </div>
-                                <Badge variant="outline" className="text-[10px] opacity-50 font-normal">Essential</Badge>
-                            </div>
-                            <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                                {STANDARD_MICROS.slice(0, 16).map(micro => (
-                                    <div key={micro} className="space-y-1">
-                                        <Label className="text-[10px] text-slate-500 truncate block">
-                                            {micro} <span className="text-[8px] opacity-60">({MICRONUTRIENT_UNITS[micro] || 'mg'})</span>
-                                        </Label>
+                                <div className="space-y-5">
+                                    <div className="space-y-1.5">
+                                        <Label className="text-[10px] uppercase font-black text-slate-400">Scientific Designation</Label>
                                         <Input
-                                            className="h-8 text-xs bg-slate-50 dark:bg-slate-950"
-                                            value={micronutrients[micro] || ''}
-                                            onChange={(e) => updateMicro(micro, e.target.value)}
+                                            placeholder="e.g. Potatoes, raw, white"
+                                            className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm rounded-xl font-bold"
+                                            value={name}
+                                            onChange={(e) => setName(e.target.value)}
                                         />
                                     </div>
-                                ))}
+                                    <div className="space-y-1.5">
+                                        <Label className="text-[10px] uppercase font-black text-slate-400">Common Name</Label>
+                                        <Input
+                                            placeholder="e.g. White Potato"
+                                            className="h-11 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm rounded-xl"
+                                            value={commonName}
+                                            onChange={(e) => setCommonName(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
                             </div>
-                        </Card>
 
-                        <div className="space-y-6">
-                            <Card className="p-6">
-                                <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
-                                    <Utensils size={18} className="text-blue-500" />
-                                    <h3 className="font-bold text-sm uppercase tracking-wider">Unit Scaling</h3>
+                            <div className="space-y-6">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <Scale size={20} className="text-emerald-500" />
+                                    <h3 className="font-black text-sm uppercase tracking-widest">Energy Vectors (per 100g)</h3>
                                 </div>
-                                <div className="space-y-4">
-                                    {measures.map((m, i) => (
-                                        <div key={i} className="flex gap-2 items-end">
-                                            <div className="flex-1">
-                                                <Label className="text-[9px] font-bold text-slate-400">Unit Label</Label>
-                                                <Input
-                                                    value={m.label}
-                                                    className="h-8 text-xs bg-slate-50 dark:bg-slate-950"
-                                                    onChange={(e) => updateMeasure(i, 'label', e.target.value)}
-                                                />
-                                            </div>
-                                            <div className="w-20">
-                                                <Label className="text-[9px] font-bold text-slate-400">grams</Label>
-                                                <Input
-                                                    type="number"
-                                                    value={m.weight}
-                                                    className="h-8 text-xs bg-slate-50 dark:bg-slate-950 font-bold text-center"
-                                                    onChange={(e) => updateMeasure(i, 'weight', e.target.value)}
-                                                />
-                                            </div>
-                                            <Button variant="ghost" size="icon" onClick={() => removeMeasure(i)} className="h-8 w-8 text-slate-300 hover:text-rose-500 transition-colors">
-                                                <Trash2 size={14} />
-                                            </Button>
-                                        </div>
-                                    ))}
-                                    <Button variant="outline" size="sm" onClick={addMeasure} className="w-full text-[10px] uppercase font-black tracking-widest h-8 border-dashed">
-                                        <Plus size={12} className="mr-1" /> Add Reference Unit
-                                    </Button>
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className="space-y-1.5">
+                                        <Label className="text-[10px] uppercase font-black text-slate-400">kcal</Label>
+                                        <Input type="number" value={energyKcal} className="h-11 font-black text-center rounded-xl bg-emerald-500/5 border-emerald-500/20" onChange={(e) => setEnergyKcal(e.target.value)} />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label className="text-[10px] uppercase font-black text-slate-400">Protein</Label>
+                                        <Input type="number" value={protein} className="h-11 text-center rounded-xl bg-slate-50 dark:bg-slate-950 font-bold" onChange={(e) => setProtein(e.target.value)} />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label className="text-[10px] uppercase font-black text-slate-400">Fat</Label>
+                                        <Input type="number" value={fat} className="h-11 text-center rounded-xl bg-slate-50 dark:bg-slate-950 font-bold" onChange={(e) => setFat(e.target.value)} />
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        <Label className="text-[10px] uppercase font-black text-slate-400">Carbs</Label>
+                                        <Input type="number" value={carbs} className="h-11 text-center rounded-xl bg-slate-50 dark:bg-slate-950 font-bold" onChange={(e) => setCarbs(e.target.value)} />
+                                    </div>
+                                    <div className="space-y-1.5 col-span-2">
+                                        <Label className="text-[10px] uppercase font-black text-slate-400">kJ (Calculated)</Label>
+                                        <Input type="number" value={energyKj} className="h-11 text-center rounded-xl bg-slate-50 dark:bg-slate-950 text-slate-500" onChange={(e) => setEnergyKj(e.target.value)} />
+                                    </div>
                                 </div>
-                            </Card>
-
-                            <Card className="p-6 border-rose-500/10 bg-rose-500/[0.01]">
-                                <h3 className="font-bold text-[10px] uppercase tracking-widest text-rose-600 mb-4 flex items-center gap-2">
-                                    <Activity size={14} /> Health Markers
-                                </h3>
-                                <div className="grid grid-cols-2 gap-4">
-                                    {[
-                                        { key: 'Oxalate', unit: 'mg' },
-                                        { key: 'Fiber', unit: 'g' },
-                                        { key: 'Water', unit: 'g' },
-                                        { key: 'Magnesium', unit: 'mg' }
-                                    ].map(m => (
-                                        <div key={m.key} className="space-y-1">
-                                            <Label className="text-[10px] font-bold text-slate-500">{m.key} ({m.unit})</Label>
-                                            <Input
-                                                type="number"
-                                                className="h-8 text-xs"
-                                                value={micronutrients[m.key] || ''}
-                                                onChange={(e) => updateMicro(m.key, e.target.value)}
-                                            />
-                                        </div>
-                                    ))}
-                                </div>
-                            </Card>
-                        </div>
-                    </div>
-
-                    <Card className="p-6">
-                        <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
-                            <Sparkles size={18} className="text-purple-500" />
-                            <h3 className="font-bold text-sm uppercase tracking-wider">Deep Analytics Profile (Amino Acids & Lipids)</h3>
-                        </div>
-                        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-4 gap-y-3">
-                            {[
-                                'Alanine', 'Arginine', 'Glycine', 'Leucine', 'Lysine',
-                                'Saturated Fat', 'Omega-3', 'Omega-6', 'Cholesterol', 'Phytosterol'
-                            ].map(amino => (
-                                <div key={amino} className="space-y-1">
-                                    <Label className="text-[9px] text-slate-500 truncate block font-bold">{amino}</Label>
-                                    <Input
-                                        type="number"
-                                        className="h-7 text-[10px] bg-slate-50 dark:bg-slate-950"
-                                        value={micronutrients[amino] || ''}
-                                        onChange={(e) => updateMicro(amino, e.target.value)}
-                                    />
-                                </div>
-                            ))}
+                            </div>
                         </div>
                     </Card>
+
+                    {/* Advanced Markers Controller */}
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between">
+                            <h3 className="font-black text-sm uppercase tracking-widest flex items-center gap-3">
+                                <Activity className="text-blue-500" />
+                                Clinical Marker Matrix
+                                <span className="text-[10px] text-slate-400 font-medium normal-case tracking-normal">(Manually edit specific markers)</span>
+                            </h3>
+                            <Button
+                                variant="ghost"
+                                onClick={() => setShowAdvanced(!showAdvanced)}
+                                className="text-[10px] font-black uppercase tracking-widest gap-2"
+                            >
+                                {showAdvanced ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                                {showAdvanced ? 'Collapse Matrix' : 'Expand Matrix'}
+                            </Button>
+                        </div>
+
+                        {showAdvanced && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                {Object.entries(CATEGORIZED_MARKERS).map(([category, markers]) => (
+                                    <Card key={category} className="p-6">
+                                        <div className="mb-4 border-b border-slate-100 dark:border-slate-800 pb-2">
+                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400">{category}</h4>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+                                            {markers.map(m => (
+                                                <div key={m} className="space-y-1">
+                                                    <div className="flex justify-between items-center px-1">
+                                                        <Label className="text-[10px] text-slate-500 truncate block font-medium uppercase tracking-tighter">
+                                                            {m}
+                                                        </Label>
+                                                        {(m === 'Protein' ? protein : m === 'Fat' ? fat : m === 'Carbs' ? carbs : micronutrients[m]) ? (
+                                                            <CheckCircle2 size={10} className="text-emerald-500" />
+                                                        ) : null}
+                                                    </div>
+                                                    <Input
+                                                        type="number"
+                                                        className={cn(
+                                                            "h-8 text-xs bg-slate-50 dark:bg-slate-950 rounded-lg",
+                                                            (m === 'Protein' ? protein : m === 'Fat' ? fat : m === 'Carbs' ? carbs : micronutrients[m]) ? "border-emerald-500/20 bg-emerald-500/[0.02]" : ""
+                                                        )}
+                                                        value={m === 'Protein' ? protein : m === 'Fat' ? fat : m === 'Carbs' ? carbs : micronutrients[m] || ''}
+                                                        onChange={(e) => {
+                                                            if (m === 'Protein') setProtein(e.target.value);
+                                                            else if (m === 'Fat') setFat(e.target.value);
+                                                            else if (m === 'Carbs') setCarbs(e.target.value);
+                                                            else updateMicro(m, e.target.value);
+                                                        }}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </Card>
+                                ))}
+                            </div>
+                        )}
+
+                        {!showAdvanced && (
+                            <button
+                                onClick={() => setShowAdvanced(true)}
+                                className="w-full h-32 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center group hover:border-blue-500/50 hover:bg-blue-500/[0.02] transition-all"
+                            >
+                                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover:text-blue-500 group-hover:bg-blue-500/10 transition-all mb-3">
+                                    <ChevronDown size={20} />
+                                </div>
+                                <span className="text-xs font-black uppercase tracking-widest text-slate-400 group-hover:text-blue-500 transition-colors">Expand Manual Marker Overrides</span>
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
