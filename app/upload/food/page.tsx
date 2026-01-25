@@ -521,6 +521,33 @@ function FoodItemCreatorContent() {
                                     ))}
                                 </div>
                             </Card>
+
+                            <Card className="p-6 border-rose-100 dark:border-rose-900/30 bg-rose-50/10 dark:bg-rose-950/5">
+                                <h3 className="font-semibold text-lg mb-4 flex items-center gap-2 text-rose-700 dark:text-rose-400">
+                                    <Zap className="w-5 h-5" />
+                                    Health & Lifestyle Markers
+                                </h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                    {[
+                                        { key: 'Oxalate', unit: 'mg' },
+                                        { key: 'Water', unit: 'g' },
+                                        { key: 'Caffeine', unit: 'mg' },
+                                        { key: 'Alcohol', unit: 'g' },
+                                        { key: 'Ash', unit: 'g' },
+                                        { key: 'Beta-Hydroxybutyrate', label: 'BHB (ketones)', unit: 'g' }
+                                    ].map(m => (
+                                        <div key={m.key}>
+                                            <Label className="dark:text-slate-400 text-[10px] uppercase font-bold">{m.label || m.key} ({m.unit})</Label>
+                                            <Input
+                                                type="number"
+                                                className="h-8 text-xs bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+                                                value={micronutrients[m.key] !== undefined ? micronutrients[m.key] : ''}
+                                                onChange={(e) => updateMicro(m.key, e.target.value)}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            </Card>
                         </div>
                     </div>
 
