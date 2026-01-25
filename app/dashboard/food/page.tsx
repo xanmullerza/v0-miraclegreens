@@ -241,14 +241,14 @@ function FoodItemCreatorContent() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-8 pb-20">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-black tracking-tighter flex items-center gap-3">
-                        <Beef className="text-emerald-500" />
-                        Food Library Architect
-                    </h1>
-                    <p className="text-slate-500 mt-1 text-sm font-medium">Add clinical-grade ingredients to the global synthesis engine.</p>
-                </div>
+            <div className="text-center py-4 space-y-4">
+                <h1 className="text-4xl font-black tracking-tighter flex items-center justify-center gap-4">
+                    <Beef className="text-emerald-500 h-10 w-10" />
+                    Food Library Architect
+                </h1>
+                <p className="text-slate-500 text-sm font-medium max-w-lg mx-auto">
+                    Add clinical-grade ingredients to the global synthesis engine with neural dual-stream extraction.
+                </p>
             </div>
 
             {/* Top Row: Neural Mapping & Core Identity */}
