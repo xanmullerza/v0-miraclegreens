@@ -338,7 +338,7 @@ function FoodItemCreatorContent() {
                                     Sugar Profile (g)
                                 </h3>
                                 <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                                    {['Fructose', 'Glucose', 'Sucrose', 'Lactose', 'Galactose', 'Maltose', 'Allulose'].map(s => (
+                                    {['Fructose', 'Glucose', 'Sucrose', 'Lactose', 'Galactose', 'Maltose', 'Allulose', 'Sugar Alcohol'].map(s => (
                                         <div key={s}>
                                             <Label className="dark:text-slate-400 text-[10px] uppercase font-bold tracking-tight">{s}</Label>
                                             <Input

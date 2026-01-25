@@ -35,26 +35,24 @@ export function parseNutritionText(text: string): Partial<ParsedNutrition> {
         for (let i = 0; i < allLines.length; i++) {
             if (regex.test(allLines[i])) {
                 // Check same line first (Source 1 style)
-                // Match patterns like "20", "20g", "20 mg", "<0.1", etc.
-                const sameLineMatch = allLines[i].match(/(?:^|\s|<|:)(-?\d+(?:\.\d+)?)\s*(?:g|mg|µg|ug|kcal|kj|iu|%)/i) ||
-                    allLines[i].match(/\s+(\d+(?:\.\d+)?)$/);
-
+                const sameLineMatch = allLines[i].match(/(?:^|\s|<|:)(-?\d+(?:\.\d+)?)\s*(?:g|mg|µg|ug|kcal|kj|iu|%)/i);
                 if (sameLineMatch) return parseFloat(sameLineMatch[1]);
 
                 // Check subsequent lines (Source 2 style)
-                // Look ahead 5 lines, skipping "Amount", "% DV", or the label repeated
-                for (let j = 1; j <= 5; j++) {
+                for (let j = 1; j <= 3; j++) {
                     if (i + j >= allLines.length) break;
                     const nextLine = allLines[i + j];
-                    if (['Amount', '% DV'].includes(nextLine)) continue;
 
-                    // Match a number (allow < prefix)
+                    // If we hit an explicit "no value" marker on the next line, return 0
+                    if (nextLine === '-' || nextLine.toLowerCase() === 'n/a' || nextLine === '.') return 0;
+
+                    // Match a number
                     const match = nextLine.match(/^(?:<)?\s*(-?\d+(?:\.\d+)?)/);
                     if (match) return parseFloat(match[1]);
 
-                    // If we hit another alphabetic word that isn't a known skip, 
-                    // we might have moved to a different nutrient. But some nutrients
-                    // are multi-word, so we are cautious.
+                    // CRITICAL: If the line looks like a NEW label (mostly letters), stop searching
+                    // to prevent "bleeding" into the next nutrient's value
+                    if (/[a-zA-Z]{3,}/.test(nextLine) && !['Amount', '% DV'].includes(nextLine)) break;
                 }
             }
         }
@@ -136,6 +134,8 @@ export function parseNutritionText(text: string): Partial<ParsedNutrition> {
         'Lactose': /^Lactose$/i,
         'Galactose': /^Galactose$/i,
         'Maltose': /^Maltose$/i,
+        'Allulose': /^Allulose$/i,
+        'Sugar Alcohol': /Sugar Alcohol|Polyols/i,
         'Betaine': /^Betaine$/i,
         'Retinol': /^Retinol$/i,
         'Alpha-carotene': /Alpha-carotene/i,
@@ -144,7 +144,6 @@ export function parseNutritionText(text: string): Partial<ParsedNutrition> {
         'Lutein + Zeaxanthin': /Lutein\s*\+\s*Zeaxanthin/i,
         'Lycopene': /Lycopene/i,
         'Delta-tocopherol': /Delta\s*-?\s*Tocopherol/i,
-        'Allulose': /^Allulose$/i,
         'Alpha-tocopherol': /Vitamin E|Alpha\s*-?\s*Tocopherol/i,
         'Beta-tocopherol': /Beta\s*-?\s*Tocopherol/i,
         'Gamma-tocopherol': /Gamma\s*-?\s*Tocopherol/i
