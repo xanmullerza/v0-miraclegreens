@@ -206,7 +206,7 @@ export function parseMeasures(text: string): ParsedMeasure[] {
 
             if (weightMatch && !label.match(/^\d+$/)) {
                 measures.push({
-                    label: label.toLowerCase().replace(/,.*$/, '').trim(), // cup, whole pieces -> cup
+                    label: label.toLowerCase().trim(),
                     weight_g: parseFloat(weightMatch[1])
                 });
                 i += 2; // Skip the next two lines as we used them

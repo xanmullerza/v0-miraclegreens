@@ -34,7 +34,7 @@ const Card = ({ children, className }: { children: React.ReactNode, className?: 
     </div>
 );
 
-const ALL_79_MARKERS = [
+const ALL_CLINICAL_MARKERS = [
     'Ash', 'Water', 'Fiber', 'Alcohol', 'Protein', 'Fat', 'Saturated Fat', 'Monounsaturated Fat',
     'Polyunsaturated Fat', 'Trans Fat', 'Cholesterol', 'Starch', 'Sugars', 'Glucose', 'Fructose',
     'Sucrose', 'Lactose', 'Maltose', 'Allulose', 'Galactose', 'Sugar Alcohol', 'Vitamin A',
@@ -94,7 +94,7 @@ function FoodItemCreatorContent() {
     const [showParser, setShowParser] = useState(true);
 
     const integrity = useMemo(() => {
-        const present = ALL_79_MARKERS.filter(m => {
+        const present = ALL_CLINICAL_MARKERS.filter((m: string) => {
             // Check top-level macros first
             if (m === 'Protein') return !!protein;
             if (m === 'Fat') return !!fat;
@@ -105,12 +105,12 @@ function FoodItemCreatorContent() {
 
             return !!micronutrients[m] && micronutrients[m] !== '0';
         });
-        const missing = ALL_79_MARKERS.filter(m => !present.includes(m));
+        const missing = ALL_CLINICAL_MARKERS.filter((m: string) => !present.includes(m));
         return {
             score: present.length,
-            total: ALL_79_MARKERS.length,
+            total: ALL_CLINICAL_MARKERS.length,
             missing,
-            percent: Math.round((present.length / ALL_79_MARKERS.length) * 100)
+            percent: Math.round((present.length / ALL_CLINICAL_MARKERS.length) * 100)
         };
     }, [micronutrients, protein, fat, carbs]);
 
@@ -186,13 +186,18 @@ function FoodItemCreatorContent() {
 
             if (itemError) throw itemError;
 
-            const validMeasures = measures
+            const tempMeasures = measures
                 .filter(m => m.label && m.weight && parseFloat(m.weight) > 0)
                 .map(m => ({
                     food_item_id: item.id,
                     label: m.label.toLowerCase().trim(),
                     weight_g: parseFloat(m.weight)
                 }));
+
+            // Deduplicate by label to prevent Postgres Error
+            const validMeasures = tempMeasures.filter((m, index, self) =>
+                index === self.findIndex((t) => t.label === m.label)
+            );
 
             if (validMeasures.length > 0) {
                 const { error: measError } = await supabase
@@ -323,7 +328,7 @@ function FoodItemCreatorContent() {
                                         <AlertCircle size={10} /> {integrity.missing.length} Markers Remaining
                                     </p>
                                     <div className="flex flex-wrap gap-1.5">
-                                        {integrity.missing.map(m => (
+                                        {integrity.missing.map((m: string) => (
                                             <span key={m} className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[9px] font-medium text-slate-500">{m}</span>
                                         ))}
                                     </div>
