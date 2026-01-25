@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { Menu, TreeDeciduous, ShoppingBag, LayoutGrid, Calendar } from 'lucide-react';
+import { Menu, TreeDeciduous, ShoppingBag, LayoutGrid, Calendar, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ModeToggle } from '@/components/mode-toggle';
@@ -38,6 +38,12 @@ export function Header() {
 									<Link href="/browse">
 										<LayoutGrid className="h-4 w-4" />
 										Browse Resources
+									</Link>
+								</Button>
+								<Button className="gap-2 mt-2" asChild>
+									<Link href="/compare">
+										<BarChart3 className="h-4 w-4" />
+										Compare Ingredients
 									</Link>
 								</Button>
 								{showPlan && (
@@ -84,6 +90,12 @@ export function Header() {
 							<Link href="/browse">
 								<LayoutGrid className="h-4 w-4" />
 								Browse
+							</Link>
+						</Button>
+						<Button variant="secondary" size="sm" className="hidden lg:flex gap-2" asChild>
+							<Link href="/compare">
+								<BarChart3 className="h-4 w-4" />
+								Compare
 							</Link>
 						</Button>
 						{showPlan && (
