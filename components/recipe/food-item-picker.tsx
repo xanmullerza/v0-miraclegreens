@@ -6,6 +6,7 @@ import { searchUSDAFood, getUSDAMeasures, syncToLocal, FoodItemMatch } from '@/l
 interface FoodItem {
     id: string;
     name: string;
+    common_name?: string;
     energy_kcal: number;
     protein_g: number;
     fat_g: number;
@@ -37,8 +38,8 @@ export default function FoodItemPicker({ onSelect, onClose }: FoodItemPickerProp
             setLoading(true);
             const { data, error } = await supabase
                 .from('food_items')
-                .select('id, name, energy_kcal, protein_g, fat_g, carbs_g, energy_kj')
-                .ilike('name', `%${searchQuery}%`)
+                .select('id, name, common_name, energy_kcal, protein_g, fat_g, carbs_g, energy_kj')
+                .or(`name.ilike.%${searchQuery}%,common_name.ilike.%${searchQuery}%`)
                 .limit(20);
 
             if (!error && data) {
@@ -132,8 +133,8 @@ export default function FoodItemPicker({ onSelect, onClose }: FoodItemPickerProp
                         <button
                             onClick={() => setView('local')}
                             className={`flex-1 py-2 text-sm font-medium rounded-lg transition ${view === 'local'
-                                    ? 'bg-green-600 text-white shadow-md'
-                                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                ? 'bg-green-600 text-white shadow-md'
+                                : 'bg-muted text-muted-foreground hover:bg-muted/80'
                                 }`}
                         >
                             Local Database
@@ -141,8 +142,8 @@ export default function FoodItemPicker({ onSelect, onClose }: FoodItemPickerProp
                         <button
                             onClick={handleUSDASearch}
                             className={`flex-1 py-2 text-sm font-medium rounded-lg transition flex items-center justify-center gap-2 ${view === 'usda'
-                                    ? 'bg-blue-600 text-white shadow-md'
-                                    : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-blue-600'
+                                ? 'bg-blue-600 text-white shadow-md'
+                                : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-blue-600'
                                 }`}
                         >
                             <Sparkles className="w-4 h-4" />
@@ -187,8 +188,15 @@ export default function FoodItemPicker({ onSelect, onClose }: FoodItemPickerProp
                                             }}
                                             className="w-full text-left p-4 border border-border bg-card rounded-lg hover:bg-green-50 dark:hover:bg-green-950/30 hover:border-green-500 transition group shadow-sm"
                                         >
-                                            <div className="font-bold text-foreground group-hover:text-green-700 dark:group-hover:text-green-400">
-                                                {item.name}
+                                            <div className="flex flex-col">
+                                                <div className="font-bold text-foreground group-hover:text-green-700 dark:group-hover:text-green-400 capitalize">
+                                                    {item.common_name || item.name}
+                                                </div>
+                                                {item.common_name && (
+                                                    <div className="text-[10px] text-muted-foreground opacity-60 truncate">
+                                                        Original: {item.name}
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="text-xs text-muted-foreground mt-1 flex gap-2">
                                                 <span>{Math.round(item.energy_kcal)} kcal</span>
