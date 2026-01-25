@@ -603,20 +603,84 @@ export default function DashboardRecipePage() {
                                     ))}
                                 </div>
                             </div>
+
+                            <div className="space-y-3 pt-2">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Diet Type</Label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {['Balanced (Omnivore)', 'Pescetarian', 'Vegetarian', 'Vegan'].map(d => (
+                                        <button
+                                            key={d}
+                                            onClick={() => {
+                                                if (diet.includes(d)) {
+                                                    setDiet(diet.filter(item => item !== d));
+                                                } else {
+                                                    setDiet([...diet, d]);
+                                                }
+                                            }}
+                                            className={cn(
+                                                "h-9 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border px-2",
+                                                diet.includes(d)
+                                                    ? "bg-blue-500 text-white border-blue-600 shadow-md shadow-blue-500/20"
+                                                    : "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500"
+                                            )}
+                                        >
+                                            {d}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="flex flex-col justify-end pt-4 border-t md:border-t-0 md:border-l border-slate-100 dark:border-slate-800 md:pl-8 space-y-4">
-                            <Button
-                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20 h-16 rounded-2xl font-black uppercase tracking-widest group text-lg"
-                                disabled={saving}
-                                onClick={handleSave}
-                            >
-                                {saving ? <Loader2 className="animate-spin" /> : <Save className="mr-2 group-hover:scale-125 transition-transform" />}
-                                Save Recipe
-                            </Button>
-                            <p className="text-center text-[10px] text-slate-400 tracking-tighter uppercase px-4">
-                                By saving, this recipe and its nutrition data will be added to your recipe box.
-                            </p>
+                        <div className="flex flex-col justify-end pt-4 border-t md:border-t-0 md:border-l border-slate-100 dark:border-slate-800 md:pl-8 space-y-6">
+                            {/* Photo Upload Block */}
+                            <div className="space-y-2">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                                    <Camera size={12} /> Recipe Photo
+                                </Label>
+                                <div className="relative aspect-video rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group hover:border-emerald-500/50 transition-all flex flex-col items-center justify-center">
+                                    {image ? (
+                                        <>
+                                            <img src={image} alt="Recipe" className="w-full h-full object-cover" />
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                <Button variant="secondary" size="sm" className="gap-2" onClick={() => setImage('')}>
+                                                    <Trash2 size={14} /> Remove
+                                                </Button>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="text-center p-4">
+                                            {uploading ? (
+                                                <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mx-auto" />
+                                            ) : (
+                                                <>
+                                                    <Upload size={20} className="text-slate-400 mx-auto mb-2" />
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Upload Photo</p>
+                                                    <Input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="absolute inset-0 opacity-0 cursor-pointer"
+                                                        onChange={handleImageUpload}
+                                                    />
+                                                </>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <Button
+                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20 h-16 rounded-2xl font-black uppercase tracking-widest group text-lg"
+                                    disabled={saving}
+                                    onClick={handleSave}
+                                >
+                                    {saving ? <Loader2 className="animate-spin" /> : <Save className="mr-2 group-hover:scale-125 transition-transform" />}
+                                    Save Recipe
+                                </Button>
+                                <p className="text-center text-[10px] text-slate-400 tracking-tighter uppercase px-4">
+                                    By saving, this recipe and its nutrition data will be added to your recipe box.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </Card>
