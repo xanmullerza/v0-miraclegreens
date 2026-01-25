@@ -141,13 +141,13 @@ export function parseNutritionText(text: string): Partial<ParsedNutrition> {
         'Alpha-carotene': /Alpha-carotene/i,
         'Beta-carotene': /Beta-carotene/i,
         'Beta-cryptoxanthin': /Beta-cryptoxanthin/i,
-        'Lutein + Zeaxanthin': /Lutein \+ Zeaxanthin/i,
+        'Lutein + Zeaxanthin': /Lutein\s*\+\s*Zeaxanthin/i,
         'Lycopene': /Lycopene/i,
-        'Delta-tocopherol': /Delta-tocopherol/i,
+        'Delta-tocopherol': /Delta\s*-?\s*Tocopherol/i,
         'Allulose': /^Allulose$/i,
-        'Alpha-tocopherol': /Vitamin E \(alpha-tocopherol\)|Alpha-tocopherol/i,
-        'Beta-tocopherol': /Beta-tocopherol/i,
-        'Gamma-tocopherol': /Gamma-tocopherol/i
+        'Alpha-tocopherol': /Vitamin E|Alpha\s*-?\s*Tocopherol/i,
+        'Beta-tocopherol': /Beta\s*-?\s*Tocopherol/i,
+        'Gamma-tocopherol': /Gamma\s*-?\s*Tocopherol/i
     };
 
     Object.entries(microMap).forEach(([target, regex]) => {
