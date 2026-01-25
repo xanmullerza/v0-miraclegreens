@@ -50,7 +50,7 @@ const ALL_CLINICAL_MARKERS = [
 ];
 
 const CATEGORIZED_MARKERS: Record<string, string[]> = {
-    'Proximate': ['Ash', 'Water', 'Fiber', 'Alcohol'],
+    'Proximate': ['Ash', 'Water', 'Fiber', 'Alcohol', 'Protein', 'Fat', 'Carbohydrates'],
     'Carbohydrates': ['Starch', 'Sugars', 'Glucose', 'Fructose', 'Sucrose', 'Lactose', 'Maltose', 'Allulose', 'Galactose', 'Sugar Alcohol'],
     'Vitamins': ['Vitamin A', 'Vitamin C', 'Vitamin D', 'Vitamin E', 'Vitamin K', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Choline', 'Retinol', 'Beta-carotene', 'Alpha-carotene', 'Beta-cryptoxanthin'],
     'Vitamin E Derivatives': ['Alpha-tocopherol', 'Beta-tocopherol', 'Delta-tocopherol', 'Gamma-tocopherol'],
@@ -96,14 +96,13 @@ function FoodItemCreatorContent() {
     const integrity = useMemo(() => {
         const present = ALL_CLINICAL_MARKERS.filter((m: string) => {
             // Check top-level macros first
-            if (m === 'Protein') return !!protein;
-            if (m === 'Fat') return !!fat;
-            if (m === 'Fiber') return !!micronutrients['Fiber'] || !!(micronutrients as any)['Fiber']; // handle naming variations
+            if (m === 'Protein') return protein !== '';
+            if (m === 'Fat') return fat !== '';
+            if (m === 'Carbohydrates' || m === 'Carbs') return carbs !== '';
 
-            // Special check for carbs since it's a top level state
-            if (m === 'Carbohydrates' || m === 'Carbs') return !!carbs;
-
-            return !!micronutrients[m] && micronutrients[m] !== '0';
+            // Check for any defined value including '0'
+            const val = micronutrients[m];
+            return val !== undefined && val !== '';
         });
         const missing = ALL_CLINICAL_MARKERS.filter((m: string) => !present.includes(m));
         return {
