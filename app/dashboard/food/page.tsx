@@ -249,15 +249,6 @@ function FoodItemCreatorContent() {
                     </h1>
                     <p className="text-slate-500 mt-1 text-sm font-medium">Add clinical-grade ingredients to the global synthesis engine.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                    <Button
-                        variant="ghost"
-                        onClick={() => window.location.reload()}
-                        className="gap-2 text-slate-400 hover:text-rose-500 rounded-xl px-6"
-                    >
-                        Reset System
-                    </Button>
-                </div>
             </div>
 
             {/* Top Row: Neural Mapping & Core Identity */}
