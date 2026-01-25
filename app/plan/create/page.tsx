@@ -7,7 +7,7 @@ import IngredientBuilder, { RecipeIngredient } from '@/components/recipe/ingredi
 import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus, ListOrdered, ChevronUp, ChevronDown, ClipboardList } from 'lucide-react';
 import { Header } from '@/components/header';
 import { parseInstructionsOnly, parseRecipeText } from '@/lib/utils/recipe-parser';
-import { searchLocalFood, searchUSDAFood, getUSDAMeasures } from '@/lib/services/nutrition';
+import { searchLocalFood, searchUSDAFood, getUSDAMeasures, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -196,7 +196,15 @@ export default function CreateRecipePage() {
                     // USDA search
                     const usdaResults = await searchUSDAFood(searchQuery);
                     if (usdaResults.length > 0) {
-                        match = usdaResults[0];
+                        const usdaMatch = usdaResults[0];
+                        // FETCH measures and SYNC to local library immediately
+                        const measures = usdaMatch.fdcId ? await getUSDAMeasures(usdaMatch.fdcId) : [];
+                        const localId = await syncToLocal(usdaMatch, measures);
+                        if (localId) {
+                            match = { ...usdaMatch, id: localId, source: 'local' };
+                        } else {
+                            match = usdaMatch;
+                        }
                     }
                 }
 
