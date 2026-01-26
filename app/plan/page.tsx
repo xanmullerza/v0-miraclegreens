@@ -667,6 +667,34 @@ export default function MealPlannerPage() {
                                                             })}
                                                         </div>
                                                     </div>
+
+                                                    {/* LIFESTYLE & BIOACTIVE MARKERS */}
+                                                    <div className="p-6 rounded-2xl border bg-gradient-to-br from-purple-50 to-fuchsia-50 dark:from-purple-950/20 dark:to-fuchsia-950/20">
+                                                        <h4 className="font-black flex items-center gap-2 mb-1 text-purple-700 dark:text-purple-400 uppercase tracking-widest text-sm"><FlaskConical className="h-5 w-5" /> Lifestyle & Bioactive Markers</h4>
+                                                        <p className="text-[10px] text-muted-foreground mb-4 border-b border-purple-200 dark:border-purple-800 pb-2">Lifestyle choices & non-nutritive compounds</p>
+                                                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                                            {[
+                                                                { label: 'Caffeine', keys: ['Caffeine', 'caffeine_mg'], unit: 'mg' },
+                                                                { label: 'Alcohol', keys: ['Alcohol', 'alcohol_g'], unit: 'g' },
+                                                                { label: 'Beta-Hydroxybutyrate', keys: ['Beta-Hydroxybutyrate', 'beta_hydroxybutyrate_g'], unit: 'g' },
+                                                                { label: 'Oxalate', keys: ['Oxalate', 'oxalate_mg'], unit: 'mg' },
+                                                                { label: 'Ash', keys: ['Ash', 'ash_g'], unit: 'g' },
+                                                            ].map(({ label, keys, unit: unitLabel }) => {
+                                                                const val = getVal(keys);
+                                                                // These typically don't have standard RDAs for general health in the same way, but limits exist.
+                                                                // We'll show values plainly.
+                                                                return (
+                                                                    <div key={label} className="p-4 rounded-xl border bg-white dark:bg-slate-900 border-purple-100 dark:border-purple-900/50 hover:shadow-md transition-all">
+                                                                        <p className="text-[10px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
+                                                                        <div className="flex items-baseline gap-1">
+                                                                            <span className="text-xl font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span>
+                                                                            <span className="text-[10px] text-muted-foreground">{unitLabel}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             );
                                         })()}
