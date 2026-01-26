@@ -570,30 +570,7 @@ export default function MealPlannerPage() {
                                                             </div>
                                                         </div>
 
-                                                        {/* NON-NUTRITIVE - Vitality Essentials */}
-                                                        <div>
-                                                            <h4 className="font-black flex items-center gap-2 mb-1 text-cyan-700 dark:text-cyan-400 uppercase tracking-widest text-sm"><Droplet className="h-5 w-5" /> Non-Nutritive Essentials</h4>
-                                                            <p className="text-[10px] text-muted-foreground mb-4 border-b border-cyan-200 dark:border-cyan-800 pb-2">Zero calories • Essential for vitality</p>
-                                                            <div className="grid grid-cols-2 gap-3">
-                                                                {[
-                                                                    { label: 'Fiber', val: getVal(['Fiber', 'fiber_g']), target: 30, unit: 'g', desc: 'Digestive health' },
-                                                                    { label: 'Water', val: getVal(['Water', 'water_g', 'water_ml']) / 1000, target: 2.5, unit: 'L', desc: 'Hydration' },
-                                                                ].map(item => {
-                                                                    const pct = Math.round((item.val / item.target) * 100);
-                                                                    const styles = getNutrientLevelStyles(pct, item.label);
-                                                                    return (
-                                                                        <div key={item.label} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-900 cursor-pointer hover:shadow-md transition-all flex items-center gap-4", styles.borderLight)}>
-                                                                            <div className="flex-1">
-                                                                                <p className="text-[9px] uppercase font-black text-foreground/60 mb-1">{item.label}</p>
-                                                                                <div className="flex items-baseline gap-1"><span className="text-2xl font-black">{item.val >= 1 ? item.val.toFixed(1) : item.val.toFixed(2)}</span><span className="text-sm text-muted-foreground font-bold">/ {item.target}{item.unit}</span></div>
-                                                                                <p className="text-[10px] text-muted-foreground mt-1">{item.desc}</p>
-                                                                            </div>
-                                                                            <div className={cn("text-lg font-black px-3 py-1 rounded-lg", styles.fade, styles.text)}>{pct}%</div>
-                                                                        </div>
-                                                                    );
-                                                                })}
-                                                            </div>
-                                                        </div>
+
                                                     </div>
 
 
