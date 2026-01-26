@@ -546,7 +546,7 @@ export default function MealPlannerPage() {
                                                                     const canBreakdown = ['Protein', 'Carbs', 'Fat'].includes(macro.label);
 
                                                                     return (
-                                                                        <div key={macro.label} className={cn("p-3 rounded-xl border bg-white dark:bg-slate-900 cursor-pointer hover:shadow-md transition-all relative group", styles.borderLight)}>
+                                                                        <div key={macro.label} className={cn("p-3 rounded-xl border bg-white dark:bg-slate-900 cursor-pointer hover:shadow-md transition-all relative group", styles.borderLight, styles.fade)}>
                                                                             <div>
                                                                                 <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{macro.label}</p>
                                                                                 <div className="flex flex-col">
@@ -625,7 +625,7 @@ export default function MealPlannerPage() {
                                                                 const styles = getNutrientLevelStyles(pct || 0, label);
                                                                 const unitLabel = label.includes('Folate') || label.includes('B12') || label.includes('Biotin') ? 'µg' : 'mg';
                                                                 return (
-                                                                    <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-3 rounded-xl border bg-white dark:bg-slate-900 cursor-pointer hover:shadow-md transition-all", pct !== null ? styles.borderLight : "")}>
+                                                                    <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-3 rounded-xl border bg-white dark:bg-slate-900 cursor-pointer hover:shadow-md transition-all", pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
                                                                         <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
                                                                         <div className="flex items-baseline gap-1">
                                                                             <span className="text-lg font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span>
@@ -654,7 +654,7 @@ export default function MealPlannerPage() {
                                                                 const pct = rda ? Math.round((val / rda) * 100) : null;
                                                                 const styles = getNutrientLevelStyles(pct || 0, label);
                                                                 return (
-                                                                    <div key={label} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-900 hover:shadow-md transition-all relative group", pct !== null ? styles.borderLight : "")}>
+                                                                    <div key={label} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-900 hover:shadow-md transition-all relative group", pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
                                                                         <div onClick={() => setSelectedNutrientInfo(label)} className="cursor-pointer">
                                                                             <p className="text-[10px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
                                                                             <div className="flex items-baseline gap-1"><span className="text-xl font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span><span className={cn("text-[10px] font-bold", unitLabel === 'µg' ? "text-blue-600 dark:text-blue-400" : unitLabel === 'IU' ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground")}>{unitLabel}</span></div>
