@@ -492,8 +492,8 @@ export default function MealPlannerPage() {
                                             const getVal = (keys: string[]) => { for (const k of keys) if (m[k] !== undefined) return m[k]; return 0; };
                                             const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle }: { title: string, items: Record<string, any[]>, icon: any, theme?: 'indigo' | 'rose', subtitle?: string }) => {
                                                 const themes = {
-                                                    indigo: { bg: "from-indigo-50 to-violet-50 dark:from-indigo-950/20 dark:to-violet-950/20", text: "text-indigo-700 dark:text-indigo-400", border: "border-indigo-200 dark:border-indigo-800", itemBorder: "border-indigo-100 dark:border-indigo-900/50" },
-                                                    rose: { bg: "from-rose-50 to-pink-50 dark:from-rose-950/20 dark:to-pink-950/20", text: "text-rose-700 dark:text-rose-400", border: "border-rose-200 dark:border-rose-800", itemBorder: "border-rose-100 dark:border-rose-900/50" }
+                                                    indigo: { bg: "bg-slate-900 border-slate-800", text: "text-indigo-400", border: "border-slate-800", itemBorder: "border-indigo-900/50" },
+                                                    rose: { bg: "bg-slate-900 border-slate-800", text: "text-rose-400", border: "border-slate-800", itemBorder: "border-rose-900/50" }
                                                 };
                                                 const t = themes[theme];
 
@@ -522,11 +522,11 @@ export default function MealPlannerPage() {
                                             return (
                                                 <div className="space-y-6">
                                                     {/* MACROS - Split into Nutritive and Non-Nutritive */}
-                                                    <div className="p-6 rounded-2xl border bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 space-y-6">
+                                                    <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900 space-y-6">
                                                         {/* NUTRITIVE - Energy Providers */}
                                                         <div>
-                                                            <h4 className="font-black flex items-center gap-2 mb-1 text-orange-700 dark:text-orange-400 uppercase tracking-widest text-sm"><Zap className="h-5 w-5" /> Macronutrients</h4>
-                                                            <p className="text-[10px] text-muted-foreground mb-4 border-b border-orange-200 dark:border-orange-800 pb-2">Energy providers • Fuel for your body</p>
+                                                            <h4 className="font-black flex items-center gap-2 mb-1 text-orange-400 uppercase tracking-widest text-sm"><Zap className="h-5 w-5" /> Macronutrients</h4>
+                                                            <p className="text-[10px] text-slate-400 mb-4 border-b border-slate-800 pb-2">Energy providers • Fuel for your body</p>
                                                             <div className="grid grid-cols-4 gap-3">
                                                                 {[
                                                                     {
@@ -603,9 +603,9 @@ export default function MealPlannerPage() {
 
 
                                                     {/* DAILY VITAMINS (Water-Soluble: B-Complex + C) */}
-                                                    <div className="p-6 rounded-2xl border bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20">
-                                                        <h4 className="font-black flex items-center gap-2 mb-1 text-blue-700 dark:text-blue-400 uppercase tracking-widest text-sm"><Droplet className="h-5 w-5" /> Daily Vitamins</h4>
-                                                        <p className="text-[10px] text-muted-foreground mb-4 border-b border-blue-200 dark:border-blue-800 pb-2">Water-soluble • Must be replenished daily</p>
+                                                    <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900">
+                                                        <h4 className="font-black flex items-center gap-2 mb-1 text-blue-400 uppercase tracking-widest text-sm"><Droplet className="h-5 w-5" /> Daily Vitamins</h4>
+                                                        <p className="text-[10px] text-slate-400 mb-4 border-b border-slate-800 pb-2">Water-soluble • Must be replenished daily</p>
                                                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
                                                             {[
                                                                 { label: 'B1 (Thiamine)', keys: ['B1 (Thiamine)', 'thiamine_mg'] },
@@ -639,9 +639,9 @@ export default function MealPlannerPage() {
                                                     </div>
 
                                                     {/* STORED VITAMINS (Fat-Soluble: A, D, E, K) */}
-                                                    <div className="p-6 rounded-2xl border bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-950/20 dark:to-green-950/20">
-                                                        <h4 className="font-black flex items-center gap-2 mb-1 text-emerald-700 dark:text-emerald-400 uppercase tracking-widest text-sm"><Battery className="h-5 w-5" /> Stored Vitamins</h4>
-                                                        <p className="text-[10px] text-muted-foreground mb-4 border-b border-emerald-200 dark:border-emerald-800 pb-2">Fat-soluble • Stored in body tissues</p>
+                                                    <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900">
+                                                        <h4 className="font-black flex items-center gap-2 mb-1 text-emerald-400 uppercase tracking-widest text-sm"><Battery className="h-5 w-5" /> Stored Vitamins</h4>
+                                                        <p className="text-[10px] text-slate-400 mb-4 border-b border-slate-800 pb-2">Fat-soluble • Stored in body tissues</p>
                                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                                             {[
                                                                 { label: 'Vitamin A', keys: ['Vitamin A', 'vitamin_a_ug'], unit: 'µg', hasBreakdown: true },
