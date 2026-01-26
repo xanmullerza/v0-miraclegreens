@@ -516,7 +516,7 @@ export default function MealPlannerPage() {
                                                     <div className="p-6 rounded-2xl border bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 space-y-6">
                                                         {/* NUTRITIVE - Energy Providers */}
                                                         <div>
-                                                            <h4 className="font-black flex items-center gap-2 mb-1 text-orange-700 dark:text-orange-400 uppercase tracking-widest text-sm"><Flame className="h-5 w-5" /> Nutritive Macros</h4>
+                                                            <h4 className="font-black flex items-center gap-2 mb-1 text-orange-700 dark:text-orange-400 uppercase tracking-widest text-sm"><Zap className="h-5 w-5" /> Macronutrients</h4>
                                                             <p className="text-[10px] text-muted-foreground mb-4 border-b border-orange-200 dark:border-orange-800 pb-2">Energy providers • Fuel for your body</p>
                                                             <div className="grid grid-cols-4 gap-3">
                                                                 {[
