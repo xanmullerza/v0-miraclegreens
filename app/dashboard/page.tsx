@@ -55,7 +55,7 @@ export default function DashboardOverview() {
 
     const tools = [
         {
-            name: 'Food Manager',
+            name: 'Add Foods',
             desc: 'Add and manage food nutrition data in your library.',
             href: '/dashboard/food',
             icon: Beef,
@@ -63,7 +63,7 @@ export default function DashboardOverview() {
             bg: 'bg-emerald-500/10'
         },
         {
-            name: 'Recipe Builder',
+            name: 'Add Recipes',
             desc: 'Create and track recipes with automatic nutrition calculation.',
             href: '/dashboard/recipes',
             icon: Utensils,
@@ -71,7 +71,7 @@ export default function DashboardOverview() {
             bg: 'bg-blue-500/10'
         },
         {
-            name: 'Comparison Tool',
+            name: 'Compare Foods',
             desc: 'Compare nutritional values side-by-side using the radar chart.',
             href: '/dashboard/compare',
             icon: Scale,
@@ -79,7 +79,7 @@ export default function DashboardOverview() {
             bg: 'bg-amber-500/10'
         },
         {
-            name: 'Meal Planner',
+            name: 'Plan Meals',
             desc: 'Generate personalized daily meal plans based on your goals.',
             href: '/dashboard/plan',
             icon: Calendar,
