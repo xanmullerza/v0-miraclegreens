@@ -218,7 +218,7 @@ export default function MealPlannerPage() {
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
 
     // Nutrient breakdown definitions - which nutrients can be expanded
-    const NUTRIENT_BREAKDOWNS: Record<string, { label: string, keys: string[], unit: string }[]> = {
+    const NUTRIENT_BREAKDOWNS: Record<string, { label: string, keys: string[], unit: string, isEssential?: boolean }[]> = {
         'Vitamin A': [
             { label: 'Retinol', keys: ['Retinol', 'retinol_ug'], unit: 'µg' },
             { label: 'Alpha-carotene', keys: ['Alpha-carotene', 'alpha_carotene_ug'], unit: 'µg' },
@@ -232,6 +232,47 @@ export default function MealPlannerPage() {
             { label: 'Beta-tocopherol', keys: ['Beta Tocopherol', 'beta_tocopherol_mg'], unit: 'mg' },
             { label: 'Delta-tocopherol', keys: ['Delta Tocopherol', 'delta_tocopherol_mg'], unit: 'mg' },
             { label: 'Gamma-tocopherol', keys: ['Gamma Tocopherol', 'gamma_tocopherol_mg'], unit: 'mg' },
+        ],
+        'Protein': [
+            { label: 'Histidine', keys: ['Histidine', 'histidine_g'], unit: 'g', isEssential: true },
+            { label: 'Isoleucine', keys: ['Isoleucine', 'isoleucine_g'], unit: 'g', isEssential: true },
+            { label: 'Leucine', keys: ['Leucine', 'leucine_g'], unit: 'g', isEssential: true },
+            { label: 'Lysine', keys: ['Lysine', 'lysine_g'], unit: 'g', isEssential: true },
+            { label: 'Methionine', keys: ['Methionine', 'methionine_g'], unit: 'g', isEssential: true },
+            { label: 'Phenylalanine', keys: ['Phenylalanine', 'phenylalanine_g'], unit: 'g', isEssential: true },
+            { label: 'Threonine', keys: ['Threonine', 'threonine_g'], unit: 'g', isEssential: true },
+            { label: 'Tryptophan', keys: ['Tryptophan', 'tryptophan_g'], unit: 'g', isEssential: true },
+            { label: 'Valine', keys: ['Valine', 'valine_g'], unit: 'g', isEssential: true },
+            { label: 'Alanine', keys: ['Alanine', 'alanine_g'], unit: 'g' },
+            { label: 'Arginine', keys: ['Arginine', 'arginine_g'], unit: 'g' },
+            { label: 'Aspartic acid', keys: ['Aspartic acid', 'aspartic_acid_g'], unit: 'g' },
+            { label: 'Cystine', keys: ['Cystine', 'cystine_g'], unit: 'g' },
+            { label: 'Glutamic acid', keys: ['Glutamic acid', 'glutamic_acid_g'], unit: 'g' },
+            { label: 'Glycine', keys: ['Glycine', 'glycine_g'], unit: 'g' },
+            { label: 'Proline', keys: ['Proline', 'proline_g'], unit: 'g' },
+            { label: 'Serine', keys: ['Serine', 'serine_g'], unit: 'g' },
+            { label: 'Tyrosine', keys: ['Tyrosine', 'tyrosine_g'], unit: 'g' },
+        ],
+        'Carbs': [
+            { label: 'Fiber', keys: ['Fiber', 'fiber_g'], unit: 'g' },
+            { label: 'Starch', keys: ['Starch', 'starch_g'], unit: 'g' },
+            { label: 'Sugars (Total)', keys: ['Sugars', 'sugars_g', 'sugar_g'], unit: 'g' },
+            { label: 'Fructose', keys: ['Fructose', 'fructose_g'], unit: 'g' },
+            { label: 'Glucose', keys: ['Glucose', 'glucose_g'], unit: 'g' },
+            { label: 'Sucrose', keys: ['Sucrose', 'sucrose_g'], unit: 'g' },
+            { label: 'Lactose', keys: ['Lactose', 'lactose_g'], unit: 'g' },
+            { label: 'Maltose', keys: ['Maltose', 'maltose_g'], unit: 'g' },
+            { label: 'Galactose', keys: ['Galactose', 'galactose_g'], unit: 'g' },
+            { label: 'Added Sugars', keys: ['Added Sugars', 'added_sugars_g'], unit: 'g' },
+        ],
+        'Fat': [
+            { label: 'Saturated Fat', keys: ['Saturated', 'saturated_fat_g', 'saturated_g'], unit: 'g' },
+            { label: 'Monounsaturated', keys: ['Monounsaturated', 'monounsaturated_fat_g'], unit: 'g' },
+            { label: 'Polyunsaturated', keys: ['Polyunsaturated', 'polyunsaturated_fat_g'], unit: 'g' },
+            { label: 'Omega-3', keys: ['Omega-3', 'omega3_g', 'omega_3_g'], unit: 'g' },
+            { label: 'Omega-6', keys: ['Omega-6', 'omega6_g', 'omega_6_g'], unit: 'g' },
+            { label: 'Trans Fat', keys: ['Trans-Fats', 'trans_fat_g'], unit: 'g' },
+            { label: 'Cholesterol', keys: ['Cholesterol', 'cholesterol_mg'], unit: 'mg' },
         ],
     };
 
@@ -486,11 +527,24 @@ export default function MealPlannerPage() {
                                                                 ].map(macro => {
                                                                     const pct = Math.round((macro.val / macro.target) * 100);
                                                                     const styles = getNutrientLevelStyles(pct, macro.label);
+                                                                    const canBreakdown = ['Protein', 'Carbs', 'Fat'].includes(macro.label);
+
                                                                     return (
-                                                                        <div key={macro.label} className={cn("p-3 rounded-xl border bg-white dark:bg-slate-900 cursor-pointer hover:shadow-md transition-all", styles.borderLight)}>
-                                                                            <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{macro.label}</p>
-                                                                            <div className="flex items-baseline gap-1"><span className="text-xl font-black">{Math.round(macro.val)}</span><span className="text-[10px] text-muted-foreground font-bold">{macro.unit}</span></div>
-                                                                            <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>
+                                                                        <div key={macro.label} className={cn("p-3 rounded-xl border bg-white dark:bg-slate-900 cursor-pointer hover:shadow-md transition-all relative group", styles.borderLight)}>
+                                                                            <div>
+                                                                                <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{macro.label}</p>
+                                                                                <div className="flex items-baseline gap-1"><span className="text-xl font-black">{Math.round(macro.val)}</span><span className="text-[10px] text-muted-foreground font-bold">{macro.unit}</span></div>
+                                                                                <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>
+                                                                            </div>
+                                                                            {canBreakdown && (
+                                                                                <button
+                                                                                    onClick={(e) => { e.stopPropagation(); setBreakdownNutrient(macro.label); }}
+                                                                                    className="absolute top-2 right-2 p-1.5 rounded-lg bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-400 opacity-60 group-hover:opacity-100 hover:bg-orange-200 dark:hover:bg-orange-800 transition-all"
+                                                                                    title="View breakdown"
+                                                                                >
+                                                                                    <Layers className="h-3.5 w-3.5" />
+                                                                                </button>
+                                                                            )}
                                                                         </div>
                                                                     );
                                                                 })}
@@ -676,8 +730,13 @@ export default function MealPlannerPage() {
                         <button onClick={() => setBreakdownNutrient(null)} className="absolute top-4 right-4 p-2 hover:bg-muted rounded-full transition-colors"><X className="h-5 w-5" /></button>
 
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="h-12 w-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
-                                <Layers className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                            <div className={cn("h-12 w-12 rounded-xl flex items-center justify-center",
+                                breakdownNutrient === 'Protein' ? "bg-red-100 dark:bg-red-900/50 text-red-600" :
+                                    breakdownNutrient === 'Carbs' ? "bg-amber-100 dark:bg-amber-900/50 text-amber-600" :
+                                        breakdownNutrient === 'Fat' ? "bg-orange-100 dark:bg-orange-900/50 text-orange-600" :
+                                            "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600"
+                            )}>
+                                <Layers className="h-6 w-6" />
                             </div>
                             <div>
                                 <h3 className="text-2xl font-bold">{breakdownNutrient}</h3>
@@ -685,23 +744,38 @@ export default function MealPlannerPage() {
                             </div>
                         </div>
 
-                        <div className="space-y-3">
-                            {NUTRIENT_BREAKDOWNS[breakdownNutrient].map(({ label, keys, unit }) => {
+                        <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
+                            {NUTRIENT_BREAKDOWNS[breakdownNutrient].map(({ label, keys, unit, isEssential }) => {
                                 const m = plan.micronutrients || {};
                                 let val = 0;
                                 for (const k of keys) {
                                     if (m[k] !== undefined) { val = m[k]; break; }
                                 }
                                 const isZero = val === 0;
+
+                                const activeColor = breakdownNutrient === 'Protein' ? "text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800" :
+                                    breakdownNutrient === 'Carbs' ? "text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800" :
+                                        breakdownNutrient === 'Fat' ? "text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-800" :
+                                            "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800";
+
                                 return (
-                                    <div key={label} className={cn("flex items-center justify-between p-4 rounded-xl border transition-all", isZero ? "bg-muted/30 border-border/50" : "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800")}>
+                                    <div key={label} className={cn("flex items-center justify-between p-4 rounded-xl border transition-all", isZero ? "bg-muted/30 border-border/50" : activeColor)}>
                                         <div className="flex items-center gap-3">
-                                            <div className={cn("h-2 w-2 rounded-full", isZero ? "bg-muted-foreground/30" : "bg-emerald-500")} />
-                                            <span className={cn("font-medium", isZero ? "text-muted-foreground" : "text-foreground")}>{label}</span>
+                                            <div className={cn("h-2 w-2 rounded-full",
+                                                isZero ? "bg-muted-foreground/30" :
+                                                    breakdownNutrient === 'Protein' ? "bg-red-500" :
+                                                        breakdownNutrient === 'Carbs' ? "bg-amber-500" :
+                                                            breakdownNutrient === 'Fat' ? "bg-orange-500" :
+                                                                "bg-emerald-500"
+                                            )} />
+                                            <div>
+                                                <span className={cn("font-medium block", isZero ? "text-muted-foreground" : "text-foreground")}>{label}</span>
+                                                {isEssential && <span className="text-[9px] uppercase font-black tracking-wider bg-black/5 dark:bg-white/10 px-1.5 py-0.5 rounded text-foreground/50">Essential</span>}
+                                            </div>
                                         </div>
                                         <div className="flex items-baseline gap-1">
-                                            <span className={cn("text-lg font-bold tabular-nums", isZero ? "text-muted-foreground" : "text-emerald-700 dark:text-emerald-400")}>
-                                                {val >= 1 ? val.toFixed(2) : val.toFixed(2)}
+                                            <span className={cn("text-lg font-bold tabular-nums", isZero ? "text-muted-foreground" : "")}>
+                                                {val >= 1 ? val.toFixed(1) : val.toFixed(2)}
                                             </span>
                                             <span className="text-xs text-muted-foreground">{unit}</span>
                                         </div>
@@ -714,6 +788,9 @@ export default function MealPlannerPage() {
                             <p className="text-xs text-muted-foreground text-center">
                                 {breakdownNutrient === 'Vitamin A' && "Carotenoids (plant-based) are converted to retinol. Beta-carotene is the most efficient precursor."}
                                 {breakdownNutrient === 'Vitamin E' && "Alpha-tocopherol is the most biologically active form. Other tocopherols have antioxidant properties."}
+                                {breakdownNutrient === 'Protein' && "Essential amino acids cannot be made by the body and must come from food."}
+                                {breakdownNutrient === 'Carbs' && "Sugars include natural fruit sugars (fructose) and milk sugars (lactose). Added sugars should be minimized."}
+                                {breakdownNutrient === 'Fat' && "Unsaturated fats (Mono/Poly) are heart-healthy. Omega-3s are vital for brain & heart health."}
                             </p>
                         </div>
                     </div>
