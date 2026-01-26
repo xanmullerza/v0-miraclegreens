@@ -502,7 +502,7 @@ export default function MealPlannerPage() {
                                                             return (
                                                                 <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-3 rounded-xl border cursor-pointer hover:shadow-md transition-all", pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
                                                                     <p className="text-[10px] uppercase font-bold text-foreground/70 truncate mb-1">{label}</p>
-                                                                    <div className="flex items-baseline gap-1"><span className="text-lg font-bold">{val.toFixed(1)}</span><span className="text-[10px] text-muted-foreground">{label.includes('Folate') ? 'µg' : 'mg'}</span></div>
+                                                                    <div className="flex items-baseline gap-1"><span className="text-lg font-bold">{val.toFixed(1)}</span><span className="text-[10px] text-muted-foreground">{label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') ? 'µg' : 'mg'}</span></div>
                                                                     {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
                                                                 </div>
                                                             );
@@ -588,8 +588,8 @@ export default function MealPlannerPage() {
                                                         'Phosphorus': ['Phosphorus', 'phosphorus_mg']
                                                     }} />
 
-                                                    {/* MINERALS */}
-                                                    <NutrientGrid title="Minerals" icon={Gem} items={{
+                                                    {/* TRACE MINERALS */}
+                                                    <NutrientGrid title="Trace Minerals" icon={Gem} items={{
                                                         'Iron': ['Iron', 'iron_mg'],
                                                         'Zinc': ['Zinc', 'zinc_mg'],
                                                         'Copper': ['Copper', 'copper_mg'],
