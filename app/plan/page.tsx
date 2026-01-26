@@ -675,7 +675,7 @@ export default function MealPlannerPage() {
                                                     <div className="p-6 rounded-2xl border bg-gradient-to-br from-purple-50 to-fuchsia-50 dark:from-purple-950/20 dark:to-fuchsia-950/20">
                                                         <h4 className="font-black flex items-center gap-2 mb-1 text-purple-700 dark:text-purple-400 uppercase tracking-widest text-sm"><FlaskConical className="h-5 w-5" /> Lifestyle & Bioactive Markers</h4>
                                                         <p className="text-[10px] text-muted-foreground mb-4 border-b border-purple-200 dark:border-purple-800 pb-2">Lifestyle choices & non-nutritive compounds</p>
-                                                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                                             {[
                                                                 { label: 'Caffeine', keys: ['Caffeine', 'caffeine_mg'], unit: 'mg' },
                                                                 { label: 'Alcohol', keys: ['Alcohol', 'alcohol_g'], unit: 'g' },
