@@ -653,7 +653,7 @@ export default function MealPlannerPage() {
                                                                     <div key={label} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-900 hover:shadow-md transition-all relative group", pct !== null ? styles.borderLight : "")}>
                                                                         <div onClick={() => setSelectedNutrientInfo(label)} className="cursor-pointer">
                                                                             <p className="text-[10px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
-                                                                            <div className="flex items-baseline gap-1"><span className="text-xl font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span><span className={cn("text-[10px] font-bold", unitLabel === 'µg' ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unitLabel}</span></div>
+                                                                            <div className="flex items-baseline gap-1"><span className="text-xl font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span><span className={cn("text-[10px] font-bold", unitLabel === 'µg' ? "text-blue-600 dark:text-blue-400" : unitLabel === 'IU' ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground")}>{unitLabel}</span></div>
                                                                             {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
                                                                         </div>
                                                                         {hasBreakdown && (
@@ -681,7 +681,6 @@ export default function MealPlannerPage() {
                                                                 { label: 'Alcohol', keys: ['Alcohol', 'alcohol_g'], unit: 'g' },
                                                                 { label: 'Beta-Hydroxybutyrate', keys: ['Beta-Hydroxybutyrate', 'beta_hydroxybutyrate_g'], unit: 'g' },
                                                                 { label: 'Oxalate', keys: ['Oxalate', 'oxalate_mg'], unit: 'mg' },
-                                                                { label: 'Ash', keys: ['Ash', 'ash_g'], unit: 'g' },
                                                             ].map(({ label, keys, unit: unitLabel }) => {
                                                                 const val = getVal(keys);
                                                                 // These typically don't have standard RDAs for general health in the same way, but limits exist.
