@@ -502,7 +502,7 @@ export default function MealPlannerPage() {
                                                             return (
                                                                 <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-3 rounded-xl border cursor-pointer hover:shadow-md transition-all", pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
                                                                     <p className="text-[10px] uppercase font-bold text-foreground/70 truncate mb-1">{label}</p>
-                                                                    <div className="flex items-baseline gap-1"><span className="text-lg font-bold">{val.toFixed(1)}</span><span className="text-[10px] text-muted-foreground">{label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') ? 'µg' : 'mg'}</span></div>
+                                                                    <div className="flex items-baseline gap-1"><span className="text-lg font-bold">{val.toFixed(1)}</span><span className={cn("text-[10px] font-bold", (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12')) ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') ? 'µg' : 'mg'}</span></div>
                                                                     {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
                                                                 </div>
                                                             );
@@ -623,7 +623,10 @@ export default function MealPlannerPage() {
                                                                 return (
                                                                     <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-3 rounded-xl border bg-white dark:bg-slate-900 cursor-pointer hover:shadow-md transition-all", pct !== null ? styles.borderLight : "")}>
                                                                         <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
-                                                                        <div className="flex items-baseline gap-1"><span className="text-lg font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span><span className="text-[10px] text-muted-foreground">{unitLabel}</span></div>
+                                                                        <div className="flex items-baseline gap-1">
+                                                                            <span className="text-lg font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span>
+                                                                            <span className={cn("text-[10px] font-bold", unitLabel === 'µg' ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")} title={unitLabel === 'µg' ? 'micrograms' : 'milligrams'}>{unitLabel}</span>
+                                                                        </div>
                                                                         {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
                                                                     </div>
                                                                 );
@@ -650,7 +653,7 @@ export default function MealPlannerPage() {
                                                                     <div key={label} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-900 hover:shadow-md transition-all relative group", pct !== null ? styles.borderLight : "")}>
                                                                         <div onClick={() => setSelectedNutrientInfo(label)} className="cursor-pointer">
                                                                             <p className="text-[10px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
-                                                                            <div className="flex items-baseline gap-1"><span className="text-xl font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span><span className="text-[10px] text-muted-foreground">{unitLabel}</span></div>
+                                                                            <div className="flex items-baseline gap-1"><span className="text-xl font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span><span className={cn("text-[10px] font-bold", unitLabel === 'µg' ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unitLabel}</span></div>
                                                                             {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
                                                                         </div>
                                                                         {hasBreakdown && (
@@ -686,10 +689,7 @@ export default function MealPlannerPage() {
                                                                 return (
                                                                     <div key={label} className="p-4 rounded-xl border bg-white dark:bg-slate-900 border-purple-100 dark:border-purple-900/50 hover:shadow-md transition-all">
                                                                         <p className="text-[10px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
-                                                                        <div className="flex items-baseline gap-1">
-                                                                            <span className="text-xl font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span>
-                                                                            <span className="text-[10px] text-muted-foreground">{unitLabel}</span>
-                                                                        </div>
+                                                                        <div className="flex items-baseline gap-1"><span className="text-xl font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span><span className={cn("text-[10px] font-bold", unitLabel === 'µg' ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unitLabel}</span></div>
                                                                     </div>
                                                                 );
                                                             })}
