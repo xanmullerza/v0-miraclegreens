@@ -216,9 +216,10 @@ export default function MealPlannerPage() {
     const [selectedNutrientInfo, setSelectedNutrientInfo] = useState<string | null>(null);
     const [activeBoostContext, setActiveBoostContext] = useState<'daily' | 'recipe' | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
+    const [expandedBreakdownSections, setExpandedBreakdownSections] = useState<Record<string, boolean>>({});
 
-    // Nutrient breakdown definitions - which nutrients can be expanded
-    const NUTRIENT_BREAKDOWNS: Record<string, { label: string, keys: string[], unit: string, isEssential?: boolean }[]> = {
+    // Nutrient breakdown definitions
+    const NUTRIENT_BREAKDOWNS: Record<string, { label: string, keys: string[], unit: string, isEssential?: boolean, hiddenByDefault?: boolean, isExpandable?: boolean }[]> = {
         'Vitamin A': [
             { label: 'Retinol', keys: ['Retinol', 'retinol_ug'], unit: 'µg' },
             { label: 'Alpha-carotene', keys: ['Alpha-carotene', 'alpha_carotene_ug'], unit: 'µg' },
@@ -256,14 +257,14 @@ export default function MealPlannerPage() {
         'Carbs': [
             { label: 'Fiber', keys: ['Fiber', 'fiber_g'], unit: 'g' },
             { label: 'Starch', keys: ['Starch', 'starch_g'], unit: 'g' },
-            { label: 'Sugars (Total)', keys: ['Sugars', 'sugars_g', 'sugar_g'], unit: 'g' },
-            { label: 'Fructose', keys: ['Fructose', 'fructose_g'], unit: 'g' },
-            { label: 'Glucose', keys: ['Glucose', 'glucose_g'], unit: 'g' },
-            { label: 'Sucrose', keys: ['Sucrose', 'sucrose_g'], unit: 'g' },
-            { label: 'Lactose', keys: ['Lactose', 'lactose_g'], unit: 'g' },
-            { label: 'Maltose', keys: ['Maltose', 'maltose_g'], unit: 'g' },
-            { label: 'Galactose', keys: ['Galactose', 'galactose_g'], unit: 'g' },
-            { label: 'Added Sugars', keys: ['Added Sugars', 'added_sugars_g'], unit: 'g' },
+            { label: 'Sugars (Total)', keys: ['Sugars', 'sugars_g', 'sugar_g'], unit: 'g', isExpandable: true },
+            { label: 'Fructose', keys: ['Fructose', 'fructose_g'], unit: 'g', hiddenByDefault: true },
+            { label: 'Glucose', keys: ['Glucose', 'glucose_g'], unit: 'g', hiddenByDefault: true },
+            { label: 'Sucrose', keys: ['Sucrose', 'sucrose_g'], unit: 'g', hiddenByDefault: true },
+            { label: 'Lactose', keys: ['Lactose', 'lactose_g'], unit: 'g', hiddenByDefault: true },
+            { label: 'Maltose', keys: ['Maltose', 'maltose_g'], unit: 'g', hiddenByDefault: true },
+            { label: 'Galactose', keys: ['Galactose', 'galactose_g'], unit: 'g', hiddenByDefault: true },
+            { label: 'Added Sugars', keys: ['Added Sugars', 'added_sugars_g'], unit: 'g', hiddenByDefault: true },
         ],
         'Fat': [
             { label: 'Saturated Fat', keys: ['Saturated', 'saturated_fat_g', 'saturated_g'], unit: 'g' },
@@ -745,7 +746,11 @@ export default function MealPlannerPage() {
                         </div>
 
                         <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
-                            {NUTRIENT_BREAKDOWNS[breakdownNutrient].map(({ label, keys, unit, isEssential }) => {
+                            {NUTRIENT_BREAKDOWNS[breakdownNutrient].map(({ label, keys, unit, isEssential, hiddenByDefault, isExpandable }) => {
+                                // Skip hidden items unless expanded
+                                // For now, we assume 'Sugars (Total)' is the parent for all hidden items in Carbs
+                                if (hiddenByDefault && !expandedBreakdownSections['Sugars (Total)']) return null;
+
                                 const m = plan.micronutrients || {};
                                 let val = 0;
                                 for (const k of keys) {
@@ -758,10 +763,25 @@ export default function MealPlannerPage() {
                                         breakdownNutrient === 'Fat' ? "text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/30 border-orange-200 dark:border-orange-800" :
                                             "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800";
 
+                                const isExpanded = isExpandable && expandedBreakdownSections[label];
+
                                 return (
-                                    <div key={label} className={cn("flex items-center justify-between p-4 rounded-xl border transition-all", isZero ? "bg-muted/30 border-border/50" : activeColor)}>
+                                    <div
+                                        key={label}
+                                        className={cn(
+                                            "flex items-center justify-between p-4 rounded-xl border transition-all animate-in fade-in slide-in-from-top-1 duration-200",
+                                            isZero ? "bg-muted/30 border-border/50" : activeColor,
+                                            hiddenByDefault ? "ml-8 border-l-4 border-l-current" : "", // Indent sub-items
+                                            isExpandable ? "cursor-pointer hover:opacity-80 relative overflow-hidden" : ""
+                                        )}
+                                        onClick={() => {
+                                            if (isExpandable) {
+                                                setExpandedBreakdownSections(prev => ({ ...prev, [label]: !prev[label] }));
+                                            }
+                                        }}
+                                    >
                                         <div className="flex items-center gap-3">
-                                            <div className={cn("h-2 w-2 rounded-full",
+                                            <div className={cn("h-2 w-2 rounded-full flex-shrink-0",
                                                 isZero ? "bg-muted-foreground/30" :
                                                     breakdownNutrient === 'Protein' ? "bg-red-500" :
                                                         breakdownNutrient === 'Carbs' ? "bg-amber-500" :
@@ -769,7 +789,12 @@ export default function MealPlannerPage() {
                                                                 "bg-emerald-500"
                                             )} />
                                             <div>
-                                                <span className={cn("font-medium block", isZero ? "text-muted-foreground" : "text-foreground")}>{label}</span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className={cn("font-medium block", isZero ? "text-muted-foreground" : "text-foreground")}>{label}</span>
+                                                    {isExpandable && (
+                                                        <ChevronDown className={cn("h-4 w-4 transition-transform opacity-50", isExpanded ? "rotate-180" : "")} />
+                                                    )}
+                                                </div>
                                                 {isEssential && <span className="text-[9px] uppercase font-black tracking-wider bg-black/5 dark:bg-white/10 px-1.5 py-0.5 rounded text-foreground/50">Essential</span>}
                                             </div>
                                         </div>
