@@ -13,7 +13,8 @@ import {
     Search,
     Bell,
     User,
-    ArrowLeft
+    ArrowLeft,
+    Calendar
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
@@ -22,6 +23,7 @@ const sidebarItems = [
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Food Items', href: '/dashboard/food', icon: Beef },
     { name: 'Recipe Builder', href: '/dashboard/recipes', icon: Utensils },
+    { name: 'Meal Planner', href: '/dashboard/plan', icon: Calendar },
     { name: 'Comparison Tool', href: '/dashboard/compare', icon: Scale },
 ];
 

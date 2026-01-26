@@ -81,7 +81,7 @@ export default function DashboardOverview() {
         {
             name: 'Meal Planner',
             desc: 'Generate personalized daily meal plans based on your goals.',
-            href: '/plan',
+            href: '/dashboard/plan',
             icon: Calendar,
             color: 'text-purple-500',
             bg: 'bg-purple-500/10'

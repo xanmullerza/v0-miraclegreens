@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Header } from '@/components/header';
-import { Footer } from '@/components/footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -399,9 +397,8 @@ export default function MealPlannerPage() {
     const isFormComplete = Boolean(age && weight && height);
 
     return (
-        <main className="min-h-screen bg-background">
-            <Header />
-            <div className="max-w-5xl mx-auto py-12 px-4">
+        <div className="w-full">
+            <div className="max-w-5xl mx-auto py-6 px-4">
                 {step !== 3 && (
                     <div className="text-center mb-12">
                         <h1 className="text-4xl font-serif font-bold mb-4">Miracle Meal Planner</h1>
@@ -836,7 +833,6 @@ export default function MealPlannerPage() {
                 </div>
             )}
 
-            <Footer />
-        </main>
+        </div>
     );
 }
