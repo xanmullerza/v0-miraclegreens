@@ -450,30 +450,59 @@ export default function MealPlannerPage() {
                                             );
                                             return (
                                                 <div className="space-y-6">
-                                                    {/* MACROS */}
-                                                    <div className="p-6 rounded-2xl border bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20">
-                                                        <h4 className="font-black flex items-center gap-2 mb-4 border-b border-orange-200 dark:border-orange-800 pb-2 text-orange-700 dark:text-orange-400 uppercase tracking-widest text-sm"><Flame className="h-5 w-5" /> Macronutrients</h4>
-                                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                                                            {[
-                                                                { label: 'Energy (kcal)', val: plan.totalCalories, target: calories, unit: 'kcal' },
-                                                                { label: 'Energy (kJ)', val: plan.totalEnergyKj || plan.totalCalories * 4.184, target: calories * 4.184, unit: 'kJ' },
-                                                                { label: 'Protein', val: plan.macros.protein, target: (calories * 0.2) / 4, unit: 'g' },
-                                                                { label: 'Carbs', val: plan.macros.carbs, target: (calories * 0.5) / 4, unit: 'g' },
-                                                                { label: 'Fat', val: plan.macros.fat, target: (calories * 0.3) / 9, unit: 'g' },
-                                                                { label: 'Fiber', val: getVal(['Fiber', 'fiber_g']), target: 30, unit: 'g' },
-                                                            ].map(macro => {
-                                                                const pct = Math.round((macro.val / macro.target) * 100);
-                                                                const styles = getNutrientLevelStyles(pct, macro.label);
-                                                                return (
-                                                                    <div key={macro.label} className={cn("p-3 rounded-xl border bg-white dark:bg-slate-900 cursor-pointer hover:shadow-md transition-all", styles.borderLight)}>
-                                                                        <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{macro.label}</p>
-                                                                        <div className="flex items-baseline gap-1"><span className="text-xl font-black">{Math.round(macro.val)}</span><span className="text-[10px] text-muted-foreground font-bold">{macro.unit}</span></div>
-                                                                        <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>
-                                                                    </div>
-                                                                );
-                                                            })}
+                                                    {/* MACROS - Split into Nutritive and Non-Nutritive */}
+                                                    <div className="p-6 rounded-2xl border bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/20 dark:to-amber-950/20 space-y-6">
+                                                        {/* NUTRITIVE - Energy Providers */}
+                                                        <div>
+                                                            <h4 className="font-black flex items-center gap-2 mb-1 text-orange-700 dark:text-orange-400 uppercase tracking-widest text-sm"><Flame className="h-5 w-5" /> Nutritive Macros</h4>
+                                                            <p className="text-[10px] text-muted-foreground mb-4 border-b border-orange-200 dark:border-orange-800 pb-2">Energy providers • Fuel for your body</p>
+                                                            <div className="grid grid-cols-5 gap-3">
+                                                                {[
+                                                                    { label: 'Energy (kcal)', val: plan.totalCalories, target: calories, unit: 'kcal' },
+                                                                    { label: 'Energy (kJ)', val: plan.totalEnergyKj || plan.totalCalories * 4.184, target: calories * 4.184, unit: 'kJ' },
+                                                                    { label: 'Protein', val: plan.macros.protein, target: (calories * 0.2) / 4, unit: 'g' },
+                                                                    { label: 'Carbs', val: plan.macros.carbs, target: (calories * 0.5) / 4, unit: 'g' },
+                                                                    { label: 'Fat', val: plan.macros.fat, target: (calories * 0.3) / 9, unit: 'g' },
+                                                                ].map(macro => {
+                                                                    const pct = Math.round((macro.val / macro.target) * 100);
+                                                                    const styles = getNutrientLevelStyles(pct, macro.label);
+                                                                    return (
+                                                                        <div key={macro.label} className={cn("p-3 rounded-xl border bg-white dark:bg-slate-900 cursor-pointer hover:shadow-md transition-all", styles.borderLight)}>
+                                                                            <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{macro.label}</p>
+                                                                            <div className="flex items-baseline gap-1"><span className="text-xl font-black">{Math.round(macro.val)}</span><span className="text-[10px] text-muted-foreground font-bold">{macro.unit}</span></div>
+                                                                            <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* NON-NUTRITIVE - Vitality Essentials */}
+                                                        <div>
+                                                            <h4 className="font-black flex items-center gap-2 mb-1 text-cyan-700 dark:text-cyan-400 uppercase tracking-widest text-sm"><Droplet className="h-5 w-5" /> Non-Nutritive Essentials</h4>
+                                                            <p className="text-[10px] text-muted-foreground mb-4 border-b border-cyan-200 dark:border-cyan-800 pb-2">Zero calories • Essential for vitality</p>
+                                                            <div className="grid grid-cols-2 gap-3">
+                                                                {[
+                                                                    { label: 'Fiber', val: getVal(['Fiber', 'fiber_g']), target: 30, unit: 'g', desc: 'Digestive health' },
+                                                                    { label: 'Water', val: getVal(['Water', 'water_g', 'water_ml']) / 1000, target: 2.5, unit: 'L', desc: 'Hydration' },
+                                                                ].map(item => {
+                                                                    const pct = Math.round((item.val / item.target) * 100);
+                                                                    const styles = getNutrientLevelStyles(pct, item.label);
+                                                                    return (
+                                                                        <div key={item.label} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-900 cursor-pointer hover:shadow-md transition-all flex items-center gap-4", styles.borderLight)}>
+                                                                            <div className="flex-1">
+                                                                                <p className="text-[9px] uppercase font-black text-foreground/60 mb-1">{item.label}</p>
+                                                                                <div className="flex items-baseline gap-1"><span className="text-2xl font-black">{item.val >= 1 ? item.val.toFixed(1) : item.val.toFixed(2)}</span><span className="text-sm text-muted-foreground font-bold">/ {item.target}{item.unit}</span></div>
+                                                                                <p className="text-[10px] text-muted-foreground mt-1">{item.desc}</p>
+                                                                            </div>
+                                                                            <div className={cn("text-lg font-black px-3 py-1 rounded-lg", styles.fade, styles.text)}>{pct}%</div>
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
                                                         </div>
                                                     </div>
+
 
                                                     {/* ELECTROLYTES */}
                                                     <NutrientGrid title="Electrolytes" icon={Zap} items={{
