@@ -518,10 +518,16 @@ export default function MealPlannerPage() {
                                                         <div>
                                                             <h4 className="font-black flex items-center gap-2 mb-1 text-orange-700 dark:text-orange-400 uppercase tracking-widest text-sm"><Flame className="h-5 w-5" /> Nutritive Macros</h4>
                                                             <p className="text-[10px] text-muted-foreground mb-4 border-b border-orange-200 dark:border-orange-800 pb-2">Energy providers • Fuel for your body</p>
-                                                            <div className="grid grid-cols-5 gap-3">
+                                                            <div className="grid grid-cols-4 gap-3">
                                                                 {[
-                                                                    { label: 'Energy (kcal)', val: plan.totalCalories, target: calories, unit: 'kcal' },
-                                                                    { label: 'Energy (kJ)', val: plan.totalEnergyKj || plan.totalCalories * 4.184, target: calories * 4.184, unit: 'kJ' },
+                                                                    {
+                                                                        label: 'Energy',
+                                                                        val: plan.totalCalories,
+                                                                        target: calories,
+                                                                        unit: 'kcal',
+                                                                        secondaryVal: plan.totalEnergyKj || plan.totalCalories * 4.184,
+                                                                        secondaryUnit: 'kJ'
+                                                                    },
                                                                     { label: 'Protein', val: plan.macros.protein, target: (calories * 0.2) / 4, unit: 'g' },
                                                                     { label: 'Carbs', val: plan.macros.carbs, target: (calories * 0.5) / 4, unit: 'g' },
                                                                     { label: 'Fat', val: plan.macros.fat, target: (calories * 0.3) / 9, unit: 'g' },
@@ -534,8 +540,20 @@ export default function MealPlannerPage() {
                                                                         <div key={macro.label} className={cn("p-3 rounded-xl border bg-white dark:bg-slate-900 cursor-pointer hover:shadow-md transition-all relative group", styles.borderLight)}>
                                                                             <div>
                                                                                 <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{macro.label}</p>
-                                                                                <div className="flex items-baseline gap-1"><span className="text-xl font-black">{Math.round(macro.val)}</span><span className="text-[10px] text-muted-foreground font-bold">{macro.unit}</span></div>
-                                                                                <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>
+                                                                                <div className="flex flex-col">
+                                                                                    <div className="flex items-baseline gap-1">
+                                                                                        <span className="text-xl font-black">{Math.round(macro.val)}</span>
+                                                                                        <span className="text-[10px] text-muted-foreground font-bold">{macro.unit}</span>
+                                                                                    </div>
+                                                                                    {/* Secondary Energy Value */}
+                                                                                    {macro.secondaryVal && (
+                                                                                        <div className="flex items-baseline gap-1 -mt-1">
+                                                                                            <span className="text-xs font-bold text-muted-foreground/70">{Math.round(macro.secondaryVal)}</span>
+                                                                                            <span className="text-[9px] text-muted-foreground/60 font-bold">{macro.secondaryUnit}</span>
+                                                                                        </div>
+                                                                                    )}
+                                                                                </div>
+                                                                                <div className={cn("text-[10px] font-black mt-1", styles.text)}>{pct}%</div>
                                                                             </div>
                                                                             {canBreakdown && (
                                                                                 <button
