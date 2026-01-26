@@ -39,7 +39,8 @@ import {
     Info,
     RefreshCw,
     Shield,
-    Battery
+    Battery,
+    Layers
 } from 'lucide-react';
 import {
     Sheet,
@@ -214,6 +215,25 @@ export default function MealPlannerPage() {
     const [dailyMoringaGrams, setDailyMoringaGrams] = useState(0);
     const [selectedNutrientInfo, setSelectedNutrientInfo] = useState<string | null>(null);
     const [activeBoostContext, setActiveBoostContext] = useState<'daily' | 'recipe' | null>(null);
+    const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
+
+    // Nutrient breakdown definitions - which nutrients can be expanded
+    const NUTRIENT_BREAKDOWNS: Record<string, { label: string, keys: string[], unit: string }[]> = {
+        'Vitamin A': [
+            { label: 'Retinol', keys: ['Retinol', 'retinol_ug'], unit: 'µg' },
+            { label: 'Alpha-carotene', keys: ['Alpha-carotene', 'alpha_carotene_ug'], unit: 'µg' },
+            { label: 'Beta-carotene', keys: ['Beta-carotene', 'beta_carotene_ug'], unit: 'µg' },
+            { label: 'Beta-cryptoxanthin', keys: ['Beta-cryptoxanthin', 'beta_cryptoxanthin_ug'], unit: 'µg' },
+            { label: 'Lutein+Zeaxanthin', keys: ['Lutein+Zeaxanthin', 'lutein_zeaxanthin_ug'], unit: 'µg' },
+            { label: 'Lycopene', keys: ['Lycopene', 'lycopene_ug'], unit: 'µg' },
+        ],
+        'Vitamin E': [
+            { label: 'Alpha-tocopherol', keys: ['Vitamin E', 'vitamin_e_mg', 'alpha_tocopherol_mg'], unit: 'mg' },
+            { label: 'Beta-tocopherol', keys: ['Beta Tocopherol', 'beta_tocopherol_mg'], unit: 'mg' },
+            { label: 'Delta-tocopherol', keys: ['Delta Tocopherol', 'delta_tocopherol_mg'], unit: 'mg' },
+            { label: 'Gamma-tocopherol', keys: ['Gamma Tocopherol', 'gamma_tocopherol_mg'], unit: 'mg' },
+        ],
+    };
 
     const findNutrientMatch = (record: Record<string, any>, key: string) => {
         const mKeys = Object.keys(record);
@@ -562,20 +582,31 @@ export default function MealPlannerPage() {
                                                         <p className="text-[10px] text-muted-foreground mb-4 border-b border-emerald-200 dark:border-emerald-800 pb-2">Fat-soluble • Stored in body tissues</p>
                                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                                             {[
-                                                                { label: 'Vitamin A', keys: ['Vitamin A', 'vitamin_a_ug'], unit: 'µg' },
-                                                                { label: 'Vitamin D', keys: ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'], unit: 'IU' },
-                                                                { label: 'Vitamin E', keys: ['Vitamin E', 'vitamin_e_mg'], unit: 'mg' },
-                                                                { label: 'Vitamin K', keys: ['Vitamin K', 'vitamin_k_ug'], unit: 'µg' },
-                                                            ].map(({ label, keys, unit: unitLabel }) => {
+                                                                { label: 'Vitamin A', keys: ['Vitamin A', 'vitamin_a_ug'], unit: 'µg', hasBreakdown: true },
+                                                                { label: 'Vitamin D', keys: ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'], unit: 'IU', hasBreakdown: false },
+                                                                { label: 'Vitamin E', keys: ['Vitamin E', 'vitamin_e_mg'], unit: 'mg', hasBreakdown: true },
+                                                                { label: 'Vitamin K', keys: ['Vitamin K', 'vitamin_k_ug'], unit: 'µg', hasBreakdown: false },
+                                                            ].map(({ label, keys, unit: unitLabel, hasBreakdown }) => {
                                                                 const val = getVal(keys);
                                                                 const rda = userRDAs?.[label];
                                                                 const pct = rda ? Math.round((val / rda) * 100) : null;
                                                                 const styles = getNutrientLevelStyles(pct || 0, label);
                                                                 return (
-                                                                    <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-900 cursor-pointer hover:shadow-md transition-all", pct !== null ? styles.borderLight : "")}>
-                                                                        <p className="text-[10px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
-                                                                        <div className="flex items-baseline gap-1"><span className="text-xl font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span><span className="text-[10px] text-muted-foreground">{unitLabel}</span></div>
-                                                                        {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
+                                                                    <div key={label} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-900 hover:shadow-md transition-all relative group", pct !== null ? styles.borderLight : "")}>
+                                                                        <div onClick={() => setSelectedNutrientInfo(label)} className="cursor-pointer">
+                                                                            <p className="text-[10px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
+                                                                            <div className="flex items-baseline gap-1"><span className="text-xl font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span><span className="text-[10px] text-muted-foreground">{unitLabel}</span></div>
+                                                                            {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
+                                                                        </div>
+                                                                        {hasBreakdown && (
+                                                                            <button
+                                                                                onClick={(e) => { e.stopPropagation(); setBreakdownNutrient(label); }}
+                                                                                className="absolute top-2 right-2 p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 opacity-60 group-hover:opacity-100 hover:bg-emerald-200 dark:hover:bg-emerald-800 transition-all"
+                                                                                title="View breakdown"
+                                                                            >
+                                                                                <Layers className="h-3.5 w-3.5" />
+                                                                            </button>
+                                                                        )}
                                                                     </div>
                                                                 );
                                                             })}
@@ -637,6 +668,58 @@ export default function MealPlannerPage() {
                     </div>
                 </div>
             )}
+
+            {/* NUTRIENT BREAKDOWN MODAL */}
+            {breakdownNutrient && NUTRIENT_BREAKDOWNS[breakdownNutrient] && plan && (
+                <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setBreakdownNutrient(null)}>
+                    <div className="bg-background rounded-2xl max-w-lg w-full p-6 shadow-2xl relative animate-in zoom-in-95 fade-in duration-200" onClick={e => e.stopPropagation()}>
+                        <button onClick={() => setBreakdownNutrient(null)} className="absolute top-4 right-4 p-2 hover:bg-muted rounded-full transition-colors"><X className="h-5 w-5" /></button>
+
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="h-12 w-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+                                <Layers className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
+                            </div>
+                            <div>
+                                <h3 className="text-2xl font-bold">{breakdownNutrient}</h3>
+                                <p className="text-sm text-muted-foreground">Constituent Breakdown</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-3">
+                            {NUTRIENT_BREAKDOWNS[breakdownNutrient].map(({ label, keys, unit }) => {
+                                const m = plan.micronutrients || {};
+                                let val = 0;
+                                for (const k of keys) {
+                                    if (m[k] !== undefined) { val = m[k]; break; }
+                                }
+                                const isZero = val === 0;
+                                return (
+                                    <div key={label} className={cn("flex items-center justify-between p-4 rounded-xl border transition-all", isZero ? "bg-muted/30 border-border/50" : "bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800")}>
+                                        <div className="flex items-center gap-3">
+                                            <div className={cn("h-2 w-2 rounded-full", isZero ? "bg-muted-foreground/30" : "bg-emerald-500")} />
+                                            <span className={cn("font-medium", isZero ? "text-muted-foreground" : "text-foreground")}>{label}</span>
+                                        </div>
+                                        <div className="flex items-baseline gap-1">
+                                            <span className={cn("text-lg font-bold tabular-nums", isZero ? "text-muted-foreground" : "text-emerald-700 dark:text-emerald-400")}>
+                                                {val >= 1 ? val.toFixed(2) : val.toFixed(2)}
+                                            </span>
+                                            <span className="text-xs text-muted-foreground">{unit}</span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        <div className="mt-6 pt-4 border-t border-border">
+                            <p className="text-xs text-muted-foreground text-center">
+                                {breakdownNutrient === 'Vitamin A' && "Carotenoids (plant-based) are converted to retinol. Beta-carotene is the most efficient precursor."}
+                                {breakdownNutrient === 'Vitamin E' && "Alpha-tocopherol is the most biologically active form. Other tocopherols have antioxidant properties."}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <Footer />
         </main>
     );
