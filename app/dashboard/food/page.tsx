@@ -2,6 +2,7 @@
 
 import { useState, Suspense, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -195,7 +196,7 @@ function FoodItemCreatorContent() {
 
     const handleSave = async () => {
         if (!name) {
-            alert('Please enter a name for the food item');
+            toast.error('Please enter a name for the food item');
             return;
         }
 
@@ -225,10 +226,10 @@ function FoodItemCreatorContent() {
 
             if (itemError) throw itemError;
 
-            alert('Food item saved successfully!');
+            toast.success('Food item saved successfully!');
         } catch (err: any) {
             console.error('Error saving food item:', err);
-            alert(`Error: ${err.message}`);
+            toast.error(`Error: ${err.message}`);
         } finally {
             setLoading(false);
         }
