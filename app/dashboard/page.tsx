@@ -13,7 +13,8 @@ import {
     Database,
     Clock,
     Sparkles,
-    ChefHat
+    ChefHat,
+    Calendar
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -76,6 +77,14 @@ export default function DashboardOverview() {
             icon: Scale,
             color: 'text-amber-500',
             bg: 'bg-amber-500/10'
+        },
+        {
+            name: 'Meal Planner',
+            desc: 'Generate personalized daily meal plans based on your goals.',
+            href: '/plan',
+            icon: Calendar,
+            color: 'text-purple-500',
+            bg: 'bg-purple-500/10'
         }
     ];
 
@@ -149,7 +158,7 @@ export default function DashboardOverview() {
             </div>
 
             {/* Application Tools */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {tools.map((tool) => (
                     <Link key={tool.href} href={tool.href}>
                         <Card className="p-8 group hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 h-full flex flex-col">
