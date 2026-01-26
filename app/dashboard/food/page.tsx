@@ -388,10 +388,10 @@ function FoodItemCreatorContent() {
                                                     <Upload size={24} />
                                                 </div>
                                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Capture or Upload Reference</p>
-                                                <Input
+                                                <input
                                                     type="file"
                                                     accept="image/*"
-                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                                     onChange={handleImageUpload}
                                                 />
                                             </>
