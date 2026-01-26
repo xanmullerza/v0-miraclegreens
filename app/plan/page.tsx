@@ -490,26 +490,35 @@ export default function MealPlannerPage() {
                                                 });
                                             }
                                             const getVal = (keys: string[]) => { for (const k of keys) if (m[k] !== undefined) return m[k]; return 0; };
-                                            const NutrientGrid = ({ title, items, icon: Icon }: { title: string, items: Record<string, any[]>, icon: any }) => (
-                                                <div className="p-6 rounded-2xl border bg-card/50">
-                                                    <h4 className="font-bold flex items-center gap-2 mb-4 border-b pb-2"><Icon className="h-4 w-4 text-primary" /> {title} Focus</h4>
-                                                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                                                        {Object.entries(items).map(([label, keys]) => {
-                                                            const val = getVal(keys as string[]);
-                                                            const rda = userRDAs?.[label];
-                                                            const pct = rda ? Math.round((val / rda) * 100) : null;
-                                                            const styles = getNutrientLevelStyles(pct || 0, label);
-                                                            return (
-                                                                <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-3 rounded-xl border cursor-pointer hover:shadow-md transition-all", pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
-                                                                    <p className="text-[10px] uppercase font-bold text-foreground/70 truncate mb-1">{label}</p>
-                                                                    <div className="flex items-baseline gap-1"><span className="text-lg font-bold">{val.toFixed(1)}</span><span className={cn("text-[10px] font-bold", (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12')) ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') ? 'µg' : 'mg'}</span></div>
-                                                                    {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
-                                                                </div>
-                                                            );
-                                                        })}
+                                            const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle }: { title: string, items: Record<string, any[]>, icon: any, theme?: 'indigo' | 'rose', subtitle?: string }) => {
+                                                const themes = {
+                                                    indigo: { bg: "from-indigo-50 to-violet-50 dark:from-indigo-950/20 dark:to-violet-950/20", text: "text-indigo-700 dark:text-indigo-400", border: "border-indigo-200 dark:border-indigo-800", itemBorder: "border-indigo-100 dark:border-indigo-900/50" },
+                                                    rose: { bg: "from-rose-50 to-pink-50 dark:from-rose-950/20 dark:to-pink-950/20", text: "text-rose-700 dark:text-rose-400", border: "border-rose-200 dark:border-rose-800", itemBorder: "border-rose-100 dark:border-rose-900/50" }
+                                                };
+                                                const t = themes[theme];
+
+                                                return (
+                                                    <div className={cn("p-6 rounded-2xl border bg-gradient-to-br", t.bg)}>
+                                                        <h4 className={cn("font-black flex items-center gap-2 mb-1 uppercase tracking-widest text-sm", t.text)}><Icon className="h-5 w-5" /> {title}</h4>
+                                                        {subtitle && <p className={cn("text-[10px] text-muted-foreground mb-4 border-b pb-2", t.border)}>{subtitle}</p>}
+                                                        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                                                            {Object.entries(items).map(([label, keys]) => {
+                                                                const val = getVal(keys as string[]);
+                                                                const rda = userRDAs?.[label];
+                                                                const pct = rda ? Math.round((val / rda) * 100) : null;
+                                                                const styles = getNutrientLevelStyles(pct || 0, label);
+                                                                return (
+                                                                    <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-900 cursor-pointer hover:shadow-md transition-all", t.itemBorder, pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
+                                                                        <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
+                                                                        <div className="flex items-baseline gap-1"><span className="text-lg font-bold">{val.toFixed(1)}</span><span className={cn("text-[10px] font-bold", (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12')) ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') ? 'µg' : 'mg'}</span></div>
+                                                                        {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            );
+                                                );
+                                            };
                                             return (
                                                 <div className="space-y-6">
                                                     {/* MACROS - Split into Nutritive and Non-Nutritive */}
@@ -575,7 +584,7 @@ export default function MealPlannerPage() {
 
 
                                                     {/* ELECTROLYTES */}
-                                                    <NutrientGrid title="Electrolytes" icon={Zap} items={{
+                                                    <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Hydration • Muscle & Nerve Function" items={{
                                                         'Sodium': ['Sodium', 'sodium_mg'],
                                                         'Potassium': ['Potassium', 'potassium_mg'],
                                                         'Magnesium': ['Magnesium', 'magnesium_mg'],
@@ -584,7 +593,7 @@ export default function MealPlannerPage() {
                                                     }} />
 
                                                     {/* TRACE MINERALS */}
-                                                    <NutrientGrid title="Trace Minerals" icon={Gem} items={{
+                                                    <NutrientGrid title="Trace Minerals" icon={Gem} theme="rose" subtitle="Essential micro-minerals" items={{
                                                         'Iron': ['Iron', 'iron_mg'],
                                                         'Zinc': ['Zinc', 'zinc_mg'],
                                                         'Copper': ['Copper', 'copper_mg'],
