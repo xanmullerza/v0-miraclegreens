@@ -144,7 +144,6 @@ function FoodItemCreatorContent() {
         }
 
         // Measures are no longer handled in this view
-        setShowParser(false);
     };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
