@@ -519,9 +519,9 @@ export default function MealPlannerPage() {
                                                         'Zinc': ['Zinc', 'zinc_mg'],
                                                         'Copper': ['Copper', 'copper_mg'],
                                                         'Manganese': ['Manganese', 'manganese_mg'],
-                                                        'Selenium': ['Selenium', 'selenium_ug'],
-                                                        'Iodine': ['Iodine', 'iodine_ug']
+                                                        'Selenium': ['Selenium', 'selenium_ug']
                                                     }} />
+
 
                                                     {/* DAILY VITAMINS (Water-Soluble: B-Complex + C) */}
                                                     <div className="p-6 rounded-2xl border bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20">
