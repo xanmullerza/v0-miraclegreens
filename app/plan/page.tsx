@@ -472,9 +472,14 @@ export default function MealPlannerPage() {
                             </div>
 
                             <div className="space-y-4 pt-10 border-t">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-2xl font-bold flex items-center gap-2"><LayoutGrid className="text-primary" /> Daily Essential Nutrients</h3>
-                                    <Button variant="outline" size="sm" onClick={() => setShowDailyNutrients(!showDailyNutrients)} className="gap-2">{showDailyNutrients ? "Collapse" : "Expand Report"}</Button>
+                                <div className="flex justify-center mb-4">
+                                    <Button variant="outline" size="lg" onClick={() => setShowDailyNutrients(!showDailyNutrients)} className="gap-2 min-w-[200px] font-bold">
+                                        {showDailyNutrients ? (
+                                            <>Collapse Report <ChevronDown className="h-4 w-4 rotate-180" /></>
+                                        ) : (
+                                            <>Expand Nutrient Report <ChevronDown className="h-4 w-4" /></>
+                                        )}
+                                    </Button>
                                 </div>
 
                                 {showDailyNutrients && (
