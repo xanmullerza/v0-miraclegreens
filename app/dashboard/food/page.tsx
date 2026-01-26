@@ -116,35 +116,48 @@ function FoodItemCreatorContent() {
 
     const handleParse = () => {
         const combinedText = `${servingText}\n${nutrientText}`.trim();
-        if (!combinedText) return;
+        if (!combinedText) {
+            toast.error("Please paste some nutrition text first.");
+            return;
+        }
 
         const parsed = parseNutritionText(combinedText);
+        let foundData = false;
 
         if (parsed.energy_kcal) {
             setEnergyKcal(parsed.energy_kcal.toString());
+            foundData = true;
             if (!parsed.energy_kj) {
                 setEnergyKj(Math.round(parsed.energy_kcal * 4.184).toString());
             }
         }
         if (parsed.energy_kj) {
             setEnergyKj(parsed.energy_kj.toString());
+            foundData = true;
             if (!parsed.energy_kcal) {
                 setEnergyKcal((parsed.energy_kj / 4.184).toFixed(1));
             }
         }
-        if (parsed.protein_g) setProtein(parsed.protein_g.toString());
-        if (parsed.carbs_g) setCarbs(parsed.carbs_g.toString());
-        if (parsed.fat_g) setFat(parsed.fat_g.toString());
+        if (parsed.protein_g) { setProtein(parsed.protein_g.toString()); foundData = true; }
+        if (parsed.carbs_g) { setCarbs(parsed.carbs_g.toString()); foundData = true; }
+        if (parsed.fat_g) { setFat(parsed.fat_g.toString()); foundData = true; }
 
-        if (parsed.micronutrients) {
+        if (parsed.micronutrients && Object.keys(parsed.micronutrients).length > 0) {
             const newMicros: Record<string, string> = {};
             Object.entries(parsed.micronutrients).forEach(([key, val]) => {
                 newMicros[key] = val.toString();
             });
             setMicronutrients(prev => ({ ...prev, ...newMicros }));
+            foundData = true;
         }
 
         // Measures are no longer handled in this view
+
+        if (foundData) {
+            toast.success("Nutrition details extracted successfully!");
+        } else {
+            toast.warning("Could not identify specific nutrients. Try a different format.");
+        }
     };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
