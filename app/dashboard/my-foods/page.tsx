@@ -18,8 +18,9 @@ import {
     Save,
     X,
     Camera,
-    Upload,
-    Table
+    Table,
+    Filter,
+    Upload
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -175,7 +176,11 @@ export default function MyFoodsPage() {
         <div className="max-w-7xl mx-auto space-y-8 pb-20">
 
             {/* Category Filters */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2 text-slate-400 mr-2">
+                    <Filter size={16} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Filter:</span>
+                </div>
                 {CATEGORIES.map(category => {
                     const isActive = selectedCategories.includes(category);
                     return (
