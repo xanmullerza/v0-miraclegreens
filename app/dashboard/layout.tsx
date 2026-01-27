@@ -22,9 +22,9 @@ import { Header } from '@/components/header';
 const sidebarItems = [
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Add Foods', href: '/dashboard/food', icon: Beef },
+    { name: 'Compare Foods', href: '/dashboard/compare', icon: Scale },
     { name: 'Add Recipes', href: '/dashboard/recipes', icon: Utensils },
     { name: 'Plan Meals', href: '/dashboard/plan', icon: Calendar },
-    { name: 'Compare Foods', href: '/dashboard/compare', icon: Scale },
 ];
 
 export default function DashboardLayout({
