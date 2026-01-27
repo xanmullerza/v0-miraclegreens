@@ -46,6 +46,7 @@ interface FoodItem {
     fat_g: number;
     image: string | null;
     micronutrients: Record<string, number>;
+    is_favorite?: boolean;
 }
 
 function BrowseFoodsContent() {
@@ -106,6 +107,24 @@ function BrowseFoodsContent() {
         const debounceTimer = setTimeout(searchFoodItems, 300);
         return () => clearTimeout(debounceTimer);
     }, [searchQuery]);
+
+    const toggleFavorite = async (item: FoodItem) => {
+        try {
+            const newStatus = !item.is_favorite;
+            const { error } = await supabase
+                .from('food_items')
+                .update({ is_favorite: newStatus } as any)
+                .eq('id', item.id);
+
+            if (error) throw error;
+
+            // Update local state
+            setSelectedItem(prev => prev?.id === item.id ? { ...prev, is_favorite: newStatus } : prev);
+            setSearchResults(prev => prev.map(i => i.id === item.id ? { ...i, is_favorite: newStatus } : i));
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+        }
+    };
 
     // Default RDA for comparison context
     const userRDAs = useRDA(30, 'female', 2000);
@@ -264,8 +283,16 @@ function BrowseFoodsContent() {
                                                 )}
                                             </div>
                                             <div className="flex gap-2">
-                                                <Button variant="outline" size="icon" className="rounded-full h-10 w-10">
-                                                    <Heart size={18} />
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    className={cn(
+                                                        "rounded-full h-10 w-10 transition-all",
+                                                        selectedItem.is_favorite ? "text-rose-500 border-rose-200 bg-rose-50 dark:bg-rose-900/20 dark:border-rose-900/50" : ""
+                                                    )}
+                                                    onClick={() => toggleFavorite(selectedItem)}
+                                                >
+                                                    <Heart size={18} fill={selectedItem.is_favorite ? "currentColor" : "none"} />
                                                 </Button>
                                                 <Button variant="outline" size="icon" className="rounded-full h-10 w-10">
                                                     <Share2 size={18} />
