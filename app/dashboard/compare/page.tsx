@@ -1,6 +1,6 @@
-'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import {
     Scale,
@@ -16,7 +16,9 @@ import {
     Divide,
     Gem,
     Droplet,
-    Battery
+    Battery,
+    FileText,
+    ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -66,6 +68,7 @@ const COMPARISON_COLORS = [
 ];
 
 export default function DashboardComparisonPage() {
+    const router = useRouter();
     const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
     const [selectedItems, setSelectedItems] = useState<FoodItem[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -397,7 +400,17 @@ export default function DashboardComparisonPage() {
                                                 </div>
                                                 <div className="mt-6">
                                                     <div className="text-4xl font-black text-amber-500">{winner.score}</div>
-                                                    <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Total Score</div>
+                                                    <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-6">Total Score</div>
+
+                                                    <Button
+                                                        onClick={() => {
+                                                            const ids = selectedItems.map(i => i.id).join(',');
+                                                            router.push(`/dashboard/compare/report?ids=${ids}`);
+                                                        }}
+                                                        className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-lg shadow-amber-500/20 group"
+                                                    >
+                                                        <FileText className="w-4 h-4 mr-2" /> View Full Report <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                                                    </Button>
                                                 </div>
                                             </div>
                                         </Card>
