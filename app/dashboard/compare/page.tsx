@@ -55,26 +55,40 @@ const COMPARISON_COLORS = [
 ];
 
 export default function DashboardComparisonPage() {
-    const [allItems, setAllItems] = useState<FoodItem[]>([]);
+    const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
     const [selectedItems, setSelectedItems] = useState<FoodItem[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchItems();
-    }, []);
+        const searchFoodItems = async () => {
+            setLoading(true);
+            try {
+                let query = supabase
+                    .from('food_items')
+                    .select('id, name, common_name, energy_kcal, energy_kj, protein_g, carbs_g, fat_g, micronutrients')
+                    .limit(50);
 
-    const fetchItems = async () => {
-        const { data, error } = await supabase
-            .from('food_items')
-            .select('*')
-            .order('name');
+                if (searchQuery.trim()) {
+                    query = query.or(`name.ilike.%${searchQuery.trim()}%,common_name.ilike.%${searchQuery.trim()}%`);
+                } else {
+                    query = query.order('name', { ascending: true });
+                }
 
-        if (data) {
-            setAllItems(data);
-        }
-        setLoading(false);
-    };
+                const { data, error } = await query;
+
+                if (error) throw error;
+                if (data) setSearchResults(data);
+            } catch (error) {
+                console.error('Error searching foods:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        const debounceTimer = setTimeout(searchFoodItems, 300);
+        return () => clearTimeout(debounceTimer);
+    }, [searchQuery]);
 
     const toggleItem = (item: FoodItem) => {
         if (selectedItems.some(i => i.id === item.id)) {
@@ -83,11 +97,6 @@ export default function DashboardComparisonPage() {
             setSelectedItems([...selectedItems, item]);
         }
     };
-
-    const filteredItems = allItems.filter(item =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.common_name?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
 
     // Prepare radar data
     const radarData = [
@@ -146,10 +155,10 @@ export default function DashboardComparisonPage() {
                                     <div className="p-8 text-center">
                                         <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-solid border-emerald-500 border-r-transparent align-[-0.125em]" />
                                     </div>
-                                ) : filteredItems.length === 0 ? (
+                                ) : searchResults.length === 0 ? (
                                     <div className="p-4 text-center text-slate-500 text-sm italic">No ingredients found</div>
                                 ) : (
-                                    filteredItems.map(item => (
+                                    searchResults.map(item => (
                                         <button
                                             key={item.id}
                                             onClick={() => toggleItem(item)}

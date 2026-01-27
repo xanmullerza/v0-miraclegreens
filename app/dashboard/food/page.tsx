@@ -74,8 +74,7 @@ export default function DashboardFoodPage() {
 function FoodItemCreatorContent() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const [showAdvanced, setShowAdvanced] = useState(false);
-    const [showMissing, setShowMissing] = useState(false);
+
 
     // State for the food item
     const [name, setName] = useState('');
@@ -371,60 +370,6 @@ function FoodItemCreatorContent() {
                 </Card>
             </div>
 
-            <div className="grid grid-cols-1 gap-8">
-                {/* Main Content Area */}
-                <div className="space-y-8">
-                    {showAdvanced && (
-                        <div className="space-y-6 pt-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
-                            <div className="flex items-center justify-between border-b-2 border-slate-100 dark:border-slate-800 pb-4">
-                                <h3 className="font-black text-xl uppercase tracking-tighter flex items-center gap-3">
-                                    <Activity className="text-blue-500 h-6 w-6" />
-                                    Detailed Nutrition
-                                    <span className="text-xs text-slate-400 font-medium normal-case tracking-normal">(Full list of vitamins and minerals)</span>
-                                </h3>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                {Object.entries(CATEGORIZED_MARKERS).map(([category, markers]) => (
-                                    <Card key={category} className="p-6">
-                                        <div className="mb-4 border-b border-slate-100 dark:border-slate-800 pb-2">
-                                            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400">{category}</h4>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                                            {markers.map(m => (
-                                                <div key={m} className="space-y-1">
-                                                    <div className="flex justify-between items-center px-1">
-                                                        <Label className="text-[10px] text-slate-500 truncate block font-medium uppercase tracking-tighter">
-                                                            {m}
-                                                        </Label>
-                                                        {(m === 'Protein' ? protein : m === 'Fat' ? fat : m === 'Carbs' ? carbs : micronutrients[m]) ? (
-                                                            <CheckCircle2 size={10} className="text-emerald-500" />
-                                                        ) : null}
-                                                    </div>
-                                                    <Input
-                                                        type="number"
-                                                        className={cn(
-                                                            "h-8 text-xs bg-slate-50 dark:bg-slate-950 rounded-lg",
-                                                            (m === 'Protein' ? protein : m === 'Fat' ? fat : m === 'Carbs' ? carbs : micronutrients[m]) ? "border-emerald-500/20 bg-emerald-500/[0.02]" : ""
-                                                        )}
-                                                        value={m === 'Protein' ? protein : m === 'Fat' ? fat : m === 'Carbs' ? carbs : micronutrients[m] || ''}
-                                                        onChange={(e) => {
-                                                            if (m === 'Protein') setProtein(e.target.value);
-                                                            else if (m === 'Fat') setFat(e.target.value);
-                                                            else if (m === 'Carbs') setCarbs(e.target.value);
-                                                            else updateMicro(m, e.target.value);
-                                                        }}
-                                                    />
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </Card>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
         </div>
     );
 }
