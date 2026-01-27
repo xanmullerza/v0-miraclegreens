@@ -54,7 +54,10 @@ interface FoodItem {
     image: string | null;
     micronutrients: Record<string, number>;
     is_favorite?: boolean;
+    category?: string;
 }
+
+const CATEGORIES = ["Grains", "Vegetables", "Fruit", "Legumes", "Proteins", "General"];
 
 function BrowseFoodsContent() {
     const router = useRouter();
@@ -67,6 +70,7 @@ function BrowseFoodsContent() {
     const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
     const [editName, setEditName] = useState('');
     const [editCommonName, setEditCommonName] = useState('');
+    const [editCategory, setEditCategory] = useState('General');
     const [editImage, setEditImage] = useState('');
     const [uploading, setUploading] = useState(false);
 
@@ -191,6 +195,7 @@ function BrowseFoodsContent() {
                 .update({
                     name: editName,
                     common_name: editCommonName,
+                    category: editCategory,
                     image: editImage
                 } as any)
                 .eq('id', editingItem.id);
@@ -198,8 +203,8 @@ function BrowseFoodsContent() {
             if (error) throw error;
 
             // Refresh UI
-            setSelectedItem(prev => prev?.id === editingItem.id ? { ...prev, name: editName, common_name: editCommonName, image: editImage } : prev);
-            setSearchResults(prev => prev.map(i => i.id === editingItem.id ? { ...i, name: editName, common_name: editCommonName, image: editImage } : i));
+            setSelectedItem(prev => prev?.id === editingItem.id ? { ...prev, name: editName, common_name: editCommonName, category: editCategory, image: editImage } : prev);
+            setSearchResults(prev => prev.map(i => i.id === editingItem.id ? { ...i, name: editName, common_name: editCommonName, category: editCategory, image: editImage } : i));
 
             setEditingItem(null);
             toast.success('Food item updated successfully');
@@ -362,6 +367,7 @@ function BrowseFoodsContent() {
                                                 setEditingItem(selectedItem);
                                                 setEditName(selectedItem.name);
                                                 setEditCommonName(selectedItem.common_name);
+                                                setEditCategory(selectedItem.category || 'General');
                                                 setEditImage(selectedItem.image || '');
                                             }}
                                             className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-white/90 dark:bg-slate-950/90 shadow-lg flex items-center justify-center text-emerald-500 hover:scale-110 transition-transform opacity-0 group-hover/img:opacity-100 border border-slate-100 dark:border-slate-800"
@@ -399,6 +405,7 @@ function BrowseFoodsContent() {
                                                         setEditingItem(selectedItem);
                                                         setEditName(selectedItem.name);
                                                         setEditCommonName(selectedItem.common_name);
+                                                        setEditCategory(selectedItem.category || 'General');
                                                         setEditImage(selectedItem.image || '');
                                                     }}
                                                 >
@@ -524,6 +531,26 @@ function BrowseFoodsContent() {
                                         className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800"
                                         placeholder="e.g. Garden Pea"
                                     />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Category</Label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {CATEGORIES.map(category => (
+                                            <button
+                                                key={category}
+                                                onClick={() => setEditCategory(category)}
+                                                className={cn(
+                                                    "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all",
+                                                    editCategory === category
+                                                        ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
+                                                        : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+                                                )}
+                                            >
+                                                {category}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 <div className="space-y-2">

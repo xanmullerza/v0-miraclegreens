@@ -43,7 +43,10 @@ interface FoodItem {
     fat_g: number;
     image: string | null;
     is_favorite: boolean;
+    category: string;
 }
+
+const CATEGORIES = ["Grains", "Vegetables", "Fruit", "Legumes", "Proteins", "General"];
 
 export default function MyFoodsPage() {
     const router = useRouter();
@@ -52,8 +55,10 @@ export default function MyFoodsPage() {
     const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
     const [editName, setEditName] = useState('');
     const [editCommonName, setEditCommonName] = useState('');
+    const [editCategory, setEditCategory] = useState('General');
     const [editImage, setEditImage] = useState('');
     const [uploading, setUploading] = useState(false);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES);
 
     useEffect(() => {
         fetchFavorites();
@@ -122,6 +127,7 @@ export default function MyFoodsPage() {
                 .update({
                     name: editName,
                     common_name: editCommonName,
+                    category: editCategory,
                     image: editImage
                 } as any)
                 .eq('id', editingItem.id);
@@ -129,7 +135,7 @@ export default function MyFoodsPage() {
             if (error) throw error;
 
             setFavorites(prev => prev.map(f =>
-                f.id === editingItem.id ? { ...f, name: editName, common_name: editCommonName, image: editImage } : f
+                f.id === editingItem.id ? { ...f, name: editName, common_name: editCommonName, category: editCategory, image: editImage } : f
             ));
             setEditingItem(null);
             toast.success('Food item updated successfully');
@@ -179,6 +185,33 @@ export default function MyFoodsPage() {
                 </Button>
             </div>
 
+            {/* Category Filters */}
+            <div className="flex flex-wrap gap-2">
+                {CATEGORIES.map(category => {
+                    const isActive = selectedCategories.includes(category);
+                    return (
+                        <button
+                            key={category}
+                            onClick={() => {
+                                if (isActive) {
+                                    setSelectedCategories(prev => prev.filter(c => c !== category));
+                                } else {
+                                    setSelectedCategories(prev => [...prev, category]);
+                                }
+                            }}
+                            className={cn(
+                                "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 border",
+                                isActive
+                                    ? "bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-emerald-500/50"
+                            )}
+                        >
+                            {category}
+                        </button>
+                    );
+                })}
+            </div>
+
             {favorites.length === 0 ? (
                 <div className="h-[400px] flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
                     <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
@@ -196,63 +229,66 @@ export default function MyFoodsPage() {
                 </div>
             ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
-                    {favorites.map((item) => (
-                        <Card key={item.id} className="group relative transition-all duration-300 hover:scale-105 hover:shadow-md border-transparent hover:border-slate-200 dark:hover:border-slate-800">
-                            {/* Action Buttons */}
-                            <div className="absolute top-2 right-2 z-10 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        toggleFavorite(item);
-                                    }}
-                                    className="w-7 h-7 rounded-full bg-white/90 dark:bg-slate-950/90 shadow-sm flex items-center justify-center text-rose-500 hover:scale-110 transition-transform border border-slate-100 dark:border-slate-800"
-                                    title="Remove from favorites"
-                                >
-                                    <Heart size={12} fill="currentColor" />
-                                </button>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setEditingItem(item);
-                                        setEditName(item.name);
-                                        setEditCommonName(item.common_name);
-                                        setEditImage(item.image || '');
-                                    }}
-                                    className="w-7 h-7 rounded-full bg-white/90 dark:bg-slate-950/90 shadow-sm flex items-center justify-center text-emerald-500 hover:scale-110 transition-transform border border-slate-100 dark:border-slate-800"
-                                    title="Edit item"
-                                >
-                                    <Edit2 size={12} />
-                                </button>
-                            </div>
-
-                            <div
-                                className="cursor-pointer"
-                                onClick={() => router.push(`/dashboard/browse?id=${item.id}`)}
-                            >
-                                <div className="aspect-square relative bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                                    {item.image ? (
-                                        <img
-                                            src={item.image}
-                                            alt={item.name}
-                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-700">
-                                            <Beef size={24} />
-                                        </div>
-                                    )}
+                    {favorites
+                        .filter(item => selectedCategories.length === 0 || selectedCategories.includes(item.category || 'General'))
+                        .map((item) => (
+                            <Card key={item.id} className="group relative transition-all duration-300 hover:scale-105 hover:shadow-md border-transparent hover:border-slate-200 dark:hover:border-slate-800">
+                                {/* Action Buttons */}
+                                <div className="absolute top-2 right-2 z-10 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            toggleFavorite(item);
+                                        }}
+                                        className="w-7 h-7 rounded-full bg-white/90 dark:bg-slate-950/90 shadow-sm flex items-center justify-center text-rose-500 hover:scale-110 transition-transform border border-slate-100 dark:border-slate-800"
+                                        title="Remove from favorites"
+                                    >
+                                        <Heart size={12} fill="currentColor" />
+                                    </button>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setEditingItem(item);
+                                            setEditName(item.name);
+                                            setEditCommonName(item.common_name);
+                                            setEditCategory(item.category || 'General');
+                                            setEditImage(item.image || '');
+                                        }}
+                                        className="w-7 h-7 rounded-full bg-white/90 dark:bg-slate-950/90 shadow-sm flex items-center justify-center text-emerald-500 hover:scale-110 transition-transform border border-slate-100 dark:border-slate-800"
+                                        title="Edit item"
+                                    >
+                                        <Edit2 size={12} />
+                                    </button>
                                 </div>
-                                <div className="p-3">
-                                    <h3 className="font-bold text-[10px] capitalize truncate leading-tight mb-1 text-slate-900 dark:text-white">
-                                        {item.name}
-                                    </h3>
-                                    <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        View Profile <ArrowRight size={8} />
+
+                                <div
+                                    className="cursor-pointer"
+                                    onClick={() => router.push(`/dashboard/browse?id=${item.id}`)}
+                                >
+                                    <div className="aspect-square relative bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                                        {item.image ? (
+                                            <img
+                                                src={item.image}
+                                                alt={item.name}
+                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-700">
+                                                <Beef size={24} />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="p-3">
+                                        <h3 className="font-bold text-[10px] capitalize truncate leading-tight mb-1 text-slate-900 dark:text-white">
+                                            {item.name}
+                                        </h3>
+                                        <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            View Profile <ArrowRight size={8} />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </Card>
-                    ))}
+                            </Card>
+                        ))}
                 </div>
             )}
 
@@ -286,6 +322,26 @@ export default function MyFoodsPage() {
                                         className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800"
                                         placeholder="e.g. Garden Pea"
                                     />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Category</Label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {CATEGORIES.map(category => (
+                                            <button
+                                                key={category}
+                                                onClick={() => setEditCategory(category)}
+                                                className={cn(
+                                                    "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all",
+                                                    editCategory === category
+                                                        ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
+                                                        : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+                                                )}
+                                            >
+                                                {category}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 <div className="space-y-2">
