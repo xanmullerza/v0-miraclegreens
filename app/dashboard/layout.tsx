@@ -1,6 +1,4 @@
-'use client';
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -16,19 +14,22 @@ import {
     ArrowLeft,
     Calendar,
     Heart,
-    Library
+    Library,
+    ChevronDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
 
 const sidebarGroups = [
     {
+        id: 'overview',
         title: null,
         items: [
             { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
         ]
     },
     {
+        id: 'foods',
         title: 'Foods',
         items: [
             { name: 'My Foods', href: '/dashboard/my-foods', icon: Heart },
@@ -38,6 +39,7 @@ const sidebarGroups = [
         ]
     },
     {
+        id: 'meals',
         title: 'Meals',
         items: [
             { name: 'Add Recipes', href: '/dashboard/recipes', icon: Utensils },
@@ -52,6 +54,17 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
+    const [expandedGroup, setExpandedGroup] = useState<string | null>('overview');
+
+    // Auto-expand the group that contains the active link
+    useEffect(() => {
+        const activeGroup = sidebarGroups.find(group =>
+            group.items.some(item => item.href === pathname)
+        );
+        if (activeGroup) {
+            setExpandedGroup(activeGroup.id);
+        }
+    }, [pathname]);
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 font-sans">
@@ -68,42 +81,65 @@ export default function DashboardLayout({
                             <span className="font-bold tracking-tight text-lg">Lab Center</span>
                         </div>
 
-                        <nav className="space-y-6">
-                            {sidebarGroups.map((group, groupIdx) => (
-                                <div key={groupIdx} className="space-y-2">
-                                    {group.title && (
-                                        <h3 className="px-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400/80">
-                                            {group.title}
-                                        </h3>
-                                    )}
-                                    <div className="space-y-1">
-                                        {group.items.map((item) => {
-                                            const isActive = pathname === item.href;
-                                            return (
-                                                <Link
-                                                    key={item.href}
-                                                    href={item.href}
-                                                    className={cn(
-                                                        "flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 group text-sm font-medium",
-                                                        isActive
-                                                            ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                                                            : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100"
-                                                    )}
-                                                >
-                                                    <div className="flex items-center gap-3">
-                                                        <item.icon size={18} className={cn(
-                                                            "transition-colors",
-                                                            isActive ? "text-emerald-500" : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300"
-                                                        )} />
-                                                        {item.name}
-                                                    </div>
-                                                    {isActive && <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />}
-                                                </Link>
-                                            );
-                                        })}
+                        <nav className="space-y-4">
+                            {sidebarGroups.map((group) => {
+                                const isExpanded = expandedGroup === group.id;
+                                const hasActiveItem = group.items.some(item => item.href === pathname);
+
+                                return (
+                                    <div key={group.id} className="space-y-2">
+                                        {group.title && (
+                                            <button
+                                                onClick={() => setExpandedGroup(isExpanded ? null : group.id)}
+                                                className="w-full flex items-center justify-between px-4 py-1 group/header"
+                                            >
+                                                <h3 className={cn(
+                                                    "text-[10px] font-black uppercase tracking-[0.2em] transition-colors",
+                                                    isExpanded || hasActiveItem ? "text-emerald-500" : "text-slate-400/80 group-hover/header:text-slate-600 dark:group-hover/header:text-slate-200"
+                                                )}>
+                                                    {group.title}
+                                                </h3>
+                                                {isExpanded ? (
+                                                    <ChevronDown size={12} className="text-slate-400" />
+                                                ) : (
+                                                    <ChevronRight size={12} className="text-slate-400" />
+                                                )}
+                                            </button>
+                                        )}
+
+                                        <div className={cn(
+                                            "space-y-1 transition-all duration-300 ease-in-out overflow-hidden",
+                                            isExpanded ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+                                        )}>
+                                            {group.items.map((item) => {
+                                                const isActive = pathname === item.href;
+                                                return (
+                                                    <Link
+                                                        key={item.href}
+                                                        href={item.href}
+                                                        onClick={() => setExpandedGroup(group.id)}
+                                                        className={cn(
+                                                            "flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 group text-sm font-medium",
+                                                            isActive
+                                                                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                                                                : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50 hover:text-slate-900 dark:hover:text-slate-100"
+                                                        )}
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <item.icon size={18} className={cn(
+                                                                "transition-colors",
+                                                                isActive ? "text-emerald-500" : "text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300"
+                                                            )} />
+                                                            {item.name}
+                                                        </div>
+                                                        {isActive && <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />}
+                                                    </Link>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </nav>
                     </div>
 
