@@ -265,14 +265,9 @@ function FoodItemCreatorContent() {
                 {showParser && (
                     <div className="lg:col-span-8 space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
                         <Card className="p-8 border-emerald-500/30 bg-emerald-500/[0.03]">
-                            <div className="flex items-center gap-4 mb-6">
-                                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center text-emerald-600">
-                                    <Sparkles size={24} />
-                                </div>
-                                <div>
-                                    <h3 className="font-black uppercase tracking-widest text-sm text-emerald-700">Nutrition Scanner</h3>
-                                    <p className="text-xs text-emerald-600/80 font-medium">Paste the text from a nutrition label or website below. We'll automatically fill in the details.</p>
-                                </div>
+                            <div className="flex items-center gap-3 mb-6">
+                                <Sparkles size={20} className="text-emerald-500" />
+                                <h3 className="font-black text-sm uppercase tracking-widest">Nutrients & Servings</h3>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -342,7 +337,7 @@ function FoodItemCreatorContent() {
                     <div className="space-y-6">
                         <div className="flex items-center gap-3 mb-2">
                             <Beef size={20} className="text-emerald-500" />
-                            <h3 className="font-black text-sm uppercase tracking-widest">General Info</h3>
+                            <h3 className="font-black text-sm uppercase tracking-widest">Name</h3>
                         </div>
                         <div className="space-y-4">
                             <div className="space-y-1.5">
@@ -370,7 +365,7 @@ function FoodItemCreatorContent() {
                     <div className="space-y-6 pt-6 border-t border-slate-100 dark:border-slate-800">
                         <div className="flex items-center gap-3 mb-2">
                             <Camera size={20} className="text-emerald-500" />
-                            <h3 className="font-black text-sm uppercase tracking-widest">Food Visualization</h3>
+                            <h3 className="font-black text-sm uppercase tracking-widest">Photo</h3>
                         </div>
                         <div className="space-y-4">
                             <div className="relative aspect-video rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group hover:border-emerald-500/50 transition-all flex flex-col items-center justify-center">
