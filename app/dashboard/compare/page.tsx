@@ -330,7 +330,123 @@ export default function DashboardComparisonPage() {
                                 </div>
                             </Card>
 
-                            {/* Detailed Stats Cards */}
+                            {/* Scoreboard / Leaderboard */}
+                            {selectedItems.length > 1 && (() => {
+                                const BENEFICIAL_NUTRIENTS = [
+                                    { key: 'protein_g', label: 'Protein' },
+                                    { key: 'Fiber', label: 'Fiber' },
+                                    { key: 'Calcium', label: 'Calcium' },
+                                    { key: 'Iron', label: 'Iron' },
+                                    { key: 'Magnesium', label: 'Magnesium' },
+                                    { key: 'Potassium', label: 'Potassium' },
+                                    { key: 'Zinc', label: 'Zinc' },
+                                    { key: 'Vitamin A', label: 'Vit A' },
+                                    { key: 'Vitamin C', label: 'Vit C' },
+                                    { key: 'Vitamin D', label: 'Vit D' },
+                                    { key: 'Vitamin E', label: 'Vit E' },
+                                    { key: 'Vitamin K', label: 'Vit K' },
+                                    { key: 'B1 (Thiamine)', label: 'B1' },
+                                    { key: 'B2 (Riboflavin)', label: 'B2' },
+                                    { key: 'B3 (Niacin)', label: 'B3' },
+                                    { key: 'B5 (Pantothenic Acid)', label: 'B5' },
+                                    { key: 'B6 (Pyridoxine)', label: 'B6' },
+                                    { key: 'B9 (Folate)', label: 'Folate' },
+                                    { key: 'B12 (Cobalamin)', label: 'B12' },
+                                    { key: 'Choline', label: 'Choline' }
+                                ];
+
+                                const scores = selectedItems.map(item => ({ ...item, score: 0, wins: 0 }));
+
+                                BENEFICIAL_NUTRIENTS.forEach(({ key }) => {
+                                    // Sort items by this nutrient
+                                    const sorted = [...selectedItems].sort((a, b) => getVal(b, key) - getVal(a, key));
+
+                                    sorted.forEach((item, rank) => {
+                                        const scoreItem = scores.find(s => s.id === item.id);
+                                        if (scoreItem) {
+                                            // 3 points for 1st, 2 for 2nd, 1 for 3rd
+                                            if (rank === 0) { scoreItem.score += 3; scoreItem.wins += 1; }
+                                            else if (rank === 1) scoreItem.score += 2;
+                                            else if (rank === 2) scoreItem.score += 1;
+                                        }
+                                    });
+                                });
+
+                                const rankedItems = scores.sort((a, b) => b.score - a.score);
+                                const winner = rankedItems[0];
+                                const maxScore = rankedItems[0].score;
+
+                                return (
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                        {/* Winner Card */}
+                                        <Card className="md:col-span-1 p-6 bg-gradient-to-br from-amber-100 to-orange-50 dark:from-amber-900/40 dark:to-orange-900/20 border-amber-200 dark:border-amber-800/50 relative overflow-hidden">
+                                            <div className="absolute top-0 right-0 p-4 opacity-10">
+                                                <Gem className="w-24 h-24 text-amber-500" />
+                                            </div>
+                                            <div className="relative z-10 flex flex-col h-full justify-between">
+                                                <div>
+                                                    <h3 className="text-amber-600 dark:text-amber-400 font-bold uppercase tracking-widest text-xs mb-2 flex items-center gap-2">
+                                                        <Sparkles className="w-4 h-4" /> Nutrient Density Winner
+                                                    </h3>
+                                                    <div className="text-2xl font-black text-slate-900 dark:text-white mb-1 capitalize leading-tight">
+                                                        {winner.common_name || winner.name}
+                                                    </div>
+                                                    <p className="text-xs text-amber-700/70 dark:text-amber-400/70 font-medium">
+                                                        Won {winner.wins} categories
+                                                    </p>
+                                                </div>
+                                                <div className="mt-6">
+                                                    <div className="text-4xl font-black text-amber-500">{winner.score}</div>
+                                                    <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Total Score</div>
+                                                </div>
+                                            </div>
+                                        </Card>
+
+                                        {/* Leaderboard */}
+                                        <Card className="md:col-span-2 p-6 bg-white dark:bg-slate-900">
+                                            <h3 className="font-bold text-sm uppercase tracking-widest text-slate-500 mb-4 flex items-center gap-2">
+                                                <Activity className="w-4 h-4" /> Official Leaderboard
+                                            </h3>
+                                            <div className="space-y-3">
+                                                {rankedItems.map((item, idx) => {
+                                                    const originalIdx = selectedItems.findIndex(i => i.id === item.id);
+                                                    const isWinner = idx === 0;
+
+                                                    return (
+                                                        <div key={item.id} className="flex items-center gap-4 group">
+                                                            <div className={cn(
+                                                                "w-8 h-8 rounded-full flex items-center justify-center font-black text-xs shrink-0",
+                                                                isWinner ? "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-400" : "bg-slate-100 text-slate-500 dark:bg-slate-800"
+                                                            )}>
+                                                                {idx + 1}
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <div className="flex justify-between items-end mb-1">
+                                                                    <div className="font-bold text-sm truncate capitalize flex items-center gap-2">
+                                                                        {item.common_name || item.name}
+                                                                        {isWinner && <Sparkles className="w-3 h-3 text-amber-500" />}
+                                                                    </div>
+                                                                    <div className="font-mono font-bold text-sm">{item.score} <span className="text-[10px] text-slate-400 font-normal">pts</span></div>
+                                                                </div>
+                                                                {/* Progress bar relative to winner */}
+                                                                <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                                                    <div
+                                                                        className={cn("h-full rounded-full transition-all duration-500", isWinner ? "bg-amber-500" : "bg-emerald-500 opacity-50")}
+                                                                        style={{
+                                                                            width: `${(item.score / maxScore) * 100}%`,
+                                                                            backgroundColor: isWinner ? undefined : COMPARISON_COLORS[originalIdx]
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </Card>
+                                    </div>
+                                );
+                            })()}
 
                             {/* MACROS */}
                             <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900 space-y-6">
