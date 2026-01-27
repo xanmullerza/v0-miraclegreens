@@ -282,7 +282,12 @@ function FoodItemCreatorContent() {
                             <Button
                                 onClick={handleSave}
                                 disabled={loading || !name.trim() || !servingText.trim() || !nutrientText.trim()}
-                                className="flex-[2] h-14 rounded-[18px] bg-slate-950 hover:bg-slate-900 text-white shadow-xl shadow-slate-950/20 text-[10px] font-black uppercase tracking-widest gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className={cn(
+                                    "flex-[2] h-14 rounded-[18px] text-white shadow-xl text-[10px] font-black uppercase tracking-widest gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300",
+                                    (name.trim() && servingText.trim() && nutrientText.trim())
+                                        ? "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20 transform scale-[1.02]"
+                                        : "bg-slate-950 hover:bg-slate-900 shadow-slate-950/20"
+                                )}
                             >
                                 {loading ? <Loader2 className="animate-spin h-4 w-4" /> : <Save size={16} />}
                                 Save to My Foods
