@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import {
     Search,
@@ -121,8 +122,15 @@ function BrowseFoodsContent() {
             // Update local state
             setSelectedItem(prev => prev?.id === item.id ? { ...prev, is_favorite: newStatus } : prev);
             setSearchResults(prev => prev.map(i => i.id === item.id ? { ...i, is_favorite: newStatus } : i));
-        } catch (error) {
+
+            if (newStatus) {
+                toast.success(`${item.name} added to My Foods`);
+            } else {
+                toast.info(`${item.name} removed from My Foods`);
+            }
+        } catch (error: any) {
             console.error('Error toggling favorite:', error);
+            toast.error(`Failed to update favorite: ${error.message}`);
         }
     };
 
