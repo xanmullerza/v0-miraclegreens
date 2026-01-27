@@ -122,7 +122,7 @@ export default function MyFoodsPage() {
             ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
                     {favorites.map((item) => (
-                        <Card key={item.id} className="group relative transition-all hover:ring-2 hover:ring-emerald-500/50">
+                        <Card key={item.id} className="group relative transition-all duration-300 hover:scale-105 hover:shadow-md border-transparent hover:border-slate-200 dark:hover:border-slate-800">
                             {/* Un-favorite Absolute Button */}
                             <button
                                 onClick={(e) => {
