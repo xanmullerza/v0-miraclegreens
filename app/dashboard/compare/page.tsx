@@ -245,13 +245,11 @@ function DashboardComparisonContent() {
                     </Badge>
                     {selectedItems.length > 0 && (
                         <Button
-                            variant="ghost"
                             size="sm"
-                            className="text-muted-foreground hover:text-foreground h-8 px-2"
+                            className="bg-rose-500 hover:bg-rose-600 text-white shadow-md h-8 gap-2 font-bold px-4 transition-all animate-in zoom-in-50"
                             onClick={() => setSelectedItems([])}
-                            title="Reset Comparison"
                         >
-                            <RotateCcw className="h-4 w-4" />
+                            <RotateCcw className="h-3.5 w-3.5" /> Reset
                         </Button>
                     )}
                 </div>
