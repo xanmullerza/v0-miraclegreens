@@ -59,21 +59,35 @@ function ComparisonReportContent() {
     if (items.length < 2) return null;
 
     // --- LOGIC: Determine Winner & Insights ---
-    // (Re-implementing the scoring logic briefly to get the winner context)
     const BENEFICIAL_NUTRIENTS = [
-        'protein_g', 'Fiber', 'Calcium', 'Iron', 'Magnesium', 'Potassium', 'Zinc',
-        'Vitamin A', 'Vitamin C', 'Vitamin D', 'Vitamin E', 'B12 (Cobalamin)'
+        { k: 'protein_g', l: 'Protein' }, { k: 'Fiber', l: 'Fiber' }, { k: 'Calcium', l: 'Calcium' },
+        { k: 'Iron', l: 'Iron' }, { k: 'Magnesium', l: 'Magnesium' }, { k: 'Potassium', l: 'Potassium' },
+        { k: 'Zinc', l: 'Zinc' }, { k: 'Vitamin A', l: 'Vitamin A' }, { k: 'Vitamin C', l: 'Vitamin C' },
+        { k: 'Vitamin D', l: 'Vitamin D' }, { k: 'Vitamin E', l: 'Vitamin E' }, { k: 'B12 (Cobalamin)', l: 'Vitamin B12' }
     ];
 
-    const scores = items.map(item => ({ ...item, score: 0, wins: 0 }));
-    BENEFICIAL_NUTRIENTS.forEach(key => {
-        const getVal = (i: FoodItem) => key === 'protein_g' ? i.protein_g : (i.micronutrients[key] || 0);
+    const scores = items.map(item => ({ ...item, score: 0, winningTraits: [] as string[] }));
+
+    BENEFICIAL_NUTRIENTS.forEach(({ k, l }) => {
+        const getVal = (i: FoodItem) => k === 'protein_g' ? i.protein_g : (i.micronutrients[k] || 0);
         const sorted = [...items].sort((a, b) => getVal(b) - getVal(a));
-        scores.find(s => s.id === sorted[0].id)!.score += 3; // Simplified scoring for the winner calc
+        // Winner gets 3 points
+        const win = scores.find(s => s.id === sorted[0].id)!;
+        win.score += 3;
+        win.winningTraits.push(l);
     });
 
     const winner = scores.sort((a, b) => b.score - a.score)[0];
     const runnerUp = scores[1];
+
+    // Initializing state for share button
+    const [copied, setCopied] = useState(false);
+
+    const handleShare = () => {
+        navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
 
     // Helper to find specific strengths
     const getStrengths = (item: FoodItem) => {
@@ -84,6 +98,9 @@ function ComparisonReportContent() {
         if ((item.micronutrients['Iron'] || 0) > 4) strengths.push({ label: 'High Iron', icon: Gem });
         return strengths;
     };
+
+    // Format top winning traits
+    const topTraits = winner.winningTraits.slice(0, 3).join(', ');
 
     return (
         <div className="max-w-5xl mx-auto pb-20 space-y-12">
@@ -96,8 +113,11 @@ function ComparisonReportContent() {
                     <Button variant="outline" className="gap-2" onClick={() => window.print()}>
                         <Printer className="w-4 h-4" /> Print Report
                     </Button>
-                    <Button className="gap-2 bg-emerald-600 hover:bg-emerald-700">
-                        <Share2 className="w-4 h-4" /> Share Results
+                    <Button
+                        className={cn("gap-2 transition-all", copied ? "bg-slate-900" : "bg-emerald-600 hover:bg-emerald-700")}
+                        onClick={handleShare}
+                    >
+                        {copied ? "Copied Link!" : "Share Results"} <Share2 className="w-4 h-4" />
                     </Button>
                 </div>
             </div>
@@ -126,8 +146,8 @@ function ComparisonReportContent() {
                     </div>
                     <div className="space-y-4">
                         <h2 className="text-3xl font-bold">{winner.common_name || winner.name}</h2>
-                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                            Outperforming strictly in micronutrient density, {winner.common_name || winner.name} provides a more robust profile of essential vitamins and minerals per calorie.
+                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-lg">
+                            Dominating in <span className="font-bold text-slate-900 dark:text-white">{topTraits}</span> content, {winner.common_name || winner.name} provides a superior micronutrient profile per calorie, making it the more efficient metabolic choice.
                         </p>
 
                         <div className="flex flex-wrap gap-3 pt-2">
