@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import {
     Scale,
@@ -68,12 +68,38 @@ const COMPARISON_COLORS = [
     '#14b8a6', // teal-500
 ];
 
-export default function DashboardComparisonPage() {
+function DashboardComparisonContent() {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
     const [selectedItems, setSelectedItems] = useState<FoodItem[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
+
+    // Initial load from URL
+    useEffect(() => {
+        const idsparam = searchParams.get('ids');
+        if (idsparam) {
+            const ids = idsparam.split(',');
+            if (ids.length > 0) {
+                const fetchSelected = async () => {
+                    const { data } = await supabase.from('food_items').select('*').in('id', ids);
+                    if (data) setSelectedItems(data);
+                };
+                fetchSelected();
+            }
+        }
+    }, []); // Run once on mount
+
+    // Update URL when selection changes
+    useEffect(() => {
+        if (selectedItems.length > 0) {
+            const ids = selectedItems.map(i => i.id).join(',');
+            router.replace(`/dashboard/compare?ids=${ids}`, { scroll: false });
+        } else {
+            router.replace('/dashboard/compare', { scroll: false });
+        }
+    }, [selectedItems, router]);
 
     useEffect(() => {
         const searchFoodItems = async () => {
@@ -558,5 +584,17 @@ export default function DashboardComparisonPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function DashboardComparisonPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="animate-spin h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full" />
+            </div>
+        }>
+            <DashboardComparisonContent />
+        </Suspense>
     );
 }
