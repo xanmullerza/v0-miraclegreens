@@ -279,7 +279,7 @@ export default function MyFoodsPage() {
                                         {item.image ? (
                                             <img
                                                 src={item.image}
-                                                alt={item.name}
+                                                alt={item.common_name || item.name}
                                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                             />
                                         ) : (
@@ -290,7 +290,7 @@ export default function MyFoodsPage() {
                                     </div>
                                     <div className="p-3">
                                         <h3 className="font-bold text-[10px] capitalize truncate leading-tight mb-1 text-slate-900 dark:text-white">
-                                            {item.name}
+                                            {item.common_name || item.name}
                                         </h3>
                                         <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">
                                             View Profile <ArrowRight size={8} />
