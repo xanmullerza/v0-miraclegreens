@@ -44,7 +44,7 @@ export default function RootLayout({
       <body className={`${_dmSans.className} ${_playfair.className} font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
           disableTransitionOnChange
         >
