@@ -18,7 +18,8 @@ import {
     Save,
     X,
     Camera,
-    Upload
+    Upload,
+    Table
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -177,12 +178,21 @@ export default function MyFoodsPage() {
                     <h1 className="text-3xl font-bold tracking-tight">My Foods</h1>
                     <p className="text-slate-500 mt-1">Your curated collection of laboratory-grade ingredients.</p>
                 </div>
-                <Button
-                    onClick={() => router.push('/dashboard/browse')}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl gap-2 font-bold"
-                >
-                    <Library size={18} /> Browse Library
-                </Button>
+                <div className="flex gap-3">
+                    <Button
+                        variant="outline"
+                        onClick={() => router.push('/dashboard/manage-foods')}
+                        className="rounded-xl gap-2 font-bold border-slate-200 dark:border-slate-800"
+                    >
+                        <Table size={18} /> Bulk Manage
+                    </Button>
+                    <Button
+                        onClick={() => router.push('/dashboard/browse')}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl gap-2 font-bold"
+                    >
+                        <Library size={18} /> Browse Library
+                    </Button>
+                </div>
             </div>
 
             {/* Category Filters */}
