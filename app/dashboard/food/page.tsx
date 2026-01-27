@@ -215,20 +215,41 @@ function FoodItemCreatorContent() {
 
         setLoading(true);
         try {
+            // Parse nutrition text inline before saving
+            const combinedText = `${servingText}\n${nutrientText}`.trim();
+            const parsed = combinedText ? parseNutritionText(combinedText) : { micronutrients: {} };
+
+            // Use parsed values, falling back to any manually entered values
+            const finalEnergyKcal = parsed.energy_kcal || parseFloat(energyKcal) || null;
+            const finalEnergyKj = parsed.energy_kj || parseFloat(energyKj) || (finalEnergyKcal ? Math.round(finalEnergyKcal * 4.184) : null);
+            const finalProtein = parsed.protein_g || parseFloat(protein) || 0;
+            const finalCarbs = parsed.carbs_g || parseFloat(carbs) || 0;
+            const finalFat = parsed.fat_g || parseFloat(fat) || 0;
+
+            // Merge parsed micronutrients with any manually entered ones
+            const finalMicros: Record<string, number> = {};
+            if (parsed.micronutrients) {
+                Object.entries(parsed.micronutrients).forEach(([key, val]) => {
+                    finalMicros[key] = val;
+                });
+            }
+            Object.entries(micronutrients).forEach(([key, val]) => {
+                if (val && !finalMicros[key]) {
+                    finalMicros[key] = parseFloat(val);
+                }
+            });
+
             const foodData = {
                 name,
                 common_name: commonName || null,
                 source: source || 'manual',
-                energy_kcal: parseFloat(energyKcal) || null,
-                energy_kj: parseFloat(energyKj) || (parseFloat(energyKcal) ? Math.round(parseFloat(energyKcal) * 4.184) : null),
-                protein_g: parseFloat(protein) || 0,
-                carbs_g: parseFloat(carbs) || 0,
-                fat_g: parseFloat(fat) || 0,
+                energy_kcal: finalEnergyKcal,
+                energy_kj: finalEnergyKj,
+                protein_g: finalProtein,
+                carbs_g: finalCarbs,
+                fat_g: finalFat,
                 image: image || null,
-                micronutrients: Object.entries(micronutrients).reduce((acc, [key, val]) => {
-                    if (val) acc[key] = parseFloat(val);
-                    return acc;
-                }, {} as Record<string, number>)
+                micronutrients: finalMicros
             };
 
             const { data: item, error: itemError } = await supabase
