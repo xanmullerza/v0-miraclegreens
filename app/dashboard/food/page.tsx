@@ -402,7 +402,7 @@ function FoodItemCreatorContent() {
                                     </div>
                                 )}
                             </div>
-                            <p className="text-[10px] text-slate-400 font-medium italic text-center">Reference images help with visual identification in the synthetic engine.</p>
+
                         </div>
                     </div>
                 </Card>
