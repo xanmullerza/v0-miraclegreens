@@ -13,7 +13,10 @@ import {
     Plus,
     Activity,
     BarChart3,
-    Divide
+    Divide,
+    Gem,
+    Droplet,
+    Battery
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,6 +31,8 @@ import {
     Legend
 } from 'recharts';
 import { cn } from '@/lib/utils';
+import { useRDA } from '@/hooks/use-rda';
+import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden", className)}>
@@ -121,8 +126,77 @@ export default function DashboardComparisonPage() {
         return entry;
     });
 
+    // Default RDA for comparison context (Adult Female, 30yo, 2000kcal)
+    const userRDAs = useRDA(30, 'female', 2000);
+
+    const getVal = (item: FoodItem, key: string) => {
+        if (key === 'energy_kcal') return item.energy_kcal;
+        if (key === 'protein_g') return item.protein_g;
+        if (key === 'carbs_g') return item.carbs_g;
+        if (key === 'fat_g') return item.fat_g;
+        return item.micronutrients?.[key] || 0;
+    };
+
+    const ComparisonGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle }: { title: string, items: Record<string, string[]>, icon: any, theme?: 'indigo' | 'rose' | 'emerald' | 'blue' | 'amber', subtitle?: string }) => {
+        const themes = {
+            indigo: { bg: "bg-slate-900 border-slate-800", text: "text-indigo-400", border: "border-slate-800", itemBorder: "border-indigo-900/50" },
+            rose: { bg: "bg-slate-900 border-slate-800", text: "text-rose-400", border: "border-slate-800", itemBorder: "border-rose-900/50" },
+            emerald: { bg: "bg-slate-900 border-slate-800", text: "text-emerald-400", border: "border-slate-800", itemBorder: "border-emerald-900/50" },
+            blue: { bg: "bg-slate-900 border-slate-800", text: "text-blue-400", border: "border-slate-800", itemBorder: "border-blue-900/50" },
+            amber: { bg: "bg-slate-900 border-slate-800", text: "text-amber-400", border: "border-slate-800", itemBorder: "border-amber-900/50" }
+        };
+        const t = themes[theme];
+
+        return (
+            <div className={cn("p-6 rounded-2xl border bg-gradient-to-br", t.bg)}>
+                <h4 className={cn("font-black flex items-center gap-2 mb-1 uppercase tracking-widest text-sm", t.text)}><Icon className="h-5 w-5" /> {title}</h4>
+                {subtitle && <p className={cn("text-[10px] text-muted-foreground mb-4 border-b pb-2", t.border)}>{subtitle}</p>}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {Object.entries(items).map(([label, keys]) => {
+                        const unitLabel = label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label.includes('Vitamin A') || label.includes('Vitamin K') || label.includes('Vitamin D') ? 'µg' : label.includes('Vitamin D') ? 'IU' : 'mg';
+
+                        return (
+                            <div key={label} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-900 hover:shadow-md transition-all", t.itemBorder)}>
+                                <div className="flex justify-between items-center mb-2">
+                                    <p className="text-[10px] uppercase font-black text-foreground/60 truncate">{label}</p>
+                                    <span className="text-[10px] text-muted-foreground font-bold">{unitLabel}</span>
+                                </div>
+                                <div className="space-y-2">
+                                    {selectedItems.map((item, idx) => {
+                                        const key = keys.find(k => k === 'energy_kcal' || k === 'protein_g' || k === 'carbs_g' || k === 'fat_g' || item.micronutrients?.[k] !== undefined) || keys[0];
+                                        const val = getVal(item, key);
+                                        const rda = userRDAs?.[label];
+                                        const pct = rda ? Math.round((val / rda) * 100) : 0;
+                                        const styles = getNutrientLevelStyles(pct, label);
+
+                                        return (
+                                            <div key={item.id} className="flex items-center justify-between text-xs">
+                                                <div className="flex items-center gap-2 truncate max-w-[60%]">
+                                                    <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: COMPARISON_COLORS[idx] }} />
+                                                    <span className="truncate opacity-80">{item.common_name || item.name}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-bold">{val >= 1 ? val.toFixed(0) : val.toFixed(1)}</span>
+                                                    {rda && (
+                                                        <span className={cn("text-[9px] px-1.5 py-0.5 rounded-full font-black min-w-[32px] text-center", styles.bg, styles.textFill)}>
+                                                            {pct}%
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        );
+    };
+
     return (
-        <div className="max-w-7xl mx-auto space-y-8">
+        <div className="max-w-7xl mx-auto space-y-8 pb-20">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Ingredient Analysis</h1>
@@ -209,9 +283,9 @@ export default function DashboardComparisonPage() {
                             <p className="text-sm text-slate-500 mt-1">Select ingredients from the library to begin</p>
                         </div>
                     ) : (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
                             {/* Visual Radar Overlap */}
-                            <Card className="p-8 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden relative mb-8">
+                            <Card className="p-8 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden relative">
                                 <div className="absolute top-0 right-0 p-8">
                                     <Sparkles className="w-12 h-12 text-emerald-500/5" />
                                 </div>
@@ -250,85 +324,94 @@ export default function DashboardComparisonPage() {
                                 </div>
                             </Card>
 
-                            {/* Detailed Stats Table */}
-                            <div className="space-y-6">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="font-bold text-xl flex items-center gap-3 text-slate-900 dark:text-white">
-                                        <Divide className="w-5 h-5 text-emerald-500 rotate-12" />
-                                        Clinical Data Matrix
-                                    </h3>
-                                    <Badge variant="outline" className="text-[10px] uppercase tracking-tighter opacity-50">
-                                        Values per 100g
-                                    </Badge>
-                                </div>
+                            {/* Detailed Stats Cards */}
 
-                                <div className="overflow-x-auto rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900">
-                                    <table className="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr className="bg-slate-50 dark:bg-slate-800/50">
-                                                <th className="p-6 font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest text-[10px] w-64">Nutrient</th>
-                                                {selectedItems.map((item, idx) => (
-                                                    <th key={item.id} className="p-6 font-bold text-center border-l border-slate-100 dark:border-slate-800" style={{ color: COMPARISON_COLORS[idx] }}>
-                                                        <div className="text-xs uppercase tracking-tight truncate max-w-[120px] mx-auto">
-                                                            {item.common_name || item.name}
-                                                        </div>
-                                                    </th>
-                                                ))}
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-                                            {/* Core Macros */}
-                                            <tr className="bg-slate-50/30 dark:bg-slate-800/20">
-                                                <td colSpan={selectedItems.length + 1} className="p-3 pl-6 text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Energy & Macronutrients</td>
-                                            </tr>
-                                            {[
-                                                { label: 'Calories (kcal)', key: 'energy_kcal', bold: true },
-                                                { label: 'Energy (kJ)', key: 'energy_kj' },
-                                                { label: 'Protein (g)', key: 'protein_g' },
-                                                { label: 'Carbs (g)', key: 'carbs_g' },
-                                                { label: 'Fat (g)', key: 'fat_g' },
-                                            ].map(row => (
-                                                <tr key={row.key} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors">
-                                                    <td className="p-5 pl-6 font-medium text-xs text-slate-600 dark:text-slate-400">{row.label}</td>
-                                                    {selectedItems.map(item => (
-                                                        <td key={item.id} className={cn(
-                                                            "p-5 text-center text-xs border-l border-slate-100 dark:border-slate-800",
-                                                            row.bold ? "font-bold text-slate-900 dark:text-white" : "font-semibold"
-                                                        )}>
-                                                            {parseFloat((item as any)[row.key] || 0).toFixed(row.key === 'energy_kcal' ? 0 : 2)}
-                                                        </td>
-                                                    ))}
-                                                </tr>
-                                            ))}
+                            {/* MACROS */}
+                            <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900 space-y-6">
+                                <div>
+                                    <h4 className="font-black flex items-center gap-2 mb-1 text-orange-400 uppercase tracking-widest text-sm"><Zap className="h-5 w-5" /> Macronutrients</h4>
+                                    <p className="text-[10px] text-slate-400 mb-4 border-b border-slate-800 pb-2">Energy providers • Fuel for your body</p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                        {[
+                                            { label: 'Energy', keys: ['energy_kcal'], unit: 'kcal' },
+                                            { label: 'Protein', keys: ['protein_g'], unit: 'g' },
+                                            { label: 'Carbs', keys: ['carbs_g'], unit: 'g' },
+                                            { label: 'Fat', keys: ['fat_g'], unit: 'g' },
+                                        ].map(macro => (
+                                            <div key={macro.label} className="p-4 rounded-xl border bg-white dark:bg-slate-900 hover:shadow-md transition-all">
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <p className="text-[10px] uppercase font-black text-foreground/60 truncate">{macro.label}</p>
+                                                    <span className="text-[10px] text-muted-foreground font-bold">{macro.unit}</span>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    {selectedItems.map((item, idx) => {
+                                                        const val = getVal(item, macro.keys[0]);
+                                                        const target = macro.label === 'Energy' ? 2000 : macro.label === 'Protein' ? 50 : macro.label === 'Carbs' ? 250 : 70; // Rough averages
+                                                        const pct = Math.round((val / target) * 100);
+                                                        const styles = getNutrientLevelStyles(pct, macro.label);
 
-                                            {/* High Impact Markers */}
-                                            <tr className="bg-slate-50/30 dark:bg-slate-800/20">
-                                                <td colSpan={selectedItems.length + 1} className="p-3 pl-6 text-[10px] font-black text-rose-600 uppercase tracking-widest text-[10px]">Critical Health Markers</td>
-                                            </tr>
-                                            {[
-                                                { label: 'Oxalate (mg)', key: 'Oxalate', alert: true },
-                                                { label: 'Fiber (g)', key: 'Fiber' },
-                                                { label: 'Vitamin C (mg)', key: 'Vitamin C' },
-                                                { label: 'Vitamin A (µg)', key: 'Vitamin A' },
-                                                { label: 'Omega-3 (g)', key: 'Omega-3' },
-                                                { label: 'Sugars (g)', key: 'Sugars' },
-                                            ].map(row => (
-                                                <tr key={row.key} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/10 transition-colors">
-                                                    <td className="p-5 pl-6 text-xs flex items-center gap-3">
-                                                        <span className="font-medium text-slate-600 dark:text-slate-400">{row.label}</span>
-                                                        {row.alert && <Badge variant="outline" className="text-[8px] h-4 px-1.5 border-rose-200 text-rose-600 bg-rose-50 font-black">ALERT</Badge>}
-                                                    </td>
-                                                    {selectedItems.map(item => (
-                                                        <td key={item.id} className="p-5 text-center text-xs font-bold border-l border-slate-100 dark:border-slate-800">
-                                                            {parseFloat(item.micronutrients[row.key] as any || 0).toFixed(2)}
-                                                        </td>
-                                                    ))}
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                                        return (
+                                                            <div key={item.id} className="flex items-center justify-between text-xs">
+                                                                <div className="flex items-center gap-2 truncate max-w-[60%]">
+                                                                    <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: COMPARISON_COLORS[idx] }} />
+                                                                    <span className="truncate opacity-80">{item.common_name || item.name}</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="font-bold">{Math.round(val)}</span>
+                                                                    <span className={cn("text-[9px] px-1.5 py-0.5 rounded-full font-black min-w-[32px] text-center", styles.bg, styles.textFill)}>
+                                                                        {pct}%
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
+
+                            {/* ELECTROLYTES */}
+                            <ComparisonGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Hydration • Muscle & Nerve Function" items={{
+                                'Sodium': ['Sodium', 'sodium_mg'],
+                                'Potassium': ['Potassium', 'potassium_mg'],
+                                'Magnesium': ['Magnesium', 'magnesium_mg'],
+                                'Calcium': ['Calcium', 'calcium_mg'],
+                                'Phosphorus': ['Phosphorus', 'phosphorus_mg']
+                            }} />
+
+                            {/* TRACE MINERALS */}
+                            <ComparisonGrid title="Trace Minerals" icon={Gem} theme="rose" subtitle="Essential micro-minerals" items={{
+                                'Iron': ['Iron', 'iron_mg'],
+                                'Zinc': ['Zinc', 'zinc_mg'],
+                                'Copper': ['Copper', 'copper_mg'],
+                                'Manganese': ['Manganese', 'manganese_mg'],
+                                'Selenium': ['Selenium', 'selenium_ug']
+                            }} />
+
+                            {/* DAILY VITAMINS */}
+                            <ComparisonGrid title="Daily Vitamins" icon={Droplet} theme="blue" subtitle="Water-soluble • Must be replenished daily" items={{
+                                'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
+                                'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
+                                'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
+                                'B5 (Pantothenic)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
+                                'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
+                                'B7 (Biotin)': ['Biotin', 'biotin_ug'],
+                                'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
+                                'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
+                                'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
+                                'Choline': ['Choline', 'choline_mg'],
+                            }} />
+
+                            {/* STORED VITAMINS */}
+                            <ComparisonGrid title="Stored Vitamins" icon={Battery} theme="emerald" subtitle="Fat-soluble • Stored in body tissues" items={{
+                                'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
+                                'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
+                                'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
+                                'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
+                            }} />
+
                         </div>
                     )}
                 </div>
