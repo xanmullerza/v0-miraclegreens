@@ -253,11 +253,16 @@ export default function DashboardComparisonPage() {
                                                     : "bg-transparent border-transparent hover:bg-slate-100 dark:hover:bg-slate-800"
                                             )}
                                         >
-                                            <div className="min-w-0">
+                                            <div className="min-w-0 flex-1 mr-2">
                                                 <div className="font-semibold text-xs truncate capitalize">{item.name}</div>
                                                 {item.common_name && (
                                                     <div className="text-[10px] opacity-60 truncate">Common: {item.common_name}</div>
                                                 )}
+                                                <div className="flex gap-1 mt-1.5">
+                                                    {item.protein_g > 10 && <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">High Protein</span>}
+                                                    {item.carbs_g < 5 && item.fat_g > 5 && <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">Keto</span>}
+                                                    {item.energy_kcal < 50 && <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Low Cal</span>}
+                                                </div>
                                             </div>
                                             {selectedItems.some(i => i.id === item.id) ? (
                                                 <X size={14} className="text-emerald-500" />

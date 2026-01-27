@@ -203,7 +203,12 @@ function ComparisonReportContent() {
 
                             return (
                                 <div key={item.id} className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
-                                    <h4 className="font-bold mb-4">{item.common_name || item.name}</h4>
+                                    <h4 className="font-bold mb-2">{item.common_name || item.name}</h4>
+                                    <div className="flex gap-1 mb-4">
+                                        {item.protein_g > 10 && <Badge variant="outline" className="text-[8px] h-4 px-1 border-red-200 text-red-600 bg-red-50">High Protein</Badge>}
+                                        {item.carbs_g < 5 && item.fat_g > 5 && <Badge variant="outline" className="text-[8px] h-4 px-1 border-blue-200 text-blue-600 bg-blue-50">Keto</Badge>}
+                                        {item.energy_kcal < 50 && <Badge variant="outline" className="text-[8px] h-4 px-1 border-green-200 text-green-600 bg-green-50">Low Cal</Badge>}
+                                    </div>
                                     <p className="text-xs text-slate-500 mb-4 h-10">
                                         While it didn't win the overall density score, it is still a superior choice for specific goals:
                                     </p>
