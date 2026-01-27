@@ -47,7 +47,7 @@ interface FoodItem {
     category: string;
 }
 
-const CATEGORIES = ["Grains", "Vegetables", "Fruit", "Legumes", "Proteins", "General"];
+const CATEGORIES = ["Grains", "Vegetables", "Fruit", "Legumes", "Proteins", "Fats", "General"];
 
 export default function MyFoodsPage() {
     const router = useRouter();

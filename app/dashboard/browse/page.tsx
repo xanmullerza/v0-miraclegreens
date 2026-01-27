@@ -57,7 +57,7 @@ interface FoodItem {
     category?: string;
 }
 
-const CATEGORIES = ["Grains", "Vegetables", "Fruit", "Legumes", "Proteins", "General"];
+const CATEGORIES = ["Grains", "Vegetables", "Fruit", "Legumes", "Proteins", "Fats", "General"];
 
 function BrowseFoodsContent() {
     const router = useRouter();
