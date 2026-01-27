@@ -57,6 +57,12 @@ const COMPARISON_COLORS = [
     '#3b82f6', // blue-500
     '#f59e0b', // amber-500
     '#8b5cf6', // violet-500
+    '#f43f5e', // rose-500
+    '#06b6d4', // cyan-500
+    '#84cc16', // lime-500
+    '#d946ef', // fuchsia-500
+    '#6366f1', // indigo-500
+    '#14b8a6', // teal-500
 ];
 
 export default function DashboardComparisonPage() {
@@ -98,7 +104,7 @@ export default function DashboardComparisonPage() {
     const toggleItem = (item: FoodItem) => {
         if (selectedItems.some(i => i.id === item.id)) {
             setSelectedItems(selectedItems.filter(i => i.id !== item.id));
-        } else if (selectedItems.length < 4) {
+        } else if (selectedItems.length < 10) {
             setSelectedItems([...selectedItems, item]);
         }
     };
@@ -204,7 +210,7 @@ export default function DashboardComparisonPage() {
                 </div>
                 <div className="flex items-center gap-2">
                     <Badge variant="outline" className="bg-emerald-500/5 text-emerald-600 border-emerald-500/20 px-3 py-1">
-                        {selectedItems.length} / 4 Selected
+                        {selectedItems.length} / 10 Selected
                     </Badge>
                 </div>
             </div>
