@@ -28,6 +28,15 @@ function ComparisonReportContent() {
     const [items, setItems] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true); // Keep loading state for internal data fetching
 
+    // Initializing state for share button
+    const [copied, setCopied] = useState(false);
+
+    const handleShare = () => {
+        navigator.clipboard.writeText(window.location.href);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
     useEffect(() => {
         if (ids.length === 0) {
             router.push('/dashboard/compare');
@@ -79,15 +88,6 @@ function ComparisonReportContent() {
 
     const winner = scores.sort((a, b) => b.score - a.score)[0];
     const runnerUp = scores[1];
-
-    // Initializing state for share button
-    const [copied, setCopied] = useState(false);
-
-    const handleShare = () => {
-        navigator.clipboard.writeText(window.location.href);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-    };
 
     // Helper to find specific strengths
     const getStrengths = (item: FoodItem) => {
