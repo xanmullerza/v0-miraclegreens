@@ -18,7 +18,7 @@ const navigation = [
 
 export function Header() {
 	return (
-		<header className="sticky top-0 z-50 bg-primary border-b border-primary/80">
+		<header className="sticky top-0 z-50 bg-emerald-500 border-b border-emerald-600 text-white">
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				<div className="flex h-16 items-center justify-between">
 					{/* Mobile menu (only Shop & Donate) */}
@@ -27,7 +27,7 @@ export function Header() {
 							<Button
 								variant="ghost"
 								size="icon"
-								className="text-primary-foreground hover:bg-primary-foreground/10"
+								className="text-white hover:bg-white/10"
 							>
 								<Menu className="h-5 w-5" />
 								<span className="sr-only">Open menu</span>
@@ -82,7 +82,7 @@ export function Header() {
 
 					{/* Logo */}
 					<Link href="/" className="flex items-center gap-2">
-						<span className="font-serif text-xl md:text-2xl font-semibold text-primary-foreground tracking-tight">
+						<span className="font-serif text-xl md:text-2xl font-semibold text-white tracking-tight">
 							Miracle Greens
 						</span>
 					</Link>
