@@ -234,11 +234,7 @@ function DashboardComparisonContent() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 pb-20">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">Ingredient Analysis</h1>
-                    <p className="text-slate-500 mt-1 text-sm">Compare clinical-grade nutritional profiles side-by-side.</p>
-                </div>
+            <div className="flex flex-col md:flex-row md:items-center justify-end gap-4">
                 <div className="flex items-center gap-2">
                     <Badge variant="outline" className="bg-emerald-500/5 text-emerald-600 border-emerald-500/20 px-3 py-1">
                         {selectedItems.length} / 10 Selected
