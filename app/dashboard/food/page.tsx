@@ -257,15 +257,7 @@ function FoodItemCreatorContent() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-8 pb-20">
-            <div className="text-center py-4 space-y-4">
-                <h1 className="text-4xl font-black tracking-tighter flex items-center justify-center gap-4">
-                    <Beef className="text-emerald-500 h-10 w-10" />
-                    New Food Item
-                </h1>
-                <p className="text-slate-500 text-sm font-medium max-w-lg mx-auto">
-                    Add accurate nutrition details for your ingredients using our smart copy-paste tool.
-                </p>
-            </div>
+
 
             {/* Top Row: Info Entry */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
