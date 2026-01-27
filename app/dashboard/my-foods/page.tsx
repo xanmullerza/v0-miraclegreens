@@ -50,6 +50,20 @@ interface FoodItem {
 
 const CATEGORIES = ["Grains", "Vegetables", "Fruit", "Legumes", "Proteins", "Fats", "Flavour", "Seeds", "Nuts", "Supplements", "General"];
 
+const CATEGORY_COLORS: Record<string, string> = {
+    "Grains": "bg-amber-500 shadow-amber-500/20 border-amber-500",
+    "Vegetables": "bg-emerald-500 shadow-emerald-500/20 border-emerald-500",
+    "Fruit": "bg-rose-500 shadow-rose-500/20 border-rose-500",
+    "Legumes": "bg-orange-600 shadow-orange-600/20 border-orange-600",
+    "Proteins": "bg-red-500 shadow-red-500/20 border-red-500",
+    "Fats": "bg-sky-500 shadow-sky-500/20 border-sky-500",
+    "Flavour": "bg-purple-500 shadow-purple-500/20 border-purple-500",
+    "Seeds": "bg-teal-500 shadow-teal-500/20 border-teal-500",
+    "Nuts": "bg-stone-500 shadow-stone-500/20 border-stone-500",
+    "Supplements": "bg-indigo-500 shadow-indigo-500/20 border-indigo-500",
+    "General": "bg-slate-500 shadow-slate-500/20 border-slate-500"
+};
+
 export default function MyFoodsPage() {
     const router = useRouter();
     const [favorites, setFavorites] = useState<FoodItem[]>([]);
@@ -194,10 +208,10 @@ export default function MyFoodsPage() {
                                 }
                             }}
                             className={cn(
-                                "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 border",
+                                "px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-tight transition-all duration-300 border",
                                 isActive
-                                    ? "bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-500/20"
-                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-emerald-500/50"
+                                    ? cn("text-white shadow-lg", CATEGORY_COLORS[category])
+                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-slate-400"
                             )}
                         >
                             {category}
