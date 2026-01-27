@@ -14,13 +14,15 @@ import {
     Bell,
     User,
     ArrowLeft,
-    Calendar
+    Calendar,
+    Heart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
 
 const sidebarItems = [
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'My Foods', href: '/dashboard/my-foods', icon: Heart },
     { name: 'Add Foods', href: '/dashboard/food', icon: Beef },
     { name: 'Compare Foods', href: '/dashboard/compare', icon: Scale },
     { name: 'Add Recipes', href: '/dashboard/recipes', icon: Utensils },
