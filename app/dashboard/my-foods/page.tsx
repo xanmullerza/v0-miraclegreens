@@ -51,6 +51,7 @@ export default function MyFoodsPage() {
     const [loading, setLoading] = useState(true);
     const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
     const [editName, setEditName] = useState('');
+    const [editCommonName, setEditCommonName] = useState('');
     const [editImage, setEditImage] = useState('');
     const [uploading, setUploading] = useState(false);
 
@@ -120,6 +121,7 @@ export default function MyFoodsPage() {
                 .from('food_items')
                 .update({
                     name: editName,
+                    common_name: editCommonName,
                     image: editImage
                 } as any)
                 .eq('id', editingItem.id);
@@ -127,7 +129,7 @@ export default function MyFoodsPage() {
             if (error) throw error;
 
             setFavorites(prev => prev.map(f =>
-                f.id === editingItem.id ? { ...f, name: editName, image: editImage } : f
+                f.id === editingItem.id ? { ...f, name: editName, common_name: editCommonName, image: editImage } : f
             ));
             setEditingItem(null);
             toast.success('Food item updated successfully');
@@ -213,6 +215,7 @@ export default function MyFoodsPage() {
                                         e.stopPropagation();
                                         setEditingItem(item);
                                         setEditName(item.name);
+                                        setEditCommonName(item.common_name);
                                         setEditImage(item.image || '');
                                     }}
                                     className="w-7 h-7 rounded-full bg-white/90 dark:bg-slate-950/90 shadow-sm flex items-center justify-center text-emerald-500 hover:scale-110 transition-transform border border-slate-100 dark:border-slate-800"
@@ -272,6 +275,16 @@ export default function MyFoodsPage() {
                                         value={editName}
                                         onChange={(e) => setEditName(e.target.value)}
                                         className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 font-bold"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Common Name</Label>
+                                    <Input
+                                        value={editCommonName}
+                                        onChange={(e) => setEditCommonName(e.target.value)}
+                                        className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800"
+                                        placeholder="e.g. Garden Pea"
                                     />
                                 </div>
 

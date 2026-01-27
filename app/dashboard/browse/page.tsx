@@ -21,11 +21,17 @@ import {
     Share2,
     Calendar,
     ChevronRight,
-    Library
+    Library,
+    Edit2,
+    Camera,
+    Upload,
+    Save,
+    Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRDA } from '@/hooks/use-rda';
@@ -57,6 +63,12 @@ function BrowseFoodsContent() {
     const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
+
+    const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
+    const [editName, setEditName] = useState('');
+    const [editCommonName, setEditCommonName] = useState('');
+    const [editImage, setEditImage] = useState('');
+    const [uploading, setUploading] = useState(false);
 
     // Initial load from URL
     useEffect(() => {
@@ -131,6 +143,69 @@ function BrowseFoodsContent() {
         } catch (error: any) {
             console.error('Error toggling favorite:', error);
             toast.error(`Failed to update favorite: ${error.message}`);
+        }
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploading(true);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Math.random()}.${fileExt}`;
+            const filePath = `${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('food-items')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('food-items')
+                .getPublicUrl(filePath);
+
+            setEditImage(publicUrl);
+            toast.success('Image uploaded successfully');
+        } catch (err: any) {
+            console.error("Upload error:", err);
+            // Fallback to base64 for preview if storage fails
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setEditImage(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+            toast.error('Storage upload failed, using local preview');
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleEditSave = async () => {
+        if (!editingItem) return;
+
+        try {
+            const { error } = await supabase
+                .from('food_items')
+                .update({
+                    name: editName,
+                    common_name: editCommonName,
+                    image: editImage
+                } as any)
+                .eq('id', editingItem.id);
+
+            if (error) throw error;
+
+            // Refresh UI
+            setSelectedItem(prev => prev?.id === editingItem.id ? { ...prev, name: editName, common_name: editCommonName, image: editImage } : prev);
+            setSearchResults(prev => prev.map(i => i.id === editingItem.id ? { ...i, name: editName, common_name: editCommonName, image: editImage } : i));
+
+            setEditingItem(null);
+            toast.success('Food item updated successfully');
+        } catch (error) {
+            console.error('Error updating food item:', error);
+            toast.error('Failed to update food item');
         }
     };
 
@@ -272,15 +347,29 @@ function BrowseFoodsContent() {
                             {/* Header Card with Image */}
                             <Card className="relative overflow-hidden bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xl">
                                 <div className="flex flex-col md:flex-row">
-                                    {selectedItem.image && (
-                                        <div className="w-full md:w-64 h-64 md:h-auto overflow-hidden">
+                                    <div className="w-full md:w-64 h-64 md:h-auto overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center group/img relative">
+                                        {selectedItem.image ? (
                                             <img
                                                 src={selectedItem.image}
                                                 alt={selectedItem.name}
                                                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                                             />
-                                        </div>
-                                    )}
+                                        ) : (
+                                            <Beef size={48} className="text-slate-300 dark:text-slate-700 opacity-50" />
+                                        )}
+                                        <button
+                                            onClick={() => {
+                                                setEditingItem(selectedItem);
+                                                setEditName(selectedItem.name);
+                                                setEditCommonName(selectedItem.common_name);
+                                                setEditImage(selectedItem.image || '');
+                                            }}
+                                            className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-white/90 dark:bg-slate-950/90 shadow-lg flex items-center justify-center text-emerald-500 hover:scale-110 transition-transform opacity-0 group-hover/img:opacity-100 border border-slate-100 dark:border-slate-800"
+                                            title="Edit item image"
+                                        >
+                                            <Camera size={18} />
+                                        </button>
+                                    </div>
                                     <div className="flex-1 p-8 space-y-4">
                                         <div className="flex justify-between items-start">
                                             <div className="space-y-1">
@@ -301,6 +390,19 @@ function BrowseFoodsContent() {
                                                     onClick={() => toggleFavorite(selectedItem)}
                                                 >
                                                     <Heart size={18} fill={selectedItem.is_favorite ? "currentColor" : "none"} />
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    className="rounded-full h-10 w-10 text-emerald-500 border-emerald-100 hover:bg-emerald-50 dark:border-emerald-900/30 dark:hover:bg-emerald-900/20"
+                                                    onClick={() => {
+                                                        setEditingItem(selectedItem);
+                                                        setEditName(selectedItem.name);
+                                                        setEditCommonName(selectedItem.common_name);
+                                                        setEditImage(selectedItem.image || '');
+                                                    }}
+                                                >
+                                                    <Edit2 size={18} />
                                                 </Button>
                                                 <Button variant="outline" size="icon" className="rounded-full h-10 w-10">
                                                     <Share2 size={18} />
@@ -391,6 +493,85 @@ function BrowseFoodsContent() {
                     )}
                 </div>
             </div>
+
+            {/* Edit Modal */}
+            {editingItem && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="w-full max-w-md">
+                        <Card className="bg-white dark:bg-slate-900 p-6 space-y-6 shadow-2xl border-emerald-500/20">
+                            <div className="flex justify-between items-center">
+                                <h3 className="text-xl font-bold tracking-tight">Edit Food Entry</h3>
+                                <button onClick={() => setEditingItem(null)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400">
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Ingredient Name</Label>
+                                    <Input
+                                        value={editName}
+                                        onChange={(e) => setEditName(e.target.value)}
+                                        className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 font-bold"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Common Name</Label>
+                                    <Input
+                                        value={editCommonName}
+                                        onChange={(e) => setEditCommonName(e.target.value)}
+                                        className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800"
+                                        placeholder="e.g. Garden Pea"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Reference Photo</Label>
+                                    <div className="relative aspect-video rounded-2xl bg-white dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group/upload flex items-center justify-center">
+                                        {editImage ? (
+                                            <>
+                                                <img src={editImage} alt="Preview" className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/upload:opacity-100 transition-opacity flex items-center justify-center">
+                                                    <Button variant="secondary" size="sm" className="gap-2" onClick={() => setEditImage('')}>
+                                                        <X size={14} /> Remove
+                                                    </Button>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <div className="text-center p-4">
+                                                {uploading ? (
+                                                    <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mx-auto" />
+                                                ) : (
+                                                    <>
+                                                        <Upload size={24} className="text-slate-400 mx-auto mb-2" />
+                                                        <p className="text-[10px] font-bold text-slate-500">Click to Upload</p>
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*"
+                                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                            onChange={handleImageUpload}
+                                                        />
+                                                    </>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                <Button variant="outline" className="flex-1 rounded-xl font-bold" onClick={() => setEditingItem(null)}>
+                                    Cancel
+                                </Button>
+                                <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold gap-2" onClick={handleEditSave}>
+                                    <Save size={16} /> Save Changes
+                                </Button>
+                            </div>
+                        </Card>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
