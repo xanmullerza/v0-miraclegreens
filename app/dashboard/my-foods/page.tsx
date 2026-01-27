@@ -120,66 +120,43 @@ export default function MyFoodsPage() {
                     </Button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
                     {favorites.map((item) => (
-                        <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-all border-slate-200 dark:border-slate-800 group relative">
+                        <Card key={item.id} className="group relative transition-all hover:ring-2 hover:ring-emerald-500/50">
                             {/* Un-favorite Absolute Button */}
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     toggleFavorite(item);
                                 }}
-                                className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/90 dark:bg-slate-900/90 shadow-sm flex items-center justify-center text-rose-500 hover:scale-110 transition-transform border border-slate-100 dark:border-slate-700"
+                                className="absolute top-2 right-2 z-10 w-6 h-6 rounded-full bg-white/90 dark:bg-slate-950/90 shadow-sm flex items-center justify-center text-rose-500 hover:scale-110 transition-transform opacity-0 group-hover:opacity-100"
                             >
-                                <Heart size={16} fill="currentColor" />
+                                <Heart size={12} fill="currentColor" />
                             </button>
 
                             <div
                                 className="cursor-pointer"
                                 onClick={() => router.push(`/dashboard/browse?id=${item.id}`)}
                             >
-                                <div className="aspect-video relative bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                                <div className="aspect-square relative bg-slate-100 dark:bg-slate-800 overflow-hidden">
                                     {item.image ? (
                                         <img
                                             src={item.image}
                                             alt={item.name}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                                         />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-700">
-                                            <Beef size={48} />
+                                            <Beef size={24} />
                                         </div>
                                     )}
-                                    <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/60 to-transparent">
-                                        <Badge className="bg-emerald-500 text-white border-none text-[10px] font-black uppercase tracking-widest leading-none py-1">Saved Item</Badge>
-                                    </div>
                                 </div>
-                                <div className="p-5 space-y-4">
-                                    <div>
-                                        <h3 className="font-bold text-lg capitalize truncate">{item.name}</h3>
-                                        <p className="text-xs text-slate-500 font-medium truncate">{item.common_name || 'Individual Ingredient'}</p>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800/50">
-                                            <div className="text-[10px] uppercase font-black text-slate-400 mb-1">Protein</div>
-                                            <div className="text-sm font-bold">{item.protein_g.toFixed(1)}<span className="text-[10px] ml-0.5 text-slate-400">g</span></div>
-                                        </div>
-                                        <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800/50">
-                                            <div className="text-[10px] uppercase font-black text-slate-400 mb-1">Calories</div>
-                                            <div className="text-sm font-bold">{item.energy_kcal.toFixed(0)}<span className="text-[10px] ml-0.5 text-slate-400">cal</span></div>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex justify-between items-center pt-2">
-                                        <div className="flex -space-x-1">
-                                            <div className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-900 bg-red-100 dark:bg-red-900/30 flex items-center justify-center"><Zap size={10} className="text-red-500" /></div>
-                                            <div className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-900 bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center"><Library size={10} className="text-blue-500" /></div>
-                                            <div className="w-6 h-6 rounded-full border-2 border-white dark:border-slate-900 bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center"><Scale size={10} className="text-amber-500" /></div>
-                                        </div>
-                                        <span className="text-[10px] font-black uppercase text-emerald-600 flex items-center gap-1 group-hover:gap-2 transition-all">
-                                            View Full Lab Profile <ChevronRight size={12} />
-                                        </span>
+                                <div className="p-3">
+                                    <h3 className="font-bold text-[10px] capitalize truncate leading-tight mb-1 text-slate-900 dark:text-white">
+                                        {item.common_name || item.name}
+                                    </h3>
+                                    <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        View Profile <ArrowRight size={8} />
                                     </div>
                                 </div>
                             </div>
