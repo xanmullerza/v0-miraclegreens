@@ -240,6 +240,9 @@ function FoodItemCreatorContent() {
             if (itemError) throw itemError;
 
             toast.success('Food item saved successfully!');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
         } catch (err: any) {
             console.error('Error saving food item:', err);
             toast.error(`Error: ${err.message}`);
