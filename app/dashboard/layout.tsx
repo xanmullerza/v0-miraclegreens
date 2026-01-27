@@ -15,7 +15,8 @@ import {
     User,
     ArrowLeft,
     Calendar,
-    Heart
+    Heart,
+    Library
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
@@ -24,6 +25,7 @@ const sidebarItems = [
     { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
     { name: 'My Foods', href: '/dashboard/my-foods', icon: Heart },
     { name: 'Add Foods', href: '/dashboard/food', icon: Beef },
+    { name: 'Browse Foods', href: '/dashboard/browse', icon: Library },
     { name: 'Compare Foods', href: '/dashboard/compare', icon: Scale },
     { name: 'Add Recipes', href: '/dashboard/recipes', icon: Utensils },
     { name: 'Plan Meals', href: '/dashboard/plan', icon: Calendar },
