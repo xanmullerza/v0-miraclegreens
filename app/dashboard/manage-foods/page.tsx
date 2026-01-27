@@ -26,7 +26,7 @@ interface FoodItem {
     is_favorite: boolean;
 }
 
-const CATEGORIES = ["Grains", "Vegetables", "Fruit", "Legumes", "Proteins", "Fats", "Flavour", "General"];
+const CATEGORIES = ["Grains", "Vegetables", "Fruit", "Legumes", "Proteins", "Fats", "Flavour", "Seeds", "Nuts", "General"];
 
 export default function ManageFoodsPage() {
     const router = useRouter();
