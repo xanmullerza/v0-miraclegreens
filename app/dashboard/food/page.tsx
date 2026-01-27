@@ -216,9 +216,7 @@ function FoodItemCreatorContent() {
             if (itemError) throw itemError;
 
             toast.success('Food item saved successfully!');
-            setTimeout(() => {
-                window.location.reload();
-            }, 1500);
+
         } catch (err: any) {
             console.error('Error saving food item:', err);
             toast.error(`Error: ${err.message}`);
@@ -297,7 +295,9 @@ function FoodItemCreatorContent() {
                                 onClick={() => setShowAdvanced(!showAdvanced)}
                                 className={cn(
                                     "flex-1 h-14 rounded-[18px] text-[10px] font-black uppercase tracking-widest gap-2 transition-all",
-                                    showAdvanced ? "bg-blue-500 text-white border-blue-600" : "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800"
+                                    (nutrientText.trim())
+                                        ? "bg-emerald-500 text-white border-emerald-600 hover:bg-emerald-600 shadow-emerald-500/20"
+                                        : "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 hover:border-emerald-500/50"
                                 )}
                             >
                                 <Activity size={16} />
