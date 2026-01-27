@@ -9,7 +9,8 @@ import {
     Check,
     Filter,
     Table as TableIcon,
-    LayoutGrid
+    LayoutGrid,
+    Heart
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,6 +23,7 @@ interface FoodItem {
     name: string;
     common_name: string;
     category: string;
+    is_favorite: boolean;
 }
 
 const CATEGORIES = ["Grains", "Vegetables", "Fruit", "Legumes", "Proteins", "General"];
@@ -31,6 +33,7 @@ export default function ManageFoodsPage() {
     const [foods, setFoods] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
+    const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
 
     useEffect(() => {
@@ -42,7 +45,7 @@ export default function ManageFoodsPage() {
         try {
             const { data, error } = await supabase
                 .from('food_items')
-                .select('id, name, common_name, category')
+                .select('id, name, common_name, category, is_favorite')
                 .order('name', { ascending: true });
 
             if (error) throw error;
@@ -75,10 +78,12 @@ export default function ManageFoodsPage() {
         }
     };
 
-    const filteredFoods = foods.filter(f =>
-        f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (f.common_name && f.common_name.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
+    const filteredFoods = foods.filter(f => {
+        const matchesSearch = f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (f.common_name && f.common_name.toLowerCase().includes(searchQuery.toLowerCase()));
+        const matchesFavorite = showOnlyFavorites ? f.is_favorite : true;
+        return matchesSearch && matchesFavorite;
+    });
 
     if (loading) {
         return (
@@ -105,6 +110,17 @@ export default function ManageFoodsPage() {
                 </div>
 
                 <div className="flex items-center gap-3">
+                    <Button
+                        variant="outline"
+                        onClick={() => setShowOnlyFavorites(!showOnlyFavorites)}
+                        className={cn(
+                            "rounded-xl gap-2 font-bold border-slate-200 dark:border-slate-800",
+                            showOnlyFavorites && "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/50 text-rose-500"
+                        )}
+                    >
+                        <Heart size={16} fill={showOnlyFavorites ? "currentColor" : "none"} />
+                        {showOnlyFavorites ? "Favorites Only" : "Show All"}
+                    </Button>
                     <div className="relative w-64">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                         <Input
