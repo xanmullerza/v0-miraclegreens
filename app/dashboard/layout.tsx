@@ -29,7 +29,7 @@ const sidebarGroups = [
         ]
     },
     {
-        title: 'Laboratory',
+        title: 'Foods',
         items: [
             { name: 'My Foods', href: '/dashboard/my-foods', icon: Heart },
             { name: 'Browse Foods', href: '/dashboard/browse', icon: Library },
@@ -38,7 +38,7 @@ const sidebarGroups = [
         ]
     },
     {
-        title: 'Planning',
+        title: 'Meals',
         items: [
             { name: 'Add Recipes', href: '/dashboard/recipes', icon: Utensils },
             { name: 'Plan Meals', href: '/dashboard/plan', icon: Calendar },
