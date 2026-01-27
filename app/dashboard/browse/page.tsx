@@ -308,9 +308,9 @@ function BrowseFoodsContent() {
                                             )}
                                         >
                                             <div className="min-w-0 flex-1 mr-2">
-                                                <div className="font-semibold text-xs truncate capitalize">{item.name}</div>
+                                                <div className="font-semibold text-xs truncate capitalize">{item.common_name || item.name}</div>
                                                 {item.common_name && (
-                                                    <div className="text-[10px] opacity-60 truncate">Common: {item.common_name}</div>
+                                                    <div className="text-[10px] opacity-60 truncate">Scientific: {item.name}</div>
                                                 )}
                                                 <div className="flex gap-1 mt-1.5">
                                                     {item.protein_g > 10 && <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">High Protein</span>}
@@ -380,9 +380,9 @@ function BrowseFoodsContent() {
                                         <div className="flex justify-between items-start">
                                             <div className="space-y-1">
                                                 <Badge variant="outline" className="text-emerald-600 bg-emerald-50 border-emerald-200 uppercase tracking-widest text-[10px] px-2">Clinical Profile</Badge>
-                                                <h1 className="text-3xl font-black capitalize leading-tight">{selectedItem.name}</h1>
+                                                <h1 className="text-3xl font-black capitalize leading-tight">{selectedItem.common_name || selectedItem.name}</h1>
                                                 {selectedItem.common_name && (
-                                                    <p className="text-slate-500 font-medium">Common Name: {selectedItem.common_name}</p>
+                                                    <p className="text-slate-500 font-medium italic">Scientific: {selectedItem.name}</p>
                                                 )}
                                             </div>
                                             <div className="flex gap-2">
