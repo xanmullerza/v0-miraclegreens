@@ -85,7 +85,7 @@ export default function DashboardLayout({
 
                         <nav className="space-y-4">
                             {sidebarGroups.map((group) => {
-                                const isExpanded = expandedGroup === group.id;
+                                const isExpanded = group.title === null || expandedGroup === group.id;
                                 const hasActiveItem = group.items.some(item => item.href === pathname);
 
                                 return (

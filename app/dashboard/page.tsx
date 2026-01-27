@@ -36,18 +36,23 @@ export default function DashboardOverview() {
 
     useEffect(() => {
         const fetchStats = async () => {
-            const [itemsCount, recipesCount, recent] = await Promise.all([
-                supabase.from('food_items').select('id', { count: 'exact', head: true }),
-                supabase.from('recipes').select('id', { count: 'exact', head: true }),
-                supabase.from('food_items').select('*').order('created_at', { ascending: false }).limit(3)
-            ]);
+            try {
+                const [itemsCount, recipesCount, recent] = await Promise.all([
+                    supabase.from('food_items').select('id', { count: 'exact', head: true }),
+                    supabase.from('recipes').select('id', { count: 'exact', head: true }),
+                    supabase.from('food_items').select('*').order('created_at', { ascending: false }).limit(3)
+                ]);
 
-            setStats({
-                foodItems: itemsCount.count || 0,
-                recipes: recipesCount.count || 0,
-                recentAdditions: recent.data || []
-            });
-            setLoading(false);
+                setStats({
+                    foodItems: itemsCount.count || 0,
+                    recipes: recipesCount.count || 0,
+                    recentAdditions: recent.data || []
+                });
+            } catch (error) {
+                console.error('Error fetching dashboard stats:', error);
+            } finally {
+                setLoading(false);
+            }
         };
 
         fetchStats();
@@ -184,7 +189,7 @@ export default function DashboardOverview() {
                             <Database size={18} className="text-emerald-500" />
                             Recently Added Foods
                         </h3>
-                        <Link href="/browse" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-500 transition-colors">View All Foods</Link>
+                        <Link href="/dashboard/browse" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-500 transition-colors">View All Foods</Link>
                     </div>
                     <div className="space-y-4">
                         {stats.recentAdditions.map((item) => (
