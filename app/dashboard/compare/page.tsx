@@ -19,7 +19,8 @@ import {
     Droplet,
     Battery,
     FileText,
-    ArrowRight
+    ArrowRight,
+    RotateCcw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -242,6 +243,17 @@ function DashboardComparisonContent() {
                     <Badge variant="outline" className="bg-emerald-500/5 text-emerald-600 border-emerald-500/20 px-3 py-1">
                         {selectedItems.length} / 10 Selected
                     </Badge>
+                    {selectedItems.length > 0 && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-muted-foreground hover:text-foreground h-8 px-2"
+                            onClick={() => setSelectedItems([])}
+                            title="Reset Comparison"
+                        >
+                            <RotateCcw className="h-4 w-4" />
+                        </Button>
+                    )}
                 </div>
             </div>
 
