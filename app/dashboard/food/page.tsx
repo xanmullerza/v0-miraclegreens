@@ -240,7 +240,7 @@ function FoodItemCreatorContent() {
                         <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
                             <Plus className="text-white" size={24} />
                         </div>
-                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Add Food</h1>
+                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Add New Food</h1>
                     </div>
                     <p className="text-sky-50 font-medium max-w-md text-sm pl-1">
                         Contribute to the global knowledge base by adding detailed nutritional profiles.

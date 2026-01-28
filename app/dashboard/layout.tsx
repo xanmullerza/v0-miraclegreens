@@ -19,7 +19,8 @@ import {
     Library,
     ChevronDown,
     Table,
-    Loader2
+    Loader2,
+    Plus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
@@ -41,6 +42,7 @@ const sidebarGroups = [
             { name: 'My Foods', href: '/dashboard/my-foods', icon: Heart },
             { name: 'Browse Foods', href: '/dashboard/browse', icon: Library },
             { name: 'Compare Foods', href: '/dashboard/compare', icon: Scale },
+            { name: 'Add New Foods', href: '/dashboard/food', icon: Plus },
         ]
     },
     {
@@ -57,7 +59,7 @@ const sidebarGroups = [
         title: 'Admin',
         items: [
             { name: 'Categorization', href: '/dashboard/manage-foods', icon: Table },
-            { name: 'Add Foods', href: '/dashboard/food', icon: Beef },
+
             { name: 'Add Recipes', href: '/dashboard/recipes', icon: Utensils },
         ]
     },
