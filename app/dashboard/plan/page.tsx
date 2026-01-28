@@ -311,10 +311,19 @@ export default function MealPlannerPage() {
                     case 'active': tdee = bmr * 1.725; break;
                     default: tdee = bmr * 1.2;
                 }
-                if (profile.goal === 'lose-fat') tdee *= 0.80;
                 if (profile.goal === 'build-muscle') tdee *= 1.10;
-                setCalories(Math.max(1200, Math.round(tdee / 50) * 50));
-                setStep(2);
+                const targetCals = Math.max(1200, Math.round(tdee / 50) * 50);
+                setCalories(targetCals);
+
+                // Jump straight to generation
+                setGenerating(true);
+                generateDailyPlan({ targetCalories: targetCals, diet: profile.dietType as DietType, numMeals: 3 })
+                    .then(newPlan => {
+                        setPlan(newPlan);
+                        setStep(3);
+                    })
+                    .catch(console.error)
+                    .finally(() => setGenerating(false));
             } else {
                 setShowSummary(true);
             }
