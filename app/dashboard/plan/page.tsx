@@ -422,6 +422,10 @@ export default function MealPlannerPage() {
                                     <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-1">Diet Protocol</p>
                                     <p className="font-bold capitalize">{profile.dietType}</p>
                                 </div>
+                                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 col-span-2 sm:col-span-1">
+                                    <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-1">Activity Level</p>
+                                    <p className="font-bold capitalize">{profile.activityLevel}</p>
+                                </div>
                             </div>
 
                             <div className="space-y-4">
@@ -479,6 +483,16 @@ export default function MealPlannerPage() {
                                     <GoalCard type="lose-fat" selected={goal === 'lose-fat'} onClick={() => setGoal('lose-fat')} icon={TrendingDown} />
                                     <GoalCard type="maintain" selected={goal === 'maintain'} onClick={() => setGoal('maintain')} icon={Activity} />
                                     <GoalCard type="build-muscle" selected={goal === 'build-muscle'} onClick={() => setGoal('build-muscle')} icon={Dumbbell} />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label className="text-xs uppercase font-bold text-muted-foreground">Activity Level</Label>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                    <ActivityCard type="sedentary" selected={activityLevel === 'sedentary'} onClick={() => setActivityLevel('sedentary')} icon={User} />
+                                    <ActivityCard type="light" selected={activityLevel === 'light'} onClick={() => setActivityLevel('light')} icon={ChevronRight} />
+                                    <ActivityCard type="moderate" selected={activityLevel === 'moderate'} onClick={() => setActivityLevel('moderate')} icon={Zap} />
+                                    <ActivityCard type="active" selected={activityLevel === 'active'} onClick={() => setActivityLevel('active')} icon={Flame} />
                                 </div>
                             </div>
 
