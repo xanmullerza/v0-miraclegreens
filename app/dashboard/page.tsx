@@ -126,7 +126,7 @@ export default function DashboardOverview() {
                 </div>
 
                 {/* Quick Stats Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16 relative z-10 border-t border-slate-800 pt-10">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-16 relative z-10 border-t border-slate-800 pt-10 text-center">
                     <div className="space-y-1">
                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Library Items</p>
                         <p className="text-3xl font-black text-white">{stats.foodItems}</p>
