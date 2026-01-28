@@ -123,20 +123,6 @@ export default function DashboardOverview() {
                     <p className="text-lg text-slate-400 leading-relaxed mb-8">
                         A simple way to manage your food and recipes. Add ingredients, create healthy recipes, and check nutrition details in one easy dashboard.
                     </p>
-                    <div className="flex flex-wrap gap-4">
-                        <Button className="rounded-2xl h-14 px-8 bg-emerald-500 hover:bg-emerald-600 text-white font-bold gap-3 shadow-xl shadow-emerald-500/20" asChild>
-                            <Link href="/dashboard/recipes">
-                                <Plus size={18} />
-                                Create New Recipe
-                            </Link>
-                        </Button>
-                        <Button variant="outline" className="rounded-2xl h-14 px-8 border-slate-700 text-white hover:bg-slate-800 gap-3" asChild>
-                            <Link href="/dashboard/compare">
-                                <Activity size={18} />
-                                Compare Foods
-                            </Link>
-                        </Button>
-                    </div>
                 </div>
 
                 {/* Quick Stats Grid */}
