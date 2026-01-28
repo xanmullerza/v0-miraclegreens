@@ -50,7 +50,7 @@ interface FoodItem {
     sub_category: string | null;
 }
 
-const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Seeds", "Flavour", "Supplements"];
+const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
 const SECONDARY_CATEGORIES = ["Snacks", "Herbs", "Spices", "Condiments", "Beverage", "Starch"];
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -61,7 +61,6 @@ const CATEGORY_COLORS: Record<string, string> = {
     "Proteins": "bg-red-500 shadow-red-500/20 border-red-500",
     "Fruit": "bg-rose-500 shadow-rose-500/20 border-rose-500",
     "Nuts": "bg-stone-500 shadow-stone-500/20 border-stone-500",
-    "Seeds": "bg-teal-500 shadow-teal-500/20 border-teal-500",
     "Flavour": "bg-purple-500 shadow-purple-500/20 border-purple-500",
     "Supplements": "bg-indigo-500 shadow-indigo-500/20 border-indigo-500"
 };
