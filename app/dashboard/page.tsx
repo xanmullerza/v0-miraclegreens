@@ -139,12 +139,6 @@ export default function DashboardOverview() {
                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">System Status</p>
                         <p className="text-3xl font-black text-white">Online</p>
                     </div>
-                    <div className="space-y-1">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">System</p>
-                        <p className="text-3xl font-black text-emerald-500 flex items-center gap-2">
-                            READY <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                        </p>
-                    </div>
                 </div>
             </div>
 
