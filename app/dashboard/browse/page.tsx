@@ -63,7 +63,7 @@ const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Frui
 function BrowseFoodsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { searchQuery, setSearchQuery, setResults, setIsLoading, isFocused } = useSearch();
+    const { searchQuery, setSearchQuery, setResults, setIsLoading, registerResultClickHandler } = useSearch();
     const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
     const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
     const [loading, setLoading] = useState(true);
@@ -74,6 +74,16 @@ function BrowseFoodsContent() {
     const [editCategory, setEditCategory] = useState('General');
     const [editImage, setEditImage] = useState('');
     const [uploading, setUploading] = useState(false);
+
+    // Register click handler for search results - this always has current state
+    useEffect(() => {
+        registerResultClickHandler((result) => {
+            const item = result.data as FoodItem;
+            if (item) {
+                setSelectedItem(item);
+            }
+        });
+    }, [registerResultClickHandler]);
 
     // Initial load from URL
     useEffect(() => {
@@ -128,7 +138,7 @@ function BrowseFoodsContent() {
                             ...(item.protein_g > 10 ? ['High Protein'] : []),
                             ...(item.energy_kcal < 50 ? ['Low Calorie'] : [])
                         ],
-                        onClick: () => setSelectedItem(item)
+                        data: item // Store the raw item for the click handler
                     })));
                 }
             } catch (error) {

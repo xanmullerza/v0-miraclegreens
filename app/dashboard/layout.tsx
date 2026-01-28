@@ -78,7 +78,7 @@ function DashboardLayoutContent({
     const pathname = usePathname();
     const [expandedGroup, setExpandedGroup] = useState<string | null>('overview');
     const { profile } = useUserPreferences();
-    const { searchQuery, setSearchQuery, results, isLoading, isFocused, setIsFocused } = useSearch();
+    const { searchQuery, setSearchQuery, results, isLoading, isFocused, setIsFocused, onResultClickRef } = useSearch();
 
     // Auto-expand the group that contains the active link
     useEffect(() => {
@@ -211,7 +211,9 @@ function DashboardLayoutContent({
                                                         key={result.id}
                                                         onMouseDown={(e) => {
                                                             e.preventDefault(); // Prevent blur before click
-                                                            result.onClick();
+                                                            if (onResultClickRef.current) {
+                                                                onResultClickRef.current(result);
+                                                            }
                                                             setIsFocused(false);
                                                             setSearchQuery('');
                                                         }}

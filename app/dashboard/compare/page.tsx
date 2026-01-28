@@ -73,10 +73,20 @@ const COMPARISON_COLORS = [
 function DashboardComparisonContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { searchQuery, setSearchQuery, setResults, setIsLoading } = useSearch();
+    const { searchQuery, setSearchQuery, setResults, setIsLoading, registerResultClickHandler } = useSearch();
     const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
     const [selectedItems, setSelectedItems] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
+
+    // Register click handler for search results - this always has current state
+    useEffect(() => {
+        registerResultClickHandler((result) => {
+            const item = result.data as FoodItem;
+            if (item && !selectedItems.some(i => i.id === item.id) && selectedItems.length < 10) {
+                setSelectedItems(prev => [...prev, item]);
+            }
+        });
+    }, [selectedItems, registerResultClickHandler]);
 
     // Initial load from URL
     useEffect(() => {
@@ -137,11 +147,7 @@ function DashboardComparisonContent() {
                                 ...(item.protein_g > 10 ? ['High Protein'] : []),
                                 ...(item.energy_kcal < 50 ? ['Low Calorie'] : [])
                             ],
-                            onClick: () => {
-                                if (!isSelected && selectedItems.length < 10) {
-                                    setSelectedItems(prev => [...prev, item]);
-                                }
-                            }
+                            data: item // Store the raw item for the click handler
                         };
                     }));
                 }

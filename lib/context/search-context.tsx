@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useRef, useCallback } from 'react';
 
 export interface SearchResult {
     id: string;
@@ -8,7 +8,7 @@ export interface SearchResult {
     subtitle?: string;
     image?: string | null;
     badges?: string[];
-    onClick: () => void;
+    data?: any; // Store the raw data for the click handler to use
 }
 
 interface SearchContextType {
@@ -20,6 +20,8 @@ interface SearchContextType {
     setIsLoading: (loading: boolean) => void;
     isFocused: boolean;
     setIsFocused: (focused: boolean) => void;
+    onResultClickRef: React.MutableRefObject<((result: SearchResult) => void) | null>;
+    registerResultClickHandler: (handler: (result: SearchResult) => void) => void;
 }
 
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
@@ -29,6 +31,11 @@ export function SearchProvider({ children }: { children: ReactNode }) {
     const [results, setResults] = useState<SearchResult[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
+    const onResultClickRef = useRef<((result: SearchResult) => void) | null>(null);
+
+    const registerResultClickHandler = useCallback((handler: (result: SearchResult) => void) => {
+        onResultClickRef.current = handler;
+    }, []);
 
     return (
         <SearchContext.Provider value={{
@@ -39,7 +46,9 @@ export function SearchProvider({ children }: { children: ReactNode }) {
             isLoading,
             setIsLoading,
             isFocused,
-            setIsFocused
+            setIsFocused,
+            onResultClickRef,
+            registerResultClickHandler
         }}>
             {children}
         </SearchContext.Provider>
