@@ -115,38 +115,29 @@ export default function RecipeDetailsPage() {
 
             // Calculate live nutrition totals
             if (fetchedIngredients.length > 0) {
-                const totals = calculateRecipeNutrition(
+                const calculated = calculateRecipeNutrition(
                     fetchedIngredients.map(ing => ({
                         food_item: ing.food_item,
                         weight_g: ing.weight_g || 0
                     }))
                 );
 
-                // Scale to per-serving
-                const servings = recipeData.servings || 1;
+                // The weights in the DB are per-serving, so 'calculated' is already per-serving
                 const scaledTotals: CalculatedNutrition = {
-                    calories: totals.calories / servings,
-                    energy_kj: totals.energy_kj / servings,
-                    protein: totals.protein / servings,
-                    fat: totals.fat / servings,
-                    carbs: totals.carbs / servings,
-                    micronutrients: Object.entries(totals.micronutrients || {}).reduce((acc, [k, v]) => {
-                        acc[k] = (v as number) / servings;
-                        return acc;
-                    }, {} as Record<string, number>)
+                    ...calculated,
+                    micronutrients: calculated.micronutrients || {}
                 };
 
                 setCalculatedTotals(scaledTotals);
 
-                // Update recipe object with accurate totals for the summary cards
-                setRecipe({
-                    ...recipeData,
+                setRecipe(prev => prev ? {
+                    ...prev,
                     calories: scaledTotals.calories,
                     protein: scaledTotals.protein,
                     carbs: scaledTotals.carbs,
                     fat: scaledTotals.fat,
                     micronutrients: scaledTotals.micronutrients
-                });
+                } : null);
             } else {
                 setRecipe(recipeData);
             }

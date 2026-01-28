@@ -397,7 +397,10 @@ export default function DashboardRecipePage() {
                     image,
                     source,
                     is_favorite: isFavorite,
-                    micronutrients: totals.micronutrients,
+                    micronutrients: Object.entries(totals.micronutrients || {}).reduce((acc, [k, v]) => {
+                        acc[k] = (v as number) / (servings || 1);
+                        return acc;
+                    }, {} as Record<string, number>),
                 });
 
             if (recipeError) throw recipeError;
