@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const showShop = false;
 const showPlan = false;
-const showDashboard = false;
+const showDashboard = true;
 
 const navigation = [
 	{ name: 'Our Story', href: '#story' },
