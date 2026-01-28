@@ -48,7 +48,7 @@ interface FoodItem {
     category: string;
 }
 
-const CATEGORIES = ["Grains", "Vegetables", "Fruit", "Legumes", "Proteins", "Fats", "Flavour", "Seeds", "Nuts", "Supplements", "General"];
+const CATEGORIES = ["Grains", "Vegetables", "Fruit", "Legumes", "Proteins", "Fats", "Flavour", "Seeds", "Nuts", "Supplements"];
 
 const CATEGORY_COLORS: Record<string, string> = {
     "Grains": "bg-amber-500 shadow-amber-500/20 border-amber-500",
@@ -60,8 +60,7 @@ const CATEGORY_COLORS: Record<string, string> = {
     "Flavour": "bg-purple-500 shadow-purple-500/20 border-purple-500",
     "Seeds": "bg-teal-500 shadow-teal-500/20 border-teal-500",
     "Nuts": "bg-stone-500 shadow-stone-500/20 border-stone-500",
-    "Supplements": "bg-indigo-500 shadow-indigo-500/20 border-indigo-500",
-    "General": "bg-slate-500 shadow-slate-500/20 border-slate-500"
+    "Supplements": "bg-indigo-500 shadow-indigo-500/20 border-indigo-500"
 };
 
 export default function MyFoodsPage() {
