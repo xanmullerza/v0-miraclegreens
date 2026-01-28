@@ -164,22 +164,6 @@ export default function DashboardLayout({
                         </nav>
                     </div>
 
-                    <div className="mt-auto p-6 space-y-4">
-                        <Link
-                            href="/"
-                            className="flex items-center gap-3 px-3 py-2 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
-                        >
-                            <ArrowLeft size={16} />
-                            Back to Site
-                        </Link>
-                        <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/10">
-                            <p className="text-xs font-bold uppercase tracking-widest opacity-80 mb-1">Status</p>
-                            <p className="text-sm font-medium">System Online</p>
-                            <div className="mt-2 h-1 w-full bg-white/20 rounded-full overflow-hidden">
-                                <div className="h-full w-4/5 bg-white rounded-full" />
-                            </div>
-                        </div>
-                    </div>
                 </aside>
 
                 {/* Main Content */}
