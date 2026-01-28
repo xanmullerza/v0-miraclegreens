@@ -78,7 +78,7 @@ function DashboardLayoutContent({
     const pathname = usePathname();
     const [expandedGroup, setExpandedGroup] = useState<string | null>('overview');
     const { profile } = useUserPreferences();
-    const { searchQuery, setSearchQuery, results, isLoading, isFocused, setIsFocused, onResultClickRef } = useSearch();
+    const { searchQuery, setSearchQuery, results, isLoading, isFocused, setIsFocused, onResultClickRef, searchInputRef, keepFocusAfterSelect } = useSearch();
 
     // Auto-expand the group that contains the active link
     useEffect(() => {
@@ -182,6 +182,7 @@ function DashboardLayoutContent({
                             <div className="relative hidden md:block z-50">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                 <input
+                                    ref={searchInputRef}
                                     className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full pl-10 pr-4 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/20 w-80 transition-all font-medium"
                                     placeholder={`Search in ${sidebarGroups.flatMap(g => g.items).find(i => i.href === pathname)?.name || 'Dashboard'}...`}
                                     value={searchQuery}
@@ -221,12 +222,17 @@ function DashboardLayoutContent({
                                                                 if (onResultClickRef.current) {
                                                                     onResultClickRef.current(result);
                                                                 }
-                                                                // Don't close for Compare page if we want to select multiple, 
-                                                                // but the user said "nothing happens when i select", so we'll keep it simple for now.
-                                                                // Actually, for better UX on Compare page, we might stay open.
-                                                                // But the current implementation closes it. Let's keep it closing to be safe.
-                                                                setIsFocused(false);
+                                                                // Clear the query but check if we should keep focus
                                                                 setSearchQuery('');
+                                                                if (keepFocusAfterSelect) {
+                                                                    // Keep focus for pages that need to select multiple items (like Compare)
+                                                                    // Use setTimeout to ensure the query is cleared first
+                                                                    setTimeout(() => {
+                                                                        searchInputRef.current?.focus();
+                                                                    }, 0);
+                                                                } else {
+                                                                    setIsFocused(false);
+                                                                }
                                                             }}
                                                             className="w-full text-left p-4 hover:bg-emerald-50 dark:hover:bg-emerald-500/5 transition-all flex justify-between items-center group border-b border-slate-100 dark:border-slate-800 last:border-0"
                                                         >

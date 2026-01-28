@@ -73,10 +73,16 @@ const COMPARISON_COLORS = [
 function DashboardComparisonContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { searchQuery, setSearchQuery, setResults, setIsLoading, registerResultClickHandler } = useSearch();
+    const { searchQuery, setSearchQuery, setResults, setIsLoading, registerResultClickHandler, setKeepFocusAfterSelect } = useSearch();
     const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
     const [selectedItems, setSelectedItems] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
+
+    // Enable keepFocusAfterSelect for this page so users can add multiple items quickly
+    useEffect(() => {
+        setKeepFocusAfterSelect(true);
+        return () => setKeepFocusAfterSelect(false);
+    }, [setKeepFocusAfterSelect]);
 
     // Register click handler for search results - this always has current state
     useEffect(() => {
@@ -97,6 +103,7 @@ function DashboardComparisonContent() {
             });
         });
     }, [registerResultClickHandler]);
+
 
     // Initial load from URL
     useEffect(() => {
