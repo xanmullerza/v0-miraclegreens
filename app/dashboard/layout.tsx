@@ -269,10 +269,11 @@ function DashboardLayoutContent({
                 </main>
             </div>
 
-            {/* Global Search Backdrop */}
+
+            {/* Click outside to close search */}
             {isFocused && (
                 <div
-                    className="fixed inset-0 bg-slate-900/20 dark:bg-black/60 backdrop-blur-md z-40 transition-all duration-300"
+                    className="fixed inset-0 z-40"
                     onClick={() => setIsFocused(false)}
                 />
             )}
