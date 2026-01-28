@@ -462,7 +462,7 @@ function DashboardComparisonContent() {
                                     {/* Leaderboard */}
                                     <Card className="md:col-span-2 p-6 bg-white dark:bg-slate-900">
                                         <h3 className="font-bold text-sm uppercase tracking-widest text-slate-500 mb-4 flex items-center gap-2">
-                                            <Activity className="w-4 h-4" /> Official Leaderboard
+                                            <BarChart3 className="w-4 h-4" /> Official Leaderboard
                                         </h3>
                                         <div className="space-y-3">
                                             {rankedItems.map((item, idx) => {
