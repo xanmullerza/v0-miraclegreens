@@ -14,6 +14,7 @@ import {
     Clock,
     Sparkles,
     ChefHat,
+    Heart,
     Calendar
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -90,6 +91,14 @@ export default function DashboardOverview() {
             icon: Calendar,
             color: 'text-purple-500',
             bg: 'bg-purple-500/10'
+        },
+        {
+            name: 'My Meals',
+            desc: 'View and manage your favorite personalized recipes and meals.',
+            href: '/dashboard/my-meals',
+            icon: Heart,
+            color: 'text-rose-500',
+            bg: 'bg-rose-500/10'
         }
     ];
 

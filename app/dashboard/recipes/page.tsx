@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import IngredientBuilder, { RecipeIngredient } from '@/components/recipe/ingredient-builder';
-import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus, ListOrdered, ChevronUp, ChevronDown, ClipboardList } from 'lucide-react';
+import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus, ListOrdered, ChevronUp, ChevronDown, ClipboardList, Heart } from 'lucide-react';
 import { parseInstructionsOnly, parseRecipeText } from '@/lib/utils/recipe-parser';
 import { searchLocalFood, searchUSDAFood, getUSDAMeasures, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
@@ -42,6 +42,7 @@ export default function DashboardRecipePage() {
     const [autoImportText, setAutoImportText] = useState('');
     const [isImporting, setIsImporting] = useState(false);
     const [step, setStep] = useState(1);
+    const [isFavorite, setIsFavorite] = useState(true);
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -385,6 +386,7 @@ export default function DashboardRecipePage() {
                     servings,
                     image,
                     source,
+                    is_favorite: isFavorite,
                 });
 
             if (recipeError) throw recipeError;
@@ -422,7 +424,7 @@ export default function DashboardRecipePage() {
             if (instructionsError) throw instructionsError;
 
             alert('Recipe created successfully!');
-            router.push('/dashboard/recipes');
+            router.push('/dashboard/my-meals');
         } catch (error: any) {
             console.error('Error creating recipe:', error);
             alert(`Failed: ${error.message}`);
@@ -628,6 +630,22 @@ export default function DashboardRecipePage() {
                                         </button>
                                     ))}
                                 </div>
+                            </div>
+
+                            <div className="space-y-3 pt-2">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Collection</Label>
+                                <button
+                                    onClick={() => setIsFavorite(!isFavorite)}
+                                    className={cn(
+                                        "w-full h-12 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border flex items-center justify-center gap-2",
+                                        isFavorite
+                                            ? "bg-rose-500 text-white border-rose-600 shadow-md shadow-rose-500/20"
+                                            : "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500"
+                                    )}
+                                >
+                                    <Heart size={16} fill={isFavorite ? "currentColor" : "none"} />
+                                    {isFavorite ? "Added to My Meals" : "Add to My Meals"}
+                                </button>
                             </div>
                         </div>
 
