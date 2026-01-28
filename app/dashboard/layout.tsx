@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 const sidebarGroups = [
     {
@@ -57,6 +58,13 @@ const sidebarGroups = [
             { name: 'Browse Meals', href: '/dashboard/browse-meals', icon: Library },
             { name: 'Plan Meals', href: '/dashboard/plan', icon: Calendar },
         ]
+    },
+    {
+        id: 'settings',
+        title: 'Settings',
+        items: [
+            { name: 'Profile', href: '/dashboard/profile', icon: User },
+        ]
     }
 ];
 
@@ -67,6 +75,7 @@ export default function DashboardLayout({
 }) {
     const pathname = usePathname();
     const [expandedGroup, setExpandedGroup] = useState<string | null>('overview');
+    const { profile } = useUserPreferences();
 
     // Auto-expand the group that contains the active link
     useEffect(() => {
@@ -196,9 +205,18 @@ export default function DashboardLayout({
                                     <Bell size={18} />
                                     <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 border-2 border-slate-50 dark:border-[#020617] rounded-full" />
                                 </button>
-                                <div className="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500">
-                                    <User size={18} />
-                                </div>
+                                <Link
+                                    href="/dashboard/profile"
+                                    className="flex items-center gap-3 px-2 py-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+                                >
+                                    <div className="text-right hidden sm:block">
+                                        <p className="text-xs font-bold leading-none">{profile.nickname || profile.name || 'Guest Researcher'}</p>
+                                        <p className="text-[10px] text-slate-400 font-medium">Lab Access</p>
+                                    </div>
+                                    <div className="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500 group-hover:text-emerald-500 transition-colors">
+                                        <User size={18} />
+                                    </div>
+                                </Link>
                             </div>
                         </div>
                     </div>
