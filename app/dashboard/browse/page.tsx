@@ -66,6 +66,7 @@ function BrowseFoodsContent() {
     const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
 
     const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
     const [editName, setEditName] = useState('');
@@ -272,73 +273,93 @@ function BrowseFoodsContent() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto space-y-8 pb-20">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                {/* Selector Sidebar */}
-                <div className="lg:col-span-1 space-y-6">
-                    <Card className="p-4 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm">
-                        <div className="space-y-4">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                <Input
-                                    placeholder="Search library..."
-                                    className="pl-10 h-9 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
-                            </div>
+        <div className="max-w-7xl mx-auto space-y-8 pb-20 px-4">
+            {/* Search Header */}
+            <div className="relative z-[60]">
+                <div className="max-w-2xl mx-auto pt-8">
+                    <div className="relative">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
+                        <Input
+                            placeholder="Search for any food, nutrient or category..."
+                            className="pl-12 h-14 text-lg bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xl rounded-2xl focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onFocus={() => setIsSearchFocused(true)}
+                        />
+                        {searchQuery && (
+                            <button
+                                onClick={() => {
+                                    setSearchQuery('');
+                                    setIsSearchFocused(false);
+                                }}
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        )}
+                    </div>
 
-                            <div className="space-y-1 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                                {loading ? (
-                                    <div className="p-8 text-center">
-                                        <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-solid border-emerald-500 border-r-transparent align-[-0.125em]" />
+                    {/* Dropdown Results */}
+                    {isSearchFocused && (searchQuery.trim() || searchResults.length > 0) && (
+                        <div className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-[70]">
+                            {loading && searchQuery.trim() ? (
+                                <div className="p-12 text-center">
+                                    <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mx-auto" />
+                                    <p className="mt-4 text-sm text-slate-500 font-medium">Searching library...</p>
+                                </div>
+                            ) : searchResults.length === 0 ? (
+                                <div className="p-12 text-center text-slate-500">
+                                    <p className="font-medium">No results found for "{searchQuery}"</p>
+                                    <p className="text-xs mt-1">Try another ingredient or common name</p>
+                                </div>
+                            ) : (
+                                <div className="max-h-[450px] overflow-y-auto custom-scrollbar">
+                                    <div className="p-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
+                                        <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 px-3">Matching Ingredients</p>
                                     </div>
-                                ) : searchResults.length === 0 ? (
-                                    <div className="p-4 text-center text-slate-500 text-sm italic">No ingredients found</div>
-                                ) : (
-                                    searchResults.map(item => (
+                                    {searchResults.map(item => (
                                         <button
                                             key={item.id}
-                                            onClick={() => setSelectedItem(item)}
-                                            className={cn(
-                                                "w-full text-left p-3 rounded-xl border transition-all duration-200 flex justify-between items-center group",
-                                                selectedItem?.id === item.id
-                                                    ? "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500/50 text-emerald-700 dark:text-emerald-400 shadow-sm"
-                                                    : "bg-transparent border-transparent hover:bg-slate-100 dark:hover:bg-slate-800"
-                                            )}
+                                            onClick={() => {
+                                                setSelectedItem(item);
+                                                setIsSearchFocused(false);
+                                                setSearchQuery('');
+                                            }}
+                                            className="w-full text-left p-4 hover:bg-emerald-50 dark:hover:bg-emerald-500/5 transition-all flex justify-between items-center group border-b border-slate-100 dark:border-slate-800 last:border-0"
                                         >
-                                            <div className="min-w-0 flex-1 mr-2">
-                                                <div className="font-semibold text-xs truncate capitalize">{item.common_name || item.name}</div>
+                                            <div className="flex-1 min-w-0 mr-4">
+                                                <div className="font-bold text-slate-900 dark:text-white capitalize group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                                                    {item.common_name || item.name}
+                                                </div>
                                                 {item.common_name && (
-                                                    <div className="text-[10px] opacity-60 truncate">Scientific: {item.name}</div>
+                                                    <div className="text-xs text-slate-500 italic">Scientific: {item.name}</div>
                                                 )}
-                                                <div className="flex gap-1 mt-1.5">
-                                                    {item.protein_g > 10 && <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">High Protein</span>}
-                                                    {item.carbs_g < 5 && item.fat_g > 5 && <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">Keto</span>}
-                                                    {item.energy_kcal < 50 && <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Low Cal</span>}
+                                                <div className="flex gap-2 mt-2">
+                                                    {item.protein_g > 10 && <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-bold uppercase tracking-tight">High Protein</span>}
+                                                    {item.energy_kcal < 50 && <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 font-bold uppercase tracking-tight">Low Calorie</span>}
                                                 </div>
                                             </div>
-                                            <ChevronRight size={14} className={cn("transition-transform", selectedItem?.id === item.id ? "text-emerald-500 translate-x-1" : "text-slate-300 opacity-0 group-hover:opacity-100")} />
+                                            <ChevronRight size={18} className="text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
                                         </button>
-                                    ))
-                                )}
-                            </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
-                    </Card>
-
-                    <div className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-                        <h4 className="font-bold text-xs uppercase tracking-widest text-slate-400 mb-2 flex items-center gap-2">
-                            <Info size={12} />
-                            Discovery Tip
-                        </h4>
-                        <p className="text-[10px] text-slate-500 leading-relaxed">
-                            Use the search to find nutrient-dense alternatives. Each entry is benchmarked against adult RDA.
-                        </p>
-                    </div>
+                    )}
                 </div>
+            </div>
 
+            {/* Background Blur Overlay */}
+            {isSearchFocused && (
+                <div
+                    className="fixed inset-0 bg-slate-900/20 dark:bg-black/60 backdrop-blur-md z-50 transition-all duration-300"
+                    onClick={() => setIsSearchFocused(false)}
+                />
+            )}
+
+            <div className="w-full">
                 {/* Profile Display Area */}
-                <div className="lg:col-span-3 space-y-8">
+                <div className="space-y-8">
                     {!selectedItem ? (
                         <div className="h-[600px] flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
                             <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
@@ -346,6 +367,16 @@ function BrowseFoodsContent() {
                             </div>
                             <h3 className="text-lg font-bold text-slate-400">Select an Ingredient</h3>
                             <p className="text-sm text-slate-500 mt-1">Pick a food from the library to view its clinical profile</p>
+
+                            <div className="mt-8 p-4 rounded-2xl bg-emerald-50/50 dark:bg-emerald-500/5 border border-emerald-100/50 dark:border-emerald-500/10 max-w-sm text-center">
+                                <h4 className="font-bold text-xs uppercase tracking-widest text-emerald-600/60 mb-2 flex items-center justify-center gap-2">
+                                    <Info size={12} />
+                                    Discovery Tip
+                                </h4>
+                                <p className="text-[10px] text-slate-500 leading-relaxed">
+                                    Use the search to find nutrient-dense alternatives. Each entry is benchmarked against adult RDA.
+                                </p>
+                            </div>
                         </div>
                     ) : (
                         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
