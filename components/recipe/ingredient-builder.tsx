@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, Zap, X as CloseIcon } from 'lucide-react';
+import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, Zap, X as CloseIcon, ChevronDown } from 'lucide-react';
 import FoodItemPicker from './food-item-picker';
 import { fetchFoodMeasures, FoodMeasure } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -418,10 +418,36 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
         const updated = [...ingredients];
         const ing = updated[index];
 
-        // Just update the label, do NOT change weight or quantity
+        // Recalculate weight based on new unit
+        let newWeight = ing.weight_g;
+        const newUnitLower = newUnit.toLowerCase().trim();
+
+        if (newUnitLower === 'g' || newUnitLower === 'gram') {
+            newWeight = ing.quantity;
+        } else if (newUnitLower === 'kg' || newUnitLower === 'kilogram') {
+            newWeight = ing.quantity * 1000;
+        } else {
+            const measure = ing.available_measures?.find(m => m.label.toLowerCase() === newUnitLower);
+            if (measure) {
+                newWeight = ing.quantity * measure.weight_g;
+            }
+        }
+
+        const ratio = newWeight / (ing.weight_g || 1);
+
         updated[index] = {
             ...ing,
-            measure_label: newUnit
+            measure_label: newUnit,
+            weight_g: newWeight,
+            calories: Math.round(ing.calories * ratio),
+            energy_kj: Math.round(ing.energy_kj * ratio),
+            protein: Math.round(ing.protein * ratio * 10) / 10,
+            fat: Math.round(ing.fat * ratio * 10) / 10,
+            carbs: Math.round(ing.carbs * ratio * 10) / 10,
+            micronutrients: Object.entries(ing.micronutrients || {}).reduce((acc, [key, val]) => {
+                acc[key] = (val as number) * ratio;
+                return acc;
+            }, {} as Record<string, number>),
         };
         onChange(updated);
     };
@@ -712,13 +738,26 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
 
                                     <div className="space-y-1.5">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Measure</Label>
-                                        <input
-                                            type="text"
-                                            value={ing.measure_label}
-                                            onChange={(e) => handleUpdateUnit(index, e.target.value)}
-                                            className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-sm rounded-xl font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
-                                            placeholder="e.g. cup"
-                                        />
+                                        <div className="relative">
+                                            <select
+                                                value={ing.measure_label}
+                                                onChange={(e) => handleUpdateUnit(index, e.target.value)}
+                                                className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-sm rounded-xl font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all appearance-none cursor-pointer"
+                                            >
+                                                <option value="g">g</option>
+                                                <option value="kg">kg</option>
+                                                {ing.available_measures?.map(m => (
+                                                    <option key={m.label} value={m.label}>{m.label}</option>
+                                                ))}
+                                                {/* If current label isn't in available, show it so it's selected */}
+                                                {ing.measure_label !== 'g' && ing.measure_label !== 'kg' && !ing.available_measures?.some(m => m.label === ing.measure_label) && (
+                                                    <option value={ing.measure_label}>{ing.measure_label}</option>
+                                                )}
+                                            </select>
+                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                                <ChevronDown size={14} />
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div className="space-y-1.5">
