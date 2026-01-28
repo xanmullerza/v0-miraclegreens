@@ -99,6 +99,14 @@ export default function DashboardOverview() {
             icon: Heart,
             color: 'text-rose-500',
             bg: 'bg-rose-500/10'
+        },
+        {
+            name: 'Categorization',
+            desc: 'Bulk manage and categorize food items in the database.',
+            href: '/dashboard/manage-foods',
+            icon: Database,
+            color: 'text-stone-500',
+            bg: 'bg-stone-500/10'
         }
     ];
 

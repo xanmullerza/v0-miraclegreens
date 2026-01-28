@@ -51,6 +51,15 @@ const sidebarGroups = [
         ]
     },
     {
+        id: 'admin',
+        title: 'Admin',
+        items: [
+            { name: 'Categorization', href: '/dashboard/manage-foods', icon: Table },
+            { name: 'Add Foods', href: '/dashboard/food', icon: Beef },
+            { name: 'Add Recipes', href: '/dashboard/recipes', icon: Utensils },
+        ]
+    },
+    {
         id: 'settings',
         title: 'Settings',
         items: [
