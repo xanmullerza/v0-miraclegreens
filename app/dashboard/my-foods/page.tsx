@@ -52,34 +52,20 @@ interface FoodItem {
 }
 
 const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
-const SECONDARY_CATEGORIES = ["Snacks", "Herbs", "Spices", "Condiments", "Beverage", "Starch"];
-
-const CATEGORY_COLORS: Record<string, string> = {
-    "Vegetables": "bg-emerald-500 shadow-emerald-500/20 border-emerald-500",
-    "Grains": "bg-amber-500 shadow-amber-500/20 border-amber-500",
-    "Legumes": "bg-orange-600 shadow-orange-600/20 border-orange-600",
-    "Oils": "bg-sky-500 shadow-sky-500/20 border-sky-500",
-    "Proteins": "bg-red-500 shadow-red-500/20 border-red-500",
-    "Fruit": "bg-rose-500 shadow-rose-500/20 border-rose-500",
-    "Nuts": "bg-stone-500 shadow-stone-500/20 border-stone-500",
-    "Flavour": "bg-purple-500 shadow-purple-500/20 border-purple-500",
-    "Supplements": "bg-indigo-500 shadow-indigo-500/20 border-indigo-500"
-};
 
 export default function MyFoodsPage() {
     const router = useRouter();
-    const { searchQuery } = useSearch();
     const [favorites, setFavorites] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES);
+
     const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
     const [editName, setEditName] = useState('');
     const [editCommonName, setEditCommonName] = useState('');
     const [editCategory, setEditCategory] = useState('General');
-    const [editSubCategory, setEditSubCategory] = useState<string | null>(null);
     const [editImage, setEditImage] = useState('');
     const [uploading, setUploading] = useState(false);
-    const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES.filter(c => c !== 'Flavour' && c !== 'Supplements'));
-    const [selectedSecondary, setSelectedSecondary] = useState<string[]>([]);
 
     useEffect(() => {
         fetchFavorites();
@@ -92,12 +78,13 @@ export default function MyFoodsPage() {
                 .from('food_items')
                 .select('*')
                 .eq('is_favorite', true)
-                .order('name', { ascending: true });
+                .order('common_name', { ascending: true });
 
             if (error) throw error;
             if (data) setFavorites(data);
         } catch (error) {
             console.error('Error fetching favorites:', error);
+            toast.error('Failed to load your foods');
         } finally {
             setLoading(false);
         }
@@ -127,7 +114,6 @@ export default function MyFoodsPage() {
             toast.success('Image uploaded successfully');
         } catch (err: any) {
             console.error("Upload error:", err);
-            // Fallback to base64 for preview if storage fails
             const reader = new FileReader();
             reader.onloadend = () => {
                 setEditImage(reader.result as string);
@@ -149,7 +135,6 @@ export default function MyFoodsPage() {
                     name: editName,
                     common_name: editCommonName,
                     category: editCategory,
-                    sub_category: editSubCategory,
                     image: editImage
                 } as any)
                 .eq('id', editingItem.id);
@@ -157,7 +142,7 @@ export default function MyFoodsPage() {
             if (error) throw error;
 
             setFavorites(prev => prev.map(f =>
-                f.id === editingItem.id ? { ...f, name: editName, common_name: editCommonName, category: editCategory, sub_category: editSubCategory, image: editImage } : f
+                f.id === editingItem.id ? { ...f, name: editName, common_name: editCommonName, category: editCategory, image: editImage } : f
             ));
             setEditingItem(null);
             toast.success('Food item updated successfully');
@@ -167,7 +152,8 @@ export default function MyFoodsPage() {
         }
     };
 
-    const toggleFavorite = async (item: FoodItem) => {
+    const toggleFavorite = async (item: FoodItem, e?: React.MouseEvent) => {
+        e?.stopPropagation();
         try {
             const { error } = await supabase
                 .from('food_items')
@@ -176,286 +162,229 @@ export default function MyFoodsPage() {
 
             if (error) throw error;
 
-            // Remove from local state
             setFavorites(prev => prev.filter(f => f.id !== item.id));
+            toast.info(`${item.common_name || item.name} removed from My Foods`);
         } catch (error) {
             console.error('Error removing favorite:', error);
+            toast.error('Failed to remove from favorites');
         }
     };
 
-    if (loading) {
-        return (
-            <div className="max-w-7xl mx-auto h-[60vh] flex flex-col items-center justify-center">
-                <Loader2 className="h-10 w-10 animate-spin text-emerald-500 mb-4" />
-                <p className="text-slate-500 font-medium">Loading your library...</p>
-            </div>
-        );
-    }
+    const filteredFavorites = favorites.filter(item => {
+        const name = (item.common_name || item.name || '').toLowerCase();
+        const matchesSearch = !searchQuery.trim() || name.includes(searchQuery.toLowerCase());
+        const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(item.category || 'General');
+        return matchesSearch && matchesCategory;
+    });
+
+    const getCategoryCounts = () => {
+        const counts: Record<string, number> = {};
+        CATEGORIES.forEach(cat => {
+            counts[cat] = favorites.filter(f => f.category === cat).length;
+        });
+        return counts;
+    };
+    const categoryCounts = getCategoryCounts();
 
     return (
-        <div className="max-w-7xl mx-auto space-y-8 pb-20">
+        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
+            {/* Hero Section */}
+            <div className="relative h-48 rounded-[2.5rem] bg-rose-600 overflow-hidden flex items-center px-12 group">
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1490818387583-1baba5e638af?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
+                <div className="absolute inset-0 bg-gradient-to-r from-rose-600 to-pink-600/50 mix-blend-multiply" />
 
-            {/* Category Filters */}
-            <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-2 text-slate-400 mr-2">
-                    <Filter size={16} />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Filter:</span>
+                <div className="relative z-10 space-y-2">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
+                            <Heart className="text-white" size={24} />
+                        </div>
+                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">My Foods</h1>
+                    </div>
+                    <p className="text-rose-50 font-medium max-w-md text-sm pl-1">
+                        Your personalized collection of favorite ingredients for quick access and meal planning.
+                    </p>
                 </div>
 
-                {/* Total Filter Block */}
-                <button
-                    onClick={() => {
-                        if (selectedCategories.length === CATEGORIES.length) {
-                            setSelectedCategories([]);
-                        } else {
-                            setSelectedCategories(CATEGORIES);
-                        }
-                    }}
-                    className={cn(
-                        "px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tight transition-all duration-300 border flex items-center gap-3",
-                        selectedCategories.length === CATEGORIES.length
-                            ? "bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-500/20"
-                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-emerald-500"
-                    )}
-                >
-                    <span>Total</span>
-                    <span className={cn(
-                        "px-1.5 py-0.5 rounded-md text-[9px]",
-                        selectedCategories.length === CATEGORIES.length ? "bg-white/20" : "bg-slate-100 dark:bg-slate-800"
-                    )}>
-                        {favorites.length}
-                    </span>
-                </button>
-
-                <div className="h-4 w-[1px] bg-slate-200 dark:bg-slate-800 mx-1" />
-
-                {CATEGORIES.filter(c => c !== 'Flavour' && c !== 'Supplements').map(category => {
-                    const isActive = selectedCategories.includes(category);
-                    const count = favorites.filter(f => f.category === category).length;
-
-                    return (
-                        <button
-                            key={category}
-                            onClick={() => {
-                                if (isActive) {
-                                    setSelectedCategories(prev => prev.filter(c => c !== category));
-                                } else {
-                                    setSelectedCategories(prev => [...prev, category]);
-                                }
-                            }}
-                            className={cn(
-                                "group px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-tight transition-all duration-300 border flex flex-col items-center gap-0.5 min-w-[65px]",
-                                isActive
-                                    ? cn("text-white shadow-lg", CATEGORY_COLORS[category])
-                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:border-slate-400"
-                            )}
-                        >
-                            <span>{category}</span>
-                            <span className={cn(
-                                "text-[8px] opacity-60 font-bold",
-                                isActive ? "text-white" : "text-slate-400"
-                            )}>
-                                {count}
-                            </span>
-                        </button>
-                    );
-                })}
-
-                <div className="h-4 w-[1px] bg-slate-200 dark:bg-slate-800 mx-2" />
-
-                {/* Add Flavour Distinct Button */}
-                {(() => {
-                    const category = 'Flavour';
-                    const isActive = selectedCategories.includes(category);
-                    const count = favorites.filter(f => f.category === category).length;
-                    return (
-                        <button
-                            onClick={() => {
-                                if (isActive) {
-                                    setSelectedCategories(prev => prev.filter(c => c !== category));
-                                } else {
-                                    setSelectedCategories(prev => [...prev, category]);
-                                }
-                            }}
-                            className={cn(
-                                "group px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tight transition-all duration-300 border flex items-center gap-3",
-                                isActive
-                                    ? "bg-purple-600 text-white border-purple-500 shadow-lg shadow-purple-500/20"
-                                    : "bg-white dark:bg-slate-900 border-dashed border-purple-400/50 text-purple-600 dark:text-purple-400 hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/10"
-                            )}
-                        >
-                            <span className="flex items-center gap-1.5">
-                                <Plus size={12} className={cn("transition-transform duration-300", isActive && "rotate-45")} />
-                                Add Flavour
-                            </span>
-                            <span className={cn(
-                                "px-1.5 py-0.5 rounded-md text-[9px] font-bold",
-                                isActive ? "bg-white/20" : "bg-purple-100 dark:bg-purple-900/30"
-                            )}>
-                                {count}
-                            </span>
-                        </button>
-                    );
-                })()}
-
-                {/* Add Supplements Distinct Button */}
-                {(() => {
-                    const category = 'Supplements';
-                    const isActive = selectedCategories.includes(category);
-                    const count = favorites.filter(f => f.category === category).length;
-                    return (
-                        <button
-                            onClick={() => {
-                                if (isActive) {
-                                    setSelectedCategories(prev => prev.filter(c => c !== category));
-                                } else {
-                                    setSelectedCategories(prev => [...prev, category]);
-                                }
-                            }}
-                            className={cn(
-                                "group px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tight transition-all duration-300 border flex items-center gap-3",
-                                isActive
-                                    ? "bg-indigo-600 text-white border-indigo-500 shadow-lg shadow-indigo-500/20"
-                                    : "bg-white dark:bg-slate-900 border-dashed border-indigo-400/50 text-indigo-600 dark:text-indigo-400 hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/10"
-                            )}
-                        >
-                            <span className="flex items-center gap-1.5">
-                                <Plus size={12} className={cn("transition-transform duration-300", isActive && "rotate-45")} />
-                                Add Supplements
-                            </span>
-                            <span className={cn(
-                                "px-1.5 py-0.5 rounded-md text-[9px] font-bold",
-                                isActive ? "bg-white/20" : "bg-indigo-100 dark:bg-indigo-900/30"
-                            )}>
-                                {count}
-                            </span>
-                        </button>
-                    );
-                })()}
-            </div>
-
-            {/* Secondary Group Filters */}
-            <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-2 text-slate-400 mr-2">
-                    <Plus size={16} />
-                    <span className="text-[10px] font-black uppercase tracking-widest">Groups:</span>
+                <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-6">
+                    <div className="text-right hidden sm:block">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-rose-200 mb-1">Your Collection</p>
+                        <p className="text-3xl font-black text-white leading-none tracking-tighter italic">
+                            {favorites.length} <span className="text-rose-300">SAVED</span>
+                        </p>
+                    </div>
                 </div>
-                {SECONDARY_CATEGORIES.map(sub => {
-                    const isActive = selectedSecondary.includes(sub);
-                    const count = favorites.filter(f => f.sub_category === sub).length;
-                    if (count === 0 && !isActive) return null;
-
-                    return (
-                        <button
-                            key={sub}
-                            onClick={() => {
-                                if (isActive) {
-                                    setSelectedSecondary(prev => prev.filter(s => s !== sub));
-                                } else {
-                                    setSelectedSecondary(prev => [...prev, sub]);
-                                }
-                            }}
-                            className={cn(
-                                "px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-tight transition-all duration-300 border flex items-center gap-2",
-                                isActive
-                                    ? "bg-indigo-600 text-white border-indigo-500 shadow-lg shadow-indigo-500/20"
-                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:border-slate-400"
-                            )}
-                        >
-                            {sub}
-                            <span className="opacity-60">{count}</span>
-                        </button>
-                    );
-                })}
             </div>
 
-            {favorites.length === 0 ? (
-                <div className="h-[400px] flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
-                    <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
+            {/* Controls Row */}
+            <div className="flex flex-col md:flex-row gap-4">
+                <div className="relative flex-1 group">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-rose-500 transition-colors" size={18} />
+                    <Input
+                        placeholder="Search your saved foods..."
+                        className="pl-12 h-14 bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-rose-500/10 transition-all font-medium"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+
+                {/* Category Filter */}
+                <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar">
+                    {CATEGORIES.map(category => {
+                        const isActive = selectedCategories.includes(category);
+                        const count = categoryCounts[category] || 0;
+
+                        return (
+                            <button
+                                key={category}
+                                onClick={() => {
+                                    if (isActive) {
+                                        setSelectedCategories(prev => prev.filter(c => c !== category));
+                                    } else {
+                                        setSelectedCategories(prev => [...prev, category]);
+                                    }
+                                }}
+                                className={cn(
+                                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
+                                    isActive
+                                        ? "bg-rose-600 text-white shadow-lg shadow-rose-500/20"
+                                        : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
+                                )}
+                            >
+                                {category}
+                                <span className={cn(
+                                    "px-1.5 py-0.5 rounded-md text-[9px]",
+                                    isActive ? "bg-white/20" : "bg-slate-100 dark:bg-slate-800"
+                                )}>
+                                    {count}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Main Grid */}
+            {loading ? (
+                <div className="h-96 flex flex-col items-center justify-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center">
+                        <Loader2 className="animate-spin text-rose-500" size={24} />
+                    </div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Loading Your Collection...</p>
+                </div>
+            ) : favorites.length === 0 ? (
+                <div className="h-96 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
+                    <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
                         <Heart size={32} />
                     </div>
-                    <h3 className="text-lg font-bold text-slate-400">Your collection is empty</h3>
-                    <p className="text-sm text-slate-500 mt-1 mb-6 text-center max-w-xs">Favorite ingredients while browsing the library to build your personalized reference set.</p>
+                    <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">Your collection is empty</p>
+                    <p className="text-sm text-slate-500 text-center max-w-sm mb-6">Favorite ingredients while browsing the library to build your personalized reference set.</p>
                     <Button
-                        variant="outline"
                         onClick={() => router.push('/dashboard/browse')}
-                        className="rounded-xl font-bold"
+                        className="bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-bold px-6"
                     >
-                        Go to Browse Library
+                        Browse Food Library
                     </Button>
                 </div>
+            ) : filteredFavorites.length === 0 ? (
+                <div className="h-96 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
+                    <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
+                        <Search size={32} />
+                    </div>
+                    <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">No results found</p>
+                    <p className="text-sm text-slate-500 text-center">Try adjusting your search or category filters.</p>
+                </div>
             ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
-                    {favorites
-                        .filter(item => {
-                            const name = (item.common_name || item.name || '').toLowerCase();
-                            const matchesSearch = searchQuery === '' || name.includes(searchQuery.toLowerCase());
-                            const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(item.category || 'General');
-                            const matchesSecondary = selectedSecondary.length === 0 || (item.sub_category && selectedSecondary.includes(item.sub_category));
-                            return matchesSearch && matchesCategory && matchesSecondary;
-                        })
-                        .map((item) => (
-                            <Card key={item.id} className="group relative transition-all duration-300 hover:scale-105 hover:shadow-md border-transparent hover:border-slate-200 dark:hover:border-slate-800">
-                                {/* Action Buttons */}
-                                <div className="absolute top-2 right-2 z-10 flex flex-col gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            toggleFavorite(item);
-                                        }}
-                                        className="w-7 h-7 rounded-full bg-white/90 dark:bg-slate-950/90 shadow-sm flex items-center justify-center text-rose-500 hover:scale-110 transition-transform border border-slate-100 dark:border-slate-800"
-                                        title="Remove from favorites"
-                                    >
-                                        <Heart size={12} fill="currentColor" />
-                                    </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setEditingItem(item);
-                                            setEditName(item.name);
-                                            setEditCommonName(item.common_name);
-                                            setEditCategory(item.category || 'General');
-                                            setEditSubCategory(item.sub_category || null);
-                                            setEditImage(item.image || '');
-                                        }}
-                                        className="w-7 h-7 rounded-full bg-white/90 dark:bg-slate-950/90 shadow-sm flex items-center justify-center text-emerald-500 hover:scale-110 transition-transform border border-slate-100 dark:border-slate-800"
-                                        title="Edit item"
-                                    >
-                                        <Edit2 size={12} />
-                                    </button>
-                                </div>
-
-                                <div
-                                    className="cursor-pointer"
-                                    onClick={() => router.push(`/dashboard/browse?id=${item.id}`)}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {filteredFavorites.map((food) => (
+                        <Card key={food.id} className="group relative transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border-transparent hover:border-rose-500/20">
+                            {/* Action Buttons */}
+                            <div className="absolute top-3 right-3 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                    onClick={(e) => toggleFavorite(food, e)}
+                                    className="w-8 h-8 rounded-full bg-rose-500 text-white shadow-sm flex items-center justify-center transition-all border border-rose-600 hover:scale-110"
                                 >
-                                    <div className="aspect-square relative bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                                        {item.image ? (
-                                            <img
-                                                src={item.image}
-                                                alt={item.common_name || item.name}
-                                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-700">
-                                                <Beef size={24} />
+                                    <Heart size={14} fill="currentColor" />
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setEditingItem(food);
+                                        setEditName(food.name);
+                                        setEditCommonName(food.common_name);
+                                        setEditCategory(food.category || 'General');
+                                        setEditImage(food.image || '');
+                                    }}
+                                    className="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-950/90 shadow-sm flex items-center justify-center text-emerald-500 hover:scale-110 transition-transform border border-slate-100 dark:border-slate-800"
+                                >
+                                    <Edit2 size={14} />
+                                </button>
+                            </div>
+
+                            <div className="p-3">
+                                <div className="aspect-[4/3] rounded-xl bg-slate-100 dark:bg-slate-950/50 mb-4 overflow-hidden relative border border-slate-100 dark:border-slate-800">
+                                    {food.image ? (
+                                        <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                            <Beef size={48} className="opacity-20" />
+                                        </div>
+                                    )}
+                                    {food.category && (
+                                        <div className="absolute top-2 left-2">
+                                            <Badge className="bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-white border-none text-[8px] font-black uppercase tracking-widest px-2.5 py-1 backdrop-blur-sm">
+                                                {food.category}
+                                            </Badge>
+                                        </div>
+                                    )}
+                                    <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/60 to-transparent">
+                                        <div className="flex items-center gap-3 text-white">
+                                            <div className="flex items-center gap-1">
+                                                <Zap size={10} className="text-rose-400" />
+                                                <span className="text-[9px] font-black">{Math.round(food.energy_kcal)}kcal</span>
                                             </div>
-                                        )}
-                                    </div>
-                                    <div className="p-3">
-                                        <h3 className="font-bold text-[10px] capitalize truncate leading-tight mb-1 text-slate-900 dark:text-white">
-                                            {item.common_name || item.name}
-                                        </h3>
-                                        {item.sub_category && (
-                                            <p className="text-[8px] font-medium text-slate-500 mb-1">{item.sub_category}</p>
-                                        )}
-                                        <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            View Profile <ArrowRight size={8} />
+                                            <div className="flex items-center gap-1">
+                                                <Beef size={10} className="text-rose-400" />
+                                                <span className="text-[9px] font-black">{food.protein_g.toFixed(1)}g pro</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </Card>
-                        ))}
+
+                                <div className="space-y-3">
+                                    <div className="min-h-[40px]">
+                                        <h3 className="font-bold text-sm tracking-tight line-clamp-2 text-slate-900 dark:text-white leading-tight capitalize">
+                                            {food.common_name || food.name}
+                                        </h3>
+                                        {food.common_name && (
+                                            <p className="text-[10px] text-slate-500 italic truncate">{food.name}</p>
+                                        )}
+                                    </div>
+
+                                    <div className="grid grid-cols-4 gap-1">
+                                        {[
+                                            { label: 'CAL', val: food.energy_kcal, sub: 'kcal', color: 'text-orange-500' },
+                                            { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-red-500' },
+                                            { label: 'CHO', val: food.carbs_g, sub: 'g', color: 'text-amber-500' },
+                                            { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-sky-500' }
+                                        ].map(stat => (
+                                            <div key={stat.label} className="p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 text-center">
+                                                <p className="text-[7px] font-black uppercase tracking-tighter text-slate-400 mb-0.5">{stat.label}</p>
+                                                <p className={cn("text-xs font-black leading-none", stat.color)}>{Math.round(stat.val)}<span className="text-[7px] opacity-70 ml-0.5">{stat.sub}</span></p>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <button
+                                        onClick={() => router.push(`/dashboard/browse?id=${food.id}`)}
+                                        className="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/50 hover:bg-rose-500 hover:text-white transition-all group/btn2 border border-transparent"
+                                    >
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 group-hover/btn2:text-white">View Profile</span>
+                                        <ArrowRight size={12} className="group-hover/btn2:translate-x-1 transition-transform" />
+                                    </button>
+                                </div>
+                            </div>
+                        </Card>
+                    ))}
                 </div>
             )}
 
@@ -463,7 +392,7 @@ export default function MyFoodsPage() {
             {editingItem && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="w-full max-w-md">
-                        <Card className="bg-white dark:bg-slate-900 p-6 space-y-6 shadow-2xl border-emerald-500/20">
+                        <Card className="bg-white dark:bg-slate-900 p-6 space-y-6 shadow-2xl border-rose-500/20">
                             <div className="flex justify-between items-center">
                                 <h3 className="text-xl font-bold tracking-tight">Edit Food Entry</h3>
                                 <button onClick={() => setEditingItem(null)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400">
@@ -501,42 +430,11 @@ export default function MyFoodsPage() {
                                                 className={cn(
                                                     "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all",
                                                     editCategory === category
-                                                        ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
+                                                        ? "bg-rose-500 text-white shadow-md shadow-rose-500/20"
                                                         : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
                                                 )}
                                             >
                                                 {category}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Secondary Grouping</Label>
-                                    <div className="flex flex-wrap gap-2">
-                                        <button
-                                            onClick={() => setEditSubCategory(null)}
-                                            className={cn(
-                                                "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all",
-                                                editSubCategory === null
-                                                    ? "bg-slate-500 text-white shadow-md shadow-slate-500/20"
-                                                    : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
-                                            )}
-                                        >
-                                            None
-                                        </button>
-                                        {SECONDARY_CATEGORIES.map(sub => (
-                                            <button
-                                                key={sub}
-                                                onClick={() => setEditSubCategory(sub)}
-                                                className={cn(
-                                                    "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all",
-                                                    editSubCategory === sub
-                                                        ? "bg-indigo-500 text-white shadow-md shadow-indigo-500/20"
-                                                        : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
-                                                )}
-                                            >
-                                                {sub}
                                             </button>
                                         ))}
                                     </div>
@@ -557,7 +455,7 @@ export default function MyFoodsPage() {
                                         ) : (
                                             <div className="text-center p-4">
                                                 {uploading ? (
-                                                    <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mx-auto" />
+                                                    <Loader2 className="h-8 w-8 animate-spin text-rose-500 mx-auto" />
                                                 ) : (
                                                     <>
                                                         <Upload size={24} className="text-slate-400 mx-auto mb-2" />
@@ -580,7 +478,7 @@ export default function MyFoodsPage() {
                                 <Button variant="outline" className="flex-1 rounded-xl font-bold" onClick={() => setEditingItem(null)}>
                                     Cancel
                                 </Button>
-                                <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold gap-2" onClick={handleEditSave}>
+                                <Button className="flex-1 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-bold gap-2" onClick={handleEditSave}>
                                     <Save size={16} /> Save Changes
                                 </Button>
                             </div>
