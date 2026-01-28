@@ -13,7 +13,6 @@ import {
     Loader2,
     Utensils,
     ShoppingBasket,
-    Flame,
     Zap,
     Scale,
     Activity,
@@ -26,6 +25,7 @@ import {
     X,
     ChevronDown
 } from 'lucide-react';
+import { calculateRecipeNutrition, CalculatedNutrition } from '@/lib/utils/nutrition-calculator';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -45,6 +45,7 @@ interface Ingredient {
     amount: string;
     base_ingredient: string;
     weight_g: number;
+    food_item?: any;
 }
 
 interface Instruction {
@@ -81,6 +82,7 @@ export default function RecipeDetailsPage() {
     const [selectedNutrientInfo, setSelectedNutrientInfo] = useState<string | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
     const [expandedBreakdownSections, setExpandedBreakdownSections] = useState<Record<string, boolean>>({});
+    const [calculatedTotals, setCalculatedTotals] = useState<CalculatedNutrition | null>(null);
 
     const userRDAs = useRDA(undefined, 'female', recipe?.calories || 2000);
 
@@ -99,16 +101,55 @@ export default function RecipeDetailsPage() {
                 .single();
 
             if (recipeError) throw recipeError;
-            setRecipe(recipeData);
 
-            // Fetch Ingredients
+            // Fetch Ingredients with food item data
             const { data: ingData, error: ingError } = await supabase
                 .from('ingredients')
-                .select('*')
+                .select('*, food_item:food_items(*)')
                 .eq('recipe_id', id);
 
             if (ingError) throw ingError;
-            setIngredients(ingData || []);
+
+            const fetchedIngredients = ingData || [];
+            setIngredients(fetchedIngredients);
+
+            // Calculate live nutrition totals
+            if (fetchedIngredients.length > 0) {
+                const totals = calculateRecipeNutrition(
+                    fetchedIngredients.map(ing => ({
+                        food_item: ing.food_item,
+                        weight_g: ing.weight_g || 0
+                    }))
+                );
+
+                // Scale to per-serving
+                const servings = recipeData.servings || 1;
+                const scaledTotals: CalculatedNutrition = {
+                    calories: totals.calories / servings,
+                    energy_kj: totals.energy_kj / servings,
+                    protein: totals.protein / servings,
+                    fat: totals.fat / servings,
+                    carbs: totals.carbs / servings,
+                    micronutrients: Object.entries(totals.micronutrients || {}).reduce((acc, [k, v]) => {
+                        acc[k] = (v as number) / servings;
+                        return acc;
+                    }, {} as Record<string, number>)
+                };
+
+                setCalculatedTotals(scaledTotals);
+
+                // Update recipe object with accurate totals for the summary cards
+                setRecipe({
+                    ...recipeData,
+                    calories: scaledTotals.calories,
+                    protein: scaledTotals.protein,
+                    carbs: scaledTotals.carbs,
+                    fat: scaledTotals.fat,
+                    micronutrients: scaledTotals.micronutrients
+                });
+            } else {
+                setRecipe(recipeData);
+            }
 
             // Fetch Instructions
             const { data: insData, error: insError } = await supabase
