@@ -63,11 +63,10 @@ const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Frui
 function BrowseFoodsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { searchQuery, setSearchQuery } = useSearch();
+    const { searchQuery, setSearchQuery, setResults, setIsLoading, isFocused } = useSearch();
     const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
     const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
     const [loading, setLoading] = useState(true);
-    const [isSearchFocused, setIsSearchFocused] = useState(false);
 
     const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
     const [editName, setEditName] = useState('');
@@ -99,33 +98,50 @@ function BrowseFoodsContent() {
 
     useEffect(() => {
         const searchFoodItems = async () => {
+            if (!searchQuery.trim()) {
+                setResults([]);
+                setSearchResults([]);
+                return;
+            }
+
+            setIsLoading(true);
             setLoading(true);
             try {
                 let query = supabase
                     .from('food_items')
                     .select('*')
-                    .limit(50);
+                    .limit(15);
 
-                if (searchQuery.trim()) {
-                    query = query.or(`name.ilike.%${searchQuery.trim()}%,common_name.ilike.%${searchQuery.trim()}%`);
-                } else {
-                    query = query.order('name', { ascending: true });
-                }
+                query = query.or(`name.ilike.%${searchQuery.trim()}%,common_name.ilike.%${searchQuery.trim()}%`);
 
                 const { data, error } = await query;
 
                 if (error) throw error;
-                if (data) setSearchResults(data);
+                if (data) {
+                    setSearchResults(data);
+                    // Push to global context for universal search bar dropdown
+                    setResults(data.map(item => ({
+                        id: item.id,
+                        title: item.common_name || item.name,
+                        subtitle: item.common_name ? `Scientific: ${item.name}` : undefined,
+                        badges: [
+                            ...(item.protein_g > 10 ? ['High Protein'] : []),
+                            ...(item.energy_kcal < 50 ? ['Low Calorie'] : [])
+                        ],
+                        onClick: () => setSelectedItem(item)
+                    })));
+                }
             } catch (error) {
                 console.error('Error searching foods:', error);
             } finally {
+                setIsLoading(false);
                 setLoading(false);
             }
         };
 
         const debounceTimer = setTimeout(searchFoodItems, 300);
         return () => clearTimeout(debounceTimer);
-    }, [searchQuery]);
+    }, [searchQuery, setResults, setIsLoading]);
 
     const toggleFavorite = async (item: FoodItem) => {
         try {
@@ -282,17 +298,13 @@ function BrowseFoodsContent() {
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
                         <Input
                             placeholder="Search for any food, nutrient or category..."
-                            className="pl-12 h-14 text-lg bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xl rounded-2xl focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                            className="pl-12 h-14 text-lg bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xl rounded-2xl focus:ring-2 focus:ring-emerald-500/20 transition-all font-medium"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            onFocus={() => setIsSearchFocused(true)}
                         />
                         {searchQuery && (
                             <button
-                                onClick={() => {
-                                    setSearchQuery('');
-                                    setIsSearchFocused(false);
-                                }}
+                                onClick={() => setSearchQuery('')}
                                 className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
                             >
                                 <X size={20} />
@@ -300,66 +312,9 @@ function BrowseFoodsContent() {
                         )}
                     </div>
 
-                    {/* Dropdown Results */}
-                    {((isSearchFocused || searchQuery.trim().length > 0) && !selectedItem) && (
-                        <div className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-[70]">
-                            {loading && searchQuery.trim() ? (
-                                <div className="p-12 text-center">
-                                    <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mx-auto" />
-                                    <p className="mt-4 text-sm text-slate-500 font-medium">Searching library...</p>
-                                </div>
-                            ) : searchResults.length === 0 ? (
-                                <div className="p-12 text-center text-slate-500">
-                                    <p className="font-medium">No results found for "{searchQuery}"</p>
-                                    <p className="text-xs mt-1">Try another ingredient or common name</p>
-                                </div>
-                            ) : (
-                                <div className="max-h-[calc(100vh-220px)] overflow-y-auto custom-scrollbar">
-                                    <div className="p-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
-                                        <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 px-3">Matching Ingredients</p>
-                                    </div>
-                                    {searchResults.map(item => (
-                                        <button
-                                            key={item.id}
-                                            onClick={() => {
-                                                setSelectedItem(item);
-                                                setIsSearchFocused(false);
-                                                setSearchQuery('');
-                                            }}
-                                            className="w-full text-left p-4 hover:bg-emerald-50 dark:hover:bg-emerald-500/5 transition-all flex justify-between items-center group border-b border-slate-100 dark:border-slate-800 last:border-0"
-                                        >
-                                            <div className="flex-1 min-w-0 mr-4">
-                                                <div className="font-bold text-slate-900 dark:text-white capitalize group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-                                                    {item.common_name || item.name}
-                                                </div>
-                                                {item.common_name && (
-                                                    <div className="text-xs text-slate-500 italic">Scientific: {item.name}</div>
-                                                )}
-                                                <div className="flex gap-2 mt-2">
-                                                    {item.protein_g > 10 && <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 font-bold uppercase tracking-tight">High Protein</span>}
-                                                    {item.energy_kcal < 50 && <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 font-bold uppercase tracking-tight">Low Calorie</span>}
-                                                </div>
-                                            </div>
-                                            <ChevronRight size={18} className="text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    )}
+                    {/* Background blur is now handled by the Global Layout Header */}
                 </div>
             </div>
-
-            {/* Background Blur Overlay */}
-            {(isSearchFocused || (searchQuery.trim() !== '' && !selectedItem)) && (
-                <div
-                    className="fixed inset-0 bg-slate-900/20 dark:bg-black/60 backdrop-blur-md z-50 transition-all duration-300"
-                    onClick={() => {
-                        setIsSearchFocused(false);
-                        if (searchQuery.trim() === '') setSearchQuery('');
-                    }}
-                />
-            )}
 
             <div className="w-full">
                 {/* Profile Display Area */}

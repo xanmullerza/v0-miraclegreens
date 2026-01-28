@@ -18,7 +18,8 @@ import {
     Heart,
     Library,
     ChevronDown,
-    Table
+    Table,
+    Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
@@ -77,7 +78,7 @@ function DashboardLayoutContent({
     const pathname = usePathname();
     const [expandedGroup, setExpandedGroup] = useState<string | null>('overview');
     const { profile } = useUserPreferences();
-    const { searchQuery, setSearchQuery } = useSearch();
+    const { searchQuery, setSearchQuery, results, isLoading, isFocused, setIsFocused } = useSearch();
 
     // Auto-expand the group that contains the active link
     useEffect(() => {
@@ -178,14 +179,68 @@ function DashboardLayoutContent({
                         </div>
 
                         <div className="flex items-center gap-6">
-                            <div className="relative hidden md:block">
+                            <div className="relative hidden md:block z-50">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                 <input
-                                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full pl-10 pr-4 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/20 w-64 transition-all"
+                                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full pl-10 pr-4 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/20 w-80 transition-all font-medium"
                                     placeholder={`Search in ${sidebarGroups.flatMap(g => g.items).find(i => i.href === pathname)?.name || 'Dashboard'}...`}
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
+                                    onFocus={() => setIsFocused(true)}
                                 />
+
+                                {/* Universal Global Results Dropdown */}
+                                {(isFocused && (searchQuery.trim() !== '' || isLoading)) && (
+                                    <div className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 w-[400px]">
+                                        {isLoading ? (
+                                            <div className="p-12 text-center">
+                                                <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mx-auto" />
+                                                <p className="mt-4 text-xs text-slate-500 font-black uppercase tracking-widest">Searching...</p>
+                                            </div>
+                                        ) : results.length === 0 ? (
+                                            <div className="p-8 text-center text-slate-500">
+                                                <p className="font-bold text-sm">No results found for "{searchQuery}"</p>
+                                            </div>
+                                        ) : (
+                                            <div className="max-h-[min(500px,calc(100vh-140px))] overflow-y-auto custom-scrollbar">
+                                                <div className="p-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                                                    <p className="text-[9px] uppercase font-black tracking-widest text-slate-400 px-3">Top Matches</p>
+                                                </div>
+                                                {results.map((result) => (
+                                                    <button
+                                                        key={result.id}
+                                                        onMouseDown={(e) => {
+                                                            e.preventDefault(); // Prevent blur before click
+                                                            result.onClick();
+                                                            setIsFocused(false);
+                                                            setSearchQuery('');
+                                                        }}
+                                                        className="w-full text-left p-4 hover:bg-emerald-50 dark:hover:bg-emerald-500/5 transition-all flex justify-between items-center group border-b border-slate-100 dark:border-slate-800 last:border-0"
+                                                    >
+                                                        <div className="flex-1 min-w-0 mr-4">
+                                                            <div className="font-bold text-slate-900 dark:text-white capitalize group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors text-sm">
+                                                                {result.title}
+                                                            </div>
+                                                            {result.subtitle && (
+                                                                <div className="text-[10px] text-slate-500 italic mt-0.5">{result.subtitle}</div>
+                                                            )}
+                                                            {result.badges && (
+                                                                <div className="flex gap-2 mt-2">
+                                                                    {result.badges.map(badge => (
+                                                                        <span key={badge} className="text-[8px] px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-tight">
+                                                                            {badge}
+                                                                        </span>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <ChevronRight size={14} className="text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
                             <div className="flex items-center gap-3">
                                 <button className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 relative">
@@ -213,6 +268,14 @@ function DashboardLayoutContent({
                     </div>
                 </main>
             </div>
+
+            {/* Global Search Backdrop */}
+            {isFocused && (
+                <div
+                    className="fixed inset-0 bg-slate-900/20 dark:bg-black/60 backdrop-blur-md z-40 transition-all duration-300"
+                    onClick={() => setIsFocused(false)}
+                />
+            )}
         </div>
     );
 }
