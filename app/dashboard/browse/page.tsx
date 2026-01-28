@@ -404,7 +404,7 @@ function BrowseFoodsContent() {
             ) : (
                 <div className="space-y-4">
                     {/* List Header */}
-                    <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_100px_40px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                    <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_40px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
                         <div>Image</div>
                         <div>Food Item</div>
                         <div className="text-right">Calories</div>
@@ -420,7 +420,6 @@ function BrowseFoodsContent() {
                             <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
                             Protein
                         </div>
-                        <div className="text-right">Choline</div>
                         <div></div>
                     </div>
 
@@ -432,7 +431,7 @@ function BrowseFoodsContent() {
                                 onClick={() => setSelectedItem(food)}
                                 className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
                             >
-                                <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_100px_40px] gap-4 lg:items-center">
+                                <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_40px] gap-4 lg:items-center">
                                     {/* Thumbnail */}
                                     <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
                                         {food.image ? (
@@ -472,18 +471,15 @@ function BrowseFoodsContent() {
                                     <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
                                         {food.protein_g.toFixed(1)}g
                                     </div>
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                        {(food.micronutrients?.['Choline'] || food.micronutrients?.['choline_mg'] || 0).toFixed(0)}<span className="text-[10px] text-slate-400 ml-0.5 font-bold">mg</span>
-                                    </div>
+
 
                                     {/* Mobile Stats Row */}
-                                    <div className="lg:hidden grid grid-cols-5 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                    <div className="lg:hidden grid grid-cols-4 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
                                         {[
                                             { label: 'CAL', val: food.energy_kcal, sub: 'k', color: 'text-orange-500' },
                                             { label: 'CHO', val: food.carbs_g, sub: 'g', color: 'text-amber-500' },
                                             { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-sky-500' },
-                                            { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-purple-500' },
-                                            { label: 'CHO', val: food.micronutrients?.['Choline'] || food.micronutrients?.['choline_mg'] || 0, sub: 'm', color: 'text-indigo-500' }
+                                            { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-purple-500' }
                                         ].map(stat => (
                                             <div key={stat.label} className="text-center">
                                                 <p className="text-[8px] font-black text-slate-400 mb-0.5">{stat.label}</p>
