@@ -291,32 +291,7 @@ function BrowseFoodsContent() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 pb-20 px-4">
-            {/* Search Header */}
-            <div className="relative z-[60]">
-                <div className="max-w-2xl mx-auto pt-8">
-                    <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 pointer-events-none" />
-                        <Input
-                            placeholder="Search for any food, nutrient or category..."
-                            className="pl-12 h-14 text-lg bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xl rounded-2xl focus:ring-2 focus:ring-emerald-500/20 transition-all font-medium"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                        {searchQuery && (
-                            <button
-                                onClick={() => setSearchQuery('')}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
-                            >
-                                <X size={20} />
-                            </button>
-                        )}
-                    </div>
-
-                    {/* Background blur is now handled by the Global Layout Header */}
-                </div>
-            </div>
-
-            <div className="w-full">
+            <div className="w-full pt-8">
                 {/* Profile Display Area */}
                 <div className="space-y-8">
                     {!selectedItem ? (
