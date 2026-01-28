@@ -95,12 +95,6 @@ export default function DashboardLayout({
                 {/* Modern Sidebar */}
                 <aside className="w-64 border-r border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl hidden lg:flex flex-col">
                     <div className="p-6">
-                        <div className="flex items-center gap-3 px-2 py-1.5 mb-8">
-                            <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
-                                <LayoutDashboard size={18} />
-                            </div>
-                            <span className="font-bold tracking-tight text-lg">Lab Center</span>
-                        </div>
 
                         <nav className="space-y-4">
                             {sidebarGroups.map((group) => {
