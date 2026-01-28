@@ -74,7 +74,7 @@ export default function MyFoodsPage() {
     const [editCategory, setEditCategory] = useState('General');
     const [editImage, setEditImage] = useState('');
     const [uploading, setUploading] = useState(false);
-    const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES.filter(c => c !== 'Flavour'));
+    const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES.filter(c => c !== 'Flavour' && c !== 'Supplements'));
 
     useEffect(() => {
         fetchFavorites();
@@ -223,7 +223,7 @@ export default function MyFoodsPage() {
 
                 <div className="h-4 w-[1px] bg-slate-200 dark:bg-slate-800 mx-1" />
 
-                {CATEGORIES.filter(c => c !== 'Flavour').map(category => {
+                {CATEGORIES.filter(c => c !== 'Flavour' && c !== 'Supplements').map(category => {
                     const isActive = selectedCategories.includes(category);
                     const count = favorites.filter(f => f.category === category).length;
 
@@ -285,6 +285,41 @@ export default function MyFoodsPage() {
                             <span className={cn(
                                 "px-1.5 py-0.5 rounded-md text-[9px] font-bold",
                                 isActive ? "bg-white/20" : "bg-purple-100 dark:bg-purple-900/30"
+                            )}>
+                                {count}
+                            </span>
+                        </button>
+                    );
+                })()}
+
+                {/* Add Supplements Distinct Button */}
+                {(() => {
+                    const category = 'Supplements';
+                    const isActive = selectedCategories.includes(category);
+                    const count = favorites.filter(f => f.category === category).length;
+                    return (
+                        <button
+                            onClick={() => {
+                                if (isActive) {
+                                    setSelectedCategories(prev => prev.filter(c => c !== category));
+                                } else {
+                                    setSelectedCategories(prev => [...prev, category]);
+                                }
+                            }}
+                            className={cn(
+                                "group px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tight transition-all duration-300 border flex items-center gap-3",
+                                isActive
+                                    ? "bg-indigo-600 text-white border-indigo-500 shadow-lg shadow-indigo-500/20"
+                                    : "bg-white dark:bg-slate-900 border-dashed border-indigo-400/50 text-indigo-600 dark:text-indigo-400 hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/10"
+                            )}
+                        >
+                            <span className="flex items-center gap-1.5">
+                                <Plus size={12} className={cn("transition-transform duration-300", isActive && "rotate-45")} />
+                                Add Supplements
+                            </span>
+                            <span className={cn(
+                                "px-1.5 py-0.5 rounded-md text-[9px] font-bold",
+                                isActive ? "bg-white/20" : "bg-indigo-100 dark:bg-indigo-900/30"
                             )}>
                                 {count}
                             </span>
