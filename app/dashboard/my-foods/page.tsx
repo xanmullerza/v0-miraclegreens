@@ -195,8 +195,38 @@ export default function MyFoodsPage() {
                     <Filter size={16} />
                     <span className="text-[10px] font-black uppercase tracking-widest">Filter:</span>
                 </div>
+
+                {/* Total Filter Block */}
+                <button
+                    onClick={() => {
+                        if (selectedCategories.length === CATEGORIES.length) {
+                            setSelectedCategories([]);
+                        } else {
+                            setSelectedCategories(CATEGORIES);
+                        }
+                    }}
+                    className={cn(
+                        "px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tight transition-all duration-300 border flex items-center gap-3",
+                        selectedCategories.length === CATEGORIES.length
+                            ? "bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-500/20"
+                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-emerald-500"
+                    )}
+                >
+                    <span>Total</span>
+                    <span className={cn(
+                        "px-1.5 py-0.5 rounded-md text-[9px]",
+                        selectedCategories.length === CATEGORIES.length ? "bg-white/20" : "bg-slate-100 dark:bg-slate-800"
+                    )}>
+                        {favorites.length}
+                    </span>
+                </button>
+
+                <div className="h-4 w-[1px] bg-slate-200 dark:bg-slate-800 mx-2" />
+
                 {CATEGORIES.map(category => {
                     const isActive = selectedCategories.includes(category);
+                    const count = favorites.filter(f => f.category === category || (!f.category && category === 'General')).length;
+
                     return (
                         <button
                             key={category}
@@ -208,13 +238,19 @@ export default function MyFoodsPage() {
                                 }
                             }}
                             className={cn(
-                                "px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-tight transition-all duration-300 border",
+                                "group px-2.5 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-tight transition-all duration-300 border flex flex-col items-center gap-0.5 min-w-[65px]",
                                 isActive
                                     ? cn("text-white shadow-lg", CATEGORY_COLORS[category])
-                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-slate-400"
+                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:border-slate-400"
                             )}
                         >
-                            {category}
+                            <span>{category}</span>
+                            <span className={cn(
+                                "text-[8px] opacity-60 font-bold",
+                                isActive ? "text-white" : "text-slate-400"
+                            )}>
+                                {count}
+                            </span>
                         </button>
                     );
                 })}
