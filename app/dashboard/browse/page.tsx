@@ -63,10 +63,12 @@ const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Frui
 function BrowseFoodsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { searchQuery, setSearchQuery, setResults, setIsLoading, registerResultClickHandler } = useSearch();
-    const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
-    const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
+    const { setResults, setIsLoading: setGlobalLoading, registerResultClickHandler } = useSearch();
+    const [foods, setFoods] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES);
+    const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
 
     const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
     const [editName, setEditName] = useState('');
@@ -75,7 +77,32 @@ function BrowseFoodsContent() {
     const [editImage, setEditImage] = useState('');
     const [uploading, setUploading] = useState(false);
 
-    // Register click handler for search results - this always has current state
+    // Default RDA for comparison context
+    const userRDAs = useRDA(30, 'female', 2000);
+
+    useEffect(() => {
+        fetchAllFoods();
+    }, []);
+
+    const fetchAllFoods = async () => {
+        setLoading(true);
+        try {
+            const { data, error } = await supabase
+                .from('food_items')
+                .select('*')
+                .order('common_name', { ascending: true });
+
+            if (error) throw error;
+            setFoods(data || []);
+        } catch (error) {
+            console.error('Error fetching foods:', error);
+            toast.error('Failed to load food library');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Register click handler for global search bar
     useEffect(() => {
         registerResultClickHandler((result) => {
             const item = result.data as FoodItem;
@@ -85,75 +112,34 @@ function BrowseFoodsContent() {
         });
     }, [registerResultClickHandler]);
 
-    // Initial load from URL
+    // Update global search context when typing in local search
     useEffect(() => {
-        const id = searchParams.get('id');
-        if (id) {
-            const fetchItem = async () => {
-                const { data } = await supabase.from('food_items').select('*').eq('id', id).single();
-                if (data) setSelectedItem(data);
-            };
-            fetchItem();
+        if (!searchQuery.trim()) {
+            setResults([]);
+            return;
         }
-    }, [searchParams]);
 
-    // Update URL when selection changes
-    useEffect(() => {
-        if (selectedItem) {
-            router.replace(`/dashboard/browse?id=${selectedItem.id}`, { scroll: false });
-        } else {
-            router.replace('/dashboard/browse', { scroll: false });
-        }
-    }, [selectedItem, router]);
+        setGlobalLoading(true);
+        const filtered = foods.filter(item =>
+            item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (item.common_name && item.common_name.toLowerCase().includes(searchQuery.toLowerCase()))
+        ).slice(0, 15);
 
-    useEffect(() => {
-        const searchFoodItems = async () => {
-            if (!searchQuery.trim()) {
-                setResults([]);
-                setSearchResults([]);
-                return;
-            }
+        setResults(filtered.map(item => ({
+            id: item.id,
+            title: item.common_name || item.name,
+            subtitle: item.common_name ? `Scientific: ${item.name}` : undefined,
+            badges: [
+                ...(item.protein_g > 10 ? ['High Protein'] : []),
+                ...(item.energy_kcal < 50 ? ['Low Calorie'] : [])
+            ],
+            data: item
+        })));
+        setGlobalLoading(false);
+    }, [searchQuery, foods, setResults, setGlobalLoading]);
 
-            setIsLoading(true);
-            setLoading(true);
-            try {
-                let query = supabase
-                    .from('food_items')
-                    .select('*')
-                    .limit(15);
-
-                query = query.or(`name.ilike.%${searchQuery.trim()}%,common_name.ilike.%${searchQuery.trim()}%`);
-
-                const { data, error } = await query;
-
-                if (error) throw error;
-                if (data) {
-                    setSearchResults(data);
-                    // Push to global context for universal search bar dropdown
-                    setResults(data.map(item => ({
-                        id: item.id,
-                        title: item.common_name || item.name,
-                        subtitle: item.common_name ? `Scientific: ${item.name}` : undefined,
-                        badges: [
-                            ...(item.protein_g > 10 ? ['High Protein'] : []),
-                            ...(item.energy_kcal < 50 ? ['Low Calorie'] : [])
-                        ],
-                        data: item // Store the raw item for the click handler
-                    })));
-                }
-            } catch (error) {
-                console.error('Error searching foods:', error);
-            } finally {
-                setIsLoading(false);
-                setLoading(false);
-            }
-        };
-
-        const debounceTimer = setTimeout(searchFoodItems, 300);
-        return () => clearTimeout(debounceTimer);
-    }, [searchQuery, setResults, setIsLoading]);
-
-    const toggleFavorite = async (item: FoodItem) => {
+    const toggleFavorite = async (item: FoodItem, e?: React.MouseEvent) => {
+        e?.stopPropagation();
         try {
             const newStatus = !item.is_favorite;
             const { error } = await supabase
@@ -163,14 +149,13 @@ function BrowseFoodsContent() {
 
             if (error) throw error;
 
-            // Update local state
+            setFoods(prev => prev.map(f => f.id === item.id ? { ...f, is_favorite: newStatus } : f));
             setSelectedItem(prev => prev?.id === item.id ? { ...prev, is_favorite: newStatus } : prev);
-            setSearchResults(prev => prev.map(i => i.id === item.id ? { ...i, is_favorite: newStatus } : i));
 
             if (newStatus) {
-                toast.success(`${item.name} added to My Foods`);
+                toast.success(`${item.common_name || item.name} added to My Foods`);
             } else {
-                toast.info(`${item.name} removed from My Foods`);
+                toast.info(`${item.common_name || item.name} removed from My Foods`);
             }
         } catch (error: any) {
             console.error('Error toggling favorite:', error);
@@ -202,7 +187,6 @@ function BrowseFoodsContent() {
             toast.success('Image uploaded successfully');
         } catch (err: any) {
             console.error("Upload error:", err);
-            // Fallback to base64 for preview if storage fails
             const reader = new FileReader();
             reader.onloadend = () => {
                 setEditImage(reader.result as string);
@@ -230,9 +214,8 @@ function BrowseFoodsContent() {
 
             if (error) throw error;
 
-            // Refresh UI
+            setFoods(prev => prev.map(f => f.id === editingItem.id ? { ...f, name: editName, common_name: editCommonName, category: editCategory, image: editImage } : f));
             setSelectedItem(prev => prev?.id === editingItem.id ? { ...prev, name: editName, common_name: editCommonName, category: editCategory, image: editImage } : prev);
-            setSearchResults(prev => prev.map(i => i.id === editingItem.id ? { ...i, name: editName, common_name: editCommonName, category: editCategory, image: editImage } : i));
 
             setEditingItem(null);
             toast.success('Food item updated successfully');
@@ -242,8 +225,22 @@ function BrowseFoodsContent() {
         }
     };
 
-    // Default RDA for comparison context
-    const userRDAs = useRDA(30, 'female', 2000);
+    const filteredFoods = foods.filter(food => {
+        const matchesSearch = !searchQuery.trim() ||
+            food.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (food.common_name && food.common_name.toLowerCase().includes(searchQuery.toLowerCase()));
+        const matchesCategory = !food.category || selectedCategories.includes(food.category);
+        return matchesSearch && matchesCategory;
+    });
+
+    const getCategoryCounts = () => {
+        const counts: Record<string, number> = {};
+        CATEGORIES.forEach(cat => {
+            counts[cat] = foods.filter(f => f.category === cat).length;
+        });
+        return counts;
+    };
+    const categoryCounts = getCategoryCounts();
 
     const getVal = (item: FoodItem, key: string) => {
         if (key === 'energy_kcal') return item.energy_kcal;
@@ -267,7 +264,7 @@ function BrowseFoodsContent() {
             <div className={cn("p-6 rounded-2xl border bg-gradient-to-br", t.bg)}>
                 <h4 className={cn("font-black flex items-center gap-2 mb-1 uppercase tracking-widest text-sm", t.text)}><Icon className="h-5 w-5" /> {title}</h4>
                 {subtitle && <p className={cn("text-[10px] text-muted-foreground mb-4 border-b pb-2", t.border)}>{subtitle}</p>}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     {Object.entries(items).map(([label, keys]) => {
                         const unitLabel = label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label.includes('Vitamin A') || label.includes('Vitamin K') || label.includes('Vitamin D') ? 'µg' : label.includes('Vitamin D') ? 'IU' : 'mg';
 
@@ -300,185 +297,321 @@ function BrowseFoodsContent() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto space-y-8 pb-20 px-4">
-            <div className="w-full pt-8">
-                {/* Profile Display Area */}
-                <div className="space-y-8">
-                    {!selectedItem ? (
-                        <div className="h-[600px] flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
-                            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
-                                <Library size={32} />
-                            </div>
-                            <h3 className="text-lg font-bold text-slate-400">Select an Ingredient</h3>
-                            <p className="text-sm text-slate-500 mt-1">Pick a food from the library to view its clinical profile</p>
+        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
+            {/* Hero Section */}
+            <div className="relative h-48 rounded-[2.5rem] bg-emerald-600 overflow-hidden flex items-center px-12 group">
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1540420773420-3366772f4999?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600/50 mix-blend-multiply" />
 
-                            <div className="mt-8 p-4 rounded-2xl bg-emerald-50/50 dark:bg-emerald-500/5 border border-emerald-100/50 dark:border-emerald-500/10 max-w-sm text-center">
-                                <h4 className="font-bold text-xs uppercase tracking-widest text-emerald-600/60 mb-2 flex items-center justify-center gap-2">
-                                    <Info size={12} />
-                                    Discovery Tip
-                                </h4>
-                                <p className="text-[10px] text-slate-500 leading-relaxed">
-                                    Use the search to find nutrient-dense alternatives. Each entry is benchmarked against adult RDA.
-                                </p>
-                            </div>
+                <div className="relative z-10 space-y-2">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
+                            <Library className="text-white" size={24} />
                         </div>
-                    ) : (
-                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
-                            {/* Header Card with Image */}
-                            <Card className="relative overflow-hidden bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-xl">
-                                <div className="flex flex-col md:flex-row">
-                                    <div className="w-full md:w-64 h-64 md:h-auto overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center group/img relative">
+                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Food Library</h1>
+                    </div>
+                    <p className="text-emerald-50 font-medium max-w-md text-sm pl-1">
+                        Explore our database of nutrient-dense whole foods with complete micronutrient profiles.
+                    </p>
+                </div>
+
+                <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-6">
+                    <div className="text-right hidden sm:block">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-200 mb-1">Global Database</p>
+                        <p className="text-3xl font-black text-white leading-none tracking-tighter italic">
+                            {foods.length} <span className="text-emerald-300">FOODS</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Controls Row */}
+            <div className="flex flex-col md:flex-row gap-4">
+                <div className="relative flex-1 group">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
+                    <Input
+                        placeholder="Search the global food databank..."
+                        className="pl-12 h-14 bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 transition-all font-medium"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+
+                {/* Category Filter */}
+                <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar">
+                    {CATEGORIES.map(category => {
+                        const isActive = selectedCategories.includes(category);
+                        const count = categoryCounts[category] || 0;
+
+                        return (
+                            <button
+                                key={category}
+                                onClick={() => {
+                                    if (isActive) {
+                                        setSelectedCategories(prev => prev.filter(c => c !== category));
+                                    } else {
+                                        setSelectedCategories(prev => [...prev, category]);
+                                    }
+                                }}
+                                className={cn(
+                                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
+                                    isActive
+                                        ? "bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
+                                        : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
+                                )}
+                            >
+                                {category}
+                                <span className={cn(
+                                    "px-1.5 py-0.5 rounded-md text-[9px]",
+                                    isActive ? "bg-white/20" : "bg-slate-100 dark:bg-slate-800"
+                                )}>
+                                    {count}
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Main Grid */}
+            {loading ? (
+                <div className="h-96 flex flex-col items-center justify-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
+                        <Loader2 className="animate-spin text-emerald-500" size={24} />
+                    </div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Querying Databank...</p>
+                </div>
+            ) : filteredFoods.length === 0 ? (
+                <div className="h-96 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
+                    <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
+                        <Library size={32} />
+                    </div>
+                    <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">No results found.</p>
+                    <p className="text-sm text-slate-500 text-center">We couldn't find any foods matching your criteria.</p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {filteredFoods.map((food) => (
+                        <Card key={food.id} className="group relative transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border-transparent hover:border-emerald-500/20">
+                            {/* Action Buttons */}
+                            <div className="absolute top-3 right-3 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                    onClick={(e) => toggleFavorite(food, e)}
+                                    className={cn(
+                                        "w-8 h-8 rounded-full shadow-sm flex items-center justify-center transition-all border",
+                                        food.is_favorite
+                                            ? "bg-rose-500 text-white border-rose-600 scale-110"
+                                            : "bg-white/90 dark:bg-slate-950/90 text-slate-400 hover:text-rose-500 border-slate-100 dark:border-slate-800"
+                                    )}
+                                >
+                                    <Heart size={14} fill={food.is_favorite ? "currentColor" : "none"} />
+                                </button>
+                            </div>
+
+                            <div className="p-3">
+                                <div className="aspect-[4/3] rounded-xl bg-slate-100 dark:bg-slate-950/50 mb-4 overflow-hidden relative border border-slate-100 dark:border-slate-800">
+                                    {food.image ? (
+                                        <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                            <Beef size={48} className="opacity-20" />
+                                        </div>
+                                    )}
+                                    {food.category && (
+                                        <div className="absolute top-2 left-2">
+                                            <Badge className="bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-white border-none text-[8px] font-black uppercase tracking-widest px-2.5 py-1 backdrop-blur-sm">
+                                                {food.category}
+                                            </Badge>
+                                        </div>
+                                    )}
+                                    <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/60 to-transparent">
+                                        <div className="flex items-center gap-3 text-white">
+                                            <div className="flex items-center gap-1">
+                                                <Zap size={10} className="text-emerald-400" />
+                                                <span className="text-[9px] font-black">{Math.round(food.energy_kcal)}kcal</span>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <Beef size={10} className="text-emerald-400" />
+                                                <span className="text-[9px] font-black">{food.protein_g.toFixed(1)}g pro</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <div className="min-h-[40px]">
+                                        <h3 className="font-bold text-sm tracking-tight line-clamp-2 text-slate-900 dark:text-white leading-tight capitalize">
+                                            {food.common_name || food.name}
+                                        </h3>
+                                        {food.common_name && (
+                                            <p className="text-[10px] text-slate-500 italic truncate">{food.name}</p>
+                                        )}
+                                    </div>
+
+                                    <div className="grid grid-cols-4 gap-1">
+                                        {[
+                                            { label: 'CAL', val: food.energy_kcal, sub: 'kcal', color: 'text-orange-500' },
+                                            { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-red-500' },
+                                            { label: 'CHO', val: food.carbs_g, sub: 'g', color: 'text-amber-500' },
+                                            { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-sky-500' }
+                                        ].map(stat => (
+                                            <div key={stat.label} className="p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 text-center">
+                                                <p className="text-[7px] font-black uppercase tracking-tighter text-slate-400 mb-0.5">{stat.label}</p>
+                                                <p className={cn("text-xs font-black leading-none", stat.color)}>{Math.round(stat.val)}<span className="text-[7px] opacity-70 ml-0.5">{stat.sub}</span></p>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <button
+                                        onClick={() => setSelectedItem(food)}
+                                        className="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/50 hover:bg-emerald-500 hover:text-white transition-all group/btn2 border border-transparent"
+                                    >
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 group-hover/btn2:text-white">View Profile</span>
+                                        <ArrowRight size={12} className="group-hover/btn2:translate-x-1 transition-transform" />
+                                    </button>
+                                </div>
+                            </div>
+                        </Card>
+                    ))}
+                </div>
+            )}
+
+            {/* Detail Modal */}
+            {selectedItem && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto">
+                    <div className="w-full max-w-4xl my-8">
+                        <Card className="bg-white dark:bg-slate-900 shadow-2xl border-emerald-500/20 max-h-[85vh] overflow-y-auto">
+                            {/* Modal Header */}
+                            <div className="sticky top-0 z-10 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 flex justify-between items-center">
+                                <div className="flex items-center gap-4">
+                                    <Badge variant="outline" className="text-emerald-600 bg-emerald-50 border-emerald-200 uppercase tracking-widest text-[10px] px-2">Clinical Profile</Badge>
+                                    <h2 className="text-xl font-black capitalize">{selectedItem.common_name || selectedItem.name}</h2>
+                                </div>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className={cn(
+                                            "rounded-full h-10 w-10 transition-all",
+                                            selectedItem.is_favorite ? "text-rose-500 border-rose-200 bg-rose-50 dark:bg-rose-900/20 dark:border-rose-900/50" : ""
+                                        )}
+                                        onClick={() => toggleFavorite(selectedItem)}
+                                    >
+                                        <Heart size={18} fill={selectedItem.is_favorite ? "currentColor" : "none"} />
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="rounded-full h-10 w-10 text-emerald-500 border-emerald-100 hover:bg-emerald-50 dark:border-emerald-900/30 dark:hover:bg-emerald-900/20"
+                                        onClick={() => {
+                                            setEditingItem(selectedItem);
+                                            setEditName(selectedItem.name);
+                                            setEditCommonName(selectedItem.common_name);
+                                            setEditCategory(selectedItem.category || 'General');
+                                            setEditImage(selectedItem.image || '');
+                                        }}
+                                    >
+                                        <Edit2 size={18} />
+                                    </Button>
+                                    <button onClick={() => setSelectedItem(null)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400">
+                                        <X size={20} />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="p-6 space-y-6">
+                                {/* Image and Basic Info */}
+                                <div className="flex flex-col md:flex-row gap-6">
+                                    <div className="w-full md:w-48 h-48 rounded-2xl bg-slate-100 dark:bg-slate-800 overflow-hidden flex items-center justify-center">
                                         {selectedItem.image ? (
-                                            <img
-                                                src={selectedItem.image}
-                                                alt={selectedItem.name}
-                                                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                                            />
+                                            <img src={selectedItem.image} alt={selectedItem.name} className="w-full h-full object-cover" />
                                         ) : (
                                             <Beef size={48} className="text-slate-300 dark:text-slate-700 opacity-50" />
                                         )}
-                                        <button
-                                            onClick={() => {
-                                                setEditingItem(selectedItem);
-                                                setEditName(selectedItem.name);
-                                                setEditCommonName(selectedItem.common_name);
-                                                setEditCategory(selectedItem.category || 'General');
-                                                setEditImage(selectedItem.image || '');
-                                            }}
-                                            className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-white/90 dark:bg-slate-950/90 shadow-lg flex items-center justify-center text-emerald-500 hover:scale-110 transition-transform opacity-0 group-hover/img:opacity-100 border border-slate-100 dark:border-slate-800"
-                                            title="Edit item image"
-                                        >
-                                            <Camera size={18} />
-                                        </button>
                                     </div>
-                                    <div className="flex-1 p-8 space-y-4">
-                                        <div className="flex justify-between items-start">
-                                            <div className="space-y-1">
-                                                <Badge variant="outline" className="text-emerald-600 bg-emerald-50 border-emerald-200 uppercase tracking-widest text-[10px] px-2">Clinical Profile</Badge>
-                                                <h1 className="text-3xl font-black capitalize leading-tight">{selectedItem.common_name || selectedItem.name}</h1>
-                                                {selectedItem.common_name && (
-                                                    <p className="text-slate-500 font-medium italic">Scientific: {selectedItem.name}</p>
-                                                )}
-                                            </div>
-                                            <div className="flex gap-2">
-                                                <Button
-                                                    variant="outline"
-                                                    size="icon"
-                                                    className={cn(
-                                                        "rounded-full h-10 w-10 transition-all",
-                                                        selectedItem.is_favorite ? "text-rose-500 border-rose-200 bg-rose-50 dark:bg-rose-900/20 dark:border-rose-900/50" : ""
-                                                    )}
-                                                    onClick={() => toggleFavorite(selectedItem)}
-                                                >
-                                                    <Heart size={18} fill={selectedItem.is_favorite ? "currentColor" : "none"} />
-                                                </Button>
-                                                <Button
-                                                    variant="outline"
-                                                    size="icon"
-                                                    className="rounded-full h-10 w-10 text-emerald-500 border-emerald-100 hover:bg-emerald-50 dark:border-emerald-900/30 dark:hover:bg-emerald-900/20"
-                                                    onClick={() => {
-                                                        setEditingItem(selectedItem);
-                                                        setEditName(selectedItem.name);
-                                                        setEditCommonName(selectedItem.common_name);
-                                                        setEditCategory(selectedItem.category || 'General');
-                                                        setEditImage(selectedItem.image || '');
-                                                    }}
-                                                >
-                                                    <Edit2 size={18} />
-                                                </Button>
-                                                <Button variant="outline" size="icon" className="rounded-full h-10 w-10">
-                                                    <Share2 size={18} />
-                                                </Button>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex flex-wrap gap-2 pt-2">
+                                    <div className="flex-1 space-y-4">
+                                        {selectedItem.common_name && (
+                                            <p className="text-slate-500 font-medium italic">Scientific: {selectedItem.name}</p>
+                                        )}
+                                        <div className="flex flex-wrap gap-2">
                                             {selectedItem.protein_g > 10 && <Badge className="bg-red-500/10 text-red-600 border-red-200 px-3 py-1">High Protein</Badge>}
                                             {selectedItem.carbs_g < 5 && selectedItem.fat_g > 5 && <Badge className="bg-blue-500/10 text-blue-600 border-blue-200 px-3 py-1">Keto Friendly</Badge>}
                                             {selectedItem.energy_kcal < 100 && <Badge className="bg-green-500/10 text-green-600 border-green-200 px-3 py-1">Low Calorie</Badge>}
                                             {(selectedItem.micronutrients['Fiber'] || 0) > 5 && <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200 px-3 py-1">High Fiber</Badge>}
                                         </div>
+
+                                        {/* Macro Breakdown */}
+                                        <div className="grid grid-cols-4 gap-3">
+                                            {[
+                                                { label: 'Energy', val: selectedItem.energy_kcal, unit: 'kcal', color: 'text-orange-500', bg: 'bg-orange-500/10' },
+                                                { label: 'Protein', val: selectedItem.protein_g, unit: 'g', color: 'text-red-500', bg: 'bg-red-500/10' },
+                                                { label: 'Carbs', val: selectedItem.carbs_g, unit: 'g', color: 'text-blue-500', bg: 'bg-blue-500/10' },
+                                                { label: 'Fat', val: selectedItem.fat_g, unit: 'g', color: 'text-amber-500', bg: 'bg-amber-500/10' },
+                                            ].map(macro => (
+                                                <div key={macro.label} className="p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
+                                                    <div className="text-xl font-black">{macro.val.toFixed(macro.label === 'Energy' ? 0 : 1)}<span className="text-xs font-bold text-slate-400 ml-1">{macro.unit}</span></div>
+                                                    <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{macro.label}</div>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
-                            </Card>
 
-                            {/* Macro Breakdown */}
-                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                {[
-                                    { label: 'Energy', val: selectedItem.energy_kcal, unit: 'kcal', color: 'text-orange-500', bg: 'bg-orange-500/10' },
-                                    { label: 'Protein', val: selectedItem.protein_g, unit: 'g', color: 'text-red-500', bg: 'bg-red-500/10' },
-                                    { label: 'Carbs', val: selectedItem.carbs_g, unit: 'g', color: 'text-blue-500', bg: 'bg-blue-500/10' },
-                                    { label: 'Fat', val: selectedItem.fat_g, unit: 'g', color: 'text-amber-500', bg: 'bg-amber-500/10' },
-                                ].map(macro => (
-                                    <div key={macro.label} className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-center">
-                                        <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3", macro.bg)}>
-                                            <Zap size={20} className={macro.color} />
-                                        </div>
-                                        <div className="text-2xl font-black">{macro.val.toFixed(macro.label === 'Energy' ? 0 : 1)}<span className="text-xs font-bold text-slate-400 ml-1">{macro.unit}</span></div>
-                                        <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{macro.label}</div>
-                                    </div>
-                                ))}
+                                {/* Detailed Nutrient Sections */}
+                                <div className="space-y-6">
+                                    <NutrientSection title="Electrolytes" icon={Zap} theme="indigo" subtitle="Hydration • Muscle & Nerve Function" items={{
+                                        'Sodium': ['Sodium', 'sodium_mg'],
+                                        'Potassium': ['Potassium', 'potassium_mg'],
+                                        'Magnesium': ['Magnesium', 'magnesium_mg'],
+                                        'Calcium': ['Calcium', 'calcium_mg'],
+                                        'Phosphorus': ['Phosphorus', 'phosphorus_mg']
+                                    }} />
+
+                                    <NutrientSection title="Trace Minerals" icon={Gem} theme="rose" subtitle="Essential micro-minerals" items={{
+                                        'Iron': ['Iron', 'iron_mg'],
+                                        'Zinc': ['Zinc', 'zinc_mg'],
+                                        'Copper': ['Copper', 'copper_mg'],
+                                        'Manganese': ['Manganese', 'manganese_mg'],
+                                        'Selenium': ['Selenium', 'selenium_ug']
+                                    }} />
+
+                                    <NutrientSection title="Daily Vitamins" icon={Droplet} theme="blue" subtitle="Water-soluble • Must be replenished daily" items={{
+                                        'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
+                                        'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
+                                        'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
+                                        'B5 (Pantothenic)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
+                                        'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
+                                        'B7 (Biotin)': ['Biotin', 'biotin_ug'],
+                                        'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
+                                        'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
+                                        'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
+                                        'Choline': ['Choline', 'choline_mg'],
+                                    }} />
+
+                                    <NutrientSection title="Stored Vitamins" icon={Battery} theme="emerald" subtitle="Fat-soluble • Stored in body tissues" items={{
+                                        'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
+                                        'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
+                                        'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
+                                        'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
+                                    }} />
+
+                                    <NutrientSection title="Health Markers" icon={Activity} theme="amber" subtitle="Specialized nutritional markers" items={{
+                                        'Fiber': ['Fiber'],
+                                        'Sugars': ['Sugars'],
+                                        'Oxalate': ['Oxalate'],
+                                        'Omega-3': ['Omega-3'],
+                                        'Cholesterol': ['Cholesterol'],
+                                    }} />
+                                </div>
                             </div>
-
-                            {/* Detailed Nutrient Sections */}
-                            <div className="space-y-6">
-                                {/* ELECTROLYTES */}
-                                <NutrientSection title="Electrolytes" icon={Zap} theme="indigo" subtitle="Hydration • Muscle & Nerve Function" items={{
-                                    'Sodium': ['Sodium', 'sodium_mg'],
-                                    'Potassium': ['Potassium', 'potassium_mg'],
-                                    'Magnesium': ['Magnesium', 'magnesium_mg'],
-                                    'Calcium': ['Calcium', 'calcium_mg'],
-                                    'Phosphorus': ['Phosphorus', 'phosphorus_mg']
-                                }} />
-
-                                {/* TRACE MINERALS */}
-                                <NutrientSection title="Trace Minerals" icon={Gem} theme="rose" subtitle="Essential micro-minerals" items={{
-                                    'Iron': ['Iron', 'iron_mg'],
-                                    'Zinc': ['Zinc', 'zinc_mg'],
-                                    'Copper': ['Copper', 'copper_mg'],
-                                    'Manganese': ['Manganese', 'manganese_mg'],
-                                    'Selenium': ['Selenium', 'selenium_ug']
-                                }} />
-
-                                {/* DAILY VITAMINS */}
-                                <NutrientSection title="Daily Vitamins" icon={Droplet} theme="blue" subtitle="Water-soluble • Must be replenished daily" items={{
-                                    'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
-                                    'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
-                                    'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
-                                    'B5 (Pantothenic)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
-                                    'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
-                                    'B7 (Biotin)': ['Biotin', 'biotin_ug'],
-                                    'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
-                                    'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
-                                    'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
-                                    'Choline': ['Choline', 'choline_mg'],
-                                }} />
-
-                                {/* STORED VITAMINS */}
-                                <NutrientSection title="Stored Vitamins" icon={Battery} theme="emerald" subtitle="Fat-soluble • Stored in body tissues" items={{
-                                    'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
-                                    'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
-                                    'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
-                                    'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
-                                }} />
-
-                                {/* MISC */}
-                                <NutrientSection title="Health Markers" icon={Activity} theme="amber" subtitle="Specialized nutritional markers" items={{
-                                    'Fiber': ['Fiber'],
-                                    'Sugars': ['Sugars'],
-                                    'Oxalate': ['Oxalate'],
-                                    'Omega-3': ['Omega-3'],
-                                    'Cholesterol': ['Cholesterol'],
-                                }} />
-                            </div>
-                        </div>
-                    )}
+                        </Card>
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Edit Modal */}
             {editingItem && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="w-full max-w-md">
                         <Card className="bg-white dark:bg-slate-900 p-6 space-y-6 shadow-2xl border-emerald-500/20">
                             <div className="flex justify-between items-center">
