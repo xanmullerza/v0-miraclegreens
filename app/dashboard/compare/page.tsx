@@ -37,6 +37,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useRDA } from '@/hooks/use-rda';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
+import { useSearch } from '@/lib/context/search-context';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden", className)}>
@@ -72,9 +73,9 @@ const COMPARISON_COLORS = [
 function DashboardComparisonContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { searchQuery, setSearchQuery, setResults, setIsLoading } = useSearch();
     const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
     const [selectedItems, setSelectedItems] = useState<FoodItem[]>([]);
-    const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
 
     // Initial load from URL
@@ -104,33 +105,57 @@ function DashboardComparisonContent() {
 
     useEffect(() => {
         const searchFoodItems = async () => {
+            if (!searchQuery.trim()) {
+                setResults([]);
+                setSearchResults([]);
+                return;
+            }
+
+            setIsLoading(true);
             setLoading(true);
             try {
                 let query = supabase
                     .from('food_items')
                     .select('id, name, common_name, energy_kcal, energy_kj, protein_g, carbs_g, fat_g, micronutrients')
-                    .limit(50);
+                    .limit(15);
 
-                if (searchQuery.trim()) {
-                    query = query.or(`name.ilike.%${searchQuery.trim()}%,common_name.ilike.%${searchQuery.trim()}%`);
-                } else {
-                    query = query.order('name', { ascending: true });
-                }
+                query = query.or(`name.ilike.%${searchQuery.trim()}%,common_name.ilike.%${searchQuery.trim()}%`);
 
                 const { data, error } = await query;
 
                 if (error) throw error;
-                if (data) setSearchResults(data);
+                if (data) {
+                    setSearchResults(data);
+                    // Push to global context for universal search bar dropdown
+                    setResults(data.map(item => {
+                        const isSelected = selectedItems.some(i => i.id === item.id);
+                        return {
+                            id: item.id,
+                            title: item.common_name || item.name,
+                            subtitle: isSelected ? '✓ Already in comparison' : 'Click to add to comparison',
+                            badges: [
+                                ...(item.protein_g > 10 ? ['High Protein'] : []),
+                                ...(item.energy_kcal < 50 ? ['Low Calorie'] : [])
+                            ],
+                            onClick: () => {
+                                if (!isSelected && selectedItems.length < 10) {
+                                    setSelectedItems(prev => [...prev, item]);
+                                }
+                            }
+                        };
+                    }));
+                }
             } catch (error) {
                 console.error('Error searching foods:', error);
             } finally {
+                setIsLoading(false);
                 setLoading(false);
             }
         };
 
         const debounceTimer = setTimeout(searchFoodItems, 300);
         return () => clearTimeout(debounceTimer);
-    }, [searchQuery]);
+    }, [searchQuery, selectedItems, setResults, setIsLoading]);
 
     const toggleItem = (item: FoodItem) => {
         if (selectedItems.some(i => i.id === item.id)) {
@@ -256,51 +281,31 @@ function DashboardComparisonContent() {
                 <div className="lg:col-span-1 space-y-6">
                     <Card className="p-4 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm">
                         <div className="space-y-4">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                <Input
-                                    placeholder="Search library..."
-                                    className="pl-10 h-9 bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm"
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                />
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-xs font-bold uppercase tracking-widest text-slate-400">Selected Items</h3>
+                                <span className="text-[10px] text-slate-500">{selectedItems.length}/10</span>
                             </div>
 
                             <div className="space-y-1 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                                {loading ? (
-                                    <div className="p-8 text-center">
-                                        <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-solid border-emerald-500 border-r-transparent align-[-0.125em]" />
+                                {selectedItems.length === 0 ? (
+                                    <div className="p-4 text-center text-slate-500 text-sm italic">
+                                        Use the search bar above to add items
                                     </div>
-                                ) : searchResults.length === 0 ? (
-                                    <div className="p-4 text-center text-slate-500 text-sm italic">No ingredients found</div>
                                 ) : (
-                                    searchResults.map(item => (
+                                    selectedItems.map((item, idx) => (
                                         <button
                                             key={item.id}
                                             onClick={() => toggleItem(item)}
-                                            className={cn(
-                                                "w-full text-left p-3 rounded-xl border transition-all duration-200 flex justify-between items-center group",
-                                                selectedItems.some(i => i.id === item.id)
-                                                    ? "bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500/50 text-emerald-700 dark:text-emerald-400"
-                                                    : "bg-transparent border-transparent hover:bg-slate-100 dark:hover:bg-slate-800"
-                                            )}
+                                            className="w-full text-left p-3 rounded-xl border transition-all duration-200 flex justify-between items-center group bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500/50 text-emerald-700 dark:text-emerald-400"
                                         >
-                                            <div className="min-w-0 flex-1 mr-2">
-                                                <div className="font-semibold text-xs truncate capitalize">{item.name}</div>
-                                                {item.common_name && (
-                                                    <div className="text-[10px] opacity-60 truncate">Common: {item.common_name}</div>
-                                                )}
-                                                <div className="flex gap-1 mt-1.5">
-                                                    {item.protein_g > 10 && <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">High Protein</span>}
-                                                    {item.carbs_g < 5 && item.fat_g > 5 && <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">Keto</span>}
-                                                    {item.energy_kcal < 50 && <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Low Cal</span>}
+                                            <div className="min-w-0 flex-1 mr-2 flex items-center gap-2">
+                                                <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: COMPARISON_COLORS[idx] }} />
+                                                <div>
+                                                    <div className="font-semibold text-xs truncate capitalize">{item.common_name || item.name}</div>
+                                                    <div className="text-[10px] opacity-60">Click to remove</div>
                                                 </div>
                                             </div>
-                                            {selectedItems.some(i => i.id === item.id) ? (
-                                                <X size={14} className="text-emerald-500" />
-                                            ) : (
-                                                <Plus size={14} className="text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                            )}
+                                            <X size={14} className="text-emerald-500" />
                                         </button>
                                     ))
                                 )}
