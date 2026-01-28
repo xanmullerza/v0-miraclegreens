@@ -65,7 +65,7 @@ const CATEGORIZED_MARKERS: Record<string, string[]> = {
 
 export default function DashboardFoodPage() {
     return (
-        <Suspense fallback={<div className="h-full flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500" /></div>}>
+        <Suspense fallback={<div className="h-full flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-sky-500" /></div>}>
             <FoodItemCreatorContent />
         </Suspense>
     );
@@ -229,35 +229,51 @@ function FoodItemCreatorContent() {
     };
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8 pb-20">
+        <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
+            {/* Hero Section */}
+            <div className="relative h-48 rounded-[2.5rem] bg-sky-500 overflow-hidden flex items-center px-12 group">
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
+                <div className="absolute inset-0 bg-gradient-to-r from-sky-500 to-blue-500/50 mix-blend-multiply opacity-40" />
 
+                <div className="relative z-10 space-y-2">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
+                            <Plus className="text-white" size={24} />
+                        </div>
+                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Add Food</h1>
+                    </div>
+                    <p className="text-sky-50 font-medium max-w-md text-sm pl-1">
+                        Contribute to the global knowledge base by adding detailed nutritional profiles.
+                    </p>
+                </div>
+            </div>
 
             {/* Top Row: Info Entry */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 {/* Extraction Section */}
                 {showParser && (
                     <div className="lg:col-span-8 space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
-                        <Card className="p-8 border-emerald-500/30 bg-emerald-500/[0.03]">
+                        <Card className="p-8 border-sky-500/30 bg-sky-500/[0.03]">
                             <div className="flex items-center gap-3 mb-6">
-                                <Sparkles size={20} className="text-emerald-500" />
+                                <Sparkles size={20} className="text-sky-500" />
                                 <h3 className="font-black text-sm uppercase tracking-widest">Nutrients & Servings</h3>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Servings & Sizes</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-sky-700 ml-1">Servings & Sizes</Label>
                                     <Textarea
                                         placeholder="Paste things like '1 cup = 240g' or serving info here..."
-                                        className="min-h-[180px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
+                                        className="min-h-[180px] bg-white dark:bg-slate-950 border-sky-500/10 text-xs focus:ring-sky-500/20 rounded-2xl font-mono p-4"
                                         value={servingText}
                                         onChange={(e) => setServingText(e.target.value)}
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Nutrient List</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-sky-700 ml-1">Nutrient List</Label>
                                     <Textarea
                                         placeholder="Paste the list of calories, vitamins, and minerals here..."
-                                        className="min-h-[180px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
+                                        className="min-h-[180px] bg-white dark:bg-slate-950 border-sky-500/10 text-xs focus:ring-sky-500/20 rounded-2xl font-mono p-4"
                                         value={nutrientText}
                                         onChange={(e) => setNutrientText(e.target.value)}
                                     />
@@ -282,7 +298,7 @@ function FoodItemCreatorContent() {
                                 className={cn(
                                     "flex-1 h-14 rounded-[18px] text-white shadow-xl text-[10px] font-black uppercase tracking-widest gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300",
                                     (name.trim() && servingText.trim() && nutrientText.trim())
-                                        ? "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20 transform scale-[1.02]"
+                                        ? "bg-sky-500 hover:bg-sky-600 shadow-sky-500/20 transform scale-[1.02]"
                                         : "bg-slate-950 hover:bg-slate-900 shadow-slate-950/20"
                                 )}
                             >
@@ -298,7 +314,7 @@ function FoodItemCreatorContent() {
                     {/* Basic Info Section */}
                     <div className="space-y-6">
                         <div className="flex items-center gap-3 mb-2">
-                            <Beef size={20} className="text-emerald-500" />
+                            <Beef size={20} className="text-sky-500" />
                             <h3 className="font-black text-sm uppercase tracking-widest">Name</h3>
                         </div>
                         <div className="space-y-4">
@@ -326,11 +342,11 @@ function FoodItemCreatorContent() {
                     {/* Food Visualization */}
                     <div className="space-y-6 pt-6 border-t border-slate-100 dark:border-slate-800">
                         <div className="flex items-center gap-3 mb-2">
-                            <Camera size={20} className="text-emerald-500" />
+                            <Camera size={20} className="text-sky-500" />
                             <h3 className="font-black text-sm uppercase tracking-widest">Photo</h3>
                         </div>
                         <div className="space-y-4">
-                            <div className="relative aspect-video rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group hover:border-emerald-500/50 transition-all flex flex-col items-center justify-center">
+                            <div className="relative aspect-video rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group hover:border-sky-500/50 transition-all flex flex-col items-center justify-center">
                                 {image ? (
                                     <>
                                         <img src={image} alt="Food item" className="w-full h-full object-cover" />
@@ -344,7 +360,7 @@ function FoodItemCreatorContent() {
                                     <div className="text-center p-6">
                                         {uploading ? (
                                             <div className="space-y-3">
-                                                <Loader2 className="h-10 w-10 animate-spin text-emerald-500 mx-auto" />
+                                                <Loader2 className="h-10 w-10 animate-spin text-sky-500 mx-auto" />
                                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Uploading Item...</p>
                                             </div>
                                         ) : (
