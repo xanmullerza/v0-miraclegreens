@@ -39,7 +39,7 @@ export function Header() {
 									<Button className="gap-2 mt-4" asChild>
 										<Link href="/dashboard">
 											<LayoutDashboard className="h-4 w-4" />
-											Lab Dashboard
+											Dashboard
 										</Link>
 									</Button>
 								)}
@@ -99,7 +99,7 @@ export function Header() {
 							<Button variant="secondary" size="sm" className="hidden lg:flex gap-2" asChild>
 								<Link href="/dashboard">
 									<LayoutDashboard className="h-4 w-4" />
-									Lab Dashboard
+									Dashboard
 								</Link>
 							</Button>
 						)}
@@ -145,6 +145,6 @@ export function Header() {
 					{/* <ModeToggle className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground ml-2" /> */}
 				</div>
 			</div>
-		</header>
+		</header >
 	);
 }
