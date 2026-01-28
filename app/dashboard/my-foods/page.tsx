@@ -47,9 +47,11 @@ interface FoodItem {
     image: string | null;
     is_favorite: boolean;
     category: string;
+    sub_category: string | null;
 }
 
 const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Seeds", "Flavour", "Supplements"];
+const SECONDARY_CATEGORIES = ["Snacks", "Herbs", "Spices", "Condiments", "Beverage", "Starch"];
 
 const CATEGORY_COLORS: Record<string, string> = {
     "Vegetables": "bg-emerald-500 shadow-emerald-500/20 border-emerald-500",
@@ -72,9 +74,11 @@ export default function MyFoodsPage() {
     const [editName, setEditName] = useState('');
     const [editCommonName, setEditCommonName] = useState('');
     const [editCategory, setEditCategory] = useState('General');
+    const [editSubCategory, setEditSubCategory] = useState<string | null>(null);
     const [editImage, setEditImage] = useState('');
     const [uploading, setUploading] = useState(false);
     const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES.filter(c => c !== 'Flavour' && c !== 'Supplements'));
+    const [selectedSecondary, setSelectedSecondary] = useState<string[]>([]);
 
     useEffect(() => {
         fetchFavorites();
@@ -144,6 +148,7 @@ export default function MyFoodsPage() {
                     name: editName,
                     common_name: editCommonName,
                     category: editCategory,
+                    sub_category: editSubCategory,
                     image: editImage
                 } as any)
                 .eq('id', editingItem.id);
@@ -151,7 +156,7 @@ export default function MyFoodsPage() {
             if (error) throw error;
 
             setFavorites(prev => prev.map(f =>
-                f.id === editingItem.id ? { ...f, name: editName, common_name: editCommonName, category: editCategory, image: editImage } : f
+                f.id === editingItem.id ? { ...f, name: editName, common_name: editCommonName, category: editCategory, sub_category: editSubCategory, image: editImage } : f
             ));
             setEditingItem(null);
             toast.success('Food item updated successfully');
@@ -328,6 +333,41 @@ export default function MyFoodsPage() {
                 })()}
             </div>
 
+            {/* Secondary Group Filters */}
+            <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2 text-slate-400 mr-2">
+                    <Plus size={16} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Groups:</span>
+                </div>
+                {SECONDARY_CATEGORIES.map(sub => {
+                    const isActive = selectedSecondary.includes(sub);
+                    const count = favorites.filter(f => f.sub_category === sub).length;
+                    if (count === 0 && !isActive) return null;
+
+                    return (
+                        <button
+                            key={sub}
+                            onClick={() => {
+                                if (isActive) {
+                                    setSelectedSecondary(prev => prev.filter(s => s !== sub));
+                                } else {
+                                    setSelectedSecondary(prev => [...prev, sub]);
+                                }
+                            }}
+                            className={cn(
+                                "px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-tight transition-all duration-300 border flex items-center gap-2",
+                                isActive
+                                    ? "bg-indigo-600 text-white border-indigo-500 shadow-lg shadow-indigo-500/20"
+                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-500 hover:border-slate-400"
+                            )}
+                        >
+                            {sub}
+                            <span className="opacity-60">{count}</span>
+                        </button>
+                    );
+                })}
+            </div>
+
             {favorites.length === 0 ? (
                 <div className="h-[400px] flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
                     <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
@@ -346,7 +386,11 @@ export default function MyFoodsPage() {
             ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
                     {favorites
-                        .filter(item => selectedCategories.length === 0 || selectedCategories.includes(item.category || 'General'))
+                        .filter(item => {
+                            const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(item.category || 'General');
+                            const matchesSecondary = selectedSecondary.length === 0 || (item.sub_category && selectedSecondary.includes(item.sub_category));
+                            return matchesCategory && matchesSecondary;
+                        })
                         .map((item) => (
                             <Card key={item.id} className="group relative transition-all duration-300 hover:scale-105 hover:shadow-md border-transparent hover:border-slate-200 dark:hover:border-slate-800">
                                 {/* Action Buttons */}
@@ -368,6 +412,7 @@ export default function MyFoodsPage() {
                                             setEditName(item.name);
                                             setEditCommonName(item.common_name);
                                             setEditCategory(item.category || 'General');
+                                            setEditSubCategory(item.sub_category || null);
                                             setEditImage(item.image || '');
                                         }}
                                         className="w-7 h-7 rounded-full bg-white/90 dark:bg-slate-950/90 shadow-sm flex items-center justify-center text-emerald-500 hover:scale-110 transition-transform border border-slate-100 dark:border-slate-800"
@@ -398,6 +443,9 @@ export default function MyFoodsPage() {
                                         <h3 className="font-bold text-[10px] capitalize truncate leading-tight mb-1 text-slate-900 dark:text-white">
                                             {item.common_name || item.name}
                                         </h3>
+                                        {item.sub_category && (
+                                            <p className="text-[8px] font-medium text-slate-500 mb-1">{item.sub_category}</p>
+                                        )}
                                         <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">
                                             View Profile <ArrowRight size={8} />
                                         </div>
@@ -455,6 +503,37 @@ export default function MyFoodsPage() {
                                                 )}
                                             >
                                                 {category}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Secondary Grouping</Label>
+                                    <div className="flex flex-wrap gap-2">
+                                        <button
+                                            onClick={() => setEditSubCategory(null)}
+                                            className={cn(
+                                                "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all",
+                                                editSubCategory === null
+                                                    ? "bg-slate-500 text-white shadow-md shadow-slate-500/20"
+                                                    : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+                                            )}
+                                        >
+                                            None
+                                        </button>
+                                        {SECONDARY_CATEGORIES.map(sub => (
+                                            <button
+                                                key={sub}
+                                                onClick={() => setEditSubCategory(sub)}
+                                                className={cn(
+                                                    "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all",
+                                                    editSubCategory === sub
+                                                        ? "bg-indigo-500 text-white shadow-md shadow-indigo-500/20"
+                                                        : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+                                                )}
+                                            >
+                                                {sub}
                                             </button>
                                         ))}
                                     </div>
