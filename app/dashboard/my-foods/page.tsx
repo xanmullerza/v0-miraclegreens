@@ -55,8 +55,12 @@ const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Frui
 
 export default function MyFoodsPage() {
     const router = useRouter();
+    const PAGE_SIZE = 20;
     const [favorites, setFavorites] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [page, setPage] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES);
 
@@ -68,25 +72,57 @@ export default function MyFoodsPage() {
     const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
-        fetchFavorites();
-    }, []);
+        fetchFavorites(0, true);
+    }, [searchQuery, selectedCategories]);
 
-    const fetchFavorites = async () => {
-        setLoading(true);
+    const fetchFavorites = async (pageNum: number, isNewSearch = false) => {
+        if (pageNum === 0) setLoading(true);
+        else setLoadingMore(true);
+
         try {
-            const { data, error } = await supabase
+            let query = supabase
                 .from('food_items')
-                .select('*')
+                .select('*', { count: 'exact' })
                 .eq('is_favorite', true)
                 .order('common_name', { ascending: true });
 
+            if (searchQuery.trim()) {
+                query = query.or(`name.ilike.%${searchQuery}%,common_name.ilike.%${searchQuery}%`);
+            }
+
+            if (selectedCategories.length < CATEGORIES.length) {
+                query = query.in('category', selectedCategories);
+            }
+
+            const from = pageNum * PAGE_SIZE;
+            const to = from + PAGE_SIZE - 1;
+            query = query.range(from, to);
+
+            const { data, error, count } = await query;
             if (error) throw error;
-            if (data) setFavorites(data);
+
+            const newItems = data || [];
+            if (isNewSearch) {
+                setFavorites(newItems);
+                setPage(0);
+            } else {
+                setFavorites(prev => [...prev, ...newItems]);
+                setPage(pageNum);
+            }
+
+            setHasMore(count ? (isNewSearch ? newItems.length : favorites.length + newItems.length) < count : false);
         } catch (error) {
             console.error('Error fetching favorites:', error);
             toast.error('Failed to load your foods');
         } finally {
             setLoading(false);
+            setLoadingMore(false);
+        }
+    };
+
+    const handleLoadMore = () => {
+        if (!loadingMore && hasMore) {
+            fetchFavorites(page + 1);
         }
     };
 
@@ -163,28 +199,14 @@ export default function MyFoodsPage() {
             if (error) throw error;
 
             setFavorites(prev => prev.filter(f => f.id !== item.id));
-            toast.info(`${item.common_name || item.name} removed from My Foods`);
+            toast.info(`${item.common_name || item.name} removed from collections`);
         } catch (error) {
             console.error('Error removing favorite:', error);
             toast.error('Failed to remove from favorites');
         }
     };
 
-    const filteredFavorites = favorites.filter(item => {
-        const name = (item.common_name || item.name || '').toLowerCase();
-        const matchesSearch = !searchQuery.trim() || name.includes(searchQuery.toLowerCase());
-        const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(item.category || 'General');
-        return matchesSearch && matchesCategory;
-    });
 
-    const getCategoryCounts = () => {
-        const counts: Record<string, number> = {};
-        CATEGORIES.forEach(cat => {
-            counts[cat] = favorites.filter(f => f.category === cat).length;
-        });
-        return counts;
-    };
-    const categoryCounts = getCategoryCounts();
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
@@ -231,7 +253,6 @@ export default function MyFoodsPage() {
                 <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar">
                     {CATEGORIES.map(category => {
                         const isActive = selectedCategories.includes(category);
-                        const count = categoryCounts[category] || 0;
 
                         return (
                             <button
@@ -251,140 +272,163 @@ export default function MyFoodsPage() {
                                 )}
                             >
                                 {category}
-                                <span className={cn(
-                                    "px-1.5 py-0.5 rounded-md text-[9px]",
-                                    isActive ? "bg-white/20" : "bg-slate-100 dark:bg-slate-800"
-                                )}>
-                                    {count}
-                                </span>
                             </button>
                         );
                     })}
                 </div>
             </div>
 
-            {/* Main Grid */}
+            {/* Main Content Area */}
             {loading ? (
                 <div className="h-96 flex flex-col items-center justify-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center">
                         <Loader2 className="animate-spin text-rose-500" size={24} />
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Loading Your Collection...</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Loading your collection...</p>
                 </div>
             ) : favorites.length === 0 ? (
                 <div className="h-96 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
                     <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
                         <Heart size={32} />
                     </div>
-                    <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">Your collection is empty</p>
-                    <p className="text-sm text-slate-500 text-center max-w-sm mb-6">Favorite ingredients while browsing the library to build your personalized reference set.</p>
-                    <Button
-                        onClick={() => router.push('/dashboard/browse')}
-                        className="bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-bold px-6"
-                    >
-                        Browse Food Library
-                    </Button>
-                </div>
-            ) : filteredFavorites.length === 0 ? (
-                <div className="h-96 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
-                    <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
-                        <Search size={32} />
-                    </div>
-                    <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">No results found</p>
-                    <p className="text-sm text-slate-500 text-center">Try adjusting your search or category filters.</p>
+                    <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">Your collection is empty.</p>
+                    <p className="text-sm text-slate-500 text-center max-w-xs px-6">Browse the library and tap the heart icon to start building your personal database.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredFavorites.map((food) => (
-                        <Card key={food.id} className="group relative transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border-transparent hover:border-rose-500/20">
-                            {/* Action Buttons */}
-                            <div className="absolute top-3 right-3 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button
-                                    onClick={(e) => toggleFavorite(food, e)}
-                                    className="w-8 h-8 rounded-full bg-rose-500 text-white shadow-sm flex items-center justify-center transition-all border border-rose-600 hover:scale-110"
-                                >
-                                    <Heart size={14} fill="currentColor" />
-                                </button>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setEditingItem(food);
-                                        setEditName(food.name);
-                                        setEditCommonName(food.common_name);
-                                        setEditCategory(food.category || 'General');
-                                        setEditImage(food.image || '');
-                                    }}
-                                    className="w-8 h-8 rounded-full bg-white/90 dark:bg-slate-950/90 shadow-sm flex items-center justify-center text-emerald-500 hover:scale-110 transition-transform border border-slate-100 dark:border-slate-800"
-                                >
-                                    <Edit2 size={14} />
-                                </button>
-                            </div>
+                <div className="space-y-4">
+                    {/* List Header */}
+                    <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_80px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                        <div>Image</div>
+                        <div>Food Item</div>
+                        <div className="text-right">Calories</div>
+                        <div className="text-right flex items-center justify-end gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                            Carbs
+                        </div>
+                        <div className="text-right flex items-center justify-end gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+                            Fat
+                        </div>
+                        <div className="text-right flex items-center justify-end gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                            Protein
+                        </div>
+                        <div className="text-center">Actions</div>
+                    </div>
 
-                            <div className="p-3">
-                                <div className="aspect-[4/3] rounded-xl bg-slate-100 dark:bg-slate-950/50 mb-4 overflow-hidden relative border border-slate-100 dark:border-slate-800">
-                                    {food.image ? (
-                                        <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                            <Beef size={48} className="opacity-20" />
-                                        </div>
-                                    )}
-                                    {food.category && (
-                                        <div className="absolute top-2 left-2">
-                                            <Badge className="bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-white border-none text-[8px] font-black uppercase tracking-widest px-2.5 py-1 backdrop-blur-sm">
-                                                {food.category}
-                                            </Badge>
-                                        </div>
-                                    )}
-                                    <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/60 to-transparent">
-                                        <div className="flex items-center gap-3 text-white">
-                                            <div className="flex items-center gap-1">
-                                                <Zap size={10} className="text-rose-400" />
-                                                <span className="text-[9px] font-black">{Math.round(food.energy_kcal)}kcal</span>
+                    {/* Food Items List */}
+                    <div className="space-y-3">
+                        {favorites.map((food) => (
+                            <div
+                                key={food.id}
+                                onClick={() => router.push(`/dashboard/browse?id=${food.id}`)}
+                                className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-rose-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
+                            >
+                                <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_80px] gap-4 lg:items-center">
+                                    {/* Thumbnail */}
+                                    <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
+                                        {food.image ? (
+                                            <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                <Beef size={24} className="opacity-20" />
                                             </div>
-                                            <div className="flex items-center gap-1">
-                                                <Beef size={10} className="text-rose-400" />
-                                                <span className="text-[9px] font-black">{food.protein_g.toFixed(1)}g pro</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-3">
-                                    <div className="min-h-[40px]">
-                                        <h3 className="font-bold text-sm tracking-tight line-clamp-2 text-slate-900 dark:text-white leading-tight capitalize">
-                                            {food.common_name || food.name}
-                                        </h3>
-                                        {food.common_name && (
-                                            <p className="text-[10px] text-slate-500 italic truncate">{food.name}</p>
                                         )}
                                     </div>
 
-                                    <div className="grid grid-cols-4 gap-1">
+                                    {/* Info */}
+                                    <div className="p-3 lg:p-0">
+                                        <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
+                                            {food.common_name || food.name}
+                                        </h3>
+                                        {food.common_name && (
+                                            <p className="text-[10px] text-slate-400 italic truncate uppercase tracking-tighter">{food.name}</p>
+                                        )}
+                                        {food.category && (
+                                            <Badge className="lg:hidden mt-2 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none">
+                                                {food.category}
+                                            </Badge>
+                                        )}
+                                    </div>
+
+                                    {/* Stats (Desktop View) */}
+                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                        {Math.round(food.energy_kcal)}
+                                    </div>
+                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                        {food.carbs_g.toFixed(1)}g
+                                    </div>
+                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                        {food.fat_g.toFixed(1)}g
+                                    </div>
+                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                        {food.protein_g.toFixed(1)}g
+                                    </div>
+
+                                    {/* Mobile Stats Row */}
+                                    <div className="lg:hidden grid grid-cols-4 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
                                         {[
-                                            { label: 'CAL', val: food.energy_kcal, sub: 'kcal', color: 'text-orange-500' },
-                                            { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-red-500' },
+                                            { label: 'CAL', val: food.energy_kcal, sub: 'k', color: 'text-orange-500' },
                                             { label: 'CHO', val: food.carbs_g, sub: 'g', color: 'text-amber-500' },
-                                            { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-sky-500' }
+                                            { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-sky-500' },
+                                            { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-purple-500' }
                                         ].map(stat => (
-                                            <div key={stat.label} className="p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 text-center">
-                                                <p className="text-[7px] font-black uppercase tracking-tighter text-slate-400 mb-0.5">{stat.label}</p>
-                                                <p className={cn("text-xs font-black leading-none", stat.color)}>{Math.round(stat.val)}<span className="text-[7px] opacity-70 ml-0.5">{stat.sub}</span></p>
+                                            <div key={stat.label} className="text-center">
+                                                <p className="text-[8px] font-black text-slate-400 mb-0.5">{stat.label}</p>
+                                                <p className={cn("text-xs font-black", stat.color)}>{Math.round(stat.val)}{stat.sub}</p>
                                             </div>
                                         ))}
                                     </div>
 
-                                    <button
-                                        onClick={() => router.push(`/dashboard/browse?id=${food.id}`)}
-                                        className="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/50 hover:bg-rose-500 hover:text-white transition-all group/btn2 border border-transparent"
-                                    >
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 group-hover/btn2:text-white">View Profile</span>
-                                        <ArrowRight size={12} className="group-hover/btn2:translate-x-1 transition-transform" />
-                                    </button>
+                                    {/* Action Buttons */}
+                                    <div className="p-3 lg:p-0 flex justify-end lg:justify-center gap-2">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setEditingItem(food);
+                                                setEditName(food.name);
+                                                setEditCommonName(food.common_name);
+                                                setEditCategory(food.category || 'General');
+                                                setEditImage(food.image || '');
+                                            }}
+                                            className="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 flex items-center justify-center transition-all border border-slate-100 dark:border-slate-700"
+                                        >
+                                            <Edit2 size={14} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => toggleFavorite(food, e)}
+                                            className="w-8 h-8 rounded-full bg-rose-500 text-white shadow-md shadow-rose-500/20 flex items-center justify-center transition-all border border-rose-600"
+                                        >
+                                            <Heart size={14} fill="currentColor" />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </Card>
-                    ))}
+                        ))}
+                    </div>
+
+                    {/* Pagination Button */}
+                    {hasMore && (
+                        <div className="flex justify-center pt-8">
+                            <Button
+                                onClick={handleLoadMore}
+                                disabled={loadingMore}
+                                className="h-14 px-8 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-[0.2em] shadow-xl group transition-all"
+                            >
+                                {loadingMore ? (
+                                    <>
+                                        <Loader2 className="animate-spin mr-3" size={18} />
+                                        Loading Results...
+                                    </>
+                                ) : (
+                                    <>
+                                        View More Saved Foods
+                                        <ArrowRight className="ml-3 group-hover:translate-x-1 transition-transform" size={18} />
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                    )}
                 </div>
             )}
 
