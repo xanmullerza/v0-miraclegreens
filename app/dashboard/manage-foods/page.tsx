@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
 import {
     Search,
     ArrowLeft,
@@ -10,7 +12,14 @@ import {
     Filter,
     Table as TableIcon,
     LayoutGrid,
-    Heart
+    Heart,
+    Edit2,
+    Trash2,
+    Save,
+    X,
+    ExternalLink,
+    Upload,
+    Camera
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,6 +33,10 @@ interface FoodItem {
     common_name: string;
     category: string;
     is_favorite: boolean;
+    energy_kcal?: number;
+    protein_g?: number;
+    carbs_g?: number;
+    fat_g?: number;
 }
 
 const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
@@ -35,6 +48,18 @@ export default function ManageFoodsPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
+    const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
+    const [isDeleting, setIsDeleting] = useState<string | null>(null);
+
+    // Edit states
+    const [editName, setEditName] = useState('');
+    const [editCommonName, setEditCommonName] = useState('');
+    const [editCategoryState, setEditCategoryState] = useState('');
+    const [editEnergy, setEditEnergy] = useState<number>(0);
+    const [editProtein, setEditProtein] = useState<number>(0);
+    const [editCarbs, setEditCarbs] = useState<number>(0);
+    const [editFat, setEditFat] = useState<number>(0);
+    const [saveLoading, setSaveLoading] = useState(false);
 
     useEffect(() => {
         fetchFoods();
@@ -43,18 +68,120 @@ export default function ManageFoodsPage() {
     const fetchFoods = async () => {
         setLoading(true);
         try {
-            const { data, error } = await supabase
-                .from('food_items')
-                .select('id, name, common_name, category, is_favorite')
-                .order('name', { ascending: true });
+            let allFoods: FoodItem[] = [];
+            let lastId = null;
+            let hasMore = true;
+            const PAGE_SIZE = 1000;
 
-            if (error) throw error;
-            if (data) setFoods(data);
+            while (hasMore) {
+                let query = supabase
+                    .from('food_items')
+                    .select('id, name, common_name, category, is_favorite, energy_kcal, protein_g, carbs_g, fat_g')
+                    .order('id', { ascending: true })
+                    .limit(PAGE_SIZE);
+
+                if (lastId) {
+                    query = query.gt('id', lastId);
+                }
+
+                const { data, error } = await query;
+
+                if (error) throw error;
+                if (!data || data.length === 0) {
+                    hasMore = false;
+                } else {
+                    allFoods = [...allFoods, ...data];
+                    lastId = data[data.length - 1].id;
+                    if (data.length < PAGE_SIZE) hasMore = false;
+                }
+            }
+
+            // Finally sort by name
+            allFoods.sort((a, b) => a.name.localeCompare(b.name));
+            setFoods(allFoods);
         } catch (error) {
             console.error('Error fetching foods:', error);
             toast.error('Failed to load library');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const deleteItem = async (id: string, name: string) => {
+        if (!confirm(`Are you sure you want to PERMANENTLY delete "${name}"? This cannot be undone.`)) return;
+
+        setIsDeleting(id);
+        try {
+            const { error } = await supabase
+                .from('food_items')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            setFoods(prev => prev.filter(f => f.id !== id));
+            toast.success('Food item deleted');
+        } catch (error) {
+            console.error('Error deleting food:', error);
+            toast.error('Failed to delete item');
+        } finally {
+            setIsDeleting(null);
+        }
+    };
+
+    const handleEditStart = (item: FoodItem) => {
+        setEditingItem(item);
+        setEditName(item.name);
+        setEditCommonName(item.common_name || '');
+        setEditCategoryState(item.category);
+        setEditEnergy(item.energy_kcal || 0);
+        setEditProtein(item.protein_g || 0);
+        setEditCarbs(item.carbs_g || 0);
+        setEditFat(item.fat_g || 0);
+    };
+
+    const handleEditSave = async () => {
+        if (!editingItem) return;
+
+        setSaveLoading(true);
+        try {
+            const { error } = await supabase
+                .from('food_items')
+                .update({
+                    name: editName,
+                    common_name: editCommonName,
+                    category: editCategoryState,
+                    energy_kcal: editEnergy,
+                    protein_g: editProtein,
+                    carbs_g: editCarbs,
+                    fat_g: editFat
+                } as any)
+                .eq('id', editingItem.id);
+
+            if (error) throw error;
+
+            setFoods(prev => prev.map(f =>
+                f.id === editingItem.id
+                    ? {
+                        ...f,
+                        name: editName,
+                        common_name: editCommonName,
+                        category: editCategoryState,
+                        energy_kcal: editEnergy,
+                        protein_g: editProtein,
+                        carbs_g: editCarbs,
+                        fat_g: editFat
+                    }
+                    : f
+            ));
+
+            setEditingItem(null);
+            toast.success('Food item updated');
+        } catch (error) {
+            console.error('Error updating food:', error);
+            toast.error('Failed to update item');
+        } finally {
+            setSaveLoading(false);
         }
     };
 
@@ -142,6 +269,7 @@ export default function ManageFoodsPage() {
                                 <th className="px-6 py-4 text-[10px] uppercase font-black tracking-widest text-slate-400">Ingredient Name</th>
                                 <th className="px-6 py-4 text-[10px] uppercase font-black tracking-widest text-slate-400">Common Name</th>
                                 <th className="px-6 py-4 text-[10px] uppercase font-black tracking-widest text-slate-400">Category</th>
+                                <th className="px-6 py-4 text-[10px] uppercase font-black tracking-widest text-slate-400 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -176,6 +304,32 @@ export default function ManageFoodsPage() {
                                             ))}
                                         </div>
                                     </td>
+                                    <td className="px-6 py-4 text-right">
+                                        <div className="flex items-center justify-end gap-2 text-slate-400">
+                                            <button
+                                                onClick={() => router.push(`/dashboard/browse?id=${item.id}`)}
+                                                className="p-2 hover:text-emerald-500 transition-colors"
+                                                title="View Profile"
+                                            >
+                                                <ExternalLink size={16} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleEditStart(item)}
+                                                className="p-2 hover:text-amber-500 transition-colors"
+                                                title="Edit Item"
+                                            >
+                                                <Edit2 size={16} />
+                                            </button>
+                                            <button
+                                                onClick={() => deleteItem(item.id, item.name)}
+                                                disabled={isDeleting === item.id}
+                                                className="p-2 hover:text-rose-500 transition-colors disabled:opacity-50"
+                                                title="Delete Item"
+                                            >
+                                                {isDeleting === item.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
+                                            </button>
+                                        </div>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
@@ -192,6 +346,129 @@ export default function ManageFoodsPage() {
             <div className="flex justify-center italic text-[10px] text-slate-400 uppercase tracking-widest font-bold">
                 Showing {filteredFoods.length} items
             </div>
+
+            {/* Edit Modal */}
+            {editingItem && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="w-full max-w-2xl">
+                        <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 space-y-8 shadow-2xl border border-slate-200 dark:border-slate-800">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <Badge variant="outline" className="text-emerald-600 bg-emerald-50 border-emerald-200 uppercase tracking-widest text-[9px] mb-2 px-2">Edit Mode</Badge>
+                                    <h3 className="text-2xl font-black tracking-tight capitalize">Update Database Entry</h3>
+                                </div>
+                                <button onClick={() => setEditingItem(null)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400">
+                                    <X size={24} />
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400 px-1">Ingredient Name (Scientific)</Label>
+                                        <Input
+                                            value={editName}
+                                            onChange={(e) => setEditName(e.target.value)}
+                                            className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 font-bold h-12 rounded-xl"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400 px-1">Common Name</Label>
+                                        <Input
+                                            value={editCommonName}
+                                            onChange={(e) => setEditCommonName(e.target.value)}
+                                            className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 h-12 rounded-xl"
+                                            placeholder="e.g. Garden Pea"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400 px-1">Category</Label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {CATEGORIES.map(category => (
+                                                <button
+                                                    key={category}
+                                                    onClick={() => setEditCategoryState(category)}
+                                                    className={cn(
+                                                        "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all",
+                                                        editCategoryState === category
+                                                            ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
+                                                            : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+                                                    )}
+                                                >
+                                                    {category}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-slate-50 dark:bg-slate-950 rounded-[2rem] p-6 space-y-6 border border-slate-200 dark:border-slate-800">
+                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Nutritional Data (per 100g)</h4>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label className="text-[9px] uppercase font-black tracking-widest text-slate-500">Kcal</Label>
+                                            <Input
+                                                type="number"
+                                                value={editEnergy}
+                                                onChange={(e) => setEditEnergy(Number(e.target.value))}
+                                                className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 font-bold"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-[9px] uppercase font-black tracking-widest text-slate-500">Protein (g)</Label>
+                                            <Input
+                                                type="number"
+                                                value={editProtein}
+                                                onChange={(e) => setEditProtein(Number(e.target.value))}
+                                                className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 font-bold text-red-500"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-[9px] uppercase font-black tracking-widest text-slate-500">Carbs (g)</Label>
+                                            <Input
+                                                type="number"
+                                                value={editCarbs}
+                                                onChange={(e) => setEditCarbs(Number(e.target.value))}
+                                                className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 font-bold text-blue-500"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-[9px] uppercase font-black tracking-widest text-slate-500">Fat (g)</Label>
+                                            <Input
+                                                type="number"
+                                                value={editFat}
+                                                onChange={(e) => setEditFat(Number(e.target.value))}
+                                                className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 font-bold text-amber-500"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
+                                        <p className="text-[9px] text-slate-400 italic">Advanced micronutrient mapping is handled in the Lab section.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-4 pt-6 mt-8 border-t border-slate-100 dark:border-slate-800">
+                                <Button variant="outline" className="flex-1 rounded-2xl h-14 font-black uppercase tracking-widest text-xs" onClick={() => setEditingItem(null)}>
+                                    Discard Changes
+                                </Button>
+                                <Button
+                                    className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl h-14 font-black uppercase tracking-widest text-xs shadow-xl shadow-emerald-500/20 gap-3"
+                                    onClick={handleEditSave}
+                                    disabled={saveLoading}
+                                >
+                                    {saveLoading ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
+                                    Sync to Database
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
