@@ -191,7 +191,7 @@ export default function MyFoodsPage() {
             {/* Hero Section */}
             <div className="relative h-48 rounded-[2.5rem] bg-rose-600 overflow-hidden flex items-center px-12 group">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1490818387583-1baba5e638af?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
-                <div className="absolute inset-0 bg-gradient-to-r from-rose-600 to-pink-600/50 mix-blend-multiply" />
+                <div className="absolute inset-0 bg-gradient-to-r from-rose-600 to-pink-600/50 mix-blend-multiply opacity-60" />
 
                 <div className="relative z-10 space-y-2">
                     <div className="flex items-center gap-3">
