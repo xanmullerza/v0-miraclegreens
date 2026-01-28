@@ -19,7 +19,8 @@ import {
     Battery,
     FileText,
     ArrowRight,
-    RotateCcw
+    RotateCcw,
+    Activity
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -280,12 +281,40 @@ function DashboardComparisonContent() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto space-y-8 pb-20">
-            {/* Header with selected items as chips */}
-            <div className="flex flex-col gap-4">
-                <div className="flex flex-wrap items-center gap-2">
+        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
+            {/* Hero Section */}
+            <div className="relative h-48 rounded-[2.5rem] bg-indigo-600 overflow-hidden flex items-center px-12 group">
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-violet-600/50 mix-blend-multiply" />
+
+                <div className="relative z-10 space-y-2">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
+                            <Scale className="text-white" size={24} />
+                        </div>
+                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Compare Foods</h1>
+                    </div>
+                    <p className="text-indigo-50 font-medium max-w-md text-sm pl-1">
+                        Analyze and compare nutrient profiles side-by-side. Choose up to 10 foods to discover the best options for your needs.
+                    </p>
+                </div>
+
+                <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-6">
+                    <div className="text-right hidden sm:block">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-indigo-200 mb-1">Selected Items</p>
+                        <p className="text-3xl font-black text-white leading-none tracking-tighter italic">
+                            {selectedItems.length} <span className="text-indigo-300">/ 10</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            {/* Selected Items Row */}
+            <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1 flex flex-wrap items-center gap-2 bg-white dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
                     {selectedItems.length === 0 ? (
-                        <div className="text-sm text-slate-500 italic">
+                        <div className="text-sm text-slate-500 italic flex items-center gap-2">
+                            <Search size={16} className="opacity-50" />
                             Use the search bar above to add foods for comparison
                         </div>
                     ) : (
@@ -294,10 +323,10 @@ function DashboardComparisonContent() {
                                 <button
                                     key={item.id}
                                     onClick={() => toggleItem(item)}
-                                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-200 group bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-200 group bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 hover:border-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 shadow-sm"
                                 >
                                     <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: COMPARISON_COLORS[idx] }} />
-                                    <span className="text-xs font-semibold capitalize text-slate-700 dark:text-slate-300 group-hover:text-rose-600 dark:group-hover:text-rose-400">
+                                    <span className="text-xs font-bold capitalize text-slate-700 dark:text-slate-300 group-hover:text-rose-600 dark:group-hover:text-rose-400">
                                         {item.common_name || item.name}
                                     </span>
                                     <X size={12} className="text-slate-400 group-hover:text-rose-500" />
@@ -305,35 +334,30 @@ function DashboardComparisonContent() {
                             ))}
                         </>
                     )}
-
-                    {/* Badge and Reset */}
-                    <div className="flex items-center gap-2 ml-auto">
-                        <Badge variant="outline" className="bg-emerald-500/5 text-emerald-600 border-emerald-500/20 px-3 py-1">
-                            {selectedItems.length} / 10
-                        </Badge>
-                        {selectedItems.length > 0 && (
-                            <Button
-                                size="sm"
-                                className="bg-rose-500 hover:bg-rose-600 text-white shadow-md h-8 gap-2 font-bold px-4 transition-all animate-in zoom-in-50"
-                                onClick={() => setSelectedItems([])}
-                            >
-                                <RotateCcw className="h-3.5 w-3.5" /> Reset
-                            </Button>
-                        )}
-                    </div>
                 </div>
+
+                {/* Reset Button */}
+                {selectedItems.length > 0 && (
+                    <Button
+                        size="lg"
+                        className="bg-rose-500 hover:bg-rose-600 text-white shadow-lg h-14 gap-2 font-bold px-6 rounded-2xl transition-all animate-in zoom-in-50"
+                        onClick={() => setSelectedItems([])}
+                    >
+                        <RotateCcw className="h-4 w-4" /> Reset All
+                    </Button>
+                )}
             </div>
 
             {/* Full-width Comparison Result Area */}
             <div className="space-y-8">
                 {selectedItems.length === 0 ? (
 
-                    <div className="h-[600px] flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
-                        <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
-                            <BarChart3 size={32} />
+                    <div className="h-96 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
+                        <div className="w-16 h-16 rounded-3xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-400 dark:text-indigo-500 mb-6 group-hover:scale-110 transition-transform">
+                            <Scale size={32} />
                         </div>
-                        <h3 className="text-lg font-bold text-slate-400">Analysis Lab Ready</h3>
-                        <p className="text-sm text-slate-500 mt-1">Select ingredients from the library to begin</p>
+                        <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">Analysis Lab Ready</p>
+                        <p className="text-sm text-slate-500 text-center max-w-sm">Use the search bar above to add foods and begin comparing their nutrient profiles.</p>
                     </div>
                 ) : (
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
@@ -589,6 +613,15 @@ function DashboardComparisonContent() {
                             'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
                             'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
                             'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
+                        }} />
+
+                        {/* HEALTH MARKERS */}
+                        <ComparisonGrid title="Health Markers" icon={Activity} theme="amber" subtitle="Specialized nutritional markers" items={{
+                            'Fiber': ['Fiber'],
+                            'Sugars': ['Sugars'],
+                            'Oxalate': ['Oxalate'],
+                            'Omega-3': ['Omega-3'],
+                            'Cholesterol': ['Cholesterol'],
                         }} />
 
                     </div>
