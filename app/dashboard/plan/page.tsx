@@ -166,6 +166,16 @@ export default function MealPlannerPage() {
     const [activeBoostContext, setActiveBoostContext] = useState<'daily' | 'recipe' | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
     const [expandedBreakdownSections, setExpandedBreakdownSections] = useState<Record<string, boolean>>({});
+    const {
+        profile,
+        energyUnit: unit,
+        skipPlannerQuiz,
+        setSkipPlannerQuiz,
+        measurementUnit
+    } = useUserPreferences();
+
+    const [showSummary, setShowSummary] = useState(false);
+    const [alwaysSkip, setAlwaysSkip] = useState(skipPlannerQuiz);
 
     // Nutrient breakdown definitions
     const NUTRIENT_BREAKDOWNS: Record<string, { label: string, keys: string[], unit: string, isEssential?: boolean, hiddenByDefault?: boolean, isExpandable?: boolean }[]> = {
@@ -268,13 +278,47 @@ export default function MealPlannerPage() {
 
     const [calories, setCalories] = useState(2000);
     const [diet, setDiet] = useState<DietType>('anything');
-    const { energyUnit: unit, setEnergyUnit: setUnit } = useUserPreferences();
     const [goal, setGoal] = useState<GoalType>('maintain');
     const [activityLevel, setActivityLevel] = useState<ActivityLevel>('sedentary');
     const [gender, setGender] = useState<'male' | 'female'>('female');
     const [age, setAge] = useState<number | ''>('');
     const [weight, setWeight] = useState<number | ''>('');
     const [height, setHeight] = useState<number | ''>('');
+
+    // Sync profile data to local state for the planner
+    useEffect(() => {
+        if (profile.age) {
+            setAge(profile.age);
+            setWeight(profile.weight);
+            setHeight(profile.height);
+            setGender(profile.gender);
+            setGoal(profile.goal);
+            setDiet(profile.dietType as DietType);
+            setActivityLevel(profile.activityLevel);
+
+            if (skipPlannerQuiz) {
+                // Auto-calculate and go to step 2
+                const w = Number(profile.weight) || 70;
+                const h = Number(profile.height) || 170;
+                const a = Number(profile.age) || 30;
+                let bmr = (10 * w) + (6.25 * h) - (5 * a);
+                if (profile.gender === 'male') bmr += 5; else bmr -= 161;
+                let tdee = bmr;
+                switch (profile.activityLevel) {
+                    case 'light': tdee = bmr * 1.375; break;
+                    case 'moderate': tdee = bmr * 1.55; break;
+                    case 'active': tdee = bmr * 1.725; break;
+                    default: tdee = bmr * 1.2;
+                }
+                if (profile.goal === 'lose-fat') tdee *= 0.80;
+                if (profile.goal === 'build-muscle') tdee *= 1.10;
+                setCalories(Math.max(1200, Math.round(tdee / 50) * 50));
+                setStep(2);
+            } else {
+                setShowSummary(true);
+            }
+        }
+    }, [profile, skipPlannerQuiz]);
 
     const userRDAs = useRDA(age === '' ? undefined : Number(age), gender, calories);
 
@@ -358,7 +402,63 @@ export default function MealPlannerPage() {
                 )}
 
                 <div className="bg-card border rounded-3xl p-10 shadow-sm relative overflow-hidden min-h-[600px]">
-                    {step === 1 && (
+                    {step === 1 && showSummary && (
+                        <div className="space-y-8 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4">
+                            <div className="text-center space-y-2">
+                                <h2 className="text-3xl font-bold">Welcome back, {profile.nickname || profile.name || 'Researcher'}</h2>
+                                <p className="text-slate-500">We've loaded your stored biological and dietary parameters.</p>
+                            </div>
+
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                                    <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-1">Metrics</p>
+                                    <p className="font-bold">{profile.age}y • {profile.weight}{measurementUnit === 'metric' ? 'kg' : 'lb'} • {profile.height}{measurementUnit === 'metric' ? 'cm' : 'ft'}</p>
+                                </div>
+                                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                                    <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-1">Dietary Goal</p>
+                                    <p className="font-bold capitalize">{profile.goal.replace('-', ' ')}</p>
+                                </div>
+                                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                                    <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-1">Diet Protocol</p>
+                                    <p className="font-bold capitalize">{profile.dietType}</p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <Button size="lg" onClick={handleNextStep} className="w-full h-14 text-lg font-bold rounded-2xl shadow-lg shadow-emerald-500/20">
+                                    Generate Daily Nutrition <ChevronRight className="ml-2 h-5 w-5" />
+                                </Button>
+
+                                <div className="flex items-center justify-between px-2">
+                                    <button
+                                        onClick={() => setShowSummary(false)}
+                                        className="text-xs font-bold text-slate-500 hover:text-emerald-500 transition-colors flex items-center gap-1"
+                                    >
+                                        Edit these settings
+                                    </button>
+
+                                    <label className="flex items-center gap-2 cursor-pointer group">
+                                        <div
+                                            onClick={() => {
+                                                const newVal = !alwaysSkip;
+                                                setAlwaysSkip(newVal);
+                                                setSkipPlannerQuiz(newVal);
+                                            }}
+                                            className={cn(
+                                                "w-4 h-4 rounded border transition-colors flex items-center justify-center",
+                                                alwaysSkip ? "bg-emerald-500 border-emerald-500" : "border-slate-300 dark:border-slate-700 hover:border-emerald-500"
+                                            )}
+                                        >
+                                            {alwaysSkip && <Check size={10} className="text-white" />}
+                                        </div>
+                                        <span className="text-xs font-medium text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors">Always skip this summary</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {step === 1 && !showSummary && (
                         <div className="space-y-6 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4">
                             <div className="grid grid-cols-4 gap-4">
                                 <div className="col-span-1 space-y-2">

@@ -26,6 +26,8 @@ interface UserPreferencesContextType {
     setMeasurementUnit: (unit: MeasurementUnit) => void;
     profile: UserProfile;
     updateProfile: (updates: Partial<UserProfile>) => void;
+    skipPlannerQuiz: boolean;
+    setSkipPlannerQuiz: (skip: boolean) => void;
 }
 
 const UserPreferencesContext = createContext<UserPreferencesContextType | undefined>(
@@ -46,6 +48,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         dietType: "anything",
         activityLevel: "sedentary"
     });
+    const [skipPlannerQuiz, setSkipPlannerQuizState] = useState(false);
 
     useEffect(() => {
         const savedUnit = localStorage.getItem("energyUnit") as EnergyUnit;
@@ -66,6 +69,11 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
                 console.error("Failed to parse user profile", e);
             }
         }
+
+        const savedSkip = localStorage.getItem("skipPlannerQuiz");
+        if (savedSkip !== null) {
+            setSkipPlannerQuizState(savedSkip === "true");
+        }
     }, []);
 
     const setEnergyUnit = (unit: EnergyUnit) => {
@@ -84,6 +92,11 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         localStorage.setItem("userProfile", JSON.stringify(newProfile));
     };
 
+    const setSkipPlannerQuiz = (skip: boolean) => {
+        setSkipPlannerQuizState(skip);
+        localStorage.setItem("skipPlannerQuiz", String(skip));
+    };
+
     return (
         <UserPreferencesContext.Provider value={{
             energyUnit,
@@ -91,7 +104,9 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
             measurementUnit,
             setMeasurementUnit,
             profile,
-            updateProfile
+            updateProfile,
+            skipPlannerQuiz,
+            setSkipPlannerQuiz
         }}>
             {children}
         </UserPreferencesContext.Provider>
