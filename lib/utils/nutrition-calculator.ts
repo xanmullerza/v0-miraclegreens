@@ -61,26 +61,39 @@ export const findNutrientMatch = (record: Record<string, any>, key: string) => {
     const kL = key.toLowerCase();
     const exact = mKeys.find(mk => mk.toLowerCase() === kL);
     if (exact) return exact;
-    if (kL.includes('vitamin')) {
-        const letter = kL.split(' ')[1]?.toLowerCase();
-        if (letter && letter.length === 1) {
-            const match = mKeys.find(mk => {
-                const mkL = mk.toLowerCase();
-                return mkL.includes('vitamin') && new RegExp(`\\b${letter}\\b`, 'i').test(mkL);
-            });
-            if (match) return match;
-        }
-    }
-    if (kL.startsWith('b') && /\b[b]\d+\b/.test(kL)) {
-        const bNum = kL.split(' ')[0].toLowerCase();
+
+    // Specific Vitamin matching logic (A, B1, C, D, E, K etc)
+    const vitMatch = kL.match(/vitamin\s*([a-z]\d*)/i);
+    const snakeVitMatch = kL.match(/vitamin_([a-z]\d*)/i);
+    const targetVit = (vitMatch?.[1] || snakeVitMatch?.[1])?.toLowerCase();
+
+    if (targetVit) {
         const match = mKeys.find(mk => {
             const mkL = mk.toLowerCase();
-            return mkL.includes(bNum) || (kL.includes('thiamine') && mkL.includes('thiamine')) || (kL.includes('riboflavin') && mkL.includes('riboflavin'));
+            const mkVitMatch = mkL.match(/vitamin\s*([a-z]\d*)/i);
+            const mkSnakeVitMatch = mkL.match(/vitamin_([a-z]\d*)/i);
+            const mkVit = (mkVitMatch?.[1] || mkSnakeVitMatch?.[1])?.toLowerCase();
+            return mkVit === targetVit;
         });
         if (match) return match;
     }
-    const firstWord = kL.split(' ')[0];
-    if (firstWord.length > 3) {
+
+    // B-Vitamin aliases (Thiamine, Riboflavin, etc)
+    if (kL.includes('thiamine') || kL.includes('b1')) {
+        const match = mKeys.find(mk => mk.toLowerCase().includes('thiamine') || mk.toLowerCase().includes('b1'));
+        if (match) return match;
+    }
+    if (kL.includes('riboflavin') || kL.includes('b2')) {
+        const match = mKeys.find(mk => mk.toLowerCase().includes('riboflavin') || mk.toLowerCase().includes('b2'));
+        if (match) return match;
+    }
+    if (kL.includes('niacin') || kL.includes('b3')) {
+        const match = mKeys.find(mk => mk.toLowerCase().includes('niacin') || mk.toLowerCase().includes('b3'));
+        if (match) return match;
+    }
+
+    const firstWord = kL.split(/[\s_]/)[0];
+    if (firstWord.length > 3 && firstWord !== 'vitamin') {
         const fuzzy = mKeys.find(mk => mk.toLowerCase().includes(firstWord));
         if (fuzzy) return fuzzy;
     }
