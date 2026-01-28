@@ -20,7 +20,8 @@ import {
     Camera,
     Table,
     Filter,
-    Upload
+    Upload,
+    Plus
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
