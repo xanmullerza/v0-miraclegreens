@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import IngredientBuilder, { RecipeIngredient } from '@/components/recipe/ingredient-builder';
+import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus, ListOrdered, ChevronUp, ChevronDown, ClipboardList, Heart } from 'lucide-react';
 import { parseInstructionsOnly, parseRecipeText } from '@/lib/utils/recipe-parser';
 import { searchLocalFood, searchUSDAFood, getUSDAMeasures, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
@@ -360,14 +361,23 @@ export default function DashboardRecipePage() {
 
             const recipeId = `recipe-${Date.now()}`;
             const totals = updatedIngredients.reduce(
-                (acc, ing) => ({
-                    calories: acc.calories + ing.calories,
-                    energy_kj: acc.energy_kj + ing.energy_kj,
-                    protein: acc.protein + ing.protein,
-                    fat: acc.fat + ing.fat,
-                    carbs: acc.carbs + ing.carbs,
-                }),
-                { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0 }
+                (acc, ing) => {
+                    const newMicros = { ...acc.micronutrients };
+                    Object.entries(ing.micronutrients || {}).forEach(([key, val]) => {
+                        const match = findNutrientMatch(newMicros, key) || key;
+                        newMicros[match] = (newMicros[match] || 0) + (val as number);
+                    });
+
+                    return {
+                        calories: acc.calories + ing.calories,
+                        energy_kj: acc.energy_kj + ing.energy_kj,
+                        protein: acc.protein + ing.protein,
+                        fat: acc.fat + ing.fat,
+                        carbs: acc.carbs + ing.carbs,
+                        micronutrients: newMicros
+                    };
+                },
+                { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0, micronutrients: {} as Record<string, number> }
             );
 
             const { error: recipeError } = await supabase
@@ -387,6 +397,7 @@ export default function DashboardRecipePage() {
                     image,
                     source,
                     is_favorite: isFavorite,
+                    micronutrients: totals.micronutrients,
                 });
 
             if (recipeError) throw recipeError;

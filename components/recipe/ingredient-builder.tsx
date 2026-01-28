@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, Zap, X as CloseIcon, ChevronDown, Layers, Gem, Droplet, Battery, X } from 'lucide-react';
 import FoodItemPicker from './food-item-picker';
-import { fetchFoodMeasures, FoodMeasure } from '@/lib/utils/nutrition-calculator';
+import { fetchFoodMeasures, FoodMeasure, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { parseIngredientsOnly } from '@/lib/utils/recipe-parser';
 import { searchLocalFood, searchUSDAFood, getUSDAMeasures, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
@@ -67,36 +67,6 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
     const { energyUnit, setEnergyUnit } = useUserPreferences();
     const useKilojoules = energyUnit === 'kJ';
 
-    const findNutrientMatch = (record: Record<string, any>, key: string) => {
-        const mKeys = Object.keys(record);
-        const kL = key.toLowerCase();
-        const exact = mKeys.find(mk => mk.toLowerCase() === kL);
-        if (exact) return exact;
-        if (kL.includes('vitamin')) {
-            const letter = kL.split(' ')[1]?.toLowerCase();
-            if (letter && letter.length === 1) {
-                const match = mKeys.find(mk => {
-                    const mkL = mk.toLowerCase();
-                    return mkL.includes('vitamin') && new RegExp(`\\b${letter}\\b`, 'i').test(mkL);
-                });
-                if (match) return match;
-            }
-        }
-        if (kL.startsWith('b') && /\b[b]\d+\b/.test(kL)) {
-            const bNum = kL.split(' ')[0].toLowerCase();
-            const match = mKeys.find(mk => {
-                const mkL = mk.toLowerCase();
-                return mkL.includes(bNum) || (kL.includes('thiamine') && mkL.includes('thiamine')) || (kL.includes('riboflavin') && mkL.includes('riboflavin'));
-            });
-            if (match) return match;
-        }
-        const firstWord = kL.split(' ')[0];
-        if (firstWord.length > 3) {
-            const fuzzy = mKeys.find(mk => mk.toLowerCase().includes(firstWord));
-            if (fuzzy) return fuzzy;
-        }
-        return null;
-    };
 
     const handleAddIngredient = async (foodItem: FoodItem | FoodItemMatch, initialValues?: { weightG?: number, quantity?: number, unit?: string, modifier?: string }) => {
         // Fetch available measures
