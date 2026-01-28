@@ -38,7 +38,8 @@ import {
     RefreshCw,
     Shield,
     Battery,
-    Layers
+    Layers,
+    User
 } from 'lucide-react';
 import {
     Sheet,
