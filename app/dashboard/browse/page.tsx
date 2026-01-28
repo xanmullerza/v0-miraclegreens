@@ -313,7 +313,7 @@ function BrowseFoodsContent() {
                                     <p className="text-xs mt-1">Try another ingredient or common name</p>
                                 </div>
                             ) : (
-                                <div className="max-h-[450px] overflow-y-auto custom-scrollbar">
+                                <div className="max-h-[380px] overflow-y-auto custom-scrollbar">
                                     <div className="p-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
                                         <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 px-3">Matching Ingredients</p>
                                     </div>
