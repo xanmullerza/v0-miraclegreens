@@ -113,7 +113,7 @@ export default function RecipeDetailsPage() {
             const fetchedIngredients = ingData || [];
             setIngredients(fetchedIngredients);
 
-            // Calculate live nutrition totals
+            // Calculate live micronutrients for the report
             if (fetchedIngredients.length > 0) {
                 const calculated = calculateRecipeNutrition(
                     fetchedIngredients.map(ing => ({
@@ -122,22 +122,17 @@ export default function RecipeDetailsPage() {
                     }))
                 );
 
-                // The weights in the DB are per-serving, so 'calculated' is already per-serving
-                const scaledTotals: CalculatedNutrition = {
-                    ...calculated,
-                    micronutrients: calculated.micronutrients || {}
-                };
+                setCalculatedTotals(calculated);
 
-                setCalculatedTotals(scaledTotals);
-
-                setRecipe(prev => prev ? {
-                    ...prev,
-                    calories: scaledTotals.calories,
-                    protein: scaledTotals.protein,
-                    carbs: scaledTotals.carbs,
-                    fat: scaledTotals.fat,
-                    micronutrients: scaledTotals.micronutrients
-                } : null);
+                // Use the fresh calculation for the entire display
+                setRecipe({
+                    ...recipeData,
+                    calories: calculated.calories,
+                    protein: calculated.protein,
+                    carbs: calculated.carbs,
+                    fat: calculated.fat,
+                    micronutrients: calculated.micronutrients
+                });
             } else {
                 setRecipe(recipeData);
             }

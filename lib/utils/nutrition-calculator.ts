@@ -32,20 +32,37 @@ export function calculateNutrition(
 ): CalculatedNutrition {
     const multiplier = weightGrams / 100;
 
-    const result: CalculatedNutrition = {
-        calories: Math.round(foodItem.energy_kcal * multiplier),
-        energy_kj: Math.round((foodItem.energy_kj || (foodItem.energy_kcal * 4.184)) * multiplier),
-        protein: Math.round(foodItem.protein_g * multiplier * 10) / 10,
-        fat: Math.round(foodItem.fat_g * multiplier * 10) / 10,
-        carbs: Math.round(foodItem.carbs_g * multiplier * 10) / 10,
+    // Fallback helper to find macros in the micronutrients JSON
+    const getMacro = (mainVal: number | undefined, keys: string[]) => {
+        if (mainVal && mainVal > 0) return mainVal;
+        if (!foodItem.micronutrients) return mainVal || 0;
+        for (const k of keys) {
+            const val = foodItem.micronutrients[k];
+            if (typeof val === 'number') return val;
+        }
+        return mainVal || 0;
     };
 
-    // Calculate micronutrients if available
+    const calories = getMacro(foodItem.energy_kcal, ['Energy', 'Calories', 'energy_kcal']);
+    const protein = getMacro(foodItem.protein_g, ['Protein', 'protein_g']);
+    const carbs = getMacro(foodItem.carbs_g, ['Carbohydrates', 'carbs_g']);
+    const fat = getMacro(foodItem.fat_g, ['Fat', 'fat_g']);
+    const energyKj = getMacro(foodItem.energy_kj, ['energy_kj']);
+
+    const result: CalculatedNutrition = {
+        calories: Math.round(calories * multiplier),
+        energy_kj: Math.round((energyKj || (calories * 4.184)) * multiplier),
+        protein: Math.round(protein * multiplier * 10) / 10,
+        fat: Math.round(fat * multiplier * 10) / 10,
+        carbs: Math.round(carbs * multiplier * 10) / 10,
+    };
+
+    // Calculate micronutrients
     if (foodItem.micronutrients) {
         result.micronutrients = {};
         for (const [key, value] of Object.entries(foodItem.micronutrients)) {
             if (typeof value === 'number') {
-                result.micronutrients[key] = Math.round(value * multiplier * 100) / 100;
+                result.micronutrients[key] = value * multiplier;
             }
         }
     }
@@ -105,6 +122,33 @@ export const findNutrientMatch = (record: Record<string, any>, key: string) => {
  * @param ingredients - Array of ingredients with their food items and weights
  * @returns Total nutrition for the recipe
  */
+const PREFERRED_KEYS: Record<string, string> = {
+    'Potassium': 'Potassium',
+    'Magnesium': 'Magnesium',
+    'Calcium': 'Calcium',
+    'Phosphorus': 'Phosphorus',
+    'Sodium': 'Sodium',
+    'Iron': 'Iron',
+    'Zinc': 'Zinc',
+    'Selenium': 'Selenium',
+    'Copper': 'Copper',
+    'Manganese': 'Manganese',
+    'Vitamin A': 'Vitamin A',
+    'Vitamin C': 'Vitamin C',
+    'Vitamin D': 'Vitamin D',
+    'Vitamin E': 'Vitamin E',
+    'Vitamin K': 'Vitamin K',
+    'B1 (Thiamine)': 'B1 (Thiamine)',
+    'B2 (Riboflavin)': 'B2 (Riboflavin)',
+    'B3 (Niacin)': 'B3 (Niacin)',
+    'B5 (Pantothenic Acid)': 'B5 (Pantothenic Acid)',
+    'B6 (Pyridoxine)': 'B6 (Pyridoxine)',
+    'B9 (Folate)': 'B9 (Folate)',
+    'B12 (Cobalamin)': 'B12 (Cobalamin)',
+    'Choline': 'Choline',
+    'Fiber': 'Fiber'
+};
+
 export function calculateRecipeNutrition(
     ingredients: Array<{
         food_item: FoodItemNutrition;
@@ -114,14 +158,26 @@ export function calculateRecipeNutrition(
     return ingredients.reduce(
         (total, ing) => {
             const nutrition = calculateNutrition(ing.food_item, ing.weight_g);
-            const newMicros = { ...(total.micronutrients || {}) };
 
+            // Deduplicate within this single ingredient FIRST
+            const ingredientMicrosMapped: Record<string, number> = {};
             if (nutrition.micronutrients) {
                 Object.entries(nutrition.micronutrients).forEach(([key, val]) => {
-                    const match = findNutrientMatch(newMicros, key) || key;
-                    newMicros[match] = (newMicros[match] || 0) + (val as number);
+                    const match = findNutrientMatch(PREFERRED_KEYS, key);
+                    const standardKey = match ? PREFERRED_KEYS[match] : key;
+
+                    if (ingredientMicrosMapped[standardKey] === undefined) {
+                        ingredientMicrosMapped[standardKey] = val as number;
+                    }
                 });
             }
+
+            // Now add to the recipe-wide accumulator
+            const newMicros = { ...(total.micronutrients || {}) };
+            Object.entries(ingredientMicrosMapped).forEach(([key, val]) => {
+                const match = findNutrientMatch(newMicros, key) || key;
+                newMicros[match] = (newMicros[match] || 0) + val;
+            });
 
             return {
                 calories: total.calories + nutrition.calories,
