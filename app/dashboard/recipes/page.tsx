@@ -448,21 +448,30 @@ export default function DashboardRecipePage() {
     };
 
     return (
-        <div className="max-w-5xl mx-auto space-y-8">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-8">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-                        <ChefHat className="text-emerald-600" />
-                        Recipe Builder
-                    </h1>
-                    <p className="text-slate-500 mt-1 text-sm">Create and manage your favorite recipes with accurate nutrition.</p>
+        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
+            {/* Hero Section */}
+            <div className="relative h-48 rounded-[2.5rem] bg-violet-600 overflow-hidden flex items-center px-12 group">
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1505935428862-770b6f24f629?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
+                <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-purple-600/50 mix-blend-multiply opacity-40" />
+
+                <div className="relative z-10 space-y-2">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
+                            <ChefHat className="text-white" size={24} />
+                        </div>
+                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Recipe Builder</h1>
+                    </div>
+                    <p className="text-violet-50 font-medium max-w-md text-sm pl-1">
+                        Create and manage your favorite recipes with accurate nutrition.
+                    </p>
                 </div>
-                <div className="flex gap-3">
+
+                <div className="absolute right-12 top-1/2 -translate-y-1/2 hidden md:block">
                     <Button
                         onClick={() => setShowAutoImport(true)}
-                        className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-none shadow-sm hover:bg-emerald-500/20 gap-2 px-6"
+                        className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-12 rounded-xl font-bold uppercase tracking-widest"
                     >
-                        <Zap size={16} />
+                        <Zap size={16} className="text-yellow-300 fill-current" />
                         Quick Import
                     </Button>
                 </div>
@@ -473,7 +482,7 @@ export default function DashboardRecipePage() {
                 <Card className="p-8 space-y-6">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="text-lg font-bold flex items-center gap-3">
-                            <Plus className="w-5 h-5 text-emerald-500" />
+                            <Plus className="w-5 h-5 text-violet-500" />
                             Ingredients
                         </h3>
                         <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-widest opacity-60">
@@ -532,14 +541,14 @@ export default function DashboardRecipePage() {
                     <div className="space-y-4">
                         {instructions.map((stepText, index) => (
                             <div key={index} className="flex gap-4 group">
-                                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900/50 flex items-center justify-center font-black text-sm text-slate-400 group-hover:bg-emerald-500 group-hover:text-white transition-all cursor-move">
+                                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900/50 flex items-center justify-center font-black text-sm text-slate-400 group-hover:bg-violet-500 group-hover:text-white transition-all cursor-move">
                                     {index + 1}
                                 </div>
                                 <div className="flex-1 relative">
                                     <textarea
                                         value={stepText}
                                         onChange={(e) => handleUpdateInstruction(index, e.target.value)}
-                                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 focus:border-emerald-500/50 rounded-xl p-4 text-sm min-h-[80px] transition-all resize-none"
+                                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 focus:border-violet-500/50 rounded-xl p-4 text-sm min-h-[80px] transition-all resize-none"
                                         placeholder={`Explain instruction step ${index + 1}...`}
                                     />
                                     {instructions.length > 1 && (
@@ -559,7 +568,7 @@ export default function DashboardRecipePage() {
                 {/* Metadata Section */}
                 <Card className="p-8 space-y-8">
                     <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
-                        <ClipboardList size={20} className="text-emerald-500" />
+                        <ClipboardList size={20} className="text-violet-500" />
                         <h3 className="font-bold uppercase tracking-wider text-sm">Recipe Details</h3>
                     </div>
 
@@ -610,7 +619,7 @@ export default function DashboardRecipePage() {
                                             className={cn(
                                                 "h-9 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border",
                                                 type === m
-                                                    ? "bg-emerald-500 text-white border-emerald-600 shadow-md shadow-emerald-500/20"
+                                                    ? "bg-violet-500 text-white border-violet-600 shadow-md shadow-violet-500/20"
                                                     : "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500"
                                             )}
                                         >
@@ -669,7 +678,7 @@ export default function DashboardRecipePage() {
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
                                     <Camera size={12} /> Recipe Photo
                                 </Label>
-                                <div className="relative aspect-video rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group hover:border-emerald-500/50 transition-all flex flex-col items-center justify-center">
+                                <div className="relative aspect-video rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group hover:border-violet-500/50 transition-all flex flex-col items-center justify-center">
                                     {image ? (
                                         <>
                                             <img src={image} alt="Recipe" className="w-full h-full object-cover" />
@@ -683,7 +692,7 @@ export default function DashboardRecipePage() {
                                         <>
                                             <div className="text-center p-4 pointer-events-none">
                                                 {uploading ? (
-                                                    <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mx-auto" />
+                                                    <Loader2 className="h-8 w-8 animate-spin text-violet-500 mx-auto" />
                                                 ) : (
                                                     <>
                                                         <Upload size={20} className="text-slate-400 mx-auto mb-2" />
@@ -706,7 +715,7 @@ export default function DashboardRecipePage() {
 
                             <div className="space-y-4">
                                 <Button
-                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20 h-16 rounded-2xl font-black uppercase tracking-widest group text-lg"
+                                    className="w-full bg-violet-600 hover:bg-violet-700 text-white shadow-xl shadow-violet-500/20 h-16 rounded-2xl font-black uppercase tracking-widest group text-lg"
                                     disabled={saving}
                                     onClick={handleSave}
                                 >
@@ -726,12 +735,12 @@ export default function DashboardRecipePage() {
             <Sheet open={showAutoImport} onOpenChange={setShowAutoImport}>
                 <SheetContent side="right" className="w-[600px] border-l border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 p-0">
                     <div className="h-full flex flex-col">
-                        <div className="p-10 bg-emerald-500 text-white">
+                        <div className="p-10 bg-violet-500 text-white">
                             <div className="flex items-center gap-4 mb-2">
                                 <Zap size={40} className="text-yellow-300 fill-current" />
                                 <SheetTitle className="text-3xl font-black uppercase tracking-tighter text-white">Smart Import</SheetTitle>
                             </div>
-                            <SheetDescription className="text-emerald-50 opacity-80 text-lg">
+                            <SheetDescription className="text-violet-50 opacity-80 text-lg">
                                 Paste any recipe text (ingredients & steps) below. Our tool will automatically find the nutrition details.
                             </SheetDescription>
                         </div>
@@ -739,14 +748,14 @@ export default function DashboardRecipePage() {
                             <div className="flex-1 space-y-2">
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Raw Recipe Content</Label>
                                 <textarea
-                                    className="w-full h-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 text-sm focus:outline-none focus:ring-4 focus:ring-emerald-500/10 transition-all resize-none"
+                                    className="w-full h-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 text-sm focus:outline-none focus:ring-4 focus:ring-violet-500/10 transition-all resize-none"
                                     placeholder="Paste ingredient list and instructions here..."
                                     value={autoImportText}
                                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setAutoImportText(e.target.value)}
                                 />
                             </div>
                             <Button
-                                className="w-full h-16 rounded-3xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest text-lg shadow-2xl shadow-emerald-600/20"
+                                className="w-full h-16 rounded-3xl bg-violet-600 hover:bg-violet-700 text-white font-black uppercase tracking-widest text-lg shadow-2xl shadow-violet-600/20"
                                 onClick={handleAutoImport}
                                 disabled={isImporting}
                             >
