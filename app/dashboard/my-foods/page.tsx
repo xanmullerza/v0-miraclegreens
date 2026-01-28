@@ -73,7 +73,7 @@ export default function MyFoodsPage() {
     const [editCategory, setEditCategory] = useState('General');
     const [editImage, setEditImage] = useState('');
     const [uploading, setUploading] = useState(false);
-    const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES.filter(c => c !== 'Flavour'));
 
     useEffect(() => {
         fetchFavorites();
@@ -220,11 +220,11 @@ export default function MyFoodsPage() {
                     </span>
                 </button>
 
-                <div className="h-4 w-[1px] bg-slate-200 dark:bg-slate-800 mx-2" />
+                <div className="h-4 w-[1px] bg-slate-200 dark:bg-slate-800 mx-1" />
 
-                {CATEGORIES.map(category => {
+                {CATEGORIES.filter(c => c !== 'Flavour').map(category => {
                     const isActive = selectedCategories.includes(category);
-                    const count = favorites.filter(f => f.category === category || (!f.category && category === 'General')).length;
+                    const count = favorites.filter(f => f.category === category).length;
 
                     return (
                         <button
@@ -253,6 +253,43 @@ export default function MyFoodsPage() {
                         </button>
                     );
                 })}
+
+                <div className="h-4 w-[1px] bg-slate-200 dark:bg-slate-800 mx-2" />
+
+                {/* Add Flavour Distinct Button */}
+                {(() => {
+                    const category = 'Flavour';
+                    const isActive = selectedCategories.includes(category);
+                    const count = favorites.filter(f => f.category === category).length;
+                    return (
+                        <button
+                            onClick={() => {
+                                if (isActive) {
+                                    setSelectedCategories(prev => prev.filter(c => c !== category));
+                                } else {
+                                    setSelectedCategories(prev => [...prev, category]);
+                                }
+                            }}
+                            className={cn(
+                                "group px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tight transition-all duration-300 border flex items-center gap-3",
+                                isActive
+                                    ? "bg-purple-600 text-white border-purple-500 shadow-lg shadow-purple-500/20"
+                                    : "bg-white dark:bg-slate-900 border-dashed border-purple-400/50 text-purple-600 dark:text-purple-400 hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/10"
+                            )}
+                        >
+                            <span className="flex items-center gap-1.5">
+                                <Plus size={12} className={cn("transition-transform duration-300", isActive && "rotate-45")} />
+                                Add Flavour
+                            </span>
+                            <span className={cn(
+                                "px-1.5 py-0.5 rounded-md text-[9px] font-bold",
+                                isActive ? "bg-white/20" : "bg-purple-100 dark:bg-purple-900/30"
+                            )}>
+                                {count}
+                            </span>
+                        </button>
+                    );
+                })()}
             </div>
 
             {favorites.length === 0 ? (
