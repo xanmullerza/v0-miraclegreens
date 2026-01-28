@@ -35,6 +35,7 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRDA } from '@/hooks/use-rda';
+import { useSearch } from '@/lib/context/search-context';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden", className)}>
@@ -62,9 +63,9 @@ const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Frui
 function BrowseFoodsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { searchQuery, setSearchQuery } = useSearch();
     const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
     const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
-    const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
     const [isSearchFocused, setIsSearchFocused] = useState(false);
 
@@ -300,7 +301,7 @@ function BrowseFoodsContent() {
                     </div>
 
                     {/* Dropdown Results */}
-                    {isSearchFocused && (searchQuery.trim() || searchResults.length > 0) && (
+                    {((isSearchFocused || searchQuery.trim().length > 0) && !selectedItem) && (
                         <div className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 z-[70]">
                             {loading && searchQuery.trim() ? (
                                 <div className="p-12 text-center">
@@ -350,10 +351,13 @@ function BrowseFoodsContent() {
             </div>
 
             {/* Background Blur Overlay */}
-            {isSearchFocused && (
+            {(isSearchFocused || (searchQuery.trim() !== '' && !selectedItem)) && (
                 <div
                     className="fixed inset-0 bg-slate-900/20 dark:bg-black/60 backdrop-blur-md z-50 transition-all duration-300"
-                    onClick={() => setIsSearchFocused(false)}
+                    onClick={() => {
+                        setIsSearchFocused(false);
+                        if (searchQuery.trim() === '') setSearchQuery('');
+                    }}
                 />
             )}
 

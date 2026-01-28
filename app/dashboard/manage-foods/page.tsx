@@ -26,6 +26,7 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { useSearch } from '@/lib/context/search-context';
 
 interface FoodItem {
     id: string;
@@ -43,9 +44,9 @@ const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Frui
 
 export default function ManageFoodsPage() {
     const router = useRouter();
+    const { searchQuery, setSearchQuery } = useSearch();
     const [foods, setFoods] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
     const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
     const [editingItem, setEditingItem] = useState<FoodItem | null>(null);

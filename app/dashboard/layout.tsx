@@ -23,6 +23,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { SearchProvider, useSearch } from '@/lib/context/search-context';
 
 const sidebarGroups = [
     {
@@ -68,7 +69,7 @@ const sidebarGroups = [
     }
 ];
 
-export default function DashboardLayout({
+function DashboardLayoutContent({
     children,
 }: {
     children: React.ReactNode;
@@ -76,6 +77,7 @@ export default function DashboardLayout({
     const pathname = usePathname();
     const [expandedGroup, setExpandedGroup] = useState<string | null>('overview');
     const { profile } = useUserPreferences();
+    const { searchQuery, setSearchQuery } = useSearch();
 
     // Auto-expand the group that contains the active link
     useEffect(() => {
@@ -86,6 +88,11 @@ export default function DashboardLayout({
             setExpandedGroup(activeGroup.id);
         }
     }, [pathname]);
+
+    // Reset search when changing pages
+    useEffect(() => {
+        setSearchQuery('');
+    }, [pathname, setSearchQuery]);
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-[#020617] text-slate-900 dark:text-slate-100 font-sans">
@@ -175,7 +182,9 @@ export default function DashboardLayout({
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
                                 <input
                                     className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full pl-10 pr-4 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/20 w-64 transition-all"
-                                    placeholder="Search your lab data..."
+                                    placeholder={`Search in ${sidebarGroups.flatMap(g => g.items).find(i => i.href === pathname)?.name || 'Dashboard'}...`}
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
                                 />
                             </div>
                             <div className="flex items-center gap-3">
@@ -205,5 +214,17 @@ export default function DashboardLayout({
                 </main>
             </div>
         </div>
+    );
+}
+
+export default function DashboardLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    return (
+        <SearchProvider>
+            <DashboardLayoutContent>{children}</DashboardLayoutContent>
+        </SearchProvider>
     );
 }

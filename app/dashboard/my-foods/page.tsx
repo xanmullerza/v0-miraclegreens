@@ -29,6 +29,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useSearch } from '@/lib/context/search-context';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden", className)}>
@@ -67,6 +68,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 export default function MyFoodsPage() {
     const router = useRouter();
+    const { searchQuery } = useSearch();
     const [favorites, setFavorites] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
@@ -386,9 +388,11 @@ export default function MyFoodsPage() {
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
                     {favorites
                         .filter(item => {
+                            const name = (item.common_name || item.name || '').toLowerCase();
+                            const matchesSearch = searchQuery === '' || name.includes(searchQuery.toLowerCase());
                             const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(item.category || 'General');
                             const matchesSecondary = selectedSecondary.length === 0 || (item.sub_category && selectedSecondary.includes(item.sub_category));
-                            return matchesCategory && matchesSecondary;
+                            return matchesSearch && matchesCategory && matchesSecondary;
                         })
                         .map((item) => (
                             <Card key={item.id} className="group relative transition-all duration-300 hover:scale-105 hover:shadow-md border-transparent hover:border-slate-200 dark:hover:border-slate-800">
