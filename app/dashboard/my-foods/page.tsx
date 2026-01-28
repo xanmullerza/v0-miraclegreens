@@ -49,18 +49,18 @@ interface FoodItem {
     category: string;
 }
 
-const CATEGORIES = ["Grains", "Vegetables", "Fruit", "Legumes", "Proteins", "Fats", "Flavour", "Seeds", "Nuts", "Supplements"];
+const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Seeds", "Flavour", "Supplements"];
 
 const CATEGORY_COLORS: Record<string, string> = {
-    "Grains": "bg-amber-500 shadow-amber-500/20 border-amber-500",
     "Vegetables": "bg-emerald-500 shadow-emerald-500/20 border-emerald-500",
-    "Fruit": "bg-rose-500 shadow-rose-500/20 border-rose-500",
+    "Grains": "bg-amber-500 shadow-amber-500/20 border-amber-500",
     "Legumes": "bg-orange-600 shadow-orange-600/20 border-orange-600",
+    "Oils": "bg-sky-500 shadow-sky-500/20 border-sky-500",
     "Proteins": "bg-red-500 shadow-red-500/20 border-red-500",
-    "Fats": "bg-sky-500 shadow-sky-500/20 border-sky-500",
-    "Flavour": "bg-purple-500 shadow-purple-500/20 border-purple-500",
-    "Seeds": "bg-teal-500 shadow-teal-500/20 border-teal-500",
+    "Fruit": "bg-rose-500 shadow-rose-500/20 border-rose-500",
     "Nuts": "bg-stone-500 shadow-stone-500/20 border-stone-500",
+    "Seeds": "bg-teal-500 shadow-teal-500/20 border-teal-500",
+    "Flavour": "bg-purple-500 shadow-purple-500/20 border-purple-500",
     "Supplements": "bg-indigo-500 shadow-indigo-500/20 border-indigo-500"
 };
 
