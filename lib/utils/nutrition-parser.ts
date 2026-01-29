@@ -195,7 +195,17 @@ export function parseMeasures(text: string): ParsedMeasure[] {
         // Skip headers
         if (['#', 'Measure', 'Grams', 'Weight'].includes(line)) continue;
 
-        // Check if current line is a number (quantity, usually 1)
+        // Check if current line is a simple "1 cup = 240g" or "cup = 240" format
+        const simpleMatch = line.match(/^(?:1\s+)?([a-zA-Z\s]+)\s*(?:=|:)\s*(\d+(?:\.\d+)?)\s*(?:g)?$/i);
+        if (simpleMatch) {
+            measures.push({
+                label: simpleMatch[1].trim().toLowerCase(),
+                weight_g: parseFloat(simpleMatch[2])
+            });
+            continue;
+        }
+
+        // Check if current line is a number (quantity, usually 1) - USDA Multi-line style
         const qtyMatch = line.match(/^(\d+(?:\.\d+)?)$/);
         if (qtyMatch && i + 2 < lines.length) {
             const label = lines[i + 1];

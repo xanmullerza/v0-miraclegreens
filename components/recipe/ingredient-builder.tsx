@@ -24,6 +24,7 @@ interface FoodItem {
     carbs_g: number;
     energy_kj?: number;
     micronutrients?: Record<string, number>;
+    portions?: FoodMeasure[];
 }
 
 export interface RecipeIngredient {
@@ -83,7 +84,11 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             } else {
                 measures = usdaMeasures;
             }
+        } else if (foodItem.portions && foodItem.portions.length > 0) {
+            // Use local JSONB portions if available
+            measures = foodItem.portions;
         } else if (foodItem.id) {
+            // Fallback to fetching from table (legacy support)
             measures = await fetchFoodMeasures(foodItem.id);
         }
 

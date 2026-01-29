@@ -173,6 +173,9 @@ function FoodItemCreatorContent() {
             const combinedText = `${servingText}\n${nutrientText}`.trim();
             const parsed = combinedText ? parseNutritionText(combinedText) : { micronutrients: {} };
 
+            // Parse portions
+            const parsedPortions = servingText ? parseMeasures(servingText) : [];
+
             // Use parsed values, falling back to any manually entered values
             const finalEnergyKcal = parsed.energy_kcal || parseFloat(energyKcal) || null;
             const finalEnergyKj = parsed.energy_kj || parseFloat(energyKj) || (finalEnergyKcal ? Math.round(finalEnergyKcal * 4.184) : null);
@@ -203,7 +206,8 @@ function FoodItemCreatorContent() {
                 carbs_g: finalCarbs,
                 fat_g: finalFat,
                 image: image || null,
-                micronutrients: finalMicros
+                micronutrients: finalMicros,
+                portions: parsedPortions
             };
 
             const { data: item, error: itemError } = await supabase

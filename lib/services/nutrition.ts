@@ -13,6 +13,7 @@ export interface FoodItemMatch {
     micronutrients: Record<string, number>;
     source: 'local' | 'usda';
     fdcId?: number;
+    portions?: FoodMeasure[];
 }
 
 import { FoodMeasure } from '@/lib/utils/nutrition-calculator';
@@ -44,6 +45,7 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
         carbs_g: item.carbs_g,
         fat_g: item.fat_g,
         micronutrients: item.micronutrients || {},
+        portions: item.portions || [], // Use JSONB column
         source: 'local' as const
     })).sort((a, b) => {
         // Prioritize common_name matches
@@ -237,7 +239,21 @@ export async function syncToLocal(food: FoodItemMatch, measures: FoodMeasure[]):
         return clean;
     };
 
-    // 2. Insert or get Food Item
+    // 3. Prepare Portions (JSONB)
+    // We now save measures directly to the food_item 'portions' column
+    let uniquePortions: any[] = [];
+
+    if (measures.length > 0) {
+        const measuresToInsert = measures.map(m => ({
+            label: standardizeLabel(m.label),
+            weight_g: m.weight_g
+        })).filter(m => m.weight_g > 0);
+
+        // Filter out internal duplicates
+        uniquePortions = Array.from(new Map(measuresToInsert.map(m => [m.label, m])).values());
+    }
+
+    // 4. Insert or get Food Item (with portions)
     const { data: itemData, error: itemError } = await supabase
         .from('food_items')
         .upsert({
@@ -248,7 +264,8 @@ export async function syncToLocal(food: FoodItemMatch, measures: FoodMeasure[]):
             carbs_g: food.carbs_g,
             fat_g: food.fat_g,
             source: food.source || 'usda',
-            micronutrients: food.micronutrients
+            micronutrients: food.micronutrients,
+            portions: uniquePortions // Save to JSONB
         }, { onConflict: 'name' })
         .select()
         .single();
@@ -258,23 +275,8 @@ export async function syncToLocal(food: FoodItemMatch, measures: FoodMeasure[]):
         return null;
     }
 
-    // 3. Insert or Update measures
-    if (measures.length > 0) {
-        const measuresToInsert = measures.map(m => ({
-            food_item_id: itemData.id,
-            label: standardizeLabel(m.label),
-            weight_g: m.weight_g
-        })).filter(m => m.weight_g > 0);
-
-        // Filter out internal duplicates in the payload before sending to Supabase
-        const uniqueMeasures = Array.from(new Map(measuresToInsert.map(m => [m.label, m])).values());
-
-        const { error: measError } = await supabase
-            .from('food_measures')
-            .upsert(uniqueMeasures, { onConflict: 'food_item_id, label' });
-
-        if (measError) console.warn("Sync Measures Warning:", measError);
-    }
+    // Legacy: We can still save to food_measures table if needed, but 'portions' column is now primary.
+    // We skip the separate table insert to rely on the JSONB column as requested.
 
     return itemData.id;
 }

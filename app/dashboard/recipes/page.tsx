@@ -345,7 +345,10 @@ export default function DashboardRecipePage() {
                             protein_g: ing.protein,
                             carbs_g: ing.carbs,
                             fat_g: ing.fat,
-                            micronutrients: {}
+                            micronutrients: {},
+                            portions: (ing.measure_label && ing.measure_label !== 'g' && ing.measure_label !== 'kg' && ing.measure_label !== 'ml' && ing.weight_g > 0 && ing.quantity > 0)
+                                ? [{ label: ing.measure_label, weight_g: ing.weight_g / ing.quantity }]
+                                : []
                         })
                         .select()
                         .single();
