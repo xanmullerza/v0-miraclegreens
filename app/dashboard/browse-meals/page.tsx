@@ -18,7 +18,8 @@ import {
     Utensils,
     Zap,
     Scale,
-    Library
+    Library,
+    Globe
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -199,28 +200,28 @@ export default function BrowseMealsPage() {
 
                 <div className="flex items-center gap-6">
                     {/* Favorites Switch Toggle */}
-                    <div className="flex items-center gap-3 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all shrink-0">
-                        <Label
-                            htmlFor="favorites-mode"
+                    <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all shrink-0">
+                        <Globe
+                            size={18}
                             className={cn(
-                                "text-[10px] font-black uppercase tracking-[0.2em] cursor-pointer transition-colors whitespace-nowrap",
-                                showFavoritesOnly ? "text-rose-500" : "text-slate-400"
+                                "transition-all cursor-pointer",
+                                !showFavoritesOnly ? "text-emerald-500 scale-110 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]" : "text-slate-300 hover:text-slate-400"
                             )}
-                        >
-                            {showFavoritesOnly ? "Refining My Collection" : "Exploring Global Library"}
-                        </Label>
+                            onClick={() => setShowFavoritesOnly(false)}
+                        />
                         <Switch
                             id="favorites-mode"
                             checked={showFavoritesOnly}
                             onCheckedChange={setShowFavoritesOnly}
-                            className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-slate-200 dark:data-[state=unchecked]:bg-slate-800"
+                            className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-emerald-600"
                         />
                         <Heart
-                            size={16}
+                            size={18}
                             className={cn(
-                                "transition-all",
-                                showFavoritesOnly ? "text-rose-500 fill-rose-500 scale-110" : "text-slate-300"
+                                "transition-all cursor-pointer",
+                                showFavoritesOnly ? "text-rose-500 fill-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : "text-slate-300 hover:text-slate-400"
                             )}
+                            onClick={() => setShowFavoritesOnly(true)}
                         />
                     </div>
 
