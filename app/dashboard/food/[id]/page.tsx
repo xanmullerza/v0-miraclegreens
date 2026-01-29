@@ -347,7 +347,6 @@ export default function FoodDetailsPage() {
                         <h1 className="text-6xl font-black tracking-tighter italic uppercase text-slate-900 dark:text-white leading-[0.85]">
                             {food.common_name || food.name}
                         </h1>
-                        <p className="text-xl font-medium text-slate-400 italic">Scientific: {food.name}</p>
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

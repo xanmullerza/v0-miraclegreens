@@ -183,7 +183,7 @@ function FoodsContent() {
         setResults(filtered.map(item => ({
             id: item.id,
             title: item.common_name || item.name,
-            subtitle: item.common_name ? `Scientific: ${item.name}` : undefined,
+            subtitle: item.common_name ? item.name : undefined,
             badges: [
                 ...(item.protein_g > 10 ? ['High Protein'] : []),
                 ...(item.energy_kcal < 50 ? ['Low Calorie'] : [])
