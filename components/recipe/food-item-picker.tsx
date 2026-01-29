@@ -78,6 +78,14 @@ export default function FoodItemPicker({ onSelect, onClose }: FoodItemPickerProp
             const localId = await syncToLocal(item, measures);
 
             if (localId) {
+                // Prepare portions for immediate UI use without re-fetch
+                const standardMeasures = measures.map(m => ({
+                    label: m.label.toLowerCase().replace(/\s*\(.*?\)/g, '').trim(),
+                    weight_g: m.weight_g
+                })).filter(m => m.weight_g > 0);
+
+                const uniquePortions = Array.from(new Map(standardMeasures.map(m => [m.label, m])).values());
+
                 onSelect({
                     id: localId,
                     name: item.name,
@@ -85,7 +93,8 @@ export default function FoodItemPicker({ onSelect, onClose }: FoodItemPickerProp
                     energy_kj: item.energy_kj,
                     protein_g: item.protein_g,
                     fat_g: item.fat_g,
-                    carbs_g: item.carbs_g
+                    carbs_g: item.carbs_g,
+                    portions: uniquePortions
                 });
                 onClose();
             }

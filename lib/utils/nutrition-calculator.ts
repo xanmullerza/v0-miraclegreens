@@ -262,6 +262,18 @@ export interface FoodMeasure {
 }
 
 export async function fetchFoodMeasures(foodItemId: string): Promise<FoodMeasure[]> {
+    // 1. Try reading from portions JSONB column first (New System)
+    const { data: itemData } = await supabase
+        .from('food_items')
+        .select('portions')
+        .eq('id', foodItemId)
+        .single();
+
+    if (itemData?.portions && Array.isArray(itemData.portions) && itemData.portions.length > 0) {
+        return itemData.portions as FoodMeasure[];
+    }
+
+    // 2. Fallback to reading from food_measures table (Legacy System)
     const { data, error } = await supabase
         .from('food_measures')
         .select('*')
