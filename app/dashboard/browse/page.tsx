@@ -406,10 +406,10 @@ function BrowseFoodsContent() {
                             <Wheat size={14} className="text-amber-500" title="Carbohydrates" />
                         </div>
                         <div className="flex justify-end">
-                            <Droplet size={14} className="text-sky-500" title="Fat" />
+                            <Droplet size={14} className="text-amber-900" title="Fat" />
                         </div>
                         <div className="flex justify-end">
-                            <Beef size={14} className="text-purple-500" title="Protein" />
+                            <Beef size={14} className="text-rose-500" title="Protein" />
                         </div>
                         <div></div>
                     </div>
@@ -469,8 +469,8 @@ function BrowseFoodsContent() {
                                         {[
                                             { label: 'CAL', val: food.energy_kcal, sub: 'k', color: 'text-orange-500' },
                                             { label: 'CHO', val: food.carbs_g, sub: 'g', color: 'text-amber-500' },
-                                            { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-sky-500' },
-                                            { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-purple-500' }
+                                            { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-amber-900' },
+                                            { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-rose-500' }
                                         ].map(stat => (
                                             <div key={stat.label} className="text-center">
                                                 <p className="text-[8px] font-black text-slate-400 mb-0.5">{stat.label}</p>

@@ -337,10 +337,10 @@ export default function BrowseMealsPage() {
                             <Wheat size={14} className="text-amber-500" title="Carbohydrates" />
                         </div>
                         <div className="flex justify-end">
-                            <Droplet size={14} className="text-sky-500" title="Fat" />
+                            <Droplet size={14} className="text-amber-900" title="Fat" />
                         </div>
                         <div className="flex justify-end">
-                            <Beef size={14} className="text-purple-500" title="Protein" />
+                            <Beef size={14} className="text-rose-500" title="Protein" />
                         </div>
                         <div></div>
                     </div>
@@ -404,8 +404,8 @@ export default function BrowseMealsPage() {
                                         {[
                                             { label: 'CAL', val: recipe.calories, sub: 'k', color: 'text-orange-500' },
                                             { label: 'CHO', val: recipe.carbs, sub: 'g', color: 'text-amber-500' },
-                                            { label: 'FAT', val: recipe.fat, sub: 'g', color: 'text-sky-500' },
-                                            { label: 'PRO', val: recipe.protein, sub: 'g', color: 'text-purple-500' }
+                                            { label: 'FAT', val: recipe.fat, sub: 'g', color: 'text-amber-900' },
+                                            { label: 'PRO', val: recipe.protein, sub: 'g', color: 'text-rose-500' }
                                         ].map(stat => (
                                             <div key={stat.label} className="text-center">
                                                 <p className="text-[8px] font-black text-slate-400 mb-0.5">{stat.label}</p>
