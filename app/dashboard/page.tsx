@@ -103,7 +103,7 @@ export default function DashboardOverview() {
                 <div className="relative z-10 max-w-2xl">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-black uppercase tracking-widest mb-6">
                         <Zap size={12} className="fill-current" />
-                        Miracle Greens Pre-release
+                        Miracle Greens Beta
                     </div>
                     <h1 className="text-4xl lg:text-6xl font-black text-white tracking-tighter leading-[0.9] mb-6">
                         Welcome to your <span className="text-emerald-500">Dashboard.</span>
