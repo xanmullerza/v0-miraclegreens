@@ -247,26 +247,47 @@ export async function getUSDAFoodDetails(fdcId: number): Promise<{ portions: Foo
         const data = await response.json();
 
         // Parse Portions
-        const portions = [];
-        if (data.foodPortions) {
-            portions.push(...data.foodPortions.map((p: any) => {
-                let label = (p.modifier || '').trim();
-                let unitName = (p.measureUnit?.name || p.measureUnitName || '').trim(); // FIXED: Check nested measureUnit.name first
+        const portions: FoodMeasure[] = [];
+        if (data.foodPortions && data.foodPortions.length > 0) {
+            data.foodPortions.forEach((p: any) => {
+                // Priority 1: portionDescription (e.g., "1 pouch", "1 small can")
+                // Priority 2: modifier (sometimes has label like "cup")
+                // Priority 3: measureUnit.name (e.g., "cup")
+                let label = (p.portionDescription || '').trim();
 
-                const isBad = (s: string) => !s || /^\d+$/.test(s) || s.toLowerCase() === 'undetermined' || s.length > 25;
-
-                // If modifier is bad, try unitName. If both bad, use 'portion'
-                if (isBad(label)) {
-                    label = isBad(unitName) ? 'portion' : unitName;
-                } else if (!isBad(unitName) && !label.toLowerCase().includes(unitName.toLowerCase())) {
-                    label = `${label} ${unitName}`;
+                // If portionDescription is missing or bad, try modifier
+                if (!label || label.toLowerCase() === 'quantity not specified') {
+                    label = (p.modifier || '').trim();
                 }
 
-                return {
-                    label: label.toLowerCase(),
-                    weight_g: p.gramWeight || 0
-                };
-            }).filter((p: any) => p.weight_g > 0));
+                // If modifier is also bad (numeric ID), try measureUnit.name
+                const isBad = (s: string) => !s || /^\d+$/.test(s) || s.toLowerCase() === 'undetermined' || s.length > 30;
+                if (isBad(label)) {
+                    const unitName = (p.measureUnit?.name || '').trim();
+                    label = isBad(unitName) ? 'serving' : unitName;
+                }
+
+                // Clean up: remove leading "1" if present (we store just the unit name)
+                label = label.replace(/^1\s+/, '').toLowerCase();
+
+                if (p.gramWeight && p.gramWeight > 0) {
+                    portions.push({
+                        label,
+                        weight_g: p.gramWeight
+                    });
+                }
+            });
+        }
+
+        // Also check for top-level serving info (common in Branded foods)
+        if (data.servingSize && data.householdServingFullText) {
+            const label = data.householdServingFullText.replace(/^1\s+/, '').toLowerCase();
+            if (!portions.find(p => p.label === label)) {
+                portions.push({
+                    label,
+                    weight_g: data.servingSize
+                });
+            }
         }
 
         // Parse Micronutrients
