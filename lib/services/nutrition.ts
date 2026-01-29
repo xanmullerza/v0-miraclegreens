@@ -167,7 +167,7 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
     console.log(`[USDA Search] Query: "${query}", Using Key: ${USDA_API_KEY === 'DEMO_KEY' ? 'DEMO_KEY' : 'Custom Key (Set)'}`);
 
     try {
-        const url = `${USDA_BASE_URL}/foods/search?api_key=${USDA_API_KEY}&query=${encodeURIComponent(query)}&pageSize=15`;
+        const url = `${USDA_BASE_URL}/foods/search?api_key=${USDA_API_KEY}&query=${encodeURIComponent(query)}&pageSize=25`;
         const response = await fetch(url);
 
         if (!response.ok) {
@@ -185,7 +185,15 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
 
         console.log(`[USDA Search] Found ${data.foods.length} items`);
 
-        return data.foods.map((food: any) => {
+        // Priority order for data types (lower = better)
+        const dataTypePriority: Record<string, number> = {
+            'SR Legacy': 1,
+            'Foundation': 2,
+            'Survey (FNDDS)': 3,
+            'Branded': 4
+        };
+
+        const results = data.foods.map((food: any) => {
             // Check for strict exclusionary mismatches (e.g. searching for Chicken but getting Turkey)
             const desc = (food.description || "").toLowerCase();
             const lowerQuery = query.toLowerCase();
@@ -222,15 +230,23 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
             return {
                 fdcId: food.fdcId,
                 name: food.description,
+                dataType: food.dataType, // Include for display/sorting
                 energy_kcal: energyKcal,
                 energy_kj: energyKj,
                 protein_g: protein,
                 carbs_g: carbs,
                 fat_g: fat,
                 micronutrients,
-                source: 'usda' as const
+                source: 'usda' as const,
+                _priority: dataTypePriority[food.dataType] || 5 // for sorting
             };
         }).filter((f: any) => f !== null);
+
+        // Sort by priority (SR Legacy first, Branded last)
+        results.sort((a: any, b: any) => a._priority - b._priority);
+
+        // Remove _priority before returning
+        return results.map(({ _priority, ...rest }: any) => rest).slice(0, 15);
     } catch (error) {
         console.error("[USDA Search Exception] Catch Block:", error);
         return [];
