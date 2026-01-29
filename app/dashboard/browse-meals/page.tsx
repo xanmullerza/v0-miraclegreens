@@ -19,7 +19,8 @@ import {
     Zap,
     Scale,
     Library,
-    Globe
+    Globe,
+    Pencil
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -378,20 +379,31 @@ export default function BrowseMealsPage() {
 
                                     {/* Action Buttons */}
                                     <div className="p-3 lg:p-0 flex justify-end lg:justify-center pr-4">
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                toggleFavorite(recipe);
-                                            }}
-                                            className={cn(
-                                                "w-8 h-8 rounded-full shadow-sm flex items-center justify-center transition-all border",
-                                                recipe.is_favorite
-                                                    ? "bg-rose-500 text-white border-rose-600 scale-110"
-                                                    : "bg-white/90 dark:bg-slate-950/90 text-slate-400 hover:text-rose-500 border-slate-100 dark:border-slate-800"
-                                            )}
-                                        >
-                                            <Heart size={14} fill={recipe.is_favorite ? "currentColor" : "none"} />
-                                        </button>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    router.push(`/dashboard/recipes/${recipe.id}/edit`);
+                                                }}
+                                                className="w-8 h-8 rounded-full shadow-sm flex items-center justify-center transition-all border bg-white/90 dark:bg-slate-950/90 text-slate-400 hover:text-blue-500 border-slate-100 dark:border-slate-800"
+                                            >
+                                                <Pencil size={14} />
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    toggleFavorite(recipe);
+                                                }}
+                                                className={cn(
+                                                    "w-8 h-8 rounded-full shadow-sm flex items-center justify-center transition-all border",
+                                                    recipe.is_favorite
+                                                        ? "bg-rose-500 text-white border-rose-600 scale-110"
+                                                        : "bg-white/90 dark:bg-slate-950/90 text-slate-400 hover:text-rose-500 border-slate-100 dark:border-slate-800"
+                                                )}
+                                            >
+                                                <Heart size={14} fill={recipe.is_favorite ? "currentColor" : "none"} />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

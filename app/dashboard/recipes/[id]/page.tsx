@@ -23,7 +23,8 @@ import {
     Droplet,
     Battery,
     X,
-    ChevronDown
+    ChevronDown,
+    Pencil
 } from 'lucide-react';
 import { calculateRecipeNutrition, CalculatedNutrition } from '@/lib/utils/nutrition-calculator';
 import { Badge } from '@/components/ui/badge';
@@ -198,6 +199,14 @@ export default function RecipeDetailsPage() {
                     Back to Library
                 </button>
                 <div className="flex gap-3">
+                    <Button
+                        onClick={() => router.push(`/dashboard/recipes/${id}/edit`)}
+                        variant="outline"
+                        className="rounded-2xl px-6 h-12 font-black uppercase tracking-widest gap-2 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all font-medium text-slate-600 dark:text-slate-300"
+                    >
+                        <Pencil size={18} />
+                        Edit Recipe
+                    </Button>
                     <Button
                         onClick={toggleFavorite}
                         variant="outline"
