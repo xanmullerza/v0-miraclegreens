@@ -145,10 +145,10 @@ function BrowseFoodsContent() {
         registerResultClickHandler((result) => {
             const item = result.data as FoodItem;
             if (item) {
-                setSelectedItem(item);
+                router.push(`/dashboard/food/${item.id}`);
             }
         });
-    }, [registerResultClickHandler]);
+    }, [registerResultClickHandler, router]);
 
     // Update global search context when searching
     useEffect(() => {

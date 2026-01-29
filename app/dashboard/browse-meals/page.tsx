@@ -64,7 +64,7 @@ export default function BrowseMealsPage() {
     const [loadingMore, setLoadingMore] = useState(false);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
-    const { searchQuery, setSearchQuery } = useSearch();
+    const { searchQuery, setSearchQuery, setResults, setIsLoading: setGlobalLoading, registerResultClickHandler } = useSearch();
     const [selectedTypes, setSelectedTypes] = useState<string[]>(MEAL_TYPES);
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
@@ -127,6 +127,38 @@ export default function BrowseMealsPage() {
             fetchRecipes(page + 1);
         }
     };
+
+    // Register click handler for global search bar
+    useEffect(() => {
+        registerResultClickHandler((result) => {
+            const recipe = result.data as Recipe;
+            if (recipe) {
+                router.push(`/dashboard/recipes/${recipe.id}`);
+            }
+        });
+    }, [registerResultClickHandler, router]);
+
+    // Update global search context when searching
+    useEffect(() => {
+        if (!searchQuery.trim()) {
+            setResults([]);
+            return;
+        }
+
+        setGlobalLoading(true);
+        const filtered = recipes.filter(item =>
+            item.title.toLowerCase().includes(searchQuery.toLowerCase())
+        ).slice(0, 15);
+
+        setResults(filtered.map(item => ({
+            id: item.id,
+            title: item.title,
+            subtitle: `${item.type.toUpperCase()} • ${Math.round(item.calories)} kcal`,
+            badges: item.diet || [],
+            data: item
+        })));
+        setGlobalLoading(false);
+    }, [searchQuery, recipes, setResults, setGlobalLoading]);
 
     const toggleFavorite = async (recipe: Recipe) => {
         const newStatus = !recipe.is_favorite;
