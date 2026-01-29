@@ -205,7 +205,7 @@ export default function BrowseMealsPage() {
                             size={18}
                             className={cn(
                                 "transition-all cursor-pointer",
-                                !showFavoritesOnly ? "text-emerald-500 scale-110 drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]" : "text-slate-300 hover:text-slate-400"
+                                !showFavoritesOnly ? "text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" : "text-slate-300 hover:text-slate-400"
                             )}
                             onClick={() => setShowFavoritesOnly(false)}
                         />
@@ -213,7 +213,7 @@ export default function BrowseMealsPage() {
                             id="favorites-mode"
                             checked={showFavoritesOnly}
                             onCheckedChange={setShowFavoritesOnly}
-                            className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-emerald-600"
+                            className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-blue-600"
                         />
                         <Heart
                             size={18}
