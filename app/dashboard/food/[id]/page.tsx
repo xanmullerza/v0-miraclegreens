@@ -12,11 +12,9 @@ import {
     Droplet,
     Battery,
     Activity,
-    Info,
     Edit2,
     X,
     Loader2,
-    Layers,
     Share2,
     Star,
     Upload,
@@ -362,19 +360,8 @@ export default function FoodDetailsPage() {
 
             {/* Comprehensive Nutrient Report */}
             <div className="space-y-8">
-                <div className="flex items-center justify-between">
-                    <h2 className="text-3xl font-black uppercase tracking-tighter italic flex items-center gap-4">
-                        <Layers className="text-emerald-500" />
-                        Constituent Analysis
-                    </h2>
-                    <div className="p-4 bg-blue-500/5 border border-blue-500/20 rounded-2xl flex items-center gap-3">
-                        <Info size={16} className="text-blue-500" />
-                        <p className="text-[10px] uppercase font-black tracking-widest text-blue-600">All values represent a 100g clinical sample</p>
-                    </div>
-                </div>
-
                 <div className="space-y-8">
-                    <NutrientSection title="Hydration & Electrolytes" icon={Zap} theme="indigo" subtitle="Essential minerals for cellular hydration and nerve signal transmission" items={{
+                    <NutrientSection title="Electrolytes" icon={Zap} theme="indigo" subtitle="Essential minerals for cellular hydration and nerve signal transmission" items={{
                         'Sodium': ['Sodium', 'sodium_mg'],
                         'Potassium': ['Potassium', 'potassium_mg'],
                         'Magnesium': ['Magnesium', 'magnesium_mg'],
