@@ -319,6 +319,19 @@ export async function getUSDAFoodDetails(fdcId: number): Promise<{ portions: Foo
             }
         }
 
+        // Always add default base measures (gram and kilogram)
+        const defaultMeasures: FoodMeasure[] = [
+            { label: 'gram', weight_g: 1 },
+            { label: 'kilogram', weight_g: 1000 }
+        ];
+
+        // Add defaults if not already present
+        defaultMeasures.forEach(dm => {
+            if (!portions.find(p => p.label === dm.label)) {
+                portions.unshift(dm); // Add at beginning
+            }
+        });
+
         // Parse Micronutrients
         const micronutrients = extractUSDANutrients(data.foodNutrients);
 

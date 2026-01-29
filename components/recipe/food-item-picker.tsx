@@ -258,25 +258,53 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: Food
                             ) : (
                                 <div className="space-y-2">
                                     <div className="text-[10px] font-black uppercase tracking-tighter text-blue-600 mb-2 px-1">Global Results (Click to Import)</div>
-                                    {usdaResults.map((item, idx) => (
-                                        <button
-                                            key={item.fdcId || idx}
-                                            onClick={() => handleSelectUSDA(item)}
-                                            className="w-full text-left p-4 border border-blue-100 dark:border-blue-900/30 bg-card rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-500 transition group shadow-sm"
-                                        >
-                                            <div className="font-bold text-foreground group-hover:text-blue-700 dark:group-hover:text-blue-400">
-                                                {item.name}
-                                            </div>
-                                            <div className="text-xs text-muted-foreground mt-1 flex gap-2">
-                                                <span>{Math.round(item.energy_kcal)} kcal</span>
-                                                <span>•</span>
-                                                <span>P: {item.protein_g?.toFixed(1)}g</span>
-                                                <span>F: {item.fat_g?.toFixed(1)}g</span>
-                                                <span>C: {item.carbs_g?.toFixed(1)}g</span>
-                                                <Badge variant="outline" className="ml-auto text-[8px] py-0 h-4 uppercase border-blue-200 text-blue-600">USDA</Badge>
-                                            </div>
-                                        </button>
-                                    ))}
+                                    {usdaResults.map((item, idx) => {
+                                        // Determine badge color based on data type
+                                        const dataType = (item as any).dataType || 'Unknown';
+                                        const getTypeStyle = () => {
+                                            if (dataType.includes('SR Legacy') || dataType.includes('Foundation')) {
+                                                return 'border-green-300 text-green-600 bg-green-50 dark:bg-green-900/20';
+                                            }
+                                            if (dataType.includes('Survey')) {
+                                                return 'border-amber-300 text-amber-600 bg-amber-50 dark:bg-amber-900/20';
+                                            }
+                                            if (dataType.includes('Branded')) {
+                                                return 'border-gray-300 text-gray-500 bg-gray-50 dark:bg-gray-800/20';
+                                            }
+                                            return 'border-blue-200 text-blue-600';
+                                        };
+                                        const getTypeLabel = () => {
+                                            if (dataType.includes('SR Legacy')) return 'Raw';
+                                            if (dataType.includes('Foundation')) return 'Foundation';
+                                            if (dataType.includes('Survey')) return 'Survey';
+                                            if (dataType.includes('Branded')) return 'Branded';
+                                            return 'USDA';
+                                        };
+
+                                        return (
+                                            <button
+                                                key={item.fdcId || idx}
+                                                onClick={() => handleSelectUSDA(item)}
+                                                className="w-full text-left p-4 border border-blue-100 dark:border-blue-900/30 bg-card rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-500 transition group shadow-sm"
+                                            >
+                                                <div className="flex items-start justify-between gap-2">
+                                                    <div className="font-bold text-foreground group-hover:text-blue-700 dark:group-hover:text-blue-400 flex-1">
+                                                        {item.name}
+                                                    </div>
+                                                    <Badge variant="outline" className={`text-[8px] py-0 h-4 uppercase shrink-0 ${getTypeStyle()}`}>
+                                                        {getTypeLabel()}
+                                                    </Badge>
+                                                </div>
+                                                <div className="text-xs text-muted-foreground mt-1 flex gap-2">
+                                                    <span>{Math.round(item.energy_kcal)} kcal</span>
+                                                    <span>•</span>
+                                                    <span>P: {item.protein_g?.toFixed(1)}g</span>
+                                                    <span>F: {item.fat_g?.toFixed(1)}g</span>
+                                                    <span>C: {item.carbs_g?.toFixed(1)}g</span>
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             )}
                         </>
