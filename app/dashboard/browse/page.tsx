@@ -26,7 +26,8 @@ import {
     Camera,
     Upload,
     Save,
-    Loader2
+    Loader2,
+    Wheat
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -398,18 +399,17 @@ function BrowseFoodsContent() {
                     <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_80px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
                         <div></div>
                         <div></div>
-                        <div className="text-right">Calories</div>
-                        <div className="text-right flex items-center justify-end gap-1.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                            Carbs
+                        <div className="flex justify-end">
+                            <Zap size={14} className="text-emerald-500" title="Calories" />
                         </div>
-                        <div className="text-right flex items-center justify-end gap-1.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-sky-500" />
-                            Fat
+                        <div className="flex justify-end">
+                            <Wheat size={14} className="text-amber-500" title="Carbohydrates" />
                         </div>
-                        <div className="text-right flex items-center justify-end gap-1.5">
-                            <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-                            Protein
+                        <div className="flex justify-end">
+                            <Droplet size={14} className="text-sky-500" title="Fat" />
+                        </div>
+                        <div className="flex justify-end">
+                            <Beef size={14} className="text-purple-500" title="Protein" />
                         </div>
                         <div></div>
                     </div>
