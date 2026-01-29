@@ -203,10 +203,10 @@ export default function BrowseMealsPage() {
                         <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
                             <Library className="text-white" size={24} />
                         </div>
-                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Meal Library</h1>
+                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Meals Hub</h1>
                     </div>
                     <p className="text-emerald-50 font-medium max-w-md text-sm pl-1">
-                        Explore a world of nutritionally optimized laboratory-tested recipes.
+                        Explore a world of nutritionally optimized, budget friendly recipes.
                     </p>
                 </div>
 
