@@ -219,20 +219,27 @@ export default function BrowseMealsPage() {
                             {totalCount} <span className="text-emerald-300">MEALS</span>
                         </p>
                     </div>
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-2">
                         <Button
                             onClick={() => router.push('/dashboard/plan')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-12 rounded-2xl font-black uppercase tracking-widest group/btn transition-all"
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
-                            <Calendar size={18} className="group-hover/btn:scale-110 transition-transform" />
+                            <Calendar size={16} className="group-hover/btn:scale-110 transition-transform" />
                             Plan Your Meal
                         </Button>
                         <Button
                             onClick={() => router.push('/dashboard/recipes')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-12 rounded-2xl font-black uppercase tracking-widest group/btn transition-all"
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
-                            <Plus size={18} className="group-hover/btn:rotate-90 transition-transform" />
+                            <Plus size={16} className="group-hover/btn:rotate-90 transition-transform" />
                             Create a Recipe
+                        </Button>
+                        <Button
+                            onClick={() => router.push('/dashboard/browse')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                        >
+                            <Utensils size={16} className="group-hover/btn:scale-110 transition-transform" />
+                            Browse Foods
                         </Button>
                     </div>
                 </div>
