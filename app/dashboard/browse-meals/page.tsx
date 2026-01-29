@@ -20,7 +20,8 @@ import {
     Scale,
     Library,
     Globe,
-    Pencil
+    Pencil,
+    Calendar
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -212,13 +213,22 @@ export default function BrowseMealsPage() {
                             {totalCount} <span className="text-emerald-300">MEALS</span>
                         </p>
                     </div>
-                    <Button
-                        onClick={() => router.push('/dashboard/recipes')}
-                        className="bg-white hover:bg-emerald-50 text-emerald-600 rounded-2xl px-6 h-12 font-black uppercase tracking-widest gap-2 shadow-lg shadow-emerald-900/40 border-none group/btn"
-                    >
-                        <Plus size={18} className="group-hover/btn:rotate-90 transition-transform" />
-                        Create Recipe
-                    </Button>
+                    <div className="flex flex-col gap-3">
+                        <Button
+                            onClick={() => router.push('/dashboard/plan')}
+                            className="bg-emerald-500 hover:bg-emerald-400 text-white rounded-2xl px-6 h-12 font-black uppercase tracking-widest gap-2 shadow-lg shadow-emerald-900/40 border border-emerald-400/30 group/btn"
+                        >
+                            <Calendar size={18} className="group-hover/btn:scale-110 transition-transform" />
+                            Plan Your Meal
+                        </Button>
+                        <Button
+                            onClick={() => router.push('/dashboard/recipes')}
+                            className="bg-white hover:bg-emerald-50 text-emerald-600 rounded-2xl px-6 h-12 font-black uppercase tracking-widest gap-2 shadow-lg shadow-emerald-900/40 border-none group/btn"
+                        >
+                            <Plus size={18} className="group-hover/btn:rotate-90 transition-transform" />
+                            Create a Recipe
+                        </Button>
+                    </div>
                 </div>
             </div>
 
