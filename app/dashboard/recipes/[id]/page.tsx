@@ -150,7 +150,7 @@ export default function RecipeDetailsPage() {
         } catch (error) {
             console.error('Error fetching recipe:', error);
             toast.error('Failed to load recipe details');
-            router.push('/dashboard/my-meals');
+            router.push('/dashboard/browse-meals');
         } finally {
             setLoading(false);
         }

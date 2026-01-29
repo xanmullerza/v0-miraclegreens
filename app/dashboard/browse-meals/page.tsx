@@ -61,10 +61,11 @@ export default function BrowseMealsPage() {
     const [hasMore, setHasMore] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedTypes, setSelectedTypes] = useState<string[]>(MEAL_TYPES);
+    const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
     useEffect(() => {
         fetchRecipes(0, true);
-    }, [searchQuery, selectedTypes]);
+    }, [searchQuery, selectedTypes, showFavoritesOnly]);
 
     const fetchRecipes = async (pageNum: number, isNewSearch = false) => {
         if (pageNum === 0) setLoading(true);
@@ -82,6 +83,10 @@ export default function BrowseMealsPage() {
 
             if (selectedTypes.length < MEAL_TYPES.length) {
                 query = query.in('type', selectedTypes);
+            }
+
+            if (showFavoritesOnly) {
+                query = query.eq('is_favorite', true);
             }
 
             const from = pageNum * PAGE_SIZE;
@@ -168,6 +173,13 @@ export default function BrowseMealsPage() {
                             {totalCount} <span className="text-emerald-300">RECIPES</span>
                         </p>
                     </div>
+                    <Button
+                        onClick={() => router.push('/dashboard/recipes')}
+                        className="bg-white hover:bg-emerald-50 text-emerald-600 rounded-2xl px-6 h-12 font-black uppercase tracking-widest gap-2 shadow-lg shadow-emerald-900/40 border-none group/btn"
+                    >
+                        <Plus size={18} className="group-hover/btn:rotate-90 transition-transform" />
+                        Create Recipe
+                    </Button>
                 </div>
             </div>
 
@@ -183,32 +195,48 @@ export default function BrowseMealsPage() {
                     />
                 </div>
 
-                {/* Type Filter */}
-                <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar">
-                    {MEAL_TYPES.map(type => {
-                        const isActive = selectedTypes.includes(type);
+                <div className="flex items-center gap-3">
+                    {/* Favorites Toggle */}
+                    <button
+                        onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                        className={cn(
+                            "h-14 px-6 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center gap-2 transition-all border shrink-0",
+                            showFavoritesOnly
+                                ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
+                                : "bg-white dark:bg-slate-900/50 text-slate-500 border-slate-200 dark:border-slate-800 hover:bg-slate-50"
+                        )}
+                    >
+                        <Heart size={16} fill={showFavoritesOnly ? "currentColor" : "none"} />
+                        {showFavoritesOnly ? "My Collection" : "Browse All"}
+                    </button>
 
-                        return (
-                            <button
-                                key={type}
-                                onClick={() => {
-                                    if (isActive) {
-                                        setSelectedTypes(prev => prev.filter(t => t !== type));
-                                    } else {
-                                        setSelectedTypes(prev => [...prev, type]);
-                                    }
-                                }}
-                                className={cn(
-                                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
-                                    isActive
-                                        ? "bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
-                                        : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
-                                )}
-                            >
-                                {type}
-                            </button>
-                        );
-                    })}
+                    {/* Type Filter */}
+                    <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar">
+                        {MEAL_TYPES.map(type => {
+                            const isActive = selectedTypes.includes(type);
+
+                            return (
+                                <button
+                                    key={type}
+                                    onClick={() => {
+                                        if (isActive) {
+                                            setSelectedTypes(prev => prev.filter(t => t !== type));
+                                        } else {
+                                            setSelectedTypes(prev => [...prev, type]);
+                                        }
+                                    }}
+                                    className={cn(
+                                        "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
+                                        isActive
+                                            ? "bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
+                                            : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
+                                    )}
+                                >
+                                    {type}
+                                </button>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
 
@@ -223,10 +251,24 @@ export default function BrowseMealsPage() {
             ) : recipes.length === 0 ? (
                 <div className="h-96 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
                     <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
-                        <Library size={32} />
+                        {showFavoritesOnly ? <Heart size={32} /> : <Library size={32} />}
                     </div>
-                    <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">No results found.</p>
-                    <p className="text-sm text-slate-500 text-center">We couldn't find any recipes matching your criteria.</p>
+                    <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                        {showFavoritesOnly ? "Your collection is empty" : "No results found"}
+                    </p>
+                    <p className="text-sm text-slate-500 text-center max-w-xs">
+                        {showFavoritesOnly
+                            ? "You haven't favorited any recipes yet. Browse the library to add some to your collection."
+                            : "We couldn't find any recipes matching your criteria."}
+                    </p>
+                    {showFavoritesOnly && (
+                        <Button
+                            onClick={() => setShowFavoritesOnly(false)}
+                            className="mt-6 rounded-full bg-emerald-600 text-white px-8 font-black uppercase tracking-widest text-[10px]"
+                        >
+                            Browse All Recipes
+                        </Button>
+                    )}
                 </div>
             ) : (
                 <div className="space-y-4">

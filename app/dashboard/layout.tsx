@@ -49,7 +49,6 @@ const sidebarGroups = [
         id: 'meals',
         title: 'Meals',
         items: [
-            { name: 'My Meals', href: '/dashboard/my-meals', icon: Heart },
             { name: 'Browse Meals', href: '/dashboard/browse-meals', icon: Library },
             { name: 'Plan Meals', href: '/dashboard/plan', icon: Calendar },
             { name: 'Add New Recipes', href: '/dashboard/recipes', icon: Plus },

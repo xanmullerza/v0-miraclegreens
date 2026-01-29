@@ -438,7 +438,7 @@ export default function DashboardRecipePage() {
             if (instructionsError) throw instructionsError;
 
             alert('Recipe created successfully!');
-            router.push('/dashboard/my-meals');
+            router.push('/dashboard/browse-meals');
         } catch (error: any) {
             console.error('Error creating recipe:', error);
             alert(`Failed: ${error.message}`);

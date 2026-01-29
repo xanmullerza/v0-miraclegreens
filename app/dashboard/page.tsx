@@ -15,7 +15,8 @@ import {
     Sparkles,
     ChefHat,
     Heart,
-    Calendar
+    Calendar,
+    Library
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -93,10 +94,10 @@ export default function DashboardOverview() {
             bg: 'bg-purple-500/10'
         },
         {
-            name: 'My Meals',
-            desc: 'View and manage your favorite personalized recipes and meals.',
-            href: '/dashboard/my-meals',
-            icon: Heart,
+            name: 'Meal Library',
+            desc: 'View and manage your personalized recipes and the global database.',
+            href: '/dashboard/browse-meals',
+            icon: Library,
             color: 'text-rose-500',
             bg: 'bg-rose-500/10'
         },
