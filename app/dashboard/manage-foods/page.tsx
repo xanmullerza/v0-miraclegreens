@@ -308,7 +308,7 @@ export default function ManageFoodsPage() {
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex items-center justify-end gap-2 text-slate-400">
                                             <button
-                                                onClick={() => router.push(`/dashboard/browse?id=${item.id}`)}
+                                                onClick={() => router.push(`/dashboard/food/${item.id}`)}
                                                 className="p-2 hover:text-emerald-500 transition-colors"
                                                 title="View Profile"
                                             >

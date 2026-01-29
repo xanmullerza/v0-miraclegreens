@@ -428,7 +428,7 @@ function BrowseFoodsContent() {
                         {foods.map((food) => (
                             <div
                                 key={food.id}
-                                onClick={() => setSelectedItem(food)}
+                                onClick={() => router.push(`/dashboard/food/${food.id}`)}
                                 className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
                             >
                                 <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_40px] gap-4 lg:items-center">
@@ -532,138 +532,7 @@ function BrowseFoodsContent() {
                 </div>
             )}
 
-            {/* Detail Modal */}
-            {selectedItem && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200 overflow-y-auto">
-                    <div className="w-full max-w-4xl my-8">
-                        <Card className="bg-white dark:bg-slate-900 shadow-2xl border-emerald-500/20 max-h-[85vh] overflow-y-auto">
-                            {/* Modal Header */}
-                            <div className="sticky top-0 z-10 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 p-4 flex justify-between items-center">
-                                <div className="flex items-center gap-4">
-                                    <Badge variant="outline" className="text-emerald-600 bg-emerald-50 border-emerald-200 uppercase tracking-widest text-[10px] px-2">Clinical Profile</Badge>
-                                    <h2 className="text-xl font-black capitalize">{selectedItem.common_name || selectedItem.name}</h2>
-                                </div>
-                                <div className="flex gap-2">
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        className={cn(
-                                            "rounded-full h-10 w-10 transition-all",
-                                            selectedItem.is_favorite ? "text-rose-500 border-rose-200 bg-rose-50 dark:bg-rose-900/20 dark:border-rose-900/50" : ""
-                                        )}
-                                        onClick={() => toggleFavorite(selectedItem)}
-                                    >
-                                        <Heart size={18} fill={selectedItem.is_favorite ? "currentColor" : "none"} />
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        size="icon"
-                                        className="rounded-full h-10 w-10 text-emerald-500 border-emerald-100 hover:bg-emerald-50 dark:border-emerald-900/30 dark:hover:bg-emerald-900/20"
-                                        onClick={() => {
-                                            setEditingItem(selectedItem);
-                                            setEditName(selectedItem.name);
-                                            setEditCommonName(selectedItem.common_name);
-                                            setEditCategory(selectedItem.category || 'General');
-                                            setEditImage(selectedItem.image || '');
-                                        }}
-                                    >
-                                        <Edit2 size={18} />
-                                    </Button>
-                                    <button onClick={() => setSelectedItem(null)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400">
-                                        <X size={20} />
-                                    </button>
-                                </div>
-                            </div>
 
-                            <div className="p-6 space-y-6">
-                                {/* Image and Basic Info */}
-                                <div className="flex flex-col md:flex-row gap-6">
-                                    <div className="w-full md:w-48 h-48 rounded-2xl bg-slate-100 dark:bg-slate-800 overflow-hidden flex items-center justify-center">
-                                        {selectedItem.image ? (
-                                            <img src={selectedItem.image} alt={selectedItem.name} className="w-full h-full object-cover" />
-                                        ) : (
-                                            <Beef size={48} className="text-slate-300 dark:text-slate-700 opacity-50" />
-                                        )}
-                                    </div>
-                                    <div className="flex-1 space-y-4">
-                                        {selectedItem.common_name && (
-                                            <p className="text-slate-500 font-medium italic">Scientific: {selectedItem.name}</p>
-                                        )}
-                                        <div className="flex flex-wrap gap-2">
-                                            {selectedItem.protein_g > 10 && <Badge className="bg-red-500/10 text-red-600 border-red-200 px-3 py-1">High Protein</Badge>}
-                                            {selectedItem.carbs_g < 5 && selectedItem.fat_g > 5 && <Badge className="bg-blue-500/10 text-blue-600 border-blue-200 px-3 py-1">Keto Friendly</Badge>}
-                                            {selectedItem.energy_kcal < 100 && <Badge className="bg-green-500/10 text-green-600 border-green-200 px-3 py-1">Low Calorie</Badge>}
-                                            {(selectedItem.micronutrients['Fiber'] || 0) > 5 && <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-200 px-3 py-1">High Fiber</Badge>}
-                                        </div>
-
-                                        {/* Macro Breakdown */}
-                                        <div className="grid grid-cols-4 gap-3">
-                                            {[
-                                                { label: 'Energy', val: selectedItem.energy_kcal, unit: 'kcal', color: 'text-orange-500', bg: 'bg-orange-500/10' },
-                                                { label: 'Protein', val: selectedItem.protein_g, unit: 'g', color: 'text-red-500', bg: 'bg-red-500/10' },
-                                                { label: 'Carbs', val: selectedItem.carbs_g, unit: 'g', color: 'text-blue-500', bg: 'bg-blue-500/10' },
-                                                { label: 'Fat', val: selectedItem.fat_g, unit: 'g', color: 'text-amber-500', bg: 'bg-amber-500/10' },
-                                            ].map(macro => (
-                                                <div key={macro.label} className="p-4 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-center">
-                                                    <div className="text-xl font-black">{macro.val.toFixed(macro.label === 'Energy' ? 0 : 1)}<span className="text-xs font-bold text-slate-400 ml-1">{macro.unit}</span></div>
-                                                    <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">{macro.label}</div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Detailed Nutrient Sections */}
-                                <div className="space-y-6">
-                                    <NutrientSection title="Electrolytes" icon={Zap} theme="indigo" subtitle="Hydration • Muscle & Nerve Function" items={{
-                                        'Sodium': ['Sodium', 'sodium_mg'],
-                                        'Potassium': ['Potassium', 'potassium_mg'],
-                                        'Magnesium': ['Magnesium', 'magnesium_mg'],
-                                        'Calcium': ['Calcium', 'calcium_mg'],
-                                        'Phosphorus': ['Phosphorus', 'phosphorus_mg']
-                                    }} />
-
-                                    <NutrientSection title="Trace Minerals" icon={Gem} theme="rose" subtitle="Essential micro-minerals" items={{
-                                        'Iron': ['Iron', 'iron_mg'],
-                                        'Zinc': ['Zinc', 'zinc_mg'],
-                                        'Copper': ['Copper', 'copper_mg'],
-                                        'Manganese': ['Manganese', 'manganese_mg'],
-                                        'Selenium': ['Selenium', 'selenium_ug']
-                                    }} />
-
-                                    <NutrientSection title="Daily Vitamins" icon={Droplet} theme="blue" subtitle="Water-soluble • Must be replenished daily" items={{
-                                        'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
-                                        'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
-                                        'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
-                                        'B5 (Pantothenic)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
-                                        'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
-                                        'B7 (Biotin)': ['Biotin', 'biotin_ug'],
-                                        'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
-                                        'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
-                                        'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
-                                        'Choline': ['Choline', 'choline_mg'],
-                                    }} />
-
-                                    <NutrientSection title="Stored Vitamins" icon={Battery} theme="emerald" subtitle="Fat-soluble • Stored in body tissues" items={{
-                                        'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
-                                        'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
-                                        'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
-                                        'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
-                                    }} />
-
-                                    <NutrientSection title="Health Markers" icon={Activity} theme="amber" subtitle="Specialized nutritional markers" items={{
-                                        'Fiber': ['Fiber'],
-                                        'Sugars': ['Sugars'],
-                                        'Oxalate': ['Oxalate'],
-                                        'Omega-3': ['Omega-3'],
-                                        'Cholesterol': ['Cholesterol'],
-                                    }} />
-                                </div>
-                            </div>
-                        </Card>
-                    </div>
-                </div>
-            )}
 
             {/* Edit Modal */}
             {editingItem && (

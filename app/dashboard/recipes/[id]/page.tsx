@@ -325,8 +325,15 @@ export default function RecipeDetailsPage() {
                                 Lab Ingredients
                             </h3>
                             <div className="space-y-2">
-                                {ingredients.map((ing, i) => (
-                                    <div key={i} className="flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/20 transition-all group">
+                                {ingredients.map((ing: any, i) => (
+                                    <div
+                                        key={i}
+                                        onClick={() => ing.food_item_id && router.push(`/dashboard/food/${ing.food_item_id}`)}
+                                        className={cn(
+                                            "flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/20 transition-all group",
+                                            ing.food_item_id ? "cursor-pointer" : ""
+                                        )}
+                                    >
                                         <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center text-emerald-500 font-black text-xs group-hover:bg-emerald-500 group-hover:text-white transition-all">
                                             {i + 1}
                                         </div>
