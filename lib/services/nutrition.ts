@@ -61,50 +61,50 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
  * Searches for food items using the USDA FoodData Central API.
  */
 const USDA_MICRO_MAP: Record<string, string> = {
-    'Potassium, K': 'Potassium',
-    'Magnesium, Mg': 'Magnesium',
-    'Calcium, Ca': 'Calcium',
-    'Phosphorus, P': 'Phosphorus',
-    'Sodium, Na': 'Sodium',
-    'Iron, Fe': 'Iron',
-    'Zinc, Zn': 'Zinc',
-    'Selenium, Se': 'Selenium',
-    'Copper, Cu': 'Copper',
-    'Manganese, Mn': 'Manganese',
-    'Iodine, I': 'Iodine',
-    'Fluoride, F': 'Fluoride',
+    'Potassium': 'Potassium',
+    'Magnesium': 'Magnesium',
+    'Calcium': 'Calcium',
+    'Phosphorus': 'Phosphorus',
+    'Sodium': 'Sodium',
+    'Iron': 'Iron',
+    'Zinc': 'Zinc',
+    'Selenium': 'Selenium',
+    'Copper': 'Copper',
+    'Manganese': 'Manganese',
+    'Iodine': 'Iodine',
+    'Fluoride': 'Fluoride',
     'Chromium': 'Chromium',
     'Molybdenum': 'Molybdenum',
-    'Vitamin A, RAE': 'Vitamin A',
-    'Vitamin C, total ascorbic acid': 'Vitamin C',
-    'Vitamin D (D2 + D3)': 'Vitamin D',
-    'Vitamin E (alpha-tocopherol)': 'Vitamin E',
-    'Vitamin K (phylloquinone)': 'Vitamin K',
+    'Vitamin A': 'Vitamin A',
+    'Vitamin C': 'Vitamin C',
+    'Vitamin D': 'Vitamin D',
+    'Vitamin E': 'Vitamin E',
+    'Vitamin K': 'Vitamin K',
     'Thiamin': 'B1 (Thiamine)',
     'Riboflavin': 'B2 (Riboflavin)',
     'Niacin': 'B3 (Niacin)',
-    'Pantothenic acid': 'B5 (Pantothenic Acid)',
+    'Pantothenic': 'B5 (Pantothenic Acid)',
     'Vitamin B-6': 'B6 (Pyridoxine)',
-    'Folate, total': 'B9 (Folate)',
+    'Folate': 'B9 (Folate)',
     'Vitamin B-12': 'B12 (Cobalamin)',
-    'Choline, total': 'Choline',
-    'Fiber, total dietary': 'Fiber',
+    'Choline': 'Choline',
+    'Fiber': 'Fiber',
     'Ash': 'Ash',
     'Water': 'Water',
-    'Alcohol, ethyl': 'Alcohol',
-    'Sugars, total': 'Sugars',
+    'Alcohol': 'Alcohol',
+    'Sugars': 'Sugars',
     'Sucrose': 'Sucrose',
-    'Glucose (dextrose)': 'Glucose',
+    'Glucose': 'Glucose',
     'Fructose': 'Fructose',
     'Lactose': 'Lactose',
     'Maltose': 'Maltose',
     'Galactose': 'Galactose',
     'Starch': 'Starch',
     'Cholesterol': 'Cholesterol',
-    'Fatty acids, total saturated': 'Saturated Fat',
-    'Fatty acids, total monounsaturated': 'Monounsaturated Fat',
-    'Fatty acids, total polyunsaturated': 'Polyunsaturated Fat',
-    'Fatty acids, total trans': 'Trans Fat',
+    'Saturated': 'Saturated Fat',
+    'Monounsaturated': 'Monounsaturated Fat',
+    'Polyunsaturated': 'Polyunsaturated Fat',
+    'Trans': 'Trans Fat',
     'Tryptophan': 'Tryptophan',
     'Threonine': 'Threonine',
     'Isoleucine': 'Isoleucine',
@@ -118,8 +118,8 @@ const USDA_MICRO_MAP: Record<string, string> = {
     'Arginine': 'Arginine',
     'Histidine': 'Histidine',
     'Alanine': 'Alanine',
-    'Aspartic acid': 'Aspartic acid',
-    'Glutamic acid': 'Glutamic acid',
+    'Aspartic': 'Aspartic acid',
+    'Glutamic': 'Glutamic acid',
     'Glycine': 'Glycine',
     'Proline': 'Proline',
     'Serine': 'Serine',
@@ -127,9 +127,9 @@ const USDA_MICRO_MAP: Record<string, string> = {
     'Retinol': 'Retinol',
     'Carotene, beta': 'Beta-carotene',
     'Carotene, alpha': 'Alpha-carotene',
-    'Cryptoxanthin, beta': 'Beta-cryptoxanthin',
+    'Cryptoxanthin': 'Beta-cryptoxanthin',
     'Lycopene': 'Lycopene',
-    'Lutein + zeaxanthin': 'Lutein + Zeaxanthin',
+    'Lutein': 'Lutein + Zeaxanthin',
     'Tocopherol, beta': 'Beta-tocopherol',
     'Tocopherol, gamma': 'Gamma-tocopherol',
     'Tocopherol, delta': 'Delta-tocopherol',
@@ -143,6 +143,7 @@ function extractUSDANutrients(foodNutrients: any[]): Record<string, number> {
         foodNutrients.forEach((nut: any) => {
             Object.entries(USDA_MICRO_MAP).forEach(([usdaName, ourName]) => {
                 // Check for Details API format (item.nutrient.name)
+                // We use .includes() so "Vitamin A, RAE" matches "Vitamin A"
                 if (nut.nutrient?.name && nut.nutrient.name.toLowerCase().includes(usdaName.toLowerCase())) {
                     micronutrients[ourName] = nut.amount || nut.value || 0;
                 }
@@ -250,7 +251,7 @@ export async function getUSDAFoodDetails(fdcId: number): Promise<{ portions: Foo
         if (data.foodPortions) {
             portions.push(...data.foodPortions.map((p: any) => {
                 let label = (p.modifier || '').trim();
-                let unitName = (p.measureUnitName || '').trim();
+                let unitName = (p.measureUnit?.name || p.measureUnitName || '').trim(); // FIXED: Check nested measureUnit.name first
 
                 const isBad = (s: string) => !s || /^\d+$/.test(s) || s.toLowerCase() === 'undetermined' || s.length > 25;
 
