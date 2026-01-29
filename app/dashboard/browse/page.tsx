@@ -30,7 +30,9 @@ import {
     Wheat,
     Filter,
     Check,
-    ChevronDown
+    ChevronDown,
+    Scale,
+    ChefHat
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -339,12 +341,37 @@ function BrowseFoodsContent() {
                     </p>
                 </div>
 
+
                 <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-6">
                     <div className="text-right hidden sm:block">
                         <p className="text-[10px] font-black uppercase tracking-widest text-emerald-200 mb-1">Global Database</p>
                         <p className="text-3xl font-black text-white leading-none tracking-tighter italic">
                             {foods.length} <span className="text-emerald-300">FOODS</span>
                         </p>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <Button
+                            onClick={() => router.push('/dashboard/compare')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                        >
+                            <Scale size={16} className="group-hover/btn:scale-110 transition-transform" />
+                            Compare Foods
+                        </Button>
+                        <Button
+                            onClick={() => router.push('/dashboard/food')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                        >
+                            <Plus size={16} className="group-hover/btn:rotate-90 transition-transform" />
+                            Add New Food
+                        </Button>
+                        <Button
+                            onClick={() => router.push('/dashboard/meals')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                        >
+                            <ChefHat size={16} className="group-hover/btn:scale-110 transition-transform" />
+                            Browse Recipes
+                        </Button>
                     </div>
                 </div>
             </div>
