@@ -52,30 +52,69 @@ const MEAL_TYPES = ["breakfast", "lunch", "dinner", "snack"];
 
 export default function BrowseMealsPage() {
     const router = useRouter();
+    const PAGE_SIZE = 20;
     const [recipes, setRecipes] = useState<Recipe[]>([]);
+    const [totalCount, setTotalCount] = useState(0);
     const [loading, setLoading] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [page, setPage] = useState(0);
+    const [hasMore, setHasMore] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedTypes, setSelectedTypes] = useState<string[]>(MEAL_TYPES);
 
     useEffect(() => {
-        fetchAllRecipes();
-    }, []);
+        fetchRecipes(0, true);
+    }, [searchQuery, selectedTypes]);
 
-    const fetchAllRecipes = async () => {
-        setLoading(true);
+    const fetchRecipes = async (pageNum: number, isNewSearch = false) => {
+        if (pageNum === 0) setLoading(true);
+        else setLoadingMore(true);
+
         try {
-            const { data, error } = await supabase
+            let query = supabase
                 .from('recipes')
-                .select('*')
+                .select('*', { count: 'exact' })
                 .order('title', { ascending: true });
 
+            if (searchQuery.trim()) {
+                query = query.ilike('title', `%${searchQuery}%`);
+            }
+
+            if (selectedTypes.length < MEAL_TYPES.length) {
+                query = query.in('type', selectedTypes);
+            }
+
+            const from = pageNum * PAGE_SIZE;
+            const to = from + PAGE_SIZE - 1;
+            query = query.range(from, to);
+
+            const { data, error, count } = await query;
             if (error) throw error;
-            setRecipes(data || []);
+
+            if (count !== null) setTotalCount(count);
+
+            const newItems = data || [];
+            if (isNewSearch) {
+                setRecipes(newItems);
+                setPage(0);
+            } else {
+                setRecipes(prev => [...prev, ...newItems]);
+                setPage(pageNum);
+            }
+
+            setHasMore(count ? (isNewSearch ? newItems.length : recipes.length + newItems.length) < count : false);
         } catch (error) {
             console.error('Error fetching recipes:', error);
             toast.error('Failed to load recipe library');
         } finally {
             setLoading(false);
+            setLoadingMore(false);
+        }
+    };
+
+    const handleLoadMore = () => {
+        if (!loadingMore && hasMore) {
+            fetchRecipes(page + 1);
         }
     };
 
@@ -96,18 +135,12 @@ export default function BrowseMealsPage() {
             if (newStatus) {
                 toast.success('Added to collections');
             } else {
-                toast.success('Removed from collections');
+                toast.info('Removed from collections');
             }
         } catch (error) {
             toast.error('Failed to update favorite status');
         }
     };
-
-    const filteredRecipes = recipes.filter(recipe => {
-        const matchesSearch = recipe.title.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesType = selectedTypes.includes(recipe.type?.toLowerCase());
-        return matchesSearch && matchesType;
-    });
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
@@ -132,7 +165,7 @@ export default function BrowseMealsPage() {
                     <div className="text-right hidden sm:block">
                         <p className="text-[10px] font-black uppercase tracking-widest text-emerald-200 mb-1">Global Database</p>
                         <p className="text-3xl font-black text-white leading-none tracking-tighter italic">
-                            {recipes.length} <span className="text-emerald-300">RECIPES</span>
+                            {totalCount} <span className="text-emerald-300">RECIPES</span>
                         </p>
                     </div>
                 </div>
@@ -154,7 +187,6 @@ export default function BrowseMealsPage() {
                 <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar">
                     {MEAL_TYPES.map(type => {
                         const isActive = selectedTypes.includes(type);
-                        const count = recipes.filter(r => r.type?.toLowerCase() === type).length;
 
                         return (
                             <button
@@ -174,19 +206,13 @@ export default function BrowseMealsPage() {
                                 )}
                             >
                                 {type}
-                                <span className={cn(
-                                    "px-1.5 py-0.5 rounded-md text-[9px]",
-                                    isActive ? "bg-white/20" : "bg-slate-100 dark:bg-slate-800"
-                                )}>
-                                    {count}
-                                </span>
                             </button>
                         );
                     })}
                 </div>
             </div>
 
-            {/* Main Grid */}
+            {/* Main Content Area */}
             {loading ? (
                 <div className="h-96 flex flex-col items-center justify-center gap-4">
                     <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
@@ -194,7 +220,7 @@ export default function BrowseMealsPage() {
                     </div>
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Querying Databank...</p>
                 </div>
-            ) : filteredRecipes.length === 0 ? (
+            ) : recipes.length === 0 ? (
                 <div className="h-96 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
                     <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
                         <Library size={32} />
@@ -203,84 +229,140 @@ export default function BrowseMealsPage() {
                     <p className="text-sm text-slate-500 text-center">We couldn't find any recipes matching your criteria.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredRecipes.map((recipe) => (
-                        <Card key={recipe.id} className="group relative transition-all duration-300 hover:scale-[1.02] hover:shadow-xl border-transparent hover:border-emerald-500/20">
-                            {/* Action Buttons */}
-                            <div className="absolute top-3 right-3 z-10 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button
-                                    onClick={() => toggleFavorite(recipe)}
-                                    className={cn(
-                                        "w-8 h-8 rounded-full shadow-sm flex items-center justify-center transition-all border",
-                                        recipe.is_favorite
-                                            ? "bg-rose-500 text-white border-rose-600 scale-110"
-                                            : "bg-white/90 dark:bg-slate-950/90 text-slate-400 hover:text-rose-500 border-slate-100 dark:border-slate-800"
-                                    )}
-                                >
-                                    <Heart size={14} fill={recipe.is_favorite ? "currentColor" : "none"} />
-                                </button>
-                            </div>
+                <div className="space-y-4">
+                    {/* List Header */}
+                    <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_40px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                        <div>Image</div>
+                        <div>Meal Item</div>
+                        <div className="text-right">Calories</div>
+                        <div className="text-right flex items-center justify-end gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                            Carbs
+                        </div>
+                        <div className="text-right flex items-center justify-end gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-sky-500" />
+                            Fat
+                        </div>
+                        <div className="text-right flex items-center justify-end gap-1.5">
+                            <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                            Protein
+                        </div>
+                        <div></div>
+                    </div>
 
-                            <div className="p-3">
-                                <div className="aspect-[4/3] rounded-xl bg-slate-100 dark:bg-slate-950/50 mb-4 overflow-hidden relative border border-slate-100 dark:border-slate-800">
-                                    {recipe.image ? (
-                                        <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                            <ChefHat size={48} className="opacity-20" />
-                                        </div>
-                                    )}
-                                    <div className="absolute top-2 left-2">
-                                        <Badge className="bg-white/90 dark:bg-slate-900/90 text-slate-800 dark:text-white border-none text-[8px] font-black uppercase tracking-widest px-2.5 py-1 backdrop-blur-sm">
-                                            {recipe.type}
-                                        </Badge>
-                                    </div>
-                                    <div className="absolute bottom-0 inset-x-0 p-3 bg-gradient-to-t from-black/60 to-transparent">
-                                        <div className="flex items-center gap-3 text-white">
-                                            <div className="flex items-center gap-1">
-                                                <Clock size={10} className="text-emerald-400" />
-                                                <span className="text-[9px] font-black">{recipe.prep_time}m</span>
+                    {/* Meal Items List */}
+                    <div className="space-y-3">
+                        {recipes.map((recipe) => (
+                            <div
+                                key={recipe.id}
+                                onClick={() => router.push(`/dashboard/recipes/${recipe.id}`)}
+                                className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
+                            >
+                                <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_40px] gap-4 lg:items-center">
+                                    {/* Thumbnail */}
+                                    <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
+                                        {recipe.image ? (
+                                            <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                <ChefHat size={24} className="opacity-20" />
                                             </div>
-                                            <div className="flex items-center gap-1">
-                                                <Users size={10} className="text-emerald-400" />
-                                                <span className="text-[9px] font-black">{recipe.servings}P</span>
-                                            </div>
-                                        </div>
+                                        )}
                                     </div>
-                                </div>
 
-                                <div className="space-y-3">
-                                    <div className="min-h-[40px]">
-                                        <h3 className="font-bold text-sm tracking-tight line-clamp-2 text-slate-900 dark:text-white leading-tight">
+                                    {/* Info */}
+                                    <div className="p-3 lg:p-0">
+                                        <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
                                             {recipe.title}
                                         </h3>
+                                        <div className="flex items-center gap-3 mt-1">
+                                            <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
+                                                <Clock size={10} />
+                                                {recipe.prep_time}m
+                                            </div>
+                                            <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
+                                                <Users size={10} />
+                                                {recipe.servings}P
+                                            </div>
+                                            <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase tracking-widest px-1.5 py-0">
+                                                {recipe.type}
+                                            </Badge>
+                                        </div>
                                     </div>
 
-                                    <div className="grid grid-cols-4 gap-1">
+                                    {/* Stats (Desktop View) */}
+                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                        {Math.round(recipe.calories)}
+                                    </div>
+                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                        {recipe.carbs.toFixed(1)}g
+                                    </div>
+                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                        {recipe.fat.toFixed(1)}g
+                                    </div>
+                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                        {recipe.protein.toFixed(1)}g
+                                    </div>
+
+                                    {/* Mobile Stats Row */}
+                                    <div className="lg:hidden grid grid-cols-4 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
                                         {[
-                                            { label: 'CAL', val: recipe.calories, sub: 'kcal', color: 'text-orange-500' },
-                                            { label: 'PRO', val: recipe.protein, sub: 'g', color: 'text-red-500' },
+                                            { label: 'CAL', val: recipe.calories, sub: 'k', color: 'text-orange-500' },
                                             { label: 'CHO', val: recipe.carbs, sub: 'g', color: 'text-amber-500' },
-                                            { label: 'FAT', val: recipe.fat, sub: 'g', color: 'text-sky-500' }
+                                            { label: 'FAT', val: recipe.fat, sub: 'g', color: 'text-sky-500' },
+                                            { label: 'PRO', val: recipe.protein, sub: 'g', color: 'text-purple-500' }
                                         ].map(stat => (
-                                            <div key={stat.label} className="p-2 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 text-center">
-                                                <p className="text-[7px] font-black uppercase tracking-tighter text-slate-400 mb-0.5">{stat.label}</p>
-                                                <p className={cn("text-xs font-black leading-none", stat.color)}>{Math.round(stat.val)}<span className="text-[7px] opacity-70 ml-0.5">{stat.sub}</span></p>
+                                            <div key={stat.label} className="text-center">
+                                                <p className="text-[8px] font-black text-slate-400 mb-0.5">{stat.label}</p>
+                                                <p className={cn("text-xs font-black", stat.color)}>{Math.round(stat.val)}{stat.sub}</p>
                                             </div>
                                         ))}
                                     </div>
 
-                                    <button
-                                        onClick={() => router.push(`/dashboard/recipes/${recipe.id}`)}
-                                        className="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/50 hover:bg-emerald-500 hover:text-white transition-all group/btn2 border border-transparent"
-                                    >
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 group-hover/btn2:text-white">View Details</span>
-                                        <ArrowRight size={12} className="group-hover/btn2:translate-x-1 transition-transform" />
-                                    </button>
+                                    {/* Action Buttons */}
+                                    <div className="p-3 lg:p-0 flex justify-end lg:justify-center pr-4">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleFavorite(recipe);
+                                            }}
+                                            className={cn(
+                                                "w-8 h-8 rounded-full shadow-sm flex items-center justify-center transition-all border",
+                                                recipe.is_favorite
+                                                    ? "bg-rose-500 text-white border-rose-600 scale-110"
+                                                    : "bg-white/90 dark:bg-slate-950/90 text-slate-400 hover:text-rose-500 border-slate-100 dark:border-slate-800"
+                                            )}
+                                        >
+                                            <Heart size={14} fill={recipe.is_favorite ? "currentColor" : "none"} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </Card>
-                    ))}
+                        ))}
+                    </div>
+
+                    {/* Pagination Button */}
+                    {hasMore && (
+                        <div className="flex justify-center pt-8">
+                            <Button
+                                onClick={handleLoadMore}
+                                disabled={loadingMore}
+                                className="h-14 px-8 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-[0.2em] shadow-xl group transition-all"
+                            >
+                                {loadingMore ? (
+                                    <>
+                                        <Loader2 className="animate-spin mr-3" size={18} />
+                                        Loading Results...
+                                    </>
+                                ) : (
+                                    <>
+                                        View More Meals
+                                        <ArrowRight className="ml-3 group-hover:translate-x-1 transition-transform" size={18} />
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                    )}
                 </div>
             )}
         </div>
