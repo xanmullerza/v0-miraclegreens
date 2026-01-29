@@ -75,24 +75,24 @@ const USDA_MICRO_MAP: Record<string, string> = {
     'Fluoride': 'Fluoride',
     'Chromium': 'Chromium',
     'Molybdenum': 'Molybdenum',
-    'Vitamin A': 'Vitamin A',
+    'Vitamin A, RAE': 'Vitamin A',  // More specific to avoid matching IU version
     'Vitamin C': 'Vitamin C',
-    'Vitamin D': 'Vitamin D',
-    'Vitamin E': 'Vitamin E',
-    'Vitamin K': 'Vitamin K',
+    'Vitamin D (D2 + D3)': 'Vitamin D', // More specific
+    'Vitamin E (alpha-tocopherol)': 'Vitamin E', // More specific
+    'Vitamin K (phylloquinone)': 'Vitamin K',
     'Thiamin': 'B1 (Thiamine)',
     'Riboflavin': 'B2 (Riboflavin)',
     'Niacin': 'B3 (Niacin)',
-    'Pantothenic': 'B5 (Pantothenic Acid)',
+    'Pantothenic acid': 'B5 (Pantothenic Acid)',
     'Vitamin B-6': 'B6 (Pyridoxine)',
-    'Folate': 'B9 (Folate)',
+    'Folate, total': 'B9 (Folate)', // More specific
     'Vitamin B-12': 'B12 (Cobalamin)',
-    'Choline': 'Choline',
-    'Fiber': 'Fiber',
+    'Choline, total': 'Choline', // More specific
+    'Fiber, total dietary': 'Fiber',
     'Ash': 'Ash',
     'Water': 'Water',
-    'Alcohol': 'Alcohol',
-    'Sugars': 'Sugars',
+    'Alcohol, ethyl': 'Alcohol',
+    'Total Sugars': 'Sugars',
     'Sucrose': 'Sucrose',
     'Glucose': 'Glucose',
     'Fructose': 'Fructose',
@@ -101,10 +101,10 @@ const USDA_MICRO_MAP: Record<string, string> = {
     'Galactose': 'Galactose',
     'Starch': 'Starch',
     'Cholesterol': 'Cholesterol',
-    'Saturated': 'Saturated Fat',
-    'Monounsaturated': 'Monounsaturated Fat',
-    'Polyunsaturated': 'Polyunsaturated Fat',
-    'Trans': 'Trans Fat',
+    'Fatty acids, total saturated': 'Saturated Fat',
+    'Fatty acids, total monounsaturated': 'Monounsaturated Fat',
+    'Fatty acids, total polyunsaturated': 'Polyunsaturated Fat',
+    'Fatty acids, total trans': 'Trans Fat',
     'Tryptophan': 'Tryptophan',
     'Threonine': 'Threonine',
     'Isoleucine': 'Isoleucine',
@@ -118,8 +118,8 @@ const USDA_MICRO_MAP: Record<string, string> = {
     'Arginine': 'Arginine',
     'Histidine': 'Histidine',
     'Alanine': 'Alanine',
-    'Aspartic': 'Aspartic acid',
-    'Glutamic': 'Glutamic acid',
+    'Aspartic acid': 'Aspartic acid',
+    'Glutamic acid': 'Glutamic acid',
     'Glycine': 'Glycine',
     'Proline': 'Proline',
     'Serine': 'Serine',
@@ -127,9 +127,9 @@ const USDA_MICRO_MAP: Record<string, string> = {
     'Retinol': 'Retinol',
     'Carotene, beta': 'Beta-carotene',
     'Carotene, alpha': 'Alpha-carotene',
-    'Cryptoxanthin': 'Beta-cryptoxanthin',
+    'Cryptoxanthin, beta': 'Beta-cryptoxanthin',
     'Lycopene': 'Lycopene',
-    'Lutein': 'Lutein + Zeaxanthin',
+    'Lutein + zeaxanthin': 'Lutein + Zeaxanthin',
     'Tocopherol, beta': 'Beta-tocopherol',
     'Tocopherol, gamma': 'Gamma-tocopherol',
     'Tocopherol, delta': 'Delta-tocopherol',
@@ -141,15 +141,20 @@ function extractUSDANutrients(foodNutrients: any[]): Record<string, number> {
     const micronutrients: Record<string, number> = {};
     if (foodNutrients) {
         foodNutrients.forEach((nut: any) => {
-            Object.entries(USDA_MICRO_MAP).forEach(([usdaName, ourName]) => {
-                // Check for Details API format (item.nutrient.name)
-                // We use .includes() so "Vitamin A, RAE" matches "Vitamin A"
-                if (nut.nutrient?.name && nut.nutrient.name.toLowerCase().includes(usdaName.toLowerCase())) {
-                    micronutrients[ourName] = nut.amount || nut.value || 0;
-                }
-                // Check for Search API format (item.nutrientName)
-                else if (nut.nutrientName && nut.nutrientName.toLowerCase().includes(usdaName.toLowerCase())) {
-                    micronutrients[ourName] = nut.value || 0;
+            const nutrientName = nut.nutrient?.name || nut.nutrientName || '';
+            const amount = nut.amount ?? nut.value ?? 0;
+
+            // Skip if no name or zero amount
+            if (!nutrientName) return;
+
+            Object.entries(USDA_MICRO_MAP).forEach(([usdaKey, ourName]) => {
+                // Check if this USDA nutrient name contains our key
+                if (nutrientName.toLowerCase().includes(usdaKey.toLowerCase())) {
+                    // Only set if not already captured, or if new value is non-zero and old was zero
+                    if (micronutrients[ourName] === undefined ||
+                        (micronutrients[ourName] === 0 && amount > 0)) {
+                        micronutrients[ourName] = amount;
+                    }
                 }
             });
         });
