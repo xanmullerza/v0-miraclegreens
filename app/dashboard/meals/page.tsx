@@ -61,7 +61,7 @@ interface Recipe {
 
 const MEAL_TYPES = ["breakfast", "lunch", "dinner", "snack"];
 
-export default function BrowseMealsPage() {
+export default function MealsPage() {
     const router = useRouter();
     const PAGE_SIZE = 20;
     const [recipes, setRecipes] = useState<Recipe[]>([]);

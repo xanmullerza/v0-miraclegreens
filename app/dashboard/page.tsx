@@ -96,7 +96,7 @@ export default function DashboardOverview() {
         {
             name: 'Meal Library',
             desc: 'View and manage your personalized recipes and the global database.',
-            href: '/dashboard/browse-meals',
+            href: '/dashboard/meals',
             icon: Library,
             color: 'text-rose-500',
             bg: 'bg-rose-500/10'

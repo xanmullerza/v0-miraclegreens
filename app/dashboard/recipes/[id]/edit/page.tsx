@@ -126,7 +126,7 @@ export default function EditRecipePage() {
         } catch (error: any) {
             console.error('Error fetching recipe:', error);
             toast.error(`Failed to load recipe: ${error.message}`);
-            router.push('/dashboard/browse-meals');
+            router.push('/dashboard/meals');
         } finally {
             setLoading(false);
         }
