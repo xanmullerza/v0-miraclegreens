@@ -15,6 +15,7 @@ import {
     Utensils,
     Egg,
     Leaf,
+    Fish,
     Moon,
     Sun,
     Monitor,
@@ -256,8 +257,9 @@ export default function ProfilePage() {
 
                     <div className="space-y-4">
                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Dietary Protocol</Label>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <GoalCard type="anything" label="Balanced" selected={formData.dietType === 'anything'} onClick={() => setFormData({ ...formData, dietType: 'anything' })} icon={Utensils} />
+                            <GoalCard type="pescatarian" label="Pescatarian" selected={formData.dietType === 'pescatarian'} onClick={() => setFormData({ ...formData, dietType: 'pescatarian' })} icon={Fish} />
                             <GoalCard type="vegetarian" label="Vegetarian" selected={formData.dietType === 'vegetarian'} onClick={() => setFormData({ ...formData, dietType: 'vegetarian' })} icon={Egg} />
                             <GoalCard type="vegan" label="Vegan" selected={formData.dietType === 'vegan'} onClick={() => setFormData({ ...formData, dietType: 'vegan' })} icon={Leaf} />
                         </div>

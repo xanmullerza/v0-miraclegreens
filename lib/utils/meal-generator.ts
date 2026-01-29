@@ -86,7 +86,16 @@ export const getRandomRecipeByType = async (
 
     // Transform and filter
     const recipesWithMicro: { recipe: Recipe; micronutrients: Record<string, number> }[] = recipesData
-        .filter((r: any) => diet === 'anything' || r.diet.includes(diet))
+        .filter((r: any) => {
+            if (diet === 'anything') return true;
+            if (diet === 'pescatarian') {
+                return r.diet.includes('pescatarian') || r.diet.includes('vegetarian') || r.diet.includes('vegan');
+            }
+            if (diet === 'vegetarian') {
+                return r.diet.includes('vegetarian') || r.diet.includes('vegan');
+            }
+            return r.diet.includes(diet);
+        })
         .filter((r: any) => r.id !== excludeId) // Exclude current recipe
         .map((r: any) => {
             const calculatedNutrition = calculateNutrition(r.ingredients);
@@ -230,10 +239,18 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
 
     // Filter helper
     const getRecipesByDiet = (params: { startRecipes: Recipe[], diet: DietType, type?: Recipe['type'] }) => {
-        return params.startRecipes.filter(r =>
-            (params.diet === 'anything' || r.diet.includes(params.diet)) &&
-            (!params.type || r.type === params.type)
-        );
+        return params.startRecipes.filter(r => {
+            if (params.type && r.type !== params.type) return false;
+
+            if (params.diet === 'anything') return true;
+            if (params.diet === 'pescatarian') {
+                return r.diet.includes('pescatarian') || r.diet.includes('vegetarian') || r.diet.includes('vegan');
+            }
+            if (params.diet === 'vegetarian') {
+                return r.diet.includes('vegetarian') || r.diet.includes('vegan');
+            }
+            return r.diet.includes(params.diet);
+        });
     };
 
     // Get candidates

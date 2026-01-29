@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import {
     Utensils,
     Leaf,
+    Fish,
     Flame,
     Check,
     ChevronRight,
@@ -518,8 +519,9 @@ export default function MealPlannerPage() {
 
                         <div className="space-y-2">
                             <Label className="text-xs uppercase font-bold text-muted-foreground">Diet</Label>
-                            <div className="grid grid-cols-3 gap-3">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                 <DietCard type="anything" selected={diet === 'anything'} onClick={() => setDiet('anything')} icon={Utensils} label="Balanced" />
+                                <DietCard type="pescatarian" selected={diet === 'pescatarian'} onClick={() => setDiet('pescatarian')} icon={Fish} label="Pescatarian" />
                                 <DietCard type="vegetarian" selected={diet === 'vegetarian'} onClick={() => setDiet('vegetarian')} icon={Egg} />
                                 <DietCard type="vegan" selected={diet === 'vegan'} onClick={() => setDiet('vegan')} icon={Leaf} />
                             </div>
