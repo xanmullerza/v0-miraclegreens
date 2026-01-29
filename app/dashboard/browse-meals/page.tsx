@@ -213,7 +213,7 @@ export default function BrowseMealsPage() {
                             id="favorites-mode"
                             checked={showFavoritesOnly}
                             onCheckedChange={setShowFavoritesOnly}
-                            className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-blue-600"
+                            className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-blue-600 dark:data-[state=unchecked]:bg-blue-600"
                         />
                         <Heart
                             size={18}
