@@ -3,19 +3,14 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
-    Beef,
-    ArrowRight,
     Zap,
     Activity,
-    Database,
-    Clock,
     Sparkles,
     ChefHat,
-    Heart,
-    Calendar,
     Library,
     User,
-    BarChart3
+    BarChart3,
+    ArrowRight
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -168,53 +163,6 @@ export default function DashboardOverview() {
                                 <p className="text-lg font-black text-emerald-500 italic">Online</p>
                             </div>
                             <Activity size={14} className="text-emerald-500 mb-1" />
-                        </div>
-                    </div>
-                </Card>
-            </div>
-
-            {/* Recent Items */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <Card className="p-8">
-                    <div className="flex items-center justify-between mb-8">
-                        <h3 className="font-bold flex items-center gap-3">
-                            <Database size={18} className="text-emerald-500" />
-                            Recently Added Foods
-                        </h3>
-                        <Link href="/dashboard/browse" className="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-500 transition-colors">View All Foods</Link>
-                    </div>
-                    <div className="space-y-4">
-                        {stats.recentAdditions.map((item) => (
-                            <div key={item.id} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-transparent hover:border-slate-200 dark:hover:border-slate-800 transition-all">
-                                <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800 flex items-center justify-center text-emerald-500">
-                                        <Beef size={20} />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-bold text-slate-900 dark:text-white capitalize">{item.name}</p>
-                                        <p className="text-[10px] text-slate-500 font-medium">Synced from {item.source || 'manual'}</p>
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-xs font-black text-slate-900 dark:text-white">{item.energy_kcal} kcal</p>
-                                    <p className="text-[10px] text-slate-400">per 100g</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </Card>
-
-                <Card className="p-8 bg-gradient-to-br from-emerald-500/5 to-teal-500/5 border-emerald-500/10">
-                    <div className="h-full flex flex-col">
-                        <div className="flex items-center gap-3 mb-8">
-                            <ChefHat size={18} className="text-emerald-500" />
-                            <h3 className="font-bold">Recommended for You</h3>
-                        </div>
-                        <div className="flex-grow flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-emerald-500/20 rounded-[2rem] bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
-                            <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 mb-6 font-black text-xl">?</div>
-                            <h4 className="text-lg font-bold mb-2 italic text-slate-400">Experimental Feature</h4>
-                            <p className="text-sm text-slate-500 max-w-xs">Our system is looking at your recipes to suggest your next healthy recipe based on the nutrients you have.</p>
-                            <Button className="mt-8 rounded-full bg-slate-950 text-white hover:bg-slate-800 border-none px-10 font-bold" disabled>Get Suggestions</Button>
                         </div>
                     </div>
                 </Card>
