@@ -144,12 +144,20 @@ function extractUSDANutrients(foodNutrients: any[]): Record<string, number> {
             const nutrientName = nut.nutrient?.name || nut.nutrientName || '';
             const amount = nut.amount ?? nut.value ?? 0;
 
-            // Skip if no name or zero amount
+            // Skip if no name
             if (!nutrientName) return;
+
+            const lowerName = nutrientName.toLowerCase();
+
+            // Skip IU (International Units) entries - we prefer µg/mg values
+            // This affects Vitamin A, D, E which USDA provides in both units
+            if (lowerName.includes('international units') || lowerName.includes(', iu')) {
+                return;
+            }
 
             Object.entries(USDA_MICRO_MAP).forEach(([usdaKey, ourName]) => {
                 // Check if this USDA nutrient name contains our key
-                if (nutrientName.toLowerCase().includes(usdaKey.toLowerCase())) {
+                if (lowerName.includes(usdaKey.toLowerCase())) {
                     // Only set if not already captured, or if new value is non-zero and old was zero
                     if (micronutrients[ourName] === undefined ||
                         (micronutrients[ourName] === 0 && amount > 0)) {
