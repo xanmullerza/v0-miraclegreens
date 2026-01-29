@@ -27,7 +27,10 @@ import {
     Upload,
     Save,
     Loader2,
-    Wheat
+    Wheat,
+    Filter,
+    Check,
+    ChevronDown
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -75,6 +78,7 @@ function BrowseFoodsContent() {
     const { searchQuery, setSearchQuery } = useSearch();
     const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES);
     const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
     const [editName, setEditName] = useState('');
@@ -349,31 +353,109 @@ function BrowseFoodsContent() {
             <div className="flex flex-col md:flex-row gap-4 justify-center">
 
                 {/* Category Filter */}
-                <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar">
-                    {CATEGORIES.map(category => {
-                        const isActive = selectedCategories.includes(category);
+                <div className="relative">
+                    <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar items-center h-14">
+                        <button
+                            onClick={() => setIsFilterOpen(!isFilterOpen)}
+                            className={cn(
+                                "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300",
+                                isFilterOpen ? "bg-emerald-600 text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                            )}
+                        >
+                            <Filter size={18} />
+                            <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter</span>
+                            <ChevronDown size={14} className={cn("transition-transform", isFilterOpen && "rotate-180")} />
+                        </button>
 
-                        return (
-                            <button
-                                key={category}
-                                onClick={() => {
-                                    if (isActive) {
-                                        setSelectedCategories(prev => prev.filter(c => c !== category));
-                                    } else {
-                                        setSelectedCategories(prev => [...prev, category]);
-                                    }
-                                }}
-                                className={cn(
-                                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
-                                    isActive
-                                        ? "bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
-                                        : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
-                                )}
-                            >
-                                {category}
-                            </button>
-                        );
-                    })}
+                        <div className="w-px h-6 bg-slate-200 dark:border-slate-800 mx-1" />
+
+                        {CATEGORIES.map(category => {
+                            const isActive = selectedCategories.includes(category);
+
+                            return (
+                                <button
+                                    key={category}
+                                    onClick={() => {
+                                        if (isActive) {
+                                            setSelectedCategories(prev => prev.filter(c => c !== category));
+                                        } else {
+                                            setSelectedCategories(prev => [...prev, category]);
+                                        }
+                                    }}
+                                    className={cn(
+                                        "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
+                                        isActive
+                                            ? "bg-emerald-600/10 text-emerald-600 border border-emerald-600/20"
+                                            : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
+                                    )}
+                                >
+                                    {category}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {/* Dropdown Menu */}
+                    {isFilterOpen && (
+                        <>
+                            <div
+                                className="fixed inset-0 z-40"
+                                onClick={() => setIsFilterOpen(false)}
+                            />
+                            <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-0 w-64 bg-white dark:bg-slate-900 rounded-[1.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl z-50 p-4 animate-in fade-in slide-in-from-top-2 duration-200 max-h-[70vh] overflow-y-auto no-scrollbar">
+                                <div className="space-y-3">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2">Select Categories</p>
+                                    <div className="space-y-1">
+                                        {CATEGORIES.map(category => {
+                                            const isActive = selectedCategories.includes(category);
+                                            return (
+                                                <div
+                                                    key={category}
+                                                    onClick={() => {
+                                                        if (isActive) {
+                                                            setSelectedCategories(prev => prev.filter(c => c !== category));
+                                                        } else {
+                                                            setSelectedCategories(prev => [...prev, category]);
+                                                        }
+                                                    }}
+                                                    className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer group transition-colors"
+                                                >
+                                                    <span className={cn(
+                                                        "text-xs font-bold uppercase tracking-wide transition-colors",
+                                                        isActive ? "text-emerald-600" : "text-slate-600 dark:text-slate-400"
+                                                    )}>
+                                                        {category}
+                                                    </span>
+                                                    <div className={cn(
+                                                        "w-5 h-5 rounded-lg border-2 transition-all flex items-center justify-center",
+                                                        isActive
+                                                            ? "bg-emerald-600 border-emerald-600"
+                                                            : "border-slate-200 dark:border-slate-700 group-hover:border-emerald-500/30"
+                                                    )}>
+                                                        {isActive && <Check size={12} className="text-white" />}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between gap-2">
+                                        <button
+                                            onClick={() => setSelectedCategories([])}
+                                            className="flex-1 py-2 text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors"
+                                        >
+                                            Clear All
+                                        </button>
+                                        <button
+                                            onClick={() => setSelectedCategories(CATEGORIES)}
+                                            className="flex-1 py-2 text-[9px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-700 transition-colors"
+                                        >
+                                            Select All
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
 
