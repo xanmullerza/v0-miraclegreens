@@ -75,6 +75,7 @@ function FoodsContent() {
 
     const PAGE_SIZE = 20;
     const [foods, setFoods] = useState<FoodItem[]>([]);
+    const [totalCount, setTotalCount] = useState(0);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
     const [page, setPage] = useState(0);
@@ -128,6 +129,8 @@ function FoodsContent() {
 
             const { data, error, count } = await query;
             if (error) throw error;
+
+            if (count !== null) setTotalCount(count);
 
             const newItems = data || [];
             if (isNewSearch) {
@@ -351,9 +354,11 @@ function FoodsContent() {
 
                 <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-6">
                     <div className="text-right hidden sm:block">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-200 mb-1">Global Database</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-200 mb-1">
+                            {showFavoritesOnly ? "Favourite Foods" : "All Foods"}
+                        </p>
                         <p className="text-3xl font-black text-white leading-none tracking-tighter italic">
-                            {foods.length} <span className="text-emerald-300">FOODS</span>
+                            {totalCount} <span className="text-emerald-300">FOODS</span>
                         </p>
                     </div>
 
