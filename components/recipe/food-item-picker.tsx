@@ -18,10 +18,12 @@ interface FoodItem {
 
 interface FoodItemPickerProps {
     onSelect: (foodItem: FoodItem) => void;
+
     onClose: () => void;
+    mode?: 'all' | 'usda-only';
 }
 
-export default function FoodItemPicker({ onSelect, onClose }: FoodItemPickerProps) {
+export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: FoodItemPickerProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [results, setResults] = useState<FoodItem[]>([]);
     const [usdaResults, setUsdaResults] = useState<FoodItemMatch[]>([]);
@@ -29,8 +31,17 @@ export default function FoodItemPicker({ onSelect, onClose }: FoodItemPickerProp
     const [searchingUSDA, setSearchingUSDA] = useState(false);
     const [view, setView] = useState<'local' | 'usda'>('local');
 
+    // Initialize view based on mode
+    useEffect(() => {
+        if (mode === 'usda-only') {
+            setView('usda');
+        }
+    }, [mode]);
+
     useEffect(() => {
         const searchFoodItems = async () => {
+            if (view !== 'local') return; // Skip local search if not in local view
+
             if (searchQuery.length < 2) {
                 setResults([]);
                 setUsdaResults([]);
@@ -141,15 +152,17 @@ export default function FoodItemPicker({ onSelect, onClose }: FoodItemPickerProp
                     </div>
 
                     <div className="flex gap-2">
-                        <button
-                            onClick={() => setView('local')}
-                            className={`flex-1 py-2 text-sm font-medium rounded-lg transition ${view === 'local'
-                                ? 'bg-green-600 text-white shadow-md'
-                                : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                                }`}
-                        >
-                            Local Database
-                        </button>
+                        {mode === 'all' && (
+                            <button
+                                onClick={() => setView('local')}
+                                className={`flex-1 py-2 text-sm font-medium rounded-lg transition ${view === 'local'
+                                    ? 'bg-green-600 text-white shadow-md'
+                                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                    }`}
+                            >
+                                Local Database
+                            </button>
+                        )}
                         <button
                             onClick={handleUSDASearch}
                             className={`flex-1 py-2 text-sm font-medium rounded-lg transition flex items-center justify-center gap-2 ${view === 'usda'
@@ -158,7 +171,7 @@ export default function FoodItemPicker({ onSelect, onClose }: FoodItemPickerProp
                                 }`}
                         >
                             <Sparkles className="w-4 h-4" />
-                            Search USDA Global
+                            {mode === 'all' ? 'Search USDA Global' : 'Search USDA Database'}
                         </button>
                     </div>
                 </div>

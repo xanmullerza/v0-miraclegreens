@@ -30,7 +30,10 @@ import {
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+
 import { parseNutritionText, parseMeasures } from '@/lib/utils/nutrition-parser';
+import FoodItemPicker from '@/components/recipe/food-item-picker';
+import { Database } from 'lucide-react';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden", className)}>
@@ -92,6 +95,7 @@ function FoodItemCreatorContent() {
     const [servingText, setServingText] = useState('');
     const [nutrientText, setNutrientText] = useState('');
     const [showParser, setShowParser] = useState(true);
+    const [showImportPicker, setShowImportPicker] = useState(false);
 
     const integrity = useMemo(() => {
         const present = ALL_CLINICAL_MARKERS.filter((m: string) => {
@@ -232,6 +236,48 @@ function FoodItemCreatorContent() {
         setMicronutrients(prev => ({ ...prev, [name]: value }));
     };
 
+    const handleImportSelect = (item: any) => {
+        // Populate the form with the imported item's data
+        setName(item.name);
+        setCommonName(item.common_name || '');
+        setEnergyKcal(item.energy_kcal?.toString() || '');
+        setEnergyKj(item.energy_kj?.toString() || '');
+        setProtein(item.protein_g?.toString() || '');
+        setFat(item.fat_g?.toString() || '');
+        setCarbs(item.carbs_g?.toString() || '');
+
+        // Construct nutrient text for display/editing
+        let nText = `Calories: ${item.energy_kcal || 0}
+Protein: ${item.protein_g || 0}g
+Carbs: ${item.carbs_g || 0}g
+Fat: ${item.fat_g || 0}g
+`;
+        if (item.micronutrients) {
+            Object.entries(item.micronutrients).forEach(([key, val]) => {
+                nText += `${key}: ${val}\n`;
+            });
+            // Update state map directly too
+            const newMicros: Record<string, string> = {};
+            Object.entries(item.micronutrients as Record<string, number>).forEach(([k, v]) => {
+                newMicros[k] = v.toString();
+            });
+            setMicronutrients(newMicros);
+        }
+        setNutrientText(nText);
+
+        // Construct serving text
+        let sText = '';
+        if (item.portions && Array.isArray(item.portions)) {
+            item.portions.forEach((p: any) => {
+                sText += `1 ${p.label} = ${p.weight_g}g\n`;
+            });
+        }
+        setServingText(sText);
+
+        setShowImportPicker(false);
+        toast.success("Imported data from USDA. You can now edit and save.");
+    };
+
     return (
         <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
             {/* Hero Section */}
@@ -249,6 +295,16 @@ function FoodItemCreatorContent() {
                     <p className="text-sky-50 font-medium max-w-md text-sm pl-1">
                         Contribute to the global knowledge base by adding detailed nutritional profiles.
                     </p>
+                </div>
+
+                <div className="absolute right-8 top-1/2 -translate-y-1/2 z-20">
+                    <Button
+                        onClick={() => setShowImportPicker(true)}
+                        className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl rounded-xl h-12 px-6 font-bold uppercase tracking-widest text-xs flex items-center gap-2 group transition-all hover:scale-105"
+                    >
+                        <Database className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                        Import Food
+                    </Button>
                 </div>
             </div>
 
@@ -390,6 +446,13 @@ function FoodItemCreatorContent() {
                 </Card>
             </div>
 
+            {showImportPicker && (
+                <FoodItemPicker
+                    onSelect={handleImportSelect}
+                    onClose={() => setShowImportPicker(false)}
+                    mode="usda-only"
+                />
+            )}
         </div>
     );
 }
