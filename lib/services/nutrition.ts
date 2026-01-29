@@ -60,6 +60,103 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
 /**
  * Searches for food items using the USDA FoodData Central API.
  */
+const USDA_MICRO_MAP: Record<string, string> = {
+    'Potassium, K': 'Potassium',
+    'Magnesium, Mg': 'Magnesium',
+    'Calcium, Ca': 'Calcium',
+    'Phosphorus, P': 'Phosphorus',
+    'Sodium, Na': 'Sodium',
+    'Iron, Fe': 'Iron',
+    'Zinc, Zn': 'Zinc',
+    'Selenium, Se': 'Selenium',
+    'Copper, Cu': 'Copper',
+    'Manganese, Mn': 'Manganese',
+    'Iodine, I': 'Iodine',
+    'Fluoride, F': 'Fluoride',
+    'Chromium': 'Chromium',
+    'Molybdenum': 'Molybdenum',
+    'Vitamin A, RAE': 'Vitamin A',
+    'Vitamin C, total ascorbic acid': 'Vitamin C',
+    'Vitamin D (D2 + D3)': 'Vitamin D',
+    'Vitamin E (alpha-tocopherol)': 'Vitamin E',
+    'Vitamin K (phylloquinone)': 'Vitamin K',
+    'Thiamin': 'B1 (Thiamine)',
+    'Riboflavin': 'B2 (Riboflavin)',
+    'Niacin': 'B3 (Niacin)',
+    'Pantothenic acid': 'B5 (Pantothenic Acid)',
+    'Vitamin B-6': 'B6 (Pyridoxine)',
+    'Folate, total': 'B9 (Folate)',
+    'Vitamin B-12': 'B12 (Cobalamin)',
+    'Choline, total': 'Choline',
+    'Fiber, total dietary': 'Fiber',
+    'Ash': 'Ash',
+    'Water': 'Water',
+    'Alcohol, ethyl': 'Alcohol',
+    'Sugars, total': 'Sugars',
+    'Sucrose': 'Sucrose',
+    'Glucose (dextrose)': 'Glucose',
+    'Fructose': 'Fructose',
+    'Lactose': 'Lactose',
+    'Maltose': 'Maltose',
+    'Galactose': 'Galactose',
+    'Starch': 'Starch',
+    'Cholesterol': 'Cholesterol',
+    'Fatty acids, total saturated': 'Saturated Fat',
+    'Fatty acids, total monounsaturated': 'Monounsaturated Fat',
+    'Fatty acids, total polyunsaturated': 'Polyunsaturated Fat',
+    'Fatty acids, total trans': 'Trans Fat',
+    'Tryptophan': 'Tryptophan',
+    'Threonine': 'Threonine',
+    'Isoleucine': 'Isoleucine',
+    'Leucine': 'Leucine',
+    'Lysine': 'Lysine',
+    'Methionine': 'Methionine',
+    'Cystine': 'Cystine',
+    'Phenylalanine': 'Phenylalanine',
+    'Tyrosine': 'Tyrosine',
+    'Valine': 'Valine',
+    'Arginine': 'Arginine',
+    'Histidine': 'Histidine',
+    'Alanine': 'Alanine',
+    'Aspartic acid': 'Aspartic acid',
+    'Glutamic acid': 'Glutamic acid',
+    'Glycine': 'Glycine',
+    'Proline': 'Proline',
+    'Serine': 'Serine',
+    'Hydroxyproline': 'Hydroxyproline',
+    'Retinol': 'Retinol',
+    'Carotene, beta': 'Beta-carotene',
+    'Carotene, alpha': 'Alpha-carotene',
+    'Cryptoxanthin, beta': 'Beta-cryptoxanthin',
+    'Lycopene': 'Lycopene',
+    'Lutein + zeaxanthin': 'Lutein + Zeaxanthin',
+    'Tocopherol, beta': 'Beta-tocopherol',
+    'Tocopherol, gamma': 'Gamma-tocopherol',
+    'Tocopherol, delta': 'Delta-tocopherol',
+    'Caffeine': 'Caffeine',
+    'Theobromine': 'Theobromine'
+};
+
+function extractUSDANutrients(foodNutrients: any[]): Record<string, number> {
+    const micronutrients: Record<string, number> = {};
+    if (foodNutrients) {
+        foodNutrients.forEach((nut: any) => {
+            Object.entries(USDA_MICRO_MAP).forEach(([usdaName, ourName]) => {
+                if (nut.nutrient.name && nut.nutrient.name.toLowerCase().includes(usdaName.toLowerCase())) {
+                    micronutrients[ourName] = nut.amount || nut.value || 0;
+                } else if (nut.nutrientName && nut.nutrientName.toLowerCase().includes(usdaName.toLowerCase())) {
+                    // Handle search result format (flat structure)
+                    micronutrients[ourName] = nut.value || 0;
+                }
+            });
+        });
+    }
+    return micronutrients;
+}
+
+/**
+ * Searches for food items using the USDA FoodData Central API.
+ */
 export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
     if (!query || query.trim().length < 2) return [];
 
@@ -117,44 +214,7 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
 
             const energyKj = Math.round(energyKcal * 4.184);
 
-            const micronutrients: Record<string, number> = {};
-            // ... (rest of the mapping code) ...
-            const microMap: Record<string, string> = {
-                'Potassium, K': 'Potassium',
-                'Magnesium, Mg': 'Magnesium',
-                'Calcium, Ca': 'Calcium',
-                'Phosphorus, P': 'Phosphorus',
-                'Sodium, Na': 'Sodium',
-                'Iron, Fe': 'Iron',
-                'Zinc, Zn': 'Zinc',
-                'Selenium, Se': 'Selenium',
-                'Copper, Cu': 'Copper',
-                'Manganese, Mn': 'Manganese',
-                'Vitamin A, RAE': 'Vitamin A',
-                'Vitamin C, total ascorbic acid': 'Vitamin C',
-                'Vitamin D (D2 + D3)': 'Vitamin D',
-                'Vitamin E (alpha-tocopherol)': 'Vitamin E',
-                'Vitamin K (phylloquinone)': 'Vitamin K',
-                'Thiamin': 'B1 (Thiamine)',
-                'Riboflavin': 'B2 (Riboflavin)',
-                'Niacin': 'B3 (Niacin)',
-                'Pantothenic acid': 'B5 (Pantothenic Acid)',
-                'Vitamin B-6': 'B6 (Pyridoxine)',
-                'Folate, total': 'B9 (Folate)',
-                'Vitamin B-12': 'B12 (Cobalamin)',
-                'Choline, total': 'Choline',
-                'Fiber, total dietary': 'Fiber'
-            };
-
-            if (food.foodNutrients) {
-                food.foodNutrients.forEach((nut: any) => {
-                    Object.entries(microMap).forEach(([usdaName, ourName]) => {
-                        if (nut.nutrientName && nut.nutrientName.includes(usdaName)) {
-                            micronutrients[ourName] = nut.value;
-                        }
-                    });
-                });
-            }
+            const micronutrients = extractUSDANutrients(food.foodNutrients);
 
             return {
                 fdcId: food.fdcId,
@@ -175,38 +235,55 @@ export async function searchUSDAFood(query: string): Promise<FoodItemMatch[]> {
 }
 
 /**
- * Fetches common measures/weights for a USDA food item.
+ * Fetches full details for a USDA food item, including extensive micronutrients and portions.
  */
-export async function getUSDAMeasures(fdcId: number): Promise<FoodMeasure[]> {
+export async function getUSDAFoodDetails(fdcId: number): Promise<{ portions: FoodMeasure[], micronutrients: Record<string, number> }> {
     try {
         const url = `${USDA_BASE_URL}/food/${fdcId}?api_key=${USDA_API_KEY}`;
         const response = await fetch(url);
         const data = await response.json();
 
-        if (!data.foodPortions) return [];
+        // Parse Portions
+        const portions = [];
+        if (data.foodPortions) {
+            portions.push(...data.foodPortions.map((p: any) => {
+                let label = (p.modifier || '').trim();
+                let unitName = (p.measureUnitName || '').trim();
 
-        return data.foodPortions.map((p: any) => {
-            let label = (p.modifier || '').trim();
-            let unitName = (p.measureUnitName || '').trim();
+                const isBad = (s: string) => !s || /^\d+$/.test(s) || s.toLowerCase() === 'undetermined' || s.length > 25;
 
-            const isBad = (s: string) => !s || /^\d+$/.test(s) || s.toLowerCase() === 'undetermined' || s.length > 25;
+                // If modifier is bad, try unitName. If both bad, use 'portion'
+                if (isBad(label)) {
+                    label = isBad(unitName) ? 'portion' : unitName;
+                } else if (!isBad(unitName) && !label.toLowerCase().includes(unitName.toLowerCase())) {
+                    label = `${label} ${unitName}`;
+                }
 
-            // If modifier is bad, try unitName. If both bad, use 'portion'
-            if (isBad(label)) {
-                label = isBad(unitName) ? 'portion' : unitName;
-            } else if (!isBad(unitName) && !label.toLowerCase().includes(unitName.toLowerCase())) {
-                label = `${label} ${unitName}`;
-            }
+                return {
+                    label: label.toLowerCase(),
+                    weight_g: p.gramWeight || 0
+                };
+            }).filter((p: any) => p.weight_g > 0));
+        }
 
-            return {
-                label: label.toLowerCase(),
-                weight_g: p.gramWeight || 0
-            };
-        }).filter((p: any) => p.weight_g > 0);
+        // Parse Micronutrients
+        const micronutrients = extractUSDANutrients(data.foodNutrients);
+
+        return { portions, micronutrients };
+
     } catch (error) {
-        console.error("USDA Measures Error:", error);
-        return [];
+        console.error("USDA Food Details Error:", error);
+        return { portions: [], micronutrients: {} };
     }
+}
+
+/**
+ * Fetches common measures/weights for a USDA food item.
+ * @deprecated Use getUSDAFoodDetails for full details, this is kept for legacy compatibility
+ */
+export async function getUSDAMeasures(fdcId: number): Promise<FoodMeasure[]> {
+    const details = await getUSDAFoodDetails(fdcId);
+    return details.portions;
 }
 
 /**

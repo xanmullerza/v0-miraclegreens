@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Search, X, Database, Loader2, Sparkles } from 'lucide-react';
-import { searchUSDAFood, getUSDAMeasures, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
+import { searchUSDAFood, getUSDAFoodDetails, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
 
 interface FoodItem {
     id: string;
@@ -82,15 +82,24 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: Food
     const handleSelectUSDA = async (item: FoodItemMatch) => {
         setLoading(true);
         try {
-            // Get measures from USDA first
-            const measures = item.fdcId ? await getUSDAMeasures(item.fdcId) : [];
+            // Get full details (measures + comprehensive micros) from USDA details endpoint
+            const { portions, micronutrients } = item.fdcId ? await getUSDAFoodDetails(item.fdcId) : { portions: [], micronutrients: {} };
+
+            // Merge the better micros into the item object
+            const detailedItem = {
+                ...item,
+                micronutrients: {
+                    ...item.micronutrients, // keep original search results just in case
+                    ...micronutrients       // overwrite with detailed data
+                }
+            };
 
             // Sync to local
-            const localId = await syncToLocal(item, measures);
+            const localId = await syncToLocal(detailedItem, portions);
 
             if (localId) {
                 // Prepare portions for immediate UI use without re-fetch
-                const standardMeasures = measures.map(m => ({
+                const standardMeasures = portions.map(m => ({
                     label: m.label.toLowerCase().replace(/\s*\(.*?\)/g, '').trim(),
                     weight_g: m.weight_g
                 })).filter(m => m.weight_g > 0);
@@ -99,12 +108,13 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: Food
 
                 onSelect({
                     id: localId,
-                    name: item.name,
-                    energy_kcal: item.energy_kcal,
-                    energy_kj: item.energy_kj,
-                    protein_g: item.protein_g,
-                    fat_g: item.fat_g,
-                    carbs_g: item.carbs_g,
+                    name: detailedItem.name,
+                    energy_kcal: detailedItem.energy_kcal,
+                    energy_kj: detailedItem.energy_kj,
+                    protein_g: detailedItem.protein_g,
+                    fat_g: detailedItem.fat_g,
+                    carbs_g: detailedItem.carbs_g,
+                    micronutrients: detailedItem.micronutrients,
                     portions: uniquePortions
                 });
                 onClose();
