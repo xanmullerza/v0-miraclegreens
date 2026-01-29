@@ -172,9 +172,11 @@ export default function BrowseMealsPage() {
 
                 <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-6">
                     <div className="text-right hidden sm:block">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-200 mb-1">Global Database</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-200 mb-1">
+                            {showFavoritesOnly ? "Favourite Meals" : "All Meals"}
+                        </p>
                         <p className="text-3xl font-black text-white leading-none tracking-tighter italic">
-                            {totalCount} <span className="text-emerald-300">RECIPES</span>
+                            {totalCount} <span className="text-emerald-300">MEALS</span>
                         </p>
                     </div>
                     <Button
