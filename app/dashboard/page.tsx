@@ -93,79 +93,74 @@ export default function DashboardOverview() {
     }
 
     return (
-        <div className="max-w-6xl mx-auto space-y-10">
-            {/* Hero Welcome */}
-            <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-10 lg:p-16">
-                <div className="absolute top-0 right-0 p-10 opacity-10 blur-2xl">
-                    <Sparkles size={300} className="text-emerald-500" />
+        <div className="max-w-7xl mx-auto">
+            {/* Main Layout: Hero (2/3) + Cards (1/3) */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Hero Welcome - Takes 2/3 width */}
+                <div className="lg:col-span-2 relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-10 lg:p-16 flex flex-col justify-center min-h-[400px]">
+                    <div className="absolute top-0 right-0 p-10 opacity-10 blur-2xl">
+                        <Sparkles size={300} className="text-emerald-500" />
+                    </div>
+
+                    <div className="relative z-10 max-w-xl">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-black uppercase tracking-widest mb-6">
+                            <Zap size={12} className="fill-current" />
+                            Miracle Greens Beta
+                        </div>
+                        <h1 className="text-3xl lg:text-5xl font-black text-white tracking-tighter leading-[0.9] mb-6">
+                            Welcome to your <span className="text-emerald-500">Dashboard.</span>
+                        </h1>
+                        <p className="text-base text-slate-400 leading-relaxed">
+                            A simple way to manage your food and recipes. Add ingredients, create healthy recipes, and check nutrition details in one easy dashboard.
+                        </p>
+                    </div>
                 </div>
 
-                <div className="relative z-10 max-w-2xl">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-black uppercase tracking-widest mb-6">
-                        <Zap size={12} className="fill-current" />
-                        Miracle Greens Beta
-                    </div>
-                    <h1 className="text-4xl lg:text-6xl font-black text-white tracking-tighter leading-[0.9] mb-6">
-                        Welcome to your <span className="text-emerald-500">Dashboard.</span>
-                    </h1>
-                    <p className="text-lg text-slate-400 leading-relaxed mb-8">
-                        A simple way to manage your food and recipes. Add ingredients, create healthy recipes, and check nutrition details in one easy dashboard.
-                    </p>
+                {/* Cards Grid - Takes 1/3 width, 2x2 layout */}
+                <div className="lg:col-span-1 grid grid-cols-2 gap-4">
+                    {tools.map((tool) => (
+                        <Link key={tool.href} href={tool.href}>
+                            <Card className="p-5 group hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 h-full flex flex-col">
+                                <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:rotate-6", tool.bg, tool.color)}>
+                                    <tool.icon size={20} />
+                                </div>
+                                <h3 className="text-sm font-bold tracking-tight mb-1.5 group-hover:text-emerald-500 transition-colors">{tool.name}</h3>
+                                <p className="text-[11px] text-slate-500 leading-relaxed mb-3 flex-grow line-clamp-2">{tool.desc}</p>
+                                <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-slate-400 group-hover:text-emerald-500 transition-colors">
+                                    Open
+                                    <ArrowRight size={10} className="group-hover:translate-x-0.5 transition-transform" />
+                                </div>
+                            </Card>
+                        </Link>
+                    ))}
+
+                    {/* Data Card - 4th card in the grid */}
+                    <Card className="p-5 h-full bg-slate-50/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 flex flex-col">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+                                <BarChart3 size={20} />
+                            </div>
+                            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-[7px] font-black uppercase tracking-widest">
+                                <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                                Live
+                            </div>
+                        </div>
+                        <div className="space-y-2 flex-grow">
+                            <div className="flex justify-between items-center">
+                                <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">Foods</p>
+                                <p className="text-sm font-black">{stats.foodItems}</p>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">Recipes</p>
+                                <p className="text-sm font-black">{stats.recipes}</p>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">Status</p>
+                                <p className="text-sm font-black text-emerald-500">Online</p>
+                            </div>
+                        </div>
+                    </Card>
                 </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {tools.map((tool) => (
-                    <Link key={tool.href} href={tool.href}>
-                        <Card className="p-8 group hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 h-full flex flex-col">
-                            <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center mb-10 transition-transform group-hover:rotate-6", tool.bg, tool.color)}>
-                                <tool.icon size={28} />
-                            </div>
-                            <h3 className="text-xl font-bold tracking-tight mb-3 group-hover:text-emerald-500 transition-colors">{tool.name}</h3>
-                            <p className="text-sm text-slate-500 leading-relaxed mb-6 flex-grow">{tool.desc}</p>
-                            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-emerald-500 transition-colors">
-                                Access Tool
-                                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                            </div>
-                        </Card>
-                    </Link>
-                ))}
-
-                {/* Data Card */}
-                <Card className="p-8 h-full bg-slate-50/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 flex flex-col">
-                    <div className="flex items-center justify-between mb-8">
-                        <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500">
-                            <BarChart3 size={24} />
-                        </div>
-                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-[8px] font-black uppercase tracking-widest">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            Live
-                        </div>
-                    </div>
-                    <div className="space-y-4 flex-grow">
-                        <div className="flex justify-between items-end border-b border-slate-100 dark:border-slate-800 pb-2">
-                            <div>
-                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Foods</p>
-                                <p className="text-lg font-black">{stats.foodItems}</p>
-                            </div>
-                            <Zap size={14} className="text-amber-500 mb-1" />
-                        </div>
-                        <div className="flex justify-between items-end border-b border-slate-100 dark:border-slate-800 pb-2">
-                            <div>
-                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Recipes</p>
-                                <p className="text-lg font-black">{stats.recipes}</p>
-                            </div>
-                            <ChefHat size={14} className="text-blue-500 mb-1" />
-                        </div>
-                        <div className="flex justify-between items-end">
-                            <div>
-                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Status</p>
-                                <p className="text-lg font-black text-emerald-500 italic">Online</p>
-                            </div>
-                            <Activity size={14} className="text-emerald-500 mb-1" />
-                        </div>
-                    </div>
-                </Card>
             </div>
         </div>
     );
