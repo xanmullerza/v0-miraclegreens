@@ -71,7 +71,7 @@ function BrowseFoodsContent() {
     const [loadingMore, setLoadingMore] = useState(false);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
+    const { searchQuery, setSearchQuery } = useSearch();
     const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES);
     const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
 
@@ -345,16 +345,7 @@ function BrowseFoodsContent() {
             </div>
 
             {/* Controls Row */}
-            <div className="flex flex-col md:flex-row gap-4">
-                <div className="relative flex-1 group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
-                    <Input
-                        placeholder="Search the global food databank..."
-                        className="pl-12 h-14 bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 transition-all font-medium"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
+            <div className="flex flex-col md:flex-row gap-4 justify-end">
 
                 {/* Category Filter */}
                 <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar">

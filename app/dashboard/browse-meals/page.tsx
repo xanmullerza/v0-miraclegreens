@@ -29,6 +29,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useSearch } from '@/lib/context/search-context';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden", className)}>
@@ -63,7 +64,7 @@ export default function BrowseMealsPage() {
     const [loadingMore, setLoadingMore] = useState(false);
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
+    const { searchQuery, setSearchQuery } = useSearch();
     const [selectedTypes, setSelectedTypes] = useState<string[]>(MEAL_TYPES);
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
@@ -190,17 +191,7 @@ export default function BrowseMealsPage() {
             </div>
 
             {/* Controls Row */}
-            <div className="flex flex-col md:flex-row gap-4">
-                <div className="relative flex-1 group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-emerald-500 transition-colors" size={18} />
-                    <Input
-                        placeholder="Search the global meal databank..."
-                        className="pl-12 h-14 bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 transition-all font-medium"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
-
+            <div className="flex flex-col md:flex-row gap-4 justify-end">
                 <div className="flex items-center gap-6">
                     {/* Favorites Switch Toggle */}
                     <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all shrink-0">
