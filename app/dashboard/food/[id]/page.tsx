@@ -338,12 +338,6 @@ export default function FoodDetailsPage() {
 
                 <div className="lg:col-span-2 flex flex-col justify-center space-y-6">
                     <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600">
-                                <Activity size={20} />
-                            </div>
-                            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-500">Bio-Clinical Profile</span>
-                        </div>
                         <h1 className="text-6xl font-black tracking-tighter italic uppercase text-slate-900 dark:text-white leading-[0.85]">
                             {food.common_name || food.name}
                         </h1>
