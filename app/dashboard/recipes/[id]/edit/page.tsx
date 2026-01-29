@@ -56,11 +56,14 @@ export default function EditRecipePage() {
     const fetchRecipeData = async () => {
         setLoading(true);
         try {
+            const recipeId = Array.isArray(id) ? id[0] : id;
+            if (!recipeId) throw new Error('No recipe ID provided');
+
             // Fetch Recipe details
             const { data: recipe, error: recipeError } = await supabase
                 .from('recipes')
                 .select('*')
-                .eq('id', id)
+                .eq('id', recipeId)
                 .single();
 
             if (recipeError) throw recipeError;
@@ -69,7 +72,7 @@ export default function EditRecipePage() {
             const { data: ingData, error: ingError } = await supabase
                 .from('ingredients')
                 .select('*, food_item:food_items(*)')
-                .eq('recipe_id', id);
+                .eq('recipe_id', recipeId);
 
             if (ingError) throw ingError;
 
@@ -77,7 +80,7 @@ export default function EditRecipePage() {
             const { data: insData, error: insError } = await supabase
                 .from('instructions')
                 .select('*')
-                .eq('recipe_id', id)
+                .eq('recipe_id', recipeId)
                 .order('step_order', { ascending: true });
 
             if (insError) throw insError;
@@ -463,6 +466,8 @@ export default function EditRecipePage() {
                 { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0, micronutrients: {} as Record<string, number> }
             );
 
+            const recipeId = Array.isArray(id) ? id[0] : id;
+
             // Update Recipe
             const { error: recipeError } = await supabase
                 .from('recipes')
@@ -485,16 +490,16 @@ export default function EditRecipePage() {
                         return acc;
                     }, {} as Record<string, number>),
                 } as any)
-                .eq('id', id);
+                .eq('id', recipeId);
 
             if (recipeError) throw recipeError;
 
             // Delete existing ingredients and instructions and replace them
-            await supabase.from('ingredients').delete().eq('recipe_id', id);
-            await supabase.from('instructions').delete().eq('recipe_id', id);
+            await supabase.from('ingredients').delete().eq('recipe_id', recipeId);
+            await supabase.from('instructions').delete().eq('recipe_id', recipeId);
 
             const ingredientsData = updatedIngredients.map(ing => ({
-                recipe_id: id,
+                recipe_id: recipeId,
                 food_item_id: ing.food_item_id,
                 item: ing.food_item_name,
                 amount: `${scaleIngredient(`${ing.quantity} ${ing.measure_label}`, 1 / (servings || 1))}${ing.modifier ? ' ' + ing.modifier : ''}`.trim(),
@@ -514,7 +519,7 @@ export default function EditRecipePage() {
             const instructionsData = instructions
                 .filter(stepText => stepText.trim())
                 .map((stepText, index) => ({
-                    recipe_id: id,
+                    recipe_id: recipeId,
                     step_text: stepText,
                     step_order: index + 1,
                 }));
@@ -526,7 +531,7 @@ export default function EditRecipePage() {
             if (instructionsError) throw instructionsError;
 
             toast.success('Recipe updated successfully!');
-            router.push(`/dashboard/recipes/${id}`);
+            router.push(`/dashboard/recipes/${recipeId}`);
         } catch (error: any) {
             console.error('Error updating recipe:', error);
             toast.error(`Failed: ${error.message}`);
