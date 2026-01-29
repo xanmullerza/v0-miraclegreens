@@ -216,14 +216,14 @@ export default function BrowseMealsPage() {
                     <div className="flex flex-col gap-3">
                         <Button
                             onClick={() => router.push('/dashboard/plan')}
-                            className="bg-emerald-500 hover:bg-emerald-400 text-white rounded-2xl px-6 h-12 font-black uppercase tracking-widest gap-2 shadow-lg shadow-emerald-900/40 border border-emerald-400/30 group/btn"
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-12 rounded-2xl font-black uppercase tracking-widest group/btn transition-all"
                         >
                             <Calendar size={18} className="group-hover/btn:scale-110 transition-transform" />
                             Plan Your Meal
                         </Button>
                         <Button
                             onClick={() => router.push('/dashboard/recipes')}
-                            className="bg-white hover:bg-emerald-50 text-emerald-600 rounded-2xl px-6 h-12 font-black uppercase tracking-widest gap-2 shadow-lg shadow-emerald-900/40 border-none group/btn"
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-12 rounded-2xl font-black uppercase tracking-widest group/btn transition-all"
                         >
                             <Plus size={18} className="group-hover/btn:rotate-90 transition-transform" />
                             Create a Recipe
