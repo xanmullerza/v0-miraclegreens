@@ -19,7 +19,8 @@ import {
     Star,
     Upload,
     Camera,
-    Save
+    Save,
+    ChevronDown
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -59,6 +60,7 @@ export default function FoodDetailsPage() {
     const [loading, setLoading] = useState(true);
     const [selectedNutrientInfo, setSelectedNutrientInfo] = useState<string | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
+    const [showDetailedNutrients, setShowDetailedNutrients] = useState(false);
 
     // Edit states
     const [isEditing, setIsEditing] = useState(false);
@@ -341,71 +343,100 @@ export default function FoodDetailsPage() {
                         </h1>
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                        {[
-                            { label: 'Energy', val: food.energy_kcal, unit: 'kcal', color: 'bg-orange-500/10 text-orange-500', icon: Zap },
-                            { label: 'Protein', val: food.protein_g, unit: 'g', color: 'bg-red-500/10 text-red-600', icon: Beef },
-                            { label: 'Carbs', val: food.carbs_g, unit: 'g', color: 'bg-blue-500/10 text-blue-600', icon: Activity },
-                            { label: 'Fat', val: food.fat_g, unit: 'g', color: 'bg-amber-500/10 text-amber-600', icon: Droplet },
-                        ].map(macro => (
-                            <div key={macro.label} className="p-6 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col items-center text-center">
-                                <macro.icon size={20} className={cn("mb-3", macro.color.split(' ')[1])} />
-                                <span className="text-2xl font-black">{macro.val.toFixed(macro.label === 'Energy' ? 0 : 1)}</span>
-                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{macro.label} ({macro.unit})</span>
-                            </div>
-                        ))}
+                    <Card className="p-8 space-y-6">
+                        <h3 className="font-black uppercase tracking-widest text-xs flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+                            <Zap className="text-orange-500" size={18} />
+                            Caloric Breakdown
+                        </h3>
+                        <div className="space-y-4">
+                            {[
+                                { label: 'Energy', val: food.energy_kcal, unit: 'kcal', color: 'bg-orange-500' },
+                                { label: 'Protein', val: food.protein_g, unit: 'g', color: 'bg-red-500' },
+                                { label: 'Carbs', val: food.carbs_g, unit: 'g', color: 'bg-amber-500' },
+                                { label: 'Fat', val: food.fat_g, unit: 'g', color: 'bg-sky-500' }
+                            ].map(stat => (
+                                <div key={stat.label} className="space-y-1.5">
+                                    <div className="flex justify-between items-end">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{stat.label}</p>
+                                        <p className="font-black text-sm">{Math.round(stat.val)}{stat.unit}</p>
+                                    </div>
+                                    <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                        <div
+                                            className={cn("h-full rounded-full transition-all duration-1000", stat.color)}
+                                            style={{ width: `${Math.min(100, (stat.val / (stat.label === 'Energy' ? 800 : 50)) * 100)}%` }}
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </Card>
+
+                    <div className="pt-4">
+                        <Button
+                            variant="outline"
+                            onClick={() => setShowDetailedNutrients(!showDetailedNutrients)}
+                            className="w-full gap-2 font-black text-[10px] uppercase tracking-widest h-12 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950"
+                        >
+                            {showDetailedNutrients ? (
+                                <>Collapse Nutrient Report <ChevronDown className="h-4 w-4 rotate-180" /></>
+                            ) : (
+                                <>Detailed Nutrient Report <ChevronDown className="h-4 w-4" /></>
+                            )}
+                        </Button>
                     </div>
                 </div>
             </div>
 
             {/* Comprehensive Nutrient Report */}
-            <div className="space-y-8">
-                <div className="space-y-8">
-                    <NutrientSection title="Electrolytes" icon={Zap} theme="indigo" subtitle="Essential minerals for cellular hydration and nerve signal transmission" items={{
-                        'Sodium': ['Sodium', 'sodium_mg'],
-                        'Potassium': ['Potassium', 'potassium_mg'],
-                        'Magnesium': ['Magnesium', 'magnesium_mg'],
-                        'Calcium': ['Calcium', 'calcium_mg'],
-                        'Phosphorus': ['Phosphorus', 'phosphorus_mg']
-                    }} />
+            {showDetailedNutrients && (
+                <div className="space-y-8 animate-in slide-in-from-top-4 duration-500">
+                    <div className="space-y-8">
+                        <NutrientSection title="Electrolytes" icon={Zap} theme="indigo" subtitle="Essential minerals for cellular hydration and nerve signal transmission" items={{
+                            'Sodium': ['Sodium', 'sodium_mg'],
+                            'Potassium': ['Potassium', 'potassium_mg'],
+                            'Magnesium': ['Magnesium', 'magnesium_mg'],
+                            'Calcium': ['Calcium', 'calcium_mg'],
+                            'Phosphorus': ['Phosphorus', 'phosphorus_mg']
+                        }} />
 
-                    <NutrientSection title="Trace Bio-Minerals" icon={Gem} theme="rose" subtitle="Rare essential minerals required for metabolic enzymatic reactions" items={{
-                        'Iron': ['Iron', 'iron_mg'],
-                        'Zinc': ['Zinc', 'zinc_mg'],
-                        'Copper': ['Copper', 'copper_mg'],
-                        'Manganese': ['Manganese', 'manganese_mg'],
-                        'Selenium': ['Selenium', 'selenium_ug']
-                    }} />
+                        <NutrientSection title="Trace Bio-Minerals" icon={Gem} theme="rose" subtitle="Rare essential minerals required for metabolic enzymatic reactions" items={{
+                            'Iron': ['Iron', 'iron_mg'],
+                            'Zinc': ['Zinc', 'zinc_mg'],
+                            'Copper': ['Copper', 'copper_mg'],
+                            'Manganese': ['Manganese', 'manganese_mg'],
+                            'Selenium': ['Selenium', 'selenium_ug']
+                        }} />
 
-                    <NutrientSection title="Water-Soluble Vitamins" icon={Droplet} theme="blue" subtitle="Bio-available B-Complex and Vitamin C concentrations" items={{
-                        'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
-                        'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
-                        'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
-                        'B5 (Pantothenic)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
-                        'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
-                        'B7 (Biotin)': ['Biotin', 'biotin_ug'],
-                        'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
-                        'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
-                        'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
-                        'Choline': ['Choline', 'choline_mg'],
-                    }} />
+                        <NutrientSection title="Water-Soluble Vitamins" icon={Droplet} theme="blue" subtitle="Bio-available B-Complex and Vitamin C concentrations" items={{
+                            'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
+                            'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
+                            'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
+                            'B5 (Pantothenic)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
+                            'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
+                            'B7 (Biotin)': ['Biotin', 'biotin_ug'],
+                            'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
+                            'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
+                            'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
+                            'Choline': ['Choline', 'choline_mg'],
+                        }} />
 
-                    <NutrientSection title="Fat-Soluble Bio-Storage" icon={Battery} theme="emerald" subtitle="Vitamins stored within cellular lipid layers" items={{
-                        'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
-                        'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
-                        'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
-                        'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
-                    }} />
+                        <NutrientSection title="Fat-Soluble Bio-Storage" icon={Battery} theme="emerald" subtitle="Vitamins stored within cellular lipid layers" items={{
+                            'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
+                            'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
+                            'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
+                            'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
+                        }} />
 
-                    <NutrientSection title="Clinical Markers" icon={Activity} theme="amber" subtitle="Secondary markers for advanced health profile mapping" items={{
-                        'Fiber': ['Fiber', 'fiber_g'],
-                        'Sugars': ['Sugars', 'sugars_g'],
-                        'Oxalate': ['Oxalate', 'oxalate_mg'],
-                        'Omega-3': ['Omega-3', 'omega3_g'],
-                        'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
-                    }} />
+                        <NutrientSection title="Clinical Markers" icon={Activity} theme="amber" subtitle="Secondary markers for advanced health profile mapping" items={{
+                            'Fiber': ['Fiber', 'fiber_g'],
+                            'Sugars': ['Sugars', 'sugars_g'],
+                            'Oxalate': ['Oxalate', 'oxalate_mg'],
+                            'Omega-3': ['Omega-3', 'omega3_g'],
+                            'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
+                        }} />
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* NUTRIENT INFO MODAL */}
             {selectedNutrientInfo && (nutrientInfo as any)[selectedNutrientInfo] && (
