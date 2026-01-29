@@ -190,58 +190,70 @@ function DashboardLayoutContent({
                                 />
 
                                 {/* Universal Global Results Dropdown */}
-                                {(isFocused && (searchQuery.trim() !== '' || isLoading)) && (
-                                    <div className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 w-[400px]">
-                                        {isLoading ? (
-                                            <div className="p-12 text-center">
-                                                <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mx-auto" />
-                                                <p className="mt-4 text-xs text-slate-500 font-black uppercase tracking-widest">Searching...</p>
-                                            </div>
-                                        ) : results.length === 0 ? (
-                                            <div className="p-8 text-center text-slate-500">
-                                                <p className="font-bold text-sm">No results found for "{searchQuery}"</p>
-                                            </div>
-                                        ) : (
-                                            <div className="max-h-[min(500px,calc(100vh-140px))] overflow-y-auto custom-scrollbar">
-                                                <div className="p-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-                                                    <p className="text-[9px] uppercase font-black tracking-widest text-slate-400 px-3">Top Matches</p>
+                                {isFocused && (searchQuery.trim() !== '' || isLoading) && (
+                                    <>
+                                        {/* Backdrop overlay within the same stacking context */}
+                                        <div
+                                            className="fixed inset-0 z-0 bg-transparent"
+                                            onMouseDown={() => setIsFocused(false)}
+                                        />
+
+                                        <div className="absolute top-full left-0 right-0 mt-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 w-[400px] z-10 transition-all">
+                                            {isLoading ? (
+                                                <div className="p-12 text-center">
+                                                    <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mx-auto" />
+                                                    <p className="mt-4 text-xs text-slate-500 font-black uppercase tracking-widest">Searching...</p>
                                                 </div>
-                                                {results.map((result) => (
-                                                    <button
-                                                        key={result.id}
-                                                        onMouseDown={(e) => {
-                                                            e.preventDefault(); // Prevent blur before click
-                                                            if (onResultClickRef.current) {
-                                                                onResultClickRef.current(result);
-                                                            }
-                                                            setIsFocused(false);
-                                                            setSearchQuery('');
-                                                        }}
-                                                        className="w-full text-left p-4 hover:bg-emerald-50 dark:hover:bg-emerald-500/5 transition-all flex justify-between items-center group border-b border-slate-100 dark:border-slate-800 last:border-0"
-                                                    >
-                                                        <div className="flex-1 min-w-0 mr-4">
-                                                            <div className="font-bold text-slate-900 dark:text-white capitalize group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors text-sm">
-                                                                {result.title}
-                                                            </div>
-                                                            {result.subtitle && (
-                                                                <div className="text-[10px] text-slate-500 italic mt-0.5">{result.subtitle}</div>
-                                                            )}
-                                                            {result.badges && (
-                                                                <div className="flex gap-2 mt-2">
-                                                                    {result.badges.map(badge => (
-                                                                        <span key={badge} className="text-[8px] px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-tight">
-                                                                            {badge}
-                                                                        </span>
-                                                                    ))}
+                                            ) : results.length === 0 ? (
+                                                <div className="p-8 text-center text-slate-500">
+                                                    <p className="font-bold text-sm">No results found for "{searchQuery}"</p>
+                                                </div>
+                                            ) : (
+                                                <div className="max-h-[min(500px,calc(100vh-140px))] overflow-y-auto custom-scrollbar overscroll-contain">
+                                                    <div className="p-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 sticky top-0 z-10 backdrop-blur-sm">
+                                                        <p className="text-[9px] uppercase font-black tracking-widest text-slate-400 px-3">Top Matches</p>
+                                                    </div>
+                                                    {results.map((result) => (
+                                                        <button
+                                                            key={result.id}
+                                                            onMouseDown={(e) => {
+                                                                e.preventDefault(); // Prevent blur before click
+                                                                if (onResultClickRef.current) {
+                                                                    onResultClickRef.current(result);
+                                                                }
+                                                                // Don't close for Compare page if we want to select multiple, 
+                                                                // but the user said "nothing happens when i select", so we'll keep it simple for now.
+                                                                // Actually, for better UX on Compare page, we might stay open.
+                                                                // But the current implementation closes it. Let's keep it closing to be safe.
+                                                                setIsFocused(false);
+                                                                setSearchQuery('');
+                                                            }}
+                                                            className="w-full text-left p-4 hover:bg-emerald-50 dark:hover:bg-emerald-500/5 transition-all flex justify-between items-center group border-b border-slate-100 dark:border-slate-800 last:border-0"
+                                                        >
+                                                            <div className="flex-1 min-w-0 mr-4">
+                                                                <div className="font-bold text-slate-900 dark:text-white capitalize group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors text-sm">
+                                                                    {result.title}
                                                                 </div>
-                                                            )}
-                                                        </div>
-                                                        <ChevronRight size={14} className="text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
+                                                                {result.subtitle && (
+                                                                    <div className="text-[10px] text-slate-500 italic mt-0.5">{result.subtitle}</div>
+                                                                )}
+                                                                {result.badges && (
+                                                                    <div className="flex gap-2 mt-2">
+                                                                        {result.badges.map(badge => (
+                                                                            <span key={badge} className="text-[8px] px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-tight">
+                                                                                {badge}
+                                                                            </span>
+                                                                        ))}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                            <ChevronRight size={14} className="text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </>
                                 )}
                             </div>
                             <div className="flex items-center gap-3">
@@ -272,13 +284,7 @@ function DashboardLayoutContent({
             </div>
 
 
-            {/* Click outside to close search */}
-            {isFocused && (
-                <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setIsFocused(false)}
-                />
-            )}
+            {/* Removed the old fixed-overlay that was in the wrong stacking context */}
         </div>
     );
 }

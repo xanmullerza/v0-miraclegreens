@@ -82,11 +82,21 @@ function DashboardComparisonContent() {
     useEffect(() => {
         registerResultClickHandler((result) => {
             const item = result.data as FoodItem;
-            if (item && !selectedItems.some(i => i.id === item.id) && selectedItems.length < 10) {
-                setSelectedItems(prev => [...prev, item]);
-            }
+            if (!item) return;
+
+            setSelectedItems(prev => {
+                const exists = prev.some(i => i.id === item.id);
+                if (exists) {
+                    // Deselect if already in the list
+                    return prev.filter(i => i.id !== item.id);
+                } else if (prev.length < 10) {
+                    // Select if not in list and limit not reached
+                    return [...prev, item];
+                }
+                return prev;
+            });
         });
-    }, [selectedItems, registerResultClickHandler]);
+    }, [registerResultClickHandler]);
 
     // Initial load from URL
     useEffect(() => {
