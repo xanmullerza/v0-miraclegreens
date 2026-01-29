@@ -345,7 +345,7 @@ function BrowseFoodsContent() {
             </div>
 
             {/* Controls Row */}
-            <div className="flex flex-col md:flex-row gap-4 justify-end">
+            <div className="flex flex-col md:flex-row gap-4 justify-center">
 
                 {/* Category Filter */}
                 <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar">

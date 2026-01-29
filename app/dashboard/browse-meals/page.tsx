@@ -191,7 +191,7 @@ export default function BrowseMealsPage() {
             </div>
 
             {/* Controls Row */}
-            <div className="flex flex-col md:flex-row gap-4 justify-end">
+            <div className="flex flex-col md:flex-row gap-4 justify-center">
                 <div className="flex items-center gap-6">
                     {/* Favorites Switch Toggle */}
                     <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all shrink-0">
