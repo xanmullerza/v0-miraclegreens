@@ -283,8 +283,8 @@ export default function BrowseMealsPage() {
                 <div className="space-y-4">
                     {/* List Header */}
                     <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_100px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
-                        <div>Image</div>
-                        <div>Meal Item</div>
+                        <div></div>
+                        <div></div>
                         <div className="text-right">Calories</div>
                         <div className="text-right flex items-center justify-end gap-1.5">
                             <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
@@ -309,7 +309,7 @@ export default function BrowseMealsPage() {
                                 onClick={() => router.push(`/dashboard/recipes/${recipe.id}`)}
                                 className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
                             >
-                                <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_100px] gap-4 lg:items-center">
+                                <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_100px] gap-4 lg:items-center lg:px-8">
                                     {/* Thumbnail */}
                                     <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
                                         {recipe.image ? (
