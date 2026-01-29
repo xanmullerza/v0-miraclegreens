@@ -40,30 +40,33 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: Food
 
     useEffect(() => {
         const searchFoodItems = async () => {
-            if (view !== 'local') return; // Skip local search if not in local view
-
             if (searchQuery.length < 2) {
                 setResults([]);
                 setUsdaResults([]);
                 return;
             }
 
-            setLoading(true);
-            const { data, error } = await supabase
-                .from('food_items')
-                .select('id, name, common_name, energy_kcal, protein_g, fat_g, carbs_g, energy_kj, micronutrients, portions')
-                .or(`name.ilike.%${searchQuery}%,common_name.ilike.%${searchQuery}%`)
-                .limit(20);
+            if (view === 'local') {
+                setLoading(true);
+                const { data, error } = await supabase
+                    .from('food_items')
+                    .select('id, name, common_name, energy_kcal, protein_g, fat_g, carbs_g, energy_kj, micronutrients, portions')
+                    .or(`name.ilike.%${searchQuery}%,common_name.ilike.%${searchQuery}%`)
+                    .limit(20);
 
-            if (!error && data) {
-                setResults(data);
+                if (!error && data) {
+                    setResults(data);
+                }
+                setLoading(false);
+            } else if (view === 'usda') {
+                // Trigger USDA search automatically if in usda view (and usda-only mode)
+                handleUSDASearch();
             }
-            setLoading(false);
         };
 
         const debounce = setTimeout(searchFoodItems, 300);
         return () => clearTimeout(debounce);
-    }, [searchQuery]);
+    }, [searchQuery, view]); // Added view dependency
 
     const handleUSDASearch = async () => {
         if (searchQuery.length < 2) return;
