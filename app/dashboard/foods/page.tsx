@@ -32,12 +32,14 @@ import {
     Check,
     ChevronDown,
     Scale,
-    ChefHat
+    ChefHat,
+    Globe
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRDA } from '@/hooks/use-rda';
@@ -80,6 +82,7 @@ function FoodsContent() {
     const { searchQuery, setSearchQuery } = useSearch();
     const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES);
     const [selectedItem, setSelectedItem] = useState<FoodItem | null>(null);
+    const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
@@ -95,7 +98,7 @@ function FoodsContent() {
     // Initial load and filter/search changes
     useEffect(() => {
         fetchFoods(0, true);
-    }, [searchQuery, selectedCategories]);
+    }, [searchQuery, selectedCategories, showFavoritesOnly]);
 
     const fetchFoods = async (pageNum: number, isNewSearch = false) => {
         if (pageNum === 0) setLoading(true);
@@ -113,6 +116,10 @@ function FoodsContent() {
 
             if (selectedCategories.length < CATEGORIES.length) {
                 query = query.in('category', selectedCategories);
+            }
+
+            if (showFavoritesOnly) {
+                query = query.eq('is_favorite', true);
             }
 
             const from = pageNum * PAGE_SIZE;
@@ -379,6 +386,32 @@ function FoodsContent() {
             {/* Controls Row */}
             <div className="flex flex-col md:flex-row gap-4 justify-center">
 
+                {/* Favorites Switch Toggle */}
+                <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all shrink-0">
+                    <Globe
+                        size={18}
+                        className={cn(
+                            "transition-all cursor-pointer",
+                            !showFavoritesOnly ? "text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" : "text-slate-300 hover:text-slate-400"
+                        )}
+                        onClick={() => setShowFavoritesOnly(false)}
+                    />
+                    <Switch
+                        id="favorites-mode"
+                        checked={showFavoritesOnly}
+                        onCheckedChange={setShowFavoritesOnly}
+                        className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-blue-600 dark:data-[state=unchecked]:bg-blue-600"
+                    />
+                    <Heart
+                        size={18}
+                        className={cn(
+                            "transition-all cursor-pointer",
+                            showFavoritesOnly ? "text-rose-500 fill-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : "text-slate-300 hover:text-slate-400"
+                        )}
+                        onClick={() => setShowFavoritesOnly(true)}
+                    />
+                </div>
+
                 {/* Category Filter */}
                 <div className="relative">
                     <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar items-center h-14">
@@ -499,8 +532,22 @@ function FoodsContent() {
                     <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
                         <Library size={32} />
                     </div>
-                    <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">No results found.</p>
-                    <p className="text-sm text-slate-500 text-center">We couldn't find any foods matching your criteria.</p>
+                    <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                        {showFavoritesOnly ? "No Favorites Yet" : "No results found."}
+                    </p>
+                    <p className="text-sm text-slate-500 text-center max-w-xs">
+                        {showFavoritesOnly
+                            ? "Tap the heart icon on any food to add it to your personal collection."
+                            : "We couldn't find any foods matching your criteria."}
+                    </p>
+                    {showFavoritesOnly && (
+                        <Button
+                            onClick={() => setShowFavoritesOnly(false)}
+                            className="mt-6 rounded-full bg-emerald-600 text-white px-8 font-black uppercase tracking-widest text-[10px]"
+                        >
+                            Browse All Foods
+                        </Button>
+                    )}
                 </div>
             ) : (
                 <div className="space-y-4">
