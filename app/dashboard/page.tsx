@@ -4,9 +4,6 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
     Beef,
-    Utensils,
-    Scale,
-    Plus,
     ArrowRight,
     Zap,
     Activity,
@@ -16,7 +13,9 @@ import {
     ChefHat,
     Heart,
     Calendar,
-    Library
+    Library,
+    User,
+    BarChart3
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -62,52 +61,28 @@ export default function DashboardOverview() {
 
     const tools = [
         {
-            name: 'Add Foods',
-            desc: 'Add and manage food nutrition data in your library.',
-            href: '/dashboard/food',
-            icon: Beef,
+            name: 'Browse Foods',
+            desc: 'Explore the global database of nutritional data.',
+            href: '/dashboard/browse',
+            icon: Library,
             color: 'text-emerald-500',
             bg: 'bg-emerald-500/10'
         },
         {
-            name: 'Add Recipes',
-            desc: 'Create and track recipes with automatic nutrition calculation.',
-            href: '/dashboard/recipes',
-            icon: Utensils,
+            name: 'Browse Meals',
+            desc: 'View and manage your optimized meal library.',
+            href: '/dashboard/meals',
+            icon: ChefHat,
             color: 'text-blue-500',
             bg: 'bg-blue-500/10'
         },
         {
-            name: 'Compare Foods',
-            desc: 'Compare nutritional values side-by-side using the radar chart.',
-            href: '/dashboard/compare',
-            icon: Scale,
-            color: 'text-amber-500',
-            bg: 'bg-amber-500/10'
-        },
-        {
-            name: 'Plan Meals',
-            desc: 'Generate personalized daily meal plans based on your goals.',
-            href: '/dashboard/plan',
-            icon: Calendar,
+            name: 'My Profile',
+            desc: 'Manage your personal settings and lab access.',
+            href: '/dashboard/profile',
+            icon: User,
             color: 'text-purple-500',
             bg: 'bg-purple-500/10'
-        },
-        {
-            name: 'Meal Library',
-            desc: 'View and manage your personalized recipes and the global database.',
-            href: '/dashboard/meals',
-            icon: Library,
-            color: 'text-rose-500',
-            bg: 'bg-rose-500/10'
-        },
-        {
-            name: 'Categorization',
-            desc: 'Bulk manage and categorize food items in the database.',
-            href: '/dashboard/manage-foods',
-            icon: Database,
-            color: 'text-stone-500',
-            bg: 'bg-stone-500/10'
         }
     ];
 
@@ -142,25 +117,8 @@ export default function DashboardOverview() {
                         A simple way to manage your food and recipes. Add ingredients, create healthy recipes, and check nutrition details in one easy dashboard.
                     </p>
                 </div>
-
-                {/* Quick Stats Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-16 relative z-10 border-t border-slate-800 pt-10 text-center">
-                    <div className="space-y-1">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Foods</p>
-                        <p className="text-3xl font-black text-white">{stats.foodItems}</p>
-                    </div>
-                    <div className="space-y-1">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Recipes</p>
-                        <p className="text-3xl font-black text-white">{stats.recipes}</p>
-                    </div>
-                    <div className="space-y-1">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">System Status</p>
-                        <p className="text-3xl font-black text-white">Online</p>
-                    </div>
-                </div>
             </div>
 
-            {/* Application Tools */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {tools.map((tool) => (
                     <Link key={tool.href} href={tool.href}>
@@ -177,6 +135,42 @@ export default function DashboardOverview() {
                         </Card>
                     </Link>
                 ))}
+
+                {/* Data Card */}
+                <Card className="p-8 h-full bg-slate-50/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 flex flex-col">
+                    <div className="flex items-center justify-between mb-8">
+                        <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500">
+                            <BarChart3 size={24} />
+                        </div>
+                        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-[8px] font-black uppercase tracking-widest">
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Live
+                        </div>
+                    </div>
+                    <div className="space-y-4 flex-grow">
+                        <div className="flex justify-between items-end border-b border-slate-100 dark:border-slate-800 pb-2">
+                            <div>
+                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Foods</p>
+                                <p className="text-lg font-black">{stats.foodItems}</p>
+                            </div>
+                            <Zap size={14} className="text-amber-500 mb-1" />
+                        </div>
+                        <div className="flex justify-between items-end border-b border-slate-100 dark:border-slate-800 pb-2">
+                            <div>
+                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Recipes</p>
+                                <p className="text-lg font-black">{stats.recipes}</p>
+                            </div>
+                            <ChefHat size={14} className="text-blue-500 mb-1" />
+                        </div>
+                        <div className="flex justify-between items-end">
+                            <div>
+                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Status</p>
+                                <p className="text-lg font-black text-emerald-500 italic">Online</p>
+                            </div>
+                            <Activity size={14} className="text-emerald-500 mb-1" />
+                        </div>
+                    </div>
+                </Card>
             </div>
 
             {/* Recent Items */}
