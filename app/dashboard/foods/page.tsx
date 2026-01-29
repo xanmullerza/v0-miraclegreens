@@ -41,7 +41,7 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRDA } from '@/hooks/use-rda';
-import { useSearch } from '@/lib/context/search-context';
+import { useSearch, SearchResult } from '@/lib/context/search-context';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden", className)}>
@@ -66,7 +66,7 @@ interface FoodItem {
 
 const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
 
-function BrowseFoodsContent() {
+function FoodsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { setResults, setIsLoading: setGlobalLoading, registerResultClickHandler } = useSearch();
@@ -149,7 +149,7 @@ function BrowseFoodsContent() {
 
     // Register click handler for global search bar
     useEffect(() => {
-        registerResultClickHandler((result) => {
+        registerResultClickHandler((result: SearchResult) => {
             const item = result.data as FoodItem;
             if (item) {
                 router.push(`/dashboard/food/${item.id}`);
@@ -334,7 +334,7 @@ function BrowseFoodsContent() {
                         <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
                             <Library className="text-white" size={24} />
                         </div>
-                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Food Library</h1>
+                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Foods Hub</h1>
                     </div>
                     <p className="text-emerald-50 font-medium max-w-md text-sm pl-1">
                         Explore our database of nutrient-dense whole foods with complete micronutrient profiles.
@@ -370,7 +370,7 @@ function BrowseFoodsContent() {
                             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
                             <ChefHat size={16} className="group-hover/btn:scale-110 transition-transform" />
-                            Browse Recipes
+                            Meals Hub
                         </Button>
                     </div>
                 </div>
@@ -509,16 +509,16 @@ function BrowseFoodsContent() {
                         <div></div>
                         <div></div>
                         <div className="flex justify-end">
-                            <Zap size={14} className="text-emerald-500" title="Calories" />
+                            <Zap size={14} className="text-emerald-500" />
                         </div>
                         <div className="flex justify-end">
-                            <Wheat size={14} className="text-amber-500" title="Carbohydrates" />
+                            <Wheat size={14} className="text-amber-500" />
                         </div>
                         <div className="flex justify-end">
-                            <Droplet size={14} className="text-amber-900" title="Fat" />
+                            <Droplet size={14} className="text-amber-900" />
                         </div>
                         <div className="flex justify-end">
-                            <Beef size={14} className="text-rose-500" title="Protein" />
+                            <Beef size={14} className="text-rose-500" />
                         </div>
                         <div></div>
                     </div>
@@ -651,7 +651,7 @@ function BrowseFoodsContent() {
                                     <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Ingredient Name</Label>
                                     <Input
                                         value={editName}
-                                        onChange={(e) => setEditName(e.target.value)}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditName(e.target.value)}
                                         className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 font-bold"
                                     />
                                 </div>
@@ -660,7 +660,7 @@ function BrowseFoodsContent() {
                                     <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Common Name</Label>
                                     <Input
                                         value={editCommonName}
-                                        onChange={(e) => setEditCommonName(e.target.value)}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditCommonName(e.target.value)}
                                         className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800"
                                         placeholder="e.g. Garden Pea"
                                     />
@@ -736,14 +736,14 @@ function BrowseFoodsContent() {
     );
 }
 
-export default function BrowseFoodsPage() {
+export default function FoodsPage() {
     return (
         <Suspense fallback={
             <div className="min-h-screen flex items-center justify-center">
                 <div className="animate-spin h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full" />
             </div>
         }>
-            <BrowseFoodsContent />
+            <FoodsContent />
         </Suspense>
     );
 }

@@ -56,15 +56,15 @@ export default function DashboardOverview() {
 
     const tools = [
         {
-            name: 'Browse Foods',
+            name: 'Foods Hub',
             desc: 'Explore the global database of nutritional data.',
-            href: '/dashboard/browse',
+            href: '/dashboard/foods',
             icon: Library,
             color: 'text-emerald-500',
             bg: 'bg-emerald-500/10'
         },
         {
-            name: 'Browse Meals',
+            name: 'Meals Hub',
             desc: 'View and manage your optimized meal library.',
             href: '/dashboard/meals',
             icon: ChefHat,
