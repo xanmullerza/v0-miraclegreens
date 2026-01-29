@@ -142,10 +142,12 @@ function extractUSDANutrients(foodNutrients: any[]): Record<string, number> {
     if (foodNutrients) {
         foodNutrients.forEach((nut: any) => {
             Object.entries(USDA_MICRO_MAP).forEach(([usdaName, ourName]) => {
-                if (nut.nutrient.name && nut.nutrient.name.toLowerCase().includes(usdaName.toLowerCase())) {
+                // Check for Details API format (item.nutrient.name)
+                if (nut.nutrient?.name && nut.nutrient.name.toLowerCase().includes(usdaName.toLowerCase())) {
                     micronutrients[ourName] = nut.amount || nut.value || 0;
-                } else if (nut.nutrientName && nut.nutrientName.toLowerCase().includes(usdaName.toLowerCase())) {
-                    // Handle search result format (flat structure)
+                }
+                // Check for Search API format (item.nutrientName)
+                else if (nut.nutrientName && nut.nutrientName.toLowerCase().includes(usdaName.toLowerCase())) {
                     micronutrients[ourName] = nut.value || 0;
                 }
             });
