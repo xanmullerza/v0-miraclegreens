@@ -65,7 +65,7 @@ export default function ProfilePage() {
             {/* Header */}
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">Your Profile</h1>
-                <p className="text-slate-500 mt-1">Manage your identity and laboratory preferences.</p>
+                <p className="text-slate-500 mt-1">Manage your identity and preferences.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -282,7 +282,7 @@ export default function ProfilePage() {
                     className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-6 rounded-2xl shadow-lg shadow-emerald-500/20 flex items-center gap-2 text-lg"
                 >
                     <Save size={20} />
-                    Sync Laboratory Profile
+                    Save Profile
                 </Button>
             </div>
         </div>
