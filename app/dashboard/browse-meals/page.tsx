@@ -23,6 +23,8 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -195,23 +197,35 @@ export default function BrowseMealsPage() {
                     />
                 </div>
 
-                <div className="flex items-center gap-3">
-                    {/* Favorites Toggle */}
-                    <button
-                        onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-                        className={cn(
-                            "h-14 px-6 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center gap-2 transition-all border shrink-0",
-                            showFavoritesOnly
-                                ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
-                                : "bg-white dark:bg-slate-900/50 text-slate-500 border-slate-200 dark:border-slate-800 hover:bg-slate-50"
-                        )}
-                    >
-                        <Heart size={16} fill={showFavoritesOnly ? "currentColor" : "none"} />
-                        {showFavoritesOnly ? "My Collection" : "Browse All"}
-                    </button>
+                <div className="flex items-center gap-6">
+                    {/* Favorites Switch Toggle */}
+                    <div className="flex items-center gap-3 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all shrink-0">
+                        <Label
+                            htmlFor="favorites-mode"
+                            className={cn(
+                                "text-[10px] font-black uppercase tracking-[0.2em] cursor-pointer transition-colors whitespace-nowrap",
+                                showFavoritesOnly ? "text-rose-500" : "text-slate-400"
+                            )}
+                        >
+                            {showFavoritesOnly ? "Refining My Collection" : "Exploring Global Library"}
+                        </Label>
+                        <Switch
+                            id="favorites-mode"
+                            checked={showFavoritesOnly}
+                            onCheckedChange={setShowFavoritesOnly}
+                            className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-slate-200 dark:data-[state=unchecked]:bg-slate-800"
+                        />
+                        <Heart
+                            size={16}
+                            className={cn(
+                                "transition-all",
+                                showFavoritesOnly ? "text-rose-500 fill-rose-500 scale-110" : "text-slate-300"
+                            )}
+                        />
+                    </div>
 
                     {/* Type Filter */}
-                    <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar">
+                    <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar h-14 items-center">
                         {MEAL_TYPES.map(type => {
                             const isActive = selectedTypes.includes(type);
 
