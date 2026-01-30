@@ -33,6 +33,7 @@ import { nutrientInfo } from '@/lib/data/nutrient-info';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRDA } from '@/hooks/use-rda';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900 shadow-xl rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden", className)}>
@@ -206,25 +207,42 @@ export default function FoodDetailsPage() {
         if (!food) return 0;
         const m = food.micronutrients || {};
 
-        // 1. Try to find a non-zero value in any of the provided keys (either in top-level or micronutrients)
+        // 1. Try to find a non-zero value in any of the provided keys
         for (const k of keys) {
             let val = 0;
-            if (k === 'energy_kcal') val = food.energy_kcal;
-            else if (k === 'protein_g') val = food.protein_g;
-            else if (k === 'carbs_g') val = food.carbs_g;
-            else if (k === 'fat_g') val = food.fat_g;
-            else if (m[k] !== undefined) val = m[k];
+            if (k === 'energy_kcal') val = food.energy_kcal || 0;
+            else if (k === 'protein_g') val = food.protein_g || 0;
+            else if (k === 'carbs_g') val = food.carbs_g || 0;
+            else if (k === 'fat_g') val = food.fat_g || 0;
+            else {
+                // Try direct match
+                if (m[k] !== undefined) val = m[k];
+                // Try smart fuzzy match if direct fails
+                else {
+                    const match = findNutrientMatch(m, k);
+                    if (match) val = m[match];
+                }
+            }
 
             if (val > 0) {
                 // Vitamin D conversion: µg (DB standard) to IU (UI/RDA standard)
-                if (k === 'Vitamin D' || k === 'vitamin_d_ug' || k === 'vitamin_d_mcg') {
+                if (k.toLowerCase().includes('vitamin d') || k.toLowerCase().includes('vitamin_d')) {
                     return val * 40;
                 }
                 return val;
             }
         }
 
-        // 2. If all were 0/undefined, return 0
+        // 2. Special Fallback for Energy: Calculate from macros if Energy/Calories is missing or 0
+        if (keys.some(k => k.toLowerCase().includes('energy') || k.toLowerCase().includes('calorie'))) {
+            const p = food.protein_g || 0;
+            const c = food.carbs_g || 0;
+            const f = food.fat_g || 0;
+            if (p > 0 || c > 0 || f > 0) {
+                return (p * 4) + (c * 4) + (f * 9);
+            }
+        }
+
         return 0;
     };
 
@@ -425,10 +443,10 @@ export default function FoodDetailsPage() {
 
                     <div className="space-y-6">
                         <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Scientific and Clinical breakdown of caloric density" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
-                            'Energy': ['Energy', 'energy_kcal', 'Calories'],
-                            'Protein': ['Protein', 'protein_g'],
-                            'Carbs': ['Carbohydrates', 'carbohydrates_g', 'carbs_g'],
-                            'Fat': ['Fat', 'fat_g']
+                            'Energy': ['Energy', 'energy_kcal', 'Calories', 'calories'],
+                            'Protein': ['Protein', 'protein_g', 'protein'],
+                            'Carbs': ['Carbohydrates', 'carbs_g', 'carbs'],
+                            'Fat': ['Fat', 'fat_g', 'fat']
                         }} />
 
                         <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Essential minerals for cellular hydration and nerve signal transmission" items={{
