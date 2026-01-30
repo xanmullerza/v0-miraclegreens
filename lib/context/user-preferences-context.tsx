@@ -17,6 +17,7 @@ interface UserProfile {
     goal: GoalType;
     dietType: string;
     activityLevel: ActivityLevel;
+    exclusions: string[];
 }
 
 interface UserPreferencesContextType {
@@ -46,7 +47,8 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         height: "",
         goal: "maintain",
         dietType: "anything",
-        activityLevel: "sedentary"
+        activityLevel: "sedentary",
+        exclusions: []
     });
     const [skipPlannerQuiz, setSkipPlannerQuizState] = useState(false);
 

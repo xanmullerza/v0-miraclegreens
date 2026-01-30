@@ -39,7 +39,10 @@ export default function ProfilePage() {
     } = useUserPreferences();
     const { theme, setTheme } = useTheme();
 
-    const [formData, setFormData] = useState(profile);
+    const [formData, setFormData] = useState({
+        ...profile,
+        exclusions: profile.exclusions || []
+    });
 
     const handleSave = () => {
         updateProfile(formData);
@@ -263,6 +266,35 @@ export default function ProfilePage() {
                             <GoalCard type="vegetarian" label="Vegetarian" selected={formData.dietType === 'vegetarian'} onClick={() => setFormData({ ...formData, dietType: 'vegetarian' })} icon={Egg} />
                             <GoalCard type="vegan" label="Vegan" selected={formData.dietType === 'vegan'} onClick={() => setFormData({ ...formData, dietType: 'vegan' })} icon={Leaf} />
                         </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Specific Exclusions</Label>
+                        <div className="flex flex-wrap gap-2">
+                            {['Eggs', 'Dairy', 'Honey', 'Nuts', 'Peanuts', 'Soy', 'Gluten', 'Shellfish', 'Fish', 'Corn', 'Nightshades'].map(exclusion => {
+                                const isSelected = formData.exclusions?.includes(exclusion);
+                                return (
+                                    <button
+                                        key={exclusion}
+                                        onClick={() => {
+                                            const newExclusions = isSelected
+                                                ? formData.exclusions.filter(e => e !== exclusion)
+                                                : [...(formData.exclusions || []), exclusion];
+                                            setFormData({ ...formData, exclusions: newExclusions });
+                                        }}
+                                        className={cn(
+                                            "px-4 py-2 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all",
+                                            isSelected
+                                                ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
+                                                : "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                        )}
+                                    >
+                                        {exclusion}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        <p className="text-[10px] text-slate-400 italic">These items will be marked as "Excluded" even if the meal otherwise fits your diet.</p>
                     </div>
 
                     <div className="space-y-4">

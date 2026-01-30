@@ -27,6 +27,7 @@ import {
     Pencil
 } from 'lucide-react';
 import { calculateRecipeNutrition, CalculatedNutrition } from '@/lib/utils/nutrition-calculator';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -84,6 +85,7 @@ export default function RecipeDetailsPage() {
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
     const [expandedBreakdownSections, setExpandedBreakdownSections] = useState<Record<string, boolean>>({});
     const [calculatedTotals, setCalculatedTotals] = useState<CalculatedNutrition | null>(null);
+    const { profile } = useUserPreferences();
 
     const userRDAs = useRDA(undefined, 'female', recipe?.calories || 2000);
 
@@ -262,28 +264,46 @@ export default function RecipeDetailsPage() {
                         <div className="grid grid-cols-2 gap-3">
                             {['Balanced', 'Pescatarian', 'Vegetarian', 'Vegan'].map(dietType => {
                                 const isSuitable = recipe.diet?.includes(dietType);
+
+                                // Check if ingredients conflict with user exclusions
+                                const userExclusions = profile.exclusions || [];
+                                const hasConflict = isSuitable && userExclusions.some(ex =>
+                                    ingredients.some(ing =>
+                                        (ing.base_ingredient || ing.item || '').toLowerCase().includes(ex.toLowerCase())
+                                    )
+                                );
+
                                 return (
                                     <div
                                         key={dietType}
                                         className={cn(
-                                            "p-4 rounded-2xl border text-center transition-all",
+                                            "p-4 rounded-2xl border text-center transition-all relative",
                                             isSuitable
-                                                ? "bg-emerald-50/50 dark:bg-emerald-500/5 border-emerald-100 dark:border-emerald-500/20"
+                                                ? (hasConflict ? "bg-amber-50/50 dark:bg-amber-500/5 border-amber-200 dark:border-amber-500/30" : "bg-emerald-50/50 dark:bg-emerald-500/5 border-emerald-100 dark:border-emerald-500/20")
                                                 : "bg-rose-50/50 dark:bg-rose-500/5 border-rose-100 dark:border-rose-500/20 opacity-60"
                                         )}
                                     >
                                         <p className={cn(
                                             "text-[10px] font-black uppercase tracking-widest mb-1",
-                                            isSuitable ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                                            isSuitable
+                                                ? (hasConflict ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400")
+                                                : "text-rose-600 dark:text-rose-400"
                                         )}>
                                             {dietType}
                                         </p>
                                         <p className={cn(
                                             "text-[8px] font-bold uppercase",
-                                            isSuitable ? "text-emerald-500/60" : "text-rose-500/60"
+                                            isSuitable
+                                                ? (hasConflict ? "text-amber-500/60" : "text-emerald-500/60")
+                                                : "text-rose-500/60"
                                         )}>
-                                            {isSuitable ? 'Suitable' : 'Excluded'}
+                                            {isSuitable ? (hasConflict ? 'Warning' : 'Suitable') : 'Excluded'}
                                         </p>
+                                        {hasConflict && (
+                                            <div className="absolute top-1 right-2">
+                                                <span className="text-[10px]" title="Conflict with your exclusions">⚠️</span>
+                                            </div>
+                                        )}
                                     </div>
                                 );
                             })}
