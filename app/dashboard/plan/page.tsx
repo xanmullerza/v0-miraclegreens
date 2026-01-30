@@ -37,10 +37,14 @@ import {
     Info,
     RefreshCw,
     Shield,
-    Battery,
-    Layers,
     User,
-    Apple
+    Apple,
+    Plus,
+    Library,
+    Scale,
+    Calendar,
+    Battery,
+    Layers
 } from 'lucide-react';
 import {
     Sheet,
@@ -60,6 +64,7 @@ import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import Link from 'next/link';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
+import { useRouter } from 'next/navigation';
 
 const showShop = false;
 
@@ -154,6 +159,7 @@ const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onRegenerate }: {
 };
 
 export default function MealPlannerPage() {
+    const router = useRouter();
     const [step, setStep] = useState<1 | 2 | 3>(1);
     const [generating, setGenerating] = useState(false);
     const [plan, setPlan] = useState<DailyPlan | null>(null);
@@ -400,22 +406,55 @@ export default function MealPlannerPage() {
     const isFormComplete = Boolean(age && weight && height);
 
     return (
-        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
+        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100 pb-20">
             {/* Hero Section */}
-            <div className="relative h-48 rounded-[2.5rem] bg-amber-500 overflow-hidden flex items-center px-12 group">
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1556910103-1c02745a30bf?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500/50 mix-blend-multiply opacity-40" />
+            <div className="relative h-48 rounded-[2.5rem] bg-amber-600 overflow-hidden flex items-center px-12 group">
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-600 to-orange-600/50 mix-blend-multiply opacity-50" />
 
                 <div className="relative z-10 space-y-2">
                     <div className="flex items-center gap-3">
                         <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
-                            <ChefHat className="text-white" size={24} />
+                            <Calendar className="text-white" size={24} />
                         </div>
-                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Meal Plan</h1>
+                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Meal Planner</h1>
                     </div>
-                    <p className="text-amber-50 font-medium max-w-md text-sm pl-1">
-                        Personalized daily nutrition plans tailored to your biological needs and goals.
+                    <p className="text-amber-50 font-medium max-w-md text-sm pl-1 uppercase tracking-tighter">
+                        AI-Driven daily nutrition protocols tailored to your biological profile.
                     </p>
+                </div>
+
+                <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-6">
+                    <div className="text-right hidden sm:block">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-amber-200 mb-1">Planner Status</p>
+                        <p className="text-3xl font-black text-white leading-none tracking-tighter italic uppercase">
+                            Step {step} <span className="text-amber-300">/ 3</span>
+                        </p>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <Button
+                            onClick={() => router.push('/dashboard/foods')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                        >
+                            <Library size={16} className="group-hover/btn:scale-110 transition-transform" />
+                            View Foods
+                        </Button>
+                        <Button
+                            onClick={() => router.push('/dashboard/recipes')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                        >
+                            <ChefHat size={16} className="group-hover/btn:scale-110 transition-transform" />
+                            View Recipes
+                        </Button>
+                        <Button
+                            onClick={() => router.push('/dashboard/compare')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                        >
+                            <Scale size={16} className="group-hover/btn:scale-110 transition-transform" />
+                            Compare Foods
+                        </Button>
+                    </div>
                 </div>
             </div>
 
