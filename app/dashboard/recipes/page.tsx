@@ -15,7 +15,9 @@ import {
     Plus,
     Filter,
     X,
-    Utensils,
+    Check,
+    ChevronDown,
+    Apple,
     Zap,
     Scale,
     Library,
@@ -24,9 +26,7 @@ import {
     Calendar,
     Wheat,
     Beef,
-    Droplet,
-    Check,
-    ChevronDown
+    Droplet
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -225,7 +225,7 @@ export default function RecipesPage() {
                             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
                             <Calendar size={16} className="group-hover/btn:scale-110 transition-transform" />
-                            Plan Your Meal
+                            Plan Your Meals
                         </Button>
                         <Button
                             onClick={() => router.push('/dashboard/recipebuilder')}
@@ -238,8 +238,8 @@ export default function RecipesPage() {
                             onClick={() => router.push('/dashboard/foods')}
                             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
-                            <Utensils size={16} className="group-hover/btn:scale-110 transition-transform" />
-                            Foods Hub
+                            <Apple size={16} className="group-hover/btn:scale-110 transition-transform" />
+                            View Foods
                         </Button>
                     </div>
                 </div>

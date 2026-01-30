@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-    Utensils,
     Leaf,
     Fish,
     Flame,
@@ -40,7 +39,8 @@ import {
     Shield,
     Battery,
     Layers,
-    User
+    User,
+    Apple
 } from 'lucide-react';
 import {
     Sheet,
@@ -517,7 +517,7 @@ export default function MealPlannerPage() {
                         <div className="space-y-2">
                             <Label className="text-xs uppercase font-bold text-muted-foreground">Diet</Label>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                <DietCard type="anything" selected={diet === 'anything'} onClick={() => setDiet('anything')} icon={Utensils} label="Balanced" />
+                                <DietCard type="anything" selected={diet === 'anything'} onClick={() => setDiet('anything')} icon={Apple} label="Balanced" />
                                 <DietCard type="pescatarian" selected={diet === 'pescatarian'} onClick={() => setDiet('pescatarian')} icon={Fish} label="Pescatarian" />
                                 <DietCard type="vegetarian" selected={diet === 'vegetarian'} onClick={() => setDiet('vegetarian')} icon={Egg} />
                                 <DietCard type="vegan" selected={diet === 'vegan'} onClick={() => setDiet('vegan')} icon={Leaf} />
