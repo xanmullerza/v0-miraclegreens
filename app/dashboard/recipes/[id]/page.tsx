@@ -290,9 +290,30 @@ export default function RecipeDetailsPage() {
                                 // Check if ingredients conflict with user exclusions
                                 const userExclusions = profile.exclusions || [];
                                 const hasConflict = isSuitable && userExclusions.some(ex =>
-                                    ingredients.some(ing =>
-                                        (ing.base_ingredient || ing.item || '').toLowerCase().includes(ex.toLowerCase())
-                                    )
+                                    ingredients.some(ing => {
+                                        const ingName = (ing.base_ingredient || ing.item || '').toLowerCase();
+                                        const exclusion = ex.toLowerCase();
+
+                                        // 1. Direct word match (singular/plural)
+                                        const exSingular = exclusion.replace(/s$/, '');
+                                        if (ingName.includes(exSingular)) return true;
+                                        if (exclusion.includes(ingName) && ingName.length > 3) return true;
+
+                                        // 2. Category mapping (e.g. Dairy)
+                                        if (exclusion === 'dairy') {
+                                            const dairyTerms = ['milk', 'butter', 'cheese', 'cream', 'yogurt', 'curd', 'whey', 'casein'];
+                                            if (dairyTerms.some(term => ingName.includes(term))) return true;
+                                        }
+                                        if (exclusion === 'eggs') {
+                                            if (ingName.includes('egg')) return true;
+                                        }
+                                        if (exclusion === 'nuts' || exclusion === 'peanuts') {
+                                            const nutTerms = ['nut', 'almond', 'cashew', 'walnut', 'pecan', 'pistachio', 'peanut'];
+                                            if (nutTerms.some(term => ingName.includes(term))) return true;
+                                        }
+
+                                        return false;
+                                    })
                                 );
 
                                 return (
