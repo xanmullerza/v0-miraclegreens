@@ -62,7 +62,6 @@ export default function FoodDetailsPage() {
     const [selectedNutrientInfo, setSelectedNutrientInfo] = useState<string | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
     const [showDetailedNutrients, setShowDetailedNutrients] = useState(false);
-    const { nutrientDisplayMode } = useUserPreferences();
 
     // Edit states
     const [isEditing, setIsEditing] = useState(false);
@@ -75,8 +74,14 @@ export default function FoodDetailsPage() {
 
     const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
 
-    // Default RDA for comparison context
-    const userRDAs = useRDA(30, 'female', food?.energy_kcal ? food.energy_kcal * 10 : 2000);
+    const { nutrientDisplayMode, profile } = useUserPreferences();
+
+    // Context-aware RDAs
+    const userRDAs = useRDA(
+        typeof profile.age === 'number' ? profile.age : 30,
+        profile.gender || 'female',
+        2000 // Standard reference
+    );
 
     useEffect(() => {
         if (id) {
@@ -373,24 +378,34 @@ export default function FoodDetailsPage() {
                         </h3>
                         <div className="space-y-4">
                             {[
-                                { label: 'Energy', val: food.energy_kcal, unit: 'kcal', color: 'bg-orange-500' },
-                                { label: 'Protein', val: food.protein_g, unit: 'g', color: 'bg-red-500' },
-                                { label: 'Carbs', val: food.carbs_g, unit: 'g', color: 'bg-amber-500' },
-                                { label: 'Fat', val: food.fat_g, unit: 'g', color: 'bg-sky-500' }
-                            ].map(stat => (
-                                <div key={stat.label} className="space-y-1.5">
-                                    <div className="flex justify-between items-end">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{stat.label}</p>
-                                        <p className="font-black text-sm">{Math.round(stat.val)}{stat.unit}</p>
+                                { label: 'Energy', val: food.energy_kcal, unit: 'kcal', color: 'bg-orange-500', rda: 2000 },
+                                { label: 'Protein', val: food.protein_g, unit: 'g', color: 'bg-red-500', rda: 50 },
+                                { label: 'Carbs', val: food.carbs_g, unit: 'g', color: 'bg-amber-500', rda: 275 },
+                                { label: 'Fat', val: food.fat_g, unit: 'g', color: 'bg-sky-500', rda: 70 }
+                            ].map(stat => {
+                                const pct = Math.round((stat.val / stat.rda) * 100);
+                                return (
+                                    <div key={stat.label} className="space-y-1.5">
+                                        <div className="flex justify-between items-end">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{stat.label}</p>
+                                            <p className="font-black text-sm">
+                                                {nutrientDisplayMode === 'percentage'
+                                                    ? `${pct}%`
+                                                    : nutrientDisplayMode === 'both'
+                                                        ? `${Math.round(stat.val)}${stat.unit} (${pct}%)`
+                                                        : `${Math.round(stat.val)}${stat.unit}`
+                                                }
+                                            </p>
+                                        </div>
+                                        <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                            <div
+                                                className={cn("h-full rounded-full transition-all duration-1000", stat.color)}
+                                                style={{ width: `${Math.min(100, (stat.val / stat.rda) * 100)}%` }}
+                                            />
+                                        </div>
                                     </div>
-                                    <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                        <div
-                                            className={cn("h-full rounded-full transition-all duration-1000", stat.color)}
-                                            style={{ width: `${Math.min(100, (stat.val / (stat.label === 'Energy' ? 800 : 50)) * 100)}%` }}
-                                        />
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </Card>
 

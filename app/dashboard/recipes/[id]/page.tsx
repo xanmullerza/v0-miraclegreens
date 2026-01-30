@@ -87,7 +87,11 @@ export default function RecipeDetailsPage() {
     const [calculatedTotals, setCalculatedTotals] = useState<CalculatedNutrition | null>(null);
     const { profile, nutrientDisplayMode } = useUserPreferences();
 
-    const userRDAs = useRDA(undefined, 'female', recipe?.calories || 2000);
+    const userRDAs = useRDA(
+        typeof profile.age === 'number' ? profile.age : 30,
+        profile.gender || 'female',
+        recipe?.calories || 2000
+    );
 
     // Identify dietary conflicts once ingredients are loaded
     const dietaryConflicts = React.useMemo(() => {
@@ -579,7 +583,8 @@ export default function RecipeDetailsPage() {
                                                         const val = (label === 'Energy' || label === 'Protein' || label === 'Carbs' || label === 'Fat')
                                                             ? (label === 'Energy' ? (recipe as any).calories : (recipe as any)[label.toLowerCase()])
                                                             : getVal(keys as string[]);
-                                                        const rda = userRDAs?.[label];
+                                                        const macroRDAs: Record<string, number> = { 'Energy': 2000, 'Protein': 50, 'Carbs': 275, 'Fat': 70 };
+                                                        const rda = userRDAs?.[label] || macroRDAs[label];
                                                         const pct = rda ? Math.round((val / rda) * 100) : null;
                                                         const styles = getNutrientLevelStyles(pct || 0, label);
                                                         const unit = label === 'Energy' ? 'kcal' : (label === 'Protein' || label === 'Carbs' || label === 'Fat') ? 'g' : (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12')) ? 'µg' : 'mg';
