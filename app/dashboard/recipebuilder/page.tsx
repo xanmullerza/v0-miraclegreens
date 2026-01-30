@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import IngredientBuilder, { RecipeIngredient } from '@/components/recipe/ingredient-builder';
 import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
-import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus, ListOrdered, ChevronUp, ChevronDown, ClipboardList, Heart } from 'lucide-react';
+import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus, ListOrdered, ChevronUp, ChevronDown, ClipboardList, Heart, Library, Scale, Database } from 'lucide-react';
 import { parseInstructionsOnly, parseRecipeText } from '@/lib/utils/recipe-parser';
 import { searchLocalFood, searchUSDAFood, getUSDAMeasures, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
@@ -451,11 +451,11 @@ export default function RecipeBuilderPage() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
+        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100 pb-20">
             {/* Hero Section */}
             <div className="relative h-48 rounded-[2.5rem] bg-violet-600 overflow-hidden flex items-center px-12 group">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1505935428862-770b6f24f629?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-purple-600/50 mix-blend-multiply opacity-40" />
+                <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-purple-600/50 mix-blend-multiply opacity-50" />
 
                 <div className="relative z-10 space-y-2">
                     <div className="flex items-center gap-3">
@@ -464,20 +464,56 @@ export default function RecipeBuilderPage() {
                         </div>
                         <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Recipe Builder</h1>
                     </div>
-                    <p className="text-violet-50 font-medium max-w-md text-sm pl-1">
-                        Create and manage your favorite recipes with accurate nutrition.
+                    <p className="text-violet-50 font-medium max-w-md text-sm pl-1 uppercase tracking-tighter">
+                        Architect complex nutritional profiles with culinary precision.
                     </p>
                 </div>
 
-                <div className="absolute right-12 top-1/2 -translate-y-1/2 hidden md:block">
-                    <Button
-                        onClick={() => setShowAutoImport(true)}
-                        className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-12 rounded-xl font-bold uppercase tracking-widest"
-                    >
-                        <Zap size={16} className="text-yellow-300 fill-current" />
-                        Quick Import
-                    </Button>
+                <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-6">
+                    <div className="text-right hidden sm:block">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-violet-200 mb-1">Ingredients</p>
+                        <p className="text-3xl font-black text-white leading-none tracking-tighter italic uppercase">
+                            {ingredients.length} <span className="text-violet-300">items</span>
+                        </p>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <Button
+                            onClick={() => router.push('/dashboard/foods')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                        >
+                            <Library size={16} className="group-hover/btn:scale-110 transition-transform" />
+                            View Foods
+                        </Button>
+                        <Button
+                            onClick={() => router.push('/dashboard/recipes')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                        >
+                            <ChefHat size={16} className="group-hover/btn:scale-110 transition-transform" />
+                            View Recipes
+                        </Button>
+                        <Button
+                            onClick={() => router.push('/dashboard/compare')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                        >
+                            <Scale size={16} className="group-hover/btn:scale-110 transition-transform" />
+                            Compare Foods
+                        </Button>
+                    </div>
                 </div>
+            </div>
+
+            {/* Sub-Hero Actions */}
+            <div className="flex justify-start">
+                <Button
+                    onClick={() => setShowAutoImport(true)}
+                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center gap-3 transition-all shadow-sm group"
+                >
+                    <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center text-violet-500 group-hover:bg-violet-500 group-hover:text-white transition-all">
+                        <Database className="w-4 h-4" />
+                    </div>
+                    <span>Smart Import From URL / Text</span>
+                </Button>
             </div>
 
             <div className="space-y-8">
