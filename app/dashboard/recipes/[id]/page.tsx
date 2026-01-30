@@ -526,21 +526,12 @@ export default function RecipeDetailsPage() {
                                         for (const k of keys) {
                                             // 1. Try direct match
                                             if (m[k] !== undefined) {
-                                                let val = m[k];
-                                                // Vitamin D conversion: µg (DB standard) to IU (UI/RDA standard)
-                                                if (k.toLowerCase().includes('vitamin d') || k.toLowerCase().includes('vitamin_d')) {
-                                                    return val * 40;
-                                                }
-                                                return val;
+                                                return m[k];
                                             }
                                             // 2. Try fuzzy match
                                             const match = findNutrientMatch(m, k);
                                             if (match) {
-                                                let val = m[match];
-                                                if (k.toLowerCase().includes('vitamin d') || k.toLowerCase().includes('vitamin_d')) {
-                                                    return val * 40;
-                                                }
-                                                return val;
+                                                return m[match];
                                             }
                                         }
                                         return 0;
@@ -612,7 +603,7 @@ export default function RecipeDetailsPage() {
                                                         const rda = userRDAs?.[label] || macroRDAs[label];
                                                         const pct = rda ? Math.round((val / rda) * 100) : null;
                                                         const styles = getNutrientLevelStyles(pct || 0, label);
-                                                        const unit = label === 'Energy' ? 'kcal' : (label === 'Protein' || label === 'Carbs' || label === 'Fat') ? 'g' : (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12')) ? 'µg' : 'mg';
+                                                        const unit = label === 'Energy' ? 'kcal' : (label === 'Protein' || label === 'Carbs' || label === 'Fat') ? 'g' : (label === 'Vitamin D') ? 'IU' : (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg')) ? 'µg' : 'mg';
                                                         const hasBreakdown = breakdownLabels.includes(label);
 
                                                         return (

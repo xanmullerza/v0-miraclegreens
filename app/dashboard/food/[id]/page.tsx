@@ -225,10 +225,6 @@ export default function FoodDetailsPage() {
             }
 
             if (val > 0) {
-                // Vitamin D conversion: µg (DB standard) to IU (UI/RDA standard)
-                if (k.toLowerCase().includes('vitamin d') || k.toLowerCase().includes('vitamin_d')) {
-                    return val * 40;
-                }
                 return val;
             }
         }
@@ -310,7 +306,7 @@ export default function FoodDetailsPage() {
                         const rda = userRDAs?.[label] || macroRDAs[label];
                         const pct = rda ? Math.round((val / rda) * 100) : 0;
                         const styles = getNutrientLevelStyles(pct || 0, label);
-                        const unitLabel = label === 'Vitamin D' ? 'IU' : (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label.includes('Vitamin A') || label.includes('Vitamin K') ? 'µg' : (label === 'Energy' ? 'kcal' : (label === 'Protein' || label === 'Carbs' || label === 'Fat') ? 'g' : 'mg'));
+                        const unitLabel = label === 'Vitamin D' ? 'IU' : (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg') ? 'µg' : (label === 'Energy' ? 'kcal' : (label === 'Protein' || label === 'Carbs' || label === 'Fat') ? 'g' : 'mg'));
                         const hasBreakdown = breakdownLabels.includes(label);
 
                         return (
