@@ -492,7 +492,7 @@ export default function RecipeDetailsPage() {
 
 
                         {showDetailedNutrients && recipe && (
-                            <div className="pt-8 border-t border-slate-100 dark:border-slate-800 animate-in slide-in-from-top-4 duration-500">
+                            <div className="pt-4 animate-in slide-in-from-top-4 duration-500">
                                 {(() => {
                                     const m = recipe.micronutrients || {};
                                     const getVal = (keys: string[]) => { for (const k of keys) if (m[k] !== undefined) return m[k]; return 0; };
