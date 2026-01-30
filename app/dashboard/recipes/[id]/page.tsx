@@ -339,7 +339,7 @@ export default function RecipeDetailsPage() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-[200px_320px_1fr] gap-6 flex-1">
+                        <div className="grid grid-cols-1 md:grid-cols-[200px_150px_1fr] gap-6 flex-1">
                             {/* Vertical Stack for Specs */}
                             <div className="space-y-4 h-full flex flex-col">
                                 <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-center flex-1 flex flex-col items-center justify-center">
@@ -355,12 +355,12 @@ export default function RecipeDetailsPage() {
                             </div>
 
                             {/* Dietary Compatibility Card */}
-                            <Card className="p-6 flex flex-col h-full bg-white dark:bg-slate-900">
-                                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
-                                    <Activity size={14} className="text-emerald-500" />
-                                    Dietary Compatibility
+                            <Card className="p-4 flex flex-col h-full bg-white dark:bg-slate-900">
+                                <h3 className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center justify-center gap-1.5 text-center">
+                                    <Activity size={10} className="text-emerald-500" />
+                                    Compatibility
                                 </h3>
-                                <div className="grid grid-cols-2 gap-3 flex-1 items-stretch">
+                                <div className="flex flex-col gap-2 flex-1">
                                     {[
                                         { label: 'Balanced', dbKey: 'Balanced (Omnivore)' },
                                         { label: 'Pescatarian', dbKey: 'Pescetarian' },
@@ -384,14 +384,14 @@ export default function RecipeDetailsPage() {
                                             <div
                                                 key={label}
                                                 className={cn(
-                                                    "p-3 rounded-2xl border text-center transition-all relative flex flex-col justify-center",
+                                                    "p-2 rounded-xl border text-center transition-all relative flex flex-col justify-center flex-1",
                                                     isSuitable
                                                         ? (hasConflict ? "bg-amber-50/50 dark:bg-amber-500/5 border-amber-200 dark:border-amber-500/30" : "bg-emerald-50/50 dark:bg-emerald-500/5 border-emerald-100 dark:border-emerald-500/20")
                                                         : "bg-rose-50/50 dark:bg-rose-500/5 border-rose-100 dark:border-rose-500/20 opacity-60"
                                                 )}
                                             >
                                                 <p className={cn(
-                                                    "text-[9px] font-black uppercase tracking-widest mb-1",
+                                                    "text-[8px] font-black uppercase tracking-tighter mb-0.5",
                                                     isSuitable
                                                         ? (hasConflict ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400")
                                                         : "text-rose-600 dark:text-rose-400"
@@ -399,12 +399,12 @@ export default function RecipeDetailsPage() {
                                                     {label}
                                                 </p>
                                                 <p className={cn(
-                                                    "text-[8px] font-bold uppercase",
+                                                    "text-[7px] font-bold uppercase",
                                                     isSuitable
                                                         ? (hasConflict ? "text-amber-500/60" : "text-emerald-500/60")
                                                         : "text-rose-500/60"
                                                 )}>
-                                                    {isSuitable ? (hasConflict ? 'Warning' : 'Suitable') : 'Excluded'}
+                                                    {isSuitable ? (hasConflict ? 'Warn' : 'Yes') : 'No'}
                                                 </p>
                                             </div>
                                         );
@@ -413,34 +413,43 @@ export default function RecipeDetailsPage() {
                             </Card>
 
                             {/* Dietary Advisory Card */}
-                            <Card className="p-6 flex flex-col h-full bg-white dark:bg-slate-900">
-                                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                            <Card className="p-6 flex flex-col h-full bg-white dark:bg-slate-900 border-emerald-500/10 dark:border-emerald-500/20">
+                                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-5 flex items-center gap-2">
                                     <Info size={14} className="text-amber-500" />
-                                    Dietary Advisory
+                                    Clinical Dietary Advisory
                                 </h3>
-                                <div className="flex-1 space-y-3">
+                                <div className="flex-1 space-y-4">
                                     {dietaryConflicts.length > 0 ? (
-                                        <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10 flex flex-col gap-2">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">Allergen/Exclusion Alert</p>
-                                            <p className="text-[11px] text-amber-500/80 leading-relaxed font-bold">
-                                                This laboratory sample contains ingredients flagged in your profile:
-                                                <span className="block mt-1 text-slate-900 dark:text-white uppercase tracking-tight text-xs font-black">
+                                        <div className="p-5 rounded-[2rem] bg-amber-500/5 border border-amber-500/10 flex flex-col gap-3 shadow-inner shadow-amber-500/5">
+                                            <div className="flex items-center gap-2">
+                                                <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">Allergen/Exclusion Alert</p>
+                                            </div>
+                                            <p className="text-xs text-amber-500/80 leading-relaxed font-bold">
+                                                This laboratory sample contains ingredients flagged in your medical profile:
+                                                <span className="block mt-2 text-slate-900 dark:text-white uppercase tracking-tight text-sm font-black italic">
                                                     {dietaryConflicts.map(c => c.exclusion).join(', ')}
                                                 </span>
                                             </p>
                                         </div>
                                     ) : (
-                                        <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 flex flex-col gap-2">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Dietary Integrity</p>
-                                            <p className="text-[11px] text-emerald-500/80 leading-relaxed font-bold italic">
-                                                "This recipe aligns with all active clinical exclusions in your profile. No matches for your prohibited items were detected."
+                                        <div className="p-5 rounded-[2rem] bg-emerald-500/5 border border-emerald-500/10 flex flex-col gap-3 shadow-inner shadow-emerald-500/5">
+                                            <div className="flex items-center gap-2">
+                                                <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Dietary Integrity</p>
+                                            </div>
+                                            <p className="text-sm text-emerald-500/80 leading-relaxed font-bold italic">
+                                                "This recipe aligns with all active clinical exclusions in your profile. No matches for your prohibited items were detected in our ingredient analysis."
                                             </p>
                                         </div>
                                     )}
-                                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/50 border border-slate-100 dark:border-slate-800">
-                                        <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">Portion Control</p>
-                                        <p className="text-[10px] text-slate-500 leading-tight font-medium">
-                                            Nutrient values are calculated for a single serving of <span className="font-bold text-slate-900 dark:text-white">1P</span>.
+                                    <div className="p-5 rounded-[2rem] bg-slate-50 dark:bg-slate-950/50 border border-slate-100 dark:border-slate-800">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <div className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+                                            <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">Portion Control</p>
+                                        </div>
+                                        <p className="text-[11px] text-slate-500 leading-tight font-medium">
+                                            All clinical nutrient values and percentage markers are calculated based on a single sample of <span className="font-bold text-emerald-500 dark:text-emerald-400 underline decoration-dotted">1P</span>.
                                         </p>
                                     </div>
                                 </div>
