@@ -235,7 +235,7 @@ export default function RecipeDetailsPage() {
                             )}
                             <div className="absolute top-4 left-4">
                                 <Badge className="bg-white/90 dark:bg-slate-900/90 text-slate-900 dark:text-white border-none text-[10px] font-black uppercase tracking-widest px-4 py-2 backdrop-blur-md shadow-xl">
-                                    {recipe.type}
+                                    Meal Type: {recipe.type}
                                 </Badge>
                             </div>
                         </div>
@@ -253,6 +253,42 @@ export default function RecipeDetailsPage() {
                             <p className="text-xl font-black">{recipe.servings}P</p>
                         </div>
                     </div>
+
+                    <Card className="p-6">
+                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                            <Activity size={14} className="text-emerald-500" />
+                            Dietary Compatibility
+                        </h3>
+                        <div className="grid grid-cols-2 gap-3">
+                            {['Vegan', 'Keto', 'Paleo', 'Vegetarian'].map(dietType => {
+                                const isSuitable = recipe.diet?.includes(dietType);
+                                return (
+                                    <div
+                                        key={dietType}
+                                        className={cn(
+                                            "p-4 rounded-2xl border text-center transition-all",
+                                            isSuitable
+                                                ? "bg-emerald-50/50 dark:bg-emerald-500/5 border-emerald-100 dark:border-emerald-500/20"
+                                                : "bg-rose-50/50 dark:bg-rose-500/5 border-rose-100 dark:border-rose-500/20 opacity-60"
+                                        )}
+                                    >
+                                        <p className={cn(
+                                            "text-[10px] font-black uppercase tracking-widest mb-1",
+                                            isSuitable ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                                        )}>
+                                            {dietType}
+                                        </p>
+                                        <p className={cn(
+                                            "text-[8px] font-bold uppercase",
+                                            isSuitable ? "text-emerald-500/60" : "text-rose-500/60"
+                                        )}>
+                                            {isSuitable ? 'Suitable' : 'Excluded'}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </Card>
 
 
 
@@ -278,11 +314,6 @@ export default function RecipeDetailsPage() {
                             {recipe.title}
                         </h1>
                         <div className="flex flex-wrap gap-2">
-                            {recipe.diet?.map(d => (
-                                <Badge key={d} variant="outline" className="border-emerald-500/30 text-emerald-600 dark:bg-emerald-500/5 text-[9px] font-black uppercase tracking-widest px-3">
-                                    {d}
-                                </Badge>
-                            ))}
                             {recipe.source && (
                                 <Badge variant="outline" className="border-slate-200 dark:border-slate-800 text-slate-400 text-[9px] font-black uppercase tracking-widest px-3">
                                     Source: {recipe.source}
