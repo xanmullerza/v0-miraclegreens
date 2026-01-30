@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, Zap, X as CloseIcon, ChevronDown, Layers, Gem, Droplet, Battery, X } from 'lucide-react';
+import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, Zap, X as CloseIcon, ChevronDown, Layers, Gem, Droplet, Battery, X, Activity } from 'lucide-react';
 import FoodItemPicker from './food-item-picker';
 import { fetchFoodMeasures, FoodMeasure, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -893,12 +893,15 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                                     const m = totals.micronutrients;
                                     const getVal = (keys: string[]) => { for (const k of keys) if (m[k] !== undefined) return m[k]; return 0; };
 
-                                    const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle }: { title: string, items: Record<string, any[]>, icon: any, theme?: 'indigo' | 'rose', subtitle?: string }) => {
+                                    const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle, forceRaw = false }: { title: string, items: Record<string, any[]>, icon: any, theme?: 'indigo' | 'rose' | 'amber' | 'emerald' | 'blue', subtitle?: string, forceRaw?: boolean }) => {
                                         const themes = {
                                             indigo: { bg: "bg-slate-900 border-slate-800", text: "text-indigo-400", border: "border-slate-800", itemBorder: "border-indigo-900/50" },
-                                            rose: { bg: "bg-slate-900 border-slate-800", text: "text-rose-400", border: "border-slate-800", itemBorder: "border-rose-900/50" }
+                                            rose: { bg: "bg-slate-900 border-slate-800", text: "text-rose-400", border: "border-slate-800", itemBorder: "border-rose-900/50" },
+                                            amber: { bg: "bg-slate-900 border-slate-800", text: "text-amber-400", border: "border-slate-800", itemBorder: "border-amber-900/50" },
+                                            emerald: { bg: "bg-slate-900 border-slate-800", text: "text-emerald-400", border: "border-slate-800", itemBorder: "border-emerald-900/50" },
+                                            blue: { bg: "bg-slate-900 border-slate-800", text: "text-blue-400", border: "border-slate-800", itemBorder: "border-blue-900/50" }
                                         };
-                                        const t = themes[theme];
+                                        const t = (themes as any)[theme] || themes.indigo;
 
                                         return (
                                             <div className={cn("p-6 rounded-2xl border bg-gradient-to-br", t.bg)}>
@@ -911,10 +914,10 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                                                         const pct = rda ? Math.round((val / rda) * 100) : null;
                                                         const styles = getNutrientLevelStyles(pct || 0, label);
                                                         return (
-                                                            <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all", t.itemBorder, pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
+                                                            <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all", t.itemBorder, pct !== null && !forceRaw ? `${styles.borderLight} ${styles.fade}` : "")}>
                                                                 <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
                                                                 <div className="flex items-baseline gap-1"><span className="text-lg font-bold">{val.toFixed(1)}</span><span className={cn("text-[10px] font-bold", (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12')) ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') ? 'µg' : 'mg'}</span></div>
-                                                                {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
+                                                                {pct !== null && !forceRaw && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
                                                             </div>
                                                         );
                                                     })}
@@ -1017,41 +1020,20 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                                                 </div>
                                             </div>
 
-                                            <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900">
-                                                <h4 className="font-black flex items-center gap-2 mb-1 text-emerald-400 uppercase tracking-widest text-[10px]"><Battery className="h-4 w-4" /> Stored Vitamins</h4>
-                                                <p className="text-[9px] text-slate-400 mb-4 border-b border-slate-800 pb-2">Fat-soluble storage (A, D, E, K)</p>
-                                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                                    {[
-                                                        { label: 'Vitamin A', keys: ['Vitamin A', 'vitamin_a_ug'], unit: 'µg', hasBreakdown: true },
-                                                        { label: 'Vitamin D', keys: ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'], unit: 'IU', hasBreakdown: false },
-                                                        { label: 'Vitamin E', keys: ['Vitamin E', 'vitamin_e_mg'], unit: 'mg', hasBreakdown: true },
-                                                        { label: 'Vitamin K', keys: ['Vitamin K', 'vitamin_k_ug'], unit: 'µg', hasBreakdown: false },
-                                                    ].map(({ label, keys, unit: unitLabel, hasBreakdown }) => {
-                                                        const val = getVal(keys);
-                                                        const rda = userRDAs?.[label];
-                                                        const pct = rda ? Math.round((val / rda) * 100) : null;
-                                                        const styles = getNutrientLevelStyles(pct || 0, label);
-                                                        return (
-                                                            <div key={label} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-950 hover:shadow-md transition-all relative group", pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
-                                                                <div onClick={() => setSelectedNutrientInfo(label)} className="cursor-pointer">
-                                                                    <p className="text-[10px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
-                                                                    <div className="flex items-baseline gap-1"><span className="text-xl font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span><span className={cn("text-[10px] font-bold", unitLabel === 'µg' ? "text-blue-600 dark:text-blue-400" : unitLabel === 'IU' ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground")}>{unitLabel}</span></div>
-                                                                    {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
-                                                                </div>
-                                                                {hasBreakdown && (
-                                                                    <button
-                                                                        onClick={(e) => { e.stopPropagation(); setBreakdownNutrient(label); }}
-                                                                        className="absolute top-2 right-2 p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 opacity-60 group-hover:opacity-100 hover:bg-emerald-200 dark:hover:bg-emerald-800 transition-all border border-emerald-200/50 dark:border-emerald-700/50"
-                                                                        title="View breakdown"
-                                                                    >
-                                                                        <Layers className="h-3.5 w-3.5" />
-                                                                    </button>
-                                                                )}
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
+                                            <NutrientGrid title="Stored Vitamins" icon={Battery} theme="emerald" subtitle="Fat-soluble storage (A, D, E, K)" items={{
+                                                'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
+                                                'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
+                                                'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
+                                                'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
+                                            }} />
+
+                                            <NutrientGrid title="Clinical Markers" icon={Activity} theme="amber" subtitle="Secondary markers for advanced health profile mapping" forceRaw={true} items={{
+                                                'Fiber': ['Fiber', 'fiber_g'],
+                                                'Sugars': ['Sugars', 'sugars_g'],
+                                                'Oxalate': ['Oxalate', 'oxalate_mg'],
+                                                'Omega-3': ['Omega-3', 'omega3_g'],
+                                                'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
+                                            }} />
                                         </div>
                                     );
                                 })()}

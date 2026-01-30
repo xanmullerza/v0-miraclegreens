@@ -226,6 +226,11 @@ function FoodItemCreatorContent() {
 
             toast.success('Food item saved successfully!');
 
+            // Refresh page to clear form and update lists
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+
         } catch (err: any) {
             console.error('Error saving food item:', err);
             toast.error(`Error: ${err.message}`);
