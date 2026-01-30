@@ -321,102 +321,6 @@ export default function RecipeDetailsPage() {
                         </div>
                     </Card>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-center">
-                            <Clock size={20} className="mx-auto mb-2 text-emerald-500" />
-                            <p className="text-[10px] font-black uppercase tracking-tighter text-slate-400">Prep Time</p>
-                            <p className="text-xl font-black">{recipe.prep_time}m</p>
-                        </div>
-                        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-center">
-                            <Users size={20} className="mx-auto mb-2 text-emerald-500" />
-                            <p className="text-[10px] font-black uppercase tracking-tighter text-slate-400">Servings</p>
-                            <p className="text-xl font-black">{recipe.servings}P</p>
-                        </div>
-                    </div>
-
-                    <Card className="p-6">
-                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
-                            <Activity size={14} className="text-emerald-500" />
-                            Dietary Compatibility
-                        </h3>
-                        <div className="grid grid-cols-2 gap-3">
-                            {[
-                                { label: 'Balanced', dbKey: 'Balanced (Omnivore)' },
-                                { label: 'Pescatarian', dbKey: 'Pescetarian' },
-                                { label: 'Vegetarian', dbKey: 'Vegetarian' },
-                                { label: 'Vegan', dbKey: 'Vegan' }
-                            ].map(({ label, dbKey }) => {
-                                // Hierarchical suitability:
-                                // Vegan meals are suitable for everyone.
-                                // Vegetarian meals are suitable for Vegetarian, Pescatarian, and Balanced.
-                                // Pescatarian meals are suitable for Pescatarian and Balanced.
-                                // Balanced meals are only suitable for Balanced.
-
-                                const hasDirectTag = recipe.diet?.includes(dbKey);
-
-                                let isSuitable = hasDirectTag;
-                                if (!isSuitable && recipe.diet) {
-                                    if (label === 'Balanced') {
-                                        isSuitable = recipe.diet.includes('Balanced (Omnivore)') || recipe.diet.includes('Pescetarian') || recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
-                                    } else if (label === 'Pescatarian') {
-                                        isSuitable = recipe.diet.includes('Pescetarian') || recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
-                                    } else if (label === 'Vegetarian') {
-                                        isSuitable = recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
-                                    }
-                                }
-
-                                const hasConflict = isSuitable && dietaryConflicts.length > 0;
-
-                                return (
-                                    <div
-                                        key={label}
-                                        className={cn(
-                                            "p-4 rounded-2xl border text-center transition-all relative",
-                                            isSuitable
-                                                ? (hasConflict ? "bg-amber-50/50 dark:bg-amber-500/5 border-amber-200 dark:border-amber-500/30" : "bg-emerald-50/50 dark:bg-emerald-500/5 border-emerald-100 dark:border-emerald-500/20")
-                                                : "bg-rose-50/50 dark:bg-rose-500/5 border-rose-100 dark:border-rose-500/20 opacity-60"
-                                        )}
-                                    >
-                                        <p className={cn(
-                                            "text-[10px] font-black uppercase tracking-widest mb-1",
-                                            isSuitable
-                                                ? (hasConflict ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400")
-                                                : "text-rose-600 dark:text-rose-400"
-                                        )}>
-                                            {label}
-                                        </p>
-                                        <p className={cn(
-                                            "text-[8px] font-bold uppercase",
-                                            isSuitable
-                                                ? (hasConflict ? "text-amber-500/60" : "text-emerald-500/60")
-                                                : "text-rose-500/60"
-                                        )}>
-                                            {isSuitable ? (hasConflict ? 'Warning' : 'Suitable') : 'Excluded'}
-                                        </p>
-                                        {hasConflict && (
-                                            <div className="absolute top-1 right-2">
-                                                <span className="text-[10px]" title={`Contains: ${dietaryConflicts.map(c => c.exclusion).join(', ')}`}>⚠️</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                        {dietaryConflicts.length > 0 && (
-                            <div className="mt-4 p-3 rounded-xl bg-amber-500/5 border border-amber-500/10 flex items-start gap-2">
-                                <Info size={14} className="text-amber-500 mt-0.5" />
-                                <div className="space-y-1">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">Exclusion Match Found</p>
-                                    <p className="text-[9px] text-amber-500/80 leading-tight">
-                                        This meal contains <span className="font-bold">{dietaryConflicts.map(c => c.exclusion).join(', ')}</span>.
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-                    </Card>
-
-
-
                     <div className="pt-4">
                         <Button
                             variant="outline"
@@ -445,6 +349,96 @@ export default function RecipeDetailsPage() {
                                 </Badge>
                             )}
                         </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6">
+                        {/* Vertical Stack for Specs */}
+                        <div className="space-y-4">
+                            <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-center">
+                                <Clock size={20} className="mx-auto mb-2 text-emerald-500" />
+                                <p className="text-[10px] font-black uppercase tracking-tighter text-slate-400">Prep Time</p>
+                                <p className="text-xl font-black">{recipe.prep_time}m</p>
+                            </div>
+                            <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-center">
+                                <Users size={20} className="mx-auto mb-2 text-emerald-500" />
+                                <p className="text-[10px] font-black uppercase tracking-tighter text-slate-400">Servings</p>
+                                <p className="text-xl font-black">{recipe.servings}P</p>
+                            </div>
+                        </div>
+
+                        {/* Dietary Compatibility Card */}
+                        <Card className="p-6 flex flex-col justify-center">
+                            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                                <Activity size={14} className="text-emerald-500" />
+                                Dietary Compatibility
+                            </h3>
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                {[
+                                    { label: 'Balanced', dbKey: 'Balanced (Omnivore)' },
+                                    { label: 'Pescatarian', dbKey: 'Pescetarian' },
+                                    { label: 'Vegetarian', dbKey: 'Vegetarian' },
+                                    { label: 'Vegan', dbKey: 'Vegan' }
+                                ].map(({ label, dbKey }) => {
+                                    const hasDirectTag = recipe.diet?.includes(dbKey);
+                                    let isSuitable = hasDirectTag;
+                                    if (!isSuitable && recipe.diet) {
+                                        if (label === 'Balanced') {
+                                            isSuitable = recipe.diet.includes('Balanced (Omnivore)') || recipe.diet.includes('Pescetarian') || recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
+                                        } else if (label === 'Pescatarian') {
+                                            isSuitable = recipe.diet.includes('Pescetarian') || recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
+                                        } else if (label === 'Vegetarian') {
+                                            isSuitable = recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
+                                        }
+                                    }
+                                    const hasConflict = isSuitable && dietaryConflicts.length > 0;
+
+                                    return (
+                                        <div
+                                            key={label}
+                                            className={cn(
+                                                "p-4 rounded-2xl border text-center transition-all relative",
+                                                isSuitable
+                                                    ? (hasConflict ? "bg-amber-50/50 dark:bg-amber-500/5 border-amber-200 dark:border-amber-500/30" : "bg-emerald-50/50 dark:bg-emerald-500/5 border-emerald-100 dark:border-emerald-500/20")
+                                                    : "bg-rose-50/50 dark:bg-rose-500/5 border-rose-100 dark:border-rose-500/20 opacity-60"
+                                            )}
+                                        >
+                                            <p className={cn(
+                                                "text-[10px] font-black uppercase tracking-widest mb-1",
+                                                isSuitable
+                                                    ? (hasConflict ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400")
+                                                    : "text-rose-600 dark:text-rose-400"
+                                            )}>
+                                                {label}
+                                            </p>
+                                            <p className={cn(
+                                                "text-[8px] font-bold uppercase",
+                                                isSuitable
+                                                    ? (hasConflict ? "text-amber-500/60" : "text-emerald-500/60")
+                                                    : "text-rose-500/60"
+                                            )}>
+                                                {isSuitable ? (hasConflict ? 'Warning' : 'Suitable') : 'Excluded'}
+                                            </p>
+                                            {hasConflict && (
+                                                <div className="absolute top-1 right-2">
+                                                    <span className="text-[10px]" title={`Contains: ${dietaryConflicts.map(c => c.exclusion).join(', ')}`}>⚠️</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            {dietaryConflicts.length > 0 && (
+                                <div className="mt-4 p-3 rounded-xl bg-amber-500/5 border border-amber-500/10 flex items-start gap-2">
+                                    <Info size={14} className="text-amber-500 mt-0.5" />
+                                    <div className="space-y-1">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">Exclusion Match Found</p>
+                                        <p className="text-[9px] text-amber-500/80 leading-tight">
+                                            This meal contains <span className="font-bold">{dietaryConflicts.map(c => c.exclusion).join(', ')}</span>.
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+                        </Card>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
