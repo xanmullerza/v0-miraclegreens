@@ -449,7 +449,7 @@ export default function FoodDetailsPage() {
                             'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
                             'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
                             'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
-                            'B5 (Pantothenic)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
+                            'B5 (Pantothenic Acid)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
                             'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
                             'B7 (Biotin)': ['Biotin', 'biotin_ug'],
                             'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],

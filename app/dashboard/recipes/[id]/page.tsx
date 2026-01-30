@@ -664,7 +664,7 @@ export default function RecipeDetailsPage() {
                                                         { label: 'B1 (Thiamine)', keys: ['B1 (Thiamine)', 'thiamine_mg'] },
                                                         { label: 'B2 (Riboflavin)', keys: ['B2 (Riboflavin)', 'riboflavin_mg'] },
                                                         { label: 'B3 (Niacin)', keys: ['B3 (Niacin)', 'niacin_mg'] },
-                                                        { label: 'B5 (Pantothenic)', keys: ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'] },
+                                                        { label: 'B5 (Pantothenic Acid)', keys: ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'] },
                                                         { label: 'B6 (Pyridoxine)', keys: ['B6 (Pyridoxine)', 'vitamin_b6_mg'] },
                                                         { label: 'B9 (Folate)', keys: ['B9 (Folate)', 'folate_ug'] },
                                                         { label: 'B12 (Cobalamin)', keys: ['B12 (Cobalamin)', 'vitamin_b12_ug'] },
