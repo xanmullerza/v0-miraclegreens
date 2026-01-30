@@ -260,7 +260,7 @@ export default function RecipeDetailsPage() {
                             Dietary Compatibility
                         </h3>
                         <div className="grid grid-cols-2 gap-3">
-                            {['Vegan', 'Keto', 'Paleo', 'Vegetarian'].map(dietType => {
+                            {['Balanced', 'Pescatarian', 'Vegetarian', 'Vegan'].map(dietType => {
                                 const isSuitable = recipe.diet?.includes(dietType);
                                 return (
                                     <div
