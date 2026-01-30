@@ -408,13 +408,13 @@ export default function RecipeDetailsPage() {
                                         { label: 'Sugars', keys: ['Sugars', 'sugars_g'], unit: 'g' },
                                     ],
                                     'Fat': [
-                                        { label: 'Saturated Fat', keys: ['Saturated Fat', 'saturated_fat_g'], unit: 'g' },
-                                        { label: 'Monounsaturated', keys: ['Monounsaturated Fat', 'monounsaturated_fat_g'], unit: 'g' },
-                                        { label: 'Polyunsaturated', keys: ['Polyunsaturated Fat', 'polyunsaturated_fat_g'], unit: 'g' },
-                                        { label: 'Trans Fat', keys: ['Trans Fat', 'trans_fat_g'], unit: 'g' },
-                                        { label: 'Omega-3', keys: ['Omega-3', 'omega3_g'], unit: 'g' },
-                                        { label: 'Omega-6', keys: ['Omega-6', 'omega6_g'], unit: 'g' },
-                                        { label: 'Cholesterol', keys: ['Cholesterol', 'cholesterol_mg'], unit: 'mg' },
+                                        { label: 'Saturated Fat', keys: ['Saturated Fat'], unit: 'g' },
+                                        { label: 'Monounsaturated', keys: ['Monounsaturated Fat'], unit: 'g' },
+                                        { label: 'Polyunsaturated', keys: ['Polyunsaturated Fat'], unit: 'g' },
+                                        { label: 'Trans Fat', keys: ['Trans Fat'], unit: 'g' },
+                                        { label: 'Omega-3', keys: ['Omega-3'], unit: 'g' },
+                                        { label: 'Omega-6', keys: ['Omega-6'], unit: 'g' },
+                                        { label: 'Cholesterol', keys: ['Cholesterol'], unit: 'mg' },
                                     ],
                                 };
 
@@ -652,13 +652,13 @@ export default function RecipeDetailsPage() {
                                         { label: 'Sugars', keys: ['Sugars', 'sugars_g'], unit: 'g' },
                                     ],
                                     'Fat': [
-                                        { label: 'Saturated Fat', keys: ['Saturated Fat', 'saturated_fat_g'], unit: 'g' },
-                                        { label: 'Monounsaturated', keys: ['Monounsaturated Fat', 'monounsaturated_fat_g'], unit: 'g' },
-                                        { label: 'Polyunsaturated', keys: ['Polyunsaturated Fat', 'polyunsaturated_fat_g'], unit: 'g' },
-                                        { label: 'Trans Fat', keys: ['Trans Fat', 'trans_fat_g'], unit: 'g' },
-                                        { label: 'Omega-3', keys: ['Omega-3', 'omega3_g'], unit: 'g' },
-                                        { label: 'Omega-6', keys: ['Omega-6', 'omega6_g'], unit: 'g' },
-                                        { label: 'Cholesterol', keys: ['Cholesterol', 'cholesterol_mg'], unit: 'mg' },
+                                        { label: 'Saturated Fat', keys: ['Saturated Fat'], unit: 'g' },
+                                        { label: 'Monounsaturated', keys: ['Monounsaturated Fat'], unit: 'g' },
+                                        { label: 'Polyunsaturated', keys: ['Polyunsaturated Fat'], unit: 'g' },
+                                        { label: 'Trans Fat', keys: ['Trans Fat'], unit: 'g' },
+                                        { label: 'Omega-3', keys: ['Omega-3'], unit: 'g' },
+                                        { label: 'Omega-6', keys: ['Omega-6'], unit: 'g' },
+                                        { label: 'Cholesterol', keys: ['Cholesterol'], unit: 'mg' },
                                     ],
                                 };
 

@@ -81,36 +81,44 @@ export const findNutrientMatch = (record: Record<string, any>, key: string) => {
     const exact = mKeys.find(mk => mk.toLowerCase() === kL);
     if (exact) return exact;
 
-    // 2. Strict Macro/Fat matching (Prevent cross-matching)
-    if (kL.includes('saturated') && !kL.includes('mono') && !kL.includes('poly')) {
-        const match = mKeys.find(mk => {
-            const mkL = mk.toLowerCase();
-            return mkL.includes('saturated') && !mkL.includes('mono') && !mkL.includes('poly');
-        });
+    // 2. Strict Word-Boundary Fat Matching (Prevent cross-matching "Saturated" into "Monounsaturated")
+    const isSaturated = /\bsaturated\b/i.test(kL) && !/\bmono\b/i.test(kL) && !/\bpoly\b/i.test(kL);
+    const isMono = /\bmonounsaturated\b/i.test(kL) || (/\bmono\b/i.test(kL) && /\bfat\b/i.test(kL));
+    const isPoly = /\bpolyunsaturated\b/i.test(kL) || (/\bpoly\b/i.test(kL) && /\bfat\b/i.test(kL));
+    const isTrans = /\btrans\b/i.test(kL);
+    const isCholesterol = /\bcholesterol\b/i.test(kL);
+
+    if (isSaturated) {
+        const match = mKeys.find(mk => /\bsaturated\b/i.test(mk) && !/\bmono\b/i.test(mk) && !/\bpoly\b/i.test(mk));
         if (match) return match;
     }
-    if (kL.includes('monounsaturated')) {
-        const match = mKeys.find(mk => mk.toLowerCase().includes('monounsaturated'));
+    if (isMono) {
+        const match = mKeys.find(mk => /\bmonounsaturated\b/i.test(mk) || (/\bmono\b/i.test(mk) && /\bfat\b/i.test(mk)));
         if (match) return match;
     }
-    if (kL.includes('polyunsaturated')) {
-        const match = mKeys.find(mk => mk.toLowerCase().includes('polyunsaturated'));
+    if (isPoly) {
+        const match = mKeys.find(mk => /\bpolyunsaturated\b/i.test(mk) || (/\bpoly\b/i.test(mk) && /\bfat\b/i.test(mk)));
         if (match) return match;
     }
-    if (kL.includes('trans') && (kL.includes('fat') || kL.includes('acid'))) {
-        const match = mKeys.find(mk => mk.toLowerCase().includes('trans'));
+    if (isTrans) {
+        const match = mKeys.find(mk => /\btrans\b/i.test(mk));
         if (match) return match;
     }
-    if (kL.includes('cholesterol')) {
-        const match = mKeys.find(mk => mk.toLowerCase().includes('cholesterol'));
+    if (isCholesterol) {
+        const match = mKeys.find(mk => /\bcholesterol\b/i.test(mk));
         if (match) return match;
     }
-    if (kL.includes('omega-3') || kL.includes('omega 3') || kL.includes('n-3')) {
-        const match = mKeys.find(mk => mk.toLowerCase().includes('omega-3') || mk.toLowerCase().includes('omega 3'));
+
+    // Omega specifics (Keep separate from general Poly-sum)
+    const omega3Match = /\bomega[- ]?3\b/i.test(kL) || /\bn-3\b/i.test(kL);
+    const omega6Match = /\bomega[- ]?6\b/i.test(kL) || /\bn-6\b/i.test(kL);
+
+    if (omega3Match) {
+        const match = mKeys.find(mk => /\bomega[- ]?3\b/i.test(mk) || /\bn-3\b/i.test(mk));
         if (match) return match;
     }
-    if (kL.includes('omega-6') || kL.includes('omega 6') || kL.includes('n-6')) {
-        const match = mKeys.find(mk => mk.toLowerCase().includes('omega-6') || mk.toLowerCase().includes('omega 6'));
+    if (omega6Match) {
+        const match = mKeys.find(mk => /\bomega[- ]?6\b/i.test(mk) || /\bn-6\b/i.test(mk));
         if (match) return match;
     }
 
@@ -131,26 +139,26 @@ export const findNutrientMatch = (record: Record<string, any>, key: string) => {
     }
 
     // B-Vitamin Specifics
-    if (kL.includes('thiamine') || kL.includes('b1')) {
-        const match = mKeys.find(mk => mk.toLowerCase().includes('thiamine') || mk.toLowerCase().includes('b1'));
+    if (/\bthiamine\b/i.test(kL) || /\bb1\b/i.test(kL)) {
+        const match = mKeys.find(mk => /\bthiamine\b/i.test(mk) || /\bb1\b/i.test(mk));
         if (match) return match;
     }
-    if (kL.includes('riboflavin') || kL.includes('b2')) {
-        const match = mKeys.find(mk => mk.toLowerCase().includes('riboflavin') || mk.toLowerCase().includes('b2'));
+    if (/\briboflavin\b/i.test(kL) || /\bb2\b/i.test(kL)) {
+        const match = mKeys.find(mk => /\briboflavin\b/i.test(mk) || /\bb2\b/i.test(mk));
         if (match) return match;
     }
-    if (kL.includes('niacin') || kL.includes('b3')) {
-        const match = mKeys.find(mk => mk.toLowerCase().includes('niacin') || mk.toLowerCase().includes('b3'));
+    if (/\bniacin\b/i.test(kL) || /\bb3\b/i.test(kL)) {
+        const match = mKeys.find(mk => /\bniacin\b/i.test(mk) || /\bb3\b/i.test(mk));
         if (match) return match;
     }
-    if (kL.includes('folate') || kL.includes('folic') || kL.includes('b9')) {
-        const match = mKeys.find(mk => mk.toLowerCase().includes('folate') || mk.toLowerCase().includes('folic') || mk.toLowerCase().includes('b9'));
+    if (/\bfolate\b/i.test(kL) || /\bfolic\b/i.test(kL) || /\bb9\b/i.test(kL)) {
+        const match = mKeys.find(mk => /\bfolate\b/i.test(mk) || /\bfolic\b/i.test(mk) || /\bb9\b/i.test(mk));
         if (match) return match;
     }
 
-    // 4. Fuzzy word matching (lower priority, restricted)
+    // 4. Fuzzy word matching (Very restricted fallback)
     const firstWord = kL.split(/[\s_]/)[0];
-    if (firstWord.length > 4 && !['vitamin', 'saturated', 'monounsaturated', 'polyunsaturated', 'fatty', 'total'].includes(firstWord)) {
+    if (firstWord.length > 5 && !['vitamin', 'saturated', 'monounsaturated', 'polyunsaturated', 'total'].includes(firstWord)) {
         const fuzzy = mKeys.find(mk => mk.toLowerCase().includes(firstWord));
         if (fuzzy) return fuzzy;
     }
