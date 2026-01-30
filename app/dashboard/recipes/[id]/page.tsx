@@ -89,6 +89,52 @@ export default function RecipeDetailsPage() {
 
     const userRDAs = useRDA(undefined, 'female', recipe?.calories || 2000);
 
+    // Identify dietary conflicts once ingredients are loaded
+    const dietaryConflicts = React.useMemo(() => {
+        if (!ingredients.length || !profile.exclusions?.length) return [];
+
+        const conflicts: { exclusion: string; ingredient: string }[] = [];
+        const userExclusions = profile.exclusions;
+
+        userExclusions.forEach(ex => {
+            const exclusion = ex.toLowerCase();
+            const matchingIng = ingredients.find(ing => {
+                const ingName = (ing.base_ingredient || ing.item || '').toLowerCase();
+                const exSingular = exclusion.replace(/s$/, '');
+                if (ingName.includes(exSingular)) return true;
+                if (exclusion.includes(ingName) && ingName.length > 3) return true;
+
+                if (exclusion === 'dairy') {
+                    const dairyTerms = ['milk', 'butter', 'cheese', 'cream', 'yogurt', 'curd', 'whey', 'casein'];
+                    if (dairyTerms.some(term => ingName.includes(term))) return true;
+                }
+                if (exclusion === 'eggs' && ingName.includes('egg')) return true;
+                if ((exclusion === 'nuts' || exclusion === 'peanuts')) {
+                    const nutTerms = ['nut', 'almond', 'cashew', 'walnut', 'pecan', 'pistachio', 'peanut'];
+                    if (nutTerms.some(term => ingName.includes(term))) return true;
+                }
+                return false;
+            });
+
+            if (matchingIng) {
+                conflicts.push({ exclusion: ex, ingredient: matchingIng.item });
+            }
+        });
+
+        return conflicts;
+    }, [ingredients, profile.exclusions]);
+
+    // Notify user of conflicts on mount/load
+    useEffect(() => {
+        if (dietaryConflicts.length > 0) {
+            const items = dietaryConflicts.map(c => c.exclusion).join(', ');
+            toast.warning(`Dietary Warning: This meal contains ${items}, which you've excluded from your profile.`, {
+                duration: 6000,
+                position: 'top-center'
+            });
+        }
+    }, [dietaryConflicts]);
+
     useEffect(() => {
         fetchRecipeDetails();
     }, [id]);
@@ -287,34 +333,7 @@ export default function RecipeDetailsPage() {
                                     }
                                 }
 
-                                // Check if ingredients conflict with user exclusions
-                                const userExclusions = profile.exclusions || [];
-                                const hasConflict = isSuitable && userExclusions.some(ex =>
-                                    ingredients.some(ing => {
-                                        const ingName = (ing.base_ingredient || ing.item || '').toLowerCase();
-                                        const exclusion = ex.toLowerCase();
-
-                                        // 1. Direct word match (singular/plural)
-                                        const exSingular = exclusion.replace(/s$/, '');
-                                        if (ingName.includes(exSingular)) return true;
-                                        if (exclusion.includes(ingName) && ingName.length > 3) return true;
-
-                                        // 2. Category mapping (e.g. Dairy)
-                                        if (exclusion === 'dairy') {
-                                            const dairyTerms = ['milk', 'butter', 'cheese', 'cream', 'yogurt', 'curd', 'whey', 'casein'];
-                                            if (dairyTerms.some(term => ingName.includes(term))) return true;
-                                        }
-                                        if (exclusion === 'eggs') {
-                                            if (ingName.includes('egg')) return true;
-                                        }
-                                        if (exclusion === 'nuts' || exclusion === 'peanuts') {
-                                            const nutTerms = ['nut', 'almond', 'cashew', 'walnut', 'pecan', 'pistachio', 'peanut'];
-                                            if (nutTerms.some(term => ingName.includes(term))) return true;
-                                        }
-
-                                        return false;
-                                    })
-                                );
+                                const hasConflict = isSuitable && dietaryConflicts.length > 0;
 
                                 return (
                                     <div
@@ -344,13 +363,24 @@ export default function RecipeDetailsPage() {
                                         </p>
                                         {hasConflict && (
                                             <div className="absolute top-1 right-2">
-                                                <span className="text-[10px]" title="Conflict with your exclusions">⚠️</span>
+                                                <span className="text-[10px]" title={`Contains: ${dietaryConflicts.map(c => c.exclusion).join(', ')}`}>⚠️</span>
                                             </div>
                                         )}
                                     </div>
                                 );
                             })}
                         </div>
+                        {dietaryConflicts.length > 0 && (
+                            <div className="mt-4 p-3 rounded-xl bg-amber-500/5 border border-amber-500/10 flex items-start gap-2">
+                                <Info size={14} className="text-amber-500 mt-0.5" />
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">Exclusion Match Found</p>
+                                    <p className="text-[9px] text-amber-500/80 leading-tight">
+                                        This meal contains <span className="font-bold">{dietaryConflicts.map(c => c.exclusion).join(', ')}</span>.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                     </Card>
 
 
