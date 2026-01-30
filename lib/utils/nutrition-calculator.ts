@@ -76,10 +76,45 @@ export function calculateNutrition(
 export const findNutrientMatch = (record: Record<string, any>, key: string) => {
     const mKeys = Object.keys(record);
     const kL = key.toLowerCase();
+
+    // 1. Exact case-insensitive match (highest priority)
     const exact = mKeys.find(mk => mk.toLowerCase() === kL);
     if (exact) return exact;
 
-    // Specific Vitamin matching logic (A, B1, C, D, E, K etc)
+    // 2. Strict Macro/Fat matching (Prevent cross-matching)
+    if (kL.includes('saturated') && !kL.includes('mono') && !kL.includes('poly')) {
+        const match = mKeys.find(mk => {
+            const mkL = mk.toLowerCase();
+            return mkL.includes('saturated') && !mkL.includes('mono') && !mkL.includes('poly');
+        });
+        if (match) return match;
+    }
+    if (kL.includes('monounsaturated')) {
+        const match = mKeys.find(mk => mk.toLowerCase().includes('monounsaturated'));
+        if (match) return match;
+    }
+    if (kL.includes('polyunsaturated')) {
+        const match = mKeys.find(mk => mk.toLowerCase().includes('polyunsaturated'));
+        if (match) return match;
+    }
+    if (kL.includes('trans') && (kL.includes('fat') || kL.includes('acid'))) {
+        const match = mKeys.find(mk => mk.toLowerCase().includes('trans'));
+        if (match) return match;
+    }
+    if (kL.includes('cholesterol')) {
+        const match = mKeys.find(mk => mk.toLowerCase().includes('cholesterol'));
+        if (match) return match;
+    }
+    if (kL.includes('omega-3') || kL.includes('omega 3') || kL.includes('n-3')) {
+        const match = mKeys.find(mk => mk.toLowerCase().includes('omega-3') || mk.toLowerCase().includes('omega 3'));
+        if (match) return match;
+    }
+    if (kL.includes('omega-6') || kL.includes('omega 6') || kL.includes('n-6')) {
+        const match = mKeys.find(mk => mk.toLowerCase().includes('omega-6') || mk.toLowerCase().includes('omega 6'));
+        if (match) return match;
+    }
+
+    // 3. Vitamins with numbers (B1, B2, etc)
     const vitMatch = kL.match(/vitamin\s*([a-z]\d*)/i);
     const snakeVitMatch = kL.match(/vitamin_([a-z]\d*)/i);
     const targetVit = (vitMatch?.[1] || snakeVitMatch?.[1])?.toLowerCase();
@@ -95,7 +130,7 @@ export const findNutrientMatch = (record: Record<string, any>, key: string) => {
         if (match) return match;
     }
 
-    // B-Vitamin aliases (Thiamine, Riboflavin, etc)
+    // B-Vitamin Specifics
     if (kL.includes('thiamine') || kL.includes('b1')) {
         const match = mKeys.find(mk => mk.toLowerCase().includes('thiamine') || mk.toLowerCase().includes('b1'));
         if (match) return match;
@@ -108,9 +143,14 @@ export const findNutrientMatch = (record: Record<string, any>, key: string) => {
         const match = mKeys.find(mk => mk.toLowerCase().includes('niacin') || mk.toLowerCase().includes('b3'));
         if (match) return match;
     }
+    if (kL.includes('folate') || kL.includes('folic') || kL.includes('b9')) {
+        const match = mKeys.find(mk => mk.toLowerCase().includes('folate') || mk.toLowerCase().includes('folic') || mk.toLowerCase().includes('b9'));
+        if (match) return match;
+    }
 
+    // 4. Fuzzy word matching (lower priority, restricted)
     const firstWord = kL.split(/[\s_]/)[0];
-    if (firstWord.length > 3 && firstWord !== 'vitamin' && firstWord !== 'saturated') {
+    if (firstWord.length > 4 && !['vitamin', 'saturated', 'monounsaturated', 'polyunsaturated', 'fatty', 'total'].includes(firstWord)) {
         const fuzzy = mKeys.find(mk => mk.toLowerCase().includes(firstWord));
         if (fuzzy) return fuzzy;
     }
@@ -123,16 +163,22 @@ export const findNutrientMatch = (record: Record<string, any>, key: string) => {
  * @returns Total nutrition for the recipe
  */
 const PREFERRED_KEYS: Record<string, string> = {
+    // Electrolytes
+    'Sodium': 'Sodium',
     'Potassium': 'Potassium',
     'Magnesium': 'Magnesium',
     'Calcium': 'Calcium',
     'Phosphorus': 'Phosphorus',
-    'Sodium': 'Sodium',
+    // Minerals
     'Iron': 'Iron',
     'Zinc': 'Zinc',
     'Selenium': 'Selenium',
     'Copper': 'Copper',
     'Manganese': 'Manganese',
+    'Iodine': 'Iodine',
+    'Chromium': 'Chromium',
+    'Molybdenum': 'Molybdenum',
+    // Vitamins
     'Vitamin A': 'Vitamin A',
     'Vitamin C': 'Vitamin C',
     'Vitamin D': 'Vitamin D',
@@ -146,11 +192,23 @@ const PREFERRED_KEYS: Record<string, string> = {
     'B9 (Folate)': 'B9 (Folate)',
     'B12 (Cobalamin)': 'B12 (Cobalamin)',
     'Choline': 'Choline',
-    'Fiber': 'Fiber',
+    // Fats (Standardized)
     'Saturated Fat': 'Saturated Fat',
     'Monounsaturated Fat': 'Monounsaturated Fat',
     'Polyunsaturated Fat': 'Polyunsaturated Fat',
-    'Trans Fat': 'Trans Fat'
+    'Trans Fat': 'Trans Fat',
+    'Cholesterol': 'Cholesterol',
+    'Omega-3': 'Omega-3',
+    'Omega-6': 'Omega-6',
+    // Carbs
+    'Fiber': 'Fiber',
+    'Starch': 'Starch',
+    'Sugars': 'Sugars',
+    // Special
+    'Lutein + Zeaxanthin': 'Lutein + Zeaxanthin',
+    'Beta-carotene': 'Beta-carotene',
+    'Alpha-carotene': 'Alpha-carotene',
+    'Lycopene': 'Lycopene'
 };
 
 export function calculateRecipeNutrition(
