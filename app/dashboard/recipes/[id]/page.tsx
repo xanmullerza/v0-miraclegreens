@@ -254,33 +254,7 @@ export default function RecipeDetailsPage() {
                         </div>
                     </div>
 
-                    <Card className="p-8 space-y-6">
-                        <h3 className="font-black uppercase tracking-widest text-xs flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
-                            <Zap className="text-orange-500" size={18} />
-                            Caloric Breakdown
-                        </h3>
-                        <div className="space-y-4">
-                            {[
-                                { label: 'Energy', val: recipe.calories, unit: 'kcal', color: 'bg-orange-500' },
-                                { label: 'Protein', val: recipe.protein, unit: 'g', color: 'bg-red-500' },
-                                { label: 'Carbs', val: recipe.carbs, unit: 'g', color: 'bg-amber-500' },
-                                { label: 'Fat', val: recipe.fat, unit: 'g', color: 'bg-sky-500' }
-                            ].map(stat => (
-                                <div key={stat.label} className="space-y-1.5">
-                                    <div className="flex justify-between items-end">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{stat.label}</p>
-                                        <p className="font-black text-sm">{Math.round(stat.val)}{stat.unit}</p>
-                                    </div>
-                                    <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                        <div
-                                            className={cn("h-full rounded-full transition-all duration-1000", stat.color)}
-                                            style={{ width: `${Math.min(100, (stat.val / (stat.label === 'Energy' ? 800 : 50)) * 100)}%` }}
-                                        />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </Card>
+
 
                     <div className="pt-4">
                         <Button
