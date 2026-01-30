@@ -131,8 +131,12 @@ export default function RecipeDetailsPage() {
                     const soyTerms = ['soy', 'tofu', 'tempeh', 'edamame', 'miso', 'tamari'];
                     if (soyTerms.some(term => ingName.includes(term))) return true;
                 }
-                if (exclusion === 'fish' && !exclusion.includes('shellfish')) {
-                    const fishTerms = ['salmon', 'tuna', 'cod', 'haddock', 'trout', 'sardine', 'anchovy', 'mackerel'];
+                if (exclusion === 'fish') {
+                    const fishTerms = [
+                        'fish', 'salmon', 'tuna', 'cod', 'haddock', 'trout', 'sardine', 'anchovy', 'mackerel',
+                        'pilchard', 'snapper', 'tilapia', 'bass', 'carp', 'catfish', 'hake', 'herring', 'halibut',
+                        'sole', 'bream', 'mullet', 'kingfish', 'yellowtail', 'tuna', 'snoek', 'yellowfin'
+                    ];
                     if (fishTerms.some(term => ingName.includes(term))) return true;
                 }
                 if (exclusion === 'corn') {
