@@ -378,11 +378,11 @@ function FoodsContent() {
                             Add New Food
                         </Button>
                         <Button
-                            onClick={() => router.push('/dashboard/meals')}
+                            onClick={() => window.location.href = 'https://www.yourtestsite.xyz/dashboard/recipes'}
                             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
                             <ChefHat size={16} className="group-hover/btn:scale-110 transition-transform" />
-                            Meals Hub
+                            Recipes
                         </Button>
                     </div>
                 </div>
