@@ -205,13 +205,17 @@ export default function FoodDetailsPage() {
     const getVal = (keys: string[]) => {
         if (!food) return 0;
         const m = food.micronutrients || {};
+
+        // 1. Try to find a non-zero value in any of the provided keys (either in top-level or micronutrients)
         for (const k of keys) {
-            if (k === 'energy_kcal') return food.energy_kcal;
-            if (k === 'protein_g') return food.protein_g;
-            if (k === 'carbs_g') return food.carbs_g;
-            if (k === 'fat_g') return food.fat_g;
-            if (m[k] !== undefined) {
-                let val = m[k];
+            let val = 0;
+            if (k === 'energy_kcal') val = food.energy_kcal;
+            else if (k === 'protein_g') val = food.protein_g;
+            else if (k === 'carbs_g') val = food.carbs_g;
+            else if (k === 'fat_g') val = food.fat_g;
+            else if (m[k] !== undefined) val = m[k];
+
+            if (val > 0) {
                 // Vitamin D conversion: µg (DB standard) to IU (UI/RDA standard)
                 if (k === 'Vitamin D' || k === 'vitamin_d_ug' || k === 'vitamin_d_mcg') {
                     return val * 40;
@@ -219,6 +223,8 @@ export default function FoodDetailsPage() {
                 return val;
             }
         }
+
+        // 2. If all were 0/undefined, return 0
         return 0;
     };
 
@@ -293,7 +299,7 @@ export default function FoodDetailsPage() {
                             <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct > 0 ? `${styles.borderLight} ${styles.fade}` : "")}>
                                 <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
                                 <div className="space-y-0.5">
-                                    {nutrientDisplayMode === 'percentage' && pct > 0 ? (
+                                    {nutrientDisplayMode === 'percentage' ? (
                                         <>
                                             <div className="flex items-baseline gap-1">
                                                 <span className={cn("text-xl font-black tracking-tighter", styles.text)}>{pct}%</span>
@@ -308,7 +314,7 @@ export default function FoodDetailsPage() {
                                                 <span className="text-lg font-bold">{val.toFixed(1)}</span>
                                                 <span className={cn("text-[10px] font-bold", (unitLabel === 'µg') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unitLabel}</span>
                                             </div>
-                                            {(nutrientDisplayMode === 'both' || nutrientDisplayMode === 'percentage') && pct > 0 && (
+                                            {(nutrientDisplayMode === 'both') && pct > 0 && (
                                                 <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>
                                             )}
                                         </>
@@ -419,10 +425,10 @@ export default function FoodDetailsPage() {
 
                     <div className="space-y-6">
                         <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Scientific and Clinical breakdown of caloric density" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
-                            'Energy': ['energy_kcal'],
-                            'Protein': ['protein_g'],
-                            'Carbs': ['carbs_g'],
-                            'Fat': ['fat_g']
+                            'Energy': ['Energy', 'energy_kcal', 'Calories'],
+                            'Protein': ['Protein', 'protein_g'],
+                            'Carbs': ['Carbohydrates', 'carbohydrates_g', 'carbs_g'],
+                            'Fat': ['Fat', 'fat_g']
                         }} />
 
                         <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Essential minerals for cellular hydration and nerve signal transmission" items={{
