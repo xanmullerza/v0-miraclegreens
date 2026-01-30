@@ -20,7 +20,8 @@ import {
     Upload,
     Camera,
     Save,
-    ChevronDown
+    ChevronDown,
+    Layers
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -222,67 +223,106 @@ export default function FoodDetailsPage() {
         return 0;
     };
 
-    const NutrientSection = ({ title, items, icon: Icon, theme = 'indigo', subtitle }: { title: string, items: Record<string, string[]>, icon: any, theme?: 'indigo' | 'rose' | 'emerald' | 'blue' | 'amber', subtitle?: string }) => {
+    const NUTRIENT_BREAKDOWNS: Record<string, any[]> = {
+        'Vitamin A': [
+            { label: 'Retinol', keys: ['Retinol', 'retinol_ug'], unit: 'µg' },
+            { label: 'Alpha-carotene', keys: ['Alpha-carotene', 'alpha_carotene_ug'], unit: 'µg' },
+            { label: 'Beta-carotene', keys: ['Beta-carotene', 'beta_carotene_ug'], unit: 'µg' },
+            { label: 'Beta-cryptoxanthin', keys: ['Beta-cryptoxanthin', 'beta_cryptoxanthin_ug'], unit: 'µg' },
+            { label: 'Lutein + Zeaxanthin', keys: ['Lutein + Zeaxanthin', 'Lutein+Zeaxanthin', 'lutein_zeaxanthin_ug'], unit: 'µg' },
+            { label: 'Lycopene', keys: ['Lycopene', 'lycopene_ug'], unit: 'µg' },
+        ],
+        'Vitamin E': [
+            { label: 'Alpha-tocopherol', keys: ['Alpha-tocopherol', 'Vitamin E', 'alpha_tocopherol_mg'], unit: 'mg' },
+            { label: 'Beta-tocopherol', keys: ['Beta-tocopherol', 'beta_tocopherol_mg'], unit: 'mg' },
+            { label: 'Delta-tocopherol', keys: ['Delta-tocopherol', 'delta_tocopherol_mg'], unit: 'mg' },
+            { label: 'Gamma-tocopherol', keys: ['Gamma-tocopherol', 'gamma_tocopherol_mg'], unit: 'mg' },
+        ],
+        'Protein': [
+            { label: 'Histidine', keys: ['Histidine', 'histidine_g'], unit: 'g', isEssential: true },
+            { label: 'Isoleucine', keys: ['Isoleucine', 'isoleucine_g'], unit: 'g', isEssential: true },
+            { label: 'Leucine', keys: ['Leucine', 'leucine_g'], unit: 'g', isEssential: true },
+            { label: 'Lysine', keys: ['Lysine', 'lysine_g'], unit: 'g', isEssential: true },
+            { label: 'Methionine', keys: ['Methionine', 'methionine_g'], unit: 'g', isEssential: true },
+            { label: 'Phenylalanine', keys: ['Phenylalanine', 'phenylalanine_g'], unit: 'g', isEssential: true },
+            { label: 'Threonine', keys: ['Threonine', 'threonine_g'], unit: 'g', isEssential: true },
+            { label: 'Tryptophan', keys: ['Tryptophan', 'tryptophan_g'], unit: 'g', isEssential: true },
+            { label: 'Valine', keys: ['Valine', 'valine_g'], unit: 'g', isEssential: true },
+        ],
+        'Carbs': [
+            { label: 'Fiber', keys: ['Fiber', 'fiber_g'], unit: 'g' },
+            { label: 'Starch', keys: ['Starch', 'starch_g'], unit: 'g' },
+            { label: 'Sugars', keys: ['Sugars', 'sugars_g'], unit: 'g' },
+        ],
+        'Fat': [
+            { label: 'Saturated Fat', keys: ['Saturated Fat'], unit: 'g' },
+            { label: 'Monounsaturated', keys: ['Monounsaturated Fat'], unit: 'g' },
+            { label: 'Polyunsaturated', keys: ['Polyunsaturated Fat'], unit: 'g' },
+            { label: 'Trans Fat', keys: ['Trans Fat'], unit: 'g' },
+            { label: 'Omega-3', keys: ['Omega-3'], unit: 'g' },
+            { label: 'Omega-6', keys: ['Omega-6'], unit: 'g' },
+            { label: 'Cholesterol', keys: ['Cholesterol'], unit: 'mg' },
+        ],
+    };
+
+    const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle, breakdownLabels = [] }: { title: string, items: Record<string, any[]>, icon: any, theme?: string, subtitle?: string, breakdownLabels?: string[] }) => {
         const themes = {
             indigo: { bg: "bg-slate-900 border-slate-800", text: "text-indigo-400", border: "border-slate-800", itemBorder: "border-indigo-900/50" },
             rose: { bg: "bg-slate-900 border-slate-800", text: "text-rose-400", border: "border-slate-800", itemBorder: "border-rose-900/50" },
+            orange: { bg: "bg-slate-900 border-slate-800", text: "text-orange-400", border: "border-slate-800", itemBorder: "border-orange-900/50" },
             emerald: { bg: "bg-slate-900 border-slate-800", text: "text-emerald-400", border: "border-slate-800", itemBorder: "border-emerald-900/50" },
             blue: { bg: "bg-slate-900 border-slate-800", text: "text-blue-400", border: "border-slate-800", itemBorder: "border-blue-900/50" },
             amber: { bg: "bg-slate-900 border-slate-800", text: "text-amber-400", border: "border-slate-800", itemBorder: "border-amber-900/50" }
         };
-        const t = (themes as any)[theme];
+        const t = (themes as any)[theme] || themes.indigo;
 
         return (
-            <div className={cn("p-8 rounded-[2.5rem] border bg-gradient-to-br", t.bg)}>
-                <h4 className={cn("font-black flex items-center gap-3 mb-1 uppercase tracking-widest text-xs", t.text)}><Icon className="h-5 w-5" /> {title}</h4>
-                {subtitle && <p className={cn("text-[10px] text-slate-400 mb-6 border-b pb-2", t.border)}>{subtitle}</p>}
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className={cn("p-6 pt-5 rounded-3xl border bg-gradient-to-br mb-6", t.bg)}>
+                <h4 className={cn("font-black flex items-center gap-2 mb-1 uppercase tracking-widest text-[10px]", t.text)}><Icon className="h-4 w-4" /> {title}</h4>
+                {subtitle && <p className={cn("text-[9px] text-slate-400 mb-4 border-b pb-2 transition-colors", t.border)}>{subtitle}</p>}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                     {Object.entries(items).map(([label, keys]) => {
-                        const unitLabel = label === 'Vitamin D' ? 'IU' : (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label.includes('Vitamin A') || label.includes('Vitamin K') ? 'µg' : 'mg');
-                        const val = getVal(keys);
-                        const rda = (userRDAs as any)?.[label];
+                        const val = getVal(keys as string[]);
+                        const macroRDAs: Record<string, number> = { 'Energy': 2000, 'Protein': 50, 'Carbs': 275, 'Fat': 70 };
+                        const rda = userRDAs?.[label] || macroRDAs[label];
                         const pct = rda ? Math.round((val / rda) * 100) : 0;
-                        const styles = getNutrientLevelStyles(pct, label);
+                        const styles = getNutrientLevelStyles(pct || 0, label);
+                        const unitLabel = label === 'Vitamin D' ? 'IU' : (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label.includes('Vitamin A') || label.includes('Vitamin K') ? 'µg' : (label === 'Energy' ? 'kcal' : (label === 'Protein' || label === 'Carbs' || label === 'Fat') ? 'g' : 'mg'));
+                        const hasBreakdown = breakdownLabels.includes(label);
 
                         return (
-                            <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-5 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all", t.itemBorder, pct > 0 ? `${styles.borderLight} ${styles.fade}` : "")}>
-                                <div className="flex justify-between items-center mb-2">
-                                    <p className="text-[9px] uppercase font-black text-foreground/60 truncate">{label}</p>
-                                    <span className="text-[9px] text-muted-foreground font-black">{unitLabel}</span>
-                                </div>
-
-                                <div className="space-y-1">
+                            <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct > 0 ? `${styles.borderLight} ${styles.fade}` : "")}>
+                                <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
+                                <div className="space-y-0.5">
                                     {nutrientDisplayMode === 'percentage' && pct > 0 ? (
                                         <>
                                             <div className="flex items-baseline gap-1">
-                                                <span className={cn("text-2xl font-black tracking-tighter", styles.text)}>{pct}%</span>
+                                                <span className={cn("text-xl font-black tracking-tighter", styles.text)}>{pct}%</span>
                                             </div>
-                                            <p className="text-[10px] font-bold text-slate-400">
-                                                {val >= 1 ? val.toFixed(1) : val.toFixed(2)} {unitLabel}
+                                            <p className="text-[9px] font-bold text-slate-400">
+                                                {val.toFixed(1)}{unitLabel}
                                             </p>
                                         </>
                                     ) : (
                                         <>
                                             <div className="flex items-baseline gap-1">
-                                                <span className="text-xl font-black tracking-tighter">
-                                                    {val >= 1 ? val.toFixed(1) : val.toFixed(2)}
-                                                </span>
+                                                <span className="text-lg font-bold">{val.toFixed(1)}</span>
+                                                <span className={cn("text-[10px] font-bold", (unitLabel === 'µg') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unitLabel}</span>
                                             </div>
                                             {(nutrientDisplayMode === 'both' || nutrientDisplayMode === 'percentage') && pct > 0 && (
-                                                <div className={cn("text-[10px] font-black flex items-center gap-1", styles.text)}>
-                                                    <span>{pct}% RDA</span>
-                                                </div>
+                                                <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>
                                             )}
                                         </>
                                     )}
                                 </div>
 
-                                {pct > 0 && (
-                                    <div className="mt-3">
-                                        <div className={cn("h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden")}>
-                                            <div className={cn("h-full rounded-full", styles.bg)} style={{ width: `${Math.min(100, pct)}%` }} />
-                                        </div>
-                                    </div>
+                                {hasBreakdown && (
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setBreakdownNutrient(label); }}
+                                        className="absolute top-2 right-2 p-1 rounded-lg bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-400 opacity-40 group-hover:opacity-100 hover:bg-orange-200 dark:hover:bg-orange-800 transition-all border border-orange-200/50 dark:border-orange-700/50"
+                                    >
+                                        <Layers className="h-3 w-3" />
+                                    </button>
                                 )}
                             </div>
                         );
@@ -435,8 +475,15 @@ export default function FoodDetailsPage() {
             {/* Comprehensive Nutrient Report */}
             {showDetailedNutrients && (
                 <div className="space-y-8 animate-in slide-in-from-top-4 duration-500">
-                    <div className="space-y-8">
-                        <NutrientSection title="Electrolytes" icon={Zap} theme="indigo" subtitle="Essential minerals for cellular hydration and nerve signal transmission" items={{
+                    <div className="space-y-6">
+                        <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Scientific and Clinical breakdown of caloric density" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
+                            'Energy': ['energy_kcal'],
+                            'Protein': ['protein_g'],
+                            'Carbs': ['carbs_g'],
+                            'Fat': ['fat_g']
+                        }} />
+
+                        <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Essential minerals for cellular hydration and nerve signal transmission" items={{
                             'Sodium': ['Sodium', 'sodium_mg'],
                             'Potassium': ['Potassium', 'potassium_mg'],
                             'Magnesium': ['Magnesium', 'magnesium_mg'],
@@ -444,7 +491,7 @@ export default function FoodDetailsPage() {
                             'Phosphorus': ['Phosphorus', 'phosphorus_mg']
                         }} />
 
-                        <NutrientSection title="Trace Bio-Minerals" icon={Gem} theme="rose" subtitle="Rare essential minerals required for metabolic enzymatic reactions" items={{
+                        <NutrientGrid title="Trace Bio-Minerals" icon={Gem} theme="rose" subtitle="Rare essential minerals required for metabolic enzymatic reactions" items={{
                             'Iron': ['Iron', 'iron_mg'],
                             'Zinc': ['Zinc', 'zinc_mg'],
                             'Copper': ['Copper', 'copper_mg'],
@@ -452,7 +499,7 @@ export default function FoodDetailsPage() {
                             'Selenium': ['Selenium', 'selenium_ug']
                         }} />
 
-                        <NutrientSection title="Water-Soluble Vitamins" icon={Droplet} theme="blue" subtitle="Bio-available B-Complex and Vitamin C concentrations" items={{
+                        <NutrientGrid title="Water-Soluble Vitamins" icon={Droplet} theme="blue" subtitle="Bio-available B-Complex and Vitamin C concentrations" items={{
                             'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
                             'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
                             'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
@@ -465,14 +512,14 @@ export default function FoodDetailsPage() {
                             'Choline': ['Choline', 'choline_mg'],
                         }} />
 
-                        <NutrientSection title="Fat-Soluble Bio-Storage" icon={Battery} theme="emerald" subtitle="Vitamins stored within cellular lipid layers" items={{
+                        <NutrientGrid title="Fat-Soluble Bio-Storage" icon={Battery} theme="emerald" subtitle="Vitamins stored within cellular lipid layers" breakdownLabels={['Vitamin A', 'Vitamin E']} items={{
                             'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
                             'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
                             'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
                             'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
                         }} />
 
-                        <NutrientSection title="Clinical Markers" icon={Activity} theme="amber" subtitle="Secondary markers for advanced health profile mapping" items={{
+                        <NutrientGrid title="Clinical Markers" icon={Activity} theme="amber" subtitle="Secondary markers for advanced health profile mapping" items={{
                             'Fiber': ['Fiber', 'fiber_g'],
                             'Sugars': ['Sugars', 'sugars_g'],
                             'Oxalate': ['Oxalate', 'oxalate_mg'],
@@ -517,6 +564,57 @@ export default function FoodDetailsPage() {
                                     ))}
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* NUTRIENT BREAKDOWN MODAL */}
+            {breakdownNutrient && (food.micronutrients) && (
+                <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setBreakdownNutrient(null)}>
+                    <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] max-w-lg w-full p-8 shadow-2xl relative animate-in zoom-in-95 duration-200 border border-slate-200 dark:border-slate-800" onClick={e => e.stopPropagation()}>
+                        <button onClick={() => setBreakdownNutrient(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"><X size={24} /></button>
+
+                        <div className="flex items-center gap-4 mb-8">
+                            <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center shadow-xl shadow-current/10",
+                                breakdownNutrient === 'Protein' ? "bg-red-100 text-red-600" :
+                                    breakdownNutrient === 'Carbs' ? "bg-amber-100 text-amber-600" :
+                                        breakdownNutrient === 'Fat' ? "bg-orange-100 text-orange-600" :
+                                            "bg-emerald-100 text-emerald-600"
+                            )}>
+                                <Layers className="h-7 w-7" />
+                            </div>
+                            <div>
+                                <h3 className="text-2xl font-black uppercase tracking-tighter italic">{breakdownNutrient}</h3>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Constituent Laboratory Analysis</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+                            {(() => {
+                                const items = NUTRIENT_BREAKDOWNS[breakdownNutrient] || [];
+                                return items.map((item, idx) => {
+                                    const val = getVal(item.keys);
+                                    return (
+                                        <div key={idx} className="flex justify-between items-center p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 group hover:border-emerald-500/30 transition-all">
+                                            <div className="flex flex-col">
+                                                <span className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">
+                                                    {item.label}
+                                                    {item.isEssential && <span className="ml-2 text-[8px] px-1.5 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300 rounded uppercase">Essential</span>}
+                                                </span>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="font-black text-xs text-slate-900 dark:text-white">{val.toFixed(2)}</span>
+                                                <span className="ml-1 text-[10px] font-bold text-slate-400">{item.unit}</span>
+                                            </div>
+                                        </div>
+                                    );
+                                });
+                            })()}
+                        </div>
+
+                        <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Values represent a 100g clinical sample volume</p>
                         </div>
                     </div>
                 </div>
