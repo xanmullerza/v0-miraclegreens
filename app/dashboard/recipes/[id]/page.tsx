@@ -417,7 +417,7 @@ export default function RecipeDetailsPage() {
                                     ],
                                 };
 
-                                const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle }: { title: string, items: Record<string, any[]>, icon: any, theme?: string, subtitle?: string }) => {
+                                const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle, breakdownLabels = [] }: { title: string, items: Record<string, any[]>, icon: any, theme?: string, subtitle?: string, breakdownLabels?: string[] }) => {
                                     const themes = {
                                         indigo: { bg: "bg-slate-900 border-slate-800", text: "text-indigo-400", border: "border-slate-800", itemBorder: "border-indigo-900/50" },
                                         rose: { bg: "bg-slate-900 border-slate-800", text: "text-rose-400", border: "border-slate-800", itemBorder: "border-rose-900/50" },
@@ -438,11 +438,22 @@ export default function RecipeDetailsPage() {
                                                     const pct = rda ? Math.round((val / rda) * 100) : null;
                                                     const styles = getNutrientLevelStyles(pct || 0, label);
                                                     const unit = label === 'Energy' ? 'kcal' : (label === 'Protein' || label === 'Carbs' || label === 'Fat') ? 'g' : (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12')) ? 'µg' : 'mg';
+                                                    const hasBreakdown = breakdownLabels.includes(label);
+
                                                     return (
-                                                        <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all", t.itemBorder, pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
+                                                        <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
                                                             <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
                                                             <div className="flex items-baseline gap-1"><span className="text-lg font-bold">{val.toFixed(1)}</span><span className={cn("text-[10px] font-bold", (unit === 'µg') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unit}</span></div>
                                                             {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
+
+                                                            {hasBreakdown && (
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); setBreakdownNutrient(label); }}
+                                                                    className="absolute top-2 right-2 p-1 rounded-lg bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-400 opacity-40 group-hover:opacity-100 hover:bg-orange-200 dark:hover:bg-orange-800 transition-all border border-orange-200/50 dark:border-orange-700/50"
+                                                                >
+                                                                    <Layers className="h-3 w-3" />
+                                                                </button>
+                                                            )}
                                                         </div>
                                                     );
                                                 })}
@@ -453,7 +464,7 @@ export default function RecipeDetailsPage() {
 
                                 return (
                                     <div className="space-y-6">
-                                        <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Caloric & Macro Breakdown" items={{
+                                        <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Caloric & Macro Breakdown" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
                                             'Energy': ['calories'],
                                             'Protein': ['protein'],
                                             'Carbs': ['carbs'],
@@ -623,7 +634,30 @@ export default function RecipeDetailsPage() {
                                         { label: 'Delta-tocopherol', keys: ['Delta Tocopherol', 'delta_tocopherol_mg'], unit: 'mg' },
                                         { label: 'Gamma-tocopherol', keys: ['Gamma Tocopherol', 'gamma_tocopherol_mg'], unit: 'mg' },
                                     ],
-                                    // Add more if needed matching IngredientBuilder
+                                    'Protein': [
+                                        { label: 'Histidine', keys: ['Histidine', 'histidine_g'], unit: 'g', isEssential: true },
+                                        { label: 'Isoleucine', keys: ['Isoleucine', 'isoleucine_g'], unit: 'g', isEssential: true },
+                                        { label: 'Leucine', keys: ['Leucine', 'leucine_g'], unit: 'g', isEssential: true },
+                                        { label: 'Lysine', keys: ['Lysine', 'lysine_g'], unit: 'g', isEssential: true },
+                                        { label: 'Methionine', keys: ['Methionine', 'methionine_g'], unit: 'g', isEssential: true },
+                                        { label: 'Phenylalanine', keys: ['Phenylalanine', 'phenylalanine_g'], unit: 'g', isEssential: true },
+                                        { label: 'Threonine', keys: ['Threonine', 'threonine_g'], unit: 'g', isEssential: true },
+                                        { label: 'Tryptophan', keys: ['Tryptophan', 'tryptophan_g'], unit: 'g', isEssential: true },
+                                        { label: 'Valine', keys: ['Valine', 'valine_g'], unit: 'g', isEssential: true },
+                                    ],
+                                    'Carbs': [
+                                        { label: 'Fiber', keys: ['Fiber', 'fiber_g'], unit: 'g' },
+                                        { label: 'Starch', keys: ['Starch', 'starch_g'], unit: 'g' },
+                                        { label: 'Sugars', keys: ['Sugars', 'sugars_g', 'sugar_g'], unit: 'g' },
+                                    ],
+                                    'Fat': [
+                                        { label: 'Saturated Fat', keys: ['Saturated', 'saturated_fat_g', 'saturated_g'], unit: 'g' },
+                                        { label: 'Monounsaturated', keys: ['Monounsaturated', 'monounsaturated_fat_g'], unit: 'g' },
+                                        { label: 'Polyunsaturated', keys: ['Polyunsaturated', 'polyunsaturated_fat_g'], unit: 'g' },
+                                        { label: 'Omega-3', keys: ['Omega-3', 'omega3_g', 'omega_3_g'], unit: 'g' },
+                                        { label: 'Omega-6', keys: ['Omega-6', 'omega6_g', 'omega_6_g'], unit: 'g' },
+                                        { label: 'Cholesterol', keys: ['Cholesterol', 'cholesterol_mg'], unit: 'mg' },
+                                    ],
                                 };
 
                                 const m = recipe.micronutrients || {};
