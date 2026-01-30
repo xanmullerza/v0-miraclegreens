@@ -24,7 +24,9 @@ import {
     ChevronRight,
     Save,
     ChefHat,
-    Library
+    Library,
+    Plus,
+    Calendar
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -81,42 +83,49 @@ export default function ProfilePage() {
                         <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
                             <User className="text-white" size={24} />
                         </div>
-                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">User Profile</h1>
+                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Laboratory Profile</h1>
                     </div>
                     <p className="text-indigo-50 font-medium max-w-md text-sm pl-1 uppercase tracking-tighter">
-                        Manage your biometrics, dietary protocols, and interface settings.
+                        Manage your biometrics, diet protocols, and interface settings.
                     </p>
                 </div>
 
                 <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-6">
                     <div className="text-right hidden sm:block">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-indigo-200 mb-1">Active Protocol</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-indigo-200 mb-1">Active DNA Protocol</p>
                         <p className="text-3xl font-black text-white leading-none tracking-tighter italic uppercase">
                             {formData.dietType}
                         </p>
                     </div>
 
-                    <div className="flex flex-col gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                         <Button
-                            onClick={() => router.push('/dashboard/foods')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                            onClick={() => router.push('/dashboard/plan')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
-                            <Library size={16} className="group-hover/btn:scale-110 transition-transform" />
-                            View Foods
+                            <Calendar size={14} className="group-hover/btn:scale-110 transition-transform" />
+                            Plan Meals
                         </Button>
                         <Button
                             onClick={() => router.push('/dashboard/recipes')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
-                            <ChefHat size={16} className="group-hover/btn:scale-110 transition-transform" />
-                            View Recipes
+                            <ChefHat size={14} className="group-hover/btn:scale-110 transition-transform" />
+                            Recipes Hub
                         </Button>
                         <Button
-                            onClick={() => router.push('/dashboard/compare')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                            onClick={() => router.push('/dashboard/food')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
-                            <Scale size={16} className="group-hover/btn:scale-110 transition-transform" />
-                            Compare Foods
+                            <Plus size={14} className="group-hover/btn:rotate-90 transition-transform" />
+                            Add Food
+                        </Button>
+                        <Button
+                            onClick={() => router.push('/dashboard/foods')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                        >
+                            <Library size={14} className="group-hover/btn:scale-110 transition-transform" />
+                            Foods Hub
                         </Button>
                     </div>
                 </div>
