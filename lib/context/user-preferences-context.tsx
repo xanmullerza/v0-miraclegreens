@@ -6,6 +6,7 @@ export type EnergyUnit = "kcal" | "kJ";
 export type MeasurementUnit = "metric" | "imperial";
 export type GoalType = 'lose-fat' | 'maintain' | 'build-muscle';
 export type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'active';
+export type NutrientDisplayMode = 'value' | 'percentage' | 'both';
 
 interface UserProfile {
     name: string;
@@ -25,6 +26,8 @@ interface UserPreferencesContextType {
     setEnergyUnit: (unit: EnergyUnit) => void;
     measurementUnit: MeasurementUnit;
     setMeasurementUnit: (unit: MeasurementUnit) => void;
+    nutrientDisplayMode: NutrientDisplayMode;
+    setNutrientDisplayMode: (mode: NutrientDisplayMode) => void;
     profile: UserProfile;
     updateProfile: (updates: Partial<UserProfile>) => void;
     skipPlannerQuiz: boolean;
@@ -38,6 +41,7 @@ const UserPreferencesContext = createContext<UserPreferencesContextType | undefi
 export function UserPreferencesProvider({ children }: { children: React.ReactNode }) {
     const [energyUnit, setEnergyUnitState] = useState<EnergyUnit>("kJ");
     const [measurementUnit, setMeasurementUnitState] = useState<MeasurementUnit>("metric");
+    const [nutrientDisplayMode, setNutrientDisplayModeState] = useState<NutrientDisplayMode>("both");
     const [profile, setProfileState] = useState<UserProfile>({
         name: "",
         nickname: "",
@@ -61,6 +65,11 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         const savedMUnit = localStorage.getItem("measurementUnit") as MeasurementUnit;
         if (savedMUnit === "metric" || savedMUnit === "imperial") {
             setMeasurementUnitState(savedMUnit);
+        }
+
+        const savedNMode = localStorage.getItem("nutrientDisplayMode") as NutrientDisplayMode;
+        if (savedNMode === "value" || savedNMode === "percentage" || savedNMode === "both") {
+            setNutrientDisplayModeState(savedNMode);
         }
 
         const savedProfile = localStorage.getItem("userProfile");
@@ -88,6 +97,11 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         localStorage.setItem("measurementUnit", unit);
     };
 
+    const setNutrientDisplayMode = (mode: NutrientDisplayMode) => {
+        setNutrientDisplayModeState(mode);
+        localStorage.setItem("nutrientDisplayMode", mode);
+    };
+
     const updateProfile = (updates: Partial<UserProfile>) => {
         const newProfile = { ...profile, ...updates };
         setProfileState(newProfile);
@@ -105,6 +119,8 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
             setEnergyUnit,
             measurementUnit,
             setMeasurementUnit,
+            nutrientDisplayMode,
+            setNutrientDisplayMode,
             profile,
             updateProfile,
             skipPlannerQuiz,

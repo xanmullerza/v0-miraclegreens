@@ -85,7 +85,7 @@ export default function RecipeDetailsPage() {
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
     const [expandedBreakdownSections, setExpandedBreakdownSections] = useState<Record<string, boolean>>({});
     const [calculatedTotals, setCalculatedTotals] = useState<CalculatedNutrition | null>(null);
-    const { profile } = useUserPreferences();
+    const { profile, nutrientDisplayMode } = useUserPreferences();
 
     const userRDAs = useRDA(undefined, 'female', recipe?.calories || 2000);
 
@@ -588,8 +588,28 @@ export default function RecipeDetailsPage() {
                                                         return (
                                                             <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
                                                                 <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
-                                                                <div className="flex items-baseline gap-1"><span className="text-lg font-bold">{val.toFixed(1)}</span><span className={cn("text-[10px] font-bold", (unit === 'µg') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unit}</span></div>
-                                                                {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
+                                                                <div className="space-y-0.5">
+                                                                    {nutrientDisplayMode === 'percentage' && pct !== null ? (
+                                                                        <>
+                                                                            <div className="flex items-baseline gap-1">
+                                                                                <span className={cn("text-xl font-black tracking-tighter", styles.text)}>{pct}%</span>
+                                                                            </div>
+                                                                            <p className="text-[9px] font-bold text-slate-400">
+                                                                                {val.toFixed(1)}{unit}
+                                                                            </p>
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <div className="flex items-baseline gap-1">
+                                                                                <span className="text-lg font-bold">{val.toFixed(1)}</span>
+                                                                                <span className={cn("text-[10px] font-bold", (unit === 'µg') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unit}</span>
+                                                                            </div>
+                                                                            {(nutrientDisplayMode === 'both' || nutrientDisplayMode === 'percentage') && pct !== null && (
+                                                                                <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>
+                                                                            )}
+                                                                        </>
+                                                                    )}
+                                                                </div>
 
                                                                 {hasBreakdown && (
                                                                     <button
@@ -654,11 +674,28 @@ export default function RecipeDetailsPage() {
                                                         return (
                                                             <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-3 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all", pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
                                                                 <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
-                                                                <div className="flex items-baseline gap-1">
-                                                                    <span className="text-lg font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span>
-                                                                    <span className={cn("text-[10px] font-bold", unitLabel === 'µg' ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unitLabel}</span>
+                                                                <div className="space-y-0.5">
+                                                                    {nutrientDisplayMode === 'percentage' && pct !== null ? (
+                                                                        <>
+                                                                            <div className="flex items-baseline gap-1">
+                                                                                <span className={cn("text-xl font-black tracking-tighter", styles.text)}>{pct}%</span>
+                                                                            </div>
+                                                                            <p className="text-[9px] font-bold text-slate-400">
+                                                                                {(val >= 1 ? val.toFixed(1) : val.toFixed(2))}{unitLabel}
+                                                                            </p>
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <div className="flex items-baseline gap-1">
+                                                                                <span className="text-lg font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span>
+                                                                                <span className={cn("text-[10px] font-bold", unitLabel === 'µg' ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unitLabel}</span>
+                                                                            </div>
+                                                                            {(nutrientDisplayMode === 'both' || nutrientDisplayMode === 'percentage') && pct !== null && (
+                                                                                <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>
+                                                                            )}
+                                                                        </>
+                                                                    )}
                                                                 </div>
-                                                                {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
                                                             </div>
                                                         );
                                                     })}
@@ -683,8 +720,28 @@ export default function RecipeDetailsPage() {
                                                             <div key={label} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 hover:shadow-md transition-all relative group", pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
                                                                 <div onClick={() => setSelectedNutrientInfo(label)} className="cursor-pointer">
                                                                     <p className="text-[10px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
-                                                                    <div className="flex items-baseline gap-1"><span className="text-xl font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span><span className={cn("text-[10px] font-bold", unitLabel === 'µg' ? "text-blue-600 dark:text-blue-400" : unitLabel === 'IU' ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground")}>{unitLabel}</span></div>
-                                                                    {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
+                                                                    <div className="space-y-0.5">
+                                                                        {nutrientDisplayMode === 'percentage' && pct !== null ? (
+                                                                            <>
+                                                                                <div className="flex items-baseline gap-1">
+                                                                                    <span className={cn("text-xl font-black tracking-tighter", styles.text)}>{pct}%</span>
+                                                                                </div>
+                                                                                <p className="text-[9px] font-bold text-slate-400">
+                                                                                    {(val >= 1 ? val.toFixed(1) : val.toFixed(2))}{unitLabel}
+                                                                                </p>
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <div className="flex items-baseline gap-1">
+                                                                                    <span className="text-xl font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span>
+                                                                                    <span className={cn("text-[10px] font-bold", unitLabel === 'µg' ? "text-blue-600 dark:text-blue-400" : unitLabel === 'IU' ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground")}>{unitLabel}</span>
+                                                                                </div>
+                                                                                {(nutrientDisplayMode === 'both' || nutrientDisplayMode === 'percentage') && pct !== null && (
+                                                                                    <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>
+                                                                                )}
+                                                                            </>
+                                                                        )}
+                                                                    </div>
                                                                 </div>
                                                                 {hasBreakdown && (
                                                                     <button

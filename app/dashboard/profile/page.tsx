@@ -11,7 +11,13 @@ import {
     Scale,
     Flame,
     TrendingDown,
+    Plus,
+    Calendar,
+    ChefHat,
+    Library,
     Activity,
+    BarChart3,
+    Divide,
     Dumbbell,
     Utensils,
     Egg,
@@ -22,11 +28,7 @@ import {
     Sun,
     Monitor,
     ChevronRight,
-    Save,
-    ChefHat,
-    Library,
-    Plus,
-    Calendar
+    Save
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -41,7 +43,9 @@ export default function ProfilePage() {
         energyUnit,
         setEnergyUnit,
         measurementUnit,
-        setMeasurementUnit
+        setMeasurementUnit,
+        nutrientDisplayMode,
+        setNutrientDisplayMode
     } = useUserPreferences();
     const { theme, setTheme } = useTheme();
     const router = useRouter();
@@ -215,6 +219,40 @@ export default function ProfilePage() {
                                         )}
                                     >
                                         <Scale size={14} /> Imperial (lb/ft)
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Nutrient Display Mode */}
+                            <div className="space-y-3">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Analytical Display</Label>
+                                <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+                                    <button
+                                        onClick={() => setNutrientDisplayMode("value")}
+                                        className={cn(
+                                            "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
+                                            nutrientDisplayMode === "value" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
+                                        )}
+                                    >
+                                        <BarChart3 size={12} /> Values
+                                    </button>
+                                    <button
+                                        onClick={() => setNutrientDisplayMode("percentage")}
+                                        className={cn(
+                                            "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
+                                            nutrientDisplayMode === "percentage" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
+                                        )}
+                                    >
+                                        <Divide size={12} /> RDA %
+                                    </button>
+                                    <button
+                                        onClick={() => setNutrientDisplayMode("both")}
+                                        className={cn(
+                                            "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
+                                            nutrientDisplayMode === "both" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
+                                        )}
+                                    >
+                                        <Activity size={12} /> Combined
                                     </button>
                                 </div>
                             </div>

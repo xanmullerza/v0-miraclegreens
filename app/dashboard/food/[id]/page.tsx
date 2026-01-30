@@ -31,6 +31,7 @@ import { toast } from 'sonner';
 import { nutrientInfo } from '@/lib/data/nutrient-info';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRDA } from '@/hooks/use-rda';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900 shadow-xl rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden", className)}>
@@ -61,6 +62,7 @@ export default function FoodDetailsPage() {
     const [selectedNutrientInfo, setSelectedNutrientInfo] = useState<string | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
     const [showDetailedNutrients, setShowDetailedNutrients] = useState(false);
+    const { nutrientDisplayMode } = useUserPreferences();
 
     // Edit states
     const [isEditing, setIsEditing] = useState(false);
@@ -236,17 +238,38 @@ export default function FoodDetailsPage() {
                                     <p className="text-[9px] uppercase font-black text-foreground/60 truncate">{label}</p>
                                     <span className="text-[9px] text-muted-foreground font-black">{unitLabel}</span>
                                 </div>
-                                <div className="flex items-baseline gap-1">
-                                    <span className="text-xl font-black tracking-tighter">
-                                        {val >= 1 ? val.toFixed(1) : val.toFixed(2)}
-                                    </span>
+
+                                <div className="space-y-1">
+                                    {nutrientDisplayMode === 'percentage' && pct > 0 ? (
+                                        <>
+                                            <div className="flex items-baseline gap-1">
+                                                <span className={cn("text-2xl font-black tracking-tighter", styles.text)}>{pct}%</span>
+                                            </div>
+                                            <p className="text-[10px] font-bold text-slate-400">
+                                                {val >= 1 ? val.toFixed(1) : val.toFixed(2)} {unitLabel}
+                                            </p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-xl font-black tracking-tighter">
+                                                    {val >= 1 ? val.toFixed(1) : val.toFixed(2)}
+                                                </span>
+                                            </div>
+                                            {(nutrientDisplayMode === 'both' || nutrientDisplayMode === 'percentage') && pct > 0 && (
+                                                <div className={cn("text-[10px] font-black flex items-center gap-1", styles.text)}>
+                                                    <span>{pct}% RDA</span>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
                                 </div>
+
                                 {pct > 0 && (
-                                    <div className={cn("mt-2 text-[10px] font-black flex items-center gap-1", styles.text)}>
+                                    <div className="mt-3">
                                         <div className={cn("h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden")}>
                                             <div className={cn("h-full rounded-full", styles.bg)} style={{ width: `${Math.min(100, pct)}%` }} />
                                         </div>
-                                        <span>{pct}%</span>
                                     </div>
                                 )}
                             </div>
