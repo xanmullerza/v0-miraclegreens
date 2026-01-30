@@ -225,21 +225,21 @@ export default function RecipesPage() {
                             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
                             <Calendar size={16} className="group-hover/btn:scale-110 transition-transform" />
-                            Plan Your Meals
+                            Plan Meals
                         </Button>
                         <Button
                             onClick={() => router.push('/dashboard/recipebuilder')}
                             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
                             <Plus size={16} className="group-hover/btn:rotate-90 transition-transform" />
-                            Create a Recipe
+                            Create Recipe
                         </Button>
                         <Button
                             onClick={() => router.push('/dashboard/foods')}
                             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
-                            <Apple size={16} className="group-hover/btn:scale-110 transition-transform" />
-                            View Foods
+                            <Library size={16} className="group-hover/btn:scale-110 transition-transform" />
+                            Foods Hub
                         </Button>
                     </div>
                 </div>

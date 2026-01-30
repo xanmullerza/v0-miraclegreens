@@ -479,25 +479,25 @@ export default function RecipeBuilderPage() {
 
                     <div className="flex flex-col gap-2">
                         <Button
-                            onClick={() => router.push('/dashboard/foods')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
-                        >
-                            <Library size={16} className="group-hover/btn:scale-110 transition-transform" />
-                            View Foods
-                        </Button>
-                        <Button
                             onClick={() => router.push('/dashboard/recipes')}
                             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
                             <ChefHat size={16} className="group-hover/btn:scale-110 transition-transform" />
-                            View Recipes
+                            Recipes Hub
                         </Button>
                         <Button
-                            onClick={() => router.push('/dashboard/compare')}
+                            onClick={() => router.push('/dashboard/plan')}
                             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
-                            <Scale size={16} className="group-hover/btn:scale-110 transition-transform" />
-                            Compare Foods
+                            <Calendar size={16} className="group-hover/btn:scale-110 transition-transform" />
+                            Plan Meals
+                        </Button>
+                        <Button
+                            onClick={() => router.push('/dashboard/foods')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                        >
+                            <Library size={16} className="group-hover/btn:scale-110 transition-transform" />
+                            Foods Hub
                         </Button>
                     </div>
                 </div>
