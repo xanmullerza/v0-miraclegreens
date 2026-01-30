@@ -492,7 +492,7 @@ export default function RecipeDetailsPage() {
 
 
                         {showDetailedNutrients && recipe && (
-                            <div className="pt-4 animate-in slide-in-from-top-4 duration-500">
+                            <div className="animate-in slide-in-from-top-4 duration-500">
                                 {(() => {
                                     const m = recipe.micronutrients || {};
                                     const getVal = (keys: string[]) => { for (const k of keys) if (m[k] !== undefined) return m[k]; return 0; };
@@ -548,7 +548,7 @@ export default function RecipeDetailsPage() {
                                         const t = (themes as any)[theme] || themes.indigo;
 
                                         return (
-                                            <div className={cn("p-6 rounded-3xl border bg-gradient-to-br mb-6", t.bg)}>
+                                            <div className={cn("p-6 pt-5 rounded-3xl border bg-gradient-to-br mb-6", t.bg)}>
                                                 <h4 className={cn("font-black flex items-center gap-2 mb-1 uppercase tracking-widest text-[10px]", t.text)}><Icon className="h-4 w-4" /> {title}</h4>
                                                 {subtitle && <p className={cn("text-[9px] text-slate-400 mb-4 border-b pb-2 transition-colors", t.border)}>{subtitle}</p>}
                                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
