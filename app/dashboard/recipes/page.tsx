@@ -26,7 +26,8 @@ import {
     Calendar,
     Wheat,
     Beef,
-    Droplet
+    Droplet,
+    Camera
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -74,10 +75,12 @@ export default function RecipesPage() {
     const [selectedTypes, setSelectedTypes] = useState<string[]>(MEAL_TYPES);
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [sortField, setSortField] = useState<string>('title');
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
     useEffect(() => {
         fetchRecipes(0, true);
-    }, [searchQuery, selectedTypes, showFavoritesOnly]);
+    }, [searchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection]);
 
     const fetchRecipes = async (pageNum: number, isNewSearch = false) => {
         if (pageNum === 0) setLoading(true);
@@ -87,7 +90,7 @@ export default function RecipesPage() {
             let query = supabase
                 .from('recipes')
                 .select('*', { count: 'exact' })
-                .order('title', { ascending: true });
+                .order(sortField, { ascending: sortDirection === 'asc' });
 
             if (searchQuery.trim()) {
                 query = query.ilike('title', `%${searchQuery}%`);
@@ -126,6 +129,15 @@ export default function RecipesPage() {
         } finally {
             setLoading(false);
             setLoadingMore(false);
+        }
+    };
+
+    const handleSort = (field: string) => {
+        if (sortField === field) {
+            setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortField(field);
+            setSortDirection('asc');
         }
     };
 
@@ -422,19 +434,48 @@ export default function RecipesPage() {
                 <div className="space-y-4">
                     {/* List Header */}
                     <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_100px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
-                        <div></div>
-                        <div></div>
-                        <div className="flex justify-end">
-                            <Zap size={14} className="text-emerald-500" title="Calories" />
+                        <div
+                            className="flex items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors"
+                            onClick={() => handleSort('image')}
+                        >
+                            <Camera size={14} className={cn(sortField === 'image' && "text-emerald-500")} />
+                            {sortField === 'image' && (sortDirection === 'asc' ? <Plus size={10} /> : <X size={10} className="rotate-45" />)}
                         </div>
-                        <div className="flex justify-end">
-                            <Wheat size={14} className="text-amber-500" title="Carbohydrates" />
+                        <div
+                            className="flex items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors"
+                            onClick={() => handleSort('title')}
+                        >
+                            <ChefHat size={14} className={cn(sortField === 'title' && "text-emerald-500")} />
+                            <span>Title</span>
+                            {sortField === 'title' && (sortDirection === 'asc' ? <Plus size={10} /> : <X size={10} className="rotate-45" />)}
                         </div>
-                        <div className="flex justify-end">
-                            <Droplet size={14} className="text-amber-900" title="Fat" />
+                        <div
+                            className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors"
+                            onClick={() => handleSort('calories')}
+                        >
+                            <Zap size={14} className={cn(sortField === 'calories' ? "text-emerald-500" : "text-emerald-500/50")} title="Calories" />
+                            {sortField === 'calories' && (sortDirection === 'asc' ? <Plus size={10} /> : <X size={10} className="rotate-45" />)}
                         </div>
-                        <div className="flex justify-end">
-                            <Beef size={14} className="text-rose-500" title="Protein" />
+                        <div
+                            className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors"
+                            onClick={() => handleSort('carbs')}
+                        >
+                            <Wheat size={14} className={cn(sortField === 'carbs' ? "text-amber-500" : "text-amber-500/50")} title="Carbohydrates" />
+                            {sortField === 'carbs' && (sortDirection === 'asc' ? <Plus size={10} /> : <X size={10} className="rotate-45" />)}
+                        </div>
+                        <div
+                            className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors"
+                            onClick={() => handleSort('fat')}
+                        >
+                            <Droplet size={14} className={cn(sortField === 'fat' ? "text-amber-900" : "text-amber-900/50")} title="Fat" />
+                            {sortField === 'fat' && (sortDirection === 'asc' ? <Plus size={10} /> : <X size={10} className="rotate-45" />)}
+                        </div>
+                        <div
+                            className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors"
+                            onClick={() => handleSort('protein')}
+                        >
+                            <Beef size={14} className={cn(sortField === 'protein' ? "text-rose-500" : "text-rose-500/50")} title="Protein" />
+                            {sortField === 'protein' && (sortDirection === 'asc' ? <Plus size={10} /> : <X size={10} className="rotate-45" />)}
                         </div>
                         <div></div>
                     </div>
