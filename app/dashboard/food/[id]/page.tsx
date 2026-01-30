@@ -62,7 +62,6 @@ export default function FoodDetailsPage() {
     const [loading, setLoading] = useState(true);
     const [selectedNutrientInfo, setSelectedNutrientInfo] = useState<string | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
-    const [showDetailedNutrients, setShowDetailedNutrients] = useState(false);
 
     // Edit states
     const [isEditing, setIsEditing] = useState(false);
@@ -411,70 +410,13 @@ export default function FoodDetailsPage() {
                     </Card>
                 </div>
 
-                <div className="lg:col-span-2 flex flex-col justify-center space-y-6">
+                <div className="lg:col-span-2 space-y-6">
                     <div className="space-y-4">
                         <h1 className="text-6xl font-black tracking-tighter italic uppercase text-slate-900 dark:text-white leading-[0.85]">
                             {food.common_name || food.name}
                         </h1>
                     </div>
 
-                    <Card className="p-8 space-y-6">
-                        <h3 className="font-black uppercase tracking-widest text-xs flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
-                            <Zap className="text-orange-500" size={18} />
-                            Caloric Breakdown
-                        </h3>
-                        <div className="space-y-4">
-                            {[
-                                { label: 'Energy', val: food.energy_kcal, unit: 'kcal', color: 'bg-orange-500', rda: 2000 },
-                                { label: 'Protein', val: food.protein_g, unit: 'g', color: 'bg-red-500', rda: 50 },
-                                { label: 'Carbs', val: food.carbs_g, unit: 'g', color: 'bg-amber-500', rda: 275 },
-                                { label: 'Fat', val: food.fat_g, unit: 'g', color: 'bg-sky-500', rda: 70 }
-                            ].map(stat => {
-                                const pct = Math.round((stat.val / stat.rda) * 100);
-                                return (
-                                    <div key={stat.label} className="space-y-1.5">
-                                        <div className="flex justify-between items-end">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{stat.label}</p>
-                                            <p className="font-black text-sm">
-                                                {nutrientDisplayMode === 'percentage'
-                                                    ? `${pct}%`
-                                                    : nutrientDisplayMode === 'both'
-                                                        ? `${Math.round(stat.val)}${stat.unit} (${pct}%)`
-                                                        : `${Math.round(stat.val)}${stat.unit}`
-                                                }
-                                            </p>
-                                        </div>
-                                        <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                            <div
-                                                className={cn("h-full rounded-full transition-all duration-1000", stat.color)}
-                                                style={{ width: `${Math.min(100, (stat.val / stat.rda) * 100)}%` }}
-                                            />
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </Card>
-
-                    <div className="pt-4">
-                        <Button
-                            variant="outline"
-                            onClick={() => setShowDetailedNutrients(!showDetailedNutrients)}
-                            className="w-full gap-2 font-black text-[10px] uppercase tracking-widest h-12 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950"
-                        >
-                            {showDetailedNutrients ? (
-                                <>Collapse Nutrient Report <ChevronDown className="h-4 w-4 rotate-180" /></>
-                            ) : (
-                                <>Detailed Nutrient Report <ChevronDown className="h-4 w-4" /></>
-                            )}
-                        </Button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Comprehensive Nutrient Report */}
-            {showDetailedNutrients && (
-                <div className="space-y-8 animate-in slide-in-from-top-4 duration-500">
                     <div className="space-y-6">
                         <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Scientific and Clinical breakdown of caloric density" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
                             'Energy': ['energy_kcal'],
@@ -528,7 +470,7 @@ export default function FoodDetailsPage() {
                         }} />
                     </div>
                 </div>
-            )}
+            </div>
 
             {/* NUTRIENT INFO MODAL */}
             {selectedNutrientInfo && (nutrientInfo as any)[selectedNutrientInfo] && (
