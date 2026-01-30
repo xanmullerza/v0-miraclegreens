@@ -522,7 +522,19 @@ export default function RecipeDetailsPage() {
                             <div className="animate-in slide-in-from-top-4 duration-500">
                                 {(() => {
                                     const m = recipe.micronutrients || {};
-                                    const getVal = (keys: string[]) => { for (const k of keys) if (m[k] !== undefined) return m[k]; return 0; };
+                                    const getVal = (keys: string[]) => {
+                                        for (const k of keys) {
+                                            if (m[k] !== undefined) {
+                                                let val = m[k];
+                                                // Vitamin D conversion: µg (DB standard) to IU (UI/RDA standard)
+                                                if (k === 'Vitamin D' || k === 'vitamin_d_ug' || k === 'vitamin_d_mcg') {
+                                                    return val * 40;
+                                                }
+                                                return val;
+                                            }
+                                        }
+                                        return 0;
+                                    };
 
                                     const NUTRIENT_BREAKDOWNS: Record<string, any[]> = {
                                         'Vitamin A': [
@@ -675,7 +687,7 @@ export default function RecipeDetailsPage() {
                                                         const rda = userRDAs?.[label];
                                                         const pct = rda ? Math.round((val / rda) * 100) : null;
                                                         const styles = getNutrientLevelStyles(pct || 0, label);
-                                                        const unitLabel = label.includes('Folate') || label.includes('B12') ? 'µg' : 'mg';
+                                                        const unitLabel = label === 'Vitamin D' ? 'IU' : (label.includes('Folate') || label.includes('B12') ? 'µg' : 'mg');
                                                         return (
                                                             <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-3 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all", pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
                                                                 <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>

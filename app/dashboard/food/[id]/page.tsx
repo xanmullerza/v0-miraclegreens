@@ -210,7 +210,14 @@ export default function FoodDetailsPage() {
             if (k === 'protein_g') return food.protein_g;
             if (k === 'carbs_g') return food.carbs_g;
             if (k === 'fat_g') return food.fat_g;
-            if (m[k] !== undefined) return m[k];
+            if (m[k] !== undefined) {
+                let val = m[k];
+                // Vitamin D conversion: µg (DB standard) to IU (UI/RDA standard)
+                if (k === 'Vitamin D' || k === 'vitamin_d_ug' || k === 'vitamin_d_mcg') {
+                    return val * 40;
+                }
+                return val;
+            }
         }
         return 0;
     };
@@ -231,7 +238,7 @@ export default function FoodDetailsPage() {
                 {subtitle && <p className={cn("text-[10px] text-slate-400 mb-6 border-b pb-2", t.border)}>{subtitle}</p>}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                     {Object.entries(items).map(([label, keys]) => {
-                        const unitLabel = label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label.includes('Vitamin A') || label.includes('Vitamin K') || label.includes('Vitamin D') ? 'µg' : label.includes('Vitamin D') ? 'IU' : 'mg';
+                        const unitLabel = label === 'Vitamin D' ? 'IU' : (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label.includes('Vitamin A') || label.includes('Vitamin K') ? 'µg' : 'mg');
                         const val = getVal(keys);
                         const rda = (userRDAs as any)?.[label];
                         const pct = rda ? Math.round((val / rda) * 100) : 0;
