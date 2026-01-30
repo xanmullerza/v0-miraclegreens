@@ -447,18 +447,18 @@ export default function RecipeDetailsPage() {
                                         key={i}
                                         onClick={() => ing.food_item_id && router.push(`/dashboard/food/${ing.food_item_id}`)}
                                         className={cn(
-                                            "flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/20 transition-all group",
+                                            "flex items-start gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/20 transition-all group",
                                             ing.food_item_id ? "cursor-pointer" : ""
                                         )}
                                     >
-                                        <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center text-emerald-500 font-black text-xs group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                        <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center text-emerald-500 font-black text-xs group-hover:bg-emerald-500 group-hover:text-white transition-all shrink-0">
                                             {i + 1}
                                         </div>
-                                        <div className="flex-1 text-left">
-                                            <p className="text-xs font-black text-slate-900 dark:text-white capitalize truncate">{ing.base_ingredient || ing.item}</p>
-                                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{ing.amount}</p>
+                                        <div className="flex-1 text-left min-w-0">
+                                            <p className="text-xs font-black text-slate-900 dark:text-white capitalize leading-relaxed">{ing.base_ingredient || ing.item}</p>
+                                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">{ing.amount}</p>
                                         </div>
-                                        <div className="text-right shrink-0">
+                                        <div className="text-right shrink-0 pt-0.5">
                                             <p className="text-[10px] font-black text-slate-400">{Math.round(ing.weight_g)}g</p>
                                         </div>
                                     </div>
