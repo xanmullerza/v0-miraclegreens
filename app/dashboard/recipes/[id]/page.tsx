@@ -262,8 +262,30 @@ export default function RecipeDetailsPage() {
                             Dietary Compatibility
                         </h3>
                         <div className="grid grid-cols-2 gap-3">
-                            {['Balanced', 'Pescatarian', 'Vegetarian', 'Vegan'].map(dietType => {
-                                const isSuitable = recipe.diet?.includes(dietType);
+                            {[
+                                { label: 'Balanced', dbKey: 'Balanced (Omnivore)' },
+                                { label: 'Pescatarian', dbKey: 'Pescetarian' },
+                                { label: 'Vegetarian', dbKey: 'Vegetarian' },
+                                { label: 'Vegan', dbKey: 'Vegan' }
+                            ].map(({ label, dbKey }) => {
+                                // Hierarchical suitability:
+                                // Vegan meals are suitable for everyone.
+                                // Vegetarian meals are suitable for Vegetarian, Pescatarian, and Balanced.
+                                // Pescatarian meals are suitable for Pescatarian and Balanced.
+                                // Balanced meals are only suitable for Balanced.
+
+                                const hasDirectTag = recipe.diet?.includes(dbKey);
+
+                                let isSuitable = hasDirectTag;
+                                if (!isSuitable && recipe.diet) {
+                                    if (label === 'Balanced') {
+                                        isSuitable = recipe.diet.includes('Balanced (Omnivore)') || recipe.diet.includes('Pescetarian') || recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
+                                    } else if (label === 'Pescatarian') {
+                                        isSuitable = recipe.diet.includes('Pescetarian') || recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
+                                    } else if (label === 'Vegetarian') {
+                                        isSuitable = recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
+                                    }
+                                }
 
                                 // Check if ingredients conflict with user exclusions
                                 const userExclusions = profile.exclusions || [];
@@ -275,7 +297,7 @@ export default function RecipeDetailsPage() {
 
                                 return (
                                     <div
-                                        key={dietType}
+                                        key={label}
                                         className={cn(
                                             "p-4 rounded-2xl border text-center transition-all relative",
                                             isSuitable
@@ -289,7 +311,7 @@ export default function RecipeDetailsPage() {
                                                 ? (hasConflict ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400")
                                                 : "text-rose-600 dark:text-rose-400"
                                         )}>
-                                            {dietType}
+                                            {label}
                                         </p>
                                         <p className={cn(
                                             "text-[8px] font-bold uppercase",
