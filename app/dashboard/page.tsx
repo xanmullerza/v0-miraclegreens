@@ -64,9 +64,9 @@ export default function DashboardOverview() {
             bg: 'bg-emerald-500/10'
         },
         {
-            name: 'Meals Hub',
+            name: 'Recipes Hub',
             desc: 'View and manage your optimized meal library.',
-            href: '/dashboard/meals',
+            href: '/dashboard/recipes',
             icon: ChefHat,
             color: 'text-blue-500',
             bg: 'bg-blue-500/10'
