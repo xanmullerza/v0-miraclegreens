@@ -289,7 +289,7 @@ function DashboardComparisonContent() {
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-violet-500/50 mix-blend-multiply opacity-40" />
 
-                <div className="relative z-10 space-y-4">
+                <div className="relative z-10 space-y-2">
                     <div className="flex items-center gap-3">
                         <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
                             <Scale className="text-white" size={24} />
@@ -299,30 +299,6 @@ function DashboardComparisonContent() {
                     <p className="text-indigo-50 font-medium max-w-md text-sm pl-1">
                         Analyze and compare nutrient profiles side-by-side. Choose up to 10 foods to discover the best options for your needs.
                     </p>
-
-                    <div className="flex flex-wrap gap-2 pt-2">
-                        <Button
-                            onClick={() => router.push('/dashboard/foods')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-9 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[9px]"
-                        >
-                            <Library size={14} className="group-hover/btn:scale-110 transition-transform" />
-                            View Foods
-                        </Button>
-                        <Button
-                            onClick={() => router.push('/dashboard/food')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-9 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[9px]"
-                        >
-                            <Plus size={14} className="group-hover/btn:rotate-90 transition-transform" />
-                            Add New Food
-                        </Button>
-                        <Button
-                            onClick={() => router.push('/dashboard/recipes')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-9 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[9px]"
-                        >
-                            <ChefHat size={14} className="group-hover/btn:scale-110 transition-transform" />
-                            View Recipes
-                        </Button>
-                    </div>
                 </div>
 
                 <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-6">
@@ -331,6 +307,30 @@ function DashboardComparisonContent() {
                         <p className="text-3xl font-black text-white leading-none tracking-tighter italic">
                             {selectedItems.length} <span className="text-indigo-300">/ 10</span>
                         </p>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <Button
+                            onClick={() => router.push('/dashboard/foods')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                        >
+                            <Library size={16} className="group-hover/btn:scale-110 transition-transform" />
+                            View Foods
+                        </Button>
+                        <Button
+                            onClick={() => router.push('/dashboard/food')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                        >
+                            <Plus size={16} className="group-hover/btn:rotate-90 transition-transform" />
+                            Add New Food
+                        </Button>
+                        <Button
+                            onClick={() => router.push('/dashboard/recipes')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                        >
+                            <ChefHat size={16} className="group-hover/btn:scale-110 transition-transform" />
+                            View Recipes
+                        </Button>
                     </div>
                 </div>
             </div>
