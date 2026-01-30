@@ -339,7 +339,7 @@ export default function RecipeDetailsPage() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-[200px_1fr] gap-6 flex-1">
+                        <div className="grid grid-cols-1 md:grid-cols-[200px_320px_1fr] gap-6 flex-1">
                             {/* Vertical Stack for Specs */}
                             <div className="space-y-4 h-full flex flex-col">
                                 <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-center flex-1 flex flex-col items-center justify-center">
@@ -360,7 +360,7 @@ export default function RecipeDetailsPage() {
                                     <Activity size={14} className="text-emerald-500" />
                                     Dietary Compatibility
                                 </h3>
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 flex-1 items-stretch">
+                                <div className="grid grid-cols-2 gap-3 flex-1 items-stretch">
                                     {[
                                         { label: 'Balanced', dbKey: 'Balanced (Omnivore)' },
                                         { label: 'Pescatarian', dbKey: 'Pescetarian' },
@@ -384,14 +384,14 @@ export default function RecipeDetailsPage() {
                                             <div
                                                 key={label}
                                                 className={cn(
-                                                    "p-4 rounded-2xl border text-center transition-all relative flex flex-col justify-center",
+                                                    "p-3 rounded-2xl border text-center transition-all relative flex flex-col justify-center",
                                                     isSuitable
                                                         ? (hasConflict ? "bg-amber-50/50 dark:bg-amber-500/5 border-amber-200 dark:border-amber-500/30" : "bg-emerald-50/50 dark:bg-emerald-500/5 border-emerald-100 dark:border-emerald-500/20")
                                                         : "bg-rose-50/50 dark:bg-rose-500/5 border-rose-100 dark:border-rose-500/20 opacity-60"
                                                 )}
                                             >
                                                 <p className={cn(
-                                                    "text-[10px] font-black uppercase tracking-widest mb-1",
+                                                    "text-[9px] font-black uppercase tracking-widest mb-1",
                                                     isSuitable
                                                         ? (hasConflict ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400")
                                                         : "text-rose-600 dark:text-rose-400"
@@ -406,26 +406,44 @@ export default function RecipeDetailsPage() {
                                                 )}>
                                                     {isSuitable ? (hasConflict ? 'Warning' : 'Suitable') : 'Excluded'}
                                                 </p>
-                                                {hasConflict && (
-                                                    <div className="absolute top-1 right-2">
-                                                        <span className="text-[10px]" title={`Contains: ${dietaryConflicts.map(c => c.exclusion).join(', ')}`}>⚠️</span>
-                                                    </div>
-                                                )}
                                             </div>
                                         );
                                     })}
                                 </div>
-                                {dietaryConflicts.length > 0 && (
-                                    <div className="mt-4 p-3 rounded-xl bg-amber-500/5 border border-amber-500/10 flex items-start gap-2">
-                                        <Info size={14} className="text-amber-500 mt-0.5" />
-                                        <div className="space-y-1">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">Exclusion Match Found</p>
-                                            <p className="text-[9px] text-amber-500/80 leading-tight">
-                                                This meal contains <span className="font-bold">{dietaryConflicts.map(c => c.exclusion).join(', ')}</span>.
+                            </Card>
+
+                            {/* Dietary Advisory Card */}
+                            <Card className="p-6 flex flex-col h-full bg-white dark:bg-slate-900">
+                                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                                    <Info size={14} className="text-amber-500" />
+                                    Dietary Advisory
+                                </h3>
+                                <div className="flex-1 space-y-3">
+                                    {dietaryConflicts.length > 0 ? (
+                                        <div className="p-4 rounded-2xl bg-amber-500/5 border border-amber-500/10 flex flex-col gap-2">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">Allergen/Exclusion Alert</p>
+                                            <p className="text-[11px] text-amber-500/80 leading-relaxed font-bold">
+                                                This laboratory sample contains ingredients flagged in your profile:
+                                                <span className="block mt-1 text-slate-900 dark:text-white uppercase tracking-tight text-xs font-black">
+                                                    {dietaryConflicts.map(c => c.exclusion).join(', ')}
+                                                </span>
                                             </p>
                                         </div>
+                                    ) : (
+                                        <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 flex flex-col gap-2">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Dietary Integrity</p>
+                                            <p className="text-[11px] text-emerald-500/80 leading-relaxed font-bold italic">
+                                                "This recipe aligns with all active clinical exclusions in your profile. No matches for your prohibited items were detected."
+                                            </p>
+                                        </div>
+                                    )}
+                                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/50 border border-slate-100 dark:border-slate-800">
+                                        <p className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-1">Portion Control</p>
+                                        <p className="text-[10px] text-slate-500 leading-tight font-medium">
+                                            Nutrient values are calculated for a single serving of <span className="font-bold text-slate-900 dark:text-white">1P</span>.
+                                        </p>
                                     </div>
-                                )}
+                                </div>
                             </Card>
                         </div>
                     </div>
