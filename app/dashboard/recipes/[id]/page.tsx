@@ -321,6 +321,56 @@ export default function RecipeDetailsPage() {
                         </div>
                     </Card>
 
+                    {/* Lab Ingredients */}
+                    <Card className="p-6">
+                        <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3 italic mb-6">
+                            <ShoppingBasket size={24} className="text-emerald-500" />
+                            Lab Ingredients
+                        </h3>
+                        <div className="space-y-2">
+                            {ingredients.map((ing: any, i) => (
+                                <div
+                                    key={i}
+                                    onClick={() => ing.food_item_id && router.push(`/dashboard/food/${ing.food_item_id}`)}
+                                    className={cn(
+                                        "flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/20 transition-all group",
+                                        ing.food_item_id ? "cursor-pointer" : ""
+                                    )}
+                                >
+                                    <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center text-emerald-500 font-black text-xs group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                        {i + 1}
+                                    </div>
+                                    <div className="flex-1 text-left">
+                                        <p className="text-xs font-black text-slate-900 dark:text-white capitalize truncate">{ing.base_ingredient || ing.item}</p>
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{ing.amount}</p>
+                                    </div>
+                                    <div className="text-right shrink-0">
+                                        <p className="text-[10px] font-black text-slate-400">{Math.round(ing.weight_g)}g</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </Card>
+
+                    {/* Procedure */}
+                    <Card className="p-6">
+                        <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3 italic text-amber-500 mb-6">
+                            <ChefHat size={24} />
+                            Procedure
+                        </h3>
+                        <div className="space-y-6 relative before:absolute before:inset-y-0 before:left-5 before:w-px before:bg-slate-100 dark:before:bg-slate-800 pl-2">
+                            {instructions.map((ins, i) => (
+                                <div key={i} className="relative pl-10 space-y-2 group text-left">
+                                    <div className="absolute left-0 top-0 w-10 h-10 rounded-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 flex items-center justify-center z-10 group-hover:border-amber-500 transition-colors shadow-sm">
+                                        <span className="text-xs font-black text-slate-400 group-hover:text-amber-500">{ins.step_order}</span>
+                                    </div>
+                                    <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400 font-bold pt-2">
+                                        {ins.step_text}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </Card>
                 </div>
 
                 {/* Right Column: Title, Ingredients, Instructions, and Nutrient Report */}
@@ -428,58 +478,6 @@ export default function RecipeDetailsPage() {
                         </Card>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Ingredients */}
-                        <div className="space-y-6">
-                            <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3 italic">
-                                <ShoppingBasket className="text-emerald-500" />
-                                Lab Ingredients
-                            </h3>
-                            <div className="space-y-2">
-                                {ingredients.map((ing: any, i) => (
-                                    <div
-                                        key={i}
-                                        onClick={() => ing.food_item_id && router.push(`/dashboard/food/${ing.food_item_id}`)}
-                                        className={cn(
-                                            "flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/20 transition-all group",
-                                            ing.food_item_id ? "cursor-pointer" : ""
-                                        )}
-                                    >
-                                        <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center text-emerald-500 font-black text-xs group-hover:bg-emerald-500 group-hover:text-white transition-all">
-                                            {i + 1}
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="text-xs font-black text-slate-900 dark:text-white capitalize">{ing.base_ingredient || ing.item}</p>
-                                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{ing.amount}</p>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-[10px] font-black text-slate-400">{Math.round(ing.weight_g)}g</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Instructions */}
-                        <div className="space-y-6">
-                            <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3 italic text-amber-500">
-                                <ChefHat />
-                                Procedure
-                            </h3>
-                            <div className="space-y-6 relative before:absolute before:inset-y-0 before:left-5 before:w-px before:bg-slate-100 dark:before:bg-slate-800 pl-2">
-                                {instructions.map((ins, i) => (
-                                    <div key={i} className="relative pl-10 space-y-2 group">
-                                        <div className="absolute left-0 top-0 w-10 h-10 rounded-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 flex items-center justify-center z-10 group-hover:border-amber-500 transition-colors">
-                                            <span className="text-xs font-black text-slate-400 group-hover:text-amber-500">{ins.step_order}</span>
-                                        </div>
-                                        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 font-medium pt-2">
-                                            {ins.step_text}
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
 
                     {showDetailedNutrients && recipe && (
                         <div className="pt-8 border-t border-slate-100 dark:border-slate-800 animate-in slide-in-from-top-4 duration-500">
