@@ -14,6 +14,7 @@ interface FoodItem {
     energy_kj?: number;
     micronutrients?: Record<string, number>;
     portions?: any[];
+    image?: string;
 }
 
 interface FoodItemPickerProps {
@@ -50,7 +51,7 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: Food
                 setLoading(true);
                 const { data, error } = await supabase
                     .from('food_items')
-                    .select('id, name, common_name, energy_kcal, protein_g, fat_g, carbs_g, energy_kj, micronutrients, portions')
+                    .select('id, name, common_name, energy_kcal, protein_g, fat_g, carbs_g, energy_kj, micronutrients, portions, image')
                     .or(`name.ilike.%${searchQuery}%,common_name.ilike.%${searchQuery}%`)
                     .limit(20);
 
@@ -225,15 +226,24 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: Food
                                             }}
                                             className="w-full text-left p-4 border border-border bg-card rounded-lg hover:bg-green-50 dark:hover:bg-green-950/30 hover:border-green-500 transition group shadow-sm"
                                         >
-                                            <div className="flex flex-col">
-                                                <div className="font-bold text-foreground group-hover:text-green-700 dark:group-hover:text-green-400 capitalize">
-                                                    {item.common_name || item.name}
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 rounded-xl bg-muted border border-border flex items-center justify-center overflow-hidden shrink-0">
+                                                    {item.image ? (
+                                                        <img src={item.image} alt="" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <Database size={16} className="text-muted-foreground opacity-40" />
+                                                    )}
                                                 </div>
-                                                {item.common_name && (
-                                                    <div className="text-[10px] text-muted-foreground opacity-60 truncate">
-                                                        Original: {item.name}
+                                                <div className="flex flex-col flex-1 min-w-0">
+                                                    <div className="font-bold text-foreground group-hover:text-green-700 dark:group-hover:text-green-400 capitalize truncate">
+                                                        {item.common_name || item.name}
                                                     </div>
-                                                )}
+                                                    {item.common_name && (
+                                                        <div className="text-[10px] text-muted-foreground opacity-60 truncate">
+                                                            Original: {item.name}
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
                                             <div className="text-xs text-muted-foreground mt-1 flex gap-2">
                                                 <span>{Math.round(item.energy_kcal)} kcal</span>

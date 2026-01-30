@@ -478,8 +478,12 @@ export default function RecipeDetailsPage() {
                                             ing.food_item_id ? "cursor-pointer" : ""
                                         )}
                                     >
-                                        <div className="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center text-emerald-500 font-black text-xs group-hover:bg-emerald-500 group-hover:text-white transition-all shrink-0">
-                                            {i + 1}
+                                        <div className="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-300">
+                                            {ing.food_item?.image ? (
+                                                <img src={ing.food_item.image} alt="" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <Utensils size={16} className="text-slate-400 opacity-40 shadow-sm" />
+                                            )}
                                         </div>
                                         <div className="flex-1 text-left min-w-0">
                                             <p className="text-xs font-black text-slate-900 dark:text-white capitalize leading-relaxed">{ing.base_ingredient || ing.item}</p>

@@ -25,6 +25,7 @@ interface FoodItem {
     energy_kj?: number;
     micronutrients?: Record<string, number>;
     portions?: FoodMeasure[];
+    image?: string;
 }
 
 export interface RecipeIngredient {
@@ -34,6 +35,7 @@ export interface RecipeIngredient {
     quantity: number;
     measure_label: string;
     modifier?: string; // New field for prep state
+    image?: string;
     // Calculated nutrition
     calories: number;
     energy_kj: number;
@@ -214,6 +216,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             weight_g,
             quantity,
             measure_label: unit,
+            image: finalFoodItem.image,
             calories: Math.round(finalFoodItem.energy_kcal * multiplier),
             energy_kj: Math.round((finalFoodItem.energy_kj || (finalFoodItem.energy_kcal * 4.184)) * multiplier),
             protein: Math.round(finalFoodItem.protein_g * multiplier * 10) / 10,
@@ -768,28 +771,39 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                                 {/* Left Section: Identity & Quick Macros */}
                                 <div className="lg:col-span-4 space-y-4">
-                                    <div className="flex items-center gap-2 group/name">
-                                        {editingNameIndex === index ? (
-                                            <input
-                                                type="text"
-                                                value={ing.food_item_name}
-                                                onChange={(e) => handleUpdateName(index, e.target.value)}
-                                                onBlur={() => setEditingNameIndex(null)}
-                                                onKeyDown={(e) => e.key === 'Enter' && setEditingNameIndex(null)}
-                                                autoFocus
-                                                className="bg-transparent border-b-2 border-emerald-500 font-black text-slate-900 dark:text-white px-0 py-1 text-lg w-full outline-none"
-                                            />
-                                        ) : (
-                                            <>
-                                                <h4 className="font-black text-slate-900 dark:text-white truncate text-lg">{ing.food_item_name}</h4>
-                                                <button
-                                                    onClick={() => setEditingNameIndex(index)}
-                                                    className="p-1 opacity-0 group-hover/name:opacity-100 transition-opacity text-slate-400 hover:text-emerald-500"
-                                                >
-                                                    <Pencil size={12} />
-                                                </button>
-                                            </>
-                                        )}
+                                    <div className="flex items-center gap-4 group/name">
+                                        <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                                            {ing.image ? (
+                                                <img src={ing.image} alt="" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <Utensils size={20} className="text-slate-400 opacity-40 shadow-inner" />
+                                            )}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2">
+                                                {editingNameIndex === index ? (
+                                                    <input
+                                                        type="text"
+                                                        value={ing.food_item_name}
+                                                        onChange={(e) => handleUpdateName(index, e.target.value)}
+                                                        onBlur={() => setEditingNameIndex(null)}
+                                                        onKeyDown={(e) => e.key === 'Enter' && setEditingNameIndex(null)}
+                                                        autoFocus
+                                                        className="bg-transparent border-b-2 border-emerald-500 font-black text-slate-900 dark:text-white px-0 py-1 text-lg w-full outline-none"
+                                                    />
+                                                ) : (
+                                                    <>
+                                                        <h4 className="font-black text-slate-900 dark:text-white truncate text-lg">{ing.food_item_name}</h4>
+                                                        <button
+                                                            onClick={() => setEditingNameIndex(index)}
+                                                            className="p-1 opacity-0 group-hover/name:opacity-100 transition-opacity text-slate-400 hover:text-emerald-500"
+                                                        >
+                                                            <Pencil size={12} />
+                                                        </button>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div className="flex flex-wrap gap-2">
