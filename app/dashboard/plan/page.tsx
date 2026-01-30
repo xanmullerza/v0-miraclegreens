@@ -107,19 +107,16 @@ const ActivityCard = ({ type, selected, onClick, icon: Icon, label }: { type: Ac
     </div>
 );
 
-const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onClick, onRegenerate }: {
+const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onRegenerate }: {
     recipe: Recipe,
     mealLabel: string,
     unit?: UnitType,
-    onClick?: () => void,
     onRegenerate?: () => void
 }) => {
     const [imageError, setImageError] = useState(false);
     return (
-        <div
-            onClick={onClick}
-            className="group relative bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-all animate-in fade-in zoom-in-95 duration-500 flex flex-col h-full cursor-pointer"
-        >
+        <div className="group relative bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-all animate-in fade-in zoom-in-95 duration-500 flex flex-col h-full">
+            <Link href={`/dashboard/recipes/${recipe.id}`} className="absolute inset-x-0 top-0 bottom-[140px] z-10" />
             <div className="aspect-video relative overflow-hidden bg-muted flex-shrink-0">
                 <div className="absolute inset-0 bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-muted-foreground">
                     {recipe.image && !imageError ? (
@@ -141,11 +138,13 @@ const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onClick, onRegenerate }: {
                     <span className="flex items-center gap-1"><Droplet className="h-4 w-4 text-yellow-500" />{Number(recipe.fat * (recipe.servings || 1)).toFixed(1)}g</span>
                     <span className="flex items-center gap-1"><Wheat className="h-4 w-4 text-amber-600" />{Number(recipe.carbs * (recipe.servings || 1)).toFixed(1)}g</span>
                 </div>
-                <button className="mt-3 w-full py-2 px-4 bg-primary text-primary-foreground rounded-lg text-sm font-bold shadow-sm hover:bg-primary/90 transition-all flex items-center justify-center gap-2 group/btn" onClick={(e) => { e.stopPropagation(); onClick?.(); }}>
-                    View Recipe <ChevronRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-0.5" />
-                </button>
+                <Link href={`/dashboard/recipes/${recipe.id}`} className="mt-auto block w-full">
+                    <button className="w-full py-2 px-4 bg-primary text-primary-foreground rounded-lg text-sm font-bold shadow-sm hover:bg-primary/90 transition-all flex items-center justify-center gap-2 group/btn">
+                        View Full Recipe <ChevronRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-0.5" />
+                    </button>
+                </Link>
                 {onRegenerate && (
-                    <button className="mt-2 w-full py-2 px-4 bg-muted hover:bg-muted/80 text-muted-foreground rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2" onClick={(e) => { e.stopPropagation(); onRegenerate(); }}>
+                    <button className="mt-2 w-full py-2 px-4 bg-muted hover:bg-muted/80 text-muted-foreground rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 relative z-20" onClick={(e) => { e.stopPropagation(); onRegenerate(); }}>
                         <RotateCcw className="h-4 w-4" /> Try Another
                     </button>
                 )}
@@ -158,7 +157,6 @@ export default function MealPlannerPage() {
     const [step, setStep] = useState<1 | 2 | 3>(1);
     const [generating, setGenerating] = useState(false);
     const [plan, setPlan] = useState<DailyPlan | null>(null);
-    const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
     const [showRecipeNutrients, setShowRecipeNutrients] = useState(false);
     const [recipeMoringaGrams, setRecipeMoringaGrams] = useState(0);
     const [moringaGrams, setMoringaGrams] = useState(0);
@@ -397,7 +395,6 @@ export default function MealPlannerPage() {
             up.totalCalories = (up.breakfast.calories * (up.breakfast.servings || 1)) + (up.lunch.calories * (up.lunch.servings || 1)) + (up.dinner.calories * (up.dinner.servings || 1));
             return up;
         });
-        if (selectedRecipe?.id === rid) setSelectedRecipe(prev => prev ? { ...prev, servings: n } : null);
     };
 
     const isFormComplete = Boolean(age && weight && height);
@@ -550,9 +547,9 @@ export default function MealPlannerPage() {
                 {step === 3 && plan && (
                     <div className="space-y-8 animate-in fade-in-up duration-500">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <RecipeCard recipe={plan.breakfast} mealLabel="Breakfast" unit={unit} onClick={() => setSelectedRecipe(plan.breakfast)} onRegenerate={() => handleRegenerateMeal('breakfast', plan.breakfast.id)} />
-                            <RecipeCard recipe={plan.lunch} mealLabel="Lunch" unit={unit} onClick={() => setSelectedRecipe(plan.lunch)} onRegenerate={() => handleRegenerateMeal('lunch', plan.lunch.id)} />
-                            <RecipeCard recipe={plan.dinner} mealLabel="Dinner" unit={unit} onClick={() => setSelectedRecipe(plan.dinner)} onRegenerate={() => handleRegenerateMeal('dinner', plan.dinner.id)} />
+                            <RecipeCard recipe={plan.breakfast} mealLabel="Breakfast" unit={unit} onRegenerate={() => handleRegenerateMeal('breakfast', plan.breakfast.id)} />
+                            <RecipeCard recipe={plan.lunch} mealLabel="Lunch" unit={unit} onRegenerate={() => handleRegenerateMeal('lunch', plan.lunch.id)} />
+                            <RecipeCard recipe={plan.dinner} mealLabel="Dinner" unit={unit} onRegenerate={() => handleRegenerateMeal('dinner', plan.dinner.id)} />
                         </div>
 
                         <div className="space-y-4 pt-10 border-t">
@@ -774,39 +771,6 @@ export default function MealPlannerPage() {
                     </div>
                 )}
             </div>
-
-            {
-                selectedRecipe && (
-                    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setSelectedRecipe(null)}>
-                        <div className="bg-background rounded-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl p-6" onClick={e => e.stopPropagation()}>
-                            <div className="flex justify-between items-start mb-6">
-                                <div><h2 className="text-2xl font-bold">{selectedRecipe.title}</h2><p className="text-muted-foreground text-sm uppercase font-bold tracking-widest">{selectedRecipe.prepTime} min prep</p></div>
-                                <button onClick={() => setSelectedRecipe(null)} className="p-2 hover:bg-muted rounded-full"><X /></button>
-                            </div>
-                            <div className="space-y-8">
-                                <div className="grid grid-cols-4 gap-4 p-4 bg-muted/40 rounded-2xl border">
-                                    <div className="text-center font-bold">Energy<div className="text-xl text-primary">{Math.round(selectedRecipe.calories)}</div></div>
-                                    <div className="text-center font-bold">Protein<div className="text-xl text-red-500">{selectedRecipe.protein}g</div></div>
-                                    <div className="text-center font-bold">Carbs<div className="text-xl text-amber-600">{selectedRecipe.carbs}g</div></div>
-                                    <div className="text-center font-bold">Fat<div className="text-xl text-orange-500">{selectedRecipe.fat}g</div></div>
-                                </div>
-                                <div>
-                                    <h3 className="font-bold border-b pb-2 mb-4 flex items-center gap-2 text-primary"><ShoppingBasket size={18} /> Ingredients</h3>
-                                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-6">
-                                        {selectedRecipe.ingredients.map((ing, i) => (<li key={i} className="flex gap-2 text-sm"><span>•</span> {ing.amount} <span className="font-bold underline">{ing.baseIngredient || ing.item}</span></li>))}
-                                    </ul>
-                                </div>
-                                <div>
-                                    <h3 className="font-bold border-b pb-2 mb-4 flex items-center gap-2 text-primary"><ChefHat size={18} /> Method</h3>
-                                    <div className="space-y-4">
-                                        {selectedRecipe.instructions.map((ins, i) => (<div key={i} className="flex gap-4"><div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shrink-0">{i + 1}</div><p className="text-sm">{ins}</p></div>))}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )
-            }
 
             {
                 selectedNutrientInfo && nutrientInfo[selectedNutrientInfo] && (

@@ -271,10 +271,12 @@ export default function RecipeDetailsPage() {
             <div className="flex items-center justify-between">
                 <button
                     onClick={() => router.back()}
-                    className="flex items-center gap-2 text-slate-500 hover:text-emerald-600 font-bold text-sm transition-colors group"
+                    className="flex items-center gap-2 text-slate-500 hover:text-rose-600 font-bold text-sm transition-colors group"
                 >
-                    <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-                    Back to Library
+                    <div className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-800 flex items-center justify-center group-hover:bg-rose-50 dark:group-hover:bg-rose-900/20 group-hover:border-rose-200 transition-all">
+                        <X size={16} />
+                    </div>
+                    Close
                 </button>
                 <div className="flex gap-3">
                     <Button
