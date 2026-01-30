@@ -25,7 +25,9 @@ import {
     Info,
     Camera,
     Upload,
-    Loader2
+    Loader2,
+    Library,
+    ChefHat
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -281,9 +283,9 @@ Fat: ${item.fat_g || 0}g
     return (
         <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
             {/* Hero Section */}
-            <div className="relative h-48 rounded-[2.5rem] bg-sky-500 overflow-hidden flex items-center px-12 group">
+            <div className="relative h-48 rounded-[2.5rem] bg-sky-600 overflow-hidden flex items-center px-12 group">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
-                <div className="absolute inset-0 bg-gradient-to-r from-sky-500 to-blue-500/50 mix-blend-multiply opacity-40" />
+                <div className="absolute inset-0 bg-gradient-to-r from-sky-600 to-blue-600/50 mix-blend-multiply opacity-50" />
 
                 <div className="relative z-10 space-y-2">
                     <div className="flex items-center gap-3">
@@ -292,20 +294,56 @@ Fat: ${item.fat_g || 0}g
                         </div>
                         <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Add New Food</h1>
                     </div>
-                    <p className="text-sky-50 font-medium max-w-md text-sm pl-1">
-                        Contribute to the global knowledge base by adding detailed nutritional profiles.
+                    <p className="text-sky-50 font-medium max-w-md text-sm pl-1 uppercase tracking-tighter">
+                        Contribute to the global knowledge base with clinical precision.
                     </p>
                 </div>
 
-                <div className="absolute right-8 top-1/2 -translate-y-1/2 z-20">
-                    <Button
-                        onClick={() => setShowImportPicker(true)}
-                        className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl rounded-xl h-12 px-6 font-bold uppercase tracking-widest text-xs flex items-center gap-2 group transition-all hover:scale-105"
-                    >
-                        <Database className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                        Import Food
-                    </Button>
+                <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-6">
+                    <div className="text-right hidden sm:block">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-sky-200 mb-1">Integrity Score</p>
+                        <p className="text-3xl font-black text-white leading-none tracking-tighter italic uppercase">
+                            {integrity.percent}<span className="text-sky-300">%</span>
+                        </p>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <Button
+                            onClick={() => router.push('/dashboard/foods')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                        >
+                            <Library size={16} className="group-hover/btn:scale-110 transition-transform" />
+                            View Foods
+                        </Button>
+                        <Button
+                            onClick={() => router.push('/dashboard/recipes')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                        >
+                            <ChefHat size={16} className="group-hover/btn:scale-110 transition-transform" />
+                            View Recipes
+                        </Button>
+                        <Button
+                            onClick={() => router.push('/dashboard/compare')}
+                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-10 rounded-2xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                        >
+                            <Scale size={16} className="group-hover/btn:scale-110 transition-transform" />
+                            Compare Foods
+                        </Button>
+                    </div>
                 </div>
+            </div>
+
+            {/* Sub-Hero Actions */}
+            <div className="flex justify-start">
+                <Button
+                    onClick={() => setShowImportPicker(true)}
+                    className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center gap-3 transition-all shadow-sm group"
+                >
+                    <div className="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-500 group-hover:bg-sky-500 group-hover:text-white transition-all">
+                        <Database className="w-4 h-4" />
+                    </div>
+                    <span>Import from USDA Database</span>
+                </Button>
             </div>
 
             {/* Top Row: Info Entry */}
