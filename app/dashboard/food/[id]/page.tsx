@@ -288,7 +288,7 @@ export default function FoodDetailsPage() {
         ],
     };
 
-    const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle, breakdownLabels = [] }: { title: string, items: Record<string, any[]>, icon: any, theme?: string, subtitle?: string, breakdownLabels?: string[] }) => {
+    const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle, breakdownLabels = [], forceRaw = false }: { title: string, items: Record<string, any[]>, icon: any, theme?: string, subtitle?: string, breakdownLabels?: string[], forceRaw?: boolean }) => {
         const themes = {
             indigo: { bg: "bg-slate-900 border-slate-800", text: "text-indigo-400", border: "border-slate-800", itemBorder: "border-indigo-900/50" },
             rose: { bg: "bg-slate-900 border-slate-800", text: "text-rose-400", border: "border-slate-800", itemBorder: "border-rose-900/50" },
@@ -317,7 +317,7 @@ export default function FoodDetailsPage() {
                             <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct > 0 ? `${styles.borderLight} ${styles.fade}` : "")}>
                                 <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
                                 <div className="space-y-0.5">
-                                    {nutrientDisplayMode === 'percentage' ? (
+                                    {(nutrientDisplayMode === 'percentage' && !forceRaw) ? (
                                         <>
                                             <div className="flex items-baseline gap-1">
                                                 <span className={cn("text-xl font-black tracking-tighter", styles.text)}>{pct}%</span>
@@ -332,7 +332,7 @@ export default function FoodDetailsPage() {
                                                 <span className="text-lg font-bold">{val.toFixed(1)}</span>
                                                 <span className={cn("text-[10px] font-bold", (unitLabel === 'µg') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unitLabel}</span>
                                             </div>
-                                            {(nutrientDisplayMode === 'both') && pct > 0 && (
+                                            {(nutrientDisplayMode === 'both' || (nutrientDisplayMode === 'percentage' && forceRaw)) && pct > 0 && !forceRaw && (
                                                 <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>
                                             )}
                                         </>
@@ -485,7 +485,7 @@ export default function FoodDetailsPage() {
                             'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
                         }} />
 
-                        <NutrientGrid title="Clinical Markers" icon={Activity} theme="amber" subtitle="Secondary markers for advanced health profile mapping" items={{
+                        <NutrientGrid title="Clinical Markers" icon={Activity} theme="amber" subtitle="Secondary markers for advanced health profile mapping" forceRaw={true} items={{
                             'Fiber': ['Fiber', 'fiber_g'],
                             'Sugars': ['Sugars', 'sugars_g'],
                             'Oxalate': ['Oxalate', 'oxalate_mg'],
