@@ -80,7 +80,7 @@ export default function RecipeDetailsPage() {
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
     const [instructions, setInstructions] = useState<Instruction[]>([]);
     const [loading, setLoading] = useState(true);
-    const [showDetailedNutrients, setShowDetailedNutrients] = useState(false);
+    const [showDetailedNutrients, setShowDetailedNutrients] = useState(true);
     const [selectedNutrientInfo, setSelectedNutrientInfo] = useState<string | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
     const [expandedBreakdownSections, setExpandedBreakdownSections] = useState<Record<string, boolean>>({});
@@ -321,19 +321,6 @@ export default function RecipeDetailsPage() {
                         </div>
                     </Card>
 
-                    <div className="pt-4">
-                        <Button
-                            variant="outline"
-                            onClick={() => setShowDetailedNutrients(!showDetailedNutrients)}
-                            className="w-full gap-2 font-black text-[10px] uppercase tracking-widest h-12 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950"
-                        >
-                            {showDetailedNutrients ? (
-                                <>Collapse Nutrient Report <ChevronDown className="h-4 w-4 rotate-180" /></>
-                            ) : (
-                                <>Detailed Nutrient Report <ChevronDown className="h-4 w-4" /></>
-                            )}
-                        </Button>
-                    </div>
                 </div>
 
                 {/* Right Column: Title, Ingredients, Instructions, and Nutrient Report */}
