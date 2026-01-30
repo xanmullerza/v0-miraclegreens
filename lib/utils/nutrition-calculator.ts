@@ -110,7 +110,7 @@ export const findNutrientMatch = (record: Record<string, any>, key: string) => {
     }
 
     const firstWord = kL.split(/[\s_]/)[0];
-    if (firstWord.length > 3 && firstWord !== 'vitamin') {
+    if (firstWord.length > 3 && firstWord !== 'vitamin' && firstWord !== 'saturated') {
         const fuzzy = mKeys.find(mk => mk.toLowerCase().includes(firstWord));
         if (fuzzy) return fuzzy;
     }
@@ -146,7 +146,11 @@ const PREFERRED_KEYS: Record<string, string> = {
     'B9 (Folate)': 'B9 (Folate)',
     'B12 (Cobalamin)': 'B12 (Cobalamin)',
     'Choline': 'Choline',
-    'Fiber': 'Fiber'
+    'Fiber': 'Fiber',
+    'Saturated Fat': 'Saturated Fat',
+    'Monounsaturated Fat': 'Monounsaturated Fat',
+    'Polyunsaturated Fat': 'Polyunsaturated Fat',
+    'Trans Fat': 'Trans Fat'
 };
 
 export function calculateRecipeNutrition(
