@@ -417,12 +417,13 @@ export default function RecipeDetailsPage() {
                                     ],
                                 };
 
-                                const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle }: { title: string, items: Record<string, any[]>, icon: any, theme?: 'indigo' | 'rose', subtitle?: string }) => {
+                                const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle }: { title: string, items: Record<string, any[]>, icon: any, theme?: string, subtitle?: string }) => {
                                     const themes = {
                                         indigo: { bg: "bg-slate-900 border-slate-800", text: "text-indigo-400", border: "border-slate-800", itemBorder: "border-indigo-900/50" },
-                                        rose: { bg: "bg-slate-900 border-slate-800", text: "text-rose-400", border: "border-slate-800", itemBorder: "border-rose-900/50" }
+                                        rose: { bg: "bg-slate-900 border-slate-800", text: "text-rose-400", border: "border-slate-800", itemBorder: "border-rose-900/50" },
+                                        orange: { bg: "bg-slate-900 border-slate-800", text: "text-orange-400", border: "border-slate-800", itemBorder: "border-orange-900/50" }
                                     };
-                                    const t = themes[theme];
+                                    const t = (themes as any)[theme] || themes.indigo;
 
                                     return (
                                         <div className={cn("p-6 rounded-3xl border bg-gradient-to-br mb-6", t.bg)}>
@@ -430,14 +431,17 @@ export default function RecipeDetailsPage() {
                                             {subtitle && <p className={cn("text-[9px] text-slate-400 mb-4 border-b pb-2 transition-colors", t.border)}>{subtitle}</p>}
                                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                                                 {Object.entries(items).map(([label, keys]) => {
-                                                    const val = getVal(keys as string[]);
+                                                    const val = (label === 'Energy' || label === 'Protein' || label === 'Carbs' || label === 'Fat')
+                                                        ? (label === 'Energy' ? (recipe as any).calories : (recipe as any)[label.toLowerCase()])
+                                                        : getVal(keys as string[]);
                                                     const rda = userRDAs?.[label];
                                                     const pct = rda ? Math.round((val / rda) * 100) : null;
                                                     const styles = getNutrientLevelStyles(pct || 0, label);
+                                                    const unit = label === 'Energy' ? 'kcal' : (label === 'Protein' || label === 'Carbs' || label === 'Fat') ? 'g' : (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12')) ? 'µg' : 'mg';
                                                     return (
                                                         <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all", t.itemBorder, pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
                                                             <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
-                                                            <div className="flex items-baseline gap-1"><span className="text-lg font-bold">{val.toFixed(1)}</span><span className={cn("text-[10px] font-bold", (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12')) ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') ? 'µg' : 'mg'}</span></div>
+                                                            <div className="flex items-baseline gap-1"><span className="text-lg font-bold">{val.toFixed(1)}</span><span className={cn("text-[10px] font-bold", (unit === 'µg') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unit}</span></div>
                                                             {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
                                                         </div>
                                                     );
@@ -449,6 +453,12 @@ export default function RecipeDetailsPage() {
 
                                 return (
                                     <div className="space-y-6">
+                                        <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Caloric & Macro Breakdown" items={{
+                                            'Energy': ['calories'],
+                                            'Protein': ['protein'],
+                                            'Carbs': ['carbs'],
+                                            'Fat': ['fat']
+                                        }} />
                                         <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Hydration & Mineral Balance" items={{
                                             'Sodium': ['Sodium', 'sodium_mg'],
                                             'Potassium': ['Potassium', 'potassium_mg'],
