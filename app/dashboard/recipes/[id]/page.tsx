@@ -113,6 +113,32 @@ export default function RecipeDetailsPage() {
                     const nutTerms = ['nut', 'almond', 'cashew', 'walnut', 'pecan', 'pistachio', 'peanut'];
                     if (nutTerms.some(term => ingName.includes(term))) return true;
                 }
+                if (exclusion === 'nightshades') {
+                    const nightshadeTerms = ['tomato', 'potato', 'eggplant', 'pepper', 'chili', 'paprika', 'cayenne'];
+                    // Exclusion: Sweet potatoes and Yams are NOT nightshades
+                    if (ingName.includes('sweet potato') || ingName.includes('yam')) return false;
+                    if (nightshadeTerms.some(term => ingName.includes(term))) return true;
+                }
+                if (exclusion === 'gluten') {
+                    const glutenTerms = ['wheat', 'barley', 'rye', 'spelt', 'flour', 'bread', 'pasta', 'couscous', 'semolina', 'kamut'];
+                    if (glutenTerms.some(term => ingName.includes(term))) return true;
+                }
+                if (exclusion === 'shellfish') {
+                    const shellfishTerms = ['shrimp', 'prawn', 'crab', 'lobster', 'mussel', 'clam', 'oyster', 'scallop', 'crayfish'];
+                    if (shellfishTerms.some(term => ingName.includes(term))) return true;
+                }
+                if (exclusion === 'soy') {
+                    const soyTerms = ['soy', 'tofu', 'tempeh', 'edamame', 'miso', 'tamari'];
+                    if (soyTerms.some(term => ingName.includes(term))) return true;
+                }
+                if (exclusion === 'fish' && !exclusion.includes('shellfish')) {
+                    const fishTerms = ['salmon', 'tuna', 'cod', 'haddock', 'trout', 'sardine', 'anchovy', 'mackerel'];
+                    if (fishTerms.some(term => ingName.includes(term))) return true;
+                }
+                if (exclusion === 'corn') {
+                    const cornTerms = ['corn', 'maize', 'polenta', 'hominy'];
+                    if (cornTerms.some(term => ingName.includes(term))) return true;
+                }
                 return false;
             });
 
