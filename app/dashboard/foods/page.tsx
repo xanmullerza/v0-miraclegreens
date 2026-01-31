@@ -944,8 +944,9 @@ function FoodsContent() {
                                             </>
                                         ) : (
                                             <>
-                                                <Plus size={16} className="text-slate-300 mb-2" />
-                                                <div className="text-[8px] font-black uppercase tracking-widest text-slate-400">Add Item</div>
+                                                <div className="w-8 h-8 rounded-full border border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-200 dark:text-slate-800">
+                                                    <Scale size={14} className="opacity-20" />
+                                                </div>
                                             </>
                                         )}
                                     </div>
@@ -953,25 +954,8 @@ function FoodsContent() {
                             })}
                         </div>
 
-                        {compareItems.length === 0 ? (
-                            <div className="py-12 flex flex-col items-center justify-center text-center space-y-4">
-                                <div className="w-16 h-16 rounded-3xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-200">
-                                    <Library size={32} />
-                                </div>
-                                <p className="text-sm font-bold text-slate-500 lowercase italic tracking-tight">
-                                    Select another food or two for comparison
-                                </p>
-                            </div>
-                        ) : (
-                            <div className="py-12 flex flex-col items-center justify-center text-center space-y-4">
-                                <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-                                    <Scale size={32} />
-                                </div>
-                                <p className="text-sm font-bold text-slate-600 dark:text-slate-400 lowercase italic tracking-tight">
-                                    {compareItems.length} food{compareItems.length > 1 ? 's' : ''} selected. Ready for analysis.
-                                </p>
-                            </div>
-                        )}
+                        {/* Empty Space for clarity */}
+                        <div className="flex-1" />
                     </div>
 
                     {/* Footer Actions */}
