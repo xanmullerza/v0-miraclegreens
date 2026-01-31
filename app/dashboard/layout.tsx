@@ -18,6 +18,8 @@ import { SearchProvider, useSearch } from '@/lib/context/search-context';
 
 
 
+import { Footer } from '@/components/footer';
+
 function DashboardLayoutContent({
     children,
 }: {
@@ -157,6 +159,8 @@ function DashboardLayoutContent({
                     <div className="p-8 pb-20">
                         {children}
                     </div>
+
+                    <Footer />
                 </main>
             </div>
 
