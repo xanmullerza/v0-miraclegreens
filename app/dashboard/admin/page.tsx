@@ -34,7 +34,7 @@ export default function AdminOverview() {
         {
             name: 'Food Creator',
             desc: 'Add new food items to the database with detailed clinical nutrition data.',
-            href: '/dashboard/admin/food',
+            href: '/dashboard/food',
             icon: Plus,
             color: 'text-sky-500',
             bg: 'bg-sky-500/10'
