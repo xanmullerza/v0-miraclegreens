@@ -95,6 +95,10 @@ function FoodsContent() {
     const [editImage, setEditImage] = useState('');
     const [uploading, setUploading] = useState(false);
 
+    // Comparison State
+    const [compareItems, setCompareItems] = useState<FoodItem[]>([]);
+    const [isCompareOpen, setIsCompareOpen] = useState(false);
+
     // Default RDA for comparison context
     const userRDAs = useRDA(30, 'female', 2000);
 
@@ -289,12 +293,32 @@ function FoodsContent() {
         }
     };
 
+    const addToCompare = (item: FoodItem) => {
+        if (compareItems.some(i => i.id === item.id)) {
+            setCompareItems(prev => prev.filter(i => i.id !== item.id));
+        } else if (compareItems.length < 3) {
+            setCompareItems(prev => [...prev, item]);
+            setIsCompareOpen(true);
+        } else {
+            toast.error("Maximum 3 foods for comparison.");
+        }
+    };
+
     const getVal = (item: FoodItem, key: string) => {
         if (key === 'energy_kcal') return item.energy_kcal;
         if (key === 'protein_g') return item.protein_g;
         if (key === 'carbohydrates_g' || key === 'carbs_g') return item.carbs_g;
         if (key === 'fat_g') return item.fat_g;
         return item.micronutrients?.[key] || 0;
+    };
+
+    const getRankingColor = (val: number, allVals: number[]) => {
+        const sorted = [...new Set(allVals)].sort((a, b) => b - a);
+        const rank = sorted.indexOf(val);
+        if (rank === 0) return 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20'; // Winner
+        if (rank === 1) return 'text-blue-500 bg-blue-500/10 border-blue-500/20'; // Runner up
+        if (rank === 2) return 'text-amber-500 bg-amber-500/10 border-amber-500/20'; // Third
+        return 'text-slate-400 bg-slate-100 dark:bg-slate-800 border-transparent';
     };
 
     const NutrientSection = ({ title, items, icon: Icon, theme = 'indigo', subtitle }: { title: string, items: Record<string, string[]>, icon: any, theme?: 'indigo' | 'rose' | 'emerald' | 'blue' | 'amber', subtitle?: string }) => {
@@ -687,7 +711,22 @@ function FoodsContent() {
                                     </div>
 
                                     {/* Action */}
-                                    <div className="p-3 lg:p-0 flex justify-end lg:justify-center">
+                                    <div className="p-3 lg:p-0 flex justify-end lg:justify-center gap-2">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                addToCompare(food);
+                                            }}
+                                            className={cn(
+                                                "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
+                                                compareItems.some(i => i.id === food.id)
+                                                    ? "bg-emerald-500 text-white border-emerald-600 shadow-md shadow-emerald-500/20"
+                                                    : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 border-slate-100 dark:border-slate-700"
+                                            )}
+                                            title="Compare Food"
+                                        >
+                                            <Scale size={14} />
+                                        </button>
                                         <button
                                             onClick={(e) => toggleFavorite(food, e)}
                                             className={cn(
@@ -829,6 +868,175 @@ function FoodsContent() {
                         </Card>
                     </div>
                 </div>
+            )}
+
+            {/* Comparison Sidebar */}
+            <div className={cn(
+                "fixed inset-y-0 right-0 z-[100] w-full md:w-[480px] bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800 transition-transform duration-500 ease-in-out transform",
+                isCompareOpen ? "translate-x-0" : "translate-x-full"
+            )}>
+                <div className="h-full flex flex-col">
+                    {/* Header */}
+                    <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-950 sticky top-0 z-10">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-500">
+                                <Scale size={20} />
+                            </div>
+                            <div>
+                                <h3 className="font-black text-sm uppercase tracking-widest leading-none">Analysis Lab</h3>
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Split-View Comparison</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => setIsCompareOpen(false)}
+                            className="p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all text-slate-400"
+                        >
+                            <X size={20} />
+                        </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8 text-slate-800 dark:text-slate-100">
+                        {/* Selected Food Slots */}
+                        <div className="grid grid-cols-3 gap-3">
+                            {[0, 1, 2].map((idx) => {
+                                const item = compareItems[idx];
+                                return (
+                                    <div
+                                        key={idx}
+                                        className={cn(
+                                            "aspect-square rounded-2xl border-2 flex flex-col items-center justify-center p-2 text-center transition-all duration-300 relative group overflow-hidden",
+                                            item
+                                                ? "border-emerald-500 bg-emerald-500/5"
+                                                : "border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50"
+                                        )}
+                                    >
+                                        {item ? (
+                                            <>
+                                                <div className="w-10 h-10 rounded-lg overflow-hidden mb-2 bg-slate-100 dark:bg-slate-800 group-hover:scale-110 transition-transform">
+                                                    {item.image ? (
+                                                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                            <Beef size={16} />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <p className="text-[9px] font-black uppercase tracking-tighter leading-tight text-slate-800 dark:text-slate-200 line-clamp-2">
+                                                    {item.common_name || item.name}
+                                                </p>
+                                                <button
+                                                    onClick={() => setCompareItems(prev => prev.filter((_, i) => i !== idx))}
+                                                    className="absolute top-1 right-1 p-1 bg-white dark:bg-slate-900 rounded-full border border-slate-200 dark:border-slate-800 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:text-rose-500"
+                                                >
+                                                    <X size={10} />
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Plus size={16} className="text-slate-300 mb-2" />
+                                                <div className="text-[8px] font-black uppercase tracking-widest text-slate-400">Add Item</div>
+                                            </>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+
+                        {compareItems.length === 0 ? (
+                            <div className="py-12 flex flex-col items-center justify-center text-center space-y-4">
+                                <div className="w-16 h-16 rounded-3xl bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-200">
+                                    <Library size={32} />
+                                </div>
+                                <p className="text-sm font-bold text-slate-500 lowercase italic tracking-tight">
+                                    Select another food or two for comparison
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="space-y-6">
+                                {/* Comparison Section */}
+                                {['Energy (kcal)', 'Protein (g)', 'Carbs (g)', 'Fat (g)', 'Fiber', 'Calcium', 'Iron', 'Magnesium', 'Potassium', 'Zinc', 'Vitamin C', 'Vitamin A', 'Vitamin B12'].map((nutrient) => {
+                                    const key = nutrient.toLowerCase().split(' ')[0] === 'energy' ? 'energy_kcal' :
+                                        nutrient.toLowerCase().split(' ')[0] === 'protein' ? 'protein_g' :
+                                            nutrient.toLowerCase().split(' ')[0] === 'carbs' ? 'carbs_g' :
+                                                nutrient.toLowerCase().split(' ')[0] === 'fat' ? 'fat_g' : nutrient.replace(/ \(.*\)/, '');
+
+                                    const values = compareItems.map(item => getVal(item, key));
+
+                                    return (
+                                        <div key={nutrient} className="space-y-2">
+                                            <div className="flex justify-between items-center px-1">
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{nutrient}</p>
+                                            </div>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                {[0, 1, 2].map((idx) => {
+                                                    const item = compareItems[idx];
+                                                    const val = item ? getVal(item, key) : null;
+                                                    const colorClass = item ? getRankingColor(val!, values) : 'bg-slate-50/50 dark:bg-slate-900/50 border-transparent text-slate-300';
+
+                                                    // Hide rankings colors if only one item is selected
+                                                    const finalColorClass = compareItems.length > 1 ? colorClass : 'bg-slate-50/50 dark:bg-slate-900/50 border-transparent text-slate-600 dark:text-slate-300';
+
+                                                    return (
+                                                        <div
+                                                            key={idx}
+                                                            className={cn(
+                                                                "py-2.5 px-2 rounded-xl border flex flex-col items-center justify-center transition-all",
+                                                                finalColorClass
+                                                            )}
+                                                        >
+                                                            <span className="text-xs font-black">
+                                                                {val !== null ? (val >= 1 ? val.toFixed(0) : val.toFixed(1)) : '-'}
+                                                            </span>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+
+                                {/* Legend */}
+                                <div className="pt-6 border-t border-slate-100 dark:border-slate-800 grid grid-cols-3 gap-2">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">1st</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">2nd</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">3rd</span>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950">
+                        <Button
+                            onClick={() => {
+                                const ids = compareItems.map(i => i.id).join(',');
+                                router.push(`/dashboard/compare?ids=${ids}`);
+                            }}
+                            disabled={compareItems.length < 2}
+                            className="w-full h-14 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-[0.2em] shadow-xl transition-all gap-3"
+                        >
+                            <Scale size={18} />
+                            Full Analysis
+                        </Button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Backdrop Overlay */}
+            {isCompareOpen && (
+                <div
+                    className="fixed inset-0 z-[90] bg-black/20 backdrop-blur-[2px] animate-in fade-in duration-300 md:hidden"
+                    onClick={() => setIsCompareOpen(false)}
+                />
             )}
         </div>
     );
