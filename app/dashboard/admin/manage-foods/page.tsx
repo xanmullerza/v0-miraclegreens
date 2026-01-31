@@ -206,6 +206,26 @@ export default function ManageFoodsPage() {
         }
     };
 
+    const toggleFavorite = async (id: string, currentStatus: boolean) => {
+        setUpdatingId(id);
+        try {
+            const { error } = await supabase
+                .from('food_items')
+                .update({ is_favorite: !currentStatus } as any)
+                .eq('id', id);
+
+            if (error) throw error;
+
+            setFoods(prev => prev.map(f => f.id === id ? { ...f, is_favorite: !currentStatus } : f));
+            toast.success(currentStatus ? 'Removed from favorites' : 'Added to favorites', { duration: 1000 });
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+            toast.error('Failed to update favorite status');
+        } finally {
+            setUpdatingId(null);
+        }
+    };
+
     const filteredFoods = foods.filter(f => {
         const matchesSearch = f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (f.common_name && f.common_name.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -307,6 +327,16 @@ export default function ManageFoodsPage() {
                                     </td>
                                     <td className="px-6 py-4 text-right">
                                         <div className="flex items-center justify-end gap-2 text-slate-400">
+                                            <button
+                                                onClick={() => toggleFavorite(item.id, item.is_favorite)}
+                                                className={cn(
+                                                    "p-2 transition-colors",
+                                                    item.is_favorite ? "text-rose-500 hover:text-rose-600" : "hover:text-rose-500"
+                                                )}
+                                                title={item.is_favorite ? "Remove Favorite" : "Add to Favorites"}
+                                            >
+                                                <Heart size={16} fill={item.is_favorite ? "currentColor" : "none"} />
+                                            </button>
                                             <button
                                                 onClick={() => router.push(`/dashboard/food/${item.id}`)}
                                                 className="p-2 hover:text-emerald-500 transition-colors"
