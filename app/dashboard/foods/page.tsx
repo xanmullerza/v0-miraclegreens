@@ -368,410 +368,418 @@ function FoodsContent() {
     };
 
     return (
-        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
-            {/* Hero Section */}
-            <div className="relative h-48 rounded-[2.5rem] bg-emerald-600 overflow-hidden flex items-center px-12 group">
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1540420773420-3366772f4999?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
-                <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600/50 mix-blend-multiply opacity-40" />
+        <div className="flex flex-col lg:flex-row -mx-8 -mt-8 h-[calc(100vh-128px)] overflow-hidden bg-slate-50 dark:bg-[#020617] relative">
+            {/* Library Panel */}
+            <div className={cn(
+                "h-full overflow-y-auto custom-scrollbar transition-all duration-500 ease-in-out p-8 relative",
+                isCompareOpen ? "lg:w-1/2 shadow-2xl z-10" : "w-full"
+            )}>
+                <div className={cn("space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100 pb-20", !isCompareOpen && "max-w-7xl mx-auto")}>
+                    {/* Hero Section */}
+                    <div className="relative h-48 rounded-[2.5rem] bg-emerald-600 overflow-hidden flex items-center px-12 group">
+                        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1540420773420-3366772f4999?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600/50 mix-blend-multiply opacity-40" />
 
-                <div className="relative z-10 space-y-2">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
-                            <Library className="text-white" size={24} />
+                        <div className="relative z-10 space-y-2">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
+                                    <Library className="text-white" size={24} />
+                                </div>
+                                <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Foods Hub</h1>
+                            </div>
+                            <p className="text-emerald-50 font-medium max-w-md text-sm pl-1">
+                                Explore our database of nutrient-dense whole foods with complete micronutrient profiles.
+                            </p>
                         </div>
-                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Foods Hub</h1>
+
+
+                        <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-6">
+                            <div className="text-right hidden sm:block">
+                                <p className="text-[10px] font-black uppercase tracking-widest text-emerald-200 mb-1">
+                                    {showFavoritesOnly ? "Favourite Foods" : "All Foods"}
+                                </p>
+                                <p className="text-3xl font-black text-white leading-none tracking-tighter italic">
+                                    {totalCount} <span className="text-emerald-300">FOODS</span>
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2">
+                                <Button
+                                    onClick={() => router.push('/dashboard/compare')}
+                                    className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                                >
+                                    <Scale size={14} className="group-hover/btn:scale-110 transition-transform" />
+                                    Compare
+                                </Button>
+                                <Button
+                                    className="bg-white text-emerald-600 border-none shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest pointer-events-none text-[10px]"
+                                >
+                                    <Library size={14} />
+                                    Foods Hub
+                                </Button>
+                                <Button
+                                    onClick={() => router.push('/dashboard/admin/food')}
+                                    className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                                >
+                                    <Plus size={14} className="group-hover/btn:rotate-90 transition-transform" />
+                                    Add Food
+                                </Button>
+                                <Button
+                                    onClick={() => router.push('/dashboard/recipes')}
+                                    className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                                >
+                                    <ChefHat size={14} className="group-hover/btn:scale-110 transition-transform" />
+                                    Recipes Hub
+                                </Button>
+                            </div>
+                        </div>
                     </div>
-                    <p className="text-emerald-50 font-medium max-w-md text-sm pl-1">
-                        Explore our database of nutrient-dense whole foods with complete micronutrient profiles.
-                    </p>
-                </div>
 
+                    {/* Controls Row */}
+                    <div className="flex flex-col md:flex-row gap-4 justify-center">
 
-                <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-6">
-                    <div className="text-right hidden sm:block">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-200 mb-1">
-                            {showFavoritesOnly ? "Favourite Foods" : "All Foods"}
-                        </p>
-                        <p className="text-3xl font-black text-white leading-none tracking-tighter italic">
-                            {totalCount} <span className="text-emerald-300">FOODS</span>
-                        </p>
-                    </div>
+                        {/* Favorites Switch Toggle */}
+                        <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all shrink-0">
+                            <Globe
+                                size={18}
+                                className={cn(
+                                    "transition-all cursor-pointer",
+                                    !showFavoritesOnly ? "text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" : "text-slate-300 hover:text-slate-400"
+                                )}
+                                onClick={() => setShowFavoritesOnly(false)}
+                            />
+                            <Switch
+                                id="favorites-mode"
+                                checked={showFavoritesOnly}
+                                onCheckedChange={setShowFavoritesOnly}
+                                className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-blue-600 dark:data-[state=unchecked]:bg-blue-600"
+                            />
+                            <Heart
+                                size={18}
+                                className={cn(
+                                    "transition-all cursor-pointer",
+                                    showFavoritesOnly ? "text-rose-500 fill-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : "text-slate-300 hover:text-slate-400"
+                                )}
+                                onClick={() => setShowFavoritesOnly(true)}
+                            />
+                        </div>
 
-                    <div className="grid grid-cols-2 gap-2">
-                        <Button
-                            onClick={() => router.push('/dashboard/compare')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
-                        >
-                            <Scale size={14} className="group-hover/btn:scale-110 transition-transform" />
-                            Compare
-                        </Button>
-                        <Button
-                            className="bg-white text-emerald-600 border-none shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest pointer-events-none text-[10px]"
-                        >
-                            <Library size={14} />
-                            Foods Hub
-                        </Button>
-                        <Button
-                            onClick={() => router.push('/dashboard/admin/food')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
-                        >
-                            <Plus size={14} className="group-hover/btn:rotate-90 transition-transform" />
-                            Add Food
-                        </Button>
-                        <Button
-                            onClick={() => router.push('/dashboard/recipes')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
-                        >
-                            <ChefHat size={14} className="group-hover/btn:scale-110 transition-transform" />
-                            Recipes Hub
-                        </Button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Controls Row */}
-            <div className="flex flex-col md:flex-row gap-4 justify-center">
-
-                {/* Favorites Switch Toggle */}
-                <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all shrink-0">
-                    <Globe
-                        size={18}
-                        className={cn(
-                            "transition-all cursor-pointer",
-                            !showFavoritesOnly ? "text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" : "text-slate-300 hover:text-slate-400"
-                        )}
-                        onClick={() => setShowFavoritesOnly(false)}
-                    />
-                    <Switch
-                        id="favorites-mode"
-                        checked={showFavoritesOnly}
-                        onCheckedChange={setShowFavoritesOnly}
-                        className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-blue-600 dark:data-[state=unchecked]:bg-blue-600"
-                    />
-                    <Heart
-                        size={18}
-                        className={cn(
-                            "transition-all cursor-pointer",
-                            showFavoritesOnly ? "text-rose-500 fill-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : "text-slate-300 hover:text-slate-400"
-                        )}
-                        onClick={() => setShowFavoritesOnly(true)}
-                    />
-                </div>
-
-                {/* Category Filter */}
-                <div className="relative">
-                    <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar items-center h-14">
-                        <button
-                            onClick={() => setIsFilterOpen(!isFilterOpen)}
-                            className={cn(
-                                "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300",
-                                isFilterOpen ? "bg-emerald-600 text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-                            )}
-                        >
-                            <Filter size={18} />
-                            <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter</span>
-                            <ChevronDown size={14} className={cn("transition-transform", isFilterOpen && "rotate-180")} />
-                        </button>
-
-                        <div className="w-px h-6 bg-slate-200 dark:border-slate-800 mx-1" />
-
-                        {CATEGORIES.map(category => {
-                            const isActive = selectedCategories.includes(category);
-
-                            return (
+                        {/* Category Filter */}
+                        <div className="relative">
+                            <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar items-center h-14">
                                 <button
-                                    key={category}
-                                    onClick={() => {
-                                        if (isActive) {
-                                            setSelectedCategories(prev => prev.filter(c => c !== category));
-                                        } else {
-                                            setSelectedCategories(prev => [...prev, category]);
-                                        }
-                                    }}
+                                    onClick={() => setIsFilterOpen(!isFilterOpen)}
                                     className={cn(
-                                        "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
-                                        isActive
-                                            ? "bg-emerald-600/10 text-emerald-600 border border-emerald-600/20"
-                                            : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
+                                        "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300",
+                                        isFilterOpen ? "bg-emerald-600 text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
                                     )}
                                 >
-                                    {category}
+                                    <Filter size={18} />
+                                    <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter</span>
+                                    <ChevronDown size={14} className={cn("transition-transform", isFilterOpen && "rotate-180")} />
                                 </button>
-                            );
-                        })}
+
+                                <div className="w-px h-6 bg-slate-200 dark:border-slate-800 mx-1" />
+
+                                {CATEGORIES.map(category => {
+                                    const isActive = selectedCategories.includes(category);
+
+                                    return (
+                                        <button
+                                            key={category}
+                                            onClick={() => {
+                                                if (isActive) {
+                                                    setSelectedCategories(prev => prev.filter(c => c !== category));
+                                                } else {
+                                                    setSelectedCategories(prev => [...prev, category]);
+                                                }
+                                            }}
+                                            className={cn(
+                                                "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
+                                                isActive
+                                                    ? "bg-emerald-600/10 text-emerald-600 border border-emerald-600/20"
+                                                    : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
+                                            )}
+                                        >
+                                            {category}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Dropdown Menu */}
+                            {isFilterOpen && (
+                                <>
+                                    <div
+                                        className="fixed inset-0 z-40"
+                                        onClick={() => setIsFilterOpen(false)}
+                                    />
+                                    <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-0 w-64 bg-white dark:bg-slate-900 rounded-[1.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl z-50 p-4 animate-in fade-in slide-in-from-top-2 duration-200 max-h-[70vh] overflow-y-auto no-scrollbar">
+                                        <div className="space-y-3">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2">Select Categories</p>
+                                            <div className="space-y-1">
+                                                {CATEGORIES.map(category => {
+                                                    const isActive = selectedCategories.includes(category);
+                                                    return (
+                                                        <div
+                                                            key={category}
+                                                            onClick={() => {
+                                                                if (isActive) {
+                                                                    setSelectedCategories(prev => prev.filter(c => c !== category));
+                                                                } else {
+                                                                    setSelectedCategories(prev => [...prev, category]);
+                                                                }
+                                                            }}
+                                                            className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer group transition-colors"
+                                                        >
+                                                            <span className={cn(
+                                                                "text-xs font-bold uppercase tracking-wide transition-colors",
+                                                                isActive ? "text-emerald-600" : "text-slate-600 dark:text-slate-400"
+                                                            )}>
+                                                                {category}
+                                                            </span>
+                                                            <div className={cn(
+                                                                "w-5 h-5 rounded-lg border-2 transition-all flex items-center justify-center",
+                                                                isActive
+                                                                    ? "bg-emerald-600 border-emerald-600"
+                                                                    : "border-slate-200 dark:border-slate-700 group-hover:border-emerald-500/30"
+                                                            )}>
+                                                                {isActive && <Check size={12} className="text-white" />}
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                            <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between gap-2">
+                                                <button
+                                                    onClick={() => setSelectedCategories([])}
+                                                    className="flex-1 py-2 text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors"
+                                                >
+                                                    Clear All
+                                                </button>
+                                                <button
+                                                    onClick={() => setSelectedCategories(CATEGORIES)}
+                                                    className="flex-1 py-2 text-[9px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-700 transition-colors"
+                                                >
+                                                    Select All
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </div>
                     </div>
 
-                    {/* Dropdown Menu */}
-                    {isFilterOpen && (
-                        <>
-                            <div
-                                className="fixed inset-0 z-40"
-                                onClick={() => setIsFilterOpen(false)}
-                            />
-                            <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 md:translate-x-0 md:left-0 w-64 bg-white dark:bg-slate-900 rounded-[1.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl z-50 p-4 animate-in fade-in slide-in-from-top-2 duration-200 max-h-[70vh] overflow-y-auto no-scrollbar">
-                                <div className="space-y-3">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2">Select Categories</p>
-                                    <div className="space-y-1">
-                                        {CATEGORIES.map(category => {
-                                            const isActive = selectedCategories.includes(category);
-                                            return (
-                                                <div
-                                                    key={category}
-                                                    onClick={() => {
-                                                        if (isActive) {
-                                                            setSelectedCategories(prev => prev.filter(c => c !== category));
-                                                        } else {
-                                                            setSelectedCategories(prev => [...prev, category]);
-                                                        }
-                                                    }}
-                                                    className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer group transition-colors"
-                                                >
-                                                    <span className={cn(
-                                                        "text-xs font-bold uppercase tracking-wide transition-colors",
-                                                        isActive ? "text-emerald-600" : "text-slate-600 dark:text-slate-400"
-                                                    )}>
-                                                        {category}
-                                                    </span>
-                                                    <div className={cn(
-                                                        "w-5 h-5 rounded-lg border-2 transition-all flex items-center justify-center",
-                                                        isActive
-                                                            ? "bg-emerald-600 border-emerald-600"
-                                                            : "border-slate-200 dark:border-slate-700 group-hover:border-emerald-500/30"
-                                                    )}>
-                                                        {isActive && <Check size={12} className="text-white" />}
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-between gap-2">
-                                        <button
-                                            onClick={() => setSelectedCategories([])}
-                                            className="flex-1 py-2 text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors"
-                                        >
-                                            Clear All
-                                        </button>
-                                        <button
-                                            onClick={() => setSelectedCategories(CATEGORIES)}
-                                            className="flex-1 py-2 text-[9px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-700 transition-colors"
-                                        >
-                                            Select All
-                                        </button>
-                                    </div>
-                                </div>
+                    {/* Main Content Area */}
+                    {loading ? (
+                        <div className="h-96 flex flex-col items-center justify-center gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
+                                <Loader2 className="animate-spin text-emerald-500" size={24} />
                             </div>
-                        </>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Querying Databank...</p>
+                        </div>
+                    ) : foods.length === 0 ? (
+                        <div className="h-96 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
+                            <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
+                                <Library size={32} />
+                            </div>
+                            <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                                {showFavoritesOnly ? "No Favorites Yet" : "No results found."}
+                            </p>
+                            <p className="text-sm text-slate-500 text-center max-w-xs">
+                                {showFavoritesOnly
+                                    ? "Tap the heart icon on any food to add it to your personal collection."
+                                    : "We couldn't find any foods matching your criteria."}
+                            </p>
+                            {showFavoritesOnly && (
+                                <Button
+                                    onClick={() => setShowFavoritesOnly(false)}
+                                    className="mt-6 rounded-full bg-emerald-600 text-white px-8 font-black uppercase tracking-widest text-[10px]"
+                                >
+                                    Browse All Foods
+                                </Button>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="space-y-4">
+                            {/* List Header */}
+                            <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_80px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                                <div
+                                    className="flex items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors"
+                                    onClick={() => handleSort('image')}
+                                >
+                                    <Camera size={14} className={cn(sortField === 'image' && "text-emerald-500")} />
+                                    {sortField === 'image' && (sortDirection === 'asc' ? <Plus size={10} /> : <X size={10} className="rotate-45" />)}
+                                </div>
+                                <div
+                                    className="flex items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors"
+                                    onClick={() => handleSort('common_name')}
+                                >
+                                    <Info size={14} className={cn(sortField === 'common_name' && "text-emerald-500")} />
+                                    <span>Name</span>
+                                    {sortField === 'common_name' && (sortDirection === 'asc' ? <Plus size={10} /> : <X size={10} className="rotate-45" />)}
+                                </div>
+                                <div
+                                    className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors"
+                                    onClick={() => handleSort('energy_kcal')}
+                                >
+                                    <Zap size={14} className={cn(sortField === 'energy_kcal' ? "text-emerald-500" : "text-emerald-500/50")} />
+                                    {sortField === 'energy_kcal' && (sortDirection === 'asc' ? <Plus size={10} /> : <X size={10} className="rotate-45" />)}
+                                </div>
+                                <div
+                                    className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors"
+                                    onClick={() => handleSort('carbs_g')}
+                                >
+                                    <Wheat size={14} className={cn(sortField === 'carbs_g' ? "text-amber-500" : "text-amber-500/50")} />
+                                    {sortField === 'carbs_g' && (sortDirection === 'asc' ? <Plus size={10} /> : <X size={10} className="rotate-45" />)}
+                                </div>
+                                <div
+                                    className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors"
+                                    onClick={() => handleSort('fat_g')}
+                                >
+                                    <Droplet size={14} className={cn(sortField === 'fat_g' ? "text-amber-900" : "text-amber-900/50")} />
+                                    {sortField === 'fat_g' && (sortDirection === 'asc' ? <Plus size={10} /> : <X size={10} className="rotate-45" />)}
+                                </div>
+                                <div
+                                    className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors"
+                                    onClick={() => handleSort('protein_g')}
+                                >
+                                    <Beef size={14} className={cn(sortField === 'protein_g' ? "text-rose-500" : "text-rose-500/50")} />
+                                    {sortField === 'protein_g' && (sortDirection === 'asc' ? <Plus size={10} /> : <X size={10} className="rotate-45" />)}
+                                </div>
+                                <div></div>
+                            </div>
+
+                            {/* Food Items List */}
+                            <div className="space-y-3">
+                                {foods.map((food) => (
+                                    <div
+                                        key={food.id}
+                                        onClick={() => router.push(`/dashboard/food/${food.id}`)}
+                                        className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
+                                    >
+                                        <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_80px] gap-4 lg:items-center lg:px-8">
+                                            {/* Thumbnail */}
+                                            <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
+                                                {food.image ? (
+                                                    <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                        <Beef size={24} className="opacity-20" />
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Info */}
+                                            <div className="p-3 lg:p-0">
+                                                <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
+                                                    {food.common_name || food.name}
+                                                </h3>
+                                                {food.common_name && (
+                                                    <p className="text-[10px] text-slate-400 italic truncate uppercase tracking-tighter">{food.name}</p>
+                                                )}
+                                                {food.category && (
+                                                    <Badge className="lg:hidden mt-2 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none">
+                                                        {food.category}
+                                                    </Badge>
+                                                )}
+                                            </div>
+
+                                            {/* Stats (Desktop View) */}
+                                            <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                                {Math.round(food.energy_kcal)}
+                                            </div>
+                                            <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                                {food.carbs_g.toFixed(1)}g
+                                            </div>
+                                            <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                                {food.fat_g.toFixed(1)}g
+                                            </div>
+                                            <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                                {food.protein_g.toFixed(1)}g
+                                            </div>
+
+
+                                            {/* Mobile Stats Row */}
+                                            <div className="lg:hidden grid grid-cols-4 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                                {[
+                                                    { label: 'CAL', val: food.energy_kcal, sub: 'k', color: 'text-orange-500' },
+                                                    { label: 'CHO', val: food.carbs_g, sub: 'g', color: 'text-amber-500' },
+                                                    { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-amber-900' },
+                                                    { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-rose-500' }
+                                                ].map(stat => (
+                                                    <div key={stat.label} className="text-center">
+                                                        <p className="text-[8px] font-black text-slate-400 mb-0.5">{stat.label}</p>
+                                                        <p className={cn("text-xs font-black", stat.color)}>{Math.round(stat.val)}{stat.sub}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            {/* Action */}
+                                            <div className="p-3 lg:p-0 flex justify-end lg:justify-center gap-2">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        addToCompare(food);
+                                                    }}
+                                                    className={cn(
+                                                        "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
+                                                        compareItems.some(i => i.id === food.id)
+                                                            ? "bg-emerald-500 text-white border-emerald-600 shadow-md shadow-emerald-500/20"
+                                                            : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 border-slate-100 dark:border-slate-700"
+                                                    )}
+                                                    title="Compare Food"
+                                                >
+                                                    <Scale size={14} />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => toggleFavorite(food, e)}
+                                                    className={cn(
+                                                        "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
+                                                        food.is_favorite
+                                                            ? "bg-rose-500 text-white border-rose-600 shadow-md shadow-rose-500/20"
+                                                            : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 border-slate-100 dark:border-slate-700"
+                                                    )}
+                                                >
+                                                    <Heart size={14} fill={food.is_favorite ? "currentColor" : "none"} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Pagination Button */}
+                            {hasMore && (
+                                <div className="flex justify-center pt-8">
+                                    <Button
+                                        onClick={handleLoadMore}
+                                        disabled={loadingMore}
+                                        className="h-14 px-8 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-[0.2em] shadow-xl group transition-all"
+                                    >
+                                        {loadingMore ? (
+                                            <>
+                                                <Loader2 className="animate-spin mr-3" size={18} />
+                                                Loading Results...
+                                            </>
+                                        ) : (
+                                            <>
+                                                View More Foods
+                                                <ArrowRight className="ml-3 group-hover:translate-x-1 transition-transform" size={18} />
+                                            </>
+                                        )}
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
                     )}
+
+
                 </div>
             </div>
 
-            {/* Main Content Area */}
-            {loading ? (
-                <div className="h-96 flex flex-col items-center justify-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
-                        <Loader2 className="animate-spin text-emerald-500" size={24} />
-                    </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Querying Databank...</p>
-                </div>
-            ) : foods.length === 0 ? (
-                <div className="h-96 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
-                    <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
-                        <Library size={32} />
-                    </div>
-                    <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                        {showFavoritesOnly ? "No Favorites Yet" : "No results found."}
-                    </p>
-                    <p className="text-sm text-slate-500 text-center max-w-xs">
-                        {showFavoritesOnly
-                            ? "Tap the heart icon on any food to add it to your personal collection."
-                            : "We couldn't find any foods matching your criteria."}
-                    </p>
-                    {showFavoritesOnly && (
-                        <Button
-                            onClick={() => setShowFavoritesOnly(false)}
-                            className="mt-6 rounded-full bg-emerald-600 text-white px-8 font-black uppercase tracking-widest text-[10px]"
-                        >
-                            Browse All Foods
-                        </Button>
-                    )}
-                </div>
-            ) : (
-                <div className="space-y-4">
-                    {/* List Header */}
-                    <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_80px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
-                        <div
-                            className="flex items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors"
-                            onClick={() => handleSort('image')}
-                        >
-                            <Camera size={14} className={cn(sortField === 'image' && "text-emerald-500")} />
-                            {sortField === 'image' && (sortDirection === 'asc' ? <Plus size={10} /> : <X size={10} className="rotate-45" />)}
-                        </div>
-                        <div
-                            className="flex items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors"
-                            onClick={() => handleSort('common_name')}
-                        >
-                            <Info size={14} className={cn(sortField === 'common_name' && "text-emerald-500")} />
-                            <span>Name</span>
-                            {sortField === 'common_name' && (sortDirection === 'asc' ? <Plus size={10} /> : <X size={10} className="rotate-45" />)}
-                        </div>
-                        <div
-                            className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors"
-                            onClick={() => handleSort('energy_kcal')}
-                        >
-                            <Zap size={14} className={cn(sortField === 'energy_kcal' ? "text-emerald-500" : "text-emerald-500/50")} />
-                            {sortField === 'energy_kcal' && (sortDirection === 'asc' ? <Plus size={10} /> : <X size={10} className="rotate-45" />)}
-                        </div>
-                        <div
-                            className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors"
-                            onClick={() => handleSort('carbs_g')}
-                        >
-                            <Wheat size={14} className={cn(sortField === 'carbs_g' ? "text-amber-500" : "text-amber-500/50")} />
-                            {sortField === 'carbs_g' && (sortDirection === 'asc' ? <Plus size={10} /> : <X size={10} className="rotate-45" />)}
-                        </div>
-                        <div
-                            className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors"
-                            onClick={() => handleSort('fat_g')}
-                        >
-                            <Droplet size={14} className={cn(sortField === 'fat_g' ? "text-amber-900" : "text-amber-900/50")} />
-                            {sortField === 'fat_g' && (sortDirection === 'asc' ? <Plus size={10} /> : <X size={10} className="rotate-45" />)}
-                        </div>
-                        <div
-                            className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors"
-                            onClick={() => handleSort('protein_g')}
-                        >
-                            <Beef size={14} className={cn(sortField === 'protein_g' ? "text-rose-500" : "text-rose-500/50")} />
-                            {sortField === 'protein_g' && (sortDirection === 'asc' ? <Plus size={10} /> : <X size={10} className="rotate-45" />)}
-                        </div>
-                        <div></div>
-                    </div>
-
-                    {/* Food Items List */}
-                    <div className="space-y-3">
-                        {foods.map((food) => (
-                            <div
-                                key={food.id}
-                                onClick={() => router.push(`/dashboard/food/${food.id}`)}
-                                className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
-                            >
-                                <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_80px] gap-4 lg:items-center lg:px-8">
-                                    {/* Thumbnail */}
-                                    <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
-                                        {food.image ? (
-                                            <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                <Beef size={24} className="opacity-20" />
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Info */}
-                                    <div className="p-3 lg:p-0">
-                                        <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
-                                            {food.common_name || food.name}
-                                        </h3>
-                                        {food.common_name && (
-                                            <p className="text-[10px] text-slate-400 italic truncate uppercase tracking-tighter">{food.name}</p>
-                                        )}
-                                        {food.category && (
-                                            <Badge className="lg:hidden mt-2 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none">
-                                                {food.category}
-                                            </Badge>
-                                        )}
-                                    </div>
-
-                                    {/* Stats (Desktop View) */}
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                        {Math.round(food.energy_kcal)}
-                                    </div>
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                        {food.carbs_g.toFixed(1)}g
-                                    </div>
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                        {food.fat_g.toFixed(1)}g
-                                    </div>
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                        {food.protein_g.toFixed(1)}g
-                                    </div>
-
-
-                                    {/* Mobile Stats Row */}
-                                    <div className="lg:hidden grid grid-cols-4 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-                                        {[
-                                            { label: 'CAL', val: food.energy_kcal, sub: 'k', color: 'text-orange-500' },
-                                            { label: 'CHO', val: food.carbs_g, sub: 'g', color: 'text-amber-500' },
-                                            { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-amber-900' },
-                                            { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-rose-500' }
-                                        ].map(stat => (
-                                            <div key={stat.label} className="text-center">
-                                                <p className="text-[8px] font-black text-slate-400 mb-0.5">{stat.label}</p>
-                                                <p className={cn("text-xs font-black", stat.color)}>{Math.round(stat.val)}{stat.sub}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Action */}
-                                    <div className="p-3 lg:p-0 flex justify-end lg:justify-center gap-2">
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                addToCompare(food);
-                                            }}
-                                            className={cn(
-                                                "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
-                                                compareItems.some(i => i.id === food.id)
-                                                    ? "bg-emerald-500 text-white border-emerald-600 shadow-md shadow-emerald-500/20"
-                                                    : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 border-slate-100 dark:border-slate-700"
-                                            )}
-                                            title="Compare Food"
-                                        >
-                                            <Scale size={14} />
-                                        </button>
-                                        <button
-                                            onClick={(e) => toggleFavorite(food, e)}
-                                            className={cn(
-                                                "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
-                                                food.is_favorite
-                                                    ? "bg-rose-500 text-white border-rose-600 shadow-md shadow-rose-500/20"
-                                                    : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 border-slate-100 dark:border-slate-700"
-                                            )}
-                                        >
-                                            <Heart size={14} fill={food.is_favorite ? "currentColor" : "none"} />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Pagination Button */}
-                    {hasMore && (
-                        <div className="flex justify-center pt-8">
-                            <Button
-                                onClick={handleLoadMore}
-                                disabled={loadingMore}
-                                className="h-14 px-8 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-[0.2em] shadow-xl group transition-all"
-                            >
-                                {loadingMore ? (
-                                    <>
-                                        <Loader2 className="animate-spin mr-3" size={18} />
-                                        Loading Results...
-                                    </>
-                                ) : (
-                                    <>
-                                        View More Foods
-                                        <ArrowRight className="ml-3 group-hover:translate-x-1 transition-transform" size={18} />
-                                    </>
-                                )}
-                            </Button>
-                        </div>
-                    )}
-                </div>
-            )}
-
-
-
-            {/* Edit Modal */}
+            {/* Edit Modal (Outside panels to cover both) */}
             {editingItem && (
                 <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="w-full max-w-md">
@@ -870,12 +878,15 @@ function FoodsContent() {
                 </div>
             )}
 
-            {/* Comparison Sidebar */}
+            {/* Comparison Panel */}
             <div className={cn(
-                "fixed inset-y-0 right-0 z-[100] w-full md:w-[480px] bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800 transition-transform duration-500 ease-in-out transform",
-                isCompareOpen ? "translate-x-0" : "translate-x-full"
+                "transition-all duration-500 ease-in-out bg-white dark:bg-slate-950 border-l border-slate-200 dark:border-slate-800 flex flex-col z-[100] lg:z-0",
+                isCompareOpen
+                    ? "fixed lg:relative inset-0 lg:inset-auto w-full lg:w-1/2 opacity-100 translate-x-0"
+                    : "w-0 opacity-0 border-none translate-x-full lg:translate-x-0 overflow-hidden"
             )}>
                 <div className="h-full flex flex-col">
+                    {/* Comparison Sidebar Header (Lab Control) */}
                     {/* Header */}
                     <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-950 sticky top-0 z-10">
                         <div className="flex items-center gap-3">
@@ -1031,10 +1042,10 @@ function FoodsContent() {
                 </div>
             </div>
 
-            {/* Backdrop Overlay */}
+            {/* Mobile Backdrop */}
             {isCompareOpen && (
                 <div
-                    className="fixed inset-0 z-[90] bg-black/20 backdrop-blur-[2px] animate-in fade-in duration-300 md:hidden"
+                    className="fixed inset-0 z-[90] bg-black/20 backdrop-blur-[2px] animate-in fade-in duration-300 lg:hidden"
                     onClick={() => setIsCompareOpen(false)}
                 />
             )}
