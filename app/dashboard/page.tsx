@@ -87,14 +87,6 @@ export default function DashboardOverview() {
             icon: User,
             color: 'text-purple-500',
             bg: 'bg-purple-500/10'
-        },
-        {
-            name: 'Admin',
-            desc: 'Manage global data and core lab configurations.',
-            href: '/dashboard/admin',
-            icon: ShieldCheck,
-            color: 'text-rose-500',
-            bg: 'bg-rose-500/10'
         }
     ];
 
@@ -150,33 +142,6 @@ export default function DashboardOverview() {
                             </Card>
                         </Link>
                     ))}
-
-                    {/* Data Card - 4th card in the grid */}
-                    <Card className="p-5 h-full bg-slate-50/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 flex flex-col">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500">
-                                <BarChart3 size={20} />
-                            </div>
-                            <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-[7px] font-black uppercase tracking-widest">
-                                <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-                                Live
-                            </div>
-                        </div>
-                        <div className="space-y-2 flex-grow">
-                            <div className="flex justify-between items-center">
-                                <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">Foods</p>
-                                <p className="text-sm font-black">{stats.foodItems}</p>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">Recipes</p>
-                                <p className="text-sm font-black">{stats.recipes}</p>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">Status</p>
-                                <p className="text-sm font-black text-emerald-500">Online</p>
-                            </div>
-                        </div>
-                    </Card>
                 </div>
             </div>
         </div>
