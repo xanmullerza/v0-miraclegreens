@@ -50,6 +50,7 @@ export default function ManageFoodsPage() {
     const [loading, setLoading] = useState(true);
     const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
     const [foodSourceFilter, setFoodSourceFilter] = useState<'all' | 'manual' | 'usda'>('all');
+    const [processingFilter, setProcessingFilter] = useState<'all' | 'whole' | 'processed' | 'ultra'>('all');
     const [updatingId, setUpdatingId] = useState<string | null>(null);
     const [editingItem, setEditingItem] = useState<FoodItem | null>(null);
     const [isDeleting, setIsDeleting] = useState<string | null>(null);
@@ -228,12 +229,43 @@ export default function ManageFoodsPage() {
         }
     };
 
+    const getProcessingLevel = (item: FoodItem): 'whole' | 'processed' | 'ultra' => {
+        const name = item.name.toLowerCase();
+        // Ultra-Processed Heuristics
+        const ultraKeywords = [
+            'candy', 'cookie', 'chip', 'snack', 'cake', 'cracker', 'pastry', 'pudding', 'ice cream',
+            'fast food', 'pizza', 'burger', 'fries', 'nugget', 'sausage', 'bacon', 'ham', 'salami', 'deli',
+            'soda', 'beverage', 'drink', 'sweetened', 'chocolate', 'cereal', 'granola', 'bar', 'ready-to-eat',
+            'instant', 'frozen meal', 'sauce', 'dressing', 'spread', 'margarine', 'shortening', 'whipped',
+            'frosting', 'mix', 'substitute', 'artificial', 'flavor', 'brand', 'campbell', 'kellogg', 'kraft',
+            'general mills', 'nestle', 'pepsi', 'coke', 'doritos', 'lays', 'cheetos'
+        ];
+        if (ultraKeywords.some(k => name.includes(k))) return 'ultra';
+
+        // Whole Food Heuristics (Strict)
+        const wholeKeywords = ['raw', 'fresh', 'uncooked'];
+        const isWholeCategory = ['Vegetables', 'Fruit', 'Legumes', 'Nuts', 'Proteins'].includes(item.category || '');
+        if (wholeKeywords.some(k => name.includes(k))) return 'whole';
+        if (isWholeCategory && !name.includes('canned') && !name.includes('frozen') && !name.includes('cooked') && !name.includes('dried')) return 'whole';
+
+        // Default to Processed (Lightly processed like Rice, Bread, Cheese, Cooked items)
+        return 'processed';
+    };
+
     const filteredFoods = foods.filter(f => {
         const matchesSearch = f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (f.common_name && f.common_name.toLowerCase().includes(searchQuery.toLowerCase()));
         const matchesFavorite = showOnlyFavorites ? f.is_favorite : true;
         const matchesSource = foodSourceFilter === 'all' ? true : f.source === foodSourceFilter;
-        return matchesSearch && matchesFavorite && matchesSource;
+
+        // Smart Processing Filter
+        let matchesProcessing = true;
+        if (processingFilter !== 'all') {
+            const level = getProcessingLevel(f);
+            matchesProcessing = level === processingFilter;
+        }
+
+        return matchesSearch && matchesFavorite && matchesSource && matchesProcessing;
     });
 
     if (loading) {
@@ -273,7 +305,8 @@ export default function ManageFoodsPage() {
                         {showOnlyFavorites ? "Favorites" : "All"}
                     </Button>
 
-                    <div className="flex bg-slate-100 dark:bg-slate-800/50 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+                    <div className="flex bg-slate-100 dark:bg-slate-800/50 p-1 rounded-xl border border-slate-200 dark:border-slate-800 items-center">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-2 mr-1 hidden sm:inline-block">Source</span>
                         <button
                             onClick={() => setFoodSourceFilter('all')}
                             className={cn(
@@ -294,7 +327,7 @@ export default function ManageFoodsPage() {
                                     : "text-slate-500 hover:text-emerald-500"
                             )}
                         >
-                            Unbranded
+                            Custom
                         </button>
                         <button
                             onClick={() => setFoodSourceFilter('usda')}
@@ -305,7 +338,55 @@ export default function ManageFoodsPage() {
                                     : "text-slate-500 hover:text-blue-500"
                             )}
                         >
-                            Commercial
+                            Global
+                        </button>
+                    </div>
+
+                    <div className="flex bg-slate-100 dark:bg-slate-800/50 p-1 rounded-xl border border-slate-200 dark:border-slate-800 items-center">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 px-2 mr-1 hidden sm:inline-block">Type</span>
+                        <button
+                            onClick={() => setProcessingFilter('all')}
+                            className={cn(
+                                "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                processingFilter === 'all'
+                                    ? "bg-white dark:bg-slate-700 shadow-sm text-slate-900 dark:text-white"
+                                    : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                            )}
+                        >
+                            All
+                        </button>
+                        <button
+                            onClick={() => setProcessingFilter('whole')}
+                            className={cn(
+                                "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                processingFilter === 'whole'
+                                    ? "bg-emerald-500 shadow-sm text-white"
+                                    : "text-slate-500 hover:text-emerald-500"
+                            )}
+                        >
+                            Whole
+                        </button>
+                        <button
+                            onClick={() => setProcessingFilter('processed')}
+                            className={cn(
+                                "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                processingFilter === 'processed'
+                                    ? "bg-amber-500 shadow-sm text-white"
+                                    : "text-slate-500 hover:text-amber-500"
+                            )}
+                        >
+                            Processed
+                        </button>
+                        <button
+                            onClick={() => setProcessingFilter('ultra')}
+                            className={cn(
+                                "px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                processingFilter === 'ultra'
+                                    ? "bg-rose-500 shadow-sm text-white"
+                                    : "text-slate-500 hover:text-rose-500"
+                            )}
+                        >
+                            Ultra
                         </button>
                     </div>
 
