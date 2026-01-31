@@ -9,9 +9,6 @@ import {
     ChefHat,
     ArrowRight,
     ShieldCheck,
-    Zap,
-    Database,
-    Sparkles,
     User
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -115,20 +112,6 @@ export default function AdminOverview() {
                 </div>
             </div>
 
-            {/* Bottom Notice Panel */}
-            <div className="mt-6 flex flex-col lg:flex-row gap-6">
-                <Card className="flex-1 p-8 bg-emerald-500/5 border-emerald-500/10 flex items-start gap-6">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
-                        <Sparkles size={24} />
-                    </div>
-                    <div>
-                        <h4 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-2">Clinical Protocol</h4>
-                        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed italic">
-                            "Ensure all clinical markers are verified before syncing new entries to the global health registry. Direct write access is strictly monitored for data integrity."
-                        </p>
-                    </div>
-                </Card>
-            </div>
         </div>
     );
 }
