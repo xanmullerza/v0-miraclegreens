@@ -900,9 +900,9 @@ function FoodsContent() {
                         </div>
                         <button
                             onClick={() => setIsCompareOpen(false)}
-                            className="p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all text-slate-400"
+                            className="px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-all text-emerald-600 font-black text-xs uppercase tracking-widest border border-emerald-600/20"
                         >
-                            <X size={20} />
+                            + ADD
                         </button>
                     </div>
 
