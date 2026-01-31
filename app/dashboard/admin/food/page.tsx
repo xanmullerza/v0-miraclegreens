@@ -287,6 +287,14 @@ Fat: ${item.fat_g || 0}g
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
+            {/* Back Button */}
+            <button
+                onClick={() => router.push('/dashboard/admin')}
+                className="flex items-center gap-2 text-sky-500 font-bold text-xs uppercase tracking-widest mb-2 hover:translate-x-[-4px] transition-transform"
+            >
+                <ArrowLeft size={14} /> Back to Admin
+            </button>
+
             {/* Hero Section */}
             <div className="relative h-48 rounded-[2.5rem] bg-sky-600 overflow-hidden flex items-center px-12 group">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />

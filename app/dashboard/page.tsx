@@ -10,7 +10,8 @@ import {
     Library,
     User,
     BarChart3,
-    ArrowRight
+    ArrowRight,
+    ShieldCheck
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -78,6 +79,14 @@ export default function DashboardOverview() {
             icon: User,
             color: 'text-purple-500',
             bg: 'bg-purple-500/10'
+        },
+        {
+            name: 'Admin',
+            desc: 'Manage global data and core lab configurations.',
+            href: '/dashboard/admin',
+            icon: ShieldCheck,
+            color: 'text-rose-500',
+            bg: 'bg-rose-500/10'
         }
     ];
 

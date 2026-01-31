@@ -452,6 +452,14 @@ export default function RecipeBuilderPage() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100 pb-20">
+            {/* Back Button */}
+            <button
+                onClick={() => router.push('/dashboard/admin')}
+                className="flex items-center gap-2 text-violet-500 font-bold text-xs uppercase tracking-widest mb-2 hover:translate-x-[-4px] transition-transform"
+            >
+                <ArrowLeft size={14} /> Back to Admin
+            </button>
+
             {/* Hero Section */}
             <div className="relative h-48 rounded-[2.5rem] bg-violet-600 overflow-hidden flex items-center px-12 group">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1505935428862-770b6f24f629?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
