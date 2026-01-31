@@ -57,6 +57,14 @@ export default function DashboardOverview() {
 
     const tools = [
         {
+            name: 'Nutrients Hub',
+            desc: 'Deep-dive into the biological markers that fuel human performance.',
+            href: '/dashboard/nutrients',
+            icon: Zap,
+            color: 'text-amber-500',
+            bg: 'bg-amber-500/10'
+        },
+        {
             name: 'Foods Hub',
             desc: 'Explore the global database of nutritional data.',
             href: '/dashboard/foods',
