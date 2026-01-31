@@ -230,6 +230,16 @@ export default function ProfilePage() {
                             </div>
 
                             <div className="space-y-4">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Activity Level</Label>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <GoalCard type="sedentary" label="Sedentary" selected={formData.activityLevel === 'sedentary'} onClick={() => setFormData({ ...formData, activityLevel: 'sedentary' })} icon={User} />
+                                    <GoalCard type="light" label="Lightly Active" selected={formData.activityLevel === 'light'} onClick={() => setFormData({ ...formData, activityLevel: 'light' })} icon={ChevronRight} />
+                                    <GoalCard type="moderate" label="Moderate" selected={formData.activityLevel === 'moderate'} onClick={() => setFormData({ ...formData, activityLevel: 'moderate' })} icon={Zap} />
+                                    <GoalCard type="active" label="Very Active" selected={formData.activityLevel === 'active'} onClick={() => setFormData({ ...formData, activityLevel: 'active' })} icon={Flame} />
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
                                 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Dietary Protocol</Label>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     <GoalCard type="anything" label="Balanced" selected={formData.dietType === 'anything'} onClick={() => setFormData({ ...formData, dietType: 'anything' })} icon={Apple} />
@@ -268,15 +278,7 @@ export default function ProfilePage() {
                                 <p className="text-[10px] text-slate-400 italic">These items will be marked as "Excluded" even if the meal otherwise fits your diet.</p>
                             </div>
 
-                            <div className="space-y-4">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Activity Level</Label>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    <GoalCard type="sedentary" label="Sedentary" selected={formData.activityLevel === 'sedentary'} onClick={() => setFormData({ ...formData, activityLevel: 'sedentary' })} icon={User} />
-                                    <GoalCard type="light" label="Lightly Active" selected={formData.activityLevel === 'light'} onClick={() => setFormData({ ...formData, activityLevel: 'light' })} icon={ChevronRight} />
-                                    <GoalCard type="moderate" label="Moderate" selected={formData.activityLevel === 'moderate'} onClick={() => setFormData({ ...formData, activityLevel: 'moderate' })} icon={Zap} />
-                                    <GoalCard type="active" label="Very Active" selected={formData.activityLevel === 'active'} onClick={() => setFormData({ ...formData, activityLevel: 'active' })} icon={Flame} />
-                                </div>
-                            </div>
+
                         </div>
                     </section>
 
