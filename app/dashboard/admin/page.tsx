@@ -74,21 +74,9 @@ export default function AdminOverview() {
                         <h1 className="text-4xl lg:text-6xl font-black text-white tracking-tighter leading-[0.9] mb-8 italic uppercase">
                             Lab <span className="text-emerald-500">Administration.</span>
                         </h1>
-                        <p className="text-lg text-slate-400 leading-relaxed mb-8">
+                        <p className="text-lg text-slate-400 leading-relaxed">
                             Control the core engine of Miracle Greens. Manage the global food database, curate clinical data, and architect new nutritional recipes.
                         </p>
-
-                        {/* Status Tags */}
-                        <div className="flex flex-wrap gap-4">
-                            <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">Registry Syncing</span>
-                            </div>
-                            <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">Lab Secure</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
