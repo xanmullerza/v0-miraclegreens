@@ -963,64 +963,13 @@ function FoodsContent() {
                                 </p>
                             </div>
                         ) : (
-                            <div className="space-y-6">
-                                {/* Comparison Section */}
-                                {['Energy (kcal)', 'Protein (g)', 'Carbs (g)', 'Fat (g)', 'Fiber', 'Calcium', 'Iron', 'Magnesium', 'Potassium', 'Zinc', 'Vitamin C', 'Vitamin A', 'Vitamin B12'].map((nutrient) => {
-                                    const key = nutrient.toLowerCase().split(' ')[0] === 'energy' ? 'energy_kcal' :
-                                        nutrient.toLowerCase().split(' ')[0] === 'protein' ? 'protein_g' :
-                                            nutrient.toLowerCase().split(' ')[0] === 'carbs' ? 'carbs_g' :
-                                                nutrient.toLowerCase().split(' ')[0] === 'fat' ? 'fat_g' : nutrient.replace(/ \(.*\)/, '');
-
-                                    const values = compareItems.map(item => getVal(item, key));
-
-                                    return (
-                                        <div key={nutrient} className="space-y-2">
-                                            <div className="flex justify-between items-center px-1">
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{nutrient}</p>
-                                            </div>
-                                            <div className="grid grid-cols-3 gap-2">
-                                                {[0, 1, 2].map((idx) => {
-                                                    const item = compareItems[idx];
-                                                    const val = item ? getVal(item, key) : null;
-                                                    const colorClass = item ? getRankingColor(val!, values) : 'bg-slate-50/50 dark:bg-slate-900/50 border-transparent text-slate-300';
-
-                                                    // Hide rankings colors if only one item is selected
-                                                    const finalColorClass = compareItems.length > 1 ? colorClass : 'bg-slate-50/50 dark:bg-slate-900/50 border-transparent text-slate-600 dark:text-slate-300';
-
-                                                    return (
-                                                        <div
-                                                            key={idx}
-                                                            className={cn(
-                                                                "py-2.5 px-2 rounded-xl border flex flex-col items-center justify-center transition-all",
-                                                                finalColorClass
-                                                            )}
-                                                        >
-                                                            <span className="text-xs font-black">
-                                                                {val !== null ? (val >= 1 ? val.toFixed(0) : val.toFixed(1)) : '-'}
-                                                            </span>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-
-                                {/* Legend */}
-                                <div className="pt-6 border-t border-slate-100 dark:border-slate-800 grid grid-cols-3 gap-2">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">1st</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">2nd</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500">3rd</span>
-                                    </div>
+                            <div className="py-12 flex flex-col items-center justify-center text-center space-y-4">
+                                <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                                    <Scale size={32} />
                                 </div>
+                                <p className="text-sm font-bold text-slate-600 dark:text-slate-400 lowercase italic tracking-tight">
+                                    {compareItems.length} food{compareItems.length > 1 ? 's' : ''} selected. Ready for analysis.
+                                </p>
                             </div>
                         )}
                     </div>
@@ -1036,7 +985,7 @@ function FoodsContent() {
                             className="w-full h-14 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-[0.2em] shadow-xl transition-all gap-3"
                         >
                             <Scale size={18} />
-                            Full Analysis
+                            Compare Foods
                         </Button>
                     </div>
                 </div>
