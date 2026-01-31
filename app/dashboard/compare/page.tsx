@@ -324,7 +324,7 @@ function DashboardComparisonContent() {
                             Foods Hub
                         </Button>
                         <Button
-                            onClick={() => router.push('/dashboard/food')}
+                            onClick={() => router.push('/dashboard/add-food')}
                             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
                             <Plus size={14} className="group-hover/btn:rotate-90 transition-transform" />

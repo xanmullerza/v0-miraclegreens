@@ -32,7 +32,7 @@ export default function AdminOverview() {
         {
             name: 'Food Creator',
             desc: 'Add new clinical data.',
-            href: '/dashboard/food',
+            href: '/dashboard/add-food',
             icon: Plus,
             color: 'text-sky-500',
             bg: 'bg-sky-500/10'
