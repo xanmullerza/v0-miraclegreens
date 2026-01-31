@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
     Zap,
     X,
@@ -129,13 +130,13 @@ export default function NutrientsHub() {
         <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
             {/* Nav */}
             <div className="flex items-center justify-between">
-                <button
-                    onClick={() => router.back()}
-                    className="flex items-center gap-2 text-slate-500 hover:text-emerald-600 font-bold text-sm transition-colors group"
-                >
-                    <ChevronLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-                    Back to Dashboard
-                </button>
+                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    <Link href="/dashboard" className="hover:text-emerald-500 transition-colors">
+                        Dashboard
+                    </Link>
+                    <ChevronRight size={12} />
+                    <span className="text-emerald-500">Nutrients</span>
+                </div>
 
                 <div className="flex gap-3">
                     <Button
