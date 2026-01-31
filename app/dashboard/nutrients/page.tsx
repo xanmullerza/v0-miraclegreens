@@ -40,7 +40,6 @@ const NUTRIENT_CATEGORIES = [
 export default function NutrientsHub() {
     const router = useRouter();
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedNutrient, setSelectedNutrient] = useState<string | null>(null);
 
     const filteredNutrients = Object.keys(nutrientInfo).filter(key =>
         key.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -52,6 +51,10 @@ export default function NutrientsHub() {
         indigo: "text-indigo-500 bg-indigo-500/10 border-indigo-500/20",
         rose: "text-rose-500 bg-rose-500/10 border-rose-500/20",
         emerald: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20"
+    };
+
+    const handleNutrientClick = (name: string) => {
+        router.push(`/dashboard/nutrients/${encodeURIComponent(name)}`);
     };
 
     return (
@@ -112,7 +115,7 @@ export default function NutrientsHub() {
             {searchQuery ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-8">
                     {filteredNutrients.map(k => (
-                        <NutrientSmallCard key={k} name={k} info={nutrientInfo[k]} onClick={() => setSelectedNutrient(k)} />
+                        <NutrientSmallCard key={k} name={k} info={nutrientInfo[k]} onClick={() => handleNutrientClick(k)} />
                     ))}
                 </div>
             ) : (
@@ -130,102 +133,11 @@ export default function NutrientsHub() {
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {cat.keys.filter(k => nutrientInfo[k]).map(k => (
-                                    <NutrientSmallCard key={k} name={k} info={nutrientInfo[k]} onClick={() => setSelectedNutrient(k)} />
+                                    <NutrientSmallCard key={k} name={k} info={nutrientInfo[k]} onClick={() => handleNutrientClick(k)} />
                                 ))}
                             </div>
                         </div>
                     ))}
-                </div>
-            )}
-
-            {/* Nutrient Detail Modal */}
-            {selectedNutrient && nutrientInfo[selectedNutrient] && (
-                <div
-                    className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
-                    onClick={() => setSelectedNutrient(null)}
-                >
-                    <div
-                        className="bg-white dark:bg-slate-900 rounded-[3rem] max-w-2xl w-full max-h-[90vh] overflow-y-auto no-scrollbar shadow-2xl relative border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200"
-                        onClick={e => e.stopPropagation()}
-                    >
-                        <button
-                            onClick={() => setSelectedNutrient(null)}
-                            className="absolute top-8 right-8 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-all z-10"
-                        >
-                            <X size={24} />
-                        </button>
-
-                        <div className="p-10 lg:p-14 space-y-10">
-                            {/* Header */}
-                            <div className="space-y-4">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[9px] font-black uppercase tracking-widest">
-                                    <Activity size={10} className="fill-current" />
-                                    Clinical Profile
-                                </div>
-                                <h3 className="text-5xl font-black text-slate-900 dark:text-white uppercase tracking-tighter italic leading-[0.85]">
-                                    {selectedNutrient}
-                                </h3>
-                                <p className="text-xl font-medium text-slate-500 leading-relaxed italic border-l-4 border-amber-500 pl-6">
-                                    "{nutrientInfo[selectedNutrient].description}"
-                                </p>
-                            </div>
-
-                            {/* Main Body */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                <div className="space-y-8">
-                                    <div>
-                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Functional Role</h4>
-                                        <p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-800/50 p-6 rounded-3xl border border-slate-100 dark:border-slate-800">
-                                            {nutrientInfo[selectedNutrient].importance}
-                                        </p>
-                                    </div>
-
-                                    <div>
-                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Historical Context</h4>
-                                        <p className="text-xs font-medium text-slate-500 leading-relaxed">
-                                            {nutrientInfo[selectedNutrient].history}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-8">
-                                    <div>
-                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Primary Benefits</h4>
-                                        <div className="flex flex-wrap gap-2">
-                                            {nutrientInfo[selectedNutrient].benefits.map((b, i) => (
-                                                <Badge key={i} className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl">
-                                                    {b}
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-4">Deficiency Signals</h4>
-                                        <div className="flex flex-wrap gap-2">
-                                            {nutrientInfo[selectedNutrient].deficiencySigns.map((s, i) => (
-                                                <Badge key={i} className="bg-rose-500/10 text-rose-600 border-rose-500/20 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-xl">
-                                                    {s}
-                                                </Badge>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Sources Section */}
-                            <div className="pt-10 border-t border-slate-100 dark:border-slate-800">
-                                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-6">Bio-Available Sources</h4>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                                    {nutrientInfo[selectedNutrient].sources.map((s, i) => (
-                                        <div key={i} className="p-4 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-center hover:border-amber-500/50 transition-all cursor-default">
-                                            <p className="text-[10px] font-black uppercase tracking-tighter truncate">{s}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             )}
         </div>
