@@ -163,6 +163,53 @@ export default function ProfilePage() {
                                     className="bg-slate-50/50 dark:bg-slate-950/50 border-slate-200 dark:border-slate-800 rounded-xl"
                                 />
                             </div>
+
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Gender</Label>
+                                    <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 h-10 mt-2">
+                                        <button
+                                            onClick={() => setFormData({ ...formData, gender: 'male' })}
+                                            className={cn("flex-1 text-xs font-bold rounded-lg transition-all", formData.gender === 'male' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
+                                        >
+                                            M
+                                        </button>
+                                        <button
+                                            onClick={() => setFormData({ ...formData, gender: 'female' })}
+                                            className={cn("flex-1 text-xs font-bold rounded-lg transition-all", formData.gender === 'female' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
+                                        >
+                                            F
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Age</Label>
+                                    <Input
+                                        type="number"
+                                        value={formData.age}
+                                        onChange={(e) => setFormData({ ...formData, age: e.target.value ? Number(e.target.value) : '' })}
+                                        className="bg-transparent border-none text-xl font-bold h-10 mt-1 focus-visible:ring-0 px-0"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Weight ({measurementUnit === 'metric' ? 'kg' : 'lb'})</Label>
+                                    <Input
+                                        type="number"
+                                        value={formData.weight}
+                                        onChange={(e) => setFormData({ ...formData, weight: e.target.value ? Number(e.target.value) : '' })}
+                                        className="bg-transparent border-none text-xl font-bold h-10 mt-1 focus-visible:ring-0 px-0"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Height ({measurementUnit === 'metric' ? 'cm' : 'ft/in'})</Label>
+                                    <Input
+                                        type="number"
+                                        value={formData.height}
+                                        onChange={(e) => setFormData({ ...formData, height: e.target.value ? Number(e.target.value) : '' })}
+                                        className="bg-transparent border-none text-xl font-bold h-10 mt-1 focus-visible:ring-0 px-0"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </section>
 
@@ -298,56 +345,9 @@ export default function ProfilePage() {
                 <section className="space-y-6">
                     <div className="flex items-center gap-2 text-emerald-500 mb-2">
                         <Utensils size={20} />
-                        <h2 className="text-sm font-black uppercase tracking-[0.2em]">Dietary & Biometric Profile</h2>
+                        <h2 className="text-sm font-black uppercase tracking-[0.2em]">Dietary Profile</h2>
                     </div>
                     <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 space-y-10">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Gender</Label>
-                                <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 h-10 mt-2">
-                                    <button
-                                        onClick={() => setFormData({ ...formData, gender: 'male' })}
-                                        className={cn("flex-1 text-xs font-bold rounded-lg transition-all", formData.gender === 'male' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
-                                    >
-                                        M
-                                    </button>
-                                    <button
-                                        onClick={() => setFormData({ ...formData, gender: 'female' })}
-                                        className={cn("flex-1 text-xs font-bold rounded-lg transition-all", formData.gender === 'female' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
-                                    >
-                                        F
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Age</Label>
-                                <Input
-                                    type="number"
-                                    value={formData.age}
-                                    onChange={(e) => setFormData({ ...formData, age: e.target.value ? Number(e.target.value) : '' })}
-                                    className="bg-transparent border-none text-xl font-bold h-10 mt-1 focus-visible:ring-0 px-0"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Weight ({measurementUnit === 'metric' ? 'kg' : 'lb'})</Label>
-                                <Input
-                                    type="number"
-                                    value={formData.weight}
-                                    onChange={(e) => setFormData({ ...formData, weight: e.target.value ? Number(e.target.value) : '' })}
-                                    className="bg-transparent border-none text-xl font-bold h-10 mt-1 focus-visible:ring-0 px-0"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Height ({measurementUnit === 'metric' ? 'cm' : 'ft/in'})</Label>
-                                <Input
-                                    type="number"
-                                    value={formData.height}
-                                    onChange={(e) => setFormData({ ...formData, height: e.target.value ? Number(e.target.value) : '' })}
-                                    className="bg-transparent border-none text-xl font-bold h-10 mt-1 focus-visible:ring-0 px-0"
-                                />
-                            </div>
-                        </div>
-
                         <div className="space-y-4">
                             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Goal</Label>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
