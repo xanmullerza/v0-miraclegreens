@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import {
     Zap,
     X,
@@ -128,32 +127,22 @@ export default function NutrientsHub() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
-            {/* Sticky Header Nav */}
-            <div className="sticky top-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-transparent transition-all py-4 -mx-4 px-4 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    <Link href="/dashboard" className="hover:text-emerald-500 transition-colors">
-                        Dashboard
-                    </Link>
-                    <ChevronRight size={12} />
-                    <span className="text-emerald-500">Nutrients</span>
-                </div>
-
-                <div className="flex gap-3">
-                    <Button
-                        onClick={() => router.push('/dashboard/foods')}
-                        className="bg-white/50 hover:bg-white text-slate-600 dark:text-white border border-slate-200 dark:border-white/10 backdrop-blur-md shadow-sm gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
-                    >
-                        <Library size={14} className="group-hover/btn:scale-110 transition-transform" />
-                        Foods Hub
-                    </Button>
-                    <Button
-                        onClick={() => router.push('/dashboard/recipes')}
-                        className="bg-white/50 hover:bg-white text-slate-600 dark:text-white border border-slate-200 dark:border-white/10 backdrop-blur-md shadow-sm gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
-                    >
-                        <ChefHat size={14} className="group-hover/btn:scale-110 transition-transform" />
-                        Recipes Hub
-                    </Button>
-                </div>
+            {/* Header Actions */}
+            <div className="flex justify-end gap-3">
+                <Button
+                    onClick={() => router.push('/dashboard/foods')}
+                    className="bg-white/50 hover:bg-white text-slate-600 dark:text-white border border-slate-200 dark:border-white/10 backdrop-blur-md shadow-sm gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                >
+                    <Library size={14} className="group-hover/btn:scale-110 transition-transform" />
+                    Foods Hub
+                </Button>
+                <Button
+                    onClick={() => router.push('/dashboard/recipes')}
+                    className="bg-white/50 hover:bg-white text-slate-600 dark:text-white border border-slate-200 dark:border-white/10 backdrop-blur-md shadow-sm gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
+                >
+                    <ChefHat size={14} className="group-hover/btn:scale-110 transition-transform" />
+                    Recipes Hub
+                </Button>
             </div>
 
             {/* Hero Section */}

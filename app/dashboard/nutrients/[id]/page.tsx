@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import Link from 'next/link';
 import {
     Zap,
     Activity,
@@ -146,35 +145,22 @@ export default function NutrientDetailsPage() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-10 pb-20 animate-in fade-in duration-700">
-            {/* Sticky Header Nav */}
-            <div className="sticky top-0 z-30 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl border-b border-transparent transition-all py-4 -mx-4 px-4 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                    <Link href="/dashboard" className="hover:text-emerald-500 transition-colors">
-                        Dashboard
-                    </Link>
-                    <ChevronRight size={12} />
-                    <Link href="/dashboard/nutrients" className="hover:text-emerald-500 transition-colors">
-                        Nutrients
-                    </Link>
-                    <ChevronRight size={12} />
-                    <span className="text-emerald-500">{nutrientId}</span>
-                </div>
-                <div className="flex gap-3">
-                    <Button
-                        onClick={toggleFavorite}
-                        variant="outline"
-                        className={cn(
-                            "rounded-2xl h-11 px-6 font-black uppercase tracking-widest text-[10px] gap-2 border-slate-200 dark:border-slate-800 shadow-sm transition-all",
-                            isFav ? "bg-rose-500 text-white border-rose-600 hover:bg-rose-600" : "bg-white/50 hover:bg-slate-50 dark:hover:bg-slate-800"
-                        )}
-                    >
-                        <Heart size={14} fill={isFav ? "currentColor" : "none"} />
-                        {isFav ? "Favorited" : "Favorite"}
-                    </Button>
-                    <Button className="rounded-2xl h-11 px-6 font-black uppercase tracking-widest text-[10px] bg-amber-500 hover:bg-amber-600 text-white shadow-xl shadow-amber-500/20">
-                        Generate Report
-                    </Button>
-                </div>
+            {/* Header Actions */}
+            <div className="flex justify-end gap-3">
+                <Button
+                    onClick={toggleFavorite}
+                    variant="outline"
+                    className={cn(
+                        "rounded-2xl h-11 px-6 font-black uppercase tracking-widest text-[10px] gap-2 border-slate-200 dark:border-slate-800 shadow-sm transition-all",
+                        isFav ? "bg-rose-500 text-white border-rose-600 hover:bg-rose-600" : "bg-white/50 hover:bg-slate-50 dark:hover:bg-slate-800"
+                    )}
+                >
+                    <Heart size={14} fill={isFav ? "currentColor" : "none"} />
+                    {isFav ? "Favorited" : "Favorite"}
+                </Button>
+                <Button className="rounded-2xl h-11 px-6 font-black uppercase tracking-widest text-[10px] bg-amber-500 hover:bg-amber-600 text-white shadow-xl shadow-amber-500/20">
+                    Generate Report
+                </Button>
             </div>
 
             {/* Hero Header */}
