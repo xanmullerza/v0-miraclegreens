@@ -213,6 +213,73 @@ export default function ProfilePage() {
                         </div>
                     </section>
 
+                    {/* Diet Profile */}
+                    <section className="space-y-6">
+                        <div className="flex items-center gap-2 text-emerald-500 mb-2">
+                            <Utensils size={20} />
+                            <h2 className="text-sm font-black uppercase tracking-[0.2em]">Dietary Profile</h2>
+                        </div>
+                        <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 space-y-10">
+                            <div className="space-y-4">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Goal</Label>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <GoalCard type="lose-fat" label="Lose Fat" selected={formData.goal === 'lose-fat'} onClick={() => setFormData({ ...formData, goal: 'lose-fat' })} icon={TrendingDown} />
+                                    <GoalCard type="maintain" label="Maintain" selected={formData.goal === 'maintain'} onClick={() => setFormData({ ...formData, goal: 'maintain' })} icon={Activity} />
+                                    <GoalCard type="build-muscle" label="Build Muscle" selected={formData.goal === 'build-muscle'} onClick={() => setFormData({ ...formData, goal: 'build-muscle' })} icon={Dumbbell} />
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Dietary Protocol</Label>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <GoalCard type="anything" label="Balanced" selected={formData.dietType === 'anything'} onClick={() => setFormData({ ...formData, dietType: 'anything' })} icon={Apple} />
+                                    <GoalCard type="pescatarian" label="Pescatarian" selected={formData.dietType === 'pescatarian'} onClick={() => setFormData({ ...formData, dietType: 'pescatarian' })} icon={Fish} />
+                                    <GoalCard type="vegetarian" label="Vegetarian" selected={formData.dietType === 'vegetarian'} onClick={() => setFormData({ ...formData, dietType: 'vegetarian' })} icon={Egg} />
+                                    <GoalCard type="vegan" label="Vegan" selected={formData.dietType === 'vegan'} onClick={() => setFormData({ ...formData, dietType: 'vegan' })} icon={Leaf} />
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Specific Exclusions</Label>
+                                <div className="flex flex-wrap gap-2">
+                                    {['Eggs', 'Dairy', 'Honey', 'Nuts', 'Peanuts', 'Soy', 'Gluten', 'Shellfish', 'Fish', 'Corn', 'Nightshades'].map(exclusion => {
+                                        const isSelected = formData.exclusions?.includes(exclusion);
+                                        return (
+                                            <button
+                                                key={exclusion}
+                                                onClick={() => {
+                                                    const newExclusions = isSelected
+                                                        ? formData.exclusions.filter(e => e !== exclusion)
+                                                        : [...(formData.exclusions || []), exclusion];
+                                                    setFormData({ ...formData, exclusions: newExclusions });
+                                                }}
+                                                className={cn(
+                                                    "px-4 py-2 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all",
+                                                    isSelected
+                                                        ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
+                                                        : "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                                )}
+                                            >
+                                                {exclusion}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                                <p className="text-[10px] text-slate-400 italic">These items will be marked as "Excluded" even if the meal otherwise fits your diet.</p>
+                            </div>
+
+                            <div className="space-y-4">
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Activity Level</Label>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <GoalCard type="sedentary" label="Sedentary" selected={formData.activityLevel === 'sedentary'} onClick={() => setFormData({ ...formData, activityLevel: 'sedentary' })} icon={User} />
+                                    <GoalCard type="light" label="Lightly Active" selected={formData.activityLevel === 'light'} onClick={() => setFormData({ ...formData, activityLevel: 'light' })} icon={ChevronRight} />
+                                    <GoalCard type="moderate" label="Moderate" selected={formData.activityLevel === 'moderate'} onClick={() => setFormData({ ...formData, activityLevel: 'moderate' })} icon={Zap} />
+                                    <GoalCard type="active" label="Very Active" selected={formData.activityLevel === 'active'} onClick={() => setFormData({ ...formData, activityLevel: 'active' })} icon={Flame} />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
                     {/* Units & Energy */}
                     <section className="space-y-6">
                         <div className="flex items-center gap-2 text-emerald-500 mb-2">
@@ -340,73 +407,6 @@ export default function ProfilePage() {
                         </div>
                     </section>
                 </div>
-
-                {/* Diet Profile */}
-                <section className="space-y-6">
-                    <div className="flex items-center gap-2 text-emerald-500 mb-2">
-                        <Utensils size={20} />
-                        <h2 className="text-sm font-black uppercase tracking-[0.2em]">Dietary Profile</h2>
-                    </div>
-                    <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 space-y-10">
-                        <div className="space-y-4">
-                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Goal</Label>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <GoalCard type="lose-fat" label="Lose Fat" selected={formData.goal === 'lose-fat'} onClick={() => setFormData({ ...formData, goal: 'lose-fat' })} icon={TrendingDown} />
-                                <GoalCard type="maintain" label="Maintain" selected={formData.goal === 'maintain'} onClick={() => setFormData({ ...formData, goal: 'maintain' })} icon={Activity} />
-                                <GoalCard type="build-muscle" label="Build Muscle" selected={formData.goal === 'build-muscle'} onClick={() => setFormData({ ...formData, goal: 'build-muscle' })} icon={Dumbbell} />
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Dietary Protocol</Label>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <GoalCard type="anything" label="Balanced" selected={formData.dietType === 'anything'} onClick={() => setFormData({ ...formData, dietType: 'anything' })} icon={Apple} />
-                                <GoalCard type="pescatarian" label="Pescatarian" selected={formData.dietType === 'pescatarian'} onClick={() => setFormData({ ...formData, dietType: 'pescatarian' })} icon={Fish} />
-                                <GoalCard type="vegetarian" label="Vegetarian" selected={formData.dietType === 'vegetarian'} onClick={() => setFormData({ ...formData, dietType: 'vegetarian' })} icon={Egg} />
-                                <GoalCard type="vegan" label="Vegan" selected={formData.dietType === 'vegan'} onClick={() => setFormData({ ...formData, dietType: 'vegan' })} icon={Leaf} />
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Specific Exclusions</Label>
-                            <div className="flex flex-wrap gap-2">
-                                {['Eggs', 'Dairy', 'Honey', 'Nuts', 'Peanuts', 'Soy', 'Gluten', 'Shellfish', 'Fish', 'Corn', 'Nightshades'].map(exclusion => {
-                                    const isSelected = formData.exclusions?.includes(exclusion);
-                                    return (
-                                        <button
-                                            key={exclusion}
-                                            onClick={() => {
-                                                const newExclusions = isSelected
-                                                    ? formData.exclusions.filter(e => e !== exclusion)
-                                                    : [...(formData.exclusions || []), exclusion];
-                                                setFormData({ ...formData, exclusions: newExclusions });
-                                            }}
-                                            className={cn(
-                                                "px-4 py-2 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all",
-                                                isSelected
-                                                    ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
-                                                    : "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
-                                            )}
-                                        >
-                                            {exclusion}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                            <p className="text-[10px] text-slate-400 italic">These items will be marked as "Excluded" even if the meal otherwise fits your diet.</p>
-                        </div>
-
-                        <div className="space-y-4">
-                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Activity Level</Label>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <GoalCard type="sedentary" label="Sedentary" selected={formData.activityLevel === 'sedentary'} onClick={() => setFormData({ ...formData, activityLevel: 'sedentary' })} icon={User} />
-                                <GoalCard type="light" label="Lightly Active" selected={formData.activityLevel === 'light'} onClick={() => setFormData({ ...formData, activityLevel: 'light' })} icon={ChevronRight} />
-                                <GoalCard type="moderate" label="Moderate" selected={formData.activityLevel === 'moderate'} onClick={() => setFormData({ ...formData, activityLevel: 'moderate' })} icon={Zap} />
-                                <GoalCard type="active" label="Very Active" selected={formData.activityLevel === 'active'} onClick={() => setFormData({ ...formData, activityLevel: 'active' })} icon={Flame} />
-                            </div>
-                        </div>
-                    </div>
-                </section>
 
                 {/* Save Button */}
                 <div className="flex justify-end pt-8">
