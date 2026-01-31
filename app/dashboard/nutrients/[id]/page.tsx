@@ -18,7 +18,8 @@ import {
     Star,
     Info,
     Calendar,
-    ArrowRight
+    ArrowRight,
+    Heart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -38,8 +39,30 @@ export default function NutrientDetailsPage() {
     const nutrientId = decodeURIComponent(id as string);
     const info = nutrientInfo[nutrientId];
 
+    const [favorites, setFavorites] = useState<string[]>([]);
     const [topFoods, setTopFoods] = useState<any[]>([]);
     const [loadingFoods, setLoadingFoods] = useState(true);
+
+    useEffect(() => {
+        const stored = localStorage.getItem('nutrient-favorites');
+        if (stored) {
+            try {
+                setFavorites(JSON.parse(stored));
+            } catch (e) {
+                console.error("Failed to parse favorites", e);
+            }
+        }
+    }, []);
+
+    const toggleFavorite = () => {
+        const newFavorites = favorites.includes(nutrientId)
+            ? favorites.filter(n => n !== nutrientId)
+            : [...favorites, nutrientId];
+        setFavorites(newFavorites);
+        localStorage.setItem('nutrient-favorites', JSON.stringify(newFavorites));
+    };
+
+    const isFav = favorites.includes(nutrientId);
 
     useEffect(() => {
         if (info) {
@@ -132,8 +155,16 @@ export default function NutrientDetailsPage() {
                     Library
                 </button>
                 <div className="flex gap-3">
-                    <Button variant="outline" className="rounded-2xl h-11 px-6 font-black uppercase tracking-widest text-[10px] gap-2 border-slate-200 dark:border-slate-800 shadow-sm">
-                        <Star size={14} /> Bookmark
+                    <Button
+                        onClick={toggleFavorite}
+                        variant="outline"
+                        className={cn(
+                            "rounded-2xl h-11 px-6 font-black uppercase tracking-widest text-[10px] gap-2 border-slate-200 dark:border-slate-800 shadow-sm transition-all",
+                            isFav ? "bg-rose-500 text-white border-rose-600 hover:bg-rose-600" : "hover:bg-slate-50 dark:hover:bg-slate-800"
+                        )}
+                    >
+                        <Heart size={14} fill={isFav ? "currentColor" : "none"} />
+                        {isFav ? "Favorited" : "Favorite"}
                     </Button>
                     <Button className="rounded-2xl h-11 px-6 font-black uppercase tracking-widest text-[10px] bg-amber-500 hover:bg-amber-600 text-white shadow-xl shadow-amber-500/20">
                         Generate Report
@@ -241,7 +272,7 @@ export default function NutrientDetailsPage() {
                             {loadingFoods ? (
                                 [1, 2, 3].map(i => <div key={i} className="h-16 w-full animate-pulse bg-slate-100 dark:bg-slate-800 rounded-2xl" />)
                             ) : topFoods.length > 0 ? (
-                                topFoods.map(food => (
+                                topFoods.map((food: any) => (
                                     <button
                                         key={food.id}
                                         onClick={() => router.push(`/dashboard/food/${food.id}`)}
