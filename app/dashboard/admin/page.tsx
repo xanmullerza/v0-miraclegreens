@@ -42,7 +42,7 @@ export default function AdminOverview() {
         {
             name: 'Edit Food Item',
             desc: 'Refine individual food details.',
-            href: '/dashboard/foods',
+            href: '/dashboard/admin/manage-foods',
             icon: Edit3,
             color: 'text-orange-500',
             bg: 'bg-orange-500/10'
@@ -58,7 +58,7 @@ export default function AdminOverview() {
         {
             name: 'Edit Recipe',
             desc: 'Protocol and step refinement.',
-            href: '/dashboard/recipes',
+            href: '/dashboard/admin/manage-recipes',
             icon: FileText,
             color: 'text-rose-500',
             bg: 'bg-rose-500/10'
