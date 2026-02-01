@@ -30,9 +30,7 @@ export default function AdminOverview() {
             bg: 'bg-emerald-500/10'
         },
         {
-            name: 'Food Creator',
-            desc: 'Add new clinical data.',
-            href: '/dashboard/add-food',
+            href: '/dashboard/admin/add-food',
             icon: Plus,
             color: 'text-sky-500',
             bg: 'bg-sky-500/10'
