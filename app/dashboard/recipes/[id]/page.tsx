@@ -472,7 +472,7 @@ export default function RecipeDetailsPage() {
                                 {ingredients.map((ing: any, i) => (
                                     <div
                                         key={i}
-                                        onClick={() => ing.food_item_id && router.push(`/dashboard/food/${ing.food_item_id}`)}
+                                        onClick={() => ing.food_item_id && router.push(`/dashboard/foods/${ing.food_item_id}`)}
                                         className={cn(
                                             "flex items-start gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/20 transition-all group",
                                             ing.food_item_id ? "cursor-pointer" : ""

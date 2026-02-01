@@ -266,7 +266,7 @@ export default function NutrientDetailsPage() {
                                 topFoods.map((food: any) => (
                                     <button
                                         key={food.id}
-                                        onClick={() => router.push(`/dashboard/food/${food.id}`)}
+                                        onClick={() => router.push(`/dashboard/foods/${food.id}`)}
                                         className="w-full flex items-center gap-4 p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/50 hover:shadow-lg transition-all text-left group"
                                     >
                                         <div className="w-10 h-10 rounded-lg bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0">

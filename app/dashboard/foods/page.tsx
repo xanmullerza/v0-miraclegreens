@@ -177,7 +177,7 @@ function FoodsContent() {
         registerResultClickHandler((result: SearchResult) => {
             const item = result.data as FoodItem;
             if (item) {
-                router.push(`/dashboard/food/${item.id}`);
+                router.push(`/dashboard/foods/${item.id}`);
             }
         });
     }, [registerResultClickHandler, router]);
@@ -663,7 +663,7 @@ function FoodsContent() {
                                 {foods.map((food) => (
                                     <div
                                         key={food.id}
-                                        onClick={() => router.push(`/dashboard/food/${food.id}`)}
+                                        onClick={() => router.push(`/dashboard/foods/${food.id}`)}
                                         className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
                                     >
                                         <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_80px] gap-4 lg:items-center lg:px-8">

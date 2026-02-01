@@ -459,7 +459,7 @@ export default function ManageFoodsPage() {
                                                 <Heart size={16} fill={item.is_favorite ? "currentColor" : "none"} />
                                             </button>
                                             <button
-                                                onClick={() => router.push(`/dashboard/food/${item.id}`)}
+                                                onClick={() => router.push(`/dashboard/foods/${item.id}`)}
                                                 className="p-2 hover:text-emerald-500 transition-colors"
                                                 title="View Profile"
                                             >
