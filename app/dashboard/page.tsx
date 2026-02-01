@@ -103,10 +103,10 @@ export default function DashboardOverview() {
 
     return (
         <div className="max-w-7xl mx-auto">
-            {/* Main Layout: Tools Grid expanded as Hero is hidden */}
-            <div className="grid grid-cols-1 gap-6">
-                {/* Hero Welcome Hidden as per user request */}
-                {/* <div className="lg:col-span-2 relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-10 lg:p-16 flex flex-col justify-center min-h-[400px]">
+            {/* Main Layout: Hero (2/3) + Cards (1/3) */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Hero Welcome - Takes 2/3 width */}
+                <div className="lg:col-span-2 relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-10 lg:p-16 flex flex-col justify-center min-h-[400px]">
                     <div className="absolute top-0 right-0 p-10 opacity-10 blur-2xl">
                         <Sparkles size={300} className="text-emerald-500" />
                     </div>
@@ -123,10 +123,10 @@ export default function DashboardOverview() {
                             A simple way to manage your food and recipes. Add ingredients, create healthy recipes, and check nutrition details in one easy dashboard.
                         </p>
                     </div>
-                </div> */}
+                </div>
 
-                {/* Cards Grid - Expanded to full width */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {/* Cards Grid - Takes 1/3 width, 2x2 layout */}
+                <div className="lg:col-span-1 grid grid-cols-2 gap-4">
                     {tools.map((tool) => (
                         <Link key={tool.href} href={tool.href}>
                             <Card className="p-5 group hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 h-full flex flex-col">
