@@ -417,7 +417,7 @@ export default function MealPlannerPage() {
                         <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
                             <Calendar className="text-white" size={24} />
                         </div>
-                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Meal Planner</h1>
+                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Plan Your Meals</h1>
                     </div>
                     <p className="text-amber-50 font-medium max-w-md text-sm pl-1 uppercase tracking-tighter">
                         AI-Driven daily nutrition protocols tailored to your biological profile.
@@ -437,14 +437,14 @@ export default function MealPlannerPage() {
                             className="bg-white text-amber-600 border-none shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest pointer-events-none text-[10px]"
                         >
                             <Calendar size={14} />
-                            Plan Meals
+                            Plan Your Meals
                         </Button>
                         <Button
                             onClick={() => router.push('/dashboard/recipes')}
                             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
                             <ChefHat size={14} className="group-hover/btn:scale-110 transition-transform" />
-                            Recipes Hub
+                            Explore Recipes
                         </Button>
                         <Button
                             onClick={() => router.push('/dashboard/recipebuilder')}
@@ -458,7 +458,7 @@ export default function MealPlannerPage() {
                             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
                             <Library size={14} className="group-hover/btn:scale-110 transition-transform" />
-                            Foods Hub
+                            Explore Foods
                         </Button>
                     </div>
                 </div>

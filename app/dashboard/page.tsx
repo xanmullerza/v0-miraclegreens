@@ -58,7 +58,7 @@ export default function DashboardOverview() {
 
     const tools = [
         {
-            name: 'Nutrients Hub',
+            name: 'View Nutrients',
             desc: 'Deep-dive into the biological markers that fuel human performance.',
             href: '/dashboard/nutrients',
             icon: Zap,
@@ -66,7 +66,7 @@ export default function DashboardOverview() {
             bg: 'bg-amber-500/10'
         },
         {
-            name: 'Foods Hub',
+            name: 'Explore Foods',
             desc: 'Explore the global database of nutritional data.',
             href: '/dashboard/foods',
             icon: Library,
@@ -74,7 +74,7 @@ export default function DashboardOverview() {
             bg: 'bg-emerald-500/10'
         },
         {
-            name: 'Recipes Hub',
+            name: 'Explore Recipes',
             desc: 'View and manage your optimized meal library.',
             href: '/dashboard/recipes',
             icon: ChefHat,
@@ -90,7 +90,7 @@ export default function DashboardOverview() {
             bg: 'bg-orange-500/10'
         },
         {
-            name: 'Meal Planner',
+            name: 'Plan Your Meals',
             desc: 'Generate optimized daily nutrition protocols.',
             href: '/dashboard/plan',
             icon: Calendar,
@@ -98,7 +98,7 @@ export default function DashboardOverview() {
             bg: 'bg-rose-500/10'
         },
         {
-            name: 'My Profile',
+            name: 'Profile & Settings',
             desc: 'Manage your personal settings and lab access.',
             href: '/dashboard/profile',
             icon: User,

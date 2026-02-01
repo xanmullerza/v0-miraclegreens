@@ -230,7 +230,7 @@ export default function RecipesPage() {
                         <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
                             <Library className="text-white" size={24} />
                         </div>
-                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Recipes Hub</h1>
+                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Explore Recipes</h1>
                     </div>
                     <p className="text-emerald-50 font-medium max-w-md text-sm pl-1">
                         Explore a world of nutritionally optimized, budget friendly recipes.
@@ -258,7 +258,7 @@ export default function RecipesPage() {
                             className="bg-white text-emerald-600 border-none shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest pointer-events-none text-[10px]"
                         >
                             <ChefHat size={14} />
-                            Recipes Hub
+                            Explore Recipes
                         </Button>
                         <Button
                             onClick={() => router.push('/dashboard/admin/recipebuilder')}
@@ -272,7 +272,7 @@ export default function RecipesPage() {
                             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
                             <Library size={14} className="group-hover/btn:scale-110 transition-transform" />
-                            Foods Hub
+                            Explore Foods
                         </Button>
                     </div>
                 </div>
