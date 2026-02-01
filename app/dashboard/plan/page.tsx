@@ -2,13 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import {
-    Leaf,
-    Fish,
     Flame,
     Check,
     ChevronRight,
@@ -670,7 +667,7 @@ export default function MealPlannerPage() {
 
                             <div className="flex items-center justify-between px-2">
                                 <button
-                                    onClick={() => setShowSummary(false)}
+                                    onClick={() => router.push('/dashboard/profile?from=/dashboard/plan')}
                                     className="text-xs font-bold text-slate-500 hover:text-emerald-500 transition-colors flex items-center gap-1"
                                 >
                                     Edit these settings
@@ -698,50 +695,25 @@ export default function MealPlannerPage() {
                 )}
 
                 {step === 1 && !showSummary && (
-                    <div className="space-y-6 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4">
-                        <div className="grid grid-cols-4 gap-4">
-                            <div className="col-span-1 space-y-2">
-                                <Label className="text-xs uppercase font-bold text-muted-foreground">Gender</Label>
-                                <div className="flex bg-muted p-1 rounded-lg border h-10">
-                                    <button onClick={() => setGender('male')} className={cn("flex-1 text-xs font-bold rounded-md", gender === 'male' ? "bg-primary text-white" : "")}>M</button>
-                                    <button onClick={() => setGender('female')} className={cn("flex-1 text-xs font-bold rounded-md", gender === 'female' ? "bg-primary text-white" : "")}>F</button>
-                                </div>
-                            </div>
-                            <div className="space-y-2"><Label className="text-xs uppercase font-bold text-muted-foreground">Age</Label><Input type="number" value={age} onChange={e => setAge(e.target.value ? Number(e.target.value) : '')} className="text-center" /></div>
-                            <div className="space-y-2"><Label className="text-xs uppercase font-bold text-muted-foreground">Weight (kg)</Label><Input type="number" value={weight} onChange={e => setWeight(e.target.value ? Number(e.target.value) : '')} className="text-center" /></div>
-                            <div className="space-y-2"><Label className="text-xs uppercase font-bold text-muted-foreground">Height (cm)</Label><Input type="number" value={height} onChange={e => setHeight(e.target.value ? Number(e.target.value) : '')} className="text-center" /></div>
+                    <div className="flex flex-col items-center justify-center py-20 text-center space-y-8 animate-in fade-in slide-in-from-bottom-4 max-w-xl mx-auto">
+                        <div className="h-24 w-24 bg-emerald-500/10 rounded-3xl flex items-center justify-center text-emerald-600 border border-emerald-500/20">
+                            <User size={48} className="animate-pulse" />
                         </div>
-
-                        <div className="space-y-2">
-                            <Label className="text-xs uppercase font-bold text-muted-foreground">Goal</Label>
-                            <div className="grid grid-cols-3 gap-2">
-                                <GoalCard type="lose-fat" selected={goal === 'lose-fat'} onClick={() => setGoal('lose-fat')} icon={TrendingDown} />
-                                <GoalCard type="maintain" selected={goal === 'maintain'} onClick={() => setGoal('maintain')} icon={Activity} />
-                                <GoalCard type="build-muscle" selected={goal === 'build-muscle'} onClick={() => setGoal('build-muscle')} icon={Dumbbell} />
-                            </div>
+                        <div className="space-y-3">
+                            <h2 className="text-3xl font-black tracking-tight uppercase italic">Biometrics Required</h2>
+                            <p className="text-slate-500 font-medium">
+                                To curate a precise nutritional protocol, we need your biological data (age, weight, height, and goals). These are managed in your secure laboratory profile.
+                            </p>
                         </div>
-
-                        <div className="space-y-2">
-                            <Label className="text-xs uppercase font-bold text-muted-foreground">Activity Level</Label>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                                <ActivityCard type="sedentary" selected={activityLevel === 'sedentary'} onClick={() => setActivityLevel('sedentary')} icon={User} />
-                                <ActivityCard type="light" selected={activityLevel === 'light'} onClick={() => setActivityLevel('light')} icon={ChevronRight} />
-                                <ActivityCard type="moderate" selected={activityLevel === 'moderate'} onClick={() => setActivityLevel('moderate')} icon={Zap} />
-                                <ActivityCard type="active" selected={activityLevel === 'active'} onClick={() => setActivityLevel('active')} icon={Flame} />
-                            </div>
+                        <div className="flex flex-col w-full gap-4">
+                            <Button
+                                size="lg"
+                                onClick={() => router.push('/dashboard/profile?from=/dashboard/plan')}
+                                className="w-full h-16 text-lg font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 group"
+                            >
+                                Complete Profile <ChevronRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                            </Button>
                         </div>
-
-                        <div className="space-y-2">
-                            <Label className="text-xs uppercase font-bold text-muted-foreground">Diet</Label>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                <DietCard type="anything" selected={diet === 'anything'} onClick={() => setDiet('anything')} icon={Apple} label="Balanced" />
-                                <DietCard type="pescatarian" selected={diet === 'pescatarian'} onClick={() => setDiet('pescatarian')} icon={Fish} label="Pescatarian" />
-                                <DietCard type="vegetarian" selected={diet === 'vegetarian'} onClick={() => setDiet('vegetarian')} icon={Egg} />
-                                <DietCard type="vegan" selected={diet === 'vegan'} onClick={() => setDiet('vegan')} icon={Leaf} />
-                            </div>
-                        </div>
-
-                        <Button size="lg" onClick={handleNextStep} className="w-full h-12 text-base font-bold rounded-xl mt-4">Generate Plan <ChevronRight className="ml-2 h-4 w-4" /></Button>
                     </div>
                 )}
 

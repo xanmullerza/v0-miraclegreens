@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useTheme } from 'next-themes';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
     User,
     Settings,
@@ -38,7 +38,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
-export default function ProfilePage() {
+function ProfilePageContent() {
     const {
         profile,
         updateProfile,
@@ -51,6 +51,8 @@ export default function ProfilePage() {
     } = useUserPreferences();
     const { theme, setTheme } = useTheme();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const from = searchParams.get('from');
 
     const [formData, setFormData] = useState({
         ...profile,
@@ -60,6 +62,9 @@ export default function ProfilePage() {
     const handleSave = () => {
         updateProfile(formData);
         toast.success("Profile updated successfully!");
+        if (from) {
+            router.push(from);
+        }
     };
 
     const GoalCard = ({ type, selected, onClick, icon: Icon, label }: { type: any, selected: boolean, onClick: () => void, icon: any, label?: string }) => (
@@ -79,74 +84,6 @@ export default function ProfilePage() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-12 animate-in fade-in duration-500">
-            {/* Hero Section Hidden as per user request */}
-            {/* <div className="relative h-48 rounded-[2.5rem] bg-indigo-600 overflow-hidden flex items-center px-12 group">
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1511367461989-f85a21fda167?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center mix-blend-overlay opacity-20" />
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-violet-600/50 mix-blend-multiply opacity-50" />
-
-                <div className="relative z-10 space-y-2">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
-                            <User className="text-white" size={24} />
-                        </div>
-                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Laboratory Profile</h1>
-                    </div>
-                    <p className="text-indigo-50 font-medium max-w-md text-sm pl-1 uppercase tracking-tighter">
-                        Manage your biometrics, diet protocols, and interface settings.
-                    </p>
-                </div>
-
-                <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-6">
-                    <div className="text-right hidden sm:block">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-indigo-200 mb-1">Active DNA Protocol</p>
-                        <p className="text-3xl font-black text-white leading-none tracking-tighter italic uppercase">
-                            {formData.dietType}
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                        <Button
-                            onClick={() => router.push('/dashboard/plan')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
-                        >
-                            <Calendar size={14} className="group-hover/btn:scale-110 transition-transform" />
-                            Plan Meals
-                        </Button>
-                        <Button
-                            onClick={() => router.push('/dashboard/recipes')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
-                        >
-                            <ChefHat size={14} className="group-hover/btn:scale-110 transition-transform" />
-                            Find Recipes
-                        </Button>
-                        <Button
-                            onClick={() => router.push('/dashboard/compare')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
-                        >
-                            <Scale size={14} className="group-hover/btn:scale-110 transition-transform" />
-                            Compare
-                        </Button>
-                        <Button
-                            onClick={() => router.push('/dashboard/foods')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
-                        >
-                            <Library size={14} className="group-hover/btn:scale-110 transition-transform" />
-                            Explore Foods
-                        </Button>
-                        <Button
-                            onClick={async () => {
-                                await supabase.auth.signOut();
-                                window.location.href = '/';
-                            }}
-                            className="bg-rose-500/80 hover:bg-rose-600 text-white border border-rose-400/50 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px] col-span-2"
-                        >
-                            <LogOut size={14} className="group-hover/btn:scale-110 transition-transform" />
-                            Sign Out Securely
-                        </Button>
-                    </div>
-                </div>
-            </div> */}
-
             <div className="max-w-4xl mx-auto space-y-12">
 
                 <div className="grid grid-cols-1 gap-8">
@@ -434,5 +371,18 @@ export default function ProfilePage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function ProfilePage() {
+    return (
+        <React.Suspense fallback={
+            <div className="min-h-[400px] flex flex-col items-center justify-center space-y-4">
+                <div className="animate-spin h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full" />
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400">Loading DNA Protocol...</p>
+            </div>
+        }>
+            <ProfilePageContent />
+        </React.Suspense>
     );
 }
