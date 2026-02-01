@@ -184,7 +184,9 @@ function DashboardLayoutContent({
                                 >
                                     <div className="text-right hidden sm:block">
                                         <p className="text-xs font-bold leading-none">{user?.user_metadata?.full_name || profile.nickname || profile.name || 'Guest Researcher'}</p>
-                                        <p className="text-[10px] text-slate-400 font-medium">Lab Access</p>
+                                        <p className="text-[10px] text-slate-400 font-medium">
+                                            {(user?.email || user?.user_metadata?.email || '').toLowerCase().includes('theospeak') ? 'Administrator' : 'Member'}
+                                        </p>
                                     </div>
                                     <div className="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500 group-hover:text-emerald-500 transition-colors overflow-hidden">
                                         {user?.user_metadata?.avatar_url ? (
