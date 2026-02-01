@@ -184,9 +184,11 @@ function DashboardLayoutContent({
                                     className="flex items-center gap-3 px-2 py-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
                                 >
                                     <div className="text-right hidden sm:block">
-                                        <p className="text-xs font-bold leading-none">{user?.user_metadata?.full_name || profile.nickname || profile.name || 'Guest Researcher'}</p>
+                                        <p className="text-xs font-bold leading-none">{user?.user_metadata?.full_name || profile.nickname || profile.name || 'Anonymous'}</p>
                                         <p className="text-[10px] text-slate-400 font-medium">
-                                            {(user?.email || user?.user_metadata?.email || '').toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase() ? 'Administrator' : 'Member'}
+                                            {(user?.email || user?.user_metadata?.email || '').toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase()
+                                                ? 'Administrator'
+                                                : (user || profile.name || profile.nickname) ? 'Member' : 'Guest'}
                                         </p>
                                     </div>
                                     <div className="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500 group-hover:text-emerald-500 transition-colors overflow-hidden">
