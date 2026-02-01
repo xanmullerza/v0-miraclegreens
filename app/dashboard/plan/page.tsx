@@ -641,7 +641,7 @@ export default function MealPlannerPage() {
                             <p className="text-slate-500">We've loaded your stored biological and dietary parameters.</p>
                         </div>
 
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-2 gap-4">
                             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                                 <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-1">Metrics</p>
                                 <p className="font-bold">{profile.age}y • {profile.weight}{measurementUnit === 'metric' ? 'kg' : 'lb'} • {profile.height}{measurementUnit === 'metric' ? 'cm' : 'ft'}</p>
@@ -654,7 +654,7 @@ export default function MealPlannerPage() {
                                 <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-1">Diet Protocol</p>
                                 <p className="font-bold capitalize">{profile.dietType}</p>
                             </div>
-                            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 col-span-2 sm:col-span-1">
+                            <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                                 <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-1">Activity Level</p>
                                 <p className="font-bold capitalize">{profile.activityLevel}</p>
                             </div>
