@@ -375,8 +375,8 @@ function FoodsContent() {
                 isCompareOpen ? "lg:w-1/2 shadow-2xl z-10" : "w-full"
             )}>
                 <div className={cn("space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100 pb-20", !isCompareOpen && "max-w-7xl mx-auto")}>
-                    {/* Hero Section */}
-                    <div className="relative h-48 rounded-[2.5rem] bg-emerald-600 overflow-hidden flex items-center px-12 group">
+                    {/* Hero Section Hidden as per user request */}
+                    {/* <div className="relative h-48 rounded-[2.5rem] bg-emerald-600 overflow-hidden flex items-center px-12 group shadow-2xl shadow-emerald-500/10 border border-emerald-400/20 mb-8">
                         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1540420773420-3366772f4999?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
                         <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-600/50 mix-blend-multiply opacity-40" />
 
@@ -440,7 +440,7 @@ function FoodsContent() {
                                 </Button>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
 
                     {/* Controls Row */}
                     <div className="flex flex-col md:flex-row gap-4 justify-center">

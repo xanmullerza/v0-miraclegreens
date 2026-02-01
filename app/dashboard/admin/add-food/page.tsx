@@ -295,8 +295,8 @@ Fat: ${item.fat_g || 0}g
                 <ArrowLeft size={14} /> Back to Admin
             </button>
 
-            {/* Hero Section */}
-            <div className="relative h-48 rounded-[2.5rem] bg-sky-600 overflow-hidden flex items-center px-12 group">
+            {/* Hero Section Hidden as per user request */}
+            {/* <div className="relative h-48 rounded-[2.5rem] bg-sky-600 overflow-hidden flex items-center px-12 group">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
                 <div className="absolute inset-0 bg-gradient-to-r from-sky-600 to-blue-600/50 mix-blend-multiply opacity-50" />
 
@@ -350,7 +350,7 @@ Fat: ${item.fat_g || 0}g
                         </Button>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             {/* Sub-Hero Actions */}
             <div className="flex justify-start">

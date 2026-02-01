@@ -127,8 +127,8 @@ export default function NutrientsHub() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
-            {/* Header Actions */}
-            <div className="flex justify-end gap-3">
+            {/* Header Actions Hidden as per user request */}
+            {/* <div className="flex justify-end gap-3">
                 <Button
                     onClick={() => router.push('/dashboard/foods')}
                     className="bg-white/50 hover:bg-white text-slate-600 dark:text-white border border-slate-200 dark:border-white/10 backdrop-blur-md shadow-sm gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
@@ -143,10 +143,10 @@ export default function NutrientsHub() {
                     <ChefHat size={14} className="group-hover/btn:scale-110 transition-transform" />
                     Recipes Hub
                 </Button>
-            </div>
+            </div> */}
 
-            {/* Hero Section */}
-            <div className="relative h-64 rounded-[2.5rem] bg-slate-900 overflow-hidden flex items-center px-12 group shadow-2xl">
+            {/* Hero Section Hidden as per user request */}
+            {/* <div className="relative h-64 rounded-[2.5rem] bg-slate-900 overflow-hidden flex items-center px-12 group shadow-2xl">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1576086213369-97a306d36557?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center mix-blend-overlay opacity-20" />
                 <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/80 to-transparent" />
 
@@ -171,7 +171,7 @@ export default function NutrientsHub() {
                         <Activity size={80} className="text-slate-800" />
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             {/* Controls Row */}
             <div className="flex flex-col md:flex-row gap-4 justify-center relative z-30">

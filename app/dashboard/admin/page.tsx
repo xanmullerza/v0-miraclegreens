@@ -57,11 +57,11 @@ export default function AdminOverview() {
 
     return (
         <div className="max-w-7xl mx-auto pb-20">
-            {/* Main Layout Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Main Layout Grid - Expanded as Hero is hidden */}
+            <div className="grid grid-cols-1 gap-6">
 
-                {/* Hero Section - 2/3 Width */}
-                <div className="lg:col-span-2 relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-10 lg:p-16 flex flex-col justify-center min-h-[450px]">
+                {/* Hero Section Hidden as per user request */}
+                {/* <div className="lg:col-span-2 relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-10 lg:p-16 flex flex-col justify-center min-h-[450px]">
                     <div className="absolute top-0 right-0 p-10 opacity-10 blur-2xl">
                         <ShieldCheck size={300} className="text-emerald-500" />
                     </div>
@@ -78,10 +78,10 @@ export default function AdminOverview() {
                             Control the core engine of Miracle Greens. Manage the global food database, curate clinical data, and architect new nutritional recipes.
                         </p>
                     </div>
-                </div>
+                </div> */}
 
-                {/* Tool Grid - 1/3 Width (2x2) */}
-                <div className="lg:col-span-1 grid grid-cols-2 gap-4">
+                {/* Tool Grid - Expanded to 4 columns on md+ screens */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {adminTools.map((tool) => (
                         <Link key={tool.href} href={tool.href} className="h-full">
                             <Card className="p-5 group hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 h-full flex flex-col">

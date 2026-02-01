@@ -460,10 +460,10 @@ export default function RecipeBuilderPage() {
                 <ArrowLeft size={14} /> Back to Admin
             </button>
 
-            {/* Hero Section */}
-            <div className="relative h-48 rounded-[2.5rem] bg-violet-600 overflow-hidden flex items-center px-12 group">
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1505935428862-770b6f24f629?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-purple-600/50 mix-blend-multiply opacity-50" />
+            {/* Hero Section Hidden as per user request */}
+            {/* <div className="relative h-48 rounded-[2.5rem] bg-violet-600 overflow-hidden flex items-center px-12 group">
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1556910103-1c02745aae4d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
+                <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600/50 mix-blend-multiply opacity-50" />
 
                 <div className="relative z-10 space-y-2">
                     <div className="flex items-center gap-3">
@@ -473,7 +473,7 @@ export default function RecipeBuilderPage() {
                         <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Recipe Builder</h1>
                     </div>
                     <p className="text-violet-50 font-medium max-w-md text-sm pl-1 uppercase tracking-tighter">
-                        Architect complex nutritional profiles with culinary precision.
+                        Create and optimize nutritionally dense recipe protocols for the global database.
                     </p>
                 </div>
 
@@ -515,7 +515,7 @@ export default function RecipeBuilderPage() {
                         </Button>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             {/* Sub-Hero Actions */}
             <div className="flex justify-start">

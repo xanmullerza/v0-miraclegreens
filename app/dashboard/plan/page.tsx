@@ -407,8 +407,8 @@ export default function MealPlannerPage() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100 pb-20">
-            {/* Hero Section */}
-            <div className="relative h-48 rounded-[2.5rem] bg-amber-600 overflow-hidden flex items-center px-12 group">
+            {/* Hero Section Hidden as per user request */}
+            {/* <div className="relative h-48 rounded-[2.5rem] bg-amber-600 overflow-hidden flex items-center px-12 group">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
                 <div className="absolute inset-0 bg-gradient-to-r from-amber-600 to-orange-600/50 mix-blend-multiply opacity-50" />
 
@@ -462,7 +462,7 @@ export default function MealPlannerPage() {
                         </Button>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-3xl p-10 shadow-sm relative overflow-hidden min-h-[600px]">
                 {step === 1 && showSummary && (
