@@ -1,8 +1,10 @@
 'use client';
 import Link from 'next/link';
-import { Menu, TreeDeciduous, ShoppingBag, LayoutGrid, Calendar, BarChart3, LayoutDashboard } from 'lucide-react';
+import { Menu, TreeDeciduous, ShoppingBag, LayoutGrid, Calendar, BarChart3, LayoutDashboard, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { supabase } from '@/lib/supabase';
+import { useState, useEffect } from 'react';
 // import { ModeToggle } from '@/components/mode-toggle';
 
 const showShop = false;
@@ -17,6 +19,22 @@ const navigation = [
 ];
 
 export function Header() {
+	const [user, setUser] = useState<any>(null);
+
+	useEffect(() => {
+		const getUser = async () => {
+			const { data: { user } } = await supabase.auth.getUser();
+			setUser(user);
+		};
+		getUser();
+
+		const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+			setUser(session?.user ?? null);
+		});
+
+		return () => subscription.unsubscribe();
+	}, []);
+
 	return (
 		<header className="sticky top-0 z-50 bg-emerald-500 border-b border-emerald-600 text-white">
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -95,13 +113,37 @@ export function Header() {
 								Browse
 							</Link>
 						</Button>
-						{showDashboard && (
-							<Button variant="secondary" size="sm" className="hidden lg:flex gap-2" asChild>
-								<Link href="/dashboard">
-									<LayoutDashboard className="h-4 w-4" />
-									Dashboard
-								</Link>
-							</Button>
+						{user ? (
+							<>
+								<Button variant="secondary" size="sm" className="hidden lg:flex gap-2" asChild>
+									<Link href="/dashboard/profile">
+										<User className="h-4 w-4" />
+										<span className="max-w-[100px] truncate">{user.email?.split('@')[0]}</span>
+									</Link>
+								</Button>
+								<Button
+									variant="ghost"
+									size="icon"
+									className="hidden lg:flex text-emerald-100 hover:text-white hover:bg-emerald-600"
+									onClick={async () => {
+										await supabase.auth.signOut();
+										setUser(null);
+										window.location.reload();
+									}}
+								>
+									<LogOut className="h-4 w-4" />
+									<span className="sr-only">Sign out</span>
+								</Button>
+							</>
+						) : (
+							showDashboard && (
+								<Button variant="secondary" size="sm" className="hidden lg:flex gap-2" asChild>
+									<Link href="/login">
+										<User className="h-4 w-4" />
+										Login
+									</Link>
+								</Button>
+							)
 						)}
 						{showPlan && (
 							<Button variant="secondary" size="sm" className="hidden sm:flex gap-2" asChild>
