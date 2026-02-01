@@ -11,12 +11,21 @@ import {
     ArrowLeft,
     Loader2,
     LogOut,
+    Trash2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { SearchProvider, useSearch } from '@/lib/context/search-context';
 import { supabase } from '@/lib/supabase';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 
 
@@ -185,16 +194,42 @@ function DashboardLayoutContent({
                                         )}
                                     </div>
                                 </Link>
-                                <button
-                                    onClick={async () => {
-                                        await supabase.auth.signOut();
-                                        window.location.href = '/';
-                                    }}
-                                    className="p-2 text-slate-400 hover:text-rose-500 transition-colors ml-1"
-                                    title="Sign out"
-                                >
-                                    <LogOut size={18} />
-                                </button>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <button
+                                            className="p-2 text-slate-400 hover:text-emerald-500 transition-colors ml-1 outline-none"
+                                            title="Account Options"
+                                        >
+                                            <LogOut size={18} />
+                                        </button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end" className="w-56">
+                                        <DropdownMenuLabel>Account Actions</DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuItem
+                                            onClick={async () => {
+                                                await supabase.auth.signOut();
+                                                window.location.href = '/';
+                                            }}
+                                            className="cursor-pointer"
+                                        >
+                                            <LogOut className="mr-2 h-4 w-4" />
+                                            <span>Sign Out</span>
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem
+                                            onClick={async () => {
+                                                await supabase.auth.signOut();
+                                                localStorage.clear();
+                                                sessionStorage.clear();
+                                                window.location.href = '/';
+                                            }}
+                                            className="cursor-pointer text-rose-500 focus:text-rose-500 focus:bg-rose-50 dark:focus:bg-rose-950/20"
+                                        >
+                                            <Trash2 className="mr-2 h-4 w-4" />
+                                            <span>Sign Out & Clear Data</span>
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                         </div>
                     </div>
