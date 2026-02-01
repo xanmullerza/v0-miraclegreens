@@ -38,6 +38,12 @@ export async function middleware(request: NextRequest) {
         if (!user) {
             return NextResponse.redirect(new URL('/login', request.url))
         }
+
+        // Restrict access to specific accounts
+        const userEmail = user.email || '';
+        if (!userEmail.includes('theodorespeak')) {
+            return NextResponse.redirect(new URL('/unauthorized', request.url))
+        }
     }
 
     return response
