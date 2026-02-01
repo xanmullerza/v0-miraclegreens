@@ -77,6 +77,21 @@ export default function RecipesPage() {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [sortField, setSortField] = useState<string>('title');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+    const [user, setUser] = useState<any>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        const getUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+            if (user) {
+                const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
+                const userEmail = (user.email || user.user_metadata?.email || '').toLowerCase();
+                setIsAdmin(userEmail === adminEmail.toLowerCase() && adminEmail !== '');
+            }
+        };
+        getUser();
+    }, []);
 
     useEffect(() => {
         fetchRecipes(0, true);
@@ -552,15 +567,17 @@ export default function RecipesPage() {
                                     {/* Action Buttons */}
                                     <div className="p-3 lg:p-0 flex justify-end lg:justify-center lg:pr-4">
                                         <div className="flex gap-2">
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    router.push(`/dashboard/recipes/${recipe.id}/edit`);
-                                                }}
-                                                className="w-8 h-8 rounded-full shadow-sm flex items-center justify-center transition-all border bg-white/90 dark:bg-slate-950/90 text-slate-400 hover:text-blue-500 border-slate-100 dark:border-slate-800"
-                                            >
-                                                <Pencil size={14} />
-                                            </button>
+                                            {isAdmin && (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        router.push(`/dashboard/recipes/${recipe.id}/edit`);
+                                                    }}
+                                                    className="w-8 h-8 rounded-full shadow-sm flex items-center justify-center transition-all border bg-white/90 dark:bg-slate-950/90 text-slate-400 hover:text-blue-500 border-slate-100 dark:border-slate-800"
+                                                >
+                                                    <Pencil size={14} />
+                                                </button>
+                                            )}
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();

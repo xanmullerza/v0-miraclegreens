@@ -85,7 +85,20 @@ export default function RecipeDetailsPage() {
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
     const [expandedBreakdownSections, setExpandedBreakdownSections] = useState<Record<string, boolean>>({});
     const [calculatedTotals, setCalculatedTotals] = useState<CalculatedNutrition | null>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
     const { profile, nutrientDisplayMode } = useUserPreferences();
+
+    useEffect(() => {
+        const getUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
+                const userEmail = (user.email || user.user_metadata?.email || '').toLowerCase();
+                setIsAdmin(userEmail === adminEmail.toLowerCase() && adminEmail !== '');
+            }
+        };
+        getUser();
+    }, []);
 
     const userRDAs = useRDA(
         typeof profile.age === 'number' ? profile.age : 30,
@@ -283,14 +296,16 @@ export default function RecipeDetailsPage() {
                     Close
                 </button>
                 <div className="flex gap-3">
-                    <Button
-                        onClick={() => router.push(`/dashboard/recipes/${id}/edit`)}
-                        variant="outline"
-                        className="rounded-2xl px-6 h-12 font-black uppercase tracking-widest gap-2 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all font-medium text-slate-600 dark:text-slate-300"
-                    >
-                        <Pencil size={18} />
-                        Edit Recipe
-                    </Button>
+                    {isAdmin && (
+                        <Button
+                            onClick={() => router.push(`/dashboard/recipes/${id}/edit`)}
+                            variant="outline"
+                            className="rounded-2xl px-6 h-12 font-black uppercase tracking-widest gap-2 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all font-medium text-slate-600 dark:text-slate-300"
+                        >
+                            <Pencil size={18} />
+                            Edit Recipe
+                        </Button>
+                    )}
                     <Button
                         onClick={toggleFavorite}
                         variant="outline"
