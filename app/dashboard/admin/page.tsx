@@ -9,7 +9,9 @@ import {
     ChefHat,
     ArrowRight,
     ShieldCheck,
-    User
+    User,
+    Edit3,
+    FileText
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -22,20 +24,28 @@ const Card = ({ children, className }: { children: React.ReactNode, className?: 
 export default function AdminOverview() {
     const adminTools = [
         {
-            name: 'Food Manager',
-            desc: 'Bulk manage the database.',
+            name: 'Bulk Manager',
+            desc: 'Category and tag management.',
             href: '/dashboard/admin/manage-foods',
             icon: Table,
             color: 'text-emerald-500',
             bg: 'bg-emerald-500/10'
         },
         {
-            name: 'Add Food',
+            name: 'Add New Food',
             desc: 'Manually enter clinical data.',
             href: '/dashboard/admin/add-food',
             icon: Plus,
             color: 'text-sky-500',
             bg: 'bg-sky-500/10'
+        },
+        {
+            name: 'Edit Food Item',
+            desc: 'Refine individual food details.',
+            href: '/dashboard/foods',
+            icon: Edit3,
+            color: 'text-orange-500',
+            bg: 'bg-orange-500/10'
         },
         {
             name: 'Recipe Architect',
@@ -46,7 +56,15 @@ export default function AdminOverview() {
             bg: 'bg-violet-500/10'
         },
         {
-            name: 'My Profile',
+            name: 'Edit Recipe',
+            desc: 'Protocol and step refinement.',
+            href: '/dashboard/recipes',
+            icon: FileText,
+            color: 'text-rose-500',
+            bg: 'bg-rose-500/10'
+        },
+        {
+            name: 'Lab Profile',
             desc: 'Manage account access.',
             href: '/dashboard/profile',
             icon: User,
