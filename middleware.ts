@@ -40,8 +40,8 @@ export async function middleware(request: NextRequest) {
         }
 
         // Restrict access to specific accounts
-        const userEmail = user.email || '';
-        if (!userEmail.includes('theodorespeak')) {
+        const userEmail = (user.email || user.user_metadata?.email || '').toLowerCase();
+        if (!userEmail.includes('theospeak')) {
             return NextResponse.redirect(new URL('/unauthorized', request.url))
         }
     }
