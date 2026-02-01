@@ -1,12 +1,7 @@
+import { createBrowserClient } from '@supabase/ssr';
 
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-// Create a client with placeholders if env vars are missing (e.g. during build)
-// Functionality will fail at runtime if these aren't provided.
-export const supabase = createClient(
-    supabaseUrl || 'https://placeholder.supabase.co',
-    supabaseKey || 'placeholder-key'
+// Create a client that uses cookies for auth sharing with server
+export const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
 );
