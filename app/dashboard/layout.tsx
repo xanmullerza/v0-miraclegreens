@@ -12,7 +12,8 @@ import {
     Loader2,
     LogOut,
     Trash2,
-    LogIn
+    LogIn,
+    ShieldCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
@@ -199,6 +200,15 @@ function DashboardLayoutContent({
                                         )}
                                     </div>
                                 </Link>
+                                {(user?.email || user?.user_metadata?.email || '').toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase() && (
+                                    <Link
+                                        href="/dashboard/admin"
+                                        className="p-2 text-slate-400 hover:text-emerald-500 transition-colors ml-1 outline-none"
+                                        title="Admin Dashboard"
+                                    >
+                                        <ShieldCheck size={18} />
+                                    </Link>
+                                )}
                                 {user ? (
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
