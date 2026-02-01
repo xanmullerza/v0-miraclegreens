@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 import {
     Leaf,
     Fish,
@@ -44,7 +46,12 @@ import {
     Scale,
     Calendar,
     Battery,
-    Layers
+    Layers,
+    Globe,
+    Heart,
+    Users,
+    Camera,
+    Database
 } from 'lucide-react';
 import {
     Sheet,
@@ -73,6 +80,8 @@ const BOOSTABLE_NUTRIENTS = [
     'Vitamin A', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)',
     'Vitamin C', 'Fiber', 'Energy', 'Protein', 'Carbs', 'Fat'
 ];
+
+const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snack'];
 
 // --- HELPERS ---
 const CAL_TO_KJ = 4.184;
@@ -158,6 +167,88 @@ const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onRegenerate }: {
     );
 };
 
+const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate }: {
+    recipe: Recipe,
+    mealLabel: string,
+    unit?: UnitType,
+    onRegenerate?: () => void
+}) => {
+    const router = useRouter();
+    return (
+        <div
+            onClick={() => router.push(`/dashboard/recipes/${recipe.id}`)}
+            className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
+        >
+            <div className="lg:grid lg:grid-cols-[120px_1fr_100px_80px_80px_80px_150px] gap-4 lg:items-center lg:px-8">
+                {/* Thumbnail */}
+                <div className="aspect-[4/3] lg:aspect-square w-full lg:w-30 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
+                    {recipe.image ? (
+                        <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center text-slate-300">
+                            <ChefHat size={24} className="opacity-20" />
+                        </div>
+                    )}
+                    <div className="absolute top-2 left-2 bg-black/60 text-white text-[8px] font-bold px-2 py-0.5 rounded-full backdrop-blur-sm uppercase">{mealLabel}</div>
+                </div>
+
+                {/* Info */}
+                <div className="p-3 lg:p-0">
+                    <h3 className="font-bold text-lg tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
+                        {recipe.title}
+                    </h3>
+                    <div className="flex items-center gap-3 mt-1">
+                        <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
+                            <Clock size={10} />
+                            {recipe.prepTime}m
+                        </div>
+                        <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
+                            <Users size={10} />
+                            {recipe.servings}P
+                        </div>
+                        <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase tracking-widest px-1.5 py-0">
+                            {recipe.type}
+                        </Badge>
+                    </div>
+                </div>
+
+                {/* Stats (Desktop View) */}
+                <div className="hidden lg:flex flex-col items-end">
+                    <span className="text-[9px] uppercase font-black text-slate-400">Energy</span>
+                    <span className="font-black text-sm text-slate-900 dark:text-white">{formatEnergy(recipe.calories, unit)}</span>
+                </div>
+                <div className="hidden lg:flex flex-col items-end">
+                    <span className="text-[9px] uppercase font-black text-slate-400">Carbs</span>
+                    <span className="font-black text-sm text-slate-900 dark:text-white">{recipe.carbs.toFixed(1)}g</span>
+                </div>
+                <div className="hidden lg:flex flex-col items-end">
+                    <span className="text-[9px] uppercase font-black text-slate-400">Fat</span>
+                    <span className="font-black text-sm text-slate-900 dark:text-white">{recipe.fat.toFixed(1)}g</span>
+                </div>
+                <div className="hidden lg:flex flex-col items-end">
+                    <span className="text-[9px] uppercase font-black text-slate-400">Protein</span>
+                    <span className="font-black text-sm text-slate-900 dark:text-white">{recipe.protein.toFixed(1)}g</span>
+                </div>
+
+                {/* Actions */}
+                <div className="p-3 lg:p-0 flex justify-end">
+                    {onRegenerate && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => { e.stopPropagation(); onRegenerate(); }}
+                            className="h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-50 dark:hover:bg-emerald-900/30 text-slate-400 hover:text-emerald-600 transition-all gap-2"
+                        >
+                            <RotateCcw size={14} />
+                            Shuffle
+                        </Button>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
 export default function MealPlannerPage() {
     const router = useRouter();
     const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -172,6 +263,11 @@ export default function MealPlannerPage() {
     const [activeBoostContext, setActiveBoostContext] = useState<'daily' | 'recipe' | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
     const [expandedBreakdownSections, setExpandedBreakdownSections] = useState<Record<string, boolean>>({});
+
+    // Browse/Filter State
+    const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [selectedTypes, setSelectedTypes] = useState<string[]>(['breakfast', 'lunch', 'dinner']);
     const {
         profile,
         energyUnit: unit,
@@ -340,7 +436,12 @@ export default function MealPlannerPage() {
     const handleGenerate = async () => {
         setGenerating(true);
         try {
-            const newPlan = await generateDailyPlan({ targetCalories: calories, diet, numMeals: 3 });
+            const newPlan = await generateDailyPlan({
+                targetCalories: calories,
+                diet,
+                numMeals: 3,
+                favoritesOnly: showFavoritesOnly
+            });
             setPlan(newPlan);
             setStep(3);
         } catch (error) { console.error(error); } finally { setGenerating(false); }
@@ -364,7 +465,7 @@ export default function MealPlannerPage() {
 
     const handleRegenerateMeal = async (mealType: 'breakfast' | 'lunch' | 'dinner', currentId: string) => {
         if (!plan) return;
-        const result = await getRandomRecipeByType(mealType, diet, currentId);
+        const result = await getRandomRecipeByType(mealType, diet, currentId, showFavoritesOnly);
         if (result) {
             const { recipe: newRecipe, micronutrients: newMicros } = result;
             setPlan(p => {
@@ -409,60 +510,131 @@ export default function MealPlannerPage() {
         <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100 pb-20">
             {/* Hero Section Hidden as per user request */}
             {/* <div className="relative h-48 rounded-[2.5rem] bg-amber-600 overflow-hidden flex items-center px-12 group">
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1490645935967-10de6ba17061?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-600 to-orange-600/50 mix-blend-multiply opacity-50" />
-
-                <div className="relative z-10 space-y-2">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
-                            <Calendar className="text-white" size={24} />
-                        </div>
-                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Plan Your Meals</h1>
-                    </div>
-                    <p className="text-amber-50 font-medium max-w-md text-sm pl-1 uppercase tracking-tighter">
-                        AI-Driven daily nutrition protocols tailored to your biological profile.
-                    </p>
-                </div>
-
-                <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-6">
-                    <div className="text-right hidden sm:block">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-amber-200 mb-1">Planner Status</p>
-                        <p className="text-3xl font-black text-white leading-none tracking-tighter italic uppercase">
-                            Step {step} <span className="text-amber-300">/ 3</span>
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                        <Button
-                            className="bg-white text-amber-600 border-none shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest pointer-events-none text-[10px]"
-                        >
-                            <Calendar size={14} />
-                            Plan Your Meals
-                        </Button>
-                        <Button
-                            onClick={() => router.push('/dashboard/recipes')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
-                        >
-                            <ChefHat size={14} className="group-hover/btn:scale-110 transition-transform" />
-                            Find Recipes
-                        </Button>
-                        <Button
-                            onClick={() => router.push('/dashboard/recipebuilder')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
-                        >
-                            <Plus size={14} className="group-hover/btn:rotate-90 transition-transform" />
-                            Create Recipe
-                        </Button>
-                        <Button
-                            onClick={() => router.push('/dashboard/foods')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
-                        >
-                            <Library size={14} className="group-hover/btn:scale-110 transition-transform" />
-                            Explore Foods
-                        </Button>
-                    </div>
-                </div>
+                ... (omitted for brevity)
             </div> */}
+
+            {/* Controls Row */}
+            <div className="flex flex-col md:flex-row gap-4 justify-center">
+                <div className="flex items-center gap-6">
+                    {/* Favorites Switch Toggle */}
+                    <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all shrink-0">
+                        <Globe
+                            size={18}
+                            className={cn(
+                                "transition-all cursor-pointer",
+                                !showFavoritesOnly ? "text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" : "text-slate-300 hover:text-slate-400"
+                            )}
+                            onClick={() => setShowFavoritesOnly(false)}
+                        />
+                        <Switch
+                            id="favorites-mode"
+                            checked={showFavoritesOnly}
+                            onCheckedChange={setShowFavoritesOnly}
+                            className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-blue-600 dark:data-[state=unchecked]:bg-blue-600"
+                        />
+                        <Heart
+                            size={18}
+                            className={cn(
+                                "transition-all cursor-pointer",
+                                showFavoritesOnly ? "text-rose-500 fill-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : "text-slate-300 hover:text-slate-400"
+                            )}
+                            onClick={() => setShowFavoritesOnly(true)}
+                        />
+                    </div>
+
+                    {/* Type Filter */}
+                    <div className="relative">
+                        <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar h-14 items-center">
+                            <button
+                                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                                className={cn(
+                                    "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300",
+                                    isFilterOpen ? "bg-emerald-600 text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                )}
+                            >
+                                <Filter size={18} />
+                                <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter</span>
+                                <ChevronDown size={14} className={cn("transition-transform", isFilterOpen && "rotate-180")} />
+                            </button>
+
+                            <div className="w-px h-6 bg-slate-200 dark:border-slate-800 mx-1" />
+
+                            {MEAL_TYPES.map(type => {
+                                const isActive = selectedTypes.includes(type);
+
+                                return (
+                                    <button
+                                        key={type}
+                                        onClick={() => {
+                                            if (isActive) {
+                                                setSelectedTypes(prev => prev.filter(t => t !== type));
+                                            } else {
+                                                setSelectedTypes(prev => [...prev, type]);
+                                            }
+                                        }}
+                                        className={cn(
+                                            "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
+                                            isActive
+                                                ? "bg-emerald-600/10 text-emerald-600 border border-emerald-600/20"
+                                                : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
+                                        )}
+                                    >
+                                        <span className="capitalize">{type}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {/* Dropdown Menu */}
+                        {isFilterOpen && (
+                            <>
+                                <div
+                                    className="fixed inset-0 z-40"
+                                    onClick={() => setIsFilterOpen(false)}
+                                />
+                                <div className="absolute top-full mt-2 left-0 w-64 bg-white dark:bg-slate-900 rounded-[1.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl z-50 p-4 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <div className="space-y-3">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2">Select Meal Types</p>
+                                        <div className="space-y-1">
+                                            {MEAL_TYPES.map(type => {
+                                                const isActive = selectedTypes.includes(type);
+                                                return (
+                                                    <div
+                                                        key={type}
+                                                        onClick={() => {
+                                                            if (isActive) {
+                                                                setSelectedTypes(prev => prev.filter(t => t !== type));
+                                                            } else {
+                                                                setSelectedTypes(prev => [...prev, type]);
+                                                            }
+                                                        }}
+                                                        className="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer group transition-colors"
+                                                    >
+                                                        <span className={cn(
+                                                            "text-xs font-bold uppercase tracking-wide transition-colors",
+                                                            isActive ? "text-emerald-600" : "text-slate-600 dark:text-slate-400"
+                                                        )}>
+                                                            {type}
+                                                        </span>
+                                                        <div className={cn(
+                                                            "w-5 h-5 rounded-lg border-2 transition-all flex items-center justify-center",
+                                                            isActive
+                                                                ? "bg-emerald-600 border-emerald-600"
+                                                                : "border-slate-200 dark:border-slate-700 group-hover:border-emerald-500/30"
+                                                        )}>
+                                                            {isActive && <Check size={12} className="text-white" />}
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </div>
 
             <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-3xl p-10 shadow-sm relative overflow-hidden min-h-[600px]">
                 {step === 1 && showSummary && (
@@ -590,11 +762,22 @@ export default function MealPlannerPage() {
                 )}
 
                 {step === 3 && plan && (
-                    <div className="space-y-8 animate-in fade-in-up duration-500">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <RecipeCard recipe={plan.breakfast} mealLabel="Breakfast" unit={unit} onRegenerate={() => handleRegenerateMeal('breakfast', plan.breakfast.id)} />
-                            <RecipeCard recipe={plan.lunch} mealLabel="Lunch" unit={unit} onRegenerate={() => handleRegenerateMeal('lunch', plan.lunch.id)} />
-                            <RecipeCard recipe={plan.dinner} mealLabel="Dinner" unit={unit} onRegenerate={() => handleRegenerateMeal('dinner', plan.dinner.id)} />
+                    <div className="space-y-6 animate-in fade-in-up duration-500">
+                        {/* List Header */}
+                        <div className="hidden lg:grid lg:grid-cols-[120px_1fr_100px_80px_80px_80px_150px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                            <div className="flex items-center gap-2"><Camera size={14} /> Plate</div>
+                            <div className="flex items-center gap-2"><ChefHat size={14} /> Meal Details</div>
+                            <div className="text-right flex items-center justify-end gap-2"><Zap size={14} /> Energy</div>
+                            <div className="text-right flex items-center justify-end gap-2"><Wheat size={14} /> Carbs</div>
+                            <div className="text-right flex items-center justify-end gap-2"><Droplet size={14} /> Fat</div>
+                            <div className="text-right flex items-center justify-end gap-2"><Beef size={14} /> Protein</div>
+                            <div className="text-right flex items-center justify-end gap-2"><Activity size={14} /> Control</div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <RecipeListItem recipe={plan.breakfast} mealLabel="Breakfast" unit={unit} onRegenerate={() => handleRegenerateMeal('breakfast', plan.breakfast.id)} />
+                            <RecipeListItem recipe={plan.lunch} mealLabel="Lunch" unit={unit} onRegenerate={() => handleRegenerateMeal('lunch', plan.lunch.id)} />
+                            <RecipeListItem recipe={plan.dinner} mealLabel="Dinner" unit={unit} onRegenerate={() => handleRegenerateMeal('dinner', plan.dinner.id)} />
                         </div>
 
                         <div className="space-y-4 pt-10 border-t">

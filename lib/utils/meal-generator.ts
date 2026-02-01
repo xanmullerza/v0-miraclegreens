@@ -6,6 +6,7 @@ interface PlanSettings {
     targetCalories: number;
     diet: DietType;
     numMeals: number; // 3 or 4 or 5 (3 meals + 0/1/2 snacks)
+    favoritesOnly?: boolean;
 }
 
 export interface DailyPlan {
@@ -31,6 +32,36 @@ export interface DailyPlan {
 const getRandom = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 
 /**
+ * Helper function to calculate nutrition including micronutrients
+ */
+const calculateNutrition = (ingredients: any[]) => {
+    let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0, totalEnergyKj = 0;
+    const micronutrients: Record<string, number> = {};
+
+    for (const ing of ingredients) {
+        if (ing.food_items && ing.weight_g) {
+            const foodItem = ing.food_items;
+            const ratio = ing.weight_g / 100;
+            totalCalories += (foodItem.energy_kcal || 0) * ratio;
+            totalEnergyKj += (foodItem.energy_kj || 0) * ratio;
+            totalProtein += (foodItem.protein_g || 0) * ratio;
+            totalCarbs += (foodItem.carbs_g || 0) * ratio;
+            totalFat += (foodItem.fat_g || 0) * ratio;
+
+            // Aggregate micronutrients
+            if (foodItem.micronutrients && typeof foodItem.micronutrients === 'object') {
+                Object.entries(foodItem.micronutrients).forEach(([key, val]) => {
+                    if (typeof val === 'number') {
+                        micronutrients[key] = (micronutrients[key] || 0) + val * ratio;
+                    }
+                });
+            }
+        }
+    }
+    return { calories: totalCalories, energyKj: totalEnergyKj, protein: totalProtein, carbs: totalCarbs, fat: totalFat, micronutrients };
+};
+
+/**
  * Get a random recipe of a specific type (for individual meal regeneration).
  * Optionally exclude a specific recipe ID to ensure variety.
  * Returns both the recipe and its calculated micronutrients.
@@ -38,9 +69,10 @@ const getRandom = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)
 export const getRandomRecipeByType = async (
     mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack',
     diet: DietType,
-    excludeId?: string
+    excludeId?: string,
+    favoritesOnly?: boolean
 ): Promise<{ recipe: Recipe; micronutrients: Record<string, number> } | null> => {
-    const { data: recipesData, error } = await supabase
+    let query = supabase
         .from('recipes')
         .select(`
             *,
@@ -52,37 +84,15 @@ export const getRandomRecipeByType = async (
         `)
         .eq('type', mealType);
 
+    if (favoritesOnly) {
+        query = query.eq('is_favorite', true);
+    }
+
+    const { data: recipesData, error } = await query;
+
     if (error || !recipesData || recipesData.length === 0) {
         return null;
     }
-
-    // Helper function to calculate nutrition including micronutrients
-    const calculateNutrition = (ingredients: any[]) => {
-        let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0, totalEnergyKj = 0;
-        const micronutrients: Record<string, number> = {};
-
-        for (const ing of ingredients) {
-            if (ing.food_items && ing.weight_g) {
-                const foodItem = ing.food_items;
-                const ratio = ing.weight_g / 100;
-                totalCalories += (foodItem.energy_kcal || 0) * ratio;
-                totalEnergyKj += (foodItem.energy_kj || 0) * ratio;
-                totalProtein += (foodItem.protein_g || 0) * ratio;
-                totalCarbs += (foodItem.carbs_g || 0) * ratio;
-                totalFat += (foodItem.fat_g || 0) * ratio;
-
-                // Aggregate micronutrients
-                if (foodItem.micronutrients && typeof foodItem.micronutrients === 'object') {
-                    Object.entries(foodItem.micronutrients).forEach(([key, val]) => {
-                        if (typeof val === 'number') {
-                            micronutrients[key] = (micronutrients[key] || 0) + val * ratio;
-                        }
-                    });
-                }
-            }
-        }
-        return { calories: totalCalories, energyKj: totalEnergyKj, protein: totalProtein, carbs: totalCarbs, fat: totalFat, micronutrients };
-    };
 
     // Transform and filter
     const recipesWithMicro: { recipe: Recipe; micronutrients: Record<string, number> }[] = recipesData
@@ -105,7 +115,6 @@ export const getRandomRecipeByType = async (
                     id: r.id,
                     title: r.title,
                     type: r.type,
-                    // Values are assumed to be stored per-serving in the database now
                     calories: calculatedNutrition.calories || r.calories || 0,
                     energyKj: calculatedNutrition.energyKj || r.energy_kj || 0,
                     protein: calculatedNutrition.protein || r.protein || 0,
@@ -123,7 +132,7 @@ export const getRandomRecipeByType = async (
                         measureLabel: i.measure_label
                     })),
                     instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
-                    servings: 1 // Default to 1 serving for a meal plan, regardless of yield
+                    servings: 1
                 },
                 micronutrients: calculatedNutrition.micronutrients
             };
@@ -138,10 +147,10 @@ export const getRandomRecipeByType = async (
  * Now Async to fetch from Supabase.
  */
 export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPlan> => {
-    const { targetCalories, diet, numMeals } = settings;
+    const { favoritesOnly, targetCalories, diet, numMeals } = settings;
 
-    // Fetch all recipes from Supabase with their related data AND linked food items
-    const { data: recipesData, error } = await supabase
+    // Fetch recipes from Supabase
+    let query = supabase
         .from('recipes')
         .select(`
             *,
@@ -152,60 +161,21 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
             instructions (*)
         `);
 
+    if (favoritesOnly) {
+        query = query.eq('is_favorite', true);
+    }
+
+    const { data: recipesData, error } = await query;
+
     if (error || !recipesData) {
         console.error('Error fetching recipes:', error);
         throw new Error('Failed to fetch recipes');
     }
 
-    // Helper function to calculate nutrition from ingredients
-    const calculateNutrition = (ingredients: any[]) => {
-        let totalCalories = 0;
-        let totalEnergyKj = 0;
-        let totalProtein = 0;
-        let totalCarbs = 0;
-        let totalFat = 0;
-        const micronutrients: Record<string, number> = {};
-
-        for (const ing of ingredients) {
-            // If ingredient is linked to food_items, calculate from there
-            if (ing.food_items && ing.weight_g) {
-                const foodItem = ing.food_items;
-                const ratio = ing.weight_g / 100; // Convert to per-100g basis
-
-                totalCalories += (foodItem.energy_kcal || 0) * ratio;
-                totalEnergyKj += (foodItem.energy_kj || 0) * ratio;
-                totalProtein += (foodItem.protein_g || 0) * ratio;
-                totalCarbs += (foodItem.carbs_g || 0) * ratio;
-                totalFat += (foodItem.fat_g || 0) * ratio;
-
-                // Aggregate micronutrients
-                if (foodItem.micronutrients && typeof foodItem.micronutrients === 'object') {
-                    Object.entries(foodItem.micronutrients).forEach(([key, val]) => {
-                        if (typeof val === 'number') {
-                            micronutrients[key] = (micronutrients[key] || 0) + val * ratio;
-                        }
-                    });
-                }
-            }
-        }
-
-        return {
-            calories: totalCalories,
-            energyKj: totalEnergyKj,
-            protein: totalProtein,
-            carbs: totalCarbs,
-            fat: totalFat,
-            micronutrients
-        };
-    };
-
     // Transform Supabase data to match Recipe interface
-    // IMPORTANT: Nutrition is now CALCULATED from ingredients, not stored values
-    // We also store micronutrients in a separate map for aggregation
     const recipeMicronutrients: Record<string, Record<string, number>> = {};
 
     const allRecipes: Recipe[] = recipesData.map((r: any) => {
-        const servings = r.servings || 1;
         const calculatedNutrition = calculateNutrition(r.ingredients);
 
         // Store micronutrients keyed by recipe ID
@@ -215,7 +185,6 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
             id: r.id,
             title: r.title,
             type: r.type,
-            // Use per-serving values directly from the database
             calories: calculatedNutrition.calories || r.calories || 0,
             energyKj: calculatedNutrition.energyKj || r.energy_kj || 0,
             protein: calculatedNutrition.protein || r.protein || 0,
@@ -233,7 +202,7 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
                 measureLabel: i.measure_label
             })),
             instructions: r.instructions.sort((a: any, b: any) => a.step_order - b.step_order).map((i: any) => i.step_text),
-            servings: 1 // Default to 1 serving for the generated meal plan
+            servings: 1
         };
     });
 
@@ -259,12 +228,10 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
     const dinnerOpts = getRecipesByDiet({ startRecipes: allRecipes, diet, type: 'dinner' });
     const snackOpts = getRecipesByDiet({ startRecipes: allRecipes, diet, type: 'snack' });
 
-    // Fallback if no recipes found for a category (shouldn't happen with seeded data but good safety)
     if (!breakfastOpts.length || !lunchOpts.length || !dinnerOpts.length) {
         throw new Error('Insufficient recipes for the selected criteria.');
     }
 
-    // Helper to aggregate micronutrients from array of recipe IDs
     const aggregateMicronutrients = (recipeIds: string[]): Record<string, number> => {
         const result: Record<string, number> = {};
         recipeIds.forEach(id => {
@@ -278,7 +245,6 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
         return result;
     };
 
-    // Simple brute-force retry up to 20 times to find a "close enough" match
     let bestPlan: DailyPlan | null = null;
     let minDiff = Infinity;
 
@@ -300,11 +266,9 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
         const totalEnergyKj = (b.energyKj || 0) + (l.energyKj || 0) + (d.energyKj || 0) + snacks.reduce((acc, s) => acc + (s.energyKj || 0), 0);
         const diff = Math.abs(targetCalories - totalCalories);
 
-        // Aggregate micronutrients for all selected recipes
         const allRecipeIds = [b.id, l.id, d.id, ...snacks.map(s => s.id)];
         const aggregatedMicro = aggregateMicronutrients(allRecipeIds);
 
-        // Build recipeMicronutrients map for this specific plan
         const planRecipeMicros: Record<string, Record<string, number>> = {};
         allRecipeIds.forEach(id => {
             planRecipeMicros[id] = recipeMicronutrients[id] || {};
@@ -331,7 +295,6 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
             bestPlan = currentPlan;
         }
 
-        // 10% tolerance
         if (diff / targetCalories < 0.1) {
             break;
         }
@@ -371,7 +334,6 @@ export const generateShoppingList = (plan: DailyPlan): ShoppingItem[] => {
     const itemMap = new Map<string, ShoppingItem>();
 
     allIngredients.forEach(ing => {
-        // Use base_ingredient for shopping list grouping (e.g., "Egg" instead of "Egg, Scrambled")
         const shoppingName = ing.baseIngredient || ing.item;
 
         const existing = itemMap.get(shoppingName);
@@ -387,7 +349,6 @@ export const generateShoppingList = (plan: DailyPlan): ShoppingItem[] => {
     });
 
     return Array.from(itemMap.values()).sort((a, b) => {
-        // Miracle products first, then alphabetical
         if (a.isMiracleProduct && !b.isMiracleProduct) return -1;
         if (!a.isMiracleProduct && b.isMiracleProduct) return 1;
         return a.name.localeCompare(b.name);
