@@ -9,9 +9,10 @@ import {
     ChefHat,
     Library,
     User,
-    BarChart3,
     ArrowRight,
-    ShieldCheck
+    ShieldCheck,
+    Scale,
+    Calendar
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -81,6 +82,22 @@ export default function DashboardOverview() {
             bg: 'bg-blue-500/10'
         },
         {
+            name: 'Compare Foods',
+            desc: 'Analyze and compare nutritional profiles side-by-side.',
+            href: '/dashboard/compare',
+            icon: Scale,
+            color: 'text-orange-500',
+            bg: 'bg-orange-500/10'
+        },
+        {
+            name: 'Meal Planner',
+            desc: 'Generate optimized daily nutrition protocols.',
+            href: '/dashboard/plan',
+            icon: Calendar,
+            color: 'text-rose-500',
+            bg: 'bg-rose-500/10'
+        },
+        {
             name: 'My Profile',
             desc: 'Manage your personal settings and lab access.',
             href: '/dashboard/profile',
@@ -125,19 +142,19 @@ export default function DashboardOverview() {
                     </div>
                 </div>
 
-                {/* Cards Grid - Takes 1/3 width, 2x2 layout */}
-                <div className="lg:col-span-1 grid grid-cols-2 gap-4">
+                {/* Cards Grid - Takes 1/3 width, grid layout */}
+                <div className="lg:col-span-1 grid grid-cols-2 gap-4 auto-rows-fr">
                     {tools.map((tool) => (
                         <Link key={tool.href} href={tool.href}>
-                            <Card className="p-5 group hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 h-full flex flex-col">
-                                <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:rotate-6", tool.bg, tool.color)}>
-                                    <tool.icon size={20} />
+                            <Card className="p-4 group hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 h-full flex flex-col">
+                                <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center mb-3 transition-transform group-hover:rotate-6", tool.bg, tool.color)}>
+                                    <tool.icon size={18} />
                                 </div>
-                                <h3 className="text-sm font-bold tracking-tight mb-1.5 group-hover:text-emerald-500 transition-colors">{tool.name}</h3>
-                                <p className="text-[11px] text-slate-500 leading-relaxed mb-3 flex-grow line-clamp-2">{tool.desc}</p>
-                                <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-slate-400 group-hover:text-emerald-500 transition-colors">
+                                <h3 className="text-xs font-bold tracking-tight mb-1 group-hover:text-emerald-500 transition-colors uppercase">{tool.name}</h3>
+                                <p className="text-[10px] text-slate-500 leading-tight mb-2 flex-grow line-clamp-2">{tool.desc}</p>
+                                <div className="flex items-center gap-1 text-[7px] font-black uppercase tracking-widest text-slate-400 group-hover:text-emerald-500 transition-colors">
                                     Open
-                                    <ArrowRight size={10} className="group-hover:translate-x-0.5 transition-transform" />
+                                    <ArrowRight size={8} className="group-hover:translate-x-0.5 transition-transform" />
                                 </div>
                             </Card>
                         </Link>
