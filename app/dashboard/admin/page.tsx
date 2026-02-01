@@ -61,7 +61,7 @@ export default function AdminOverview() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 {/* Hero Section - 2/3 Width */}
-                <div className="lg:col-span-2 relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-10 lg:p-16 flex flex-col justify-center min-h-[450px]">
+                <div className="lg:col-span-2 relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-10 lg:p-16 flex flex-col justify-center min-h-[400px]">
                     <div className="absolute top-0 right-0 p-10 opacity-10 blur-2xl">
                         <ShieldCheck size={300} className="text-emerald-500" />
                     </div>
@@ -71,10 +71,10 @@ export default function AdminOverview() {
                             <Settings size={12} className="fill-current" />
                             Admin Headquarters
                         </div>
-                        <h1 className="text-4xl lg:text-6xl font-black text-white tracking-tighter leading-[0.9] mb-8 italic uppercase">
+                        <h1 className="text-3xl lg:text-5xl font-black text-white tracking-tighter leading-[0.9] mb-6 italic uppercase">
                             Lab <span className="text-emerald-500">Administration.</span>
                         </h1>
-                        <p className="text-lg text-slate-400 leading-relaxed">
+                        <p className="text-base text-slate-400 leading-relaxed">
                             Control the core engine of Miracle Greens. Manage the global food database, curate clinical data, and architect new nutritional recipes.
                         </p>
                     </div>
@@ -88,8 +88,8 @@ export default function AdminOverview() {
                                 <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:rotate-6", tool.bg, tool.color)}>
                                     <tool.icon size={20} />
                                 </div>
-                                <h3 className="text-xs font-black tracking-tight mb-1.5 group-hover:text-emerald-500 transition-colors uppercase italic">{tool.name}</h3>
-                                <p className="text-[10px] text-slate-500 leading-relaxed mb-4 flex-grow line-clamp-2">{tool.desc}</p>
+                                <h3 className="text-sm font-bold tracking-tight mb-1.5 group-hover:text-emerald-500 transition-colors uppercase italic">{tool.name}</h3>
+                                <p className="text-[11px] text-slate-500 leading-relaxed mb-3 flex-grow line-clamp-2">{tool.desc}</p>
                                 <div className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest text-slate-400 group-hover:text-emerald-500 transition-colors">
                                     Launch
                                     <ArrowRight size={10} className="group-hover:translate-x-0.5 transition-transform" />
