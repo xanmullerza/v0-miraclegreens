@@ -41,7 +41,10 @@ export async function middleware(request: NextRequest) {
 
         // Restrict access to specific accounts
         const userEmail = (user.email || user.user_metadata?.email || '').toLowerCase();
-        if (!userEmail.includes('theospeak')) {
+        const adminEmail = (process.env.ADMIN_EMAIL || '').toLowerCase();
+
+        // Secure Check: Exact match against environment variable
+        if (!adminEmail || userEmail !== adminEmail) {
             return NextResponse.redirect(new URL('/unauthorized', request.url))
         }
     }
