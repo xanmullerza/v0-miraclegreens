@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { SearchProvider, useSearch } from '@/lib/context/search-context';
+import { supabase } from '@/lib/supabase';
 
 
 
@@ -28,6 +29,15 @@ function DashboardLayoutContent({
     const pathname = usePathname();
     const { profile } = useUserPreferences();
     const { searchQuery, setSearchQuery, results, isLoading, isFocused, setIsFocused, onResultClickRef, searchInputRef, keepFocusAfterSelect } = useSearch();
+    const [user, setUser] = useState<any>(null);
+
+    useEffect(() => {
+        const getUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+        };
+        getUser();
+    }, []);
 
     // Reset search when changing pages
     useEffect(() => {
@@ -163,11 +173,15 @@ function DashboardLayoutContent({
                                     className="flex items-center gap-3 px-2 py-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
                                 >
                                     <div className="text-right hidden sm:block">
-                                        <p className="text-xs font-bold leading-none">{profile.nickname || profile.name || 'Guest Researcher'}</p>
+                                        <p className="text-xs font-bold leading-none">{user?.user_metadata?.full_name || profile.nickname || profile.name || 'Guest Researcher'}</p>
                                         <p className="text-[10px] text-slate-400 font-medium">Lab Access</p>
                                     </div>
-                                    <div className="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500 group-hover:text-emerald-500 transition-colors">
-                                        <User size={18} />
+                                    <div className="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500 group-hover:text-emerald-500 transition-colors overflow-hidden">
+                                        {user?.user_metadata?.avatar_url ? (
+                                            <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <User size={18} />
+                                        )}
                                     </div>
                                 </Link>
                             </div>
