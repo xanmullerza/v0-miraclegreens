@@ -66,7 +66,7 @@ interface FoodItem {
     category?: string;
 }
 
-const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
+const CATEGORIES = ["General", "Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
 
 function FoodsContent() {
     const router = useRouter();
@@ -150,7 +150,7 @@ function FoodsContent() {
             setHasMore(count ? (isNewSearch ? newItems.length : foods.length + newItems.length) < count : false);
         } catch (error) {
             console.error('Error fetching foods:', error);
-            toast.error('Failed to load food library');
+            toast.error(`Failed to load food library: ${(error as any)?.message || 'Unknown error'}`);
         } finally {
             setLoading(false);
             setLoadingMore(false);
@@ -368,7 +368,7 @@ function FoodsContent() {
     };
 
     return (
-        <div className="flex flex-col lg:flex-row -mx-8 -mt-8 h-[calc(100vh-128px)] overflow-hidden bg-slate-50 dark:bg-[#020617] relative">
+        <div className="flex flex-col lg:flex-row -mx-8 -mt-8 min-h-[calc(100vh-128px)] bg-slate-50 dark:bg-[#020617] relative">
             {/* Library Panel */}
             <div className={cn(
                 "h-full overflow-y-auto custom-scrollbar transition-all duration-500 ease-in-out p-8 relative",

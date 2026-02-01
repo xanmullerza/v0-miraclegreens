@@ -51,7 +51,7 @@ interface FoodItem {
     sub_category: string | null;
 }
 
-const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
+const CATEGORIES = ["General", "Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
 
 export default function MyFoodsPage() {
     const router = useRouter();
@@ -113,7 +113,7 @@ export default function MyFoodsPage() {
             setHasMore(count ? (isNewSearch ? newItems.length : favorites.length + newItems.length) < count : false);
         } catch (error) {
             console.error('Error fetching favorites:', error);
-            toast.error('Failed to load your foods');
+            toast.error(`Failed to load your foods: ${(error as any)?.message || 'Unknown error'}`);
         } finally {
             setLoading(false);
             setLoadingMore(false);
