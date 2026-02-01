@@ -28,8 +28,10 @@ import {
     Sun,
     Monitor,
     ChevronRight,
-    Save
+    Save,
+    LogOut
 } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -130,6 +132,16 @@ export default function ProfilePage() {
                         >
                             <Library size={14} className="group-hover/btn:scale-110 transition-transform" />
                             Foods Hub
+                        </Button>
+                        <Button
+                            onClick={async () => {
+                                await supabase.auth.signOut();
+                                window.location.href = '/';
+                            }}
+                            className="bg-rose-500/80 hover:bg-rose-600 text-white border border-rose-400/50 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px] col-span-2"
+                        >
+                            <LogOut size={14} className="group-hover/btn:scale-110 transition-transform" />
+                            Sign Out Securely
                         </Button>
                     </div>
                 </div>

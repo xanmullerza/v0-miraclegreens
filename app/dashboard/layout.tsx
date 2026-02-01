@@ -10,6 +10,7 @@ import {
     User,
     ArrowLeft,
     Loader2,
+    LogOut,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
@@ -184,6 +185,16 @@ function DashboardLayoutContent({
                                         )}
                                     </div>
                                 </Link>
+                                <button
+                                    onClick={async () => {
+                                        await supabase.auth.signOut();
+                                        window.location.href = '/';
+                                    }}
+                                    className="p-2 text-slate-400 hover:text-rose-500 transition-colors ml-1"
+                                    title="Sign out"
+                                >
+                                    <LogOut size={18} />
+                                </button>
                             </div>
                         </div>
                     </div>
