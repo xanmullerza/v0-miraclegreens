@@ -7,21 +7,21 @@ const testimonials = [
     role: 'Community Health Director',
     image: '/african-woman-doctor-professional-headshot.jpg',
     content:
-      "The quality of Miracle Greens' moringa capsules is exceptional. They've clearly partnered with the best growers — and I can only imagine the impact once they're growing and processing their own trees.",
+      "The quality of Vitala's nutritional protocols is exceptional. They've built a platform that truly understands biological needs — I've seen a massive shift in how our patients approach their daily eating habits.",
   },
   {
     name: 'Samuel Ndlovu',
-    role: 'Moringa Supplier Partner',
+    role: 'Nutrition Research Partner',
     image: '/african-man-farmer-headshot.jpg',
     content:
-      "I've been supplying moringa powder for years. Miracle Greens insists on the highest quality — only the best leaves, properly dried. Their vision to grow their own is the right next step.",
+      "Vitala insists on the highest standards of data integrity and food quality. Their vision to provide personalized, science-backed nutrition for everyone is exactly what the industry needs.",
   },
   {
     name: 'Maria Santos',
-    role: 'NGO Partner Coordinator',
+    role: 'Wellness Coordinator',
     image: '/latina-woman-nonprofit-worker-headshot.jpg',
     content:
-      "The R500 Eternal Tree initiative is brilliant. It's not just a donation — sponsors become part of a sustainable solution that will keep producing nutrition for decades.",
+      "The Vitala Biological Protocol is brilliant. It's not just a meal planner — it's an education system that empowers people to take control of their health through density-focused nutrition.",
   },
 ];
 

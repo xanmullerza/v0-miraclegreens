@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
-export function MoringaMalnutrition() {
+export function NutritionImpact() {
     return (
         <section className="py-16 md:py-24 bg-muted/30">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -20,21 +20,16 @@ export function MoringaMalnutrition() {
                             Our Mission
                         </p>
                         <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground mb-4">
-                            Moringa in the Fight Against Malnutrition
+                            The Fight Against Malnutrition
                         </h2>
                         <p className="text-muted-foreground leading-relaxed mb-4">
-                            The World Health Organization recognizes moringa as a key solution for addressing
-                            malnutrition in developing countries. Just 6 spoonfuls of moringa powder can meet a
-                            child&apos;s daily iron and calcium needs.
+                            High-density nutrition is the foundation of human performance and health. By optimizing the intake of micronutrients and essential minerals, we can address malnutrition and energy deficits globally.
                         </p>
                         <p className="text-muted-foreground leading-relaxed mb-4">
-                            For nursing mothers, moringa has been shown to significantly increase breast milk
-                            production and nutritional quality, giving babies the best possible start in life.
+                            For developing communities, access to nutrient-dense protocols and superfoods can be life-changing, providing a sustainable way to meet daily biological requirements.
                         </p>
                         <p className="text-muted-foreground leading-relaxed">
-                            This is why Miracle Greens is committed to distributing moringa capsules to those
-                            who need them most. When you support us, you&apos;re helping bring this superfood to
-                            communities fighting hunger and malnutrition.
+                            This is why Vitala is committed to making nutritional intelligence accessible to everyone. We believe that better choices lead to better lives, regardless of where you are in the world.
                         </p>
                     </div>
                 </div>

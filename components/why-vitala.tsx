@@ -6,79 +6,74 @@ import Image from 'next/image';
 const benefits = [
 	{
 		icon: Leaf,
-		title: 'Rich in Nutrients',
+		title: 'Nutrient Density',
 		description:
-			'Moringa contains vitamins A, C, E, calcium, potassium, and protein – essential nutrients for fighting malnutrition.',
+			'Prioritize foods with the highest concentration of vitamins and minerals per calorie.',
 	},
 	{
 		icon: Shield,
-		title: 'Immune Booster',
+		title: 'Immune Resilience',
 		description:
-			"Rich in vitamin C, vitamin A, and iron to strengthen your body's natural defenses.",
+			"Optimize your intake of vitamins C, A, and Zinc to strengthen natural defenses.",
 	},
 	{
 		icon: Zap,
-		title: 'Energy Booster',
+		title: 'Metabolic Energy',
 		description:
-			'Packed with B vitamins and iron to combat fatigue and increase natural energy levels.',
+			'Fuel your cells with precise micronutrients that drive ATP production and vitality.',
 	},
 	{
 		icon: Brain,
-		title: 'Brain Health',
+		title: 'Cognitive Clarity',
 		description:
-			'Contains antioxidants and neuro-enhancers that support cognitive function, mental clarity, and healthy development.',
+			'Support neuro-regeneration and focus through antioxidant-rich biological protocols.',
 	},
 	{
 		icon: Heart,
-		title: 'Heart Health',
-		description: 'Helps maintain healthy cholesterol levels and supports cardiovascular function.',
+		title: 'Cardiac Health',
+		description: 'Maintain cardiovascular efficiency through electrolyte and lipid balance.',
 	},
 	{
 		icon: Bone,
-		title: 'Strong Bones',
+		title: 'Structural Integrity',
 		description:
-			'High levels of calcium and phosphorus support bone development and help prevent osteoporosis.',
+			'Optimize bone and joint health through bioavailable calcium and mineral profiles.',
 	},
 	{
 		icon: Leaf,
-		title: 'Anti-Inflammatory',
-		description: 'Contains isothiocyanates that help reduce inflammation throughout the body.',
+		title: 'Bio-Efficiency',
+		description: 'Focus on foods with high bioavailability for maximum systemic absorption.',
 	},
 	{
 		icon: Sparkles,
-		title: 'Complete Nutrition',
-		description: 'All 9 essential amino acids, 27 vitamins, and 46 antioxidants in one superfood.',
+		title: 'Protocol Precision',
+		description: 'Data-driven meal plans tailored to your unique biological requirements.',
 	},
 ];
 
-export function WhyMoringa() {
+export function WhyVitala() {
 	return (
-		<section id="why-moringa" className="py-16 md:py-24 bg-muted/30">
+		<section id="why-vitala" className="py-16 md:py-24 bg-muted/30">
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				<div className="grid lg:grid-cols-2 gap-12 items-center mb-12">
 					<div>
 						<p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">
-							The Miracle Tree
+							Biological Intelligence
 						</p>
 						<h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground mb-4">
-							Why Moringa?
+							Why Vitala?
 						</h2>
 						<p className="text-muted-foreground leading-relaxed mb-4">
-							Moringa oleifera, known as the &quot;Miracle Tree&quot; or &quot;Tree of Life,&quot;
-							has been used for centuries across Africa and Asia for its remarkable nutritional and
-							medicinal properties. Every part of this extraordinary plant offers benefits.
+							Optimal health isn't built on generic advice. It's built on <strong>biological precision</strong>. Vitala connects the dots between clinical data and your daily plate, ensuring every bite serves a purpose.
 						</p>
 						<p className="text-muted-foreground leading-relaxed">
-							Its leaves contain more vitamin A than carrots, more calcium than milk,
-							more iron than spinach, and more potassium than bananas. By growing moringa and
-							distributing its benefits, we're providing a sustainable
-							solution to nutritional deficiency in underserved communities.
+							By focusing on high-density nutrition and bio-efficiency, we help you navigate the complex world of food choices. Whether you're optimizing performance or fighting deficiency, our protocols provide a data-driven path to wellness.
 						</p>
 					</div>
 					<div className="relative aspect-[4/3] rounded-2xl overflow-hidden">
 						<Image
-							src="/moringa-leaves-close-up-green-vibrant-natural-supe.jpg"
-							alt="Fresh moringa leaves"
+							src="/vitala-high-density-foods.png"
+							alt="High-density whole foods"
 							fill
 							className="object-cover"
 						/>

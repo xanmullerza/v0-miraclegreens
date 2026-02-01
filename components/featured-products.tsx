@@ -15,52 +15,52 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 
-const moringaBenefits = [
+const nutritionalMarkers = [
   {
     icon: Leaf,
-    title: 'Rich in Nutrients',
+    title: 'Nutrient Concentration',
     description:
-      'Moringa contains vitamins A, C, E, calcium, potassium, and protein – essential nutrients for fighting malnutrition.',
+      'Identifying whole foods with the highest concentration of essential vitamins for systemic health.',
   },
   {
     icon: Heart,
-    title: 'Supports Heart Health',
+    title: 'Cardiovascular Support',
     description:
-      'The antioxidants in moringa help lower cholesterol and support cardiovascular health in communities we serve.',
+      'Designing protocols that optimize lipid profiles and electrolyte balance for heart efficiency.',
   },
   {
     icon: Zap,
-    title: 'Natural Energy Boost',
+    title: 'Biological Energy',
     description:
-      'Iron-rich moringa helps combat fatigue and anemia, providing sustainable energy for daily activities.',
+      'Focusing on iron-rich and B-vitamin complexes that drive cellular energy production.',
   },
   {
     icon: Shield,
-    title: 'Immune Support',
+    title: 'Immune Resilience',
     description:
-      'High vitamin C content strengthens immune systems, protecting vulnerable populations from illness.',
+      'Using micronutrient data to build natural defenses against oxidative stress and infection.',
   },
   {
     icon: Brain,
-    title: 'Cognitive Function',
+    title: 'Neuro-Enhancement',
     description:
-      'Antioxidants and neuro-enhancers in moringa support brain health and cognitive development in children.',
+      'Selecting antioxidants and healthy fats known to support cognitive function and mental longevity.',
   },
   {
     icon: Bone,
-    title: 'Strong Bones',
+    title: 'Mineral Integrity',
     description:
-      'Calcium and phosphorus content supports bone development and helps prevent osteoporosis.',
+      'Ensuring precise intake of calcium, phosphorus, and vitamin D for skeletal strength.',
   },
 ];
 
 const sponsorBenefits = [
-  'Your tree produces leaves for many years',
-  'Each tree yields thousands of capsules annually',
-  "Full transparency on your tree's impact",
-  'Certificate of sponsorship with tree location',
-  'Regular updates on harvest and distribution',
-  'Your name on our Wall of Growth',
+  'Data points for personalized meal protocols',
+  'Advanced clinical nutritional research',
+  'Global food accessibility initiatives',
+  'Priority access to future biological tools',
+  'Digital certificate of nutritional impact',
+  'Your name on our Research Wall',
 ];
 
 export function FeaturedProducts() {
@@ -71,20 +71,16 @@ export function FeaturedProducts() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">
-                Help Us Grow
+                Advancing Science
               </p>
               <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground mb-6">
-                Invest in an Eternal Moringa Tree
+                Invest in Nutritional Intelligence
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                Right now, we source our moringa powder from trusted growers. But our vision is
-                bigger — we want to grow and process our own trees. This means lower costs, better
-                quality control, and the ability to help even more families.
+                Our legacy began with Moringa, but the future of Vitala is a global data ecosystem. We are building the tools to map every nutrient to its biological outcome, making optimal health an accessible reality for everyone.
               </p>
               <p className="text-muted-foreground leading-relaxed mb-6">
-                By sponsoring an Eternal Moringa Tree for R500, you are investing in our future.
-                Your tree will be planted on our farm and will produce leaves for years to come,
-                with every leaf processed for the community. Truly a gift that keeps giving.
+                By supporting Vitala research for R500, you are funding the development of our open-source nutritional databases and the distribution of high-density meal protocols to communities in need. Join the optimization revolution.
               </p>
 
               <div className="space-y-3 mb-8">

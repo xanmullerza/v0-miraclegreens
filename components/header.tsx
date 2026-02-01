@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Menu, TreeDeciduous, ShoppingBag, LayoutGrid, Calendar, BarChart3, LayoutDashboard, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -12,10 +13,10 @@ const showPlan = false;
 const showDashboard = true;
 
 const navigation = [
-	{ name: 'Our Story', href: '#story' },
-	{ name: 'How It Works', href: '#how-it-works' },
+	{ name: 'The Vision', href: '#story' },
+	{ name: 'The Protocol', href: '#how-it-works' },
 	...(showShop ? [{ name: 'Shop', href: '/shop' }] : []),
-	{ name: 'Our Vision', href: '/vision' },
+	{ name: 'Research', href: '/browse' },
 ];
 
 export function Header() {
@@ -100,9 +101,15 @@ export function Header() {
 
 					{/* Logo */}
 					<Link href="/" className="flex items-center gap-2">
-						<span className="font-serif text-xl md:text-2xl font-semibold text-white tracking-tight">
-							Miracle Greens
-						</span>
+						<div className="relative h-10 w-40">
+							<Image
+								src="/vitala-logo.png"
+								alt="Vitala Logo"
+								fill
+								className="object-contain brightness-0 invert"
+								priority
+							/>
+						</div>
 					</Link>
 
 					{/* Right-side buttons (Shop + Donate remain) */}

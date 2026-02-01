@@ -93,7 +93,7 @@ export default function AdminOverview() {
                             Lab <span className="text-emerald-500">Administration.</span>
                         </h1>
                         <p className="text-base text-slate-400 leading-relaxed">
-                            Control the core engine of Miracle Greens. Manage the global food database, curate clinical data, and architect new nutritional recipes.
+                            Control the core engine of Vitala Research. Manage the global food database, curate clinical data, and architect new nutritional recipes.
                         </p>
                     </div>
                 </div>

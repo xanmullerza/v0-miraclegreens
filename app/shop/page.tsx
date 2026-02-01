@@ -4,8 +4,8 @@ import { ShopSection } from '@/components/shop-section';
 import { Footer } from '@/components/footer';
 
 export const metadata = {
-  title: 'Shop - Miracle Greens',
-  description: 'Buy moringa saplings, capsules, and more from Miracle Greens.',
+  title: 'Shop - Vitala',
+  description: 'Bio-optimized nutritional supplements and resources from Vitala.',
 };
 
 export default function ShopPage() {

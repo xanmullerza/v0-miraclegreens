@@ -9,9 +9,9 @@ const _dmSans = DM_Sans({ subsets: ['latin'] });
 const _playfair = Playfair_Display({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'Miracle Greens | Growing Hope Through Moringa',
+  title: 'Vitala | Biological Nutrition Protocol',
   description:
-    'A nonprofit organization growing moringa trees to distribute nutrient-rich moringa powder to communities in need.',
+    'A professional nutrition platform focused on helping you make better biological choices through optimized protocols and healthy eating.',
   generator: 'v0.app',
   icons: {
     icon: [

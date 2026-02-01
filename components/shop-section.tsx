@@ -5,34 +5,34 @@ import { TreeDeciduous, Pill, ExternalLink, Leaf } from 'lucide-react';
 const products = [
 	{
 		icon: TreeDeciduous,
-		name: 'Moringa Seedlings',
+		name: 'Vitala Starter Seedlings',
 		description:
-			'Grow your own miracle tree at home. Easy to care for and produces nutritious leaves year-round.',
+			'Begin your journey with high-density greens at home. Easy to care for and produces nutrient-rich leaves year-round.',
 		price: 'R125',
 		image: '/moringa-tree-sapling-being-planted-hands-in-soil-.jpg',
 		features: [
-			'Ready to plant',
-			'Care guide included',
-			'Grows in most climates',
+			'Bio-optimized growth',
+			'Step-by-step care guide',
+			'High mineral yield',
 		],
 	},
 	{
 		icon: Leaf,
-		name: 'Moringa Powder',
+		name: 'Vitala Density Powder',
 		description:
-			'Pure, nutrient-dense moringa leaf powder. Perfect for smoothies, soups, and daily wellness.',
+			'Pure, bioavailable nutritional powerhouse. Perfect for smoothies, soups, and protocol-based wellness.',
 		price: 'R150',
 		image: '/powder.png',
-		features: ['250g pack', '100% pure leaf', 'High nutrition boost'],
+		features: ['250g precision pack', '100% pure isolate', 'High micronutrient boost'],
 	},
 	{
 		icon: Pill,
-		name: 'Moringa Capsules',
+		name: 'Vitala Precision Capsules',
 		description:
-			'Premium moringa leaf powder in easy-to-take capsules. 90 capsules per bottle.',
+			'Clean, lab-tested nutritional density in easy-to-take format. Optimized for systemic absorption.',
 		price: 'R100',
-		image: '/moringa-powder-and-capsules-on-wooden-surface-with.jpg', // use placeholder to avoid 404s until real image is added
-		features: ['90 capsules', '100% pure moringa', 'Lab tested quality'],
+		image: '/moringa-powder-and-capsules-on-wooden-surface-with.jpg',
+		features: ['90 capsules', 'Clinically pure', 'Lab tested quality'],
 	},
 ];
 
@@ -42,14 +42,13 @@ export function ShopSection() {
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 				<div className="text-center mb-12">
 					<p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">
-						Shop With Purpose
+						Protocol Resources
 					</p>
 					<h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground">
-						Buy for Yourself, Give to Others
+						Power Your Biological Goals
 					</h2>
 					<p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
-						Every product you purchase directly funds moringa capsules for
-						families in need. Quality products, meaningful impact.
+						Every purchase supports the research and distribution of nutritional intelligence to communities worldwide. Premium products, scientific impact.
 					</p>
 				</div>
 

@@ -131,13 +131,13 @@ export default function DashboardOverview() {
                     <div className="relative z-10 max-w-xl">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-black uppercase tracking-widest mb-6">
                             <Zap size={12} className="fill-current" />
-                            Miracle Greens Beta
+                            Vitala Intelligence Beta
                         </div>
                         <h1 className="text-3xl lg:text-5xl font-black text-white tracking-tighter leading-[0.9] mb-6">
                             Welcome to your <span className="text-emerald-500">Dashboard.</span>
                         </h1>
                         <p className="text-base text-slate-400 leading-relaxed">
-                            A simple way to manage your food and recipes. Add ingredients, create healthy recipes, and check nutrition details in one easy dashboard.
+                            Your unified platform for biological data, nutritional protocols, and healthy eating choices. Optimize your performance through high-density nutrition.
                         </p>
                     </div>
                 </div>

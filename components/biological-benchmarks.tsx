@@ -7,7 +7,7 @@ const nutritionFacts = [
     { nutrient: 'Protein', comparison: '2x more than yogurt', amount: '9.4 g per 100g' },
 ];
 
-export function MoringaNutrition() {
+export function BiologicalBenchmarks() {
     return (
         <section className="py-16 md:py-24 bg-primary/5">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

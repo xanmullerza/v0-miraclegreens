@@ -1,6 +1,6 @@
 import { Globe, FlaskConical, Leaf } from 'lucide-react';
 
-export function MoringaHistory() {
+export function LegacyOfNature() {
     return (
         <section className="py-16 md:py-24 bg-background">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -35,9 +35,7 @@ export function MoringaHistory() {
                         <Leaf className="h-8 w-8 text-primary mb-4" />
                         <h3 className="text-lg font-semibold text-foreground mb-2">Modern Recognition</h3>
                         <p className="text-muted-foreground text-sm leading-relaxed">
-                            Today, the WHO, FAO, and numerous NGOs, just like ours promote moringa as a solution to
-                            malnutrition. Over 1,300 scientific studies have validated its nutritional and
-                            medicinal properties.
+                            Today, global health organizations recognize high-density superfoods as key tools in systemic health. Over 1,300 scientific studies have validated the nutritional properties of the protocols we use as our foundation.
                         </p>
                     </div>
                 </div>

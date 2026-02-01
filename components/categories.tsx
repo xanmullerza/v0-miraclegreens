@@ -5,28 +5,28 @@ const journeySteps = [
   {
     icon: Leaf,
     step: '01',
-    name: 'Now: We Source',
-    description: 'Quality powder from trusted growers',
+    name: 'Foundation: Data',
+    description: 'Aggregating global nutritional markers',
     detail:
-      'We currently partner with experienced moringa growers to source the highest quality leaf powder. This ensures that we deliver maximum nutritional benefit to those in need.',
+      'We started by collecting clinical data on superfoods like Moringa. This provided the blueprint for understanding how high-density nutrients interact with human biology.',
     image: '/cycle.jpg',
   },
   {
     icon: TreeDeciduous,
     step: '02',
-    name: 'Next: We Grow',
-    description: 'Our own sustainable moringa farm',
+    name: 'Expansion: Intelligence',
+    description: 'Dynamic biological meal protocols',
     detail:
-      "With your help, we are looking forward to establishing our own moringa plantation. Giving us full control over the process and the ability to scale our impact exponentially.",
-    image: '/moringa-tree-farm-plantation-sustainable-agricultu.jpg',
+      "We are evolving into a comprehensive intelligence platform. Our focus has expanded to all whole foods, enabling us to curate precise protocols for any health objective.",
+    image: '/vitala-research-lab.png',
   },
   {
     icon: Package,
     step: '03',
-    name: 'Then: We Process',
-    description: 'Diverse products, all in-house',
+    name: 'Future: Ecosystem',
+    description: 'Unified health performance platform',
     detail:
-      'With our own processing facility, we will expand beyond powder to produce moringa capsules, oils, teas, soups, and more — all processed and packaged in-house, for a complete range of moringa products.',
+      'The final phase of Vitala is a complete health ecosystem. From DNA-aligned supplementation to AI-driven recipe architecture, we are building the future of human optimization.',
     image: '/products.jpg',
   },
 ];
@@ -37,14 +37,13 @@ export function Categories() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <p className="text-sm font-medium text-primary uppercase tracking-wider mb-2">
-            Our Journey
+            The Vision
           </p>
           <h2 className="font-serif text-3xl md:text-4xl font-semibold text-foreground">
-            From Sourcing to Growing
+            From Moringa to Biological Intelligence
           </h2>
           <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
-            We&apos;ve built a strong foundation sourcing quality moringa. Now we&apos;re ready to
-            take the next step — with your help.
+            Our journey began with a single superfood. Today, Vitala has grown into a comprehensive platform for nutritional excellence and biological optimization.
           </p>
         </div>
         <div className="grid md:grid-cols-3 gap-6">

@@ -117,11 +117,10 @@ export default function BrowsePage() {
                                 Featured Resource
                             </Badge>
                             <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-6 leading-tight">
-                                The Miracle Tree
+                                Nutritional Intelligence
                             </h1>
                             <p className="text-lg md:text-xl text-slate-300 mb-8 leading-relaxed">
-                                Discover why Moringa Oleifera is called the "Tree of Life."
-                                A visual journey through its origins, nutritional power, and sustainable impact.
+                                Access our curated library of clinical studies and research papers. From high-density superfoods like Moringa to broader nutritional science, we provide the data behind the protocols.
                             </p>
                             <div className="flex flex-wrap gap-4">
                                 <Button

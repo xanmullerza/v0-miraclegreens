@@ -11,21 +11,10 @@ export function Hero() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="max-w-xl">
             <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl font-semibold text-foreground leading-tight text-balance">
-              Nutrition for everyone
+              Nutrition optimized for life
             </h1>
             <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-              {SHOW_SHOP ? (
-                <>
-                  At Miracle Greens, we sell premium moringa saplings, capsules and powder to the public. As a registered non-profit, every purchase funds the
-                  production and distribution of moringa powder to families fighting malnutrition.
-                  Shop with purpose — your wellness supports their health.
-                </>
-              ) : (
-                <>
-                  As a registered non-profit, Miracle Greens is dedicated to the production and distribution of moringa powder to families fighting malnutrition.
-                  Your support helps us bring this miracle tree to those who need it most.
-                </>
-              )}
+              Vitala is your expert companion for biological nutrition. We provide the tools and data you need to make better food choices, build optimized meal protocols, and achieve your health goals through the power of high-density nutrition.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               {SHOW_SHOP && (
@@ -75,9 +64,9 @@ export function Hero() {
                   <Heart className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">Every Donation Helps</p>
+                  <p className="font-medium text-foreground">Science-Backed Nutrition</p>
                   <p className="text-sm text-muted-foreground">
-                    Donations fund nutritious moringa leaf powder for the needy
+                    Discover the biological power of the foods you eat every day
                   </p>
                 </div>
               </div>

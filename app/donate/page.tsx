@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Heart, Sun, Gift } from 'lucide-react';
 
 export const metadata = {
-  title: 'Donate - Miracle Greens',
-  description: 'Support our mission: donate to sponsor moringa distribution and community programs.',
+  title: 'Donate - Vitala',
+  description: 'Support our mission: donate to advance nutritional research and community health programs.',
 };
 
 const tiers = [
@@ -37,8 +37,8 @@ export default function DonatePage() {
             ) : (
               <>
                 Browsing our resources and applying what you learn is the first step towards better health.
-                If you are able to, please consider making a donation to help us grow our mission
-                and reach more families in need.
+                If you are able to, please consider making a donation to help us advance our research
+                and reach more families seeking nutritional excellence.
               </>
             )}
           </p>

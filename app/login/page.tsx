@@ -97,7 +97,7 @@ export default function LoginPage() {
                 </div>
 
                 <p className="text-center text-[10px] text-slate-400 font-medium uppercase tracking-widest">
-                    &copy; {new Date().getFullYear()} Miracle Greens Laboratory
+                    &copy; {new Date().getFullYear()} Vitala Research Lab
                 </p>
             </div>
         </div>
