@@ -30,6 +30,8 @@ export default function AdminOverview() {
             bg: 'bg-emerald-500/10'
         },
         {
+            name: 'Add Food',
+            desc: 'Manually enter clinical data.',
             href: '/dashboard/admin/add-food',
             icon: Plus,
             color: 'text-sky-500',
