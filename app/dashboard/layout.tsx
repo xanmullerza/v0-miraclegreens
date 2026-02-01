@@ -11,7 +11,8 @@ import {
     ArrowLeft,
     Loader2,
     LogOut,
-    Trash2
+    Trash2,
+    LogIn
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
@@ -196,42 +197,52 @@ function DashboardLayoutContent({
                                         )}
                                     </div>
                                 </Link>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <button
-                                            className="p-2 text-slate-400 hover:text-emerald-500 transition-colors ml-1 outline-none"
-                                            title="Account Options"
-                                        >
-                                            <LogOut size={18} />
-                                        </button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="w-56">
-                                        <DropdownMenuLabel>Account Actions</DropdownMenuLabel>
-                                        <DropdownMenuSeparator />
-                                        <DropdownMenuItem
-                                            onClick={async () => {
-                                                await supabase.auth.signOut();
-                                                window.location.href = '/';
-                                            }}
-                                            className="cursor-pointer"
-                                        >
-                                            <LogOut className="mr-2 h-4 w-4" />
-                                            <span>Sign Out</span>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            onClick={async () => {
-                                                await supabase.auth.signOut();
-                                                localStorage.clear();
-                                                sessionStorage.clear();
-                                                window.location.href = '/';
-                                            }}
-                                            className="cursor-pointer text-rose-500 focus:text-rose-500 focus:bg-rose-50 dark:focus:bg-rose-950/20"
-                                        >
-                                            <Trash2 className="mr-2 h-4 w-4" />
-                                            <span>Sign Out & Clear Data</span>
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
+                                {user ? (
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <button
+                                                className="p-2 text-slate-400 hover:text-emerald-500 transition-colors ml-1 outline-none"
+                                                title="Account Options"
+                                            >
+                                                <LogOut size={18} />
+                                            </button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" className="w-56">
+                                            <DropdownMenuLabel>Account Actions</DropdownMenuLabel>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem
+                                                onClick={async () => {
+                                                    await supabase.auth.signOut();
+                                                    window.location.href = '/';
+                                                }}
+                                                className="cursor-pointer"
+                                            >
+                                                <LogOut className="mr-2 h-4 w-4" />
+                                                <span>Sign Out</span>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem
+                                                onClick={async () => {
+                                                    await supabase.auth.signOut();
+                                                    localStorage.clear();
+                                                    sessionStorage.clear();
+                                                    window.location.href = '/';
+                                                }}
+                                                className="cursor-pointer text-rose-500 focus:text-rose-500 focus:bg-rose-50 dark:focus:bg-rose-950/20"
+                                            >
+                                                <Trash2 className="mr-2 h-4 w-4" />
+                                                <span>Sign Out & Clear Data</span>
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                ) : (
+                                    <Link
+                                        href="/login"
+                                        className="p-2 text-slate-400 hover:text-emerald-500 transition-colors ml-1 outline-none flex items-center gap-2"
+                                        title="Sign In"
+                                    >
+                                        <LogIn size={18} />
+                                    </Link>
+                                )}
                             </div>
                         </div>
                     </div>
