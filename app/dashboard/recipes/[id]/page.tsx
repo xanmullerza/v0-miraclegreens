@@ -285,25 +285,25 @@ export default function RecipeDetailsPage() {
     return (
         <div className="max-w-5xl mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
             {/* Navigation Header - Edit Button for Admins */}
-            {isAdmin && (
-                <div className="flex justify-end">
-                    <Button
-                        onClick={() => router.push(`/dashboard/recipes/${id}/edit`)}
-                        variant="outline"
-                        className="rounded-2xl px-6 h-12 font-black uppercase tracking-widest gap-2 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all font-medium text-slate-600 dark:text-slate-300"
-                    >
-                        <Pencil size={18} />
-                        Edit Recipe
-                    </Button>
-                </div>
-            )}
+
 
             <div className="space-y-8">
                 {/* Title Section */}
                 <div className="space-y-4">
-                    <h1 className="text-5xl font-black tracking-tighter text-slate-900 dark:text-white leading-[0.95] italic uppercase">
-                        {recipe.title}
-                    </h1>
+                    <div className="flex items-center gap-4">
+                        <h1 className="text-5xl font-black tracking-tighter text-slate-900 dark:text-white leading-[0.95] italic uppercase">
+                            {recipe.title}
+                        </h1>
+                        {isAdmin && (
+                            <button
+                                onClick={() => router.push(`/dashboard/recipes/${id}/edit`)}
+                                className="p-2 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 text-slate-400 hover:text-emerald-500 transition-all hover:scale-110 active:scale-95 group mt-1"
+                                title="Edit Recipe"
+                            >
+                                <Pencil size={32} className="group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all" />
+                            </button>
+                        )}
+                    </div>
                     <div className="flex flex-wrap gap-2">
                         {recipe.source && (
                             <Badge variant="outline" className="border-slate-200 dark:border-slate-800 text-slate-400 text-[9px] font-black uppercase tracking-widest px-3">
@@ -704,142 +704,146 @@ export default function RecipeDetailsPage() {
                 </div>
 
                 {/* NUTRIENT INFO MODAL */}
-                {selectedNutrientInfo && nutrientInfo[selectedNutrientInfo] && (
-                    <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setSelectedNutrientInfo(null)}>
-                        <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] max-w-md w-full p-10 shadow-2xl relative border border-slate-200 dark:border-slate-800" onClick={e => e.stopPropagation()}>
-                            <button onClick={() => setSelectedNutrientInfo(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"><X size={24} /></button>
-                            <h3 className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-2 uppercase tracking-tighter italic">{selectedNutrientInfo}</h3>
-                            <p className="text-slate-500 italic mb-8 text-sm leading-relaxed">"{nutrientInfo[selectedNutrientInfo].description}"</p>
-                            <div className="space-y-8">
-                                <div className="p-6 bg-emerald-50 dark:bg-emerald-900/20 rounded-3xl border border-emerald-100 dark:border-emerald-800/50">
-                                    <h4 className="font-black text-[10px] mb-3 uppercase tracking-widest text-emerald-700 dark:text-emerald-400">Biological Significance</h4>
-                                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed font-serif">{nutrientInfo[selectedNutrientInfo].importance}</p>
-                                </div>
-                                <div className="flex flex-wrap gap-2.5">
-                                    {nutrientInfo[selectedNutrientInfo].benefits.map((b, i) => (
-                                        <span key={i} className="text-[10px] font-black uppercase tracking-widest bg-emerald-100 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-100 px-4 py-2 rounded-full">
-                                            {b}
-                                        </span>
-                                    ))}
-                                </div>
-                                <div>
-                                    <h4 className="font-black text-[10px] mb-3 uppercase tracking-widest text-slate-400">Natural Sources</h4>
-                                    <div className="flex flex-wrap gap-1.5">
-                                        {nutrientInfo[selectedNutrientInfo].sources.map((s, i) => (
-                                            <span key={i} className="text-[11px] bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1.5 rounded-xl font-bold border border-slate-100 dark:border-slate-800">
-                                                {s}
+                {
+                    selectedNutrientInfo && nutrientInfo[selectedNutrientInfo] && (
+                        <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setSelectedNutrientInfo(null)}>
+                            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] max-w-md w-full p-10 shadow-2xl relative border border-slate-200 dark:border-slate-800" onClick={e => e.stopPropagation()}>
+                                <button onClick={() => setSelectedNutrientInfo(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"><X size={24} /></button>
+                                <h3 className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-2 uppercase tracking-tighter italic">{selectedNutrientInfo}</h3>
+                                <p className="text-slate-500 italic mb-8 text-sm leading-relaxed">"{nutrientInfo[selectedNutrientInfo].description}"</p>
+                                <div className="space-y-8">
+                                    <div className="p-6 bg-emerald-50 dark:bg-emerald-900/20 rounded-3xl border border-emerald-100 dark:border-emerald-800/50">
+                                        <h4 className="font-black text-[10px] mb-3 uppercase tracking-widest text-emerald-700 dark:text-emerald-400">Biological Significance</h4>
+                                        <p className="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed font-serif">{nutrientInfo[selectedNutrientInfo].importance}</p>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2.5">
+                                        {nutrientInfo[selectedNutrientInfo].benefits.map((b, i) => (
+                                            <span key={i} className="text-[10px] font-black uppercase tracking-widest bg-emerald-100 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-100 px-4 py-2 rounded-full">
+                                                {b}
                                             </span>
                                         ))}
+                                    </div>
+                                    <div>
+                                        <h4 className="font-black text-[10px] mb-3 uppercase tracking-widest text-slate-400">Natural Sources</h4>
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {nutrientInfo[selectedNutrientInfo].sources.map((s, i) => (
+                                                <span key={i} className="text-[11px] bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1.5 rounded-xl font-bold border border-slate-100 dark:border-slate-800">
+                                                    {s}
+                                                </span>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )
+                }
 
                 {/* NUTRIENT BREAKDOWN MODAL */}
-                {breakdownNutrient && (recipe.micronutrients) && (
-                    <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setBreakdownNutrient(null)}>
-                        <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] max-w-lg w-full p-8 shadow-2xl relative animate-in zoom-in-95 fade-in duration-200 border border-slate-200 dark:border-slate-800" onClick={e => e.stopPropagation()}>
-                            <button onClick={() => setBreakdownNutrient(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"><X size={24} /></button>
+                {
+                    breakdownNutrient && (recipe.micronutrients) && (
+                        <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setBreakdownNutrient(null)}>
+                            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] max-w-lg w-full p-8 shadow-2xl relative animate-in zoom-in-95 fade-in duration-200 border border-slate-200 dark:border-slate-800" onClick={e => e.stopPropagation()}>
+                                <button onClick={() => setBreakdownNutrient(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"><X size={24} /></button>
 
-                            <div className="flex items-center gap-4 mb-8">
-                                <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center shadow-xl shadow-current/10",
-                                    breakdownNutrient === 'Protein' ? "bg-red-100 text-red-600" :
-                                        breakdownNutrient === 'Carbs' ? "bg-amber-100 text-amber-600" :
-                                            breakdownNutrient === 'Fat' ? "bg-orange-100 text-orange-600" :
-                                                "bg-emerald-100 text-emerald-600"
-                                )}>
-                                    <Layers className="h-7 w-7" />
+                                <div className="flex items-center gap-4 mb-8">
+                                    <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center shadow-xl shadow-current/10",
+                                        breakdownNutrient === 'Protein' ? "bg-red-100 text-red-600" :
+                                            breakdownNutrient === 'Carbs' ? "bg-amber-100 text-amber-600" :
+                                                breakdownNutrient === 'Fat' ? "bg-orange-100 text-orange-600" :
+                                                    "bg-emerald-100 text-emerald-600"
+                                    )}>
+                                        <Layers className="h-7 w-7" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-2xl font-black uppercase tracking-tighter italic">{breakdownNutrient}</h3>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Constituent Laboratory Analysis</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h3 className="text-2xl font-black uppercase tracking-tighter italic">{breakdownNutrient}</h3>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Constituent Laboratory Analysis</p>
-                                </div>
-                            </div>
 
-                            <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
-                                {(() => {
-                                    const NUTRIENT_BREAKDOWNS: Record<string, any[]> = {
-                                        'Vitamin A': [
-                                            { label: 'Retinol', keys: ['Retinol', 'retinol_ug'], unit: 'µg' },
-                                            { label: 'Alpha-carotene', keys: ['Alpha-carotene', 'alpha_carotene_ug'], unit: 'µg' },
-                                            { label: 'Beta-carotene', keys: ['Beta-carotene', 'beta_carotene_ug'], unit: 'µg' },
-                                            { label: 'Beta-cryptoxanthin', keys: ['Beta-cryptoxanthin', 'beta_cryptoxanthin_ug'], unit: 'µg' },
-                                            { label: 'Lutein + Zeaxanthin', keys: ['Lutein + Zeaxanthin', 'Lutein+Zeaxanthin', 'lutein_zeaxanthin_ug'], unit: 'µg' },
-                                            { label: 'Lycopene', keys: ['Lycopene', 'lycopene_ug'], unit: 'µg' },
-                                        ],
-                                        'Vitamin E': [
-                                            { label: 'Alpha-tocopherol', keys: ['Alpha-tocopherol', 'Vitamin E', 'alpha_tocopherol_mg'], unit: 'mg' },
-                                            { label: 'Beta-tocopherol', keys: ['Beta-tocopherol', 'beta_tocopherol_mg'], unit: 'mg' },
-                                            { label: 'Delta-tocopherol', keys: ['Delta-tocopherol', 'delta_tocopherol_mg'], unit: 'mg' },
-                                            { label: 'Gamma-tocopherol', keys: ['Gamma-tocopherol', 'gamma_tocopherol_mg'], unit: 'mg' },
-                                        ],
-                                        'Protein': [
-                                            { label: 'Histidine', keys: ['Histidine', 'histidine_g'], unit: 'g', isEssential: true },
-                                            { label: 'Isoleucine', keys: ['Isoleucine', 'isoleucine_g'], unit: 'g', isEssential: true },
-                                            { label: 'Leucine', keys: ['Leucine', 'leucine_g'], unit: 'g', isEssential: true },
-                                            { label: 'Lysine', keys: ['Lysine', 'lysine_g'], unit: 'g', isEssential: true },
-                                            { label: 'Methionine', keys: ['Methionine', 'methionine_g'], unit: 'g', isEssential: true },
-                                            { label: 'Phenylalanine', keys: ['Phenylalanine', 'phenylalanine_g'], unit: 'g', isEssential: true },
-                                            { label: 'Threonine', keys: ['Threonine', 'threonine_g'], unit: 'g', isEssential: true },
-                                            { label: 'Tryptophan', keys: ['Tryptophan', 'tryptophan_g'], unit: 'g', isEssential: true },
-                                            { label: 'Valine', keys: ['Valine', 'valine_g'], unit: 'g', isEssential: true },
-                                        ],
-                                        'Carbs': [
-                                            { label: 'Fiber', keys: ['Fiber', 'fiber_g'], unit: 'g' },
-                                            { label: 'Starch', keys: ['Starch', 'starch_g'], unit: 'g' },
-                                            { label: 'Sugars', keys: ['Sugars', 'sugars_g'], unit: 'g' },
-                                        ],
-                                        'Fat': [
-                                            { label: 'Saturated Fat', keys: ['Saturated Fat'], unit: 'g' },
-                                            { label: 'Monounsaturated', keys: ['Monounsaturated Fat'], unit: 'g' },
-                                            { label: 'Polyunsaturated', keys: ['Polyunsaturated Fat'], unit: 'g' },
-                                            { label: 'Trans Fat', keys: ['Trans Fat'], unit: 'g' },
-                                            { label: 'Omega-3', keys: ['Omega-3'], unit: 'g' },
-                                            { label: 'Omega-6', keys: ['Omega-6'], unit: 'g' },
-                                            { label: 'Cholesterol', keys: ['Cholesterol'], unit: 'mg' },
-                                        ],
-                                    };
+                                <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+                                    {(() => {
+                                        const NUTRIENT_BREAKDOWNS: Record<string, any[]> = {
+                                            'Vitamin A': [
+                                                { label: 'Retinol', keys: ['Retinol', 'retinol_ug'], unit: 'µg' },
+                                                { label: 'Alpha-carotene', keys: ['Alpha-carotene', 'alpha_carotene_ug'], unit: 'µg' },
+                                                { label: 'Beta-carotene', keys: ['Beta-carotene', 'beta_carotene_ug'], unit: 'µg' },
+                                                { label: 'Beta-cryptoxanthin', keys: ['Beta-cryptoxanthin', 'beta_cryptoxanthin_ug'], unit: 'µg' },
+                                                { label: 'Lutein + Zeaxanthin', keys: ['Lutein + Zeaxanthin', 'Lutein+Zeaxanthin', 'lutein_zeaxanthin_ug'], unit: 'µg' },
+                                                { label: 'Lycopene', keys: ['Lycopene', 'lycopene_ug'], unit: 'µg' },
+                                            ],
+                                            'Vitamin E': [
+                                                { label: 'Alpha-tocopherol', keys: ['Alpha-tocopherol', 'Vitamin E', 'alpha_tocopherol_mg'], unit: 'mg' },
+                                                { label: 'Beta-tocopherol', keys: ['Beta-tocopherol', 'beta_tocopherol_mg'], unit: 'mg' },
+                                                { label: 'Delta-tocopherol', keys: ['Delta-tocopherol', 'delta_tocopherol_mg'], unit: 'mg' },
+                                                { label: 'Gamma-tocopherol', keys: ['Gamma-tocopherol', 'gamma_tocopherol_mg'], unit: 'mg' },
+                                            ],
+                                            'Protein': [
+                                                { label: 'Histidine', keys: ['Histidine', 'histidine_g'], unit: 'g', isEssential: true },
+                                                { label: 'Isoleucine', keys: ['Isoleucine', 'isoleucine_g'], unit: 'g', isEssential: true },
+                                                { label: 'Leucine', keys: ['Leucine', 'leucine_g'], unit: 'g', isEssential: true },
+                                                { label: 'Lysine', keys: ['Lysine', 'lysine_g'], unit: 'g', isEssential: true },
+                                                { label: 'Methionine', keys: ['Methionine', 'methionine_g'], unit: 'g', isEssential: true },
+                                                { label: 'Phenylalanine', keys: ['Phenylalanine', 'phenylalanine_g'], unit: 'g', isEssential: true },
+                                                { label: 'Threonine', keys: ['Threonine', 'threonine_g'], unit: 'g', isEssential: true },
+                                                { label: 'Tryptophan', keys: ['Tryptophan', 'tryptophan_g'], unit: 'g', isEssential: true },
+                                                { label: 'Valine', keys: ['Valine', 'valine_g'], unit: 'g', isEssential: true },
+                                            ],
+                                            'Carbs': [
+                                                { label: 'Fiber', keys: ['Fiber', 'fiber_g'], unit: 'g' },
+                                                { label: 'Starch', keys: ['Starch', 'starch_g'], unit: 'g' },
+                                                { label: 'Sugars', keys: ['Sugars', 'sugars_g'], unit: 'g' },
+                                            ],
+                                            'Fat': [
+                                                { label: 'Saturated Fat', keys: ['Saturated Fat'], unit: 'g' },
+                                                { label: 'Monounsaturated', keys: ['Monounsaturated Fat'], unit: 'g' },
+                                                { label: 'Polyunsaturated', keys: ['Polyunsaturated Fat'], unit: 'g' },
+                                                { label: 'Trans Fat', keys: ['Trans Fat'], unit: 'g' },
+                                                { label: 'Omega-3', keys: ['Omega-3'], unit: 'g' },
+                                                { label: 'Omega-6', keys: ['Omega-6'], unit: 'g' },
+                                                { label: 'Cholesterol', keys: ['Cholesterol'], unit: 'mg' },
+                                            ],
+                                        };
 
-                                    const m = recipe.micronutrients || {};
-                                    const items = NUTRIENT_BREAKDOWNS[breakdownNutrient] || [];
+                                        const m = recipe.micronutrients || {};
+                                        const items = NUTRIENT_BREAKDOWNS[breakdownNutrient] || [];
 
-                                    return items.map(({ label, keys, unit, isEssential }) => {
-                                        let val = 0;
-                                        for (const k of keys) if (m[k] !== undefined) { val = m[k]; break; }
-                                        const isZero = val === 0;
+                                        return items.map(({ label, keys, unit, isEssential }) => {
+                                            let val = 0;
+                                            for (const k of keys) if (m[k] !== undefined) { val = m[k]; break; }
+                                            const isZero = val === 0;
 
-                                        return (
-                                            <div
-                                                key={label}
-                                                className={cn(
-                                                    "flex items-center justify-between p-5 rounded-2xl border transition-all animate-in fade-in slide-in-from-top-1 duration-200",
-                                                    isZero ? "bg-slate-50 dark:bg-slate-950 border-slate-100 dark:border-slate-800 opacity-60" : "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/50"
-                                                )}
-                                            >
-                                                <div className="flex items-center gap-4">
-                                                    <div className={cn("h-2.5 w-2.5 rounded-full", isZero ? "bg-slate-300" : "bg-emerald-500")} />
-                                                    <div>
-                                                        <span className={cn("font-black text-sm", isZero ? "text-slate-400" : "text-slate-900 dark:text-white uppercase tracking-tight")}>{label}</span>
-                                                        {isEssential && <span className="ml-2 text-[8px] font-black uppercase tracking-widest bg-emerald-500 text-white px-2 py-0.5 rounded-md">Essential</span>}
+                                            return (
+                                                <div
+                                                    key={label}
+                                                    className={cn(
+                                                        "flex items-center justify-between p-5 rounded-2xl border transition-all animate-in fade-in slide-in-from-top-1 duration-200",
+                                                        isZero ? "bg-slate-50 dark:bg-slate-950 border-slate-100 dark:border-slate-800 opacity-60" : "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/50"
+                                                    )}
+                                                >
+                                                    <div className="flex items-center gap-4">
+                                                        <div className={cn("h-2.5 w-2.5 rounded-full", isZero ? "bg-slate-300" : "bg-emerald-500")} />
+                                                        <div>
+                                                            <span className={cn("font-black text-sm", isZero ? "text-slate-400" : "text-slate-900 dark:text-white uppercase tracking-tight")}>{label}</span>
+                                                            {isEssential && <span className="ml-2 text-[8px] font-black uppercase tracking-widest bg-emerald-500 text-white px-2 py-0.5 rounded-md">Essential</span>}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-baseline gap-1.5">
+                                                        <span className={cn("text-xl font-black tabular-nums", isZero ? "text-slate-300" : "")}>
+                                                            {val >= 1 ? val.toFixed(1) : val.toFixed(2)}
+                                                        </span>
+                                                        <span className="text-[10px] font-black text-slate-400 uppercase">{unit}</span>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-baseline gap-1.5">
-                                                    <span className={cn("text-xl font-black tabular-nums", isZero ? "text-slate-300" : "")}>
-                                                        {val >= 1 ? val.toFixed(1) : val.toFixed(2)}
-                                                    </span>
-                                                    <span className="text-[10px] font-black text-slate-400 uppercase">{unit}</span>
-                                                </div>
-                                            </div>
-                                        );
-                                    });
-                                })()}
+                                            );
+                                        });
+                                    })()}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
-            </div>
-        </div>
+                    )
+                }
+            </div >
+        </div >
     );
 }

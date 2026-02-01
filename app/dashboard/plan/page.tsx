@@ -444,7 +444,7 @@ export default function MealPlannerPage() {
                             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
                             <ChefHat size={14} className="group-hover/btn:scale-110 transition-transform" />
-                            Explore Recipes
+                            Find Recipes
                         </Button>
                         <Button
                             onClick={() => router.push('/dashboard/recipebuilder')}

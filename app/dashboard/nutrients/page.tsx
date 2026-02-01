@@ -141,7 +141,7 @@ export default function NutrientsHub() {
                     className="bg-white/50 hover:bg-white text-slate-600 dark:text-white border border-slate-200 dark:border-white/10 backdrop-blur-md shadow-sm gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                 >
                     <ChefHat size={14} className="group-hover/btn:scale-110 transition-transform" />
-                    Explore Recipes
+                    Find Recipes
                 </Button>
             </div> */}
 

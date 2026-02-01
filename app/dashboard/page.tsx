@@ -74,7 +74,7 @@ export default function DashboardOverview() {
             bg: 'bg-emerald-500/10'
         },
         {
-            name: 'Explore Recipes',
+            name: 'Find Recipes',
             desc: 'View and manage your optimized meal library.',
             href: '/dashboard/recipes',
             icon: ChefHat,
