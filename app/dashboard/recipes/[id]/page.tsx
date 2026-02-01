@@ -284,41 +284,19 @@ export default function RecipeDetailsPage() {
 
     return (
         <div className="max-w-5xl mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
-            {/* Navigation Header */}
-            <div className="flex items-center justify-between">
-                <button
-                    onClick={() => router.back()}
-                    className="flex items-center gap-2 text-slate-500 hover:text-rose-600 font-bold text-sm transition-colors group"
-                >
-                    <div className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-800 flex items-center justify-center group-hover:bg-rose-50 dark:group-hover:bg-rose-900/20 group-hover:border-rose-200 transition-all">
-                        <X size={16} />
-                    </div>
-                    Close
-                </button>
-                <div className="flex gap-3">
-                    {isAdmin && (
-                        <Button
-                            onClick={() => router.push(`/dashboard/recipes/${id}/edit`)}
-                            variant="outline"
-                            className="rounded-2xl px-6 h-12 font-black uppercase tracking-widest gap-2 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all font-medium text-slate-600 dark:text-slate-300"
-                        >
-                            <Pencil size={18} />
-                            Edit Recipe
-                        </Button>
-                    )}
+            {/* Navigation Header - Edit Button for Admins */}
+            {isAdmin && (
+                <div className="flex justify-end">
                     <Button
-                        onClick={toggleFavorite}
+                        onClick={() => router.push(`/dashboard/recipes/${id}/edit`)}
                         variant="outline"
-                        className={cn(
-                            "rounded-2xl px-6 h-12 font-black uppercase tracking-widest gap-2 border-slate-200 dark:border-slate-800 transition-all",
-                            recipe.is_favorite ? "bg-rose-50 border-rose-200 text-rose-600 dark:bg-rose-900/20 dark:border-rose-800 dark:text-rose-400" : "hover:bg-slate-50 dark:hover:bg-slate-800"
-                        )}
+                        className="rounded-2xl px-6 h-12 font-black uppercase tracking-widest gap-2 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all font-medium text-slate-600 dark:text-slate-300"
                     >
-                        <Heart size={18} fill={recipe.is_favorite ? "currentColor" : "none"} />
-                        {recipe.is_favorite ? 'Favorited' : 'Favorite'}
+                        <Pencil size={18} />
+                        Edit Recipe
                     </Button>
                 </div>
-            </div>
+            )}
 
             <div className="space-y-8">
                 {/* Title Section */}
