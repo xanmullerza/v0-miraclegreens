@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, Zap, X as CloseIcon, ChevronDown, Layers, Gem, Droplet, Battery, Activity, Utensils, ShoppingBasket } from 'lucide-react';
+import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, Zap, X as CloseIcon, ChevronDown, Layers, Gem, Droplet, Battery, Activity, Utensils, ShoppingBasket, ArrowRight } from 'lucide-react';
 import FoodItemPicker from './food-item-picker';
 import { fetchFoodMeasures, FoodMeasure, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -64,9 +64,10 @@ interface IngredientBuilderProps {
     onChange: (ingredients: RecipeIngredient[]) => void;
     initialShowPicker?: boolean;
     initialShowMagicPaste?: boolean;
+    onNext?: () => void;
 }
 
-export default function IngredientBuilder({ ingredients, onChange, initialShowPicker = false, initialShowMagicPaste = false }: IngredientBuilderProps) {
+export default function IngredientBuilder({ ingredients, onChange, initialShowPicker = false, initialShowMagicPaste = false, onNext }: IngredientBuilderProps) {
     const [showPicker, setShowPicker] = useState(false);
     const [showMagicPaste, setShowMagicPaste] = useState(false);
     const [magicText, setMagicText] = useState('');
@@ -1101,7 +1102,7 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
             {
                 ingredients.length > 0 && (
                     <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-800">
-                        <div className="flex justify-center mb-4">
+                        <div className="flex justify-center items-center gap-4 mb-4">
                             <Button variant="outline" size="sm" onClick={() => setShowDetailedNutrients(!showDetailedNutrients)} className="gap-2 min-w-[200px] font-bold text-[10px] uppercase tracking-widest h-10 rounded-xl">
                                 {showDetailedNutrients ? (
                                     <>Collapse Report <ChevronDown className="h-4 w-4 rotate-180" /></>
@@ -1109,6 +1110,14 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
                                     <>Expand Nutrient Report <ChevronDown className="h-4 w-4" /></>
                                 )}
                             </Button>
+                            {onNext && (
+                                <Button
+                                    onClick={onNext}
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 min-w-[200px] font-black text-[10px] uppercase tracking-widest h-10 rounded-xl shadow-lg shadow-emerald-500/20"
+                                >
+                                    Next: Cooking Steps <ArrowRight size={14} />
+                                </Button>
+                            )}
                         </div>
 
                         {showDetailedNutrients && (
