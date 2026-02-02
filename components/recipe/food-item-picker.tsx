@@ -132,8 +132,8 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: Food
     };
 
     return (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-background border border-border rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-start justify-center z-[9999] p-4 pt-[10vh]">
+            <div className="bg-background border border-border rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden animate-in fade-in slide-in-from-top-8 duration-300">
                 {/* Header */}
                 <div className="p-4 border-b border-border flex items-center justify-between bg-muted/30">
                     <div className="flex items-center gap-2">
