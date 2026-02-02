@@ -75,7 +75,7 @@ export default function FoodDetailsPage() {
 
     const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
 
-    const { nutrientDisplayMode, profile, energyUnit } = useUserPreferences();
+    const { nutrientDisplayMode, profile, energyUnit, dailyTargets } = useUserPreferences();
 
     // Context-aware RDAs
     const userRDAs = useRDA(
@@ -315,10 +315,10 @@ export default function FoodDetailsPage() {
                     {Object.entries(items).map(([label, keys]) => {
                         const val = getVal(keys as string[]);
                         const macroRDAs: Record<string, number> = {
-                            'Energy': energyUnit === 'kJ' ? (profile.goal === 'build-muscle' ? 12500 : profile.goal === 'lose-fat' ? 8400 : 10500) : (profile.goal === 'build-muscle' ? 3000 : profile.goal === 'lose-fat' ? 2000 : 2500),
-                            'Protein': profile.goal === 'build-muscle' ? 150 : 50,
-                            'Carbs': profile.goal === 'lose-fat' ? 150 : 250,
-                            'Fat': 70
+                            'Energy': energyUnit === 'kJ' ? dailyTargets.energy * 4.184 : dailyTargets.energy,
+                            'Protein': dailyTargets.protein,
+                            'Carbs': dailyTargets.carbs,
+                            'Fat': dailyTargets.fat
                         };
                         const rda = userRDAs?.[label] || macroRDAs[label];
                         const pct = rda ? Math.round((val / rda) * 100) : 0;
@@ -347,7 +347,7 @@ export default function FoodDetailsPage() {
                                             </div>
                                             {(nutrientDisplayMode === 'value' || nutrientDisplayMode === 'both') && rda && (
                                                 <p className="text-[9px] font-bold text-slate-400 mt-0.5">
-                                                    Target: {rda}{unitLabel}
+                                                    Target: {Math.round(rda)}{unitLabel}
                                                 </p>
                                             )}
                                             {nutrientDisplayMode === 'both' && pct > 0 && !forceRaw && (
