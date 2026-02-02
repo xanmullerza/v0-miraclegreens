@@ -98,25 +98,35 @@ export default function EditRecipePage() {
             // Map ingredients back to RecipeIngredient format
             const mappedIngredients: RecipeIngredient[] = ingData.map(ing => {
                 const food = ing.food_item;
-                const ratio = (ing.weight_g || 100) / 100;
+                const totalWeight = ing.weight_g * recipe.servings;
+                const totalQty = ing.quantity * recipe.servings;
+                const ratio = totalWeight / 100;
+
+                // Get portions from the food_item (JSONB column)
+                const portions = food?.portions || [];
 
                 return {
                     food_item_id: ing.food_item_id,
                     food_item_name: ing.item,
-                    weight_g: ing.weight_g * recipe.servings, // Builder works with total weights
-                    quantity: ing.quantity * recipe.servings,
+                    weight_g: totalWeight, // Builder works with total weights
+                    quantity: totalQty,
                     measure_label: ing.measure_label,
                     modifier: ing.modifier,
-                    calories: food ? Math.round(food.energy_kcal * (ing.weight_g * recipe.servings / 100)) : 0,
-                    energy_kj: food ? Math.round(food.energy_kj * (ing.weight_g * recipe.servings / 100)) : 0,
-                    protein: food ? Number((food.protein_g * (ing.weight_g * recipe.servings / 100)).toFixed(1)) : 0,
-                    fat: food ? Number((food.fat_g * (ing.weight_g * recipe.servings / 100)).toFixed(1)) : 0,
-                    carbs: food ? Number((food.carbs_g * (ing.weight_g * recipe.servings / 100)).toFixed(1)) : 0,
+                    calories: food ? Math.round(food.energy_kcal * ratio) : 0,
+                    energy_kj: food ? Math.round(food.energy_kj * ratio) : 0,
+                    protein: food ? Number((food.protein_g * ratio).toFixed(1)) : 0,
+                    fat: food ? Number((food.fat_g * ratio).toFixed(1)) : 0,
+                    carbs: food ? Number((food.carbs_g * ratio).toFixed(1)) : 0,
                     micronutrients: food ? Object.entries(food.micronutrients || {}).reduce((acc, [key, val]) => {
-                        acc[key] = (val as number) * (ing.weight_g * recipe.servings / 100);
+                        acc[key] = (val as number) * ratio;
                         return acc;
                     }, {} as Record<string, number>) : {},
-                    customUnitWeight: (ing.weight_g > 0 && ing.quantity > 0) ? (ing.weight_g / ing.quantity) : undefined,
+                    // KEY FIX: Include available_measures from food_item.portions
+                    available_measures: portions,
+                    // Only set customUnitWeight if NOT using grams and no matching portion exists
+                    customUnitWeight: (ing.measure_label !== 'g' && ing.weight_g > 0 && ing.quantity > 0)
+                        ? (ing.weight_g / ing.quantity)
+                        : undefined,
                 };
             });
             setIngredients(mappedIngredients);
