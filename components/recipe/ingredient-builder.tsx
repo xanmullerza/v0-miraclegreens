@@ -389,24 +389,29 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
     const handleUpdateQuantity = (index: number, newQuantity: number) => {
         const updated = [...ingredients];
         const ing = updated[index];
+        const unitLower = ing.measure_label.toLowerCase().trim();
 
-        // Calculate new weight based on current measure or custom unit weight
+        // Recalculate weight based on unit type
         let newWeight = newQuantity;
-        const currentWeightPerUnit = (ing.weight_g > 0 && ing.quantity > 0) ? (ing.weight_g / ing.quantity) : 0;
 
-        if (ing.customUnitWeight) {
-            newWeight = newQuantity * ing.customUnitWeight;
-        } else if (ing.measure_label !== 'g' && ing.measure_label !== 'gram') {
-            // Try to find in measures
-            const measure = ing.available_measures?.find(m => m.label === ing.measure_label);
-            if (measure) {
-                newWeight = newQuantity * measure.weight_g;
-            } else if (currentWeightPerUnit > 0) {
-                // Use the weight-per-unit we already have
+        if (unitLower === 'g' || unitLower === 'gram' || unitLower === 'ml') {
+            newWeight = newQuantity;
+        } else if (unitLower === 'kg' || unitLower === 'kilogram') {
+            newWeight = newQuantity * 1000;
+        } else {
+            // Priority 1: Search standard available measures
+            const stdMeasure = ing.available_measures?.find(m => m.label.toLowerCase() === unitLower);
+            if (stdMeasure) {
+                newWeight = newQuantity * stdMeasure.weight_g;
+            }
+            // Priority 2: Use custom unit weight if we have one (from magic paste)
+            else if (ing.customUnitWeight) {
+                newWeight = newQuantity * ing.customUnitWeight;
+            }
+            // Priority 3: Maintain current ratio
+            else {
+                const currentWeightPerUnit = (ing.weight_g > 0 && ing.quantity > 0) ? (ing.weight_g / ing.quantity) : 1;
                 newWeight = newQuantity * currentWeightPerUnit;
-            } else {
-                // Fallback to 1:1 if we truly have nothing to go on
-                newWeight = newQuantity;
             }
         }
 
@@ -434,19 +439,24 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
     const handleUpdateUnit = (index: number, newUnit: string) => {
         const updated = [...ingredients];
         const ing = updated[index];
-
-        // Recalculate weight based on new unit
-        let newWeight = ing.weight_g;
         const newUnitLower = newUnit.toLowerCase().trim();
 
-        if (newUnitLower === 'g' || newUnitLower === 'gram') {
+        // Recalculate weight based on new unit type
+        let newWeight = ing.weight_g;
+
+        if (newUnitLower === 'g' || newUnitLower === 'gram' || newUnitLower === 'ml') {
             newWeight = ing.quantity;
         } else if (newUnitLower === 'kg' || newUnitLower === 'kilogram') {
             newWeight = ing.quantity * 1000;
         } else {
+            // Priority 1: Search standard available measures
             const measure = ing.available_measures?.find(m => m.label.toLowerCase() === newUnitLower);
             if (measure) {
                 newWeight = ing.quantity * measure.weight_g;
+            }
+            // Priority 2: Use custom unit weight if we have one
+            else if (ing.customUnitWeight) {
+                newWeight = ing.quantity * ing.customUnitWeight;
             }
         }
 
