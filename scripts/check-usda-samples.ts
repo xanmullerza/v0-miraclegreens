@@ -1,5 +1,5 @@
 
-import { supabase } from './lib/supabase';
+import { supabase } from '../lib/supabase';
 
 async function checkUSDASamples() {
     const { data, error } = await supabase

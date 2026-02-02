@@ -1,5 +1,5 @@
 
-import { supabase } from './lib/supabase';
+import { supabase } from '../lib/supabase';
 
 async function checkUSDAItem() {
     const { data, error } = await supabase.from('food_items').select('*').eq('source', 'usda').limit(1);

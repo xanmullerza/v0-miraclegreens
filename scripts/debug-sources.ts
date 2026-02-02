@@ -1,5 +1,5 @@
 
-import { supabase } from './lib/supabase';
+import { supabase } from '../lib/supabase';
 
 async function checkSources() {
     const { data, error } = await supabase.from('food_items').select('source').limit(100);
