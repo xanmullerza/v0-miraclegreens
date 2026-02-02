@@ -45,7 +45,7 @@ export default function RecipeBuilderPage() {
     const [isImporting, setIsImporting] = useState(false);
     const [step, setStep] = useState(1);
     const [isFavorite, setIsFavorite] = useState(true);
-    const [isStarted, setIsStarted] = useState(false);
+    const [isStarted, setIsStarted] = useState(true);
     const [startMode, setStartMode] = useState<'none' | 'smart' | 'magic' | 'manual'>('none');
     const [instructionsMode, setInstructionsMode] = useState<'none' | 'magic' | 'manual'>('none');
 
@@ -469,112 +469,7 @@ export default function RecipeBuilderPage() {
             setSaving(false);
         }
     };
-    if (!isStarted && ingredients.length === 0 && !title) {
-        return (
-            <div className="max-w-5xl mx-auto py-20 animate-in fade-in zoom-in duration-700">
-                <div className="text-center space-y-4 mb-16">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-500/10 border border-violet-500/20 text-violet-500 text-[10px] font-black uppercase tracking-widest mb-4">
-                        <Sparkles size={12} className="animate-pulse" /> Protocol Configuration Engine
-                    </div>
-                    <h1 className="text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-none">
-                        Clinical <span className="text-violet-600">Entry</span> Method
-                    </h1>
-                    <p className="text-slate-500 font-medium max-w-xl mx-auto text-sm leading-relaxed">
-                        Select your starting workflow. Our clinical engine will process your input to generate a precise nutritional and protocol profile.
-                    </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* Option 1: Smart Import */}
-                    <button
-                        onClick={() => {
-                            setShowAutoImport(true);
-                            setIsStarted(true);
-                        }}
-                        className="group relative flex flex-col items-start text-left p-10 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-violet-500 transition-all hover:shadow-2xl hover:shadow-violet-500/10 overflow-hidden"
-                    >
-                        <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                            <Wand2 size={120} />
-                        </div>
-                        <div className="w-14 h-14 rounded-2xl bg-violet-500 text-white flex items-center justify-center mb-8 shadow-xl shadow-violet-500/30 group-hover:scale-110 transition-transform">
-                            <Database size={24} />
-                        </div>
-                        <h3 className="text-xl font-black uppercase tracking-tighter mb-3 leading-tight">Smart Protocol <br />Import</h3>
-                        <p className="text-xs text-slate-400 leading-relaxed font-bold uppercase tracking-tight opacity-80">
-                            Full Recipe Extraction
-                        </p>
-                        <p className="text-[11px] text-slate-500 mt-4 leading-relaxed font-medium">
-                            Paste a URL or raw text. We'll automatically identify title, steps, and clinical ingredients.
-                        </p>
-                        <div className="mt-auto pt-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-violet-500 group-hover:gap-4 transition-all">
-                            Initialize Extraction <ArrowRight size={12} />
-                        </div>
-                    </button>
-
-                    {/* Option 2: Magic Paste */}
-                    <button
-                        onClick={() => {
-                            setIsStarted(true);
-                            setStartMode('magic');
-                        }}
-                        className="group relative flex flex-col items-start text-left p-10 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-amber-500 transition-all hover:shadow-2xl hover:shadow-amber-500/10 overflow-hidden"
-                    >
-                        <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                            <Sparkles size={120} />
-                        </div>
-                        <div className="w-14 h-14 rounded-2xl bg-amber-500 text-white flex items-center justify-center mb-8 shadow-xl shadow-amber-500/30 group-hover:scale-110 transition-transform">
-                            <Wand2 size={24} />
-                        </div>
-                        <h3 className="text-xl font-black uppercase tracking-tighter mb-3 leading-tight">Magic Ingredient <br />Paste</h3>
-                        <p className="text-xs text-slate-400 leading-relaxed font-bold uppercase tracking-tight opacity-80">
-                            Bulk Ingredient Processing
-                        </p>
-                        <p className="text-[11px] text-slate-500 mt-4 leading-relaxed font-medium">
-                            Paste a list of items. We'll map each entry to our clinical database for instant nutrient computation.
-                        </p>
-                        <div className="mt-auto pt-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-amber-500 group-hover:gap-4 transition-all">
-                            Parse Ingredients <ArrowRight size={12} />
-                        </div>
-                    </button>
-
-                    {/* Option 3: Manual Build */}
-                    <button
-                        onClick={() => {
-                            setIsStarted(true);
-                            setStartMode('manual');
-                        }}
-                        className="group relative flex flex-col items-start text-left p-10 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 transition-all hover:shadow-2xl hover:shadow-emerald-500/10 overflow-hidden"
-                    >
-                        <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                            <Plus size={120} />
-                        </div>
-                        <div className="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mb-8 shadow-xl shadow-emerald-500/30 group-hover:scale-110 transition-transform">
-                            <Plus size={24} />
-                        </div>
-                        <h3 className="text-xl font-black uppercase tracking-tighter mb-3 leading-tight">Manual Precision <br />Build</h3>
-                        <p className="text-xs text-slate-400 leading-relaxed font-bold uppercase tracking-tight opacity-80">
-                            Line-by-Line Audit
-                        </p>
-                        <p className="text-[11px] text-slate-500 mt-4 leading-relaxed font-medium">
-                            Search and verify ingredients individually for maximum accuracy and clinical precision.
-                        </p>
-                        <div className="mt-auto pt-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-600 group-hover:gap-4 transition-all">
-                            Activate Builder <ArrowRight size={12} />
-                        </div>
-                    </button>
-                </div>
-
-                <div className="flex justify-center pt-8">
-                    <button
-                        onClick={() => router.push('/dashboard/admin')}
-                        className="flex items-center gap-2 text-slate-400 hover:text-slate-600 text-[10px] font-black uppercase tracking-widest transition-colors hover:gap-4"
-                    >
-                        <ArrowLeft size={12} /> Return to Admin Workspace
-                    </button>
-                </div>
-            </div>
-        );
-    }
+    /* Welcome screen removed for unified builder experience */
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100 pb-20">
@@ -586,62 +481,31 @@ export default function RecipeBuilderPage() {
                 <ArrowLeft size={14} /> Back to Admin
             </button> */}
 
-            {/* Hero Section Hidden as per user request */}
-            {/* <div className="relative h-48 rounded-[2.5rem] bg-violet-600 overflow-hidden flex items-center px-12 group">
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1556910103-1c02745aae4d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-indigo-600/50 mix-blend-multiply opacity-50" />
-
-                <div className="relative z-10 space-y-2">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
-                            <ChefHat className="text-white" size={24} />
+            {/* Sub-Hero Header Area */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-4 border-b border-slate-200 dark:border-slate-800">
+                <div className="space-y-1">
+                    <h1 className="text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic">Protocol Builder</h1>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Clinical Nuance & Precision Analysis</p>
+                </div>
+                <div className="flex items-center gap-4">
+                    <Button
+                        onClick={() => setShowAutoImport(true)}
+                        className="bg-violet-600 hover:bg-violet-700 text-white h-12 px-6 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center gap-3 transition-all shadow-lg shadow-violet-500/20 group"
+                    >
+                        <div className="w-6 h-6 rounded-lg bg-white/10 flex items-center justify-center text-white group-hover:scale-110 transition-all">
+                            <Database className="w-3 h-3" />
                         </div>
-                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Recipe Builder</h1>
-                    </div>
-                    <p className="text-violet-50 font-medium max-w-md text-sm pl-1 uppercase tracking-tighter">
-                        Create and optimize nutritionally dense recipe protocols for the global database.
-                    </p>
+                        <span>Smart Protocol Import</span>
+                    </Button>
+                    <Button
+                        onClick={() => router.push('/dashboard/admin')}
+                        variant="outline"
+                        className="h-12 border-slate-200 dark:border-slate-800 text-slate-500 rounded-2xl font-black uppercase tracking-widest text-[10px]"
+                    >
+                        Cancel
+                    </Button>
                 </div>
-
-                <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-6">
-                    <div className="text-right hidden sm:block">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-violet-200 mb-1">Ingredients</p>
-                        <p className="text-3xl font-black text-white leading-none tracking-tighter italic uppercase">
-                            {ingredients.length} <span className="text-violet-300">items</span>
-                        </p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2">
-                        <Button
-                            onClick={() => router.push('/dashboard/mealplanner')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
-                        >
-                            <Calendar size={14} className="group-hover/btn:scale-110 transition-transform" />
-                            Plan Meals
-                        </Button>
-                        <Button
-                            onClick={() => router.push('/dashboard/recipes')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
-                        >
-                            <ChefHat size={14} className="group-hover/btn:scale-110 transition-transform" />
-                            Recipes Hub
-                        </Button>
-                        <Button
-                            className="bg-white text-violet-600 border-none shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest pointer-events-none text-[10px]"
-                        >
-                            <Plus size={14} />
-                            Create Recipe
-                        </Button>
-                        <Button
-                            onClick={() => router.push('/dashboard/foods')}
-                            className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
-                        >
-                            <Library size={14} className="group-hover/btn:scale-110 transition-transform" />
-                            Foods Hub
-                        </Button>
-                    </div>
-                </div>
-            </div> */}
+            </div>
 
             {/* Sub-Hero Actions - Hidden as handled by initialization screen */}
             {/* <div className="flex justify-start">
