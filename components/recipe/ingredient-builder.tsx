@@ -877,7 +877,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                         {ingredients.map((ing, index) => (
                             <div key={index} className="relative group p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
                                 {/* Action Buttons - Bottom Right */}
-                                <div className="absolute bottom-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
+                                <div className="absolute bottom-4 right-4 flex items-center gap-2 transition-all">
                                     <button
                                         type="button"
                                         onClick={() => handleRemoveIngredient(index)}
