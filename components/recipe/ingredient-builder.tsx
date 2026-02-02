@@ -858,24 +858,6 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
                         <h3 className="text-xl font-black uppercase tracking-tighter text-slate-900 dark:text-white">Empty Kitchen</h3>
                         <p className="text-xs font-bold text-slate-400">Add your first ingredient to start the clinical analysis</p>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <button
-                            type="button"
-                            onClick={() => setShowMagicPaste(!showMagicPaste)}
-                            className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-6 h-12 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all"
-                        >
-                            <Wand2 className="w-4 h-4" />
-                            Magic Paste
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setShowPicker(true)}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20 px-8 h-12 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all scale-110"
-                        >
-                            <Plus className="w-5 h-5" />
-                            Add Ingredient
-                        </button>
-                    </div>
                 </div>
             )}
 
