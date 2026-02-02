@@ -126,9 +126,9 @@ function DashboardComparisonContent() {
     useEffect(() => {
         if (selectedItems.length > 0) {
             const ids = selectedItems.map(i => i.id).join(',');
-            router.replace(`/dashboard/compare?ids=${ids}`, { scroll: false });
+            router.replace(`/dashboard/comparefoods?ids=${ids}`, { scroll: false });
         } else {
-            router.replace('/dashboard/compare', { scroll: false });
+            router.replace('/dashboard/comparefoods', { scroll: false });
         }
     }, [selectedItems, router]);
 
@@ -505,7 +505,7 @@ function DashboardComparisonContent() {
                                                 <Button
                                                     onClick={() => {
                                                         const ids = selectedItems.map(i => i.id).join(',');
-                                                        router.push(`/dashboard/compare/report?ids=${ids}`);
+                                                        router.push(`/dashboard/comparefoods/report?ids=${ids}`);
                                                     }}
                                                     className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-lg shadow-amber-500/20 group"
                                                 >

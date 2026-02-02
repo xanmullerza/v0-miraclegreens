@@ -84,7 +84,7 @@ export default function DashboardOverview() {
         {
             name: 'Compare Foods',
             desc: 'Analyze and compare nutritional profiles side-by-side.',
-            href: '/dashboard/compare',
+            href: '/dashboard/comparefoods',
             icon: Scale,
             color: 'text-orange-500',
             bg: 'bg-orange-500/10'
@@ -92,7 +92,7 @@ export default function DashboardOverview() {
         {
             name: 'Plan Your Meals',
             desc: 'Generate optimized daily nutrition protocols.',
-            href: '/dashboard/plan',
+            href: '/dashboard/mealplanner',
             icon: Calendar,
             color: 'text-rose-500',
             bg: 'bg-rose-500/10'

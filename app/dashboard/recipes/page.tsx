@@ -248,7 +248,7 @@ export default function RecipesPage() {
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                         <Button
-                            onClick={() => router.push('/dashboard/plan')}
+                            onClick={() => router.push('/dashboard/mealplanner')}
                             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
                             <Calendar size={14} className="group-hover/btn:scale-110 transition-transform" />

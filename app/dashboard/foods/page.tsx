@@ -419,7 +419,7 @@ function FoodsContent() {
                                     Nutrients
                                 </Button>
                                 <Button
-                                    onClick={() => router.push('/dashboard/compare')}
+                                    onClick={() => router.push('/dashboard/comparefoods')}
                                     className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                                 >
                                     <Scale size={14} className="group-hover/btn:scale-110 transition-transform" />
@@ -977,10 +977,10 @@ function FoodsContent() {
                         <Button
                             onClick={() => {
                                 const ids = compareItems.map(i => i.id).join(',');
-                                router.push(`/dashboard/compare?ids=${ids}`);
+                                router.push(`/dashboard/comparefoods?ids=${ids}`);
                             }}
                             disabled={compareItems.length < 2}
-                            className="w-full h-14 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-[0.2em] shadow-xl transition-all gap-3"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 font-black uppercase tracking-widest text-[10px] h-11 rounded-xl shadow-lg border border-emerald-500/20 px-6"
                         >
                             <Scale size={18} />
                             Compare Foods
