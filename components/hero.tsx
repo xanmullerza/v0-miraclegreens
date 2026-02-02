@@ -1,8 +1,7 @@
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, ShoppingBag, Heart, LayoutGrid, Calendar, TreeDeciduous } from 'lucide-react';
+import { ArrowRight, Heart } from 'lucide-react';
 
-const SHOW_SHOP = false;
 
 export function Hero() {
   return (
@@ -17,35 +16,12 @@ export function Hero() {
               Vitala is your expert companion for biological nutrition. We provide the tools and data you need to make better food choices, build optimized meal protocols, and achieve your health goals through the power of high-density nutrition.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              {SHOW_SHOP && (
-                <Button size="lg" className="h-12 px-8 text-base gap-2" asChild>
-                  <a href="/shop">
-                    <ShoppingBag className="h-5 w-5" />
-                    Shop Now
-                  </a>
-                </Button>
-              )}
-              {/* Hide Browse, Plan, and Donate buttons per user request */}
-              {/* <div className="flex flex-wrap gap-2 sm:gap-4">
-                <Button variant="outline" size="lg" className="h-12 px-6 text-base gap-2" asChild>
-                  <a href="/browse">
-                    <LayoutGrid className="h-5 w-5" />
-                    Browse
-                  </a>
-                </Button>
-                <Button variant="outline" size="lg" className="h-12 px-6 text-base gap-2" asChild>
-                  <a href="/plan">
-                    <Calendar className="h-5 w-5" />
-                    Plan
-                  </a>
-                </Button>
-                <Button variant="outline" size="lg" className="h-12 px-6 text-base gap-2" asChild>
-                  <a href="/donate">
-                    <TreeDeciduous className="h-5 w-5" />
-                    Donate
-                  </a>
-                </Button>
-              </div> */}
+              <Button size="lg" className="h-12 px-8 text-base gap-2" asChild>
+                <a href="/dashboard">
+                  Go to Dashboard
+                  <ArrowRight className="h-5 w-5" />
+                </a>
+              </Button>
             </div>
           </div>
           <div className="relative">

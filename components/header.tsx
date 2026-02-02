@@ -1,23 +1,14 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, TreeDeciduous, ShoppingBag, LayoutGrid, Calendar, BarChart3, LayoutDashboard, User, LogOut } from 'lucide-react';
+import { Menu, LayoutDashboard, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { supabase } from '@/lib/supabase';
 import { useState, useEffect } from 'react';
 // import { ModeToggle } from '@/components/mode-toggle';
 
-const showShop = false;
-const showPlan = false;
 const showDashboard = true;
-
-const navigation = [
-	{ name: 'The Vision', href: '#story' },
-	{ name: 'The Protocol', href: '#how-it-works' },
-	...(showShop ? [{ name: 'Shop', href: '/shop' }] : []),
-	{ name: 'Research', href: '/browse' },
-];
 
 export function Header() {
 	const [user, setUser] = useState<any>(null);
@@ -62,34 +53,6 @@ export function Header() {
 										</Link>
 									</Button>
 								)}
-								<Button className="gap-2 mt-2" asChild>
-									<Link href="/browse">
-										<LayoutGrid className="h-4 w-4" />
-										Browse Resources
-									</Link>
-								</Button>
-								{showPlan && (
-									<Button className="gap-2 mt-2" asChild>
-										<Link href="/plan">
-											<Calendar className="h-4 w-4" />
-											Plan Meals
-										</Link>
-									</Button>
-								)}
-								{showShop && (
-									<Button className="gap-2 mt-2" asChild>
-										<Link href="/shop">
-											<ShoppingBag className="h-4 w-4" />
-											Visit Shop
-										</Link>
-									</Button>
-								)}
-								<Button className="gap-2 mt-2" asChild>
-									<Link href="/donate">
-										<TreeDeciduous className="h-4 w-4" />
-										Donate
-									</Link>
-								</Button>
 
 								{/* <div className="flex items-center gap-2 mt-2">
 									<ModeToggle />
@@ -112,14 +75,21 @@ export function Header() {
 						</div>
 					</Link>
 
-					{/* Right-side buttons (Shop + Donate remain) */}
+					{/* Logo */}
+					<Link href="/" className="flex items-center gap-2">
+						<div className="relative h-10 w-40">
+							<Image
+								src="/vitala-logo.png"
+								alt="Vitala Logo"
+								fill
+								className="object-contain brightness-0 invert"
+								priority
+							/>
+						</div>
+					</Link>
+
+					{/* Right-side buttons */}
 					<div className="flex items-center gap-2">
-						<Button variant="secondary" size="sm" className="hidden sm:flex gap-2" asChild>
-							<Link href="/browse">
-								<LayoutGrid className="h-4 w-4" />
-								Browse
-							</Link>
-						</Button>
 						{user ? (
 							<>
 								<Button variant="secondary" size="sm" className="hidden lg:flex gap-2" asChild>
@@ -152,44 +122,14 @@ export function Header() {
 								</Button>
 							)
 						)}
-						{showPlan && (
+						{showDashboard && (
 							<Button variant="secondary" size="sm" className="hidden sm:flex gap-2" asChild>
-								<Link href="/plan">
-									<Calendar className="h-4 w-4" />
-									Plan
+								<Link href="/dashboard">
+									<LayoutDashboard className="h-4 w-4" />
+									Dashboard
 								</Link>
 							</Button>
 						)}
-						{showShop && (
-							<Button variant="secondary" size="sm" className="hidden sm:flex gap-2" asChild>
-								<Link href="/shop">
-									<ShoppingBag className="h-4 w-4" />
-									Shop
-								</Link>
-							</Button>
-						)}
-						<Button
-							variant="secondary"
-							size="sm"
-							className="hidden md:flex gap-2"
-							asChild
-						>
-							<Link href="/donate">
-								<TreeDeciduous className="h-4 w-4" />
-								Donate
-							</Link>
-						</Button>
-						<Button
-							variant="ghost"
-							size="icon"
-							className="sm:hidden text-primary-foreground hover:bg-primary-foreground/10"
-							asChild
-						>
-							<Link href="/shop">
-								<ShoppingBag className="h-5 w-5" />
-								<span className="sr-only">Shop</span>
-							</Link>
-						</Button>
 					</div>
 					{/* <ModeToggle className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground ml-2" /> */}
 				</div>
