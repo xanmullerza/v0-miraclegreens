@@ -8,12 +8,15 @@ import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Trophy, Crown, TrendingUp, Shield, Activity, Share2, Printer, Zap, Battery, Droplet, Gem, Scale } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
+
 // Reuse types/interfaces if possible, or redefine locally
 interface FoodItem {
     id: string;
     name: string;
     common_name: string;
     energy_kcal: number;
+    energy_kj: number;
     protein_g: number;
     carbs_g: number;
     fat_g: number;
@@ -24,6 +27,7 @@ function ComparisonReportContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const ids = searchParams.get('ids')?.split(',') || [];
+    const { energyUnit } = useUserPreferences();
 
     const [items, setItems] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true); // Keep loading state for internal data fetching
@@ -168,8 +172,8 @@ function ComparisonReportContent() {
                             <div className="text-[10px] font-bold uppercase text-slate-400">Protein</div>
                         </div>
                         <div className="text-center p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
-                            <div className="text-2xl font-black text-blue-500">{(winner.energy_kcal).toFixed(0)}</div>
-                            <div className="text-[10px] font-bold uppercase text-slate-400">Calories</div>
+                            <div className="text-2xl font-black text-blue-500">{(energyUnit === 'kJ' ? winner.energy_kj : winner.energy_kcal).toFixed(0)}</div>
+                            <div className="text-[10px] font-bold uppercase text-slate-400">{energyUnit === 'kJ' ? 'Kilojoules' : 'Calories'}</div>
                         </div>
                     </div>
                     {runnerUp && (
@@ -197,7 +201,11 @@ function ComparisonReportContent() {
                             const advantages = [];
                             if (item.protein_g > winner.protein_g) advantages.push({ label: 'Higher Protein', diff: `+${(item.protein_g - winner.protein_g).toFixed(1)}g` });
                             if ((item.micronutrients['calcium_mg'] || 0) > (winner.micronutrients['calcium_mg'] || 0)) advantages.push({ label: 'More Calcium', diff: 'Bone Health' });
-                            if (item.energy_kcal < winner.energy_kcal) advantages.push({ label: 'Lower Calorie', diff: `-${(winner.energy_kcal - item.energy_kcal).toFixed(0)} kcal` });
+
+                            const itemEnergy = energyUnit === 'kJ' ? item.energy_kj : item.energy_kcal;
+                            const winnerEnergy = energyUnit === 'kJ' ? winner.energy_kj : winner.energy_kcal;
+
+                            if (itemEnergy < winnerEnergy) advantages.push({ label: 'Lower Energy', diff: `-${(winnerEnergy - itemEnergy).toFixed(0)} ${energyUnit}` });
 
                             if (advantages.length === 0) advantages.push({ label: 'Alternative Taste', diff: 'Flavor Profile' });
 
@@ -207,7 +215,7 @@ function ComparisonReportContent() {
                                     <div className="flex gap-1 mb-4">
                                         {item.protein_g > 10 && <Badge variant="outline" className="text-[8px] h-4 px-1 border-red-200 text-red-600 bg-red-50">High Protein</Badge>}
                                         {item.carbs_g < 5 && item.fat_g > 5 && <Badge variant="outline" className="text-[8px] h-4 px-1 border-blue-200 text-blue-600 bg-blue-50">Keto</Badge>}
-                                        {item.energy_kcal < 50 && <Badge variant="outline" className="text-[8px] h-4 px-1 border-green-200 text-green-600 bg-green-50">Low Cal</Badge>}
+                                        {itemEnergy < (energyUnit === 'kJ' ? 200 : 50) && <Badge variant="outline" className="text-[8px] h-4 px-1 border-green-200 text-green-600 bg-green-50">Low Energy</Badge>}
                                     </div>
                                     <p className="text-xs text-slate-500 mb-4 h-10">
                                         While it didn't win the overall density score, it is still a superior choice for specific goals:
@@ -236,7 +244,7 @@ function ComparisonReportContent() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {[
-                        { title: 'Weight Loss', icon: Scale, desc: 'Lowest calorie density', winner: [...items].sort((a, b) => a.energy_kcal - b.energy_kcal)[0] },
+                        { title: 'Weight Loss', icon: Scale, desc: 'Lowest energy density', winner: [...items].sort((a, b) => a.energy_kcal - b.energy_kcal)[0] },
                         { title: 'Muscle Gain', icon: Zap, desc: 'Highest protein content', winner: [...items].sort((a, b) => b.protein_g - a.protein_g)[0] },
                         { title: 'Energy Boost', icon: Battery, desc: 'Highest B-Vitamin Complex', winner: [...items].sort((a, b) => (b.micronutrients['B12 (Cobalamin)'] || 0) - (a.micronutrients['B12 (Cobalamin)'] || 0))[0] },
                     ].map((scenario, i) => (
