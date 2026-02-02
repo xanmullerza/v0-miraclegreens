@@ -396,17 +396,12 @@ function ProfilePageContent() {
                 </div>
 
                 {/* Sticky Sidebar (Full-heightish Split) */}
-                <aside className="w-full lg:w-1/2 lg:sticky lg:top-24 space-y-6">
-                    <div className="bg-slate-950 border border-slate-800 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group">
+                <aside className="w-full lg:w-1/2 lg:sticky lg:top-8 space-y-6">
+                    <div className="bg-slate-950 border border-slate-800 rounded-[2.5rem] p-6 pt-7 shadow-2xl relative overflow-hidden group">
                         {/* Background Decoration */}
                         <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors duration-700" />
 
-                        <div className="mb-6 text-center">
-                            <h2 className="text-[10px] uppercase font-black tracking-[0.2em] text-blue-500 mb-1">Nutrient Strategy Protocol</h2>
-                            <p className="text-xl font-black text-slate-200 capitalize italic tracking-tighter">{formData.nutrientStrategy || 'Balanced'}</p>
-                        </div>
-
-                        <div className="grid grid-cols-3 sm:grid-cols-4 xl:grid-cols-5 gap-2 pr-1">
+                        <div className="grid grid-cols-3 sm:grid-cols-4 xl:grid-cols-5 gap-1.5 pr-1">
                             {(() => {
                                 // 1. Calculate BMR (Mifflin-St Jeor)
                                 const weight = Number(formData.weight) || 70;
@@ -467,11 +462,11 @@ function ProfilePageContent() {
                                     const displayVal = value < 1 ? value.toFixed(2) : value < 10 ? value.toFixed(1) : Math.round(value);
 
                                     return (
-                                        <div key={nutrient} className="bg-slate-900/50 border border-slate-800/50 p-2 rounded-xl flex flex-col items-center justify-center text-center hover:border-blue-500/30 transition-all hover:bg-slate-900 group/item aspect-square">
-                                            <p className="text-[8px] uppercase font-black text-slate-500 group-hover/item:text-slate-400 transition-colors leading-none mb-1.5 line-clamp-2">{nutrient}</p>
+                                        <div key={nutrient} className="bg-slate-900/50 border border-slate-800/50 p-1.5 rounded-[1.25rem] flex flex-col items-center justify-center text-center hover:border-blue-500/30 transition-all hover:bg-slate-900 group/item aspect-square">
+                                            <p className="text-[7px] uppercase font-black text-slate-500 group-hover/item:text-slate-400 transition-colors leading-none mb-1 line-clamp-2">{nutrient}</p>
                                             <div className="flex items-baseline gap-0.5">
-                                                <span className="text-sm font-black text-slate-200 tracking-tighter italic">{displayVal}</span>
-                                                <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">{unit}</span>
+                                                <span className="text-xs font-black text-slate-200 tracking-tighter italic leading-none">{displayVal}</span>
+                                                <span className="text-[7px] font-black text-slate-600 uppercase tracking-widest">{unit}</span>
                                             </div>
                                         </div>
                                     );
