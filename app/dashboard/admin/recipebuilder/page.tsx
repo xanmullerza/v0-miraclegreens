@@ -237,6 +237,15 @@ export default function RecipeBuilderPage() {
                     const weight = ing.weightG || (isGrams ? quantity : 100);
                     const ratio = weight / 100;
 
+                    const base_nutrition = {
+                        calories: match.energy_kcal,
+                        energy_kj: match.energy_kj || (match.energy_kcal * 4.184),
+                        protein: match.protein_g,
+                        fat: match.fat_g,
+                        carbs: match.carbs_g,
+                        micronutrients: (match as any).micronutrients || {}
+                    };
+
                     rawIngredients.push({
                         food_item_id: match.id || 'temp-id',
                         food_item_name: finalName,
@@ -249,10 +258,11 @@ export default function RecipeBuilderPage() {
                         protein: Number((match.protein_g * ratio).toFixed(1)),
                         fat: Number((match.fat_g * ratio).toFixed(1)),
                         carbs: Number((match.carbs_g * ratio).toFixed(1)),
-                        micronutrients: Object.entries((match as any).micronutrients || {}).reduce((acc, [key, val]) => {
+                        micronutrients: Object.entries(base_nutrition.micronutrients).reduce((acc, [key, val]) => {
                             acc[key] = (val as number) * ratio;
                             return acc;
                         }, {} as Record<string, number>),
+                        base_nutrition,
                         customUnitWeight: (weight > 0 && quantity > 0) ? (weight / quantity) : undefined,
                     });
                 } else {

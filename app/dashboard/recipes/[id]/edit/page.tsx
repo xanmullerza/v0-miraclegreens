@@ -105,6 +105,15 @@ export default function EditRecipePage() {
                 // Get portions from the food_item (JSONB column)
                 const portions = food?.portions || [];
 
+                const base_nutrition = food ? {
+                    calories: food.energy_kcal,
+                    energy_kj: food.energy_kj || (food.energy_kcal * 4.184),
+                    protein: food.protein_g,
+                    fat: food.fat_g,
+                    carbs: food.carbs_g,
+                    micronutrients: food.micronutrients || {}
+                } : undefined;
+
                 return {
                     food_item_id: ing.food_item_id,
                     food_item_name: ing.item,
@@ -121,6 +130,7 @@ export default function EditRecipePage() {
                         acc[key] = (val as number) * ratio;
                         return acc;
                     }, {} as Record<string, number>) : {},
+                    base_nutrition,
                     // KEY FIX: Include available_measures from food_item.portions
                     available_measures: portions,
                     // Only set customUnitWeight if NOT using grams and no matching portion exists

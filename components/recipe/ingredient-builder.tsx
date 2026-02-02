@@ -43,6 +43,15 @@ export interface RecipeIngredient {
     fat: number;
     carbs: number;
     micronutrients: Record<string, number>;
+    // Base nutrition per 100g (to avoid rounding drift)
+    base_nutrition?: {
+        calories: number;
+        energy_kj: number;
+        protein: number;
+        fat: number;
+        carbs: number;
+        micronutrients: Record<string, number>;
+    };
     // Available measures
     available_measures?: FoodMeasure[];
     // Parsing state
@@ -210,6 +219,15 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
 
         const multiplier = weight_g / 100;
 
+        const base_nutrition = {
+            calories: finalFoodItem.energy_kcal,
+            energy_kj: finalFoodItem.energy_kj || (finalFoodItem.energy_kcal * 4.184),
+            protein: finalFoodItem.protein_g,
+            fat: finalFoodItem.fat_g,
+            carbs: finalFoodItem.carbs_g,
+            micronutrients: finalFoodItem.micronutrients || {}
+        };
+
         const newIngredient: RecipeIngredient = {
             food_item_id: finalFoodItem.id || 'temp-id',
             food_item_name: finalFoodItem.common_name || finalFoodItem.name,
@@ -217,15 +235,16 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             quantity,
             measure_label: unit,
             image: finalFoodItem.image,
-            calories: Math.round(finalFoodItem.energy_kcal * multiplier),
-            energy_kj: Math.round((finalFoodItem.energy_kj || (finalFoodItem.energy_kcal * 4.184)) * multiplier),
-            protein: Math.round(finalFoodItem.protein_g * multiplier * 10) / 10,
-            fat: Math.round(finalFoodItem.fat_g * multiplier * 10) / 10,
-            carbs: Math.round(finalFoodItem.carbs_g * multiplier * 10) / 10,
-            micronutrients: Object.entries(finalFoodItem.micronutrients || {}).reduce((acc, [key, val]) => {
+            calories: Math.round(base_nutrition.calories * multiplier),
+            energy_kj: Math.round(base_nutrition.energy_kj * multiplier),
+            protein: Math.round(base_nutrition.protein * multiplier * 10) / 10,
+            fat: Math.round(base_nutrition.fat * multiplier * 10) / 10,
+            carbs: Math.round(base_nutrition.carbs * multiplier * 10) / 10,
+            micronutrients: Object.entries(base_nutrition.micronutrients).reduce((acc, [key, val]) => {
                 acc[key] = (val as number) * multiplier;
                 return acc;
             }, {} as Record<string, number>),
+            base_nutrition,
             available_measures: measures,
             parsedGrams: hasParsedWeight ? weight_g : undefined,
             customUnitWeight: (hasParsedWeight && quantity > 0) ? (weight_g / quantity) : undefined,
@@ -415,23 +434,44 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             }
         }
 
-        const safeOldWeight = ing.weight_g || 1;
-        const ratio = newWeight / safeOldWeight;
+        const multiplier = newWeight / 100;
 
-        updated[index] = {
-            ...ing,
-            quantity: newQuantity,
-            weight_g: newWeight,
-            calories: Math.round(ing.calories * ratio),
-            energy_kj: Math.round(ing.energy_kj * ratio),
-            protein: Math.round(ing.protein * ratio * 10) / 10,
-            fat: Math.round(ing.fat * ratio * 10) / 10,
-            carbs: Math.round(ing.carbs * ratio * 10) / 10,
-            micronutrients: Object.entries(ing.micronutrients || {}).reduce((acc, [key, val]) => {
-                acc[key] = (val as number) * ratio;
-                return acc;
-            }, {} as Record<string, number>),
-        };
+        // If we have base_nutrition, use it for calculations to avoid drift.
+        // Otherwise use the current rounded values (safety fallback)
+        if (ing.base_nutrition) {
+            const base = ing.base_nutrition;
+            updated[index] = {
+                ...ing,
+                quantity: newQuantity,
+                weight_g: newWeight,
+                calories: Math.round(base.calories * multiplier),
+                energy_kj: Math.round(base.energy_kj * multiplier),
+                protein: Math.round(base.protein * multiplier * 10) / 10,
+                fat: Math.round(base.fat * multiplier * 10) / 10,
+                carbs: Math.round(base.carbs * multiplier * 10) / 10,
+                micronutrients: Object.entries(base.micronutrients).reduce((acc, [key, val]) => {
+                    acc[key] = (val as number) * multiplier;
+                    return acc;
+                }, {} as Record<string, number>),
+            };
+        } else {
+            const safeOldWeight = ing.weight_g || 1;
+            const ratio = newWeight / safeOldWeight;
+            updated[index] = {
+                ...ing,
+                quantity: newQuantity,
+                weight_g: newWeight,
+                calories: Math.round(ing.calories * ratio),
+                energy_kj: Math.round(ing.energy_kj * ratio),
+                protein: Math.round(ing.protein * ratio * 10) / 10,
+                fat: Math.round(ing.fat * ratio * 10) / 10,
+                carbs: Math.round(ing.carbs * ratio * 10) / 10,
+                micronutrients: Object.entries(ing.micronutrients || {}).reduce((acc, [key, val]) => {
+                    acc[key] = (val as number) * ratio;
+                    return acc;
+                }, {} as Record<string, number>),
+            };
+        }
 
         onChange(updated);
     };
@@ -460,22 +500,41 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             }
         }
 
-        const ratio = newWeight / (ing.weight_g || 1);
+        const multiplier = newWeight / 100;
 
-        updated[index] = {
-            ...ing,
-            measure_label: newUnit,
-            weight_g: newWeight,
-            calories: Math.round(ing.calories * ratio),
-            energy_kj: Math.round(ing.energy_kj * ratio),
-            protein: Math.round(ing.protein * ratio * 10) / 10,
-            fat: Math.round(ing.fat * ratio * 10) / 10,
-            carbs: Math.round(ing.carbs * ratio * 10) / 10,
-            micronutrients: Object.entries(ing.micronutrients || {}).reduce((acc, [key, val]) => {
-                acc[key] = (val as number) * ratio;
-                return acc;
-            }, {} as Record<string, number>),
-        };
+        if (ing.base_nutrition) {
+            const base = ing.base_nutrition;
+            updated[index] = {
+                ...ing,
+                measure_label: newUnit,
+                weight_g: newWeight,
+                calories: Math.round(base.calories * multiplier),
+                energy_kj: Math.round(base.energy_kj * multiplier),
+                protein: Math.round(base.protein * multiplier * 10) / 10,
+                fat: Math.round(base.fat * multiplier * 10) / 10,
+                carbs: Math.round(base.carbs * multiplier * 10) / 10,
+                micronutrients: Object.entries(base.micronutrients).reduce((acc, [key, val]) => {
+                    acc[key] = (val as number) * multiplier;
+                    return acc;
+                }, {} as Record<string, number>),
+            };
+        } else {
+            const ratio = newWeight / (ing.weight_g || 1);
+            updated[index] = {
+                ...ing,
+                measure_label: newUnit,
+                weight_g: newWeight,
+                calories: Math.round(ing.calories * ratio),
+                energy_kj: Math.round(ing.energy_kj * ratio),
+                protein: Math.round(ing.protein * ratio * 10) / 10,
+                fat: Math.round(ing.fat * ratio * 10) / 10,
+                carbs: Math.round(ing.carbs * ratio * 10) / 10,
+                micronutrients: Object.entries(ing.micronutrients || {}).reduce((acc, [key, val]) => {
+                    acc[key] = (val as number) * ratio;
+                    return acc;
+                }, {} as Record<string, number>),
+            };
+        }
         onChange(updated);
     };
 
@@ -491,21 +550,39 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
     const handleUpdateWeight = (index: number, newWeight: number) => {
         const updated = [...ingredients];
         const ing = updated[index];
-        const ratio = newWeight / (ing.weight_g || 1);
+        const multiplier = newWeight / 100;
 
-        updated[index] = {
-            ...ing,
-            weight_g: newWeight,
-            calories: Math.round(ing.calories * ratio),
-            energy_kj: Math.round(ing.energy_kj * ratio),
-            protein: Math.round(ing.protein * ratio * 10) / 10,
-            fat: Math.round(ing.fat * ratio * 10) / 10,
-            carbs: Math.round(ing.carbs * ratio * 10) / 10,
-            micronutrients: Object.entries(ing.micronutrients || {}).reduce((acc, [key, val]) => {
-                acc[key] = (val as number) * ratio;
-                return acc;
-            }, {} as Record<string, number>),
-        };
+        if (ing.base_nutrition) {
+            const base = ing.base_nutrition;
+            updated[index] = {
+                ...ing,
+                weight_g: newWeight,
+                calories: Math.round(base.calories * multiplier),
+                energy_kj: Math.round(base.energy_kj * multiplier),
+                protein: Math.round(base.protein * multiplier * 10) / 10,
+                fat: Math.round(base.fat * multiplier * 10) / 10,
+                carbs: Math.round(base.carbs * multiplier * 10) / 10,
+                micronutrients: Object.entries(base.micronutrients).reduce((acc, [key, val]) => {
+                    acc[key] = (val as number) * multiplier;
+                    return acc;
+                }, {} as Record<string, number>),
+            };
+        } else {
+            const ratio = newWeight / (ing.weight_g || 1);
+            updated[index] = {
+                ...ing,
+                weight_g: newWeight,
+                calories: Math.round(ing.calories * ratio),
+                energy_kj: Math.round(ing.energy_kj * ratio),
+                protein: Math.round(ing.protein * ratio * 10) / 10,
+                fat: Math.round(ing.fat * ratio * 10) / 10,
+                carbs: Math.round(ing.carbs * ratio * 10) / 10,
+                micronutrients: Object.entries(ing.micronutrients || {}).reduce((acc, [key, val]) => {
+                    acc[key] = (val as number) * ratio;
+                    return acc;
+                }, {} as Record<string, number>),
+            };
+        }
         onChange(updated);
     };
 
