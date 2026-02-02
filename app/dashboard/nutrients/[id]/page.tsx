@@ -26,6 +26,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { nutrientInfo, NutrientInfo } from '@/lib/data/nutrient-info';
 import { supabase } from '@/lib/supabase';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { useRDA } from '@/hooks/use-rda';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm", className)}>
@@ -38,6 +40,14 @@ export default function NutrientDetailsPage() {
     const { id } = useParams();
     const nutrientId = decodeURIComponent(id as string);
     const info = nutrientInfo[nutrientId];
+    const { profile, dailyTargets, energyUnit } = useUserPreferences();
+
+    // Context-aware RDAs
+    const userRDAs = useRDA(
+        typeof profile.age === 'number' ? profile.age : 30,
+        profile.gender || 'female',
+        dailyTargets.energy || 2000
+    );
 
     const [favorites, setFavorites] = useState<string[]>([]);
     const [topFoods, setTopFoods] = useState<any[]>([]);
@@ -202,10 +212,44 @@ export default function NutrientDetailsPage() {
                         </div>
                         <div className="space-y-2">
                             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Reference Intake</h3>
-                            <p className="text-4xl font-black tracking-tighter italic">OPTIMAL</p>
+
+                            {(() => {
+                                let val = null;
+                                let unit = 'mg';
+
+                                if (nutrientId === 'Energy') {
+                                    val = energyUnit === 'kJ' ? dailyTargets.energy * 4.184 : dailyTargets.energy;
+                                    unit = energyUnit;
+                                } else if (nutrientId === 'Protein') {
+                                    val = dailyTargets.protein;
+                                    unit = 'g';
+                                } else if (nutrientId === 'Carbs') {
+                                    val = dailyTargets.carbs;
+                                    unit = 'g';
+                                } else if (nutrientId === 'Fat') {
+                                    val = dailyTargets.fat;
+                                    unit = 'g';
+                                } else if (userRDAs?.[nutrientId]) {
+                                    val = userRDAs[nutrientId];
+                                    if (nutrientId === 'Vitamin D') unit = 'IU';
+                                    else if (nutrientId.includes('Folate') || nutrientId.includes('B12') || nutrientId.includes('Biotin') || nutrientId.includes('Selenium') || nutrientId === 'Vitamin A' || nutrientId === 'Vitamin K' || nutrientId.includes('µg')) unit = 'µg';
+                                }
+
+                                if (val) {
+                                    return (
+                                        <div className="flex flex-col items-center">
+                                            <p className="text-5xl font-black tracking-tighter italic">
+                                                {val >= 100 ? Math.round(val) : val < 10 ? val.toFixed(1) : Math.round(val)}
+                                            </p>
+                                            <p className="text-xl font-black opacity-80">{unit}</p>
+                                        </div>
+                                    );
+                                }
+                                return <p className="text-4xl font-black tracking-tighter italic">OPTIMAL</p>;
+                            })()}
                         </div>
                         <p className="text-[10px] font-bold opacity-70 leading-relaxed max-w-[200px]">
-                            Ensure balanced consumption to prevent cellular oxidative stress and maintain peak metabolic rate.
+                            Your personalized daily target based on your biometric profile and nutrient strategy.
                         </p>
                     </Card>
 
