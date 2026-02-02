@@ -40,6 +40,7 @@ import { cn } from '@/lib/utils';
 import { useRDA } from '@/hooks/use-rda';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useSearch } from '@/lib/context/search-context';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden", className)}>
@@ -69,12 +70,13 @@ const COMPARISON_COLORS = [
     '#84cc16', // lime-500
     '#d946ef', // fuchsia-500
     '#6366f1', // indigo-500
-    '#14b8a6', // teal-500
+    '#14b8a6', // teal-500',
 ];
 
 function DashboardComparisonContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const { profile, dailyTargets, energyUnit, nutrientDisplayMode } = useUserPreferences();
     const { searchQuery, setSearchQuery, setResults, setIsLoading, registerResultClickHandler, setKeepFocusAfterSelect } = useSearch();
     const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
     const [selectedItems, setSelectedItems] = useState<FoodItem[]>([]);
@@ -120,33 +122,28 @@ function DashboardComparisonContent() {
                 fetchSelected();
             }
         }
-    }, []); // Run once on mount
+    }, [searchParams]);
 
-    // Update URL when selection changes
-    useEffect(() => {
-        if (selectedItems.length > 0) {
-            const ids = selectedItems.map(i => i.id).join(',');
-            router.replace(`/dashboard/comparefoods?ids=${ids}`, { scroll: false });
-        } else {
-            router.replace('/dashboard/comparefoods', { scroll: false });
-        }
-    }, [selectedItems, router]);
+    // Search logic (Client-side specific for this page if needed, or rely on global)
+    // The global search handles the input, we just react to selections.
+    // However, if we want the global search to suggest items valid for this page, we rely on the context.
 
+    // We actually need to drive the search results into the context if we want them to show up there
     useEffect(() => {
         const searchFoodItems = async () => {
             if (!searchQuery.trim()) {
-                setResults([]);
                 setSearchResults([]);
+                setResults([] as any[]); // Clear global results
                 return;
-            }
+            };
 
             setIsLoading(true);
             setLoading(true);
             try {
                 let query = supabase
                     .from('food_items')
-                    .select('id, name, common_name, energy_kcal, energy_kj, protein_g, carbs_g, fat_g, micronutrients')
-                    .limit(15);
+                    .select('*')
+                    .limit(20);
 
                 query = query.or(`name.ilike.%${searchQuery.trim()}%,common_name.ilike.%${searchQuery.trim()}%`);
 
@@ -213,11 +210,15 @@ function DashboardComparisonContent() {
         return entry;
     });
 
-    // Default RDA for comparison context (Adult Female, 30yo, 2000kcal)
-    const userRDAs = useRDA(30, 'female', 2000);
+    // Context-aware RDAs
+    const userRDAs = useRDA(
+        typeof profile.age === 'number' ? profile.age : 30,
+        profile.gender || 'female',
+        dailyTargets.energy || 2000
+    );
 
     const getVal = (item: FoodItem, key: string) => {
-        if (key === 'energy_kcal') return item.energy_kcal;
+        if (key === 'energy_kcal') return energyUnit === 'kJ' ? item.energy_kj : item.energy_kcal;
         if (key === 'protein_g') return item.protein_g;
         if (key === 'carbs_g') return item.carbs_g;
         if (key === 'fat_g') return item.fat_g;
@@ -263,8 +264,10 @@ function DashboardComparisonContent() {
                                                     <span className="truncate opacity-80">{item.common_name || item.name}</span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="font-bold">{val >= 1 ? val.toFixed(0) : val.toFixed(1)}</span>
-                                                    {rda && (
+                                                    {(nutrientDisplayMode === 'value' || nutrientDisplayMode === 'both') && (
+                                                        <span className="font-bold">{val >= 1 ? val.toFixed(0) : val.toFixed(1)}</span>
+                                                    )}
+                                                    {(nutrientDisplayMode === 'percentage' || nutrientDisplayMode === 'both') && rda && (
                                                         <span className={cn("text-[9px] px-1.5 py-0.5 rounded-full font-black min-w-[32px] text-center", styles.bg, styles.textFill)}>
                                                             {pct}%
                                                         </span>
@@ -568,7 +571,7 @@ function DashboardComparisonContent() {
                                 <p className="text-[10px] text-slate-400 mb-4 border-b border-slate-800 pb-2">Energy providers • Fuel for your body</p>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                     {[
-                                        { label: 'Energy', keys: ['energy_kcal'], unit: 'kcal' },
+                                        { label: 'Energy', keys: ['energy_kcal'], unit: energyUnit },
                                         { label: 'Protein', keys: ['protein_g'], unit: 'g' },
                                         { label: 'Carbs', keys: ['carbs_g'], unit: 'g' },
                                         { label: 'Fat', keys: ['fat_g'], unit: 'g' },
@@ -581,7 +584,7 @@ function DashboardComparisonContent() {
                                             <div className="space-y-2">
                                                 {selectedItems.map((item, idx) => {
                                                     const val = getVal(item, macro.keys[0]);
-                                                    const target = macro.label === 'Energy' ? 2000 : macro.label === 'Protein' ? 50 : macro.label === 'Carbs' ? 250 : 70; // Rough averages
+                                                    const target = macro.label === 'Energy' ? (energyUnit === 'kJ' ? dailyTargets.energy * 4.184 : dailyTargets.energy) : macro.label === 'Protein' ? dailyTargets.protein : macro.label === 'Carbs' ? dailyTargets.carbs : dailyTargets.fat;
                                                     const pct = Math.round((val / target) * 100);
                                                     const styles = getNutrientLevelStyles(pct, macro.label);
 
@@ -592,10 +595,14 @@ function DashboardComparisonContent() {
                                                                 <span className="truncate opacity-80">{item.common_name || item.name}</span>
                                                             </div>
                                                             <div className="flex items-center gap-2">
-                                                                <span className="font-bold">{Math.round(val)}</span>
-                                                                <span className={cn("text-[9px] px-1.5 py-0.5 rounded-full font-black min-w-[32px] text-center", styles.bg, styles.textFill)}>
-                                                                    {pct}%
-                                                                </span>
+                                                                {(nutrientDisplayMode === 'value' || nutrientDisplayMode === 'both') && (
+                                                                    <span className="font-bold">{val >= 100 ? Math.round(val) : val.toFixed(1)}</span>
+                                                                )}
+                                                                {(nutrientDisplayMode === 'percentage' || nutrientDisplayMode === 'both') && (
+                                                                    <span className={cn("text-[9px] px-1.5 py-0.5 rounded-full font-black min-w-[32px] text-center", styles.bg, styles.textFill)}>
+                                                                        {pct}%
+                                                                    </span>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     );
