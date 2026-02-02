@@ -76,7 +76,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
     const [expandedBreakdownSections, setExpandedBreakdownSections] = useState<Record<string, boolean>>({});
 
-    const { energyUnit, setEnergyUnit } = useUserPreferences();
+    const { energyUnit, setEnergyUnit, profile } = useUserPreferences();
     const useKilojoules = energyUnit === 'kJ';
 
 
@@ -617,7 +617,11 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
         { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0, micronutrients: {} as Record<string, number> }
     );
 
-    const userRDAs = useRDA(undefined, 'female', totals.calories); // Default RDA calc
+    const userRDAs = useRDA(
+        typeof profile.age === 'number' ? profile.age : 30,
+        profile.gender || 'female',
+        totals.calories || 2000
+    );
 
     const NUTRIENT_BREAKDOWNS: Record<string, { label: string, keys: string[], unit: string, isEssential?: boolean, hiddenByDefault?: boolean, isExpandable?: boolean }[]> = {
         'Vitamin A': [
@@ -1048,7 +1052,7 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                                                                     <div onClick={() => setSelectedNutrientInfo(macro.label)} className="cursor-pointer">
                                                                         <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{macro.label}</p>
                                                                         <div className="flex items-baseline gap-1">
-                                                                            <span className="text-xl font-black">{Math.round(macro.val)}</span>
+                                                                            <span className="text-xl font-black">{macro.val >= 1 ? macro.val.toFixed(1) : macro.val.toFixed(2)}</span>
                                                                             <span className="text-[10px] text-muted-foreground font-bold">{macro.unit}</span>
                                                                         </div>
                                                                         <div className={cn("text-[10px] font-black mt-1", styles.text)}>{pct}%</div>
