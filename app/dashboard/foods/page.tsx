@@ -107,6 +107,13 @@ function FoodsContent() {
         fetchFoods(0, true);
     }, [searchQuery, selectedCategories, showFavoritesOnly, sortField, sortDirection]);
 
+    // Handle 'favorites' query param
+    useEffect(() => {
+        if (searchParams.get('favorites') === 'true') {
+            setShowFavoritesOnly(true);
+        }
+    }, [searchParams]);
+
     const fetchFoods = async (pageNum: number, isNewSearch = false) => {
         if (pageNum === 0) setLoading(true);
         else setLoadingMore(true);
