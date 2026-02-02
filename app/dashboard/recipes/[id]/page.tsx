@@ -86,7 +86,7 @@ export default function RecipeDetailsPage() {
     const [expandedBreakdownSections, setExpandedBreakdownSections] = useState<Record<string, boolean>>({});
     const [calculatedTotals, setCalculatedTotals] = useState<CalculatedNutrition | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
-    const { profile, nutrientDisplayMode } = useUserPreferences();
+    const { profile, nutrientDisplayMode, energyUnit } = useUserPreferences();
 
     useEffect(() => {
         const getUser = async () => {
@@ -594,7 +594,7 @@ export default function RecipeDetailsPage() {
                                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                                                     {Object.entries(items).map(([label, keys]) => {
                                                         const val = (label === 'Energy' || label === 'Protein' || label === 'Carbs' || label === 'Fat')
-                                                            ? (label === 'Energy' ? (recipe as any).calories : (recipe as any)[label.toLowerCase()])
+                                                            ? (label === 'Energy' ? (energyUnit === 'kJ' ? (recipe as any).energy_kj : (recipe as any).calories) : (recipe as any)[label.toLowerCase()])
                                                             : getVal(keys as string[]);
                                                         const macroRDAs: Record<string, number> = {
                                                             'Energy': energyUnit === 'kJ' ? (profile.goal === 'build-muscle' ? 12500 : profile.goal === 'lose-fat' ? 8400 : 10500) : (profile.goal === 'build-muscle' ? 3000 : profile.goal === 'lose-fat' ? 2000 : 2500),
@@ -605,7 +605,7 @@ export default function RecipeDetailsPage() {
                                                         const rda = userRDAs?.[label] || macroRDAs[label];
                                                         const pct = rda ? Math.round((val / rda) * 100) : null;
                                                         const styles = getNutrientLevelStyles(pct || 0, label);
-                                                        const unit = label === 'Energy' ? 'kcal' : (label === 'Protein' || label === 'Carbs' || label === 'Fat') ? 'g' : (label === 'Vitamin D') ? 'IU' : (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg')) ? 'µg' : 'mg';
+                                                        const unit = label === 'Energy' ? energyUnit : (label === 'Protein' || label === 'Carbs' || label === 'Fat') ? 'g' : (label === 'Vitamin D') ? 'IU' : (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg')) ? 'µg' : 'mg';
                                                         const hasBreakdown = breakdownLabels.includes(label);
 
                                                         return (

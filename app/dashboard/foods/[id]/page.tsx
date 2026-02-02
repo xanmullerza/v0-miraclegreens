@@ -75,7 +75,7 @@ export default function FoodDetailsPage() {
 
     const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
 
-    const { nutrientDisplayMode, profile } = useUserPreferences();
+    const { nutrientDisplayMode, profile, energyUnit } = useUserPreferences();
 
     // Context-aware RDAs
     const userRDAs = useRDA(
@@ -210,7 +210,18 @@ export default function FoodDetailsPage() {
         // 1. Try to find a non-zero value in any of the provided keys
         for (const k of keys) {
             let val = 0;
-            if (k === 'energy_kcal') val = food.energy_kcal || 0;
+            if (k === 'energy_kcal') {
+                if (energyUnit === 'kJ' && food.energy_kj) val = food.energy_kj;
+                else val = food.energy_kcal || 0;
+            }
+            else if (k === 'energy_kj') {
+                if (energyUnit === 'kcal' && food.energy_kcal) val = food.energy_kcal;
+                else val = food.energy_kj || 0;
+            }
+            else if (k === 'Energy' || k === 'Calories' || k === 'calories') {
+                if (energyUnit === 'kJ') val = food.energy_kj || (food.energy_kcal ? food.energy_kcal * 4.184 : 0);
+                else val = food.energy_kcal || (food.energy_kj ? food.energy_kj / 4.184 : 0);
+            }
             else if (k === 'protein_g') val = food.protein_g || 0;
             else if (k === 'carbs_g') val = food.carbs_g || 0;
             else if (k === 'fat_g') val = food.fat_g || 0;
@@ -235,7 +246,8 @@ export default function FoodDetailsPage() {
             const c = food.carbs_g || 0;
             const f = food.fat_g || 0;
             if (p > 0 || c > 0 || f > 0) {
-                return (p * 4) + (c * 4) + (f * 9);
+                const kcal = (p * 4) + (c * 4) + (f * 9);
+                return energyUnit === 'kJ' ? kcal * 4.184 : kcal;
             }
         }
 
@@ -311,7 +323,7 @@ export default function FoodDetailsPage() {
                         const rda = userRDAs?.[label] || macroRDAs[label];
                         const pct = rda ? Math.round((val / rda) * 100) : 0;
                         const styles = getNutrientLevelStyles(pct || 0, label);
-                        const unitLabel = label === 'Vitamin D' ? 'IU' : (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg') ? 'µg' : (label === 'Energy' ? 'kcal' : (label === 'Protein' || label === 'Carbs' || label === 'Fat') ? 'g' : 'mg'));
+                        const unitLabel = label === 'Vitamin D' ? 'IU' : (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg') ? 'µg' : (label === 'Energy' ? energyUnit : (label === 'Protein' || label === 'Carbs' || label === 'Fat') ? 'g' : 'mg'));
                         const hasBreakdown = breakdownLabels.includes(label);
 
                         return (
