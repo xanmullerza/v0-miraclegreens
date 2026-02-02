@@ -596,7 +596,12 @@ export default function RecipeDetailsPage() {
                                                         const val = (label === 'Energy' || label === 'Protein' || label === 'Carbs' || label === 'Fat')
                                                             ? (label === 'Energy' ? (recipe as any).calories : (recipe as any)[label.toLowerCase()])
                                                             : getVal(keys as string[]);
-                                                        const macroRDAs: Record<string, number> = { 'Energy': 2000, 'Protein': 50, 'Carbs': 275, 'Fat': 70 };
+                                                        const macroRDAs: Record<string, number> = {
+                                                            'Energy': energyUnit === 'kJ' ? (profile.goal === 'build-muscle' ? 12500 : profile.goal === 'lose-fat' ? 8400 : 10500) : (profile.goal === 'build-muscle' ? 3000 : profile.goal === 'lose-fat' ? 2000 : 2500),
+                                                            'Protein': profile.goal === 'build-muscle' ? 150 : 50,
+                                                            'Carbs': profile.goal === 'lose-fat' ? 150 : 250,
+                                                            'Fat': 70
+                                                        };
                                                         const rda = userRDAs?.[label] || macroRDAs[label];
                                                         const pct = rda ? Math.round((val / rda) * 100) : null;
                                                         const styles = getNutrientLevelStyles(pct || 0, label);
@@ -622,7 +627,12 @@ export default function RecipeDetailsPage() {
                                                                                 <span className="text-lg font-bold">{val.toFixed(1)}</span>
                                                                                 <span className={cn("text-[10px] font-bold", (unit === 'µg') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unit}</span>
                                                                             </div>
-                                                                            {(nutrientDisplayMode === 'both' || (nutrientDisplayMode === 'percentage' && forceRaw)) && pct !== null && !forceRaw && (
+                                                                            {(nutrientDisplayMode === 'value' || nutrientDisplayMode === 'both') && rda && (
+                                                                                <p className="text-[9px] font-bold text-slate-400 mt-0.5">
+                                                                                    Target: {rda}{unit === 'kcal' ? 'kcal' : unit}
+                                                                                </p>
+                                                                            )}
+                                                                            {nutrientDisplayMode === 'both' && pct !== null && !forceRaw && (
                                                                                 <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>
                                                                             )}
                                                                         </>

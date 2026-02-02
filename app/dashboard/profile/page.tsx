@@ -29,8 +29,11 @@ import {
     Monitor,
     ChevronRight,
     Save,
-    LogOut
+    LogOut,
+    Fingerprint,
+    Info
 } from 'lucide-react';
+import { useRDA } from '@/hooks/use-rda';
 import { supabase } from '@/lib/supabase';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -58,6 +61,12 @@ function ProfilePageContent() {
         ...profile,
         exclusions: profile.exclusions || []
     });
+
+    const userRDAs = useRDA(
+        typeof formData.age === 'number' ? formData.age : 30,
+        formData.gender || 'female',
+        formData.goal === 'build-muscle' ? 3000 : formData.goal === 'lose-fat' ? 2000 : 2500
+    );
 
     const handleSave = () => {
         updateProfile(formData);
@@ -290,7 +299,7 @@ function ProfilePageContent() {
 
                             {/* Nutrient Display Mode */}
                             <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Analytical Display</Label>
+                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Nutrient Display (App-wide)</Label>
                                 <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
                                     <button
                                         onClick={() => setNutrientDisplayMode("value")}
@@ -298,6 +307,7 @@ function ProfilePageContent() {
                                             "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
                                             nutrientDisplayMode === "value" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
                                         )}
+                                        title="Show raw nutrient values (e.g., 500mg)"
                                     >
                                         <BarChart3 size={12} /> Values
                                     </button>
@@ -307,6 +317,7 @@ function ProfilePageContent() {
                                             "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
                                             nutrientDisplayMode === "percentage" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
                                         )}
+                                        title="Show % of your personal RDA"
                                     >
                                         <Divide size={12} /> RDA %
                                     </button>
@@ -316,10 +327,12 @@ function ProfilePageContent() {
                                             "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
                                             nutrientDisplayMode === "both" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
                                         )}
+                                        title="Show both values and percentages"
                                     >
                                         <Activity size={12} /> Combined
                                     </button>
                                 </div>
+                                <p className="text-[9px] text-slate-400 italic px-1">This setting affects how nutrition is displayed across all foods and recipes.</p>
                             </div>
 
                             {/* Theme */}
@@ -354,6 +367,36 @@ function ProfilePageContent() {
                                         <Monitor size={12} /> System
                                     </button>
                                 </div>
+                            </div>
+                        </div>
+                    </section>
+                    {/* RDA Blueprint Preview */}
+                    <section className="space-y-6">
+                        <div className="flex items-center gap-2 text-blue-500 mb-2">
+                            < Fingerprint size={20} />
+                            <h2 className="text-sm font-black uppercase tracking-[0.2em]">Micronutrient Blueprint</h2>
+                        </div>
+                        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-6">
+                            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                                <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest">Calculated Daily Targets</p>
+                                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-[10px] font-black">
+                                    <Info size={12} /> Personalized for your profile
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                {Object.entries(userRDAs || {}).filter(([k]) => !['calories', 'energy_kj'].includes(k.toLowerCase())).map(([nutrient, value]) => {
+                                    const unit = (nutrient === 'Vitamin D') ? 'IU' : (nutrient.includes('Folate') || nutrient.includes('B12') || nutrient.includes('Biotin') || nutrient.includes('Selenium') || nutrient === 'Vitamin A' || nutrient === 'Vitamin K') ? 'µg' : 'mg';
+                                    return (
+                                        <div key={nutrient} className="bg-slate-950 border border-slate-800/50 p-4 rounded-2xl flex flex-col gap-1">
+                                            <p className="text-[9px] uppercase font-black text-slate-500 truncate">{nutrient}</p>
+                                            <div className="flex items-baseline gap-1">
+                                                <span className="text-lg font-bold text-slate-200">{value}</span>
+                                                <span className="text-[10px] font-bold text-slate-600">{unit}</span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
                     </section>

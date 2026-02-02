@@ -79,7 +79,7 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
     const [expandedBreakdownSections, setExpandedBreakdownSections] = useState<Record<string, boolean>>({});
 
-    const { energyUnit, setEnergyUnit, profile } = useUserPreferences();
+    const { energyUnit, setEnergyUnit, nutrientDisplayMode, profile } = useUserPreferences();
     const useKilojoules = energyUnit === 'kJ';
 
     useEffect(() => {
@@ -1172,8 +1172,26 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
                                                         return (
                                                             <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all", t.itemBorder, pct !== null && !forceRaw ? `${styles.borderLight} ${styles.fade}` : "")}>
                                                                 <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
-                                                                <div className="flex items-baseline gap-1"><span className="text-lg font-bold">{val.toFixed(1)}</span><span className={cn("text-[10px] font-bold", (label === 'Vitamin D') ? "text-amber-600 dark:text-amber-400" : (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') || label === 'Vitamin A' || label === 'Vitamin K') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{(label === 'Vitamin D') ? 'IU' : (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') || label === 'Vitamin A' || label === 'Vitamin K') ? 'µg' : 'mg'}</span></div>
-                                                                {pct !== null && !forceRaw && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
+                                                                <div className="flex items-baseline gap-1">
+                                                                    <span className="text-lg font-bold">
+                                                                        {nutrientDisplayMode === "percentage" && pct !== null && !forceRaw ? `${pct}%` : (val >= 1 ? val.toFixed(1) : val.toFixed(2))}
+                                                                    </span>
+                                                                    {(nutrientDisplayMode !== "percentage" || forceRaw) && (
+                                                                        <span className={cn("text-[10px] font-black", (label === "Vitamin D") ? "text-amber-600 dark:text-amber-400" : (label.includes("Folate") || label.includes("Selenium") || label.includes("Iodine") || label.includes("B12") || label === "Vitamin A" || label === "Vitamin K") ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>
+                                                                            {(label === "Vitamin D") ? "IU" : (label.includes("Folate") || label.includes("Selenium") || label.includes("Iodine") || label.includes("B12") || label === "Vitamin A" || label === "Vitamin K") ? "µg" : "mg"}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                                {pct !== null && !forceRaw && (
+                                                                    <div className="flex flex-col gap-0.5">
+                                                                        {(nutrientDisplayMode === 'value' || nutrientDisplayMode === 'both') && rda && (
+                                                                            <div className="text-[9px] font-bold text-slate-400 opacity-80">Target: {rda}{(label === "Vitamin D") ? "IU" : (label.includes("Folate") || label.includes("Selenium") || label.includes("Iodine") || label.includes("B12") || label === "Vitamin A" || label === "Vitamin K") ? "µg" : "mg"}</div>
+                                                                        )}
+                                                                        {(nutrientDisplayMode === 'percentage' || nutrientDisplayMode === 'both') && (
+                                                                            <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>
+                                                                        )}
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         );
                                                     })}
@@ -1191,22 +1209,33 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
                                                     <p className="text-[9px] text-slate-400 mb-4 border-b border-slate-800 pb-2">Analysis of primary fuel sources</p>
                                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                                         {[
-                                                            { label: 'Energy', val: totals.calories, target: 2000, unit: 'kcal' },
-                                                            { label: 'Protein', val: totals.protein, target: 50, unit: 'g' },
-                                                            { label: 'Carbs', val: totals.carbs, target: 250, unit: 'g' },
+                                                            { label: 'Energy', val: useKilojoules ? totals.energy_kj : totals.calories, target: useKilojoules ? (profile.goal === 'build-muscle' ? 12500 : profile.goal === 'lose-fat' ? 8400 : 10500) : (profile.goal === 'build-muscle' ? 3000 : profile.goal === 'lose-fat' ? 2000 : 2500), unit: useKilojoules ? 'kJ' : 'kcal' },
+                                                            { label: 'Protein', val: totals.protein, target: profile.goal === 'build-muscle' ? 150 : 50, unit: 'g' },
+                                                            { label: 'Carbs', val: totals.carbs, target: profile.goal === 'lose-fat' ? 150 : 250, unit: 'g' },
                                                             { label: 'Fat', val: totals.fat, target: 70, unit: 'g' },
                                                         ].map(macro => {
                                                             const pct = Math.round((macro.val / macro.target) * 100);
                                                             const styles = getNutrientLevelStyles(pct, macro.label);
                                                             return (
-                                                                <div key={macro.label} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", styles.borderLight, styles.fade)}>
+                                                                <div key={macro.label} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group flex flex-col justify-between", styles.borderLight, styles.fade)}>
                                                                     <div onClick={() => setSelectedNutrientInfo(macro.label)} className="cursor-pointer">
                                                                         <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{macro.label}</p>
                                                                         <div className="flex items-baseline gap-1">
-                                                                            <span className="text-xl font-black">{macro.val >= 1 ? macro.val.toFixed(1) : macro.val.toFixed(2)}</span>
-                                                                            <span className="text-[10px] text-muted-foreground font-bold">{macro.unit}</span>
+                                                                            <span className="text-xl font-black">
+                                                                                {nutrientDisplayMode === 'percentage' ? `${pct}%` : (macro.val >= 1 ? macro.val.toFixed(1) : macro.val.toFixed(2))}
+                                                                            </span>
+                                                                            {nutrientDisplayMode !== 'percentage' && (
+                                                                                <span className="text-[10px] text-muted-foreground font-bold">{macro.unit}</span>
+                                                                            )}
                                                                         </div>
-                                                                        <div className={cn("text-[10px] font-black mt-1", styles.text)}>{pct}%</div>
+                                                                        {(nutrientDisplayMode === 'value' || nutrientDisplayMode === 'both') && (
+                                                                            <p className="text-[9px] font-bold text-slate-400 mt-0.5">
+                                                                                Target: {macro.target}{macro.unit}
+                                                                            </p>
+                                                                        )}
+                                                                        {nutrientDisplayMode === 'both' && (
+                                                                            <div className={cn("text-[10px] font-black mt-1", styles.text)}>{pct}%</div>
+                                                                        )}
                                                                     </div>
                                                                     {['Protein', 'Carbs', 'Fat'].includes(macro.label) && (
                                                                         <button
@@ -1263,13 +1292,24 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
                                                         const styles = getNutrientLevelStyles(pct || 0, label);
                                                         const unitLabel = label.includes('Folate') || label.includes('B12') || label.includes('Biotin') ? 'µg' : 'mg';
                                                         return (
-                                                            <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-3 rounded-xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all", pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
-                                                                <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
-                                                                <div className="flex items-baseline gap-1">
-                                                                    <span className="text-lg font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span>
-                                                                    <span className={cn("text-[10px] font-bold", unitLabel === 'µg' ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unitLabel}</span>
+                                                            <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-3 rounded-xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all flex flex-col justify-between", pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
+                                                                <div>
+                                                                    <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
+                                                                    <div className="flex items-baseline gap-1">
+                                                                        <span className="text-lg font-bold">
+                                                                            {nutrientDisplayMode === 'percentage' && pct !== null ? `${pct}%` : (val >= 1 ? val.toFixed(1) : val.toFixed(2))}
+                                                                        </span>
+                                                                        {nutrientDisplayMode !== 'percentage' && (
+                                                                            <span className={cn("text-[10px] font-bold", unitLabel === 'µg' ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unitLabel}</span>
+                                                                        )}
+                                                                    </div>
+                                                                    {(nutrientDisplayMode === 'value' || nutrientDisplayMode === 'both') && rda && (
+                                                                        <p className="text-[9px] font-bold text-slate-400 mt-0.5">
+                                                                            Target: {rda}{unitLabel}
+                                                                        </p>
+                                                                    )}
                                                                 </div>
-                                                                {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
+                                                                {nutrientDisplayMode === 'both' && pct !== null && <div className={cn("text-[10px] font-black mt-1", styles.text)}>{pct}%</div>}
                                                             </div>
                                                         );
                                                     })}
