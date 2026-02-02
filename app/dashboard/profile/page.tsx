@@ -390,48 +390,32 @@ function ProfilePageContent() {
                         {/* Background Decoration */}
                         <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors duration-700" />
 
-                        <div className="relative space-y-8">
-                            <div className="flex items-center gap-4 text-blue-400">
-                                <div className="p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/20 shadow-inner">
-                                    <Fingerprint size={28} />
-                                </div>
-                                <div>
-                                    <h2 className="text-sm font-black uppercase tracking-[0.2em] italic">Genetic Blueprint</h2>
-                                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Live RDA Calculation</p>
-                                </div>
-                            </div>
+                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 pr-1">
+                            {(() => {
+                                const macroRDAs: Record<string, number> = {
+                                    'Energy': energyUnit === 'kJ' ? (formData.goal === 'build-muscle' ? 12500 : formData.goal === 'lose-fat' ? 8400 : 10500) : (formData.goal === 'build-muscle' ? 3000 : formData.goal === 'lose-fat' ? 2000 : 2500),
+                                    'Protein': formData.goal === 'build-muscle' ? 150 : 50,
+                                    'Carbs': formData.goal === 'lose-fat' ? 150 : 250,
+                                    'Fat': 70
+                                };
 
-                            <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 pr-1">
-                                {Object.entries(userRDAs || {}).filter(([k]) => !['calories', 'energy_kj'].includes(k.toLowerCase())).map(([nutrient, value]) => {
-                                    const unit = (nutrient === 'Vitamin D') ? 'IU' : (nutrient.includes('Folate') || nutrient.includes('B12') || nutrient.includes('Biotin') || nutrient.includes('Selenium') || nutrient === 'Vitamin A' || nutrient === 'Vitamin K') ? 'µg' : 'mg';
+                                const combinedRDAs = { ...macroRDAs, ...(userRDAs || {}) };
+
+                                return Object.entries(combinedRDAs).map(([nutrient, value]) => {
+                                    const unit = (nutrient === 'Energy') ? energyUnit : (nutrient === 'Protein' || nutrient === 'Carbs' || nutrient === 'Fat') ? 'g' : (nutrient === 'Vitamin D') ? 'IU' : (nutrient.includes('Folate') || nutrient.includes('B12') || nutrient.includes('Biotin') || nutrient.includes('Selenium') || nutrient === 'Vitamin A' || nutrient === 'Vitamin K') ? 'µg' : 'mg';
                                     return (
                                         <div key={nutrient} className="bg-slate-900/50 border border-slate-800/50 p-1.5 rounded-lg flex flex-col items-center justify-center text-center hover:border-blue-500/30 transition-all hover:bg-slate-900 group/item aspect-square">
                                             <p className="text-[7px] uppercase font-black text-slate-500 group-hover/item:text-slate-400 transition-colors leading-none mb-1 line-clamp-2">{nutrient}</p>
                                             <div className="flex items-baseline gap-0.5">
-                                                <span className="text-xs font-black text-slate-200 tracking-tighter italic">{value}</span>
+                                                <span className="text-xs font-black text-slate-200 tracking-tighter italic">{Math.round(value)}</span>
                                                 <span className="text-[6px] font-black text-slate-600 uppercase tracking-widest">{unit}</span>
                                             </div>
                                         </div>
                                     );
-                                })}
-                            </div>
-
-                            <div className="pt-6 border-t border-slate-800">
-                                <div className="flex items-center justify-between px-1">
-                                    <div className="flex flex-col">
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 mb-1">Calculation Status</span>
-                                        <div className="flex items-center gap-2">
-                                            <span className="flex h-2 w-2 relative">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                                            </span>
-                                            <span className="text-[10px] font-black uppercase tracking-[0.1em] text-emerald-500 italic">Analysis Active</span>
-                                        </div>
-                                    </div>
-                                    <Dumbbell size={24} className="text-slate-800 opacity-50" />
-                                </div>
-                            </div>
+                                });
+                            })()}
                         </div>
+
                     </div>
                 </aside>
             </div>
