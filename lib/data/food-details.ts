@@ -7,6 +7,21 @@ export interface FoodDetail {
 }
 
 export const FOOD_DETAILS: Record<string, FoodDetail> = {
+    // Anise seed (Visual matches Star Anise)
+    "739a6ee4-c1d5-4466-8d79-e370d3e55ec9": {
+        description: "Star Anise is a star-shaped spice fruit with a distinct licorice flavor, widely used in Asian cooking and as a key ingredient in five-spice powder.",
+        history: "Native to Northeast Vietnam and Southwest China. It has been used as a spice and medicine for over 3,000 years.",
+        producers: "China and Vietnam are the dominant global producers.",
+        benefits: [
+            "Rich in Shikimic acid, a compound with strong antiviral properties.",
+            "Traditionally used to alleviate digestive issues and bloating.",
+            "Contains high levels of antioxidants like linalool and quercetin."
+        ],
+        facts: [
+            "Star Anise is the primary source of shikimic acid used to produce the anti-flu drug Tamiflu.",
+            "Despite the similar name and flavor, it is not related to common anise seed (Pimpinella anisum)."
+        ]
+    },
     // Cucumber, Raw, With Peel
     "596ae074-33c5-418c-b054-305c0d0672de": {
         description: "The cucumber is a widely-cultivated creeping vine plant in the Cucurbitaceae gourd family that bears cucumiform fruits, which are used as vegetables.",
