@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, Zap, X as CloseIcon, ChevronDown, Layers, Gem, Droplet, Battery, X, Activity, Utensils } from 'lucide-react';
+import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, Zap, X as CloseIcon, ChevronDown, Layers, Gem, Droplet, Battery, Activity, Utensils, ShoppingBasket } from 'lucide-react';
 import FoodItemPicker from './food-item-picker';
 import { fetchFoodMeasures, FoodMeasure, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -708,24 +708,26 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                         </button>
                     </div>
                 </div>
-                <div className="flex items-center gap-2">
-                    <button
-                        type="button"
-                        onClick={() => setShowMagicPaste(!showMagicPaste)}
-                        className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white border-none shadow-md group transition-all px-3 h-10 rounded-lg flex items-center justify-center gap-2 w-40 text-[10px] uppercase font-black tracking-widest whitespace-nowrap"
-                    >
-                        <Wand2 className="w-3.5 h-3.5 group-hover:scale-125 transition-transform" />
-                        Magic Paste
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => setShowPicker(true)}
-                        className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-none shadow-md group transition-all px-3 h-10 rounded-lg flex items-center justify-center gap-2 w-40 text-[10px] uppercase font-black tracking-widest whitespace-nowrap"
-                    >
-                        <Plus className="w-3.5 h-3.5 group-hover:rotate-90 transition-transform" />
-                        Add Ingredient
-                    </button>
-                </div>
+                {ingredients.length > 0 && (
+                    <div className="flex items-center gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setShowMagicPaste(!showMagicPaste)}
+                            className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 transition-all px-3 h-10 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest"
+                        >
+                            <Wand2 className="w-3.5 h-3.5" />
+                            Magic Paste
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setShowPicker(true)}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition-all px-4 h-10 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest"
+                        >
+                            <Plus className="w-3.5 h-3.5" />
+                            Add Item
+                        </button>
+                    </div>
+                )}
             </div>
 
             {showMagicPaste && (
@@ -840,144 +842,180 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             )}
 
             {ingredients.length === 0 && (
-                <div className="text-center py-12 bg-muted/20 rounded-xl text-muted-foreground font-medium italic">
-                    No ingredients added yet. Click "Add Ingredient" to get started.
+                <div className="relative group p-12 rounded-[2.5rem] bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-6 transition-all hover:border-emerald-500/50">
+                    <div className="w-20 h-20 rounded-3xl bg-slate-50 dark:bg-slate-950 flex items-center justify-center text-slate-300">
+                        <ShoppingBasket size={40} className="opacity-20" />
+                    </div>
+                    <div className="text-center space-y-1">
+                        <h3 className="text-xl font-black uppercase tracking-tighter text-slate-900 dark:text-white">Empty Kitchen</h3>
+                        <p className="text-xs font-bold text-slate-400">Add your first ingredient to start the clinical analysis</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <button
+                            type="button"
+                            onClick={() => setShowMagicPaste(!showMagicPaste)}
+                            className="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 px-6 h-12 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all"
+                        >
+                            <Wand2 className="w-4 h-4" />
+                            Magic Paste
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setShowPicker(true)}
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20 px-8 h-12 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all scale-110"
+                        >
+                            <Plus className="w-5 h-5" />
+                            Add Ingredient
+                        </button>
+                    </div>
                 </div>
             )}
 
-            {ingredients.length > 0 && (
-                <div className="space-y-3">
-                    {ingredients.map((ing, index) => (
-                        <div key={index} className="relative group p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
-                            {/* Remove Button - Absolute Positioned */}
-                            <button
-                                type="button"
-                                onClick={() => handleRemoveIngredient(index)}
-                                className="absolute top-4 right-4 p-2 text-slate-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-all opacity-0 group-hover:opacity-100"
-                                title="Remove"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                            </button>
-
-                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-                                {/* Left Section: Identity & Quick Macros */}
-                                <div className="lg:col-span-4 space-y-4">
-                                    <div className="flex items-center gap-4 group/name">
-                                        <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
-                                            {ing.image ? (
-                                                <img src={ing.image} alt="" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <Utensils size={20} className="text-slate-400 opacity-40 shadow-inner" />
-                                            )}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2">
-                                                {editingNameIndex === index ? (
-                                                    <input
-                                                        type="text"
-                                                        value={ing.food_item_name}
-                                                        onChange={(e) => handleUpdateName(index, e.target.value)}
-                                                        onBlur={() => setEditingNameIndex(null)}
-                                                        onKeyDown={(e) => e.key === 'Enter' && setEditingNameIndex(null)}
-                                                        autoFocus
-                                                        className="bg-transparent border-b-2 border-emerald-500 font-black text-slate-900 dark:text-white px-0 py-1 text-lg w-full outline-none"
-                                                    />
-                                                ) : (
-                                                    <>
-                                                        <h4 className="font-black text-slate-900 dark:text-white truncate text-lg">{ing.food_item_name}</h4>
-                                                        <button
-                                                            onClick={() => setEditingNameIndex(index)}
-                                                            className="p-1 opacity-0 group-hover/name:opacity-100 transition-opacity text-slate-400 hover:text-emerald-500"
-                                                        >
-                                                            <Pencil size={12} />
-                                                        </button>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex flex-wrap gap-2">
-                                        <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest flex items-center gap-2">
-                                            <Zap size={10} className="fill-current" />
-                                            {useKilojoules ? (ing.energy_kj % 1 === 0 ? ing.energy_kj : ing.energy_kj.toFixed(1)) : (ing.calories % 1 === 0 ? ing.calories : ing.calories.toFixed(1))} {useKilojoules ? 'kJ' : 'kcal'}
-                                        </div>
-                                        <div className="flex gap-1">
-                                            <div className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">P: {ing.protein % 1 === 0 ? ing.protein : ing.protein.toFixed(2)}g</div>
-                                            <div className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">F: {ing.fat % 1 === 0 ? ing.fat : ing.fat.toFixed(2)}g</div>
-                                            <div className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">C: {ing.carbs % 1 === 0 ? ing.carbs : ing.carbs.toFixed(2)}g</div>
-                                        </div>
-                                    </div>
+            {
+                ingredients.length > 0 && (
+                    <div className="space-y-3">
+                        {ingredients.map((ing, index) => (
+                            <div key={index} className="relative group p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
+                                {/* Action Buttons - Bottom Right */}
+                                <div className="absolute bottom-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all translate-y-2 group-hover:translate-y-0">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRemoveIngredient(index)}
+                                        className="p-2.5 bg-rose-50 dark:bg-rose-950/30 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl transition-all shadow-sm border border-rose-100 dark:border-rose-900/50"
+                                        title="Delete Ingredient"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPicker(true)}
+                                        className="p-2.5 bg-emerald-500 text-white hover:bg-emerald-600 rounded-xl transition-all shadow-lg shadow-emerald-500/20"
+                                        title="Add Another Ingredient"
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                    </button>
                                 </div>
 
-                                {/* Right Section: Controls */}
-                                <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                    <div className="space-y-1.5">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Quantity</Label>
-                                        <input
-                                            type="number"
-                                            value={ing.quantity}
-                                            onChange={(e) => handleUpdateQuantity(index, Number(e.target.value))}
-                                            className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl text-sm font-black focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
-                                            min="0"
-                                            step="0.125"
-                                        />
-                                    </div>
-
-                                    <div className="space-y-1.5">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Measure</Label>
-                                        <div className="relative">
-                                            <select
-                                                value={ing.measure_label}
-                                                onChange={(e) => handleUpdateUnit(index, e.target.value)}
-                                                className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-sm rounded-xl font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all appearance-none cursor-pointer"
-                                            >
-                                                <option value="g">g</option>
-                                                <option value="kg">kg</option>
-                                                {ing.available_measures?.map(m => (
-                                                    <option key={m.label} value={m.label}>{m.label}</option>
-                                                ))}
-                                                {/* If current label isn't in available, show it so it's selected */}
-                                                {ing.measure_label !== 'g' && ing.measure_label !== 'kg' && !ing.available_measures?.some(m => m.label === ing.measure_label) && (
-                                                    <option value={ing.measure_label}>{ing.measure_label}</option>
+                                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                                    {/* Left Section: Identity & Quick Macros */}
+                                    <div className="lg:col-span-4 space-y-4">
+                                        <div className="flex items-center gap-4 group/name">
+                                            <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+                                                {ing.image ? (
+                                                    <img src={ing.image} alt="" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <Utensils size={20} className="text-slate-400 opacity-40 shadow-inner" />
                                                 )}
-                                            </select>
-                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                                <ChevronDown size={14} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2">
+                                                    {editingNameIndex === index ? (
+                                                        <input
+                                                            type="text"
+                                                            value={ing.food_item_name}
+                                                            onChange={(e) => handleUpdateName(index, e.target.value)}
+                                                            onBlur={() => setEditingNameIndex(null)}
+                                                            onKeyDown={(e) => e.key === 'Enter' && setEditingNameIndex(null)}
+                                                            autoFocus
+                                                            className="bg-transparent border-b-2 border-emerald-500 font-black text-slate-900 dark:text-white px-0 py-1 text-lg w-full outline-none"
+                                                        />
+                                                    ) : (
+                                                        <>
+                                                            <h4 className="font-black text-slate-900 dark:text-white truncate text-lg">{ing.food_item_name}</h4>
+                                                            <button
+                                                                onClick={() => setEditingNameIndex(index)}
+                                                                className="p-1 opacity-0 group-hover/name:opacity-100 transition-opacity text-slate-400 hover:text-emerald-500"
+                                                            >
+                                                                <Pencil size={12} />
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex flex-wrap gap-2">
+                                            <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest flex items-center gap-2">
+                                                <Zap size={10} className="fill-current" />
+                                                {useKilojoules ? (ing.energy_kj % 1 === 0 ? ing.energy_kj : ing.energy_kj.toFixed(1)) : (ing.calories % 1 === 0 ? ing.calories : ing.calories.toFixed(1))} {useKilojoules ? 'kJ' : 'kcal'}
+                                            </div>
+                                            <div className="flex gap-1">
+                                                <div className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">P: {ing.protein % 1 === 0 ? ing.protein : ing.protein.toFixed(2)}g</div>
+                                                <div className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">F: {ing.fat % 1 === 0 ? ing.fat : ing.fat.toFixed(2)}g</div>
+                                                <div className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">C: {ing.carbs % 1 === 0 ? ing.carbs : ing.carbs.toFixed(2)}g</div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-1.5">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Preparation</Label>
-                                        <input
-                                            type="text"
-                                            value={ing.modifier || ''}
-                                            onChange={(e) => handleUpdateModifier(index, e.target.value)}
-                                            className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-400 text-xs rounded-xl font-bold focus:ring-2 focus:ring-amber-500/20 outline-none transition-all"
-                                            placeholder="e.g. chopped"
-                                        />
-                                    </div>
-
-                                    <div className="space-y-1.5">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Weight (g)</Label>
-                                        <div className="relative">
+                                    {/* Right Section: Controls */}
+                                    <div className="lg:col-span-8 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                        <div className="space-y-1.5">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Quantity</Label>
                                             <input
                                                 type="number"
-                                                value={ing.weight_g % 1 === 0 ? ing.weight_g : Math.round(ing.weight_g * 10) / 10}
-                                                onChange={(e) => handleUpdateWeight(index, Number(e.target.value))}
-                                                step="0.1"
-                                                className="w-full h-11 pl-4 pr-10 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-sm rounded-xl font-black focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                                value={ing.quantity}
+                                                onChange={(e) => handleUpdateQuantity(index, Number(e.target.value))}
+                                                className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white rounded-xl text-sm font-black focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                                min="0"
+                                                step="0.125"
                                             />
-                                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 pointer-events-none">G</span>
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Measure</Label>
+                                            <div className="relative">
+                                                <select
+                                                    value={ing.measure_label}
+                                                    onChange={(e) => handleUpdateUnit(index, e.target.value)}
+                                                    className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-sm rounded-xl font-bold focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all appearance-none cursor-pointer"
+                                                >
+                                                    <option value="g">g</option>
+                                                    <option value="kg">kg</option>
+                                                    {ing.available_measures?.map(m => (
+                                                        <option key={m.label} value={m.label}>{m.label}</option>
+                                                    ))}
+                                                    {/* If current label isn't in available, show it so it's selected */}
+                                                    {ing.measure_label !== 'g' && ing.measure_label !== 'kg' && !ing.available_measures?.some(m => m.label === ing.measure_label) && (
+                                                        <option value={ing.measure_label}>{ing.measure_label}</option>
+                                                    )}
+                                                </select>
+                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                                    <ChevronDown size={14} />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Preparation</Label>
+                                            <input
+                                                type="text"
+                                                value={ing.modifier || ''}
+                                                onChange={(e) => handleUpdateModifier(index, e.target.value)}
+                                                className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-400 text-xs rounded-xl font-bold focus:ring-2 focus:ring-amber-500/20 outline-none transition-all"
+                                                placeholder="e.g. chopped"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Weight (g)</Label>
+                                            <div className="relative">
+                                                <input
+                                                    type="number"
+                                                    value={ing.weight_g % 1 === 0 ? ing.weight_g : Math.round(ing.weight_g * 10) / 10}
+                                                    onChange={(e) => handleUpdateWeight(index, Number(e.target.value))}
+                                                    step="0.1"
+                                                    className="w-full h-11 pl-4 pr-10 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-sm rounded-xl font-black focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                                />
+                                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-black text-slate-400 pointer-events-none">G</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
-            )}
+                        ))}
+                    </div>
+                )
+            }
 
             {
                 ingredients.length > 0 && (
@@ -1158,124 +1196,128 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             }
 
             {/* NUTRIENT INFO MODAL */}
-            {selectedNutrientInfo && nutrientInfo[selectedNutrientInfo] && (
-                <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setSelectedNutrientInfo(null)}>
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-8 shadow-2xl relative border border-slate-200 dark:border-slate-800" onClick={e => e.stopPropagation()}>
-                        <button onClick={() => setSelectedNutrientInfo(null)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"><X size={20} /></button>
-                        <h3 className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-2 uppercase tracking-tighter">{selectedNutrientInfo}</h3>
-                        <p className="text-slate-500 italic mb-6 text-sm">"{nutrientInfo[selectedNutrientInfo].description}"</p>
-                        <div className="space-y-6">
-                            <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800/50">
-                                <h4 className="font-black text-[10px] mb-2 uppercase tracking-widest text-emerald-700 dark:text-emerald-400">Biological Significance</h4>
-                                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed">{nutrientInfo[selectedNutrientInfo].importance}</p>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                                {nutrientInfo[selectedNutrientInfo].benefits.map((b, i) => (
-                                    <span key={i} className="text-[9px] font-black uppercase tracking-widest bg-emerald-100 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-100 px-3 py-1.5 rounded-full">
-                                        {b}
-                                    </span>
-                                ))}
-                            </div>
-                            <div>
-                                <h4 className="font-black text-[10px] mb-2 uppercase tracking-widest text-slate-400">Natural Sources</h4>
-                                <div className="flex flex-wrap gap-1">
-                                    {nutrientInfo[selectedNutrientInfo].sources.map((s, i) => (
-                                        <span key={i} className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-1 rounded font-bold">
-                                            {s}
+            {
+                selectedNutrientInfo && nutrientInfo[selectedNutrientInfo] && (
+                    <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setSelectedNutrientInfo(null)}>
+                        <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-8 shadow-2xl relative border border-slate-200 dark:border-slate-800" onClick={e => e.stopPropagation()}>
+                            <button onClick={() => setSelectedNutrientInfo(null)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"><X size={20} /></button>
+                            <h3 className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-2 uppercase tracking-tighter">{selectedNutrientInfo}</h3>
+                            <p className="text-slate-500 italic mb-6 text-sm">"{nutrientInfo[selectedNutrientInfo].description}"</p>
+                            <div className="space-y-6">
+                                <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl border border-emerald-100 dark:border-emerald-800/50">
+                                    <h4 className="font-black text-[10px] mb-2 uppercase tracking-widest text-emerald-700 dark:text-emerald-400">Biological Significance</h4>
+                                    <p className="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed">{nutrientInfo[selectedNutrientInfo].importance}</p>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {nutrientInfo[selectedNutrientInfo].benefits.map((b, i) => (
+                                        <span key={i} className="text-[9px] font-black uppercase tracking-widest bg-emerald-100 dark:bg-emerald-800 text-emerald-800 dark:text-emerald-100 px-3 py-1.5 rounded-full">
+                                            {b}
                                         </span>
                                     ))}
+                                </div>
+                                <div>
+                                    <h4 className="font-black text-[10px] mb-2 uppercase tracking-widest text-slate-400">Natural Sources</h4>
+                                    <div className="flex flex-wrap gap-1">
+                                        {nutrientInfo[selectedNutrientInfo].sources.map((s, i) => (
+                                            <span key={i} className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-1 rounded font-bold">
+                                                {s}
+                                            </span>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* NUTRIENT BREAKDOWN MODAL */}
-            {breakdownNutrient && NUTRIENT_BREAKDOWNS[breakdownNutrient] && (
-                <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setBreakdownNutrient(null)}>
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative animate-in zoom-in-95 fade-in duration-200 border border-slate-200 dark:border-slate-800" onClick={e => e.stopPropagation()}>
-                        <button onClick={() => setBreakdownNutrient(null)} className="absolute top-4 right-4 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400"><X size={20} /></button>
+            {
+                breakdownNutrient && NUTRIENT_BREAKDOWNS[breakdownNutrient] && (
+                    <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setBreakdownNutrient(null)}>
+                        <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative animate-in zoom-in-95 fade-in duration-200 border border-slate-200 dark:border-slate-800" onClick={e => e.stopPropagation()}>
+                            <button onClick={() => setBreakdownNutrient(null)} className="absolute top-4 right-4 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400"><X size={20} /></button>
 
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className={cn("h-12 w-12 rounded-xl flex items-center justify-center shadow-lg shadow-current/20",
-                                breakdownNutrient === 'Protein' ? "bg-red-100 text-red-600" :
-                                    breakdownNutrient === 'Carbs' ? "bg-amber-100 text-amber-600" :
-                                        breakdownNutrient === 'Fat' ? "bg-orange-100 text-orange-600" :
-                                            "bg-emerald-100 text-emerald-600"
-                            )}>
-                                <Layers className="h-6 w-6" />
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className={cn("h-12 w-12 rounded-xl flex items-center justify-center shadow-lg shadow-current/20",
+                                    breakdownNutrient === 'Protein' ? "bg-red-100 text-red-600" :
+                                        breakdownNutrient === 'Carbs' ? "bg-amber-100 text-amber-600" :
+                                            breakdownNutrient === 'Fat' ? "bg-orange-100 text-orange-600" :
+                                                "bg-emerald-100 text-emerald-600"
+                                )}>
+                                    <Layers className="h-6 w-6" />
+                                </div>
+                                <div>
+                                    <h3 className="text-2xl font-black uppercase tracking-tighter">{breakdownNutrient}</h3>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Constituent Laboratory Analysis</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="text-2xl font-black uppercase tracking-tighter">{breakdownNutrient}</h3>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Constituent Laboratory Analysis</p>
-                            </div>
-                        </div>
 
-                        <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-                            {NUTRIENT_BREAKDOWNS[breakdownNutrient].map(({ label, keys, unit, isEssential, hiddenByDefault, isExpandable }) => {
-                                if (hiddenByDefault && !expandedBreakdownSections['Sugars (Total)']) return null;
+                            <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                                {NUTRIENT_BREAKDOWNS[breakdownNutrient].map(({ label, keys, unit, isEssential, hiddenByDefault, isExpandable }) => {
+                                    if (hiddenByDefault && !expandedBreakdownSections['Sugars (Total)']) return null;
 
-                                const m = totals.micronutrients;
-                                let val = 0;
-                                for (const k of keys) {
-                                    if (m[k] !== undefined) { val = m[k]; break; }
-                                }
-                                const isZero = val === 0;
+                                    const m = totals.micronutrients;
+                                    let val = 0;
+                                    for (const k of keys) {
+                                        if (m[k] !== undefined) { val = m[k]; break; }
+                                    }
+                                    const isZero = val === 0;
 
-                                const activeColor = breakdownNutrient === 'Protein' ? "text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/20 border-red-100 dark:border-red-900/50" :
-                                    breakdownNutrient === 'Carbs' ? "text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/50" :
-                                        breakdownNutrient === 'Fat' ? "text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 border-orange-100 dark:border-orange-900/50" :
-                                            "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/50";
+                                    const activeColor = breakdownNutrient === 'Protein' ? "text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/20 border-red-100 dark:border-red-900/50" :
+                                        breakdownNutrient === 'Carbs' ? "text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/50" :
+                                            breakdownNutrient === 'Fat' ? "text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/20 border-orange-100 dark:border-orange-900/50" :
+                                                "text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/50";
 
-                                const isExpanded = isExpandable && expandedBreakdownSections[label];
+                                    const isExpanded = isExpandable && expandedBreakdownSections[label];
 
-                                return (
-                                    <div
-                                        key={label}
-                                        className={cn(
-                                            "flex items-center justify-between p-4 rounded-xl border transition-all animate-in fade-in slide-in-from-top-1 duration-200",
-                                            isZero ? "bg-slate-50 dark:bg-slate-950 border-slate-100 dark:border-slate-800 opacity-60" : activeColor,
-                                            hiddenByDefault ? "ml-8 border-l-4 border-l-current" : "",
-                                            isExpandable ? "cursor-pointer hover:opacity-90 relative overflow-hidden" : ""
-                                        )}
-                                        onClick={() => {
-                                            if (isExpandable) {
-                                                setExpandedBreakdownSections(prev => ({ ...prev, [label]: !prev[label] }));
-                                            }
-                                        }}
-                                    >
-                                        <div className="flex items-center gap-3">
-                                            <div className={cn("h-2 w-2 rounded-full",
-                                                isZero ? "bg-slate-300 dark:bg-slate-700" :
-                                                    breakdownNutrient === 'Protein' ? "bg-red-500" :
-                                                        breakdownNutrient === 'Carbs' ? "bg-amber-500" :
-                                                            breakdownNutrient === 'Fat' ? "bg-orange-500" :
-                                                                "bg-emerald-500"
-                                            )} />
-                                            <div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className={cn("font-bold text-sm", isZero ? "text-slate-400" : "text-foreground")}>{label}</span>
-                                                    {isExpandable && (
-                                                        <ChevronDown className={cn("h-4 w-4 transition-transform opacity-50", isExpanded ? "rotate-180" : "")} />
-                                                    )}
+                                    return (
+                                        <div
+                                            key={label}
+                                            className={cn(
+                                                "flex items-center justify-between p-4 rounded-xl border transition-all animate-in fade-in slide-in-from-top-1 duration-200",
+                                                isZero ? "bg-slate-50 dark:bg-slate-950 border-slate-100 dark:border-slate-800 opacity-60" : activeColor,
+                                                hiddenByDefault ? "ml-8 border-l-4 border-l-current" : "",
+                                                isExpandable ? "cursor-pointer hover:opacity-90 relative overflow-hidden" : ""
+                                            )}
+                                            onClick={() => {
+                                                if (isExpandable) {
+                                                    setExpandedBreakdownSections(prev => ({ ...prev, [label]: !prev[label] }));
+                                                }
+                                            }}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className={cn("h-2 w-2 rounded-full",
+                                                    isZero ? "bg-slate-300 dark:bg-slate-700" :
+                                                        breakdownNutrient === 'Protein' ? "bg-red-500" :
+                                                            breakdownNutrient === 'Carbs' ? "bg-amber-500" :
+                                                                breakdownNutrient === 'Fat' ? "bg-orange-500" :
+                                                                    "bg-emerald-500"
+                                                )} />
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className={cn("font-bold text-sm", isZero ? "text-slate-400" : "text-foreground")}>{label}</span>
+                                                        {isExpandable && (
+                                                            <ChevronDown className={cn("h-4 w-4 transition-transform opacity-50", isExpanded ? "rotate-180" : "")} />
+                                                        )}
+                                                    </div>
+                                                    {isEssential && <span className="text-[9px] uppercase font-black tracking-widest bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded">Essential</span>}
                                                 </div>
-                                                {isEssential && <span className="text-[9px] uppercase font-black tracking-widest bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded">Essential</span>}
+                                            </div>
+                                            <div className="flex items-baseline gap-1">
+                                                <span className={cn("text-lg font-black tabular-nums", isZero ? "text-slate-300" : "")}>
+                                                    {val >= 1 ? val.toFixed(1) : val.toFixed(2)}
+                                                </span>
+                                                <span className="text-[10px] font-bold text-slate-400 uppercase">{unit}</span>
                                             </div>
                                         </div>
-                                        <div className="flex items-baseline gap-1">
-                                            <span className={cn("text-lg font-black tabular-nums", isZero ? "text-slate-300" : "")}>
-                                                {val >= 1 ? val.toFixed(1) : val.toFixed(2)}
-                                            </span>
-                                            <span className="text-[10px] font-bold text-slate-400 uppercase">{unit}</span>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
         </div >
     );
 }
