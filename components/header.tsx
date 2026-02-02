@@ -115,7 +115,7 @@ export function Header() {
 						) : (
 							showDashboard && (
 								<Button variant="secondary" size="sm" className="hidden lg:flex gap-2" asChild>
-									<Link href="/login">
+									<Link href="/auth/login">
 										<User className="h-4 w-4" />
 										Login
 									</Link>

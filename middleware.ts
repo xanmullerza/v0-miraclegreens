@@ -36,7 +36,7 @@ export async function middleware(request: NextRequest) {
     // Protect Admin Routes
     if (request.nextUrl.pathname.startsWith('/dashboard/admin')) {
         if (!user) {
-            return NextResponse.redirect(new URL('/login', request.url))
+            return NextResponse.redirect(new URL('/auth/login', request.url))
         }
 
         // Restrict access to specific accounts
@@ -45,7 +45,7 @@ export async function middleware(request: NextRequest) {
 
         // Secure Check: Exact match against environment variable
         if (!adminEmail || userEmail !== adminEmail) {
-            return NextResponse.redirect(new URL('/unauthorized', request.url))
+            return NextResponse.redirect(new URL('/auth/unauthorized', request.url))
         }
     }
 

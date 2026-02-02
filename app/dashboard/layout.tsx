@@ -248,7 +248,7 @@ function DashboardLayoutContent({
                                     </DropdownMenu>
                                 ) : (
                                     <Link
-                                        href="/login"
+                                        href="/auth/login"
                                         className="p-2 text-slate-400 hover:text-emerald-500 transition-colors ml-1 outline-none flex items-center gap-2"
                                         title="Sign In"
                                     >
