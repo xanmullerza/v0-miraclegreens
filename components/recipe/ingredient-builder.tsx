@@ -293,31 +293,22 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
 
                 // 2. Search
                 let localMatches = await searchLocalFood(coreName);
-                let globalMatches: FoodItemMatch[] = [];
 
                 // Fallback: If no results for core name, try full item if different
                 if (localMatches.length === 0 && coreName !== rawItem) {
                     localMatches = await searchLocalFood(rawItem);
                 }
 
-                if (localMatches.length === 0) {
-                    globalMatches = await searchUSDAFood(coreName);
-                    if (globalMatches.length === 0 && coreName !== rawItem) {
-                        globalMatches = await searchUSDAFood(rawItem);
-                    }
-                }
+                item.matches = localMatches;
 
-                const allMatches = [...localMatches, ...globalMatches];
-                item.matches = allMatches;
-                item.status = allMatches.length > 0 ? 'matched' : 'no-match';
-
-                // 3. Smart Selection (Scoring)
-                if (allMatches.length > 0) {
+                if (localMatches.length > 0) {
+                    item.status = 'matched';
+                    // Smart Selection (Scoring) for the default choice
                     const queryWords = coreName.toLowerCase().split(/\s+/).filter((w: string) => w.length > 2);
-                    let bestMatch = allMatches[0];
-                    let maxMatches = 0;
+                    let bestMatch = localMatches[0];
+                    let maxMatches = -1;
 
-                    for (const cand of allMatches) {
+                    for (const cand of localMatches) {
                         const candName = cand.name.toLowerCase();
                         let matches = 0;
                         queryWords.forEach((word: string) => {
@@ -333,6 +324,8 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
                         }
                     }
                     item.selectedMatch = bestMatch;
+                } else {
+                    item.status = 'no-match-local';
                 }
 
                 setPendingIngredients([...updatedPending]);
@@ -342,6 +335,32 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
         } finally {
             setIsParsing(false);
         }
+    };
+
+    const handleUSDASearchForPending = async (index: number) => {
+        const updated = [...pendingIngredients];
+        const item = updated[index];
+        item.status = 'searching-usda';
+        setPendingIngredients(updated);
+
+        const rawItem = item.raw.item;
+        const parenIndex = rawItem.indexOf('(');
+        let coreName = parenIndex !== -1 ? rawItem.substring(0, parenIndex).trim() : rawItem;
+        coreName = coreName.replace(/[,;:]\s*$/, '').trim();
+
+        let globalMatches = await searchUSDAFood(coreName);
+        if (globalMatches.length === 0 && coreName !== rawItem) {
+            globalMatches = await searchUSDAFood(rawItem);
+        }
+
+        const newUpdated = [...pendingIngredients];
+        const newItem = newUpdated[index];
+        newItem.matches = globalMatches;
+        newItem.status = globalMatches.length > 0 ? 'matched' : 'no-match-global';
+        if (globalMatches.length > 0) {
+            newItem.selectedMatch = globalMatches[0];
+        }
+        setPendingIngredients(newUpdated);
     };
 
     const confirmPendingIngredient = async (index: number) => {
@@ -789,46 +808,118 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
 
                             <div className="max-h-80 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
                                 {pendingIngredients.map((item, idx) => (
-                                    <div key={idx} className="flex items-center gap-3 p-3 bg-white/5 rounded-xl shadow-sm">
-                                        <div className="flex-1 min-w-0">
-                                            <div className="text-xs font-bold text-slate-800 truncate">
-                                                {item.raw.amount} {item.raw.item}
+                                    <div key={idx} className="flex flex-col gap-2 p-3 bg-white/5 rounded-2xl border border-slate-200/50 dark:border-slate-800/50">
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex-1 min-w-0">
+                                                <div className="text-xs font-black uppercase tracking-tight text-slate-900 dark:text-slate-100 truncate flex items-center gap-2">
+                                                    <span className="text-amber-600 opacity-60">#{(idx + 1).toString().padStart(2, '0')}</span>
+                                                    {item.raw.amount} {item.raw.item}
+                                                </div>
+
+                                                <div className="text-[10px] mt-1.5 min-h-[1.5rem] flex items-center">
+                                                    {item.status === 'searching' && (
+                                                        <span className="text-slate-400 flex items-center gap-2 italic">
+                                                            <Loader2 size={12} className="animate-spin text-violet-500" /> Clinical Registry Lookup...
+                                                        </span>
+                                                    )}
+
+                                                    {item.status === 'searching-usda' && (
+                                                        <span className="text-violet-500 flex items-center gap-2 italic">
+                                                            <Loader2 size={12} className="animate-spin" /> Querying Global Database...
+                                                        </span>
+                                                    )}
+
+                                                    {item.status === 'matched' && item.matches.length > 0 && (
+                                                        <div className="flex flex-col gap-2 w-full">
+                                                            <div className="flex items-center gap-2">
+                                                                <Check size={12} className="text-emerald-500" />
+                                                                <select
+                                                                    className="bg-transparent border-none text-[10px] font-bold text-emerald-600 focus:ring-0 p-0 cursor-pointer hover:underline max-w-[200px]"
+                                                                    value={item.selectedMatch?.id || item.selectedMatch?.fdcId}
+                                                                    onChange={(e) => {
+                                                                        const selected = item.matches.find((m: any) => (m.id || m.fdcId) === e.target.value);
+                                                                        const updated = [...pendingIngredients];
+                                                                        updated[idx].selectedMatch = selected;
+                                                                        setPendingIngredients(updated);
+                                                                    }}
+                                                                >
+                                                                    {item.matches.map((m: any) => (
+                                                                        <option key={m.id || m.fdcId} value={m.id || m.fdcId} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+                                                                            {m.name} ({m.source === 'local' ? 'LOCAL' : 'USDA'})
+                                                                        </option>
+                                                                    ))}
+                                                                </select>
+                                                                {item.matches.length > 1 && (
+                                                                    <span className="text-[9px] text-slate-400 font-bold uppercase">+{item.matches.length - 1} more types</span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {item.status === 'no-match-local' && (
+                                                        <div className="flex items-center gap-3">
+                                                            <span className="text-slate-400 font-bold uppercase tracking-tight">Registry mismatch</span>
+                                                            <button
+                                                                onClick={() => handleUSDASearchForPending(idx)}
+                                                                className="text-violet-600 hover:text-violet-700 font-black flex items-center gap-1.5 transition-all hover:gap-2"
+                                                            >
+                                                                <Sparkles size={10} /> Search Global?
+                                                            </button>
+                                                        </div>
+                                                    )}
+
+                                                    {item.status === 'no-match-global' && (
+                                                        <span className="text-rose-500 font-black uppercase tracking-widest">Protocol Sync Failed</span>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div className="text-[10px] flex items-center gap-1.5 mt-0.5">
-                                                {item.status === 'searching' && (
-                                                    <span className="text-slate-400 flex items-center gap-1">
-                                                        <Loader2 size={10} className="animate-spin" /> Matching...
-                                                    </span>
+
+                                            <div className="flex items-center gap-1.5 shrink-0">
+                                                {item.status === 'matched' && (
+                                                    <button
+                                                        onClick={() => confirmPendingIngredient(idx)}
+                                                        className="h-10 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-lg shadow-emerald-500/10 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95"
+                                                        title="Add to Protocol"
+                                                    >
+                                                        <Plus size={14} /> Add
+                                                    </button>
                                                 )}
-                                                {item.status === 'matched' && item.selectedMatch && (
-                                                    <span className="text-emerald-600 flex items-center gap-1 font-bold">
-                                                        <Check size={10} /> Matched: {item.selectedMatch.name}
-                                                        <span className="text-[8px] opacity-60 uppercase">({item.selectedMatch.source})</span>
-                                                    </span>
+
+                                                {item.status === 'no-match-local' && (
+                                                    <button
+                                                        onClick={() => {
+                                                            // Fallback to manual search for this specific item if everything fails
+                                                            setShowPicker(true);
+                                                            rejectPendingIngredient(idx);
+                                                        }}
+                                                        className="h-10 px-4 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest transition-all"
+                                                        title="Manual Search"
+                                                    >
+                                                        <Utensils size={14} /> Manual
+                                                    </button>
                                                 )}
-                                                {item.status === 'no-match' && (
-                                                    <span className="text-red-500 font-bold">No match found</span>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-1">
-                                            {item.status === 'matched' && (
+
                                                 <button
-                                                    onClick={() => confirmPendingIngredient(idx)}
-                                                    className="p-1.5 h-8 w-8 flex items-center justify-center bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition"
-                                                    title="Add to Recipe"
+                                                    onClick={() => rejectPendingIngredient(idx)}
+                                                    className="h-10 w-10 flex items-center justify-center bg-slate-50 dark:bg-slate-900 text-slate-400 hover:text-rose-500 rounded-xl transition-all border border-slate-100 dark:border-slate-800"
+                                                    title="Dismiss"
                                                 >
-                                                    <Plus size={14} />
+                                                    <CloseIcon size={14} />
                                                 </button>
-                                            )}
-                                            <button
-                                                onClick={() => rejectPendingIngredient(idx)}
-                                                className="p-1.5 h-8 w-8 flex items-center justify-center bg-slate-100 text-slate-500 rounded-lg hover:bg-slate-200 transition"
-                                                title="Dismiss"
-                                            >
-                                                <CloseIcon size={14} />
-                                            </button>
+                                            </div>
                                         </div>
+
+                                        {/* Optional: Show tiny "Switch to Global" if matched locally but user wants to browse USDA */}
+                                        {item.status === 'matched' && item.selectedMatch?.source === 'local' && (
+                                            <div className="px-1 pt-1 opacity-0 hover:opacity-100 transition-opacity">
+                                                <button
+                                                    onClick={() => handleUSDASearchForPending(idx)}
+                                                    className="text-[8px] font-bold text-violet-400 hover:text-violet-500 uppercase tracking-widest"
+                                                >
+                                                    Not the right version? Browse Global Database
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>
