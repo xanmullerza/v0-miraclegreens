@@ -401,25 +401,15 @@ function ProfilePageContent() {
                                 </div>
                             </div>
 
-                            <div className="p-5 rounded-2xl bg-blue-500/5 border border-blue-500/10 flex items-start gap-4">
-                                <Info size={16} className="text-blue-400 shrink-0 mt-0.5" />
-                                <p className="text-[11px] font-bold text-slate-400 leading-relaxed">
-                                    Bio-metrics synced. Targets are adjusting in real-time as you modify your DNA profile settings.
-                                </p>
-                            </div>
-
-                            <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 max-h-[calc(100vh-400px)] overflow-y-auto pr-2 custom-scrollbar lg:pr-4">
+                            <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 pr-1">
                                 {Object.entries(userRDAs || {}).filter(([k]) => !['calories', 'energy_kj'].includes(k.toLowerCase())).map(([nutrient, value]) => {
                                     const unit = (nutrient === 'Vitamin D') ? 'IU' : (nutrient.includes('Folate') || nutrient.includes('B12') || nutrient.includes('Biotin') || nutrient.includes('Selenium') || nutrient === 'Vitamin A' || nutrient === 'Vitamin K') ? 'µg' : 'mg';
                                     return (
-                                        <div key={nutrient} className="bg-slate-900/50 border border-slate-800/50 p-4 rounded-2xl flex flex-col gap-1 hover:border-blue-500/30 transition-all hover:bg-slate-900 group/item">
-                                            <div className="flex justify-between items-center mb-0.5">
-                                                <p className="text-[10px] uppercase font-black text-slate-500 group-hover/item:text-slate-400 transition-colors">{nutrient}</p>
-                                                <span className="text-[10px] font-black text-blue-500/50 group-hover/item:text-blue-400 transition-colors">Target</span>
-                                            </div>
-                                            <div className="flex items-baseline gap-1.5">
-                                                <span className="text-2xl font-black text-slate-200 tracking-tighter italic">{value}</span>
-                                                <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">{unit}</span>
+                                        <div key={nutrient} className="bg-slate-900/50 border border-slate-800/50 p-1.5 rounded-lg flex flex-col items-center justify-center text-center hover:border-blue-500/30 transition-all hover:bg-slate-900 group/item aspect-square">
+                                            <p className="text-[7px] uppercase font-black text-slate-500 group-hover/item:text-slate-400 transition-colors leading-none mb-1 line-clamp-2">{nutrient}</p>
+                                            <div className="flex items-baseline gap-0.5">
+                                                <span className="text-xs font-black text-slate-200 tracking-tighter italic">{value}</span>
+                                                <span className="text-[6px] font-black text-slate-600 uppercase tracking-widest">{unit}</span>
                                             </div>
                                         </div>
                                     );
