@@ -59,6 +59,7 @@ interface FoodItem {
     micronutrients: Record<string, number>;
     is_favorite?: boolean;
     category?: string;
+    details?: import('@/lib/data/food-details').FoodDetail;
 }
 
 export default function FoodDetailsPage() {
@@ -456,67 +457,71 @@ export default function FoodDetailsPage() {
                         </div>
                     </Card>
 
-                    {FOOD_DETAILS[food.id] && (
-                        <div className="space-y-6 pt-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-                            {/* Description */}
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-widest text-xs">
-                                    <BookOpen size={14} /> Description
+                    {/* Details Section - Dynamic Database or Fallback */}
+                    {(food.details || FOOD_DETAILS[food.id]) && (() => {
+                        const details = food.details || FOOD_DETAILS[food.id];
+                        return (
+                            <div className="space-y-6 pt-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+                                {/* Description */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-widest text-xs">
+                                        <BookOpen size={14} /> Description
+                                    </div>
+                                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                                        {details.description}
+                                    </p>
                                 </div>
-                                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                                    {FOOD_DETAILS[food.id].description}
-                                </p>
-                            </div>
 
-                            {/* History */}
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold uppercase tracking-widest text-xs">
-                                    <Globe size={14} /> Origin & History
+                                {/* History */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold uppercase tracking-widest text-xs">
+                                        <Globe size={14} /> Origin & History
+                                    </div>
+                                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                        {details.history}
+                                    </p>
                                 </div>
-                                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                                    {FOOD_DETAILS[food.id].history}
-                                </p>
-                            </div>
 
-                            {/* Producers */}
-                            <div className="p-5 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-2">
-                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Top Producers</span>
-                                <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
-                                    {FOOD_DETAILS[food.id].producers}
-                                </p>
-                            </div>
-
-                            {/* Benefits */}
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold uppercase tracking-widest text-xs">
-                                    <ShieldCheck size={14} /> Key Benefits
+                                {/* Producers */}
+                                <div className="p-5 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-2">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Top Producers</span>
+                                    <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                                        {details.producers}
+                                    </p>
                                 </div>
-                                <ul className="space-y-2.5">
-                                    {FOOD_DETAILS[food.id].benefits.map((benefit, i) => (
-                                        <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
-                                            <span className="text-blue-500 font-bold mt-0.5">•</span>
-                                            <span className="leading-snug">{benefit}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
 
-                            {/* Facts */}
-                            <div className="space-y-3">
-                                <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-bold uppercase tracking-widest text-xs">
-                                    <Lightbulb size={14} /> Did you know?
+                                {/* Benefits */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold uppercase tracking-widest text-xs">
+                                        <ShieldCheck size={14} /> Key Benefits
+                                    </div>
+                                    <ul className="space-y-2.5">
+                                        {details.benefits.map((benefit: string, i: number) => (
+                                            <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
+                                                <span className="text-blue-500 font-bold mt-0.5">•</span>
+                                                <span className="leading-snug">{benefit}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
-                                <ul className="space-y-3">
-                                    {FOOD_DETAILS[food.id].facts.map((fact, i) => (
-                                        <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400 italic">
-                                            <span className="text-purple-500 mt-0.5">✨</span>
-                                            <span className="leading-snug">{fact}</span>
-                                        </li>
-                                    ))}
-                                </ul>
+
+                                {/* Facts */}
+                                <div className="space-y-3">
+                                    <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-bold uppercase tracking-widest text-xs">
+                                        <Lightbulb size={14} /> Did you know?
+                                    </div>
+                                    <ul className="space-y-3">
+                                        {details.facts.map((fact: string, i: number) => (
+                                            <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400 italic">
+                                                <span className="text-purple-500 mt-0.5">✨</span>
+                                                <span className="leading-snug">{fact}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        );
+                    })()}
                 </div>
 
                 <div className="lg:col-span-2 space-y-6">
