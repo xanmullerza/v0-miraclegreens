@@ -81,23 +81,23 @@ function ProfilePageContent() {
         <div
             onClick={onClick}
             className={cn(
-                "cursor-pointer flex flex-col items-center justify-center gap-1 rounded-xl border p-4 transition-all hover:scale-[1.02]",
+                "cursor-pointer flex flex-col items-center justify-center gap-0.5 rounded-xl border p-2.5 transition-all hover:scale-[1.02] text-center",
                 selected
                     ? "bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-sm"
                     : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50"
             )}
         >
-            <Icon className={cn("h-6 w-6 mb-1", selected ? "text-emerald-500" : "text-slate-400")} />
-            <span className="text-xs font-bold uppercase tracking-tight text-center">{label || type.replace('-', ' ')}</span>
+            <Icon className={cn("h-4 w-4 mb-0.5", selected ? "text-emerald-500" : "text-slate-400")} />
+            <span className="text-[10px] font-bold uppercase tracking-tight leading-tight">{label || type.replace('-', ' ')}</span>
         </div>
     );
 
     return (
         <div className="max-w-7xl mx-auto animate-in fade-in duration-500 px-4 py-8">
-            <div className="flex flex-col lg:flex-row gap-8 items-start">
-                {/* Main Content (Scrollable) */}
-                <div className="flex-1 w-full space-y-12 pb-24">
-                    <div className="grid grid-cols-1 gap-12">
+            <div className="flex flex-col lg:flex-row gap-6 items-start">
+                {/* Main Content (Compact Settings) */}
+                <div className="w-full lg:w-1/2 space-y-8 pb-24">
+                    <div className="grid grid-cols-1 gap-8">
                         {/* Basic Info */}
                         <section className="space-y-6">
                             <div className="flex items-center gap-2 text-emerald-500 mb-2">
@@ -127,16 +127,16 @@ function ProfilePageContent() {
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
                                     <div className="space-y-2">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Gender</Label>
-                                        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800 h-10 mt-2">
+                                        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800 h-8 mt-1">
                                             <button
                                                 onClick={() => setFormData({ ...formData, gender: 'male' })}
-                                                className={cn("flex-1 text-xs font-bold rounded-lg transition-all", formData.gender === 'male' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
+                                                className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'male' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
                                             >
                                                 M
                                             </button>
                                             <button
                                                 onClick={() => setFormData({ ...formData, gender: 'female' })}
-                                                className={cn("flex-1 text-xs font-bold rounded-lg transition-all", formData.gender === 'female' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
+                                                className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'female' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
                                             >
                                                 F
                                             </button>
@@ -179,7 +179,7 @@ function ProfilePageContent() {
                                 <Utensils size={20} />
                                 <h2 className="text-sm font-black uppercase tracking-[0.2em]">Dietary Profile</h2>
                             </div>
-                            <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 space-y-10 shadow-sm">
+                            <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-6 shadow-sm">
                                 <div className="space-y-4">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Goal</Label>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -395,18 +395,18 @@ function ProfilePageContent() {
                     </div>
                 </div>
 
-                {/* Sticky Sidebar: RDA Blueprint Preview */}
-                <aside className="w-full lg:w-96 lg:sticky lg:top-24 space-y-6">
+                {/* Sticky Sidebar (Full-heightish Split) */}
+                <aside className="w-full lg:w-1/2 lg:sticky lg:top-24 space-y-6">
                     <div className="bg-slate-950 border border-slate-800 rounded-[2.5rem] p-8 shadow-2xl relative overflow-hidden group">
                         {/* Background Decoration */}
                         <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors duration-700" />
 
-                        <div className="mb-4 text-center">
-                            <p className="text-[9px] uppercase font-black text-slate-500">Nutrient Strategy</p>
-                            <p className="text-xs font-bold text-slate-200 capitalize">{formData.nutrientStrategy || 'Balanced'}</p>
+                        <div className="mb-6 text-center">
+                            <h2 className="text-[10px] uppercase font-black tracking-[0.2em] text-blue-500 mb-1">Nutrient Strategy Protocol</h2>
+                            <p className="text-xl font-black text-slate-200 capitalize italic tracking-tighter">{formData.nutrientStrategy || 'Balanced'}</p>
                         </div>
 
-                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 pr-1">
+                        <div className="grid grid-cols-3 sm:grid-cols-4 xl:grid-cols-5 gap-2 pr-1">
                             {(() => {
                                 // 1. Calculate BMR (Mifflin-St Jeor)
                                 const weight = Number(formData.weight) || 70;
@@ -467,11 +467,11 @@ function ProfilePageContent() {
                                     const displayVal = value < 1 ? value.toFixed(2) : value < 10 ? value.toFixed(1) : Math.round(value);
 
                                     return (
-                                        <div key={nutrient} className="bg-slate-900/50 border border-slate-800/50 p-1.5 rounded-lg flex flex-col items-center justify-center text-center hover:border-blue-500/30 transition-all hover:bg-slate-900 group/item aspect-square">
-                                            <p className="text-[7px] uppercase font-black text-slate-500 group-hover/item:text-slate-400 transition-colors leading-none mb-1 line-clamp-2">{nutrient}</p>
+                                        <div key={nutrient} className="bg-slate-900/50 border border-slate-800/50 p-2 rounded-xl flex flex-col items-center justify-center text-center hover:border-blue-500/30 transition-all hover:bg-slate-900 group/item aspect-square">
+                                            <p className="text-[8px] uppercase font-black text-slate-500 group-hover/item:text-slate-400 transition-colors leading-none mb-1.5 line-clamp-2">{nutrient}</p>
                                             <div className="flex items-baseline gap-0.5">
-                                                <span className="text-xs font-black text-slate-200 tracking-tighter italic">{displayVal}</span>
-                                                <span className="text-[6px] font-black text-slate-600 uppercase tracking-widest">{unit}</span>
+                                                <span className="text-sm font-black text-slate-200 tracking-tighter italic">{displayVal}</span>
+                                                <span className="text-[8px] font-black text-slate-600 uppercase tracking-widest">{unit}</span>
                                             </div>
                                         </div>
                                     );
