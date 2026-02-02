@@ -629,7 +629,7 @@ export default function RecipeDetailsPage() {
                                                                             </div>
                                                                             {(nutrientDisplayMode === 'value' || nutrientDisplayMode === 'both') && rda && (
                                                                                 <p className="text-[9px] font-bold text-slate-400 mt-0.5">
-                                                                                    Target: {rda}{unit === 'kcal' ? 'kcal' : unit}
+                                                                                    Target: {Math.round(rda)}{unit === 'kcal' ? 'kcal' : unit}
                                                                                 </p>
                                                                             )}
                                                                             {nutrientDisplayMode === 'both' && pct !== null && !forceRaw && (
