@@ -50,9 +50,20 @@ export default function RecipeBuilderPage() {
     const [instructionsMode, setInstructionsMode] = useState<'none' | 'magic' | 'manual'>('none');
 
     const instructionsRef = useRef<HTMLDivElement>(null);
+    const detailsRef = useRef<HTMLDivElement>(null);
 
     const handleNextStep = () => {
-        instructionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setStep(2);
+        setTimeout(() => {
+            instructionsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+    };
+
+    const handleToDetails = () => {
+        setStep(3);
+        setTimeout(() => {
+            detailsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
     };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -333,6 +344,7 @@ export default function RecipeBuilderPage() {
             setIngredients(mergedIngredients);
             setAutoImportText('');
             setShowAutoImport(false);
+            setStep(3);
             alert('Recipe imported!');
         } catch (error) {
             console.error('Import error:', error);
@@ -542,284 +554,297 @@ export default function RecipeBuilderPage() {
                 </Card>
 
                 {/* Step 2: Instructions */}
-                <Card className="p-8 space-y-6" ref={instructionsRef}>
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-bold flex items-center gap-3">
-                            <ListOrdered className="w-5 h-5 text-amber-500" />
-                            Cooking Steps
-                        </h3>
-                        {instructionsMode !== 'none' && (
-                            <div className="flex gap-2">
-                                {instructionsMode === 'magic' ? (
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => setShowMagicInstructions(!showMagicInstructions)}
-                                        className="text-[10px] uppercase font-black tracking-widest gap-2 bg-amber-500/5 text-amber-600 border-amber-500/20"
-                                    >
-                                        <Wand2 size={14} /> Paste Steps
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={handleAddInstruction}
-                                        className="text-[10px] uppercase font-black tracking-widest gap-2"
-                                    >
-                                        <Plus size={14} /> Add Step
-                                    </Button>
-                                )}
-                            </div>
-                        )}
-                    </div>
-
-                    {instructionsMode === 'none' ? (
-                        <div className="py-12 flex flex-col items-center justify-center gap-8 bg-slate-50/50 dark:bg-slate-900/20 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
-                            <div className="text-center space-y-2">
-                                <h4 className="text-xl font-black uppercase tracking-tighter">Define the Method</h4>
-                                <p className="text-sm font-medium text-slate-500">Choose how to document the clinical preparation steps</p>
-                            </div>
-                            <div className="flex gap-4">
-                                <button
-                                    onClick={() => {
-                                        setInstructionsMode('magic');
-                                        setShowMagicInstructions(true);
-                                    }}
-                                    className="p-8 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-amber-500 transition-all group flex flex-col items-center gap-4 w-64 shadow-sm hover:shadow-xl hover:shadow-amber-500/5 hover:-translate-y-1"
-                                >
-                                    <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover:scale-110 transition-transform">
-                                        <Wand2 size={32} />
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="font-black text-xs uppercase tracking-widest mb-1">Magic Paste</div>
-                                        <div className="text-[10px] text-slate-500 font-bold leading-tight">Paste full text instructions for automated parsing</div>
-                                    </div>
-                                </button>
-                                <button
-                                    onClick={() => setInstructionsMode('manual')}
-                                    className="p-8 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-violet-500 transition-all group flex flex-col items-center gap-4 w-64 shadow-sm hover:shadow-xl hover:shadow-violet-500/5 hover:-translate-y-1"
-                                >
-                                    <div className="w-16 h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center text-violet-500 group-hover:scale-110 transition-transform">
-                                        <Plus size={32} />
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="font-black text-xs uppercase tracking-widest mb-1">Manual Build</div>
-                                        <div className="text-[10px] text-slate-500 font-bold leading-tight">Add cooking steps precisely one by one</div>
-                                    </div>
-                                </button>
-                            </div>
-                        </div>
-                    ) : (
-                        <>
-                            {showMagicInstructions && (
-                                <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 animate-in fade-in slide-in-from-top-4 duration-300">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Paste Method Content Below</p>
-                                    <textarea
-                                        className="w-full h-40 bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all font-mono"
-                                        placeholder="Paste multiple steps here..."
-                                        value={magicInstructionsText}
-                                        onChange={(e) => setMagicInstructionsText(e.target.value)}
-                                    />
-                                    <div className="flex justify-end gap-3 mt-4">
-                                        <Button variant="ghost" className="text-xs text-slate-400" onClick={() => setShowMagicInstructions(false)}>Cancel</Button>
-                                        <Button onClick={handleMagicPasteInstructions} className="bg-amber-500 text-white hover:bg-amber-600 text-[10px] font-black uppercase tracking-widest px-8 shadow-lg shadow-amber-500/20">Get Steps</Button>
-                                    </div>
+                {step >= 2 && (
+                    <Card className="p-8 space-y-6" ref={instructionsRef}>
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-bold flex items-center gap-3">
+                                <ListOrdered className="w-5 h-5 text-amber-500" />
+                                Cooking Steps
+                            </h3>
+                            {instructionsMode !== 'none' && (
+                                <div className="flex gap-2">
+                                    {instructionsMode === 'magic' ? (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setShowMagicInstructions(!showMagicInstructions)}
+                                            className="text-[10px] uppercase font-black tracking-widest gap-2 bg-amber-500/5 text-amber-600 border-amber-500/20"
+                                        >
+                                            <Wand2 size={14} /> Paste Steps
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={handleAddInstruction}
+                                            className="text-[10px] uppercase font-black tracking-widest gap-2"
+                                        >
+                                            <Plus size={14} /> Add Step
+                                        </Button>
+                                    )}
                                 </div>
                             )}
+                        </div>
 
-                            <div className="space-y-4">
-                                {instructions.map((stepText, index) => (
-                                    <div key={index} className="flex gap-4 group">
-                                        <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900/50 flex items-center justify-center font-black text-sm text-slate-400 group-hover:bg-violet-500 group-hover:text-white transition-all cursor-move">
-                                            {index + 1}
+                        {instructionsMode === 'none' ? (
+                            <div className="py-12 flex flex-col items-center justify-center gap-8 bg-slate-50/50 dark:bg-slate-900/20 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                                <div className="text-center space-y-2">
+                                    <h4 className="text-xl font-black uppercase tracking-tighter">Define the Method</h4>
+                                    <p className="text-sm font-medium text-slate-500">Choose how to document the clinical preparation steps</p>
+                                </div>
+                                <div className="flex gap-4">
+                                    <button
+                                        onClick={() => {
+                                            setInstructionsMode('magic');
+                                            setShowMagicInstructions(true);
+                                        }}
+                                        className="p-8 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-amber-500 transition-all group flex flex-col items-center gap-4 w-64 shadow-sm hover:shadow-xl hover:shadow-amber-500/5 hover:-translate-y-1"
+                                    >
+                                        <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 group-hover:scale-110 transition-transform">
+                                            <Wand2 size={32} />
                                         </div>
-                                        <div className="flex-1 relative">
-                                            <textarea
-                                                value={stepText}
-                                                onChange={(e) => handleUpdateInstruction(index, e.target.value)}
-                                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 focus:border-violet-500/50 rounded-xl p-4 text-sm min-h-[80px] transition-all resize-none"
-                                                placeholder={`Explain instruction step ${index + 1}...`}
-                                            />
-                                            {instructions.length > 1 && (
-                                                <button
-                                                    onClick={() => handleRemoveInstruction(index)}
-                                                    className="absolute top-2 right-2 text-slate-300 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100"
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            )}
+                                        <div className="text-center">
+                                            <div className="font-black text-xs uppercase tracking-widest mb-1">Magic Paste</div>
+                                            <div className="text-[10px] text-slate-500 font-bold leading-tight">Paste full text instructions for automated parsing</div>
+                                        </div>
+                                    </button>
+                                    <button
+                                        onClick={() => setInstructionsMode('manual')}
+                                        className="p-8 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-violet-500 transition-all group flex flex-col items-center gap-4 w-64 shadow-sm hover:shadow-xl hover:shadow-violet-500/5 hover:-translate-y-1"
+                                    >
+                                        <div className="w-16 h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center text-violet-500 group-hover:scale-110 transition-transform">
+                                            <Plus size={32} />
+                                        </div>
+                                        <div className="text-center">
+                                            <div className="font-black text-xs uppercase tracking-widest mb-1">Manual Build</div>
+                                            <div className="text-[10px] text-slate-500 font-bold leading-tight">Add cooking steps precisely one by one</div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                {showMagicInstructions && (
+                                    <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 animate-in fade-in slide-in-from-top-4 duration-300">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Paste Method Content Below</p>
+                                        <textarea
+                                            className="w-full h-40 bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-white focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all font-mono"
+                                            placeholder="Paste multiple steps here..."
+                                            value={magicInstructionsText}
+                                            onChange={(e) => setMagicInstructionsText(e.target.value)}
+                                        />
+                                        <div className="flex justify-end gap-3 mt-4">
+                                            <Button variant="ghost" className="text-xs text-slate-400" onClick={() => setShowMagicInstructions(false)}>Cancel</Button>
+                                            <Button onClick={handleMagicPasteInstructions} className="bg-amber-500 text-white hover:bg-amber-600 text-[10px] font-black uppercase tracking-widest px-8 shadow-lg shadow-amber-500/20">Get Steps</Button>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-                        </>
-                    )}
-                </Card>
+                                )}
 
-                {/* Metadata Section */}
-                <Card className="p-8 space-y-8">
-                    <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
-                        <ClipboardList size={20} className="text-violet-500" />
-                        <h3 className="font-bold uppercase tracking-wider text-sm">Recipe Details</h3>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div className="space-y-6">
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Recipe Title</Label>
-                                <Input
-                                    className="font-bold text-lg h-12 bg-slate-50 dark:bg-slate-950"
-                                    placeholder="The Golden Bowl..."
-                                    value={title}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                                        <Clock size={12} /> Prep (min)
-                                    </Label>
-                                    <Input
-                                        type="number"
-                                        className="h-10 bg-slate-50 dark:bg-slate-950 font-bold"
-                                        value={prepTime}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPrepTime(Number(e.target.value))}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                                        <Users size={12} /> Servings
-                                    </Label>
-                                    <Input
-                                        type="number"
-                                        className="h-10 bg-slate-50 dark:bg-slate-950 font-bold"
-                                        value={servings}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setServings(Number(e.target.value))}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-3">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Meal Type</Label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    {['breakfast', 'lunch', 'dinner', 'snack'].map(m => (
-                                        <button
-                                            key={m}
-                                            onClick={() => setType(m as any)}
-                                            className={cn(
-                                                "h-9 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border",
-                                                type === m
-                                                    ? "bg-violet-500 text-white border-violet-600 shadow-md shadow-violet-500/20"
-                                                    : "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500"
-                                            )}
-                                        >
-                                            {m}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="space-y-3 pt-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Diet Type</Label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    {['Balanced (Omnivore)', 'Pescetarian', 'Vegetarian', 'Vegan'].map(d => (
-                                        <button
-                                            key={d}
-                                            onClick={() => {
-                                                if (diet.includes(d)) {
-                                                    setDiet(diet.filter(item => item !== d));
-                                                } else {
-                                                    setDiet([...diet, d]);
-                                                }
-                                            }}
-                                            className={cn(
-                                                "h-9 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border px-2",
-                                                diet.includes(d)
-                                                    ? "bg-blue-500 text-white border-blue-600 shadow-md shadow-blue-500/20"
-                                                    : "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500"
-                                            )}
-                                        >
-                                            {d}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="space-y-3 pt-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Collection</Label>
-                                <button
-                                    onClick={() => setIsFavorite(!isFavorite)}
-                                    className={cn(
-                                        "w-full h-12 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border flex items-center justify-center gap-2",
-                                        isFavorite
-                                            ? "bg-rose-500 text-white border-rose-600 shadow-md shadow-rose-500/20"
-                                            : "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500"
-                                    )}
-                                >
-                                    <Heart size={16} fill={isFavorite ? "currentColor" : "none"} />
-                                    {isFavorite ? "Added to My Meals" : "Add to My Meals"}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col justify-end pt-4 border-t md:border-t-0 md:border-l border-slate-100 dark:border-slate-800 md:pl-8 space-y-6">
-                            {/* Photo Upload Block */}
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                                    <Camera size={12} /> Recipe Photo
-                                </Label>
-                                <div className="relative aspect-video rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group hover:border-violet-500/50 transition-all flex flex-col items-center justify-center">
-                                    {image ? (
-                                        <>
-                                            <img src={image} alt="Recipe" className="w-full h-full object-cover" />
-                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                <Button variant="secondary" size="sm" className="gap-2" onClick={() => setImage('')}>
-                                                    <Trash2 size={14} /> Remove
-                                                </Button>
+                                <div className="space-y-4">
+                                    {instructions.map((stepText, index) => (
+                                        <div key={index} className="flex gap-4 group">
+                                            <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-900/50 flex items-center justify-center font-black text-sm text-slate-400 group-hover:bg-violet-500 group-hover:text-white transition-all cursor-move">
+                                                {index + 1}
                                             </div>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <div className="text-center p-4 pointer-events-none">
-                                                {uploading ? (
-                                                    <Loader2 className="h-8 w-8 animate-spin text-violet-500 mx-auto" />
-                                                ) : (
-                                                    <>
-                                                        <Upload size={20} className="text-slate-400 mx-auto mb-2" />
-                                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Upload Photo</p>
-                                                    </>
+                                            <div className="flex-1 relative">
+                                                <textarea
+                                                    value={stepText}
+                                                    onChange={(e) => handleUpdateInstruction(index, e.target.value)}
+                                                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-violet-500/50 rounded-xl p-4 text-sm min-h-[80px] transition-all resize-none"
+                                                    placeholder={`Explain instruction step ${index + 1}...`}
+                                                />
+                                                {instructions.length > 1 && (
+                                                    <button
+                                                        onClick={() => handleRemoveInstruction(index)}
+                                                        className="absolute top-2 right-2 text-slate-300 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
                                                 )}
                                             </div>
-                                            {!uploading && (
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                                                    onChange={handleImageUpload}
-                                                />
-                                            )}
-                                        </>
-                                    )}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="flex justify-center pt-8 border-t border-slate-100 dark:border-slate-800">
+                                    <Button
+                                        onClick={handleToDetails}
+                                        className="bg-amber-600 hover:bg-amber-700 text-white gap-2 min-w-[200px] font-black text-[10px] uppercase tracking-widest h-12 rounded-xl shadow-lg shadow-amber-500/20"
+                                    >
+                                        Next: Recipe Details <ArrowRight size={14} />
+                                    </Button>
+                                </div>
+                            </>
+                        )}
+                    </Card>
+                )}
+
+                {/* Metadata Section */}
+                {step >= 3 && (
+                    <Card className="p-8 space-y-8" ref={detailsRef}>
+                        <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4 mb-4">
+                            <ClipboardList size={20} className="text-violet-500" />
+                            <h3 className="font-bold uppercase tracking-wider text-sm">Recipe Details</h3>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Recipe Title</Label>
+                                    <Input
+                                        className="font-bold text-lg h-12 bg-slate-50 dark:bg-slate-950"
+                                        placeholder="The Golden Bowl..."
+                                        value={title}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                                            <Clock size={12} /> Prep (min)
+                                        </Label>
+                                        <Input
+                                            type="number"
+                                            className="h-10 bg-slate-50 dark:bg-slate-950 font-bold"
+                                            value={prepTime}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPrepTime(Number(e.target.value))}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                                            <Users size={12} /> Servings
+                                        </Label>
+                                        <Input
+                                            type="number"
+                                            className="h-10 bg-slate-50 dark:bg-slate-950 font-bold"
+                                            value={servings}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setServings(Number(e.target.value))}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Meal Type</Label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {['breakfast', 'lunch', 'dinner', 'snack'].map(m => (
+                                            <button
+                                                key={m}
+                                                onClick={() => setType(m as any)}
+                                                className={cn(
+                                                    "h-9 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border",
+                                                    type === m
+                                                        ? "bg-violet-500 text-white border-violet-600 shadow-md shadow-violet-500/20"
+                                                        : "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500"
+                                                )}
+                                            >
+                                                {m}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3 pt-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Diet Type</Label>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {['Balanced (Omnivore)', 'Pescetarian', 'Vegetarian', 'Vegan'].map(d => (
+                                            <button
+                                                key={d}
+                                                onClick={() => {
+                                                    if (diet.includes(d)) {
+                                                        setDiet(diet.filter(item => item !== d));
+                                                    } else {
+                                                        setDiet([...diet, d]);
+                                                    }
+                                                }}
+                                                className={cn(
+                                                    "h-9 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border px-2",
+                                                    diet.includes(d)
+                                                        ? "bg-blue-500 text-white border-blue-600 shadow-md shadow-blue-500/20"
+                                                        : "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500"
+                                                )}
+                                            >
+                                                {d}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3 pt-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Collection</Label>
+                                    <button
+                                        onClick={() => setIsFavorite(!isFavorite)}
+                                        className={cn(
+                                            "w-full h-12 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border flex items-center justify-center gap-2",
+                                            isFavorite
+                                                ? "bg-rose-500 text-white border-rose-600 shadow-md shadow-rose-500/20"
+                                                : "bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500"
+                                        )}
+                                    >
+                                        <Heart size={16} fill={isFavorite ? "currentColor" : "none"} />
+                                        {isFavorite ? "Added to My Meals" : "Add to My Meals"}
+                                    </button>
                                 </div>
                             </div>
 
-                            <div className="space-y-4">
-                                <Button
-                                    className="w-full bg-violet-600 hover:bg-violet-700 text-white shadow-xl shadow-violet-500/20 h-16 rounded-2xl font-black uppercase tracking-widest group text-lg"
-                                    disabled={saving}
-                                    onClick={handleSave}
-                                >
-                                    {saving ? <Loader2 className="animate-spin" /> : <Save className="mr-2 group-hover:scale-125 transition-transform" />}
-                                    Save Recipe
-                                </Button>
-                                <p className="text-center text-[10px] text-slate-400 tracking-tighter uppercase px-4">
-                                    By saving, this recipe and its nutrition data will be added to your recipe box.
-                                </p>
+                            <div className="flex flex-col justify-end pt-4 border-t md:border-t-0 md:border-l border-slate-100 dark:border-slate-800 md:pl-8 space-y-6">
+                                {/* Photo Upload Block */}
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                                        <Camera size={12} /> Recipe Photo
+                                    </Label>
+                                    <div className="relative aspect-video rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group hover:border-violet-500/50 transition-all flex flex-col items-center justify-center">
+                                        {image ? (
+                                            <>
+                                                <img src={image} alt="Recipe" className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                    <Button variant="secondary" size="sm" className="gap-2" onClick={() => setImage('')}>
+                                                        <Trash2 size={14} /> Remove
+                                                    </Button>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="text-center p-4 pointer-events-none">
+                                                    {uploading ? (
+                                                        <Loader2 className="h-8 w-8 animate-spin text-violet-500 mx-auto" />
+                                                    ) : (
+                                                        <>
+                                                            <Upload size={20} className="text-slate-400 mx-auto mb-2" />
+                                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Upload Photo</p>
+                                                        </>
+                                                    )}
+                                                </div>
+                                                {!uploading && (
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                                        onChange={handleImageUpload}
+                                                    />
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <Button
+                                        className="w-full bg-violet-600 hover:bg-violet-700 text-white shadow-xl shadow-violet-500/20 h-16 rounded-2xl font-black uppercase tracking-widest group text-lg"
+                                        disabled={saving}
+                                        onClick={handleSave}
+                                    >
+                                        {saving ? <Loader2 className="animate-spin" /> : <Save className="mr-2 group-hover:scale-125 transition-transform" />}
+                                        Save Recipe
+                                    </Button>
+                                    <p className="text-center text-[10px] text-slate-400 tracking-tighter uppercase px-4">
+                                        By saving, this recipe and its nutrition data will be added to your recipe box.
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </Card>
+                    </Card>
+                )}
             </div>
 
             {/* Auto-Import Drawer */}
