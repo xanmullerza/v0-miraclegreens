@@ -121,11 +121,11 @@ export default function EditRecipePage() {
                     quantity: totalQty,
                     measure_label: ing.measure_label,
                     modifier: ing.modifier,
-                    calories: food ? Math.round(food.energy_kcal * ratio) : 0,
-                    energy_kj: food ? Math.round(food.energy_kj * ratio) : 0,
-                    protein: food ? Number((food.protein_g * ratio).toFixed(1)) : 0,
-                    fat: food ? Number((food.fat_g * ratio).toFixed(1)) : 0,
-                    carbs: food ? Number((food.carbs_g * ratio).toFixed(1)) : 0,
+                    calories: food ? food.energy_kcal * ratio : 0,
+                    energy_kj: food ? (food.energy_kj || (food.energy_kcal * 4.184)) * ratio : 0,
+                    protein: food ? food.protein_g * ratio : 0,
+                    fat: food ? food.fat_g * ratio : 0,
+                    carbs: food ? food.carbs_g * ratio : 0,
                     micronutrients: food ? Object.entries(food.micronutrients || {}).reduce((acc, [key, val]) => {
                         acc[key] = (val as number) * ratio;
                         return acc;

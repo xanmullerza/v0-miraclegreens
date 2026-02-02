@@ -253,11 +253,11 @@ export default function RecipeBuilderPage() {
                         quantity: quantity,
                         measure_label: unit,
                         modifier: finalModifier,
-                        calories: Math.round(match.energy_kcal * ratio),
-                        energy_kj: Math.round(match.energy_kj * ratio),
-                        protein: Number((match.protein_g * ratio).toFixed(1)),
-                        fat: Number((match.fat_g * ratio).toFixed(1)),
-                        carbs: Number((match.carbs_g * ratio).toFixed(1)),
+                        calories: match.energy_kcal * ratio,
+                        energy_kj: (match.energy_kj || (match.energy_kcal * 4.184)) * ratio,
+                        protein: match.protein_g * ratio,
+                        fat: match.fat_g * ratio,
+                        carbs: match.carbs_g * ratio,
                         micronutrients: Object.entries(base_nutrition.micronutrients).reduce((acc, [key, val]) => {
                             acc[key] = (val as number) * ratio;
                             return acc;

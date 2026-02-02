@@ -235,11 +235,11 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             quantity,
             measure_label: unit,
             image: finalFoodItem.image,
-            calories: Math.round(base_nutrition.calories * multiplier),
-            energy_kj: Math.round(base_nutrition.energy_kj * multiplier),
-            protein: Math.round(base_nutrition.protein * multiplier * 10) / 10,
-            fat: Math.round(base_nutrition.fat * multiplier * 10) / 10,
-            carbs: Math.round(base_nutrition.carbs * multiplier * 10) / 10,
+            calories: base_nutrition.calories * multiplier,
+            energy_kj: base_nutrition.energy_kj * multiplier,
+            protein: base_nutrition.protein * multiplier,
+            fat: base_nutrition.fat * multiplier,
+            carbs: base_nutrition.carbs * multiplier,
             micronutrients: Object.entries(base_nutrition.micronutrients).reduce((acc, [key, val]) => {
                 acc[key] = (val as number) * multiplier;
                 return acc;
@@ -444,11 +444,11 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                 ...ing,
                 quantity: newQuantity,
                 weight_g: newWeight,
-                calories: Math.round(base.calories * multiplier),
-                energy_kj: Math.round(base.energy_kj * multiplier),
-                protein: Math.round(base.protein * multiplier * 10) / 10,
-                fat: Math.round(base.fat * multiplier * 10) / 10,
-                carbs: Math.round(base.carbs * multiplier * 10) / 10,
+                calories: base.calories * multiplier,
+                energy_kj: base.energy_kj * multiplier,
+                protein: base.protein * multiplier,
+                fat: base.fat * multiplier,
+                carbs: base.carbs * multiplier,
                 micronutrients: Object.entries(base.micronutrients).reduce((acc, [key, val]) => {
                     acc[key] = (val as number) * multiplier;
                     return acc;
@@ -461,11 +461,11 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                 ...ing,
                 quantity: newQuantity,
                 weight_g: newWeight,
-                calories: Math.round(ing.calories * ratio),
-                energy_kj: Math.round(ing.energy_kj * ratio),
-                protein: Math.round(ing.protein * ratio * 10) / 10,
-                fat: Math.round(ing.fat * ratio * 10) / 10,
-                carbs: Math.round(ing.carbs * ratio * 10) / 10,
+                calories: ing.calories * ratio,
+                energy_kj: ing.energy_kj * ratio,
+                protein: ing.protein * ratio,
+                fat: ing.fat * ratio,
+                carbs: ing.carbs * ratio,
                 micronutrients: Object.entries(ing.micronutrients || {}).reduce((acc, [key, val]) => {
                     acc[key] = (val as number) * ratio;
                     return acc;
@@ -508,11 +508,11 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                 ...ing,
                 measure_label: newUnit,
                 weight_g: newWeight,
-                calories: Math.round(base.calories * multiplier),
-                energy_kj: Math.round(base.energy_kj * multiplier),
-                protein: Math.round(base.protein * multiplier * 10) / 10,
-                fat: Math.round(base.fat * multiplier * 10) / 10,
-                carbs: Math.round(base.carbs * multiplier * 10) / 10,
+                calories: base.calories * multiplier,
+                energy_kj: base.energy_kj * multiplier,
+                protein: base.protein * multiplier,
+                fat: base.fat * multiplier,
+                carbs: base.carbs * multiplier,
                 micronutrients: Object.entries(base.micronutrients).reduce((acc, [key, val]) => {
                     acc[key] = (val as number) * multiplier;
                     return acc;
@@ -524,11 +524,11 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                 ...ing,
                 measure_label: newUnit,
                 weight_g: newWeight,
-                calories: Math.round(ing.calories * ratio),
-                energy_kj: Math.round(ing.energy_kj * ratio),
-                protein: Math.round(ing.protein * ratio * 10) / 10,
-                fat: Math.round(ing.fat * ratio * 10) / 10,
-                carbs: Math.round(ing.carbs * ratio * 10) / 10,
+                calories: ing.calories * ratio,
+                energy_kj: ing.energy_kj * ratio,
+                protein: ing.protein * ratio,
+                fat: ing.fat * ratio,
+                carbs: ing.carbs * ratio,
                 micronutrients: Object.entries(ing.micronutrients || {}).reduce((acc, [key, val]) => {
                     acc[key] = (val as number) * ratio;
                     return acc;
@@ -557,11 +557,11 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             updated[index] = {
                 ...ing,
                 weight_g: newWeight,
-                calories: Math.round(base.calories * multiplier),
-                energy_kj: Math.round(base.energy_kj * multiplier),
-                protein: Math.round(base.protein * multiplier * 10) / 10,
-                fat: Math.round(base.fat * multiplier * 10) / 10,
-                carbs: Math.round(base.carbs * multiplier * 10) / 10,
+                calories: base.calories * multiplier,
+                energy_kj: base.energy_kj * multiplier,
+                protein: base.protein * multiplier,
+                fat: base.fat * multiplier,
+                carbs: base.carbs * multiplier,
                 micronutrients: Object.entries(base.micronutrients).reduce((acc, [key, val]) => {
                     acc[key] = (val as number) * multiplier;
                     return acc;
@@ -572,11 +572,11 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
             updated[index] = {
                 ...ing,
                 weight_g: newWeight,
-                calories: Math.round(ing.calories * ratio),
-                energy_kj: Math.round(ing.energy_kj * ratio),
-                protein: Math.round(ing.protein * ratio * 10) / 10,
-                fat: Math.round(ing.fat * ratio * 10) / 10,
-                carbs: Math.round(ing.carbs * ratio * 10) / 10,
+                calories: ing.calories * ratio,
+                energy_kj: ing.energy_kj * ratio,
+                protein: ing.protein * ratio,
+                fat: ing.fat * ratio,
+                carbs: ing.carbs * ratio,
                 micronutrients: Object.entries(ing.micronutrients || {}).reduce((acc, [key, val]) => {
                     acc[key] = (val as number) * ratio;
                     return acc;
@@ -896,12 +896,12 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
                                     <div className="flex flex-wrap gap-2">
                                         <div className="px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-widest flex items-center gap-2">
                                             <Zap size={10} className="fill-current" />
-                                            {useKilojoules ? ing.energy_kj : ing.calories} {useKilojoules ? 'kJ' : 'kcal'}
+                                            {useKilojoules ? (ing.energy_kj % 1 === 0 ? ing.energy_kj : ing.energy_kj.toFixed(1)) : (ing.calories % 1 === 0 ? ing.calories : ing.calories.toFixed(1))} {useKilojoules ? 'kJ' : 'kcal'}
                                         </div>
                                         <div className="flex gap-1">
-                                            <div className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">P: {ing.protein}g</div>
-                                            <div className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">F: {ing.fat}g</div>
-                                            <div className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">C: {ing.carbs}g</div>
+                                            <div className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">P: {ing.protein % 1 === 0 ? ing.protein : ing.protein.toFixed(2)}g</div>
+                                            <div className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">F: {ing.fat % 1 === 0 ? ing.fat : ing.fat.toFixed(2)}g</div>
+                                            <div className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold text-slate-500">C: {ing.carbs % 1 === 0 ? ing.carbs : ing.carbs.toFixed(2)}g</div>
                                         </div>
                                     </div>
                                 </div>
