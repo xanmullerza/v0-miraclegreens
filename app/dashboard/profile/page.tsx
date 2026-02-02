@@ -208,6 +208,17 @@ function ProfilePageContent() {
                                         <GoalCard type="vegan" label="Vegan" selected={formData.dietType === 'vegan'} onClick={() => setFormData({ ...formData, dietType: 'vegan' })} icon={Leaf} />
                                     </div>
                                 </div>
+                                <div className="space-y-4">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nutrient Strategy</Label>
+                                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                                        <GoalCard type="balanced" label="Balanced" selected={formData.nutrientStrategy === 'balanced'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'balanced' })} icon={Activity} />
+                                        <GoalCard type="low-carb" label="Low Carb" selected={formData.nutrientStrategy === 'low-carb'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'low-carb' })} icon={TrendingDown} />
+                                        <GoalCard type="high-protein" label="High Protein" selected={formData.nutrientStrategy === 'high-protein'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'high-protein' })} icon={Dumbbell} />
+                                        <GoalCard type="keto" label="Keto Diet" selected={formData.nutrientStrategy === 'keto'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'keto' })} icon={Zap} />
+                                        <GoalCard type="high-carb" label="High Carb" selected={formData.nutrientStrategy === 'high-carb'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'high-carb' })} icon={Apple} />
+                                    </div>
+                                    <p className="text-[10px] text-slate-400 italic">Adjusts your macro ratio targets (Energy/Protein/Carbs/Fat) across the entire app.</p>
+                                </div>
 
                                 <div className="space-y-4">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Specific Exclusions</Label>
@@ -390,6 +401,11 @@ function ProfilePageContent() {
                         {/* Background Decoration */}
                         <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors duration-700" />
 
+                        <div className="mb-4 text-center">
+                            <p className="text-[9px] uppercase font-black text-slate-500">Nutrient Strategy</p>
+                            <p className="text-xs font-bold text-slate-200 capitalize">{formData.nutrientStrategy || 'Balanced'}</p>
+                        </div>
+
                         <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 pr-1">
                             {(() => {
                                 // 1. Calculate BMR (Mifflin-St Jeor)
@@ -414,9 +430,27 @@ function ProfilePageContent() {
                                 if (formData.goal === 'build-muscle') tdee += 500;
                                 tdee = Math.max(tdee, 1200); // Floor safety
 
-                                const proteinTarget = age < 14 ? (weight * 1.0) : (formData.goal === 'build-muscle' ? weight * 2.0 : weight * 1.0);
-                                const fatTarget = (tdee * 0.25) / 9;
-                                const carbsTarget = (tdee - (proteinTarget * 4) - (fatTarget * 9)) / 4;
+                                // Strategy Allocation
+                                let pPct = 0.25, cPct = 0.45, fPct = 0.30;
+                                switch (formData.nutrientStrategy) {
+                                    case 'low-carb': pPct = 0.35; cPct = 0.15; fPct = 0.50; break;
+                                    case 'high-protein': pPct = 0.40; cPct = 0.35; fPct = 0.25; break;
+                                    case 'keto': pPct = 0.25; cPct = 0.05; fPct = 0.70; break;
+                                    case 'high-carb': pPct = 0.20; cPct = 0.60; fPct = 0.20; break;
+                                }
+
+                                let proteinTarget, carbsTarget, fatTarget;
+                                if (age < 14) {
+                                    proteinTarget = weight * 1.0;
+                                    const remainingCals = tdee - (proteinTarget * 4);
+                                    const macroRatioSum = cPct + fPct;
+                                    carbsTarget = (remainingCals * (cPct / macroRatioSum)) / 4;
+                                    fatTarget = (remainingCals * (fPct / macroRatioSum)) / 9;
+                                } else {
+                                    proteinTarget = (tdee * pPct) / 4;
+                                    carbsTarget = (tdee * cPct) / 4;
+                                    fatTarget = (tdee * fPct) / 9;
+                                }
 
                                 const macroRDAs: Record<string, number> = {
                                     'Energy': energyUnit === 'kJ' ? tdee * 4.184 : tdee,
@@ -430,7 +464,6 @@ function ProfilePageContent() {
                                 return Object.entries(combinedRDAs).map(([nutrient, value]) => {
                                     const unit = (nutrient === 'Energy') ? energyUnit : (nutrient === 'Protein' || nutrient === 'Carbs' || nutrient === 'Fat' || nutrient === 'Fiber') ? 'g' : (nutrient === 'Vitamin D') ? 'IU' : (nutrient.includes('Folate') || nutrient.includes('B12') || nutrient.includes('Biotin') || nutrient.includes('Selenium') || nutrient === 'Vitamin A' || nutrient === 'Vitamin K') ? 'µg' : 'mg';
 
-                                    // Display logic: round small values to 1 decimal, others to whole
                                     const displayVal = value < 1 ? value.toFixed(2) : value < 10 ? value.toFixed(1) : Math.round(value);
 
                                     return (
