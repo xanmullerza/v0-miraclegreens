@@ -62,9 +62,11 @@ export interface RecipeIngredient {
 interface IngredientBuilderProps {
     ingredients: RecipeIngredient[];
     onChange: (ingredients: RecipeIngredient[]) => void;
+    initialShowPicker?: boolean;
+    initialShowMagicPaste?: boolean;
 }
 
-export default function IngredientBuilder({ ingredients, onChange }: IngredientBuilderProps) {
+export default function IngredientBuilder({ ingredients, onChange, initialShowPicker = false, initialShowMagicPaste = false }: IngredientBuilderProps) {
     const [showPicker, setShowPicker] = useState(false);
     const [showMagicPaste, setShowMagicPaste] = useState(false);
     const [magicText, setMagicText] = useState('');
@@ -78,6 +80,11 @@ export default function IngredientBuilder({ ingredients, onChange }: IngredientB
 
     const { energyUnit, setEnergyUnit, profile } = useUserPreferences();
     const useKilojoules = energyUnit === 'kJ';
+
+    useEffect(() => {
+        if (initialShowPicker) setShowPicker(true);
+        if (initialShowMagicPaste) setShowMagicPaste(true);
+    }, [initialShowPicker, initialShowMagicPaste]);
 
 
     const handleAddIngredient = async (foodItem: FoodItem | FoodItemMatch, initialValues?: { weightG?: number, quantity?: number, unit?: string, modifier?: string }) => {
