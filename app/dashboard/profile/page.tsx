@@ -392,22 +392,52 @@ function ProfilePageContent() {
 
                         <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5 pr-1">
                             {(() => {
+                                // 1. Calculate BMR (Mifflin-St Jeor)
+                                const weight = Number(formData.weight) || 70;
+                                const height = Number(formData.height) || 170;
+                                const age = Number(formData.age) || 30;
+                                const s = formData.gender === 'male' ? 5 : -161;
+                                const bmr = (10 * weight) + (6.25 * height) - (5 * age) + s;
+
+                                // 2. Apply Activity Factor
+                                const activityFactors: Record<string, number> = {
+                                    sedentary: 1.2,
+                                    light: 1.375,
+                                    moderate: 1.55,
+                                    active: 1.725
+                                };
+                                const factor = activityFactors[formData.activityLevel || 'sedentary'] || 1.2;
+                                let tdee = bmr * factor;
+
+                                // 3. Adjust for Goal
+                                if (formData.goal === 'lose-fat') tdee -= 500;
+                                if (formData.goal === 'build-muscle') tdee += 500;
+                                tdee = Math.max(tdee, 1200); // Floor safety
+
+                                const proteinTarget = age < 14 ? (weight * 1.0) : (formData.goal === 'build-muscle' ? weight * 2.0 : weight * 1.0);
+                                const fatTarget = (tdee * 0.25) / 9;
+                                const carbsTarget = (tdee - (proteinTarget * 4) - (fatTarget * 9)) / 4;
+
                                 const macroRDAs: Record<string, number> = {
-                                    'Energy': energyUnit === 'kJ' ? (formData.goal === 'build-muscle' ? 12500 : formData.goal === 'lose-fat' ? 8400 : 10500) : (formData.goal === 'build-muscle' ? 3000 : formData.goal === 'lose-fat' ? 2000 : 2500),
-                                    'Protein': formData.goal === 'build-muscle' ? 150 : 50,
-                                    'Carbs': formData.goal === 'lose-fat' ? 150 : 250,
-                                    'Fat': 70
+                                    'Energy': energyUnit === 'kJ' ? tdee * 4.184 : tdee,
+                                    'Protein': proteinTarget,
+                                    'Carbs': carbsTarget,
+                                    'Fat': fatTarget
                                 };
 
                                 const combinedRDAs = { ...macroRDAs, ...(userRDAs || {}) };
 
                                 return Object.entries(combinedRDAs).map(([nutrient, value]) => {
-                                    const unit = (nutrient === 'Energy') ? energyUnit : (nutrient === 'Protein' || nutrient === 'Carbs' || nutrient === 'Fat') ? 'g' : (nutrient === 'Vitamin D') ? 'IU' : (nutrient.includes('Folate') || nutrient.includes('B12') || nutrient.includes('Biotin') || nutrient.includes('Selenium') || nutrient === 'Vitamin A' || nutrient === 'Vitamin K') ? 'µg' : 'mg';
+                                    const unit = (nutrient === 'Energy') ? energyUnit : (nutrient === 'Protein' || nutrient === 'Carbs' || nutrient === 'Fat' || nutrient === 'Fiber') ? 'g' : (nutrient === 'Vitamin D') ? 'IU' : (nutrient.includes('Folate') || nutrient.includes('B12') || nutrient.includes('Biotin') || nutrient.includes('Selenium') || nutrient === 'Vitamin A' || nutrient === 'Vitamin K') ? 'µg' : 'mg';
+
+                                    // Display logic: round small values to 1 decimal, others to whole
+                                    const displayVal = value < 1 ? value.toFixed(2) : value < 10 ? value.toFixed(1) : Math.round(value);
+
                                     return (
                                         <div key={nutrient} className="bg-slate-900/50 border border-slate-800/50 p-1.5 rounded-lg flex flex-col items-center justify-center text-center hover:border-blue-500/30 transition-all hover:bg-slate-900 group/item aspect-square">
                                             <p className="text-[7px] uppercase font-black text-slate-500 group-hover/item:text-slate-400 transition-colors leading-none mb-1 line-clamp-2">{nutrient}</p>
                                             <div className="flex items-baseline gap-0.5">
-                                                <span className="text-xs font-black text-slate-200 tracking-tighter italic">{Math.round(value)}</span>
+                                                <span className="text-xs font-black text-slate-200 tracking-tighter italic">{displayVal}</span>
                                                 <span className="text-[6px] font-black text-slate-600 uppercase tracking-widest">{unit}</span>
                                             </div>
                                         </div>
