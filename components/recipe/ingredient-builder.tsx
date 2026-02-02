@@ -690,7 +690,8 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
 
     return (
         <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            {/* Secondary Header Row - Hidden as per user layout refinement */}
+            {/* <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
                         <Apple className="w-5 h-5 text-green-500 fill-green-500/20" />
@@ -735,7 +736,7 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
                         </button>
                     </div>
                 )}
-            </div>
+            </div> */}
 
             {showMagicPaste && (
                 <div className="p-6 rounded-xl border-2 border-dashed border-slate-800 bg-slate-950/40 space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">

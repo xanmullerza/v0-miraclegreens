@@ -570,13 +570,13 @@ export default function RecipeBuilderPage() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100 pb-20">
-            {/* Back Button */}
-            <button
+            {/* Back Button - Hidden as breadcrumbs are sufficient */}
+            {/* <button
                 onClick={() => router.push('/dashboard/admin')}
                 className="flex items-center gap-2 text-violet-500 font-bold text-xs uppercase tracking-widest mb-2 hover:translate-x-[-4px] transition-transform"
             >
                 <ArrowLeft size={14} /> Back to Admin
-            </button>
+            </button> */}
 
             {/* Hero Section Hidden as per user request */}
             {/* <div className="relative h-48 rounded-[2.5rem] bg-violet-600 overflow-hidden flex items-center px-12 group">
@@ -635,8 +635,8 @@ export default function RecipeBuilderPage() {
                 </div>
             </div> */}
 
-            {/* Sub-Hero Actions */}
-            <div className="flex justify-start">
+            {/* Sub-Hero Actions - Hidden as handled by initialization screen */}
+            {/* <div className="flex justify-start">
                 <Button
                     onClick={() => setShowAutoImport(true)}
                     className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-xs flex items-center gap-3 transition-all shadow-sm group"
@@ -646,7 +646,7 @@ export default function RecipeBuilderPage() {
                     </div>
                     <span>Smart Import From URL / Text</span>
                 </Button>
-            </div>
+            </div> */}
 
             <div className="space-y-8">
                 {/* Step 1: Core Ingredients */}
