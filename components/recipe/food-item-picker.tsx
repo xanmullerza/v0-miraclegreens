@@ -137,9 +137,9 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: Food
                 {/* Header */}
                 <div className="p-4 border-b border-border flex items-center justify-between bg-muted/30">
                     <div className="flex items-center gap-2">
-                        <Database className="w-5 h-5 text-green-600" />
-                        <h2 className="text-xl font-semibold text-foreground">
-                            {view === 'local' ? 'Search Food Items' : 'USDA Global Database'}
+                        <Database className="w-5 h-5 text-violet-500" />
+                        <h2 className="text-xl font-black uppercase tracking-tighter text-foreground italic">
+                            {view === 'local' ? 'Clinical Registry' : 'USDA Global Database'}
                         </h2>
                     </div>
                     <button
@@ -160,7 +160,7 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: Food
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && view === 'usda' && handleUSDASearch()}
-                            className="w-full pl-10 pr-4 py-2 border border-border bg-background text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 placeholder:text-muted-foreground"
+                            className="w-full pl-10 pr-4 py-3 border-2 border-slate-100 dark:border-slate-800 bg-background text-foreground rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 placeholder:text-muted-foreground transition-all"
                             autoFocus
                         />
                     </div>
@@ -169,23 +169,23 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: Food
                         {mode === 'all' && (
                             <button
                                 onClick={() => setView('local')}
-                                className={`flex-1 py-2 text-sm font-medium rounded-lg transition ${view === 'local'
-                                    ? 'bg-green-600 text-white shadow-md'
-                                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                                className={`flex-1 h-11 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${view === 'local'
+                                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                                    : 'bg-muted/50 text-muted-foreground hover:bg-muted'
                                     }`}
                             >
-                                Local Database
+                                Local Registry
                             </button>
                         )}
                         <button
                             onClick={handleUSDASearch}
-                            className={`flex-1 py-2 text-sm font-medium rounded-lg transition flex items-center justify-center gap-2 ${view === 'usda'
-                                ? 'bg-blue-600 text-white shadow-md'
-                                : 'bg-muted text-muted-foreground hover:bg-muted/80 hover:text-blue-600'
+                            className={`flex-1 h-11 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 ${view === 'usda'
+                                ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/20'
+                                : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-violet-600'
                                 }`}
                         >
                             <Sparkles className="w-4 h-4" />
-                            {mode === 'all' ? 'Search USDA Global' : 'Search USDA Database'}
+                            {mode === 'all' ? 'USDA Intelligence' : 'Search USDA Database'}
                         </button>
                     </div>
                 </div>
@@ -194,25 +194,25 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: Food
                 <div className="flex-1 overflow-y-auto p-4 bg-slate-50/50 dark:bg-slate-900/10">
                     {(loading || searchingUSDA) && (
                         <div className="flex flex-col items-center justify-center py-12 text-muted-foreground gap-3">
-                            <Loader2 className="w-8 h-8 animate-spin text-green-600" />
-                            <span>Searching database...</span>
+                            <Loader2 className="w-8 h-8 animate-spin text-violet-500" />
+                            <span className="text-[10px] font-black uppercase tracking-widest opacity-50">Querying Database...</span>
                         </div>
                     )}
 
                     {!loading && !searchingUSDA && view === 'local' && (
                         <>
                             {searchQuery.length < 2 ? (
-                                <div className="text-center py-12 text-muted-foreground">
+                                <div className="text-center py-12 text-muted-foreground text-[10px] font-bold uppercase tracking-widest opacity-40">
                                     Type at least 2 characters to search local items
                                 </div>
                             ) : results.length === 0 ? (
                                 <div className="text-center py-12 space-y-4">
-                                    <div className="text-muted-foreground italic">No local results for "{searchQuery}"</div>
+                                    <div className="text-muted-foreground italic text-sm">No local results for "{searchQuery}"</div>
                                     <button
                                         onClick={handleUSDASearch}
-                                        className="text-blue-600 font-bold hover:underline flex items-center gap-2 mx-auto"
+                                        className="text-violet-600 font-black text-[10px] uppercase tracking-widest hover:underline flex items-center gap-2 mx-auto"
                                     >
-                                        <Database className="w-4 h-4" /> Try the USDA Global Database instead?
+                                        <Database className="w-4 h-4" /> Switch to USDA Intelligence?
                                     </button>
                                 </div>
                             ) : (
@@ -224,7 +224,7 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: Food
                                                 onSelect(item);
                                                 onClose();
                                             }}
-                                            className="w-full text-left p-4 border border-border bg-card rounded-lg hover:bg-green-50 dark:hover:bg-green-950/30 hover:border-green-500 transition group shadow-sm"
+                                            className="w-full text-left p-4 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl hover:bg-emerald-50 dark:hover:bg-emerald-950/20 hover:border-emerald-500 transition-all group shadow-sm"
                                         >
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-12 rounded-xl bg-muted border border-border flex items-center justify-center overflow-hidden shrink-0">
@@ -235,7 +235,7 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: Food
                                                     )}
                                                 </div>
                                                 <div className="flex flex-col flex-1 min-w-0">
-                                                    <div className="font-bold text-foreground group-hover:text-green-700 dark:group-hover:text-green-400 capitalize truncate">
+                                                    <div className="font-bold text-foreground group-hover:text-emerald-700 dark:group-hover:text-emerald-400 capitalize truncate">
                                                         {item.common_name || item.name}
                                                     </div>
                                                     {item.common_name && (
@@ -267,7 +267,7 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: Food
                                 </div>
                             ) : (
                                 <div className="space-y-2">
-                                    <div className="text-[10px] font-black uppercase tracking-tighter text-blue-600 mb-2 px-1">Global Results (Click to Import)</div>
+                                    <div className="text-[10px] font-black uppercase tracking-widest text-violet-600 mb-2 px-1 opacity-50 italic">Global Results (Click to Import)</div>
                                     {usdaResults.map((item, idx) => {
                                         // Determine badge color based on data type
                                         const dataType = (item as any).dataType || 'Unknown';
@@ -295,10 +295,10 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: Food
                                             <button
                                                 key={item.fdcId || idx}
                                                 onClick={() => handleSelectUSDA(item)}
-                                                className="w-full text-left p-4 border border-blue-100 dark:border-blue-900/30 bg-card rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-500 transition group shadow-sm"
+                                                className="w-full text-left p-4 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl hover:bg-violet-50 dark:hover:bg-violet-950/20 hover:border-violet-500 transition-all group shadow-sm"
                                             >
                                                 <div className="flex items-start justify-between gap-2">
-                                                    <div className="font-bold text-foreground group-hover:text-blue-700 dark:group-hover:text-blue-400 flex-1">
+                                                    <div className="font-bold text-foreground group-hover:text-violet-700 dark:group-hover:text-violet-400 flex-1">
                                                         {item.name}
                                                     </div>
                                                     <Badge variant="outline" className={`text-[8px] py-0 h-4 uppercase shrink-0 ${getTypeStyle()}`}>
