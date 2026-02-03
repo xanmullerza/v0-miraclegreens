@@ -60,6 +60,11 @@ interface Ingredient {
     base_ingredient: string;
     weight_g: number;
     food_item?: any;
+    food_item_id?: string;
+    quantity?: number;
+    measure_label?: string;
+    modifier?: string;
+    recipe_id?: string;
 }
 
 interface Instruction {
