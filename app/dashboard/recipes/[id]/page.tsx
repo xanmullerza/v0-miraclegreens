@@ -613,9 +613,9 @@ export default function RecipeDetailsPage() {
                 </div>
 
                 {/* Header Section: Image & Specs aligned at top */}
-                <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_200px_150px_1.5fr] gap-6 items-stretch">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
                     {/* Column 1: Image */}
-                    <div className="lg:col-span-1 h-full">
+                    <div className="h-full">
                         <Card className="p-3 h-full flex flex-col bg-white dark:bg-slate-900">
                             <div className="flex-1 rounded-[2rem] bg-slate-100 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800 aspect-square lg:aspect-auto">
                                 {recipe.image ? (
@@ -634,79 +634,82 @@ export default function RecipeDetailsPage() {
                         </Card>
                     </div>
 
-                    {/* Column 2: Specs (Prep/Servings) */}
-                    <div className="space-y-4 h-full flex flex-col">
-                        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-center flex-1 flex flex-col items-center justify-center">
-                            <Clock size={20} className="mx-auto mb-2 text-emerald-500" />
-                            <p className="text-[10px] font-black uppercase tracking-tighter text-slate-400">Prep Time</p>
-                            <p className="text-xl font-black">{recipe.prep_time}m</p>
+                    {/* Column 2: Specs & Compatibility */}
+                    <div className="grid grid-cols-2 gap-4 h-full">
+                        {/* Specs (Prep/Servings) */}
+                        <div className="space-y-4 h-full flex flex-col">
+                            <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-center flex-1 flex flex-col items-center justify-center">
+                                <Clock size={20} className="mx-auto mb-2 text-emerald-500" />
+                                <p className="text-[10px] font-black uppercase tracking-tighter text-slate-400">Prep Time</p>
+                                <p className="text-xl font-black">{recipe.prep_time}m</p>
+                            </div>
+                            <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-center flex-1 flex flex-col items-center justify-center">
+                                <Users size={20} className="mx-auto mb-2 text-emerald-500" />
+                                <p className="text-[10px] font-black uppercase tracking-tighter text-slate-400">Servings</p>
+                                <p className="text-xl font-black">{recipe.servings}P</p>
+                            </div>
                         </div>
-                        <div className="p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm text-center flex-1 flex flex-col items-center justify-center">
-                            <Users size={20} className="mx-auto mb-2 text-emerald-500" />
-                            <p className="text-[10px] font-black uppercase tracking-tighter text-slate-400">Servings</p>
-                            <p className="text-xl font-black">{recipe.servings}P</p>
-                        </div>
+
+                        {/* Compatibility */}
+                        <Card className="p-4 flex flex-col h-full bg-white dark:bg-slate-900">
+                            <h3 className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center justify-center gap-1.5 text-center">
+                                <Activity size={10} className="text-emerald-500" />
+                                Compatibility
+                            </h3>
+                            <div className="flex flex-col gap-2 flex-1">
+                                {[
+                                    { label: 'Balanced', dbKey: 'Balanced (Omnivore)' },
+                                    { label: 'Pescatarian', dbKey: 'Pescetarian' },
+                                    { label: 'Vegetarian', dbKey: 'Vegetarian' },
+                                    { label: 'Vegan', dbKey: 'Vegan' }
+                                ].map(({ label, dbKey }) => {
+                                    const hasDirectTag = recipe.diet?.includes(dbKey);
+                                    let isSuitable = hasDirectTag;
+                                    if (!isSuitable && recipe.diet) {
+                                        if (label === 'Balanced') {
+                                            isSuitable = recipe.diet.includes('Balanced (Omnivore)') || recipe.diet.includes('Pescetarian') || recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
+                                        } else if (label === 'Pescatarian') {
+                                            isSuitable = recipe.diet.includes('Pescetarian') || recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
+                                        } else if (label === 'Vegetarian') {
+                                            isSuitable = recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
+                                        }
+                                    }
+                                    const hasConflict = isSuitable && dietaryConflicts.length > 0;
+
+                                    return (
+                                        <div
+                                            key={label}
+                                            className={cn(
+                                                "p-2 rounded-xl border text-center transition-all relative flex flex-col justify-center flex-1",
+                                                isSuitable
+                                                    ? (hasConflict ? "bg-amber-50/50 dark:bg-amber-500/5 border-amber-200 dark:border-amber-500/30" : "bg-emerald-50/50 dark:bg-emerald-500/5 border-emerald-100 dark:border-emerald-500/20")
+                                                    : "bg-rose-50/50 dark:bg-rose-500/5 border-rose-100 dark:border-rose-500/20 opacity-60"
+                                            )}
+                                        >
+                                            <p className={cn(
+                                                "text-[8px] font-black uppercase tracking-tighter mb-0.5",
+                                                isSuitable
+                                                    ? (hasConflict ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400")
+                                                    : "text-rose-600 dark:text-rose-400"
+                                            )}>
+                                                {label}
+                                            </p>
+                                            <p className={cn(
+                                                "text-[7px] font-bold uppercase",
+                                                isSuitable
+                                                    ? (hasConflict ? "text-amber-500/60" : "text-emerald-500/60")
+                                                    : "text-rose-500/60"
+                                            )}>
+                                                {isSuitable ? (hasConflict ? 'Warn' : 'Yes') : 'No'}
+                                            </p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </Card>
                     </div>
 
-                    {/* Column 3: Dietary Compatibility */}
-                    <Card className="p-4 flex flex-col h-full bg-white dark:bg-slate-900">
-                        <h3 className="text-[8px] font-black uppercase tracking-widest text-slate-400 mb-4 flex items-center justify-center gap-1.5 text-center">
-                            <Activity size={10} className="text-emerald-500" />
-                            Compatibility
-                        </h3>
-                        <div className="flex flex-col gap-2 flex-1">
-                            {[
-                                { label: 'Balanced', dbKey: 'Balanced (Omnivore)' },
-                                { label: 'Pescatarian', dbKey: 'Pescetarian' },
-                                { label: 'Vegetarian', dbKey: 'Vegetarian' },
-                                { label: 'Vegan', dbKey: 'Vegan' }
-                            ].map(({ label, dbKey }) => {
-                                const hasDirectTag = recipe.diet?.includes(dbKey);
-                                let isSuitable = hasDirectTag;
-                                if (!isSuitable && recipe.diet) {
-                                    if (label === 'Balanced') {
-                                        isSuitable = recipe.diet.includes('Balanced (Omnivore)') || recipe.diet.includes('Pescetarian') || recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
-                                    } else if (label === 'Pescatarian') {
-                                        isSuitable = recipe.diet.includes('Pescetarian') || recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
-                                    } else if (label === 'Vegetarian') {
-                                        isSuitable = recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
-                                    }
-                                }
-                                const hasConflict = isSuitable && dietaryConflicts.length > 0;
-
-                                return (
-                                    <div
-                                        key={label}
-                                        className={cn(
-                                            "p-2 rounded-xl border text-center transition-all relative flex flex-col justify-center flex-1",
-                                            isSuitable
-                                                ? (hasConflict ? "bg-amber-50/50 dark:bg-amber-500/5 border-amber-200 dark:border-amber-500/30" : "bg-emerald-50/50 dark:bg-emerald-500/5 border-emerald-100 dark:border-emerald-500/20")
-                                                : "bg-rose-50/50 dark:bg-rose-500/5 border-rose-100 dark:border-rose-500/20 opacity-60"
-                                        )}
-                                    >
-                                        <p className={cn(
-                                            "text-[8px] font-black uppercase tracking-tighter mb-0.5",
-                                            isSuitable
-                                                ? (hasConflict ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400")
-                                                : "text-rose-600 dark:text-rose-400"
-                                        )}>
-                                            {label}
-                                        </p>
-                                        <p className={cn(
-                                            "text-[7px] font-bold uppercase",
-                                            isSuitable
-                                                ? (hasConflict ? "text-amber-500/60" : "text-emerald-500/60")
-                                                : "text-rose-500/60"
-                                        )}>
-                                            {isSuitable ? (hasConflict ? 'Warn' : 'Yes') : 'No'}
-                                        </p>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </Card>
-
-                    {/* Column 4: Dietary Advisory */}
+                    {/* Column 3: Dietary Advisory */}
                     <Card className="p-6 flex flex-col h-full bg-white dark:bg-slate-900 border-emerald-500/10 dark:border-emerald-500/20">
                         <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-5 flex items-center gap-2">
                             <Activity size={14} className="text-amber-500" />
