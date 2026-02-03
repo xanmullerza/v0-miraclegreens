@@ -1312,8 +1312,8 @@ export default function RecipeDetailsPage() {
                 {/* NUTRIENT INFO MODAL */}
                 {
                     selectedNutrientInfo && nutrientInfo[selectedNutrientInfo] && (
-                        <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setSelectedNutrientInfo(null)}>
-                            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] max-w-md w-full p-10 shadow-2xl relative border border-slate-200 dark:border-slate-800" onClick={e => e.stopPropagation()}>
+                        <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto" onClick={() => setSelectedNutrientInfo(null)}>
+                            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] max-w-md w-full p-10 shadow-2xl relative border border-slate-200 dark:border-slate-800 max-h-[90vh] overflow-y-auto my-auto" onClick={e => e.stopPropagation()}>
                                 <button onClick={() => setSelectedNutrientInfo(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"><X size={24} /></button>
                                 <h3 className="text-3xl font-black text-emerald-600 dark:text-emerald-400 mb-2 uppercase tracking-tighter italic">{selectedNutrientInfo}</h3>
                                 <p className="text-slate-500 italic mb-8 text-sm leading-relaxed">"{nutrientInfo[selectedNutrientInfo].description}"</p>
