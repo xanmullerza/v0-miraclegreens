@@ -401,7 +401,7 @@ function ProfilePageContent() {
                         {/* Background Decoration */}
                         <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors duration-700" />
 
-                        <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-1.5 pr-1">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 pr-1">
                             {(() => {
                                 // 1. Calculate BMR (Mifflin-St Jeor)
                                 const weight = Number(formData.weight) || 70;
@@ -462,11 +462,11 @@ function ProfilePageContent() {
                                     const displayVal = value < 1 ? value.toFixed(2) : value < 10 ? value.toFixed(1) : Math.round(value);
 
                                     return (
-                                        <div key={nutrient} className="bg-slate-900/50 border border-slate-800/50 py-2 px-1 rounded-xl flex flex-col items-center justify-center text-center hover:border-blue-500/30 transition-all hover:bg-slate-900 group/item">
-                                            <p className="text-[6px] uppercase font-black text-slate-500 group-hover/item:text-slate-400 transition-colors leading-none mb-1 line-clamp-1">{nutrient}</p>
-                                            <div className="flex items-baseline gap-0.5">
-                                                <span className="text-xs font-black text-slate-200 tracking-tighter italic leading-none">{displayVal}</span>
-                                                <span className="text-[7px] font-black text-slate-600 uppercase tracking-widest">{unit}</span>
+                                        <div key={nutrient} className="bg-slate-900/50 border border-slate-800/50 px-4 py-3 rounded-2xl flex items-center justify-between hover:border-blue-500/30 transition-all hover:bg-slate-900 group/item">
+                                            <p className="text-[10px] uppercase font-black text-slate-500 group-hover/item:text-slate-400 transition-colors leading-none truncate pr-2">{nutrient}</p>
+                                            <div className="flex items-baseline gap-1 flex-shrink-0">
+                                                <span className="text-xl font-black text-slate-200 tracking-tighter italic leading-none">{displayVal}</span>
+                                                <span className="text-[9px] font-black text-slate-600 uppercase tracking-widest">{unit}</span>
                                             </div>
                                         </div>
                                     );
