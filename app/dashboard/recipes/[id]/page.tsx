@@ -761,16 +761,7 @@ export default function RecipeDetailsPage() {
                                     <ShoppingBasket size={24} className="text-emerald-500" />
                                     Lab Ingredients
                                 </h3>
-                                {/* Reset Button Moved Here */}
-                                {(ingredients.length !== originalIngredients.length || JSON.stringify(ingredients) !== JSON.stringify(originalIngredients) || hiddenIngredientIds.length > 0) && (
-                                    <button
-                                        onClick={resetOrder}
-                                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all border border-slate-200 dark:border-slate-700 text-[10px] font-black uppercase tracking-widest"
-                                        title="Reset to Default"
-                                    >
-                                        <RotateCcw size={12} /> Reset
-                                    </button>
-                                )}
+
 
                                 {/* Control Block */}
                                 <div className="p-2 gap-2 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-wrap items-center">
@@ -969,6 +960,20 @@ export default function RecipeDetailsPage() {
                                         <Plus size={20} className="group-hover:scale-110 transition-transform" />
                                         <span className="text-xs font-black uppercase tracking-widest">Add Ingredient</span>
                                     </button>
+                                )}
+
+                                {/* Reset Button (Visible if customizations exist) */}
+                                {(ingredients.length !== originalIngredients.length || JSON.stringify(ingredients) !== JSON.stringify(originalIngredients) || hiddenIngredientIds.length > 0) && (
+                                    <div className="pt-2">
+                                        <button
+                                            onClick={resetOrder}
+                                            className="w-full flex items-center justify-center gap-2 px-3 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all border border-slate-100 dark:border-slate-800 text-[10px] font-black uppercase tracking-widest group"
+                                            title="Reset to Default"
+                                        >
+                                            <RotateCcw size={14} className="group-hover:-rotate-180 transition-transform duration-500" />
+                                            Reset Recipe Defaults
+                                        </button>
+                                    </div>
                                 )}
                             </div>
                         </Card>
