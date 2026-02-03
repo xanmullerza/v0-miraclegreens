@@ -154,64 +154,90 @@ export default function NutrientDetailsPage() {
     }
 
     return (
-        <div className="max-w-6xl mx-auto space-y-10 pb-20 animate-in fade-in duration-700">
-            {/* Header Actions */}
-            <div className="flex justify-end gap-3">
-                <Button
-                    onClick={toggleFavorite}
-                    variant="outline"
-                    className={cn(
-                        "rounded-2xl h-11 px-6 font-black uppercase tracking-widest text-[10px] gap-2 border-slate-200 dark:border-slate-800 shadow-sm transition-all",
-                        isFav ? "bg-rose-500 text-white border-rose-600 hover:bg-rose-600" : "bg-white/50 hover:bg-slate-50 dark:hover:bg-slate-800"
-                    )}
-                >
-                    <Heart size={14} fill={isFav ? "currentColor" : "none"} />
-                    {isFav ? "Favorited" : "Favorite"}
-                </Button>
-                <Button className="rounded-2xl h-11 px-6 font-black uppercase tracking-widest text-[10px] bg-amber-500 hover:bg-amber-600 text-white shadow-xl shadow-amber-500/20">
-                    Generate Report
-                </Button>
+        <div className="max-w-4xl mx-auto space-y-10 pb-20 animate-in fade-in duration-700 pt-8 px-4">
+            {/* Nav */}
+            <button
+                onClick={() => router.back()}
+                className="flex items-center gap-2 text-slate-500 hover:text-emerald-600 font-bold text-sm transition-colors group"
+            >
+                <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
+                Back
+            </button>
+
+            {/* Header / Hero */}
+            <div className="space-y-6">
+                <div>
+                    <h1 className="text-6xl lg:text-8xl font-black text-emerald-600 dark:text-emerald-400 mb-4 uppercase tracking-tighter italic leading-none">
+                        {nutrientId}
+                    </h1>
+                    <p className="text-xl lg:text-2xl text-slate-400 italic leading-relaxed font-medium">
+                        "{info.description}"
+                    </p>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                    <Button
+                        onClick={toggleFavorite}
+                        variant="outline"
+                        className={cn(
+                            "rounded-2xl h-12 px-6 font-black uppercase tracking-widest text-[10px] gap-2 border-slate-200 dark:border-slate-800 transition-all shadow-sm",
+                            isFav ? "bg-rose-50 border-rose-200 text-rose-600 dark:bg-rose-900/20 dark:border-rose-800 dark:text-rose-400" : "bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800"
+                        )}
+                    >
+                        <Heart size={18} fill={isFav ? "currentColor" : "none"} />
+                        {isFav ? "Favorited" : "Favorite"}
+                    </Button>
+                    <div className="px-5 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
+                        <Zap size={16} />
+                        Clinical Reference Hub
+                    </div>
+                </div>
             </div>
 
-            {/* Hero Header */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 space-y-8">
-                    <div className="space-y-4">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] font-black uppercase tracking-widest shadow-sm shadow-amber-500/5">
-                            <Activity size={12} className="fill-current" />
-                            Clinical Reference Profile
-                        </div>
-                        <h1 className="text-5xl lg:text-7xl font-black tracking-tighter italic uppercase text-slate-900 dark:text-white leading-[0.85]">
-                            {nutrientId}
-                        </h1>
-                        <p className="text-2xl font-medium text-slate-500 leading-relaxed italic border-l-4 border-amber-500 pl-6 bg-slate-50 dark:bg-slate-900/50 py-4 rounded-r-3xl">
-                            "{info.description}"
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                <div className="space-y-8">
+                    {/* Biological Significance */}
+                    <div className="p-8 bg-emerald-50 dark:bg-emerald-950/20 rounded-[2.5rem] border border-emerald-100 dark:border-emerald-900/50 shadow-sm">
+                        <h4 className="font-black text-[11px] mb-4 uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-400">Biological Significance</h4>
+                        <p className="text-base font-medium text-slate-700 dark:text-slate-300 leading-relaxed italic">
+                            {info.importance}
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                        <Card className="p-8 space-y-4 border-none bg-gradient-to-br from-slate-50 to-white dark:from-slate-900/50 dark:to-slate-900 shadow-sm">
-                            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Significance</h4>
-                            <p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-relaxed">
-                                {info.importance}
-                            </p>
-                        </Card>
-                        <Card className="p-8 space-y-4 border-none bg-gradient-to-br from-slate-50 to-white dark:from-slate-900/50 dark:to-slate-900 shadow-sm">
-                            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Clinical History</h4>
-                            <p className="text-xs font-medium text-slate-500 leading-relaxed italic">
-                                {info.history}
-                            </p>
-                        </Card>
+                    {/* Benefits */}
+                    <div className="space-y-4">
+                        <h4 className="font-black text-[11px] px-2 uppercase tracking-[0.2em] text-slate-400">Biological Benefits</h4>
+                        <div className="flex flex-wrap gap-2.5">
+                            {info.benefits.map((b, i) => (
+                                <span key={i} className="text-[10px] font-black uppercase tracking-widest bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-100 px-5 py-2.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                                    {b}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Typical Sources */}
+                    <div className="space-y-4">
+                        <h4 className="font-black text-[11px] px-2 uppercase tracking-[0.2em] text-slate-400">Alternative Sources</h4>
+                        <div className="flex flex-wrap gap-2">
+                            {info.sources.map((s, i) => (
+                                <span key={i} className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-5 py-3 rounded-2xl font-bold border border-slate-200 dark:border-slate-800/50">
+                                    {s}
+                                </span>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                <div className="lg:col-span-1 space-y-6">
-                    <Card className="p-8 flex flex-col items-center justify-center text-center space-y-6 bg-amber-500 text-white border-none shadow-2xl shadow-amber-500/30">
+                <div className="space-y-8">
+                    {/* Targeted Intake Card */}
+                    <Card className="p-8 flex flex-col items-center justify-center text-center space-y-6 bg-emerald-600 text-white border-none shadow-2xl shadow-emerald-600/30">
                         <div className="w-16 h-16 rounded-3xl bg-white/20 flex items-center justify-center animate-pulse">
-                            <Zap size={32} />
+                            <Activity size={32} />
                         </div>
                         <div className="space-y-2">
-                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Reference Intake</h3>
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Targeted Daily Intake</h3>
 
                             {(() => {
                                 let val = null;
@@ -238,101 +264,58 @@ export default function NutrientDetailsPage() {
                                 if (val) {
                                     return (
                                         <div className="flex flex-col items-center">
-                                            <p className="text-5xl font-black tracking-tighter italic">
+                                            <p className="text-6xl font-black tracking-tighter italic">
                                                 {val >= 100 ? Math.round(val) : val < 10 ? val.toFixed(1) : Math.round(val)}
                                             </p>
-                                            <p className="text-xl font-black opacity-80">{unit}</p>
+                                            <p className="text-xl font-black opacity-80 uppercase">{unit}</p>
                                         </div>
                                     );
                                 }
-                                return <p className="text-4xl font-black tracking-tighter italic">OPTIMAL</p>;
+                                return <p className="text-4xl font-black tracking-tighter italic uppercase">Optimal Level</p>;
                             })()}
                         </div>
                         <p className="text-[10px] font-bold opacity-70 leading-relaxed max-w-[200px]">
-                            Your personalized daily target based on your biometric profile and nutrient strategy.
+                            Biometric target based on your clinical profile and nutrition strategy.
                         </p>
                     </Card>
 
-                    <div className="space-y-4">
-                        <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2 lg:mt-8">Biological Benefits</h4>
-                        <div className="flex flex-wrap gap-2">
-                            {info.benefits.map((b, i) => (
-                                <Badge key={i} className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-[9px] font-black uppercase tracking-widest px-4 py-2 rounded-xl">
-                                    {b}
-                                </Badge>
-                            ))}
+                    {/* Top Food Sources */}
+                    <div className="space-y-5">
+                        <div className="flex items-center justify-between px-2">
+                            <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400">Bio-Available Foods</h4>
+                            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest underline cursor-pointer hover:text-emerald-600" onClick={() => router.push('/dashboard/foods')}>Browse All</span>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Bottom Content */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-6">
-                <div className="lg:col-span-2 space-y-8">
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-3 px-2">
-                            <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500">
-                                <Activity size={20} />
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-black uppercase tracking-tighter italic">Deficiency Markers</h3>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Critical Warning Signs</p>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {info.deficiencySigns.map((s, i) => (
-                                <div key={i} className="flex items-center gap-4 p-5 rounded-2xl bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 group hover:border-rose-500/30 transition-all">
-                                    <div className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]" />
-                                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide group-hover:text-rose-500 transition-colors">{s}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                <div className="lg:col-span-1">
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-3 px-2">
-                            <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500">
-                                <Beef size={20} />
-                            </div>
-                            <div>
-                                <h3 className="text-xl font-black uppercase tracking-tighter italic">High Sources</h3>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Bio-Available Foods</p>
-                            </div>
-                        </div>
-
                         <div className="space-y-3">
                             {loadingFoods ? (
-                                [1, 2, 3].map(i => <div key={i} className="h-16 w-full animate-pulse bg-slate-100 dark:bg-slate-800 rounded-2xl" />)
+                                [1, 2, 3].map(i => <div key={i} className="h-16 w-full animate-pulse bg-slate-100 dark:bg-slate-800 rounded-3xl" />)
                             ) : topFoods.length > 0 ? (
                                 topFoods.map((food: any) => (
                                     <button
                                         key={food.id}
                                         onClick={() => router.push(`/dashboard/foods/${food.id}`)}
-                                        className="w-full flex items-center gap-4 p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/50 hover:shadow-lg transition-all text-left group"
+                                        className="w-full flex items-center gap-4 p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/50 hover:shadow-xl transition-all text-left group"
                                     >
-                                        <div className="w-10 h-10 rounded-lg bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0">
+                                        <div className="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0 border border-slate-100 dark:border-slate-800">
                                             {food.image ? (
-                                                <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                                                <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                    <Beef size={16} />
+                                                    <Beef size={20} />
                                                 </div>
                                             )}
                                         </div>
                                         <div className="flex-grow min-w-0">
-                                            <p className="text-xs font-black uppercase tracking-tight text-slate-900 dark:text-white truncate">
+                                            <p className="text-sm font-black uppercase tracking-tight text-slate-900 dark:text-white truncate italic">
                                                 {food.common_name || food.name}
                                             </p>
+                                            <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">View Profile</p>
                                         </div>
-                                        <ChevronRight size={14} className="text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
+                                        <ChevronRight size={18} className="text-slate-200 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
                                     </button>
                                 ))
                             ) : (
-                                <div className="text-center p-8 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase">Consult scientific abstracts for typical sources</p>
+                                <div className="text-center p-10 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Scanning laboratory data for typical sources...</p>
                                 </div>
                             )}
                         </div>

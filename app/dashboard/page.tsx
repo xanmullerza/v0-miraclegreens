@@ -88,6 +88,14 @@ export default function DashboardOverview() {
             icon: User,
             color: 'text-purple-500',
             bg: 'bg-purple-500/10'
+        },
+        {
+            name: 'Nutrient Library',
+            desc: 'Deep-dive into clinical vitamin and mineral data.',
+            href: '/dashboard/nutrients',
+            icon: Activity,
+            color: 'text-amber-500',
+            bg: 'bg-amber-500/10'
         }
     ];
 

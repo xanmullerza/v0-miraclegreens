@@ -256,8 +256,6 @@ export default function MealPlannerPage() {
     const [moringaGrams, setMoringaGrams] = useState(0);
     const [showDailyNutrients, setShowDailyNutrients] = useState(false);
     const [dailyMoringaGrams, setDailyMoringaGrams] = useState(0);
-    const [selectedNutrientInfo, setSelectedNutrientInfo] = useState<string | null>(null);
-    const [modalPosition, setModalPosition] = useState<{ top: number; left: number } | null>(null);
     const [activeBoostContext, setActiveBoostContext] = useState<'daily' | 'recipe' | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
     const [expandedBreakdownSections, setExpandedBreakdownSections] = useState<Record<string, boolean>>({});
@@ -824,19 +822,7 @@ export default function MealPlannerPage() {
                                                             const hasBreakdown = breakdownLabels.includes(label);
 
                                                             return (
-                                                                <div key={label} onClick={(e) => {
-                                                                    const rect = e.currentTarget.getBoundingClientRect();
-                                                                    const scrollY = window.scrollY;
-                                                                    const viewportHeight = window.innerHeight;
-                                                                    const modalHeight = 500;
-                                                                    let top = rect.bottom + scrollY + 8;
-                                                                    if (rect.bottom + modalHeight > viewportHeight) {
-                                                                        top = Math.max(scrollY + 80, rect.top + scrollY - modalHeight - 8);
-                                                                    }
-                                                                    let left = rect.left + (rect.width / 2);
-                                                                    setModalPosition({ top, left });
-                                                                    setSelectedNutrientInfo(label);
-                                                                }} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
+                                                                <div key={label} onClick={() => router.push(`/dashboard/nutrients/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
                                                                     <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
                                                                     <div className="space-y-0.5">
                                                                         {(pct !== null && !forceRaw) ? (
@@ -926,30 +912,7 @@ export default function MealPlannerPage() {
                 )}
             </div >
 
-            {
-                selectedNutrientInfo && nutrientInfo[selectedNutrientInfo] && modalPosition && (
-                    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => { setSelectedNutrientInfo(null); setModalPosition(null); }}>
-                        <div
-                            className="absolute bg-background rounded-2xl max-w-md w-full p-8 shadow-2xl relative max-h-[70vh] overflow-y-auto animate-in zoom-in-95 slide-in-from-top-2 duration-200"
-                            style={{
-                                top: modalPosition.top,
-                                left: Math.min(Math.max(modalPosition.left - 200, 16), window.innerWidth - 432),
-                                maxWidth: 'calc(100vw - 32px)'
-                            }}
-                            onClick={e => e.stopPropagation()}
-                        >
-                            <button onClick={() => { setSelectedNutrientInfo(null); setModalPosition(null); }} className="absolute top-4 right-4 text-muted-foreground z-10"><X /></button>
-                            <h3 className="text-3xl font-serif font-bold text-primary mb-2">{selectedNutrientInfo}</h3>
-                            <p className="text-muted-foreground italic mb-6">"{nutrientInfo[selectedNutrientInfo].description}"</p>
-                            <div className="space-y-6">
-                                <div className="p-4 bg-muted/30 rounded-xl border border-primary/10"><h4 className="font-bold text-sm mb-1 uppercase tracking-wider opacity-60">Biological Significance</h4><p className="text-sm font-medium">{nutrientInfo[selectedNutrientInfo].importance}</p></div>
-                                <div className="flex flex-wrap gap-2">{nutrientInfo[selectedNutrientInfo].benefits.map((b, i) => <span key={i} className="text-[10px] font-black uppercase tracking-widest bg-green-50 text-green-700 px-3 py-1 rounded-full border border-green-200">{b}</span>)}</div>
-                                <div><h4 className="font-bold text-sm mb-2 opacity-50">Natural Sources</h4><div className="flex flex-wrap gap-1">{nutrientInfo[selectedNutrientInfo].sources.map((s, i) => <span key={i} className="text-[10px] bg-muted px-2 py-1 rounded font-bold uppercase tracking-tighter">{s}</span>)}</div></div>
-                            </div>
-                        </div>
-                    </div>
-                )
-            }
+
 
             {/* NUTRIENT BREAKDOWN MODAL */}
             {

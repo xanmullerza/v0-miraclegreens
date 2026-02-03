@@ -67,8 +67,6 @@ export default function FoodDetailsPage() {
     const { id } = useParams();
     const [food, setFood] = useState<FoodItem | null>(null);
     const [loading, setLoading] = useState(true);
-    const [selectedNutrientInfo, setSelectedNutrientInfo] = useState<string | null>(null);
-    const [modalPosition, setModalPosition] = useState<{ top: number; left: number } | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
 
     // Edit states
@@ -334,24 +332,7 @@ export default function FoodDetailsPage() {
                         const hasBreakdown = breakdownLabels.includes(label);
 
                         return (
-                            <div key={label} onClick={(e) => {
-                                const rect = e.currentTarget.getBoundingClientRect();
-                                const scrollY = window.scrollY;
-                                const viewportHeight = window.innerHeight;
-                                const modalHeight = 500; // approximate modal height
-
-                                // Calculate top position - prefer below the element, but adjust if near bottom
-                                let top = rect.bottom + scrollY + 8;
-                                if (rect.bottom + modalHeight > viewportHeight) {
-                                    top = Math.max(scrollY + 80, rect.top + scrollY - modalHeight - 8);
-                                }
-
-                                // Center horizontally relative to clicked element
-                                let left = rect.left + (rect.width / 2);
-
-                                setModalPosition({ top, left });
-                                setSelectedNutrientInfo(label);
-                            }} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct > 0 ? `${styles.borderLight} ${styles.fade}` : "")}>
+                            <div key={label} onClick={() => router.push(`/dashboard/nutrients/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct > 0 ? `${styles.borderLight} ${styles.fade}` : "")}>
                                 <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
                                 <div className="space-y-0.5">
                                     {(nutrientDisplayMode === 'percentage' && !forceRaw) ? (
@@ -603,53 +584,6 @@ export default function FoodDetailsPage() {
                     </div>
                 </div>
             </div>
-
-            {/* NUTRIENT INFO MODAL */}
-            {selectedNutrientInfo && (nutrientInfo as any)[selectedNutrientInfo] && modalPosition && (
-                <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => { setSelectedNutrientInfo(null); setModalPosition(null); }}>
-                    <div
-                        className="absolute bg-white dark:bg-slate-900 rounded-[3rem] max-w-md w-full p-11 shadow-2xl border border-slate-200 dark:border-slate-800 max-h-[70vh] overflow-y-auto animate-in zoom-in-95 slide-in-from-top-2 duration-200"
-                        style={{
-                            top: modalPosition.top,
-                            left: Math.min(Math.max(modalPosition.left - 200, 16), window.innerWidth - 432),
-                            maxWidth: 'calc(100vw - 32px)'
-                        }}
-                        onClick={e => e.stopPropagation()}
-                    >
-                        <button onClick={() => { setSelectedNutrientInfo(null); setModalPosition(null); }} className="absolute top-8 right-8 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors z-10"><X size={24} /></button>
-                        <div className="space-y-8">
-                            <div>
-                                <h3 className="text-4xl font-black text-emerald-600 dark:text-emerald-400 mb-2 uppercase tracking-tighter italic">{selectedNutrientInfo}</h3>
-                                <p className="text-slate-400 italic text-sm leading-relaxed">"{(nutrientInfo as any)[selectedNutrientInfo].description}"</p>
-                            </div>
-
-                            <div className="p-6 bg-emerald-50 dark:bg-emerald-950/20 rounded-[2rem] border border-emerald-100 dark:border-emerald-900/50">
-                                <h4 className="font-black text-[10px] mb-3 uppercase tracking-widest text-emerald-700 dark:text-emerald-400">Biological Significance</h4>
-                                <p className="text-sm font-medium text-slate-700 dark:text-slate-300 leading-relaxed">{(nutrientInfo as any)[selectedNutrientInfo].importance}</p>
-                            </div>
-
-                            <div className="flex flex-wrap gap-2">
-                                {(nutrientInfo as any)[selectedNutrientInfo].benefits.map((b: string, i: number) => (
-                                    <span key={i} className="text-[10px] font-black uppercase tracking-widest bg-emerald-100 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-100 px-4 py-2 rounded-full border border-emerald-200 dark:border-emerald-800">
-                                        {b}
-                                    </span>
-                                ))}
-                            </div>
-
-                            <div>
-                                <h4 className="font-black text-[10px] mb-3 uppercase tracking-widest text-slate-400">Alternative Sources</h4>
-                                <div className="flex flex-wrap gap-1.5">
-                                    {(nutrientInfo as any)[selectedNutrientInfo].sources.map((s: string, i: number) => (
-                                        <span key={i} className="text-[11px] bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-4 py-2 rounded-xl font-bold border border-slate-100 dark:border-slate-800">
-                                            {s}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* NUTRIENT BREAKDOWN MODAL */}
             {breakdownNutrient && (food.micronutrients) && (

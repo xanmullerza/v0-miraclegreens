@@ -128,7 +128,7 @@ export default function NutrientsHub() {
     return (
         <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
             {/* Header Actions Hidden as per user request */}
-            {/* <div className="flex justify-end gap-3">
+            <div className="flex justify-end gap-3">
                 <Button
                     onClick={() => router.push('/dashboard/foods')}
                     className="bg-white/50 hover:bg-white text-slate-600 dark:text-white border border-slate-200 dark:border-white/10 backdrop-blur-md shadow-sm gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
@@ -143,22 +143,22 @@ export default function NutrientsHub() {
                     <ChefHat size={14} className="group-hover/btn:scale-110 transition-transform" />
                     Find Recipes
                 </Button>
-            </div> */}
+            </div>
 
-            {/* Hero Section Hidden as per user request */}
-            {/* <div className="relative h-64 rounded-[2.5rem] bg-slate-900 overflow-hidden flex items-center px-12 group shadow-2xl">
+            {/* Hero Section */}
+            <div className="relative h-64 rounded-[2.5rem] bg-slate-900 overflow-hidden flex items-center px-12 group shadow-2xl">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1576086213369-97a306d36557?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] bg-cover bg-center mix-blend-overlay opacity-20" />
                 <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/80 to-transparent" />
 
                 <div className="relative z-10 space-y-4 max-w-2xl">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[10px] font-black uppercase tracking-widest">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-black uppercase tracking-widest">
                         <Zap size={12} className="fill-current" />
                         Biological Reference Hub
                     </div>
                     <div className="space-y-1">
-                        <p className="text-[10px] font-black text-amber-500 uppercase tracking-[0.3em] mb-2 opacity-80">Clinical Lab</p>
+                        <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.3em] mb-2 opacity-80">Clinical Lab</p>
                         <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-white uppercase italic leading-[0.85]">
-                            Nutrients <span className="text-amber-500 font-black">Library.</span>
+                            Nutrients <span className="text-emerald-500 font-black">Library.</span>
                         </h1>
                     </div>
                     <p className="text-slate-400 font-medium text-sm leading-relaxed">
@@ -171,7 +171,7 @@ export default function NutrientsHub() {
                         <Activity size={80} className="text-slate-800" />
                     </div>
                 </div>
-            </div> */}
+            </div>
 
             {/* Controls Row */}
             <div className="flex flex-col md:flex-row gap-4 justify-center relative z-30">
