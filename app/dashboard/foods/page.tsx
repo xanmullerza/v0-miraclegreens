@@ -98,13 +98,19 @@ function FoodsContent() {
     // Comparison State
     const [compareItems, setCompareItems] = useState<FoodItem[]>([]);
     const [isCompareOpen, setIsCompareOpen] = useState(false);
+    const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
 
     // Default RDA for comparison context
     const userRDAs = useRDA(30, 'female', 2000);
 
     // Initial load and filter/search changes
     useEffect(() => {
-        fetchFoods(0, true);
+        const init = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user?.email) setCurrentUserEmail(user.email);
+            fetchFoods(0, true);
+        };
+        init();
     }, [searchQuery, selectedCategories, showFavoritesOnly, sortField, sortDirection]);
 
     // Handle 'favorites' query param
@@ -732,21 +738,23 @@ function FoodsContent() {
 
                                             {/* Action */}
                                             <div className="p-3 lg:p-0 flex justify-end lg:justify-center gap-2">
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        addToCompare(food);
-                                                    }}
-                                                    className={cn(
-                                                        "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
-                                                        compareItems.some(i => i.id === food.id)
-                                                            ? "bg-emerald-500 text-white border-emerald-600 shadow-md shadow-emerald-500/20"
-                                                            : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 border-slate-100 dark:border-slate-700"
-                                                    )}
-                                                    title="Compare Food"
-                                                >
-                                                    <Scale size={14} />
-                                                </button>
+                                                {currentUserEmail === 'morne@miraclegreens.co.za' && (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            addToCompare(food);
+                                                        }}
+                                                        className={cn(
+                                                            "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
+                                                            compareItems.some(i => i.id === food.id)
+                                                                ? "bg-emerald-500 text-white border-emerald-600 shadow-md shadow-emerald-500/20"
+                                                                : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 border-slate-100 dark:border-slate-700"
+                                                        )}
+                                                        title="Compare Food"
+                                                    >
+                                                        <Scale size={14} />
+                                                    </button>
+                                                )}
                                                 <button
                                                     onClick={(e) => toggleFavorite(food, e)}
                                                     className={cn(
