@@ -107,22 +107,24 @@ export default function NutrientDetailsPage() {
             // Try to find foods high in this nutrient, but exclude herbs/spices/supplements for "practical" diet additions
             const { data, error } = await supabase
                 .from('food_items')
-                .select('id, name, common_name, image, ' + col)
+                .select('id, name, common_name, image, ' + col + ', category')
                 .not(col, 'is', null)
-                .not('category', 'in', '("Flavour", "Supplements")')
+                .not('category', 'in', '(Flavour,Supplements)')
                 .order(col, { ascending: false })
                 .limit(6);
 
             if (error) {
-                // If column doesn't exist, try searching micronutrients JSON
+                // FALLBACK: If column doesn't exist, search the micronutrients JSONB column
                 const { data: jsonMatch, error: jsonError } = await supabase
                     .from('food_items')
-                    .select('id, name, common_name, image, micronutrients')
-                    .limit(50);
+                    .select('id, name, common_name, image, micronutrients, category')
+                    .not('category', 'in', '(Flavour,Supplements)')
+                    .not(`micronutrients`, 'is', null)
+                    .limit(200); // Fetch a larger sample for better JS-side sorting
 
                 if (!jsonError && jsonMatch) {
                     const sorted = jsonMatch
-                        .filter(f => f.micronutrients && f.micronutrients[nutrientId])
+                        .filter(f => f.micronutrients && f.micronutrients[nutrientId] !== undefined)
                         .sort((a, b) => (b.micronutrients[nutrientId] || 0) - (a.micronutrients[nutrientId] || 0))
                         .slice(0, 6);
                     setTopFoods(sorted);
