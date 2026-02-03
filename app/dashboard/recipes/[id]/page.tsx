@@ -997,10 +997,20 @@ export default function RecipeDetailsPage() {
                     <div className="lg:col-span-2 space-y-8">
                         {/* Directions (Moved from Left Column) */}
                         <Card className="p-6">
-                            <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3 italic text-amber-500 mb-6">
-                                <ChefHat size={24} />
-                                Directions
-                            </h3>
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3 italic text-amber-500">
+                                    <ChefHat size={24} />
+                                    Directions
+                                </h3>
+                                <div className="flex gap-2">
+                                    <Badge variant="outline" className="border-slate-200 dark:border-slate-800 text-slate-400 text-[10px] font-black uppercase tracking-widest px-3 py-1 gap-2 flex items-center">
+                                        <Clock size={12} /> {recipe.prep_time}m
+                                    </Badge>
+                                    <Badge variant="outline" className="border-slate-200 dark:border-slate-800 text-slate-400 text-[10px] font-black uppercase tracking-widest px-3 py-1 gap-2 flex items-center">
+                                        <Users size={12} /> {recipe.servings}P
+                                    </Badge>
+                                </div>
+                            </div>
                             <div className="space-y-6 relative before:absolute before:inset-y-0 before:left-5 before:w-px before:bg-slate-100 dark:before:bg-slate-800 pl-2">
                                 {instructions.map((ins, i) => (
                                     <div key={i} className="relative pl-10 space-y-2 group text-left">
