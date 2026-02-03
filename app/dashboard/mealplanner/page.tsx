@@ -257,6 +257,7 @@ export default function MealPlannerPage() {
     const [showDailyNutrients, setShowDailyNutrients] = useState(false);
     const [dailyMoringaGrams, setDailyMoringaGrams] = useState(0);
     const [selectedNutrientInfo, setSelectedNutrientInfo] = useState<string | null>(null);
+    const [modalPosition, setModalPosition] = useState<{ top: number; left: number } | null>(null);
     const [activeBoostContext, setActiveBoostContext] = useState<'daily' | 'recipe' | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
     const [expandedBreakdownSections, setExpandedBreakdownSections] = useState<Record<string, boolean>>({});
@@ -823,7 +824,19 @@ export default function MealPlannerPage() {
                                                             const hasBreakdown = breakdownLabels.includes(label);
 
                                                             return (
-                                                                <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
+                                                                <div key={label} onClick={(e) => {
+                                                                    const rect = e.currentTarget.getBoundingClientRect();
+                                                                    const scrollY = window.scrollY;
+                                                                    const viewportHeight = window.innerHeight;
+                                                                    const modalHeight = 500;
+                                                                    let top = rect.bottom + scrollY + 8;
+                                                                    if (rect.bottom + modalHeight > viewportHeight) {
+                                                                        top = Math.max(scrollY + 80, rect.top + scrollY - modalHeight - 8);
+                                                                    }
+                                                                    let left = rect.left + (rect.width / 2);
+                                                                    setModalPosition({ top, left });
+                                                                    setSelectedNutrientInfo(label);
+                                                                }} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
                                                                     <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
                                                                     <div className="space-y-0.5">
                                                                         {(pct !== null && !forceRaw) ? (
@@ -914,10 +927,18 @@ export default function MealPlannerPage() {
             </div >
 
             {
-                selectedNutrientInfo && nutrientInfo[selectedNutrientInfo] && (
-                    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-start justify-center p-4 pt-24 overflow-y-auto" onClick={() => setSelectedNutrientInfo(null)}>
-                        <div className="bg-background rounded-2xl max-w-md w-full p-8 shadow-2xl relative max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-                            <button onClick={() => setSelectedNutrientInfo(null)} className="absolute top-4 right-4 text-muted-foreground"><X /></button>
+                selectedNutrientInfo && nutrientInfo[selectedNutrientInfo] && modalPosition && (
+                    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => { setSelectedNutrientInfo(null); setModalPosition(null); }}>
+                        <div
+                            className="absolute bg-background rounded-2xl max-w-md w-full p-8 shadow-2xl relative max-h-[70vh] overflow-y-auto animate-in zoom-in-95 slide-in-from-top-2 duration-200"
+                            style={{
+                                top: modalPosition.top,
+                                left: Math.min(Math.max(modalPosition.left - 200, 16), window.innerWidth - 432),
+                                maxWidth: 'calc(100vw - 32px)'
+                            }}
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <button onClick={() => { setSelectedNutrientInfo(null); setModalPosition(null); }} className="absolute top-4 right-4 text-muted-foreground z-10"><X /></button>
                             <h3 className="text-3xl font-serif font-bold text-primary mb-2">{selectedNutrientInfo}</h3>
                             <p className="text-muted-foreground italic mb-6">"{nutrientInfo[selectedNutrientInfo].description}"</p>
                             <div className="space-y-6">
