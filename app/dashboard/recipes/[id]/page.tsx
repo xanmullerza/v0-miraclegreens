@@ -29,7 +29,8 @@ import {
     EyeOff,
     ArrowUpDown,
     ArrowUp,
-    ArrowDown
+    ArrowDown,
+    RotateCcw
 } from 'lucide-react';
 import { calculateRecipeNutrition, CalculatedNutrition, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -84,6 +85,8 @@ export default function RecipeDetailsPage() {
     const { id } = useParams();
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+    const [originalIngredients, setOriginalIngredients] = useState<Ingredient[]>([]); // To support reset
+    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
     const [hiddenIngredientIds, setHiddenIngredientIds] = useState<string[]>([]);
     const [isReordering, setIsReordering] = useState(false); // Local reordering state
     const [instructions, setInstructions] = useState<Instruction[]>([]);
@@ -100,6 +103,7 @@ export default function RecipeDetailsPage() {
         const getUser = async () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
+                setCurrentUserId(user.id);
                 const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
                 const userEmail = (user.email || user.user_metadata?.email || '').toLowerCase();
                 setIsAdmin(userEmail === adminEmail.toLowerCase() && adminEmail !== '');
@@ -216,6 +220,7 @@ export default function RecipeDetailsPage() {
 
             const fetchedIngredients = ingData || [];
             setIngredients(fetchedIngredients);
+            setOriginalIngredients(fetchedIngredients); // Save original order
 
             // Calculate live micronutrients for the report
             if (fetchedIngredients.length > 0) {
@@ -295,6 +300,30 @@ export default function RecipeDetailsPage() {
         );
     };
 
+    // Load saved order when user ID and ingredients are available
+    useEffect(() => {
+        if (currentUserId && originalIngredients.length > 0) {
+            const savedOrder = localStorage.getItem(`recipe_order_${currentUserId}_${id}`);
+            if (savedOrder) {
+                try {
+                    const orderIds = JSON.parse(savedOrder);
+                    const sorted = [...originalIngredients].sort((a, b) => {
+                        const idxA = orderIds.indexOf(a.id);
+                        const idxB = orderIds.indexOf(b.id);
+                        // If both are in the list, sort by index. If one is missing (new), put it at the end.
+                        if (idxA === -1 && idxB === -1) return 0;
+                        if (idxA === -1) return 1;
+                        if (idxB === -1) return -1;
+                        return idxA - idxB;
+                    });
+                    setIngredients(sorted);
+                } catch (e) {
+                    console.error("Failed to parse saved ingredient order", e);
+                }
+            }
+        }
+    }, [currentUserId, originalIngredients, id]);
+
     const moveIngredient = (index: number, direction: 'up' | 'down', e: React.MouseEvent) => {
         e.stopPropagation();
         if ((direction === 'up' && index === 0) || (direction === 'down' && index === ingredients.length - 1)) return;
@@ -302,7 +331,23 @@ export default function RecipeDetailsPage() {
         const newIngredients = [...ingredients];
         const swapIndex = direction === 'up' ? index - 1 : index + 1;
         [newIngredients[index], newIngredients[swapIndex]] = [newIngredients[swapIndex], newIngredients[index]];
+
         setIngredients(newIngredients);
+
+        // Save new order
+        if (currentUserId) {
+            const orderIds = newIngredients.map(ing => ing.id);
+            localStorage.setItem(`recipe_order_${currentUserId}_${id}`, JSON.stringify(orderIds));
+        }
+    };
+
+    const resetOrder = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIngredients(originalIngredients);
+        if (currentUserId) {
+            localStorage.removeItem(`recipe_order_${currentUserId}_${id}`);
+            toast.info("Ingredient order reset");
+        }
     };
 
     const toggleFavorite = async () => {
@@ -515,18 +560,29 @@ export default function RecipeDetailsPage() {
                                     <ShoppingBasket size={24} className="text-emerald-500" />
                                     Lab Ingredients
                                 </h3>
-                                <button
-                                    onClick={() => setIsReordering(!isReordering)}
-                                    className={cn(
-                                        "p-2 rounded-xl transition-all border",
-                                        isReordering
-                                            ? "bg-amber-50 dark:bg-amber-500/10 text-amber-500 border-amber-200 dark:border-amber-500/20"
-                                            : "bg-slate-50 dark:bg-slate-900 text-slate-400 border-slate-100 dark:border-slate-800 hover:text-emerald-500"
+                                <div className="flex gap-2">
+                                    {isReordering && (
+                                        <button
+                                            onClick={resetOrder}
+                                            className="p-2 rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-400 border border-slate-100 dark:border-slate-800 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all"
+                                            title="Reset Order"
+                                        >
+                                            <RotateCcw size={18} />
+                                        </button>
                                     )}
-                                    title="Rearrange Order"
-                                >
-                                    <ArrowUpDown size={18} />
-                                </button>
+                                    <button
+                                        onClick={() => setIsReordering(!isReordering)}
+                                        className={cn(
+                                            "p-2 rounded-xl transition-all border",
+                                            isReordering
+                                                ? "bg-amber-50 dark:bg-amber-500/10 text-amber-500 border-amber-200 dark:border-amber-500/20"
+                                                : "bg-slate-50 dark:bg-slate-900 text-slate-400 border-slate-100 dark:border-slate-800 hover:text-emerald-500"
+                                        )}
+                                        title="Rearrange Order"
+                                    >
+                                        <ArrowUpDown size={18} />
+                                    </button>
+                                </div>
                             </div>
                             <div className="space-y-2">
                                 {ingredients.map((ing: any, i) => (
