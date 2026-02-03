@@ -36,6 +36,7 @@ import {
     Minus,
     Trash2
 } from 'lucide-react';
+import FoodItemPicker from '@/components/recipe/food-item-picker';
 import { calculateRecipeNutrition, CalculatedNutrition, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { Badge } from '@/components/ui/badge';
@@ -94,6 +95,7 @@ export default function RecipeDetailsPage() {
     const [hiddenIngredientIds, setHiddenIngredientIds] = useState<string[]>([]);
     const [isReordering, setIsReordering] = useState(false);
     const [isEditingIngredients, setIsEditingIngredients] = useState(false); // New: Add/Remove mode
+    const [showPicker, setShowPicker] = useState(false);
     const [instructions, setInstructions] = useState<Instruction[]>([]);
     const [loading, setLoading] = useState(true);
     const [showDetailedNutrients, setShowDetailedNutrients] = useState(true);
@@ -364,22 +366,57 @@ export default function RecipeDetailsPage() {
         toast.success("Ingredient removed (local view only)");
     };
 
-    // Placeholder for Add - requires complex picker. For now, just a toast or simple mock.
-    const addIngredientMock = () => {
-        toast.info("Ingredient browser coming soon! (Mock added)");
-        // Mock add
-        /* 
-        const newIng: Ingredient = {
-            id: crypto.randomUUID(),
-            item: "New Ingredient",
-            amount: "1 serving",
-            base_ingredient: "Placeholder",
-            weight_g: 100
+    const handleAddIngredient = (foodItem: any) => {
+        // Default to 100g or a standard portion if available
+        let weight_g = 100;
+        let quantity = 1;
+        let measure_label = 'g';
+
+        if (foodItem.portions && foodItem.portions.length > 0) {
+            // Try to find a "whole" or "piece" unit first
+            const natural = foodItem.portions.find((p: any) =>
+                ['item', 'whole', 'unit', 'piece', 'cup', 'serving'].some(k => p.label.toLowerCase().includes(k))
+            );
+            if (natural) {
+                weight_g = natural.weight_g;
+                measure_label = natural.label;
+            } else {
+                // Fallback to first portion
+                weight_g = foodItem.portions[0].weight_g;
+                measure_label = foodItem.portions[0].label;
+            }
+        }
+
+        const multiplier = weight_g / 100;
+
+        const newIngredient: Ingredient = {
+            id: crypto.randomUUID(), // Temporary local ID
+            food_item_id: foodItem.id,
+            recipe_id: id as string,
+            item: foodItem.common_name || foodItem.name,
+            base_ingredient: foodItem.name,
+            amount: `${quantity} ${measure_label}`,
+            quantity: quantity,
+            measure_label: measure_label,
+            weight_g: weight_g,
+            modifier: '',
+            food_item: {
+                ...foodItem,
+                image: foodItem.image
+            }
+            // Note: We don't have full Ingredient persistence structure here (like 'calories' on the ingredient row itself vs food_item)
+            // But the UI mostly uses `ing.food_item` for calculations now in `calculateRecipeNutrition`.
+            // However, `calculateRecipeNutrition` expects `ingredients` to have keys or `food_item` to have keys.
+            // Let's ensure the necessary fields are present on the `Ingredient` object if the calculator needs them.
+            // Looking at `calculateRecipeNutrition` in `utils`, it uses `i.weight_g` and `i.food_item.energy_kcal`.
+            // So we are good with just linking the `food_item`.
         };
-        const newIngredients = [...ingredients, newIng];
+
+        const newIngredients = [...ingredients, newIngredient];
         setIngredients(newIngredients);
         saveCustomization(newIngredients);
-        */
+        setShowPicker(false);
+        toast.success(`Added ${foodItem.name}`);
     };
 
     const resetOrder = (e: React.MouseEvent) => {
@@ -718,7 +755,7 @@ export default function RecipeDetailsPage() {
                                 {/* Add Button (Only in Edit Mode) */}
                                 {isEditingIngredients && (
                                     <button
-                                        onClick={addIngredientMock}
+                                        onClick={() => setShowPicker(true)}
                                         className="w-full py-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-center gap-2 text-slate-400 hover:text-emerald-500 hover:border-emerald-200/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/5 transition-all group"
                                     >
                                         <Plus size={20} className="group-hover:scale-110 transition-transform" />
@@ -727,6 +764,15 @@ export default function RecipeDetailsPage() {
                                 )}
                             </div>
                         </Card>
+
+                        {/* Food Item Picker Modal */}
+                        {showPicker && (
+                            <FoodItemPicker
+                                onSelect={handleAddIngredient}
+                                onClose={() => setShowPicker(false)}
+                                mode="all"
+                            />
+                        )}
 
                         {/* Procedure */}
                         <Card className="p-6">
