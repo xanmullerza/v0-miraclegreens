@@ -384,7 +384,7 @@ function ProfilePageContent() {
                     </div>
 
                     {/* Save Button */}
-                    <div className="flex justify-start pt-8 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex justify-center pt-8 border-t border-slate-100 dark:border-slate-800">
                         <Button
                             onClick={handleSave}
                             className="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-8 h-12 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-2 text-xs uppercase tracking-widest"
