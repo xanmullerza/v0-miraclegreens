@@ -705,11 +705,18 @@ export default function MealPlannerPage() {
                                 To curate a personalised meal plan, we need some information from you. This includes your age, weight, height, and diet goals. This is stored locally on your device and not on our servers. You are welcome to skip this and have a look at our recipes for some ideas on your next meal. We value and respect your privacy.
                             </p>
                         </div>
-                        <div className="flex flex-col w-full gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 w-full gap-4">
+                            <Button
+                                size="lg"
+                                onClick={() => router.push('/dashboard/recipes')}
+                                className="h-16 text-lg font-black uppercase tracking-widest rounded-2xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-slate-400 hover:text-emerald-600 hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all"
+                            >
+                                <ChefHat className="mr-2 h-5 w-5" /> View Recipes
+                            </Button>
                             <Button
                                 size="lg"
                                 onClick={() => router.push('/dashboard/profile?from=/dashboard/mealplanner')}
-                                className="w-full h-16 text-lg font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 group"
+                                className="h-16 text-lg font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 group"
                             >
                                 Complete Profile <ChevronRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                             </Button>
