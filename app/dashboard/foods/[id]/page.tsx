@@ -588,8 +588,8 @@ export default function FoodDetailsPage() {
 
             {/* NUTRIENT INFO MODAL */}
             {selectedNutrientInfo && (nutrientInfo as any)[selectedNutrientInfo] && (
-                <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200 overflow-y-auto" onClick={() => setSelectedNutrientInfo(null)}>
-                    <div className="bg-white dark:bg-slate-900 rounded-[3rem] max-w-md w-full p-11 shadow-2xl relative border border-slate-200 dark:border-slate-800 max-h-[90vh] overflow-y-auto my-auto" onClick={e => e.stopPropagation()}>
+                <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-start justify-center p-4 pt-24 animate-in fade-in duration-200 overflow-y-auto" onClick={() => setSelectedNutrientInfo(null)}>
+                    <div className="bg-white dark:bg-slate-900 rounded-[3rem] max-w-md w-full p-11 shadow-2xl relative border border-slate-200 dark:border-slate-800 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
                         <button onClick={() => setSelectedNutrientInfo(null)} className="absolute top-8 right-8 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"><X size={24} /></button>
                         <div className="space-y-8">
                             <div>

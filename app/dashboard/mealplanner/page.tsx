@@ -915,8 +915,8 @@ export default function MealPlannerPage() {
 
             {
                 selectedNutrientInfo && nutrientInfo[selectedNutrientInfo] && (
-                    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto" onClick={() => setSelectedNutrientInfo(null)}>
-                        <div className="bg-background rounded-2xl max-w-md w-full p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto my-auto" onClick={e => e.stopPropagation()}>
+                    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-start justify-center p-4 pt-24 overflow-y-auto" onClick={() => setSelectedNutrientInfo(null)}>
+                        <div className="bg-background rounded-2xl max-w-md w-full p-8 shadow-2xl relative max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
                             <button onClick={() => setSelectedNutrientInfo(null)} className="absolute top-4 right-4 text-muted-foreground"><X /></button>
                             <h3 className="text-3xl font-serif font-bold text-primary mb-2">{selectedNutrientInfo}</h3>
                             <p className="text-muted-foreground italic mb-6">"{nutrientInfo[selectedNutrientInfo].description}"</p>
