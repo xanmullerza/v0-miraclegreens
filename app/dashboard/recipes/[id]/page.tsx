@@ -99,7 +99,8 @@ export default function RecipeDetailsPage() {
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
     const [hiddenIngredientIds, setHiddenIngredientIds] = useState<string[]>([]);
     const [isReordering, setIsReordering] = useState(false);
-    const [isEditingIngredients, setIsEditingIngredients] = useState(false); // New: Add/Remove mode
+    const [isEditingIngredients, setIsEditingIngredients] = useState(false); // Add/Remove mode
+    const [isEditingMeasures, setIsEditingMeasures] = useState(false); // New: Edit Measures mode
     const [showPicker, setShowPicker] = useState(false);
     const [instructions, setInstructions] = useState<Instruction[]>([]);
     const [loading, setLoading] = useState(true);
@@ -735,32 +736,57 @@ export default function RecipeDetailsPage() {
                                 <div className="p-2 gap-2 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-wrap items-center">
                                     {/* Edit Mode Toggle */}
                                     <button
-                                        onClick={() => { setIsEditingIngredients(!isEditingIngredients); setIsReordering(false); }}
+                                        onClick={() => {
+                                            setIsEditingIngredients(!isEditingIngredients);
+                                            setIsReordering(false);
+                                            setIsEditingMeasures(false);
+                                        }}
                                         className={cn(
-                                            "flex items-center gap-2 px-4 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center",
+                                            "flex items-center gap-2 px-3 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center whitespace-nowrap",
                                             isEditingIngredients
                                                 ? "bg-rose-50 dark:bg-rose-500/10 text-rose-500 border-rose-200 dark:border-rose-500/20"
-                                                : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 hover:text-emerald-500 hover:border-emerald-200"
+                                                : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 hover:text-rose-500 hover:border-rose-200"
                                         )}
                                     >
                                         <Diff size={14} /> Add/Remove
                                     </button>
 
-                                    {/* Reorder Toggle */}
+                                    {/* Measure Edit Toggle */}
                                     <button
-                                        onClick={() => { setIsReordering(!isReordering); setIsEditingIngredients(false); }}
+                                        onClick={() => {
+                                            setIsEditingMeasures(!isEditingMeasures);
+                                            setIsReordering(false);
+                                            setIsEditingIngredients(false);
+                                        }}
                                         className={cn(
-                                            "flex items-center gap-2 px-4 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center",
-                                            isReordering
-                                                ? "bg-amber-50 dark:bg-amber-500/10 text-amber-500 border-amber-200 dark:border-amber-500/20"
-                                                : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 hover:text-emerald-500 hover:border-emerald-200"
+                                            "flex items-center gap-2 px-3 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center whitespace-nowrap",
+                                            isEditingMeasures
+                                                ? "bg-blue-50 dark:bg-blue-500/10 text-blue-500 border-blue-200 dark:border-blue-500/20"
+                                                : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 hover:text-blue-500 hover:border-blue-200"
                                         )}
                                     >
-                                        <ArrowUpDown size={14} /> Rearrange
+                                        <Scale size={14} /> Adjust
+                                    </button>
+
+                                    {/* Reorder Toggle */}
+                                    <button
+                                        onClick={() => {
+                                            setIsReordering(!isReordering);
+                                            setIsEditingIngredients(false);
+                                            setIsEditingMeasures(false);
+                                        }}
+                                        className={cn(
+                                            "flex items-center gap-2 px-3 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center whitespace-nowrap",
+                                            isReordering
+                                                ? "bg-amber-50 dark:bg-amber-500/10 text-amber-500 border-amber-200 dark:border-amber-500/20"
+                                                : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 hover:text-amber-500 hover:border-amber-200"
+                                        )}
+                                    >
+                                        <ArrowUpDown size={14} /> Sort
                                     </button>
 
                                     {/* Reset */}
-                                    {(isReordering || isEditingIngredients || ingredients.length !== originalIngredients.length || JSON.stringify(ingredients) !== JSON.stringify(originalIngredients)) && (
+                                    {(isReordering || isEditingIngredients || isEditingMeasures || ingredients.length !== originalIngredients.length || JSON.stringify(ingredients) !== JSON.stringify(originalIngredients)) && (
                                         <button
                                             onClick={resetOrder}
                                             className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-rose-500 transition-all border border-slate-200 dark:border-slate-700"
@@ -776,13 +802,13 @@ export default function RecipeDetailsPage() {
                                 {ingredients.map((ing: any, i) => (
                                     <div
                                         key={ing.id || i}
-                                        onClick={() => !isReordering && !isEditingIngredients && !hiddenIngredientIds.includes(ing.id) && ing.food_item_id && router.push(`/dashboard/foods/${ing.food_item_id}`)}
+                                        onClick={() => !isReordering && !isEditingIngredients && !isEditingMeasures && !hiddenIngredientIds.includes(ing.id) && ing.food_item_id && router.push(`/dashboard/foods/${ing.food_item_id}`)}
                                         className={cn(
                                             "flex items-center gap-4 p-4 rounded-2xl border transition-all group relative overflow-hidden",
                                             hiddenIngredientIds.includes(ing.id)
                                                 ? "bg-slate-50 dark:bg-slate-900 border-dashed border-slate-200 dark:border-slate-800 opacity-60"
                                                 : "bg-white dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 hover:border-emerald-500/20",
-                                            ing.food_item_id && !hiddenIngredientIds.includes(ing.id) && !isReordering && !isEditingIngredients ? "cursor-pointer" : ""
+                                            ing.food_item_id && !hiddenIngredientIds.includes(ing.id) && !isReordering && !isEditingIngredients && !isEditingMeasures ? "cursor-pointer" : ""
                                         )}
                                     >
                                         {/* Action Buttons: Reorder OR Remove OR Toggle */}
@@ -831,7 +857,7 @@ export default function RecipeDetailsPage() {
                                                 hiddenIngredientIds.includes(ing.id) ? "text-slate-400 decoration-slate-300 line-through" : "text-slate-900 dark:text-white"
                                             )}>{ing.base_ingredient || ing.item}</p>
 
-                                            {isEditingIngredients ? (
+                                            {isEditingMeasures ? (
                                                 <div className="flex items-center gap-2 mt-1" onClick={(e) => e.stopPropagation()}>
                                                     <input
                                                         type="number"
