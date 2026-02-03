@@ -633,7 +633,7 @@ export default function MealPlannerPage() {
                 </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-3xl p-10 shadow-sm relative overflow-hidden min-h-[600px]">
+            <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 md:p-10 shadow-sm relative overflow-hidden">
                 {step === 1 && showSummary && (
                     <div className="space-y-8 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4">
                         <div className="text-center space-y-2">
@@ -695,7 +695,7 @@ export default function MealPlannerPage() {
                 )}
 
                 {step === 1 && !showSummary && (
-                    <div className="flex flex-col items-center justify-center py-20 text-center space-y-8 animate-in fade-in slide-in-from-bottom-4 max-w-xl mx-auto">
+                    <div className="flex flex-col items-center justify-center py-10 text-center space-y-6 animate-in fade-in slide-in-from-bottom-4 max-w-xl mx-auto">
                         <div className="h-24 w-24 bg-emerald-500/10 rounded-3xl flex items-center justify-center text-emerald-600 border border-emerald-500/20">
                             <User size={48} className="animate-pulse" />
                         </div>
