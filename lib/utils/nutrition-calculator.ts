@@ -11,6 +11,85 @@ export interface FoodItemNutrition {
     micronutrients?: Record<string, number>;
 }
 
+export type GoalType = 'lose-fat' | 'maintain' | 'build-muscle';
+export type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'active';
+export type NutrientStrategy = 'balanced' | 'low-carb' | 'high-protein' | 'keto' | 'high-carb';
+
+export interface UserTargetParams {
+    weight: number;
+    height: number;
+    age: number;
+    gender: 'male' | 'female';
+    activityLevel: ActivityLevel;
+    goal: GoalType;
+    nutrientStrategy: NutrientStrategy;
+}
+
+export function calculateIndividualTargets(params: UserTargetParams) {
+    const { weight, height, age, gender, activityLevel, goal, nutrientStrategy } = params;
+
+    // BMR (Mifflin-St Jeor)
+    const s = gender === 'male' ? 5 : -161;
+    const bmr = (10 * weight) + (6.25 * height) - (5 * age) + s;
+
+    // Activity Factor
+    const activityFactors: Record<string, number> = {
+        sedentary: 1.2,
+        light: 1.375,
+        moderate: 1.55,
+        active: 1.725
+    };
+    const factor = activityFactors[activityLevel] || 1.2;
+    let tdee = bmr * factor;
+
+    // Goal Adjustment
+    if (goal === 'lose-fat') tdee -= 500;
+    if (goal === 'build-muscle') tdee += 500;
+    tdee = Math.max(tdee, 1200);
+
+    // Strategy Allocation
+    let pPct = 0.25, cPct = 0.45, fPct = 0.30;
+
+    switch (nutrientStrategy) {
+        case 'low-carb':
+            pPct = 0.35; cPct = 0.15; fPct = 0.50;
+            break;
+        case 'high-protein':
+            pPct = 0.40; cPct = 0.35; fPct = 0.25;
+            break;
+        case 'keto':
+            pPct = 0.25; cPct = 0.05; fPct = 0.70;
+            break;
+        case 'high-carb':
+            pPct = 0.20; cPct = 0.60; fPct = 0.20;
+            break;
+    }
+
+    // Child logic override for protein (approx 1g/kg)
+    let protein: number;
+    if (age < 14) {
+        protein = weight * 1.0;
+        const remainingCals = tdee - (protein * 4);
+        // Distribute remaining cals based on strategy ratios
+        const macroRatioSum = cPct + fPct;
+        const adjustedCPct = cPct / macroRatioSum;
+        const adjustedFPct = fPct / macroRatioSum;
+        return {
+            energy: tdee,
+            protein,
+            carbs: (remainingCals * adjustedCPct) / 4,
+            fat: (remainingCals * adjustedFPct) / 9
+        };
+    }
+
+    return {
+        energy: tdee,
+        protein: (tdee * pPct) / 4,
+        carbs: (tdee * cPct) / 4,
+        fat: (tdee * fPct) / 9
+    };
+}
+
 export interface CalculatedNutrition {
     calories: number;
     energy_kj: number;

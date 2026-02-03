@@ -32,7 +32,9 @@ import {
     LogOut,
     Fingerprint,
     Info,
-    ChevronDown
+    ChevronDown,
+    X,
+    Users
 } from 'lucide-react';
 import { useRDA } from '@/hooks/use-rda';
 import { supabase } from '@/lib/supabase';
@@ -41,6 +43,120 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { type FamilyMember } from '@/lib/context/user-preferences-context';
+import { GoalType, ActivityLevel } from '@/lib/utils/nutrition-calculator';
+
+function FamilyMemberForm({ initialData, onSave, onCancel }: { initialData?: Partial<FamilyMember>, onSave: (data: FamilyMember) => void, onCancel: () => void }) {
+    const defaultMember: FamilyMember = {
+        id: crypto.randomUUID(),
+        name: '',
+        age: 10,
+        gender: 'male',
+        weight: 30,
+        height: 140,
+        activityLevel: 'moderate',
+        goal: 'maintain'
+    };
+
+    const [data, setData] = useState<FamilyMember>({ ...defaultMember, ...initialData } as FamilyMember);
+
+    const GoalCard = ({ type, selected, onClick, icon: Icon, label }: { type: any, selected: boolean, onClick: () => void, icon: any, label?: string }) => (
+        <div
+            onClick={onClick}
+            className={cn(
+                "cursor-pointer flex flex-col items-center justify-center gap-0.5 rounded-xl border p-2.5 transition-all hover:scale-[1.02] text-center flex-1 min-w-[80px]",
+                selected
+                    ? "bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-sm"
+                    : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+            )}
+        >
+            <Icon className={cn("h-4 w-4 mb-0.5", selected ? "text-emerald-500" : "text-slate-400")} />
+            <span className="text-[9px] font-bold uppercase tracking-tight leading-tight">{label || type.replace('-', ' ')}</span>
+        </div>
+    );
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onCancel}>
+            <div className="bg-white dark:bg-slate-950 w-full max-w-2xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
+                <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50 rounded-t-[2rem]">
+                    <div className="flex items-center gap-3">
+                        <div className="bg-emerald-100 dark:bg-emerald-900/30 p-2 rounded-xl text-emerald-600 dark:text-emerald-400">
+                            <Users size={20} />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-black tracking-tight text-slate-900 dark:text-white uppercase italic">Member Protocol</h3>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Define bio-data for calculation</p>
+                        </div>
+                    </div>
+                    <button onClick={onCancel} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-400 transition-colors">
+                        <X size={20} />
+                    </button>
+                </div>
+
+                <div className="p-8 space-y-8 overflow-y-auto custom-scrollbar">
+                    {/* Basic Info */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Name</Label>
+                            <Input
+                                value={data.name}
+                                onChange={(e) => setData({ ...data, name: e.target.value })}
+                                placeholder="e.g. Johnny"
+                                className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl font-bold"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Gender</Label>
+                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800 h-10">
+                                <button onClick={() => setData({ ...data, gender: 'male' })} className={cn("flex-1 text-xs font-black uppercase tracking-wider rounded-lg transition-all", data.gender === 'male' ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-400")}>Male</button>
+                                <button onClick={() => setData({ ...data, gender: 'female' })} className={cn("flex-1 text-xs font-black uppercase tracking-wider rounded-lg transition-all", data.gender === 'female' ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-400")}>Female</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Age (yrs)</Label>
+                            <Input type="number" value={data.age} onChange={e => setData({ ...data, age: Number(e.target.value) })} className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl font-bold text-center" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Weight (kg)</Label>
+                            <Input type="number" value={data.weight} onChange={e => setData({ ...data, weight: Number(e.target.value) })} className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl font-bold text-center" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Height (cm)</Label>
+                            <Input type="number" value={data.height} onChange={e => setData({ ...data, height: Number(e.target.value) })} className="bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl font-bold text-center" />
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Activity Level</Label>
+                        <div className="flex gap-2 overflow-x-auto pb-2">
+                            <GoalCard type="sedentary" label="Sedentary" selected={data.activityLevel === 'sedentary'} onClick={() => setData({ ...data, activityLevel: 'sedentary' })} icon={User} />
+                            <GoalCard type="light" label="Light" selected={data.activityLevel === 'light'} onClick={() => setData({ ...data, activityLevel: 'light' })} icon={ChevronRight} />
+                            <GoalCard type="moderate" label="Moderate" selected={data.activityLevel === 'moderate'} onClick={() => setData({ ...data, activityLevel: 'moderate' })} icon={Zap} />
+                            <GoalCard type="active" label="Active" selected={data.activityLevel === 'active'} onClick={() => setData({ ...data, activityLevel: 'active' })} icon={Flame} />
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Goal</Label>
+                        <div className="flex gap-2">
+                            <GoalCard type="lose-fat" label="Lose Fat" selected={data.goal === 'lose-fat'} onClick={() => setData({ ...data, goal: 'lose-fat' })} icon={TrendingDown} />
+                            <GoalCard type="maintain" label="Maintain" selected={data.goal === 'maintain'} onClick={() => setData({ ...data, goal: 'maintain' })} icon={Activity} />
+                            <GoalCard type="build-muscle" label="Build Muscle" selected={data.goal === 'build-muscle'} onClick={() => setData({ ...data, goal: 'build-muscle' })} icon={Dumbbell} />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 rounded-b-[2rem] flex justify-end gap-3">
+                    <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">Cancel</Button>
+                    <Button onClick={() => onSave(data)} className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl px-8">Save Profile</Button>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 function ProfilePageContent() {
     const {
@@ -60,8 +176,12 @@ function ProfilePageContent() {
 
     const [formData, setFormData] = useState({
         ...profile,
-        exclusions: profile.exclusions || []
+        exclusions: profile.exclusions || [],
+        familyMembers: profile.familyMembers || []
     });
+
+    const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
+    const [isAddingMember, setIsAddingMember] = useState(false);
 
     const userRDAs = useRDA(
         typeof formData.age === 'number' ? formData.age : 30,
@@ -75,6 +195,24 @@ function ProfilePageContent() {
         if (from) {
             router.push(from);
         }
+    };
+
+    const handleSaveMember = (member: FamilyMember) => {
+        let updatedMembers = [...formData.familyMembers];
+        const index = updatedMembers.findIndex(m => m.id === member.id);
+        if (index >= 0) {
+            updatedMembers[index] = member;
+        } else {
+            updatedMembers.push(member);
+        }
+        setFormData({ ...formData, familyMembers: updatedMembers });
+        setIsAddingMember(false);
+        setEditingMember(null);
+    };
+
+    const handleDeleteMember = (id: string) => {
+        const updatedMembers = formData.familyMembers.filter(m => m.id !== id);
+        setFormData({ ...formData, familyMembers: updatedMembers });
     };
 
     const GoalCard = ({ type, selected, onClick, icon: Icon, label }: { type: any, selected: boolean, onClick: () => void, icon: any, label?: string }) => (
@@ -172,6 +310,54 @@ function ProfilePageContent() {
                                 </div>
                             </div>
                         </section>
+
+                        {/* FAMILY PROTOCOLS */}
+                        <section className="space-y-6">
+                            <div className="flex items-center gap-2 text-emerald-500 mb-2">
+                                <Users size={20} />
+                                <h2 className="text-sm font-black uppercase tracking-[0.2em]">Family Protocols</h2>
+                            </div>
+                            <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-6 shadow-sm">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {/* Existing Members */}
+                                    {formData.familyMembers.map((member) => (
+                                        <div key={member.id} onClick={() => setEditingMember(member)} className="group cursor-pointer p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 hover:border-emerald-500 hover:bg-white dark:hover:bg-slate-900 transition-all relative">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <div className="flex items-center gap-2">
+                                                    <div className={cn("w-2 h-2 rounded-full", member.gender === 'male' ? "bg-blue-400" : "bg-rose-400")} />
+                                                    <h3 className="font-bold text-sm text-slate-700 dark:text-slate-200">{member.name || 'Unnamed'}</h3>
+                                                </div>
+                                                <button onClick={(e) => { e.stopPropagation(); handleDeleteMember(member.id); }} className="text-slate-300 hover:text-rose-500 transition-colors p-1"><X size={14} /></button>
+                                            </div>
+                                            <div className="flex flex-wrap gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+                                                <span className="bg-white dark:bg-slate-950 px-2 py-1 rounded-md border border-slate-100 dark:border-slate-800">{member.age} yrs</span>
+                                                <span className="bg-white dark:bg-slate-950 px-2 py-1 rounded-md border border-slate-100 dark:border-slate-800">{member.goal}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+
+                                    {/* Add Button */}
+                                    <button
+                                        onClick={() => setIsAddingMember(true)}
+                                        className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/5 transition-all text-slate-400 hover:text-emerald-500 h-[100px]"
+                                    >
+                                        <div className="p-2 rounded-full bg-slate-50 dark:bg-slate-900 group-hover:bg-white transition-colors">
+                                            <Plus size={20} />
+                                        </div>
+                                        <span className="text-[10px] font-black uppercase tracking-widest">Add Member</span>
+                                    </button>
+                                </div>
+                                <p className="text-[10px] text-slate-400 italic">Add family members to automatically calculate scale-appropriate portion sizes in recipes.</p>
+                            </div>
+                        </section>
+
+                        {(isAddingMember || editingMember) && (
+                            <FamilyMemberForm
+                                initialData={editingMember || {}}
+                                onSave={handleSaveMember}
+                                onCancel={() => { setIsAddingMember(false); setEditingMember(null); }}
+                            />
+                        )}
 
                         {/* Diet Profile */}
                         <section className="space-y-6">

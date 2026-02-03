@@ -4,10 +4,22 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 
 export type EnergyUnit = "kcal" | "kJ";
 export type MeasurementUnit = "metric" | "imperial";
-export type GoalType = 'lose-fat' | 'maintain' | 'build-muscle';
-export type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'active';
+import { calculateIndividualTargets, GoalType, ActivityLevel, NutrientStrategy } from "@/lib/utils/nutrition-calculator";
+
+export type EnergyUnit = "kcal" | "kJ";
+export type MeasurementUnit = "metric" | "imperial";
 export type NutrientDisplayMode = 'value' | 'percentage' | 'both';
-export type NutrientStrategy = 'balanced' | 'low-carb' | 'high-protein' | 'keto' | 'high-carb';
+
+export interface FamilyMember {
+    id: string;
+    name: string;
+    gender: 'male' | 'female';
+    age: number;
+    weight: number;
+    height: number;
+    activityLevel: ActivityLevel;
+    goal: GoalType;
+}
 
 interface UserProfile {
     name: string;
@@ -21,6 +33,7 @@ interface UserProfile {
     activityLevel: ActivityLevel;
     nutrientStrategy: NutrientStrategy;
     exclusions: string[];
+    familyMembers: FamilyMember[];
 }
 
 interface UserPreferencesContextType {
@@ -61,7 +74,8 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         dietType: "anything",
         activityLevel: "sedentary",
         nutrientStrategy: "balanced",
-        exclusions: []
+        exclusions: [],
+        familyMembers: []
     });
     const [skipPlannerQuiz, setSkipPlannerQuizState] = useState(false);
 
@@ -84,7 +98,10 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         const savedProfile = localStorage.getItem("userProfile");
         if (savedProfile) {
             try {
-                setProfileState(JSON.parse(savedProfile));
+                const parsed = JSON.parse(savedProfile);
+                // Ensure familyMembers exists for legacy data
+                if (!parsed.familyMembers) parsed.familyMembers = [];
+                setProfileState(parsed);
             } catch (e) {
                 console.error("Failed to parse user profile", e);
             }
@@ -112,9 +129,14 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     };
 
     const updateProfile = (updates: Partial<UserProfile>) => {
-        const newProfile = { ...profile, ...updates };
-        setProfileState(newProfile);
-        localStorage.setItem("userProfile", JSON.stringify(newProfile));
+        setProfileState(prev => {
+            const newProfile = { ...prev, ...updates };
+            // Ensure familyMembers is preserved if not in updates
+            if (!newProfile.familyMembers) newProfile.familyMembers = prev.familyMembers || [];
+
+            localStorage.setItem("userProfile", JSON.stringify(newProfile));
+            return newProfile;
+        });
     };
 
     const setSkipPlannerQuiz = (skip: boolean) => {
@@ -122,76 +144,15 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         localStorage.setItem("skipPlannerQuiz", String(skip));
     };
 
-    // --- Calculation Engine ---
-    const calculateDailyTargets = () => {
-        const weight = Number(profile.weight) || 70;
-        const height = Number(profile.height) || 170;
-        const age = Number(profile.age) || 30;
-        const gender = profile.gender || 'female';
-
-        // BMR (Mifflin-St Jeor)
-        const s = gender === 'male' ? 5 : -161;
-        const bmr = (10 * weight) + (6.25 * height) - (5 * age) + s;
-
-        // Activity Factor
-        const activityFactors: Record<string, number> = {
-            sedentary: 1.2,
-            light: 1.375,
-            moderate: 1.55,
-            active: 1.725
-        };
-        const factor = activityFactors[profile.activityLevel] || 1.2;
-        let tdee = bmr * factor;
-
-        // Goal Adjustment
-        if (profile.goal === 'lose-fat') tdee -= 500;
-        if (profile.goal === 'build-muscle') tdee += 500;
-        tdee = Math.max(tdee, 1200);
-
-        // Strategy Allocation
-        let pPct = 0.25, cPct = 0.45, fPct = 0.30;
-
-        switch (profile.nutrientStrategy) {
-            case 'low-carb':
-                pPct = 0.35; cPct = 0.15; fPct = 0.50;
-                break;
-            case 'high-protein':
-                pPct = 0.40; cPct = 0.35; fPct = 0.25;
-                break;
-            case 'keto':
-                pPct = 0.25; cPct = 0.05; fPct = 0.70;
-                break;
-            case 'high-carb':
-                pPct = 0.20; cPct = 0.60; fPct = 0.20;
-                break;
-        }
-
-        // Child logic override for protein (approx 1g/kg)
-        let protein: number;
-        if (age < 14) {
-            protein = weight * 1.0;
-            const remainingCals = tdee - (protein * 4);
-            // Distribute remaining cals based on strategy ratios
-            const macroRatioSum = cPct + fPct;
-            const adjustedCPct = cPct / macroRatioSum;
-            const adjustedFPct = fPct / macroRatioSum;
-            return {
-                energy: tdee,
-                protein,
-                carbs: (remainingCals * adjustedCPct) / 4,
-                fat: (remainingCals * adjustedFPct) / 9
-            };
-        }
-
-        return {
-            energy: tdee,
-            protein: (tdee * pPct) / 4,
-            carbs: (tdee * cPct) / 4,
-            fat: (tdee * fPct) / 9
-        };
-    };
-
-    const dailyTargets = calculateDailyTargets();
+    const dailyTargets = calculateIndividualTargets({
+        weight: Number(profile.weight) || 70,
+        height: Number(profile.height) || 170,
+        age: Number(profile.age) || 30,
+        gender: profile.gender || 'female',
+        activityLevel: profile.activityLevel,
+        goal: profile.goal,
+        nutrientStrategy: profile.nutrientStrategy
+    });
 
     return (
         <UserPreferencesContext.Provider value={{

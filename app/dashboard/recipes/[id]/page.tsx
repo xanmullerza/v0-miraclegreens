@@ -38,7 +38,7 @@ import {
     GripVertical
 } from 'lucide-react';
 import FoodItemPicker from '@/components/recipe/food-item-picker';
-import { calculateRecipeNutrition, CalculatedNutrition, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
+import { calculateRecipeNutrition, calculateIndividualTargets, CalculatedNutrition, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -114,6 +114,67 @@ export default function RecipeDetailsPage() {
     const [calculatedTotals, setCalculatedTotals] = useState<CalculatedNutrition | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
     const { profile, nutrientDisplayMode, energyUnit, dailyTargets } = useUserPreferences();
+
+    // SMART PORTION CONTROL STATE
+    const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>([]);
+
+    useEffect(() => {
+        // Default to selecting the current user on load
+        setSelectedMemberIds(['main-user']);
+    }, []);
+
+    const allPeople = React.useMemo(() => {
+        const mainUserAsMember = {
+            id: 'main-user',
+            name: profile.name || 'Me',
+            gender: profile.gender || 'female',
+            age: Number(profile.age) || 30,
+            weight: Number(profile.weight) || 70,
+            height: Number(profile.height) || 170,
+            activityLevel: profile.activityLevel || 'sedentary',
+            goal: profile.goal || 'maintain',
+            nutrientStrategy: profile.nutrientStrategy || 'balanced'
+        };
+        // Map family members to valid structure if needed
+        return [mainUserAsMember, ...(profile.familyMembers || [])];
+    }, [profile]);
+
+    const calculations = React.useMemo(() => {
+        if (selectedMemberIds.length === 0) return { totalServings: 1, maxTDEE: 2000, memberPortions: {} as Record<string, number>, currentSinglePortionCalories: 2000 };
+
+        const selectedPeople = allPeople.filter(p => selectedMemberIds.includes(p.id));
+
+        // Calculate TDEE for each selected person
+        const tdees = selectedPeople.map(p => ({
+            id: p.id,
+            tdee: calculateIndividualTargets(p as any).energy
+        }));
+
+        const maxTDEE = Math.max(...tdees.map(t => t.tdee));
+
+        // Calculate portion ratio relative to max TDEE
+        const memberPortions: Record<string, number> = {};
+        tdees.forEach(t => {
+            memberPortions[t.id] = t.tdee / maxTDEE;
+        });
+
+        const totalServings = Object.values(memberPortions).reduce((sum, val) => sum + val, 0);
+
+        return { totalServings, maxTDEE, memberPortions };
+    }, [selectedMemberIds, allPeople]);
+
+    // Derived Scaling Factor
+    const currentScalingFactor = React.useMemo(() => {
+        if (!recipe?.servings || calculations.totalServings === 0) return 1;
+        // Logic: 
+        // We need 'calculations.totalServings' number of "Big Servings".
+        // The original recipe creates 'recipe.servings' number of "Original Servings".
+        // Crucial Assumption: 1 "Big Serving" calculated here ~= 1 "Original Serving" if the original recipe is a standard meal.
+        // If the recipe is small (e.g. cookies), this logic holds: I need 1.5 cookies.
+        // If the recipe is a full meal (2000kcal), I need 1.5 full meals.
+        // So:
+        return calculations.totalServings / recipe.servings;
+    }, [calculations.totalServings, recipe?.servings]);
 
     useEffect(() => {
         const getUser = async () => {
@@ -688,18 +749,86 @@ export default function RecipeDetailsPage() {
 
                     {/* Column 3: Smart Portion Control */}
                     <Card className="p-6 flex flex-col h-full bg-white dark:bg-slate-900 border-emerald-500/10 dark:border-emerald-500/20">
-                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-5 flex items-center gap-2">
-                            <Scale size={14} className="text-emerald-500" />
-                            Smart Portion Control
-                        </h3>
-                        <div className="flex-1 flex flex-col justify-center items-center gap-4 opacity-50">
-                            {/* Placeholder for Smart Portion Control UI */}
-                            <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                                <Users size={20} className="text-slate-400" />
+                        <div className="flex items-center justify-between mb-5">
+                            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                                <Scale size={14} className="text-emerald-500" />
+                                Smart Portion Control
+                            </h3>
+                            {currentScalingFactor !== 1 && (
+                                <Badge variant="outline" className="border-emerald-500 text-emerald-500 text-[9px] font-black uppercase tracking-widest">
+                                    {(currentScalingFactor * 100).toFixed(0)}% Scale
+                                </Badge>
+                            )}
+                        </div>
+
+                        <div className="flex-1 flex flex-col gap-4">
+                            <div className="space-y-2 max-h-[140px] overflow-y-auto custom-scrollbar pr-2">
+                                {allPeople.map(person => {
+                                    const isSelected = selectedMemberIds.includes(person.id);
+                                    const portions = calculations.memberPortions[person.id] || 0;
+
+                                    return (
+                                        <div
+                                            key={person.id}
+                                            onClick={() => {
+                                                if (isSelected) {
+                                                    setSelectedMemberIds(prev => prev.filter(id => id !== person.id));
+                                                } else {
+                                                    setSelectedMemberIds(prev => [...prev, person.id]);
+                                                }
+                                            }}
+                                            className={cn(
+                                                "p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between group",
+                                                isSelected
+                                                    ? "bg-emerald-50/50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30"
+                                                    : "bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-emerald-200"
+                                            )}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <div className={cn(
+                                                    "w-4 h-4 rounded-md flex items-center justify-center border transition-colors",
+                                                    isSelected
+                                                        ? "bg-emerald-500 border-emerald-500"
+                                                        : "border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800"
+                                                )}>
+                                                    {isSelected && <CheckCircle2 size={10} className="text-white" />}
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className={cn(
+                                                        "text-xs font-bold leading-none mb-0.5",
+                                                        isSelected ? "text-slate-900 dark:text-white" : "text-slate-400"
+                                                    )}>{person.name || person.nickname || 'User'}</span>
+                                                    <span className="text-[9px] text-slate-400 font-medium">{person.age} yrs • {person.goal}</span>
+                                                </div>
+                                            </div>
+
+                                            {isSelected && (
+                                                <div className="text-right">
+                                                    <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 block">{portions.toFixed(2)}x</span>
+                                                </div>
+                                            )}
+
+                                            {!isSelected && (
+                                                <div className="text-right opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <Plus size={14} className="text-emerald-500" />
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
-                            <p className="text-[10px] uppercase font-bold text-slate-400 text-center max-w-[150px]">
-                                Use controls to adjust recipe Yield
-                            </p>
+
+                            <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800">
+                                <div className="flex justify-between items-end mb-1">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Yield</span>
+                                    <span className="text-2xl font-black text-slate-900 dark:text-white leading-none">
+                                        {calculations.totalServings.toFixed(1)} <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Servings</span>
+                                    </span>
+                                </div>
+                                <p className="text-[9px] text-slate-400 leading-relaxed text-right">
+                                    Based on largest eater's requirements ({calculations.maxTDEE.toFixed(0)} {energyUnit})
+                                </p>
+                            </div>
                         </div>
                     </Card>
                 </div>
@@ -893,14 +1022,19 @@ export default function RecipeDetailsPage() {
                                                     </select>
                                                 </div>
                                             ) : (
-                                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">{ing.amount}</p>
+                                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">
+                                                    {/* Smart Portion Scaling Display */}
+                                                    {ing.quantity && ing.measure_label
+                                                        ? `${(ing.quantity * currentScalingFactor).toLocaleString(undefined, { maximumFractionDigits: 1 })} ${ing.measure_label}`
+                                                        : (ing.amount ? `${ing.amount} (Approx.)` : '')}
+                                                </p>
                                             )}
                                         </div>
                                         <div className="text-right shrink-0 pt-0.5">
                                             <p className={cn(
                                                 "text-[10px] font-black transition-colors",
                                                 hiddenIngredientIds.includes(ing.id) ? "text-slate-300" : "text-slate-400"
-                                            )}>{Math.round(ing.weight_g)}g</p>
+                                            )}>{Math.round((ing.weight_g || 0) * currentScalingFactor)}g</p>
                                         </div>
                                     </div>
                                 ))}
