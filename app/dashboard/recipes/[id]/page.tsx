@@ -686,46 +686,20 @@ export default function RecipeDetailsPage() {
                         })}
                     </div>
 
-                    {/* Column 3: Dietary Advisory */}
+                    {/* Column 3: Smart Portion Control */}
                     <Card className="p-6 flex flex-col h-full bg-white dark:bg-slate-900 border-emerald-500/10 dark:border-emerald-500/20">
                         <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-5 flex items-center gap-2">
-                            <Activity size={14} className="text-amber-500" />
-                            Clinical Dietary Advisory
+                            <Scale size={14} className="text-emerald-500" />
+                            Smart Portion Control
                         </h3>
-                        <div className="flex-1 space-y-4">
-                            {dietaryConflicts.length > 0 ? (
-                                <div className="p-5 rounded-[2rem] bg-amber-500/5 border border-amber-500/10 flex flex-col gap-3 shadow-inner shadow-amber-500/5">
-                                    <div className="flex items-center gap-2">
-                                        <div className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">Allergen/Exclusion Alert</p>
-                                    </div>
-                                    <p className="text-xs text-amber-500/80 leading-relaxed font-bold">
-                                        This laboratory sample contains ingredients flagged in your medical profile:
-                                        <span className="block mt-2 text-slate-900 dark:text-white uppercase tracking-tight text-sm font-black italic">
-                                            {dietaryConflicts.map(c => c.exclusion).join(', ')}
-                                        </span>
-                                    </p>
-                                </div>
-                            ) : (
-                                <div className="p-5 rounded-[2rem] bg-emerald-500/5 border border-emerald-500/10 flex flex-col gap-3 shadow-inner shadow-emerald-500/5">
-                                    <div className="flex items-center gap-2">
-                                        <div className="h-2 w-2 rounded-full bg-emerald-500" />
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Dietary Integrity</p>
-                                    </div>
-                                    <p className="text-sm text-emerald-500/80 leading-relaxed font-bold italic">
-                                        "This recipe aligns with all active clinical exclusions in your profile. No matches for your prohibited items were detected in our ingredient analysis."
-                                    </p>
-                                </div>
-                            )}
-                            <div className="p-5 rounded-[2rem] bg-slate-50 dark:bg-slate-950/50 border border-slate-100 dark:border-slate-800">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <div className="h-1.5 w-1.5 rounded-full bg-slate-400" />
-                                    <p className="text-[8px] font-black uppercase tracking-widest text-slate-400">Sample Reference</p>
-                                </div>
-                                <p className="text-[11px] text-slate-500 leading-tight font-medium">
-                                    Clinical nutrient values are calculated based on a single sample of <span className="font-bold text-emerald-500 dark:text-emerald-400 underline decoration-dotted">1P</span>.
-                                </p>
+                        <div className="flex-1 flex flex-col justify-center items-center gap-4 opacity-50">
+                            {/* Placeholder for Smart Portion Control UI */}
+                            <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                                <Users size={20} className="text-slate-400" />
                             </div>
+                            <p className="text-[10px] uppercase font-bold text-slate-400 text-center max-w-[150px]">
+                                Use controls to adjust recipe Yield
+                            </p>
                         </div>
                     </Card>
                 </div>
