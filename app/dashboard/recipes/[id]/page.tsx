@@ -30,7 +30,11 @@ import {
     ArrowUpDown,
     ArrowUp,
     ArrowDown,
-    RotateCcw
+    RotateCcw,
+    Diff,
+    Plus,
+    Minus,
+    Trash2
 } from 'lucide-react';
 import { calculateRecipeNutrition, CalculatedNutrition, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -88,7 +92,8 @@ export default function RecipeDetailsPage() {
     const [originalIngredients, setOriginalIngredients] = useState<Ingredient[]>([]); // To support reset
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
     const [hiddenIngredientIds, setHiddenIngredientIds] = useState<string[]>([]);
-    const [isReordering, setIsReordering] = useState(false); // Local reordering state
+    const [isReordering, setIsReordering] = useState(false);
+    const [isEditingIngredients, setIsEditingIngredients] = useState(false); // New: Add/Remove mode
     const [instructions, setInstructions] = useState<Instruction[]>([]);
     const [loading, setLoading] = useState(true);
     const [showDetailedNutrients, setShowDetailedNutrients] = useState(true);
@@ -300,29 +305,44 @@ export default function RecipeDetailsPage() {
         );
     };
 
-    // Load saved order when user ID and ingredients are available
+    // Load saved order AND list when user ID is available
     useEffect(() => {
         if (currentUserId && originalIngredients.length > 0) {
-            const savedOrder = localStorage.getItem(`recipe_order_${currentUserId}_${id}`);
-            if (savedOrder) {
+            const savedData = localStorage.getItem(`recipe_customization_${currentUserId}_${id}`);
+            if (savedData) {
                 try {
-                    const orderIds = JSON.parse(savedOrder);
-                    const sorted = [...originalIngredients].sort((a, b) => {
-                        const idxA = orderIds.indexOf(a.id);
-                        const idxB = orderIds.indexOf(b.id);
-                        // If both are in the list, sort by index. If one is missing (new), put it at the end.
-                        if (idxA === -1 && idxB === -1) return 0;
-                        if (idxA === -1) return 1;
-                        if (idxB === -1) return -1;
-                        return idxA - idxB;
+                    const savedIngredients = JSON.parse(savedData);
+                    // We trust the saved list. It contains the full ingredient objects for added items,
+                    // and maintains the order / removals of the original items.
+                    // However, we should try to refresh the data of original items from DB to get latest info (like images)
+                    // For now, simpler approach: Use the saved list's IDs to map back to originalIngredients where possible.
+
+                    const mergedIngredients = savedIngredients.map((savedIng: Ingredient) => {
+                        const original = originalIngredients.find(o => o.id === savedIng.id);
+                        return original ? { ...original, ...savedIng } : savedIng;
                     });
-                    setIngredients(sorted);
+
+                    setIngredients(mergedIngredients);
                 } catch (e) {
-                    console.error("Failed to parse saved ingredient order", e);
+                    console.error("Failed to parse saved ingredient customization", e);
+                    // Fallback to original ingredients if parsing fails
+                    setIngredients(originalIngredients);
                 }
+            } else {
+                // If no saved customization, use the original fetched ingredients
+                setIngredients(originalIngredients);
             }
+        } else if (originalIngredients.length > 0 && !currentUserId) {
+            // If no user logged in, just use original ingredients
+            setIngredients(originalIngredients);
         }
     }, [currentUserId, originalIngredients, id]);
+
+    const saveCustomization = (newIngs: Ingredient[]) => {
+        if (currentUserId) {
+            localStorage.setItem(`recipe_customization_${currentUserId}_${id}`, JSON.stringify(newIngs));
+        }
+    };
 
     const moveIngredient = (index: number, direction: 'up' | 'down', e: React.MouseEvent) => {
         e.stopPropagation();
@@ -333,20 +353,44 @@ export default function RecipeDetailsPage() {
         [newIngredients[index], newIngredients[swapIndex]] = [newIngredients[swapIndex], newIngredients[index]];
 
         setIngredients(newIngredients);
+        saveCustomization(newIngredients);
+    };
 
-        // Save new order
-        if (currentUserId) {
-            const orderIds = newIngredients.map(ing => ing.id);
-            localStorage.setItem(`recipe_order_${currentUserId}_${id}`, JSON.stringify(orderIds));
-        }
+    const removeIngredient = (index: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        const newIngredients = ingredients.filter((_, i) => i !== index);
+        setIngredients(newIngredients);
+        saveCustomization(newIngredients);
+        toast.success("Ingredient removed (local view only)");
+    };
+
+    // Placeholder for Add - requires complex picker. For now, just a toast or simple mock.
+    const addIngredientMock = () => {
+        toast.info("Ingredient browser coming soon! (Mock added)");
+        // Mock add
+        /* 
+        const newIng: Ingredient = {
+            id: crypto.randomUUID(),
+            item: "New Ingredient",
+            amount: "1 serving",
+            base_ingredient: "Placeholder",
+            weight_g: 100
+        };
+        const newIngredients = [...ingredients, newIng];
+        setIngredients(newIngredients);
+        saveCustomization(newIngredients);
+        */
     };
 
     const resetOrder = (e: React.MouseEvent) => {
         e.stopPropagation();
         setIngredients(originalIngredients);
+        setHiddenIngredientIds([]);
         if (currentUserId) {
+            localStorage.removeItem(`recipe_customization_${currentUserId}_${id}`);
+            // Legacy cleanup
             localStorage.removeItem(`recipe_order_${currentUserId}_${id}`);
-            toast.info("Ingredient order reset");
+            toast.info("Recipe restored to original state");
         }
     };
 
@@ -555,81 +599,93 @@ export default function RecipeDetailsPage() {
                     <div className="lg:col-span-1 space-y-6">
                         {/* Lab Ingredients */}
                         <Card className="p-6">
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="mb-6 space-y-4">
                                 <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3 italic">
                                     <ShoppingBasket size={24} className="text-emerald-500" />
                                     Lab Ingredients
                                 </h3>
-                                <div className="flex gap-2">
-                                    {isReordering && (
-                                        <button
-                                            onClick={resetOrder}
-                                            className="p-2 rounded-xl bg-slate-50 dark:bg-slate-900 text-slate-400 border border-slate-100 dark:border-slate-800 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all"
-                                            title="Reset Order"
-                                        >
-                                            <RotateCcw size={18} />
-                                        </button>
-                                    )}
+
+                                {/* Control Block */}
+                                <div className="p-2 gap-2 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-wrap items-center">
+                                    {/* Edit Mode Toggle */}
                                     <button
-                                        onClick={() => setIsReordering(!isReordering)}
+                                        onClick={() => { setIsEditingIngredients(!isEditingIngredients); setIsReordering(false); }}
                                         className={cn(
-                                            "p-2 rounded-xl transition-all border",
+                                            "flex items-center gap-2 px-4 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center",
+                                            isEditingIngredients
+                                                ? "bg-rose-50 dark:bg-rose-500/10 text-rose-500 border-rose-200 dark:border-rose-500/20"
+                                                : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 hover:text-emerald-500 hover:border-emerald-200"
+                                        )}
+                                    >
+                                        <Diff size={14} /> Add/Remove
+                                    </button>
+
+                                    {/* Reorder Toggle */}
+                                    <button
+                                        onClick={() => { setIsReordering(!isReordering); setIsEditingIngredients(false); }}
+                                        className={cn(
+                                            "flex items-center gap-2 px-4 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center",
                                             isReordering
                                                 ? "bg-amber-50 dark:bg-amber-500/10 text-amber-500 border-amber-200 dark:border-amber-500/20"
-                                                : "bg-slate-50 dark:bg-slate-900 text-slate-400 border-slate-100 dark:border-slate-800 hover:text-emerald-500"
+                                                : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 hover:text-emerald-500 hover:border-emerald-200"
                                         )}
-                                        title="Rearrange Order"
                                     >
-                                        <ArrowUpDown size={18} />
+                                        <ArrowUpDown size={14} /> Rearrange
                                     </button>
+
+                                    {/* Reset */}
+                                    {(isReordering || isEditingIngredients || ingredients.length !== originalIngredients.length || JSON.stringify(ingredients) !== JSON.stringify(originalIngredients)) && (
+                                        <button
+                                            onClick={resetOrder}
+                                            className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-rose-500 transition-all border border-slate-200 dark:border-slate-700"
+                                            title="Reset to Default"
+                                        >
+                                            <RotateCcw size={14} />
+                                        </button>
+                                    )}
                                 </div>
                             </div>
+
                             <div className="space-y-2">
                                 {ingredients.map((ing: any, i) => (
                                     <div
                                         key={ing.id || i}
-                                        onClick={() => !isReordering && !hiddenIngredientIds.includes(ing.id) && ing.food_item_id && router.push(`/dashboard/foods/${ing.food_item_id}`)}
+                                        onClick={() => !isReordering && !isEditingIngredients && !hiddenIngredientIds.includes(ing.id) && ing.food_item_id && router.push(`/dashboard/foods/${ing.food_item_id}`)}
                                         className={cn(
                                             "flex items-center gap-4 p-4 rounded-2xl border transition-all group relative overflow-hidden",
                                             hiddenIngredientIds.includes(ing.id)
                                                 ? "bg-slate-50 dark:bg-slate-900 border-dashed border-slate-200 dark:border-slate-800 opacity-60"
                                                 : "bg-white dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 hover:border-emerald-500/20",
-                                            ing.food_item_id && !hiddenIngredientIds.includes(ing.id) && !isReordering ? "cursor-pointer" : ""
+                                            ing.food_item_id && !hiddenIngredientIds.includes(ing.id) && !isReordering && !isEditingIngredients ? "cursor-pointer" : ""
                                         )}
                                     >
-                                        {/* Reorder Controls */}
-                                        {isReordering ? (
-                                            <div className="flex flex-col gap-1 pr-2 border-r border-slate-100 dark:border-slate-800 mr-2">
+                                        {/* Action Buttons: Reorder OR Remove OR Toggle */}
+                                        <div className="shrink-0 z-10">
+                                            {isReordering ? (
+                                                <div className="flex flex-col gap-1">
+                                                    <button onClick={(e) => moveIngredient(i, 'up', e)} disabled={i === 0} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 disabled:opacity-20"><ArrowUp size={14} /></button>
+                                                    <button onClick={(e) => moveIngredient(i, 'down', e)} disabled={i === ingredients.length - 1} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 disabled:opacity-20"><ArrowDown size={14} /></button>
+                                                </div>
+                                            ) : isEditingIngredients ? (
                                                 <button
-                                                    onClick={(e) => moveIngredient(i, 'up', e)}
-                                                    disabled={i === 0}
-                                                    className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 disabled:opacity-20"
+                                                    onClick={(e) => removeIngredient(i, e)}
+                                                    className="p-2 rounded-full bg-rose-50 dark:bg-rose-900/10 text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/30 transition-all"
+                                                    title="Remove Ingredient"
                                                 >
-                                                    <ArrowUp size={14} />
+                                                    <Minus size={16} />
                                                 </button>
+                                            ) : (
                                                 <button
-                                                    onClick={(e) => moveIngredient(i, 'down', e)}
-                                                    disabled={i === ingredients.length - 1}
-                                                    className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 disabled:opacity-20"
+                                                    onClick={(e) => toggleIngredient(ing.id, e)}
+                                                    className={cn(
+                                                        "p-2 rounded-full transition-all",
+                                                        hiddenIngredientIds.includes(ing.id) ? "bg-slate-200 dark:bg-slate-800 text-slate-400" : "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 hover:bg-emerald-100"
+                                                    )}
                                                 >
-                                                    <ArrowDown size={14} />
+                                                    {hiddenIngredientIds.includes(ing.id) ? <EyeOff size={16} /> : <Eye size={16} />}
                                                 </button>
-                                            </div>
-                                        ) : (
-                                            /* Toggle Button */
-                                            <button
-                                                onClick={(e) => toggleIngredient(ing.id, e)}
-                                                className={cn(
-                                                    "p-2 rounded-full transition-all shrink-0 z-10",
-                                                    hiddenIngredientIds.includes(ing.id)
-                                                        ? "bg-slate-200 dark:bg-slate-800 text-slate-400 hover:text-slate-600"
-                                                        : "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 hover:bg-emerald-100 dark:hover:bg-emerald-500/20"
-                                                )}
-                                                title={hiddenIngredientIds.includes(ing.id) ? "Enable Ingredient" : "Disable Ingredient"}
-                                            >
-                                                {hiddenIngredientIds.includes(ing.id) ? <EyeOff size={16} /> : <Eye size={16} />}
-                                            </button>
-                                        )}
+                                            )}
+                                        </div>
 
                                         <div className={cn(
                                             "w-12 h-12 rounded-2xl border flex items-center justify-center overflow-hidden shrink-0 transition-all duration-300",
@@ -658,6 +714,17 @@ export default function RecipeDetailsPage() {
                                         </div>
                                     </div>
                                 ))}
+
+                                {/* Add Button (Only in Edit Mode) */}
+                                {isEditingIngredients && (
+                                    <button
+                                        onClick={addIngredientMock}
+                                        className="w-full py-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-center gap-2 text-slate-400 hover:text-emerald-500 hover:border-emerald-200/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/5 transition-all group"
+                                    >
+                                        <Plus size={20} className="group-hover:scale-110 transition-transform" />
+                                        <span className="text-xs font-black uppercase tracking-widest">Add Ingredient</span>
+                                    </button>
+                                )}
                             </div>
                         </Card>
 
