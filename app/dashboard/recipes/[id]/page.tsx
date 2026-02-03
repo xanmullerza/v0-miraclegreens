@@ -100,7 +100,8 @@ export default function RecipeDetailsPage() {
     const [hiddenIngredientIds, setHiddenIngredientIds] = useState<string[]>([]);
     const [isReordering, setIsReordering] = useState(false);
     const [isEditingIngredients, setIsEditingIngredients] = useState(false); // Add/Remove mode
-    const [isEditingMeasures, setIsEditingMeasures] = useState(false); // New: Edit Measures mode
+    const [isEditingMeasures, setIsEditingMeasures] = useState(false); // Edit Measures mode
+    const [isToggling, setIsToggling] = useState(true); // Default mode: Visibility
     const [showPicker, setShowPicker] = useState(false);
     const [instructions, setInstructions] = useState<Instruction[]>([]);
     const [loading, setLoading] = useState(true);
@@ -511,13 +512,15 @@ export default function RecipeDetailsPage() {
 
     const resetOrder = (e: React.MouseEvent) => {
         e.stopPropagation();
-        setIngredients(originalIngredients);
-        setHiddenIngredientIds([]);
-        if (currentUserId) {
-            localStorage.removeItem(`recipe_customization_${currentUserId}_${id}`);
-            // Legacy cleanup
-            localStorage.removeItem(`recipe_order_${currentUserId}_${id}`);
-            toast.info("Recipe restored to original state");
+        if (window.confirm("Are you sure? This will reset the recipe to its default state. All your customizations (added items, quantity changes, etc.) will be lost.")) {
+            setIngredients(originalIngredients);
+            setHiddenIngredientIds([]);
+            if (currentUserId) {
+                localStorage.removeItem(`recipe_customization_${currentUserId}_${id}`);
+                // Legacy cleanup
+                localStorage.removeItem(`recipe_order_${currentUserId}_${id}`);
+                toast.info("Recipe restored to original state");
+            }
         }
     };
 
@@ -731,15 +734,45 @@ export default function RecipeDetailsPage() {
                                     <ShoppingBasket size={24} className="text-emerald-500" />
                                     Lab Ingredients
                                 </h3>
+                                {/* Reset Button Moved Here */}
+                                {(ingredients.length !== originalIngredients.length || JSON.stringify(ingredients) !== JSON.stringify(originalIngredients) || hiddenIngredientIds.length > 0) && (
+                                    <button
+                                        onClick={resetOrder}
+                                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all border border-slate-200 dark:border-slate-700 text-[10px] font-black uppercase tracking-widest"
+                                        title="Reset to Default"
+                                    >
+                                        <RotateCcw size={12} /> Reset
+                                    </button>
+                                )}
 
                                 {/* Control Block */}
                                 <div className="p-2 gap-2 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-wrap items-center">
+
+                                    {/* Show/Hide Toggle */}
+                                    <button
+                                        onClick={() => {
+                                            setIsToggling(!isToggling);
+                                            setIsEditingIngredients(false);
+                                            setIsReordering(false);
+                                            setIsEditingMeasures(false);
+                                        }}
+                                        className={cn(
+                                            "flex items-center gap-2 px-3 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center whitespace-nowrap",
+                                            isToggling
+                                                ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 border-emerald-200 dark:border-emerald-500/20"
+                                                : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 hover:text-emerald-500 hover:border-emerald-200"
+                                        )}
+                                    >
+                                        <Eye size={14} /> Show/Hide
+                                    </button>
+
                                     {/* Edit Mode Toggle */}
                                     <button
                                         onClick={() => {
                                             setIsEditingIngredients(!isEditingIngredients);
                                             setIsReordering(false);
                                             setIsEditingMeasures(false);
+                                            setIsToggling(false);
                                         }}
                                         className={cn(
                                             "flex items-center gap-2 px-3 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center whitespace-nowrap",
@@ -757,6 +790,7 @@ export default function RecipeDetailsPage() {
                                             setIsEditingMeasures(!isEditingMeasures);
                                             setIsReordering(false);
                                             setIsEditingIngredients(false);
+                                            setIsToggling(false);
                                         }}
                                         className={cn(
                                             "flex items-center gap-2 px-3 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center whitespace-nowrap",
@@ -774,6 +808,7 @@ export default function RecipeDetailsPage() {
                                             setIsReordering(!isReordering);
                                             setIsEditingIngredients(false);
                                             setIsEditingMeasures(false);
+                                            setIsToggling(false);
                                         }}
                                         className={cn(
                                             "flex items-center gap-2 px-3 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center whitespace-nowrap",
@@ -784,17 +819,6 @@ export default function RecipeDetailsPage() {
                                     >
                                         <ArrowUpDown size={14} /> Sort
                                     </button>
-
-                                    {/* Reset */}
-                                    {(isReordering || isEditingIngredients || isEditingMeasures || ingredients.length !== originalIngredients.length || JSON.stringify(ingredients) !== JSON.stringify(originalIngredients)) && (
-                                        <button
-                                            onClick={resetOrder}
-                                            className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-rose-500 transition-all border border-slate-200 dark:border-slate-700"
-                                            title="Reset to Default"
-                                        >
-                                            <RotateCcw size={14} />
-                                        </button>
-                                    )}
                                 </div>
                             </div>
 
@@ -802,13 +826,13 @@ export default function RecipeDetailsPage() {
                                 {ingredients.map((ing: any, i) => (
                                     <div
                                         key={ing.id || i}
-                                        onClick={() => !isReordering && !isEditingIngredients && !isEditingMeasures && !hiddenIngredientIds.includes(ing.id) && ing.food_item_id && router.push(`/dashboard/foods/${ing.food_item_id}`)}
+                                        onClick={() => !isReordering && !isEditingIngredients && !isEditingMeasures && !isToggling && !hiddenIngredientIds.includes(ing.id) && ing.food_item_id && router.push(`/dashboard/foods/${ing.food_item_id}`)}
                                         className={cn(
                                             "flex items-center gap-4 p-4 rounded-2xl border transition-all group relative overflow-hidden",
                                             hiddenIngredientIds.includes(ing.id)
                                                 ? "bg-slate-50 dark:bg-slate-900 border-dashed border-slate-200 dark:border-slate-800 opacity-60"
                                                 : "bg-white dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 hover:border-emerald-500/20",
-                                            ing.food_item_id && !hiddenIngredientIds.includes(ing.id) && !isReordering && !isEditingIngredients && !isEditingMeasures ? "cursor-pointer" : ""
+                                            ing.food_item_id && !hiddenIngredientIds.includes(ing.id) && !isReordering && !isEditingIngredients && !isEditingMeasures && !isToggling ? "cursor-pointer" : ""
                                         )}
                                     >
                                         {/* Action Buttons: Reorder OR Remove OR Toggle */}
@@ -826,7 +850,7 @@ export default function RecipeDetailsPage() {
                                                 >
                                                     <Minus size={16} />
                                                 </button>
-                                            ) : (
+                                            ) : isToggling ? (
                                                 <button
                                                     onClick={(e) => toggleIngredient(ing.id, e)}
                                                     className={cn(
@@ -836,6 +860,10 @@ export default function RecipeDetailsPage() {
                                                 >
                                                     {hiddenIngredientIds.includes(ing.id) ? <EyeOff size={16} /> : <Eye size={16} />}
                                                 </button>
+                                            ) : (
+                                                <div className="w-8 flex justify-center">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800" />
+                                                </div>
                                             )}
                                         </div>
 
