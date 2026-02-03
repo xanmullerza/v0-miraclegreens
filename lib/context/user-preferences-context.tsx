@@ -1,9 +1,6 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useState } from "react";
-
-export type EnergyUnit = "kcal" | "kJ";
-export type MeasurementUnit = "metric" | "imperial";
 import { calculateIndividualTargets, GoalType, ActivityLevel, NutrientStrategy } from "@/lib/utils/nutrition-calculator";
 
 export type EnergyUnit = "kcal" | "kJ";
