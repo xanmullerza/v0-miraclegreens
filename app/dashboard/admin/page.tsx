@@ -11,7 +11,9 @@ import {
     ShieldCheck,
     User,
     Edit3,
-    FileText
+    FileText,
+    Zap,
+    Scale
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -70,6 +72,22 @@ export default function AdminOverview() {
             icon: User,
             color: 'text-purple-500',
             bg: 'bg-purple-500/10'
+        },
+        {
+            name: 'View Nutrients',
+            desc: 'Deep-dive into biological markers.',
+            href: '/dashboard/nutrients',
+            icon: Zap,
+            color: 'text-amber-500',
+            bg: 'bg-amber-500/10'
+        },
+        {
+            name: 'Compare Foods',
+            desc: 'Analyze and compare profiles.',
+            href: '/dashboard/comparefoods',
+            icon: Scale,
+            color: 'text-orange-500',
+            bg: 'bg-orange-500/10'
         }
     ];
 

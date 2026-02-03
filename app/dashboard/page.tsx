@@ -58,14 +58,6 @@ export default function DashboardOverview() {
 
     const tools = [
         {
-            name: 'View Nutrients',
-            desc: 'Deep-dive into the biological markers that fuel human performance.',
-            href: '/dashboard/nutrients',
-            icon: Zap,
-            color: 'text-amber-500',
-            bg: 'bg-amber-500/10'
-        },
-        {
             name: 'Explore Foods',
             desc: 'Explore the global database of nutritional data.',
             href: '/dashboard/foods',
@@ -80,14 +72,6 @@ export default function DashboardOverview() {
             icon: ChefHat,
             color: 'text-blue-500',
             bg: 'bg-blue-500/10'
-        },
-        {
-            name: 'Compare Foods',
-            desc: 'Analyze and compare nutritional profiles side-by-side.',
-            href: '/dashboard/comparefoods',
-            icon: Scale,
-            color: 'text-orange-500',
-            bg: 'bg-orange-500/10'
         },
         {
             name: 'Plan Your Meals',
