@@ -759,7 +759,7 @@ export default function RecipeDetailsPage() {
                             <div className="mb-6 space-y-4">
                                 <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3 italic">
                                     <ShoppingBasket size={24} className="text-emerald-500" />
-                                    Lab Ingredients
+                                    Ingredients
                                 </h3>
 
 
@@ -987,11 +987,16 @@ export default function RecipeDetailsPage() {
                             />
                         )}
 
-                        {/* Procedure */}
+
+                    </div>
+
+                    {/* Right Column: Nutrient Report */}
+                    <div className="lg:col-span-2 space-y-8">
+                        {/* Directions (Moved from Left Column) */}
                         <Card className="p-6">
                             <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3 italic text-amber-500 mb-6">
                                 <ChefHat size={24} />
-                                Procedure
+                                Directions
                             </h3>
                             <div className="space-y-6 relative before:absolute before:inset-y-0 before:left-5 before:w-px before:bg-slate-100 dark:before:bg-slate-800 pl-2">
                                 {instructions.map((ins, i) => (
@@ -1006,10 +1011,6 @@ export default function RecipeDetailsPage() {
                                 ))}
                             </div>
                         </Card>
-                    </div>
-
-                    {/* Right Column: Nutrient Report */}
-                    <div className="lg:col-span-2 space-y-8">
 
 
                         {showDetailedNutrients && recipe && (
