@@ -26,7 +26,10 @@ import {
     ChevronDown,
     Pencil,
     Eye,
-    EyeOff
+    EyeOff,
+    ArrowUpDown,
+    ArrowUp,
+    ArrowDown
 } from 'lucide-react';
 import { calculateRecipeNutrition, CalculatedNutrition, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -81,7 +84,8 @@ export default function RecipeDetailsPage() {
     const { id } = useParams();
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-    const [hiddenIngredientIds, setHiddenIngredientIds] = useState<string[]>([]); // New State
+    const [hiddenIngredientIds, setHiddenIngredientIds] = useState<string[]>([]);
+    const [isReordering, setIsReordering] = useState(false); // Local reordering state
     const [instructions, setInstructions] = useState<Instruction[]>([]);
     const [loading, setLoading] = useState(true);
     const [showDetailedNutrients, setShowDetailedNutrients] = useState(true);
@@ -291,6 +295,16 @@ export default function RecipeDetailsPage() {
         );
     };
 
+    const moveIngredient = (index: number, direction: 'up' | 'down', e: React.MouseEvent) => {
+        e.stopPropagation();
+        if ((direction === 'up' && index === 0) || (direction === 'down' && index === ingredients.length - 1)) return;
+
+        const newIngredients = [...ingredients];
+        const swapIndex = direction === 'up' ? index - 1 : index + 1;
+        [newIngredients[index], newIngredients[swapIndex]] = [newIngredients[swapIndex], newIngredients[index]];
+        setIngredients(newIngredients);
+    };
+
     const toggleFavorite = async () => {
         if (!recipe) return;
         const newStatus = !recipe.is_favorite;
@@ -496,36 +510,70 @@ export default function RecipeDetailsPage() {
                     <div className="lg:col-span-1 space-y-6">
                         {/* Lab Ingredients */}
                         <Card className="p-6">
-                            <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3 italic mb-6">
-                                <ShoppingBasket size={24} className="text-emerald-500" />
-                                Lab Ingredients
-                            </h3>
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3 italic">
+                                    <ShoppingBasket size={24} className="text-emerald-500" />
+                                    Lab Ingredients
+                                </h3>
+                                <button
+                                    onClick={() => setIsReordering(!isReordering)}
+                                    className={cn(
+                                        "p-2 rounded-xl transition-all border",
+                                        isReordering
+                                            ? "bg-amber-50 dark:bg-amber-500/10 text-amber-500 border-amber-200 dark:border-amber-500/20"
+                                            : "bg-slate-50 dark:bg-slate-900 text-slate-400 border-slate-100 dark:border-slate-800 hover:text-emerald-500"
+                                    )}
+                                    title="Rearrange Order"
+                                >
+                                    <ArrowUpDown size={18} />
+                                </button>
+                            </div>
                             <div className="space-y-2">
                                 {ingredients.map((ing: any, i) => (
                                     <div
                                         key={ing.id || i}
-                                        onClick={() => !hiddenIngredientIds.includes(ing.id) && ing.food_item_id && router.push(`/dashboard/foods/${ing.food_item_id}`)}
+                                        onClick={() => !isReordering && !hiddenIngredientIds.includes(ing.id) && ing.food_item_id && router.push(`/dashboard/foods/${ing.food_item_id}`)}
                                         className={cn(
                                             "flex items-center gap-4 p-4 rounded-2xl border transition-all group relative overflow-hidden",
                                             hiddenIngredientIds.includes(ing.id)
                                                 ? "bg-slate-50 dark:bg-slate-900 border-dashed border-slate-200 dark:border-slate-800 opacity-60"
                                                 : "bg-white dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 hover:border-emerald-500/20",
-                                            ing.food_item_id && !hiddenIngredientIds.includes(ing.id) ? "cursor-pointer" : ""
+                                            ing.food_item_id && !hiddenIngredientIds.includes(ing.id) && !isReordering ? "cursor-pointer" : ""
                                         )}
                                     >
-                                        {/* Toggle Button */}
-                                        <button
-                                            onClick={(e) => toggleIngredient(ing.id, e)}
-                                            className={cn(
-                                                "p-2 rounded-full transition-all shrink-0 z-10",
-                                                hiddenIngredientIds.includes(ing.id)
-                                                    ? "bg-slate-200 dark:bg-slate-800 text-slate-400 hover:text-slate-600"
-                                                    : "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 hover:bg-emerald-100 dark:hover:bg-emerald-500/20"
-                                            )}
-                                            title={hiddenIngredientIds.includes(ing.id) ? "Enable Ingredient" : "Disable Ingredient"}
-                                        >
-                                            {hiddenIngredientIds.includes(ing.id) ? <EyeOff size={16} /> : <Eye size={16} />}
-                                        </button>
+                                        {/* Reorder Controls */}
+                                        {isReordering ? (
+                                            <div className="flex flex-col gap-1 pr-2 border-r border-slate-100 dark:border-slate-800 mr-2">
+                                                <button
+                                                    onClick={(e) => moveIngredient(i, 'up', e)}
+                                                    disabled={i === 0}
+                                                    className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 disabled:opacity-20"
+                                                >
+                                                    <ArrowUp size={14} />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => moveIngredient(i, 'down', e)}
+                                                    disabled={i === ingredients.length - 1}
+                                                    className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 disabled:opacity-20"
+                                                >
+                                                    <ArrowDown size={14} />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            /* Toggle Button */
+                                            <button
+                                                onClick={(e) => toggleIngredient(ing.id, e)}
+                                                className={cn(
+                                                    "p-2 rounded-full transition-all shrink-0 z-10",
+                                                    hiddenIngredientIds.includes(ing.id)
+                                                        ? "bg-slate-200 dark:bg-slate-800 text-slate-400 hover:text-slate-600"
+                                                        : "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 hover:bg-emerald-100 dark:hover:bg-emerald-500/20"
+                                                )}
+                                                title={hiddenIngredientIds.includes(ing.id) ? "Enable Ingredient" : "Disable Ingredient"}
+                                            >
+                                                {hiddenIngredientIds.includes(ing.id) ? <EyeOff size={16} /> : <Eye size={16} />}
+                                            </button>
+                                        )}
 
                                         <div className={cn(
                                             "w-12 h-12 rounded-2xl border flex items-center justify-center overflow-hidden shrink-0 transition-all duration-300",
