@@ -371,6 +371,90 @@ export default function RecipeDetailsPage() {
         toast.success("Ingredient removed (local view only)");
     };
 
+    const handleUpdateIngredientQuantity = (index: number, newQty: number) => {
+        const updated = [...ingredients];
+        const ing = updated[index];
+        const food = ing.food_item;
+
+        // Find current unit definition
+        let unitWeight = 0;
+        const currentUnit = ing.measure_label || 'g';
+
+        if (['g', 'ml', 'gram', 'grams'].includes(currentUnit.toLowerCase())) {
+            unitWeight = 1;
+        } else if (['kg', 'kilogram'].includes(currentUnit.toLowerCase())) {
+            unitWeight = 1000;
+        } else if (['oz', 'ounce'].includes(currentUnit.toLowerCase())) {
+            unitWeight = 28.3495;
+        } else if (['lb', 'pound'].includes(currentUnit.toLowerCase())) {
+            unitWeight = 453.592;
+        } else {
+            // Check portions
+            const portion = food?.portions?.find((p: any) => p.label === currentUnit);
+            if (portion) {
+                unitWeight = portion.weight_g;
+            } else {
+                // Fallback: derived from current state if valid
+                if (ing.quantity && ing.quantity > 0 && ing.weight_g > 0) {
+                    unitWeight = ing.weight_g / ing.quantity;
+                } else {
+                    unitWeight = 0; // standard fallback?
+                }
+            }
+        }
+
+        const newWeight = newQty * unitWeight;
+
+        updated[index] = {
+            ...ing,
+            quantity: newQty,
+            weight_g: newWeight,
+            amount: `${newQty} ${currentUnit}`
+        };
+
+        setIngredients(updated);
+        saveCustomization(updated);
+    };
+
+    const handleUpdateIngredientUnit = (index: number, newUnit: string) => {
+        const updated = [...ingredients];
+        const ing = updated[index];
+        const food = ing.food_item;
+
+        // Calculate unit weight for NEW unit
+        let unitWeight = 1; // Default to 1g
+
+        if (['g', 'ml', 'gram', 'grams'].includes(newUnit.toLowerCase())) {
+            unitWeight = 1;
+        } else if (['kg', 'kilogram'].includes(newUnit.toLowerCase())) {
+            unitWeight = 1000;
+        } else if (['oz', 'ounce'].includes(newUnit.toLowerCase())) {
+            unitWeight = 28.3495;
+        } else if (['lb', 'pound'].includes(newUnit.toLowerCase())) {
+            unitWeight = 453.592;
+        } else {
+            // Check portions
+            const portion = food?.portions?.find((p: any) => p.label === newUnit);
+            if (portion) {
+                unitWeight = portion.weight_g;
+            }
+        }
+
+        // Maintain quantity, update weight
+        const qty = ing.quantity || 1;
+        const newWeight = qty * unitWeight;
+
+        updated[index] = {
+            ...ing,
+            measure_label: newUnit,
+            weight_g: newWeight,
+            amount: `${qty} ${newUnit}`
+        };
+
+        setIngredients(updated);
+        saveCustomization(updated);
+    };
+
     const handleAddIngredient = (foodItem: any) => {
         // Default to 100g or a standard portion if available
         let weight_g = 100;
@@ -746,7 +830,41 @@ export default function RecipeDetailsPage() {
                                                 "text-xs font-black capitalize leading-relaxed transition-colors",
                                                 hiddenIngredientIds.includes(ing.id) ? "text-slate-400 decoration-slate-300 line-through" : "text-slate-900 dark:text-white"
                                             )}>{ing.base_ingredient || ing.item}</p>
-                                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">{ing.amount}</p>
+
+                                            {isEditingIngredients ? (
+                                                <div className="flex items-center gap-2 mt-1" onClick={(e) => e.stopPropagation()}>
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        step="0.1"
+                                                        value={ing.quantity || 0}
+                                                        onChange={(e) => handleUpdateIngredientQuantity(i, parseFloat(e.target.value) || 0)}
+                                                        className="w-16 h-7 text-[10px] font-bold bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-2 focus:ring-1 focus:ring-emerald-500"
+                                                    />
+                                                    <select
+                                                        value={ing.measure_label}
+                                                        onChange={(e) => handleUpdateIngredientUnit(i, e.target.value)}
+                                                        className="h-7 text-[10px] font-bold bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-2 focus:ring-1 focus:ring-emerald-500 max-w-[120px]"
+                                                    >
+                                                        <optgroup label="Standard">
+                                                            <option value="g">g</option>
+                                                            <option value="oz">oz</option>
+                                                            <option value="ml">ml</option>
+                                                            <option value="kg">kg</option>
+                                                            <option value="lb">lb</option>
+                                                        </optgroup>
+                                                        {ing.food_item?.portions?.length > 0 && (
+                                                            <optgroup label="Measures">
+                                                                {ing.food_item.portions.map((p: any, idx: number) => (
+                                                                    <option key={idx} value={p.label}>{p.label}</option>
+                                                                ))}
+                                                            </optgroup>
+                                                        )}
+                                                    </select>
+                                                </div>
+                                            ) : (
+                                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">{ing.amount}</p>
+                                            )}
                                         </div>
                                         <div className="text-right shrink-0 pt-0.5">
                                             <p className={cn(
