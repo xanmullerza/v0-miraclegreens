@@ -783,28 +783,72 @@ export default function MealPlannerPage() {
                                             });
                                         }
                                         const getVal = (keys: string[]) => { for (const k of keys) if (m[k] !== undefined) return m[k]; return 0; };
-                                        const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle }: { title: string, items: Record<string, any[]>, icon: any, theme?: 'indigo' | 'rose', subtitle?: string }) => {
+
+                                        const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle, breakdownLabels = [], forceRaw = false }: { title: string, items: Record<string, any[]>, icon: any, theme?: string, subtitle?: string, breakdownLabels?: string[], forceRaw?: boolean }) => {
                                             const themes = {
                                                 indigo: { bg: "bg-slate-900 border-slate-800", text: "text-indigo-400", border: "border-slate-800", itemBorder: "border-indigo-900/50" },
-                                                rose: { bg: "bg-slate-900 border-slate-800", text: "text-rose-400", border: "border-slate-800", itemBorder: "border-rose-900/50" }
+                                                rose: { bg: "bg-slate-900 border-slate-800", text: "text-rose-400", border: "border-slate-800", itemBorder: "border-rose-900/50" },
+                                                orange: { bg: "bg-slate-900 border-slate-800", text: "text-orange-400", border: "border-slate-800", itemBorder: "border-orange-900/50" },
+                                                emerald: { bg: "bg-slate-900 border-slate-800", text: "text-emerald-400", border: "border-slate-800", itemBorder: "border-emerald-900/50" },
+                                                blue: { bg: "bg-slate-900 border-slate-800", text: "text-blue-400", border: "border-slate-800", itemBorder: "border-blue-900/50" },
+                                                amber: { bg: "bg-slate-900 border-slate-800", text: "text-amber-400", border: "border-slate-800", itemBorder: "border-amber-900/50" }
                                             };
-                                            const t = themes[theme];
+                                            const t = (themes as any)[theme] || themes.indigo;
 
                                             return (
-                                                <div className={cn("p-6 rounded-2xl border bg-gradient-to-br", t.bg)}>
-                                                    <h4 className={cn("font-black flex items-center gap-2 mb-1 uppercase tracking-widest text-sm", t.text)}><Icon className="h-5 w-5" /> {title}</h4>
-                                                    {subtitle && <p className={cn("text-[10px] text-muted-foreground mb-4 border-b pb-2", t.border)}>{subtitle}</p>}
-                                                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                                                <div className={cn("p-6 pt-5 rounded-3xl border bg-gradient-to-br mb-6", t.bg)}>
+                                                    <h4 className={cn("font-black flex items-center gap-2 mb-1 uppercase tracking-widest text-[10px]", t.text)}><Icon className="h-4 w-4" /> {title}</h4>
+                                                    {subtitle && <p className={cn("text-[9px] text-slate-400 mb-4 border-b pb-2 transition-colors", t.border)}>{subtitle}</p>}
+                                                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                                                         {Object.entries(items).map(([label, keys]) => {
-                                                            const val = getVal(keys as string[]);
-                                                            const rda = userRDAs?.[label];
+                                                            const val = (label === 'Energy') ? (unit === 'kJ' ? plan.totalCalories * 4.184 : plan.totalCalories) :
+                                                                (label === 'Protein') ? plan.macros.protein :
+                                                                    (label === 'Carbs') ? plan.macros.carbs :
+                                                                        (label === 'Fat') ? plan.macros.fat :
+                                                                            getVal(keys as string[]);
+
+                                                            const macroRDAs: Record<string, number> = {
+                                                                'Energy': unit === 'kJ' ? Math.max(1200, Math.round((profile.gender === 'male' ? ((10 * (Number(profile.weight) || 70)) + (6.25 * (Number(profile.height) || 170)) - (5 * (Number(profile.age) || 30)) + 5) : ((10 * (Number(profile.weight) || 70)) + (6.25 * (Number(profile.height) || 170)) - (5 * (Number(profile.age) || 30)) - 161)) * 1.2)) * 4.184 : Math.max(1200, Math.round((profile.gender === 'male' ? ((10 * (Number(profile.weight) || 70)) + (6.25 * (Number(profile.height) || 170)) - (5 * (Number(profile.age) || 30)) + 5) : ((10 * (Number(profile.weight) || 70)) + (6.25 * (Number(profile.height) || 170)) - (5 * (Number(profile.age) || 30)) - 161)) * 1.2)),
+                                                                // Use simple fallback RDAs if useRDA hook not perfectly aligned (though userRDAs is available in scope)
+                                                                'Protein': (Number(profile.weight) || 70) * 1.6,
+                                                                'Carbs': 250,
+                                                                'Fat': 70
+                                                            };
+                                                            // Note: userRDAs is defined in component scope, use it preferably
+                                                            const rda = userRDAs?.[label] || macroRDAs[label];
+
                                                             const pct = rda ? Math.round((val / rda) * 100) : null;
                                                             const styles = getNutrientLevelStyles(pct || 0, label);
+                                                            const u = label === 'Energy' ? unit : (label === 'Protein' || label === 'Carbs' || label === 'Fat') ? 'g' : (label === 'Vitamin D') ? 'IU' : (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg')) ? 'µg' : 'mg';
+                                                            const hasBreakdown = breakdownLabels.includes(label);
+
                                                             return (
-                                                                <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-900 cursor-pointer hover:shadow-md transition-all", t.itemBorder, pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
+                                                                <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
                                                                     <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
-                                                                    <div className="flex items-baseline gap-1"><span className="text-lg font-bold">{val.toFixed(1)}</span><span className={cn("text-[10px] font-bold", (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12')) ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') ? 'µg' : 'mg'}</span></div>
-                                                                    {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
+                                                                    <div className="space-y-0.5">
+                                                                        {(pct !== null && !forceRaw) ? (
+                                                                            <>
+                                                                                <div className="flex items-baseline gap-1">
+                                                                                    <span className={cn("text-xl font-black tracking-tighter", styles.text)}>{pct}%</span>
+                                                                                </div>
+                                                                                <p className="text-[9px] font-bold text-slate-400">
+                                                                                    {val.toFixed(1)}{u}
+                                                                                </p>
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <div className="flex items-baseline gap-1">
+                                                                                    <span className="text-lg font-bold">{val.toFixed(1)}</span>
+                                                                                    <span className={cn("text-[10px] font-bold", (u === 'µg') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{u}</span>
+                                                                                </div>
+                                                                                {rda && (
+                                                                                    <p className="text-[9px] font-bold text-slate-400 mt-0.5">
+                                                                                        Target: {Math.round(rda)}{u === 'kcal' ? 'kcal' : u}
+                                                                                    </p>
+                                                                                )}
+                                                                            </>
+                                                                        )}
+                                                                    </div>
                                                                 </div>
                                                             );
                                                         })}
@@ -812,80 +856,22 @@ export default function MealPlannerPage() {
                                                 </div>
                                             );
                                         };
+
                                         return (
                                             <div className="space-y-6">
-                                                {/* MACROS - Split into Nutritive and Non-Nutritive */}
-                                                <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900 space-y-6">
-                                                    {/* NUTRITIVE - Energy Providers */}
-                                                    <div>
-                                                        <h4 className="font-black flex items-center gap-2 mb-1 text-orange-400 uppercase tracking-widest text-sm"><Zap className="h-5 w-5" /> Macronutrients</h4>
-                                                        <p className="text-[10px] text-slate-400 mb-4 border-b border-slate-800 pb-2">Energy providers • Fuel for your body</p>
-                                                        <div className="grid grid-cols-4 gap-3">
-                                                            {[
-                                                                {
-                                                                    label: 'Energy',
-                                                                    val: plan.totalCalories,
-                                                                    target: calories,
-                                                                    unit: 'kcal',
-                                                                    secondaryVal: plan.totalEnergyKj || plan.totalCalories * 4.184,
-                                                                    secondaryUnit: 'kJ'
-                                                                },
-                                                                { label: 'Protein', val: plan.macros.protein, target: (calories * 0.2) / 4, unit: 'g' },
-                                                                { label: 'Carbs', val: plan.macros.carbs, target: (calories * 0.5) / 4, unit: 'g' },
-                                                                { label: 'Fat', val: plan.macros.fat, target: (calories * 0.3) / 9, unit: 'g' },
-                                                            ].map(macro => {
-                                                                const pct = Math.round((macro.val / macro.target) * 100);
-                                                                const styles = getNutrientLevelStyles(pct, macro.label);
-                                                                const canBreakdown = ['Protein', 'Carbs', 'Fat'].includes(macro.label);
-
-                                                                return (
-                                                                    <div key={macro.label} className={cn("p-3 rounded-xl border bg-white dark:bg-slate-900 cursor-pointer hover:shadow-md transition-all relative group", styles.borderLight, styles.fade)}>
-                                                                        <div>
-                                                                            <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{macro.label}</p>
-                                                                            <div className="flex flex-col">
-                                                                                <div className="flex items-baseline gap-1">
-                                                                                    <span className="text-xl font-black">{Math.round(macro.val)}</span>
-                                                                                    <span className="text-[10px] text-muted-foreground font-bold">{macro.unit}</span>
-                                                                                </div>
-                                                                                {/* Secondary Energy Value */}
-                                                                                {macro.secondaryVal && (
-                                                                                    <div className="flex items-baseline gap-1 -mt-1">
-                                                                                        <span className="text-xs font-bold text-muted-foreground/70">{Math.round(macro.secondaryVal)}</span>
-                                                                                        <span className="text-[9px] text-muted-foreground/60 font-bold">{macro.secondaryUnit}</span>
-                                                                                    </div>
-                                                                                )}
-                                                                            </div>
-                                                                            <div className={cn("text-[10px] font-black mt-1", styles.text)}>{pct}%</div>
-                                                                        </div>
-                                                                        {canBreakdown && (
-                                                                            <button
-                                                                                onClick={(e) => { e.stopPropagation(); setBreakdownNutrient(macro.label); }}
-                                                                                className="absolute top-2 right-2 p-1.5 rounded-lg bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-400 opacity-60 group-hover:opacity-100 hover:bg-orange-200 dark:hover:bg-orange-800 transition-all"
-                                                                                title="View breakdown"
-                                                                            >
-                                                                                <Layers className="h-3.5 w-3.5" />
-                                                                            </button>
-                                                                        )}
-                                                                    </div>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                    </div>
-
-
-                                                </div>
-
-
-                                                {/* ELECTROLYTES */}
-                                                <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Hydration • Muscle & Nerve Function" items={{
+                                                <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Caloric & Macro Breakdown" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
+                                                    'Energy': ['calories'],
+                                                    'Protein': ['protein'],
+                                                    'Carbs': ['carbs'],
+                                                    'Fat': ['fat']
+                                                }} />
+                                                <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Hydration & Mineral Balance" items={{
                                                     'Sodium': ['Sodium', 'sodium_mg'],
                                                     'Potassium': ['Potassium', 'potassium_mg'],
                                                     'Magnesium': ['Magnesium', 'magnesium_mg'],
                                                     'Calcium': ['Calcium', 'calcium_mg'],
                                                     'Phosphorus': ['Phosphorus', 'phosphorus_mg']
                                                 }} />
-
-                                                {/* TRACE MINERALS */}
                                                 <NutrientGrid title="Trace Minerals" icon={Gem} theme="rose" subtitle="Essential micro-minerals" items={{
                                                     'Iron': ['Iron', 'iron_mg'],
                                                     'Zinc': ['Zinc', 'zinc_mg'],
@@ -893,91 +879,39 @@ export default function MealPlannerPage() {
                                                     'Manganese': ['Manganese', 'manganese_mg'],
                                                     'Selenium': ['Selenium', 'selenium_ug']
                                                 }} />
-
-
-                                                {/* DAILY VITAMINS (Water-Soluble: B-Complex + C) */}
-                                                <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900">
-                                                    <h4 className="font-black flex items-center gap-2 mb-1 text-blue-400 uppercase tracking-widest text-sm"><Droplet className="h-5 w-5" /> Daily Vitamins</h4>
-                                                    <p className="text-[10px] text-slate-400 mb-4 border-b border-slate-800 pb-2">Water-soluble • Must be replenished daily</p>
-                                                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                                                        {[
-                                                            { label: 'B1 (Thiamine)', keys: ['B1 (Thiamine)', 'thiamine_mg'] },
-                                                            { label: 'B2 (Riboflavin)', keys: ['B2 (Riboflavin)', 'riboflavin_mg'] },
-                                                            { label: 'B3 (Niacin)', keys: ['B3 (Niacin)', 'niacin_mg'] },
-                                                            { label: 'B5 (Pantothenic)', keys: ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'] },
-                                                            { label: 'B6 (Pyridoxine)', keys: ['B6 (Pyridoxine)', 'vitamin_b6_mg'] },
-                                                            { label: 'B7 (Biotin)', keys: ['Biotin', 'biotin_ug'] },
-                                                            { label: 'B9 (Folate)', keys: ['B9 (Folate)', 'folate_ug'] },
-                                                            { label: 'B12 (Cobalamin)', keys: ['B12 (Cobalamin)', 'vitamin_b12_ug'] },
-                                                            { label: 'Vitamin C', keys: ['Vitamin C', 'vitamin_c_mg'] },
-                                                            { label: 'Choline', keys: ['Choline', 'choline_mg'] },
-                                                        ].map(({ label, keys }) => {
-                                                            const val = getVal(keys);
-                                                            const rda = userRDAs?.[label];
-                                                            const pct = rda ? Math.round((val / rda) * 100) : null;
-                                                            const styles = getNutrientLevelStyles(pct || 0, label);
-                                                            const unitLabel = label.includes('Folate') || label.includes('B12') || label.includes('Biotin') ? 'µg' : 'mg';
-                                                            return (
-                                                                <div key={label} onClick={() => setSelectedNutrientInfo(label)} className={cn("p-3 rounded-xl border bg-white dark:bg-slate-900 cursor-pointer hover:shadow-md transition-all", pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
-                                                                    <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
-                                                                    <div className="flex items-baseline gap-1">
-                                                                        <span className="text-lg font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span>
-                                                                        <span className={cn("text-[10px] font-bold", unitLabel === 'µg' ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")} title={unitLabel === 'µg' ? 'micrograms' : 'milligrams'}>{unitLabel}</span>
-                                                                    </div>
-                                                                    {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                </div>
-
-                                                {/* STORED VITAMINS (Fat-Soluble: A, D, E, K) */}
-                                                <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900">
-                                                    <h4 className="font-black flex items-center gap-2 mb-1 text-emerald-400 uppercase tracking-widest text-sm"><Battery className="h-5 w-5" /> Stored Vitamins</h4>
-                                                    <p className="text-[10px] text-slate-400 mb-4 border-b border-slate-800 pb-2">Fat-soluble • Stored in body tissues</p>
-                                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                                        {[
-                                                            { label: 'Vitamin A', keys: ['Vitamin A', 'vitamin_a_ug'], unit: 'µg', hasBreakdown: true },
-                                                            { label: 'Vitamin D', keys: ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'], unit: 'IU', hasBreakdown: false },
-                                                            { label: 'Vitamin E', keys: ['Vitamin E', 'vitamin_e_mg'], unit: 'mg', hasBreakdown: true },
-                                                            { label: 'Vitamin K', keys: ['Vitamin K', 'vitamin_k_ug'], unit: 'µg', hasBreakdown: false },
-                                                        ].map(({ label, keys, unit: unitLabel, hasBreakdown }) => {
-                                                            const val = getVal(keys);
-                                                            const rda = userRDAs?.[label];
-                                                            const pct = rda ? Math.round((val / rda) * 100) : null;
-                                                            const styles = getNutrientLevelStyles(pct || 0, label);
-                                                            return (
-                                                                <div key={label} className={cn("p-4 rounded-xl border bg-white dark:bg-slate-900 hover:shadow-md transition-all relative group", pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
-                                                                    <div onClick={() => setSelectedNutrientInfo(label)} className="cursor-pointer">
-                                                                        <p className="text-[10px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
-                                                                        <div className="flex items-baseline gap-1"><span className="text-xl font-bold">{val >= 1 ? val.toFixed(1) : val.toFixed(2)}</span><span className={cn("text-[10px] font-bold", unitLabel === 'µg' ? "text-blue-600 dark:text-blue-400" : unitLabel === 'IU' ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground")}>{unitLabel}</span></div>
-                                                                        {pct !== null && <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>}
-                                                                    </div>
-                                                                    {hasBreakdown && (
-                                                                        <button
-                                                                            onClick={(e) => { e.stopPropagation(); setBreakdownNutrient(label); }}
-                                                                            className="absolute top-2 right-2 p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 opacity-60 group-hover:opacity-100 hover:bg-emerald-200 dark:hover:bg-emerald-800 transition-all"
-                                                                            title="View breakdown"
-                                                                        >
-                                                                            <Layers className="h-3.5 w-3.5" />
-                                                                        </button>
-                                                                    )}
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                </div>
-
-
+                                                <NutrientGrid title="Daily Vitamins" icon={Droplet} theme="blue" subtitle="Water-soluble vitamins (B-Complex & C)" items={{
+                                                    'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
+                                                    'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
+                                                    'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
+                                                    'B5 (Pantothenic Acid)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
+                                                    'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
+                                                    'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
+                                                    'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
+                                                    'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
+                                                    'Choline': ['Choline', 'choline_mg'],
+                                                }} />
+                                                <NutrientGrid title="Stored Vitamins" icon={Battery} theme="emerald" subtitle="Fat-soluble storage (A, D, E, K)" breakdownLabels={['Vitamin A', 'Vitamin E']} items={{
+                                                    'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
+                                                    'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
+                                                    'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
+                                                    'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
+                                                }} />
+                                                <NutrientGrid title="Clinical Markers" icon={Activity} theme="amber" subtitle="Secondary markers for advanced health profile mapping" forceRaw={true} items={{
+                                                    'Fiber': ['Fiber', 'fiber_g'],
+                                                    'Sugars': ['Sugars', 'sugars_g'],
+                                                    'Oxalate': ['Oxalate', 'oxalate_mg'],
+                                                    'Omega-3': ['Omega-3', 'omega3_g'],
+                                                    'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
+                                                }} />
                                             </div>
                                         );
                                     })()}
                                 </div>
                             )}
-                        </div>
-                    </div>
+                        </div >
+                    </div >
                 )}
-            </div>
+            </div >
 
             {
                 selectedNutrientInfo && nutrientInfo[selectedNutrientInfo] && (
@@ -1096,6 +1030,6 @@ export default function MealPlannerPage() {
                 )
             }
 
-        </div>
+        </div >
     );
 }
