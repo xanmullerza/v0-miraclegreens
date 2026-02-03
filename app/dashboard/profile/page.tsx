@@ -465,7 +465,7 @@ function ProfilePageContent() {
                                         <div key={nutrient} className="bg-slate-900/50 border border-slate-800/50 px-4 py-3 rounded-2xl flex items-center justify-between hover:border-blue-500/30 transition-all hover:bg-slate-900 group/item">
                                             <p className="text-[11px] uppercase font-black text-slate-400 group-hover/item:text-slate-300 transition-colors leading-none truncate pr-2">{nutrient}</p>
                                             <div className="flex-shrink-0">
-                                                <span className="text-sm font-black text-white tracking-tighter italic leading-none">{displayVal}</span>
+                                                <span className="text-xs font-black text-white tracking-tighter italic leading-none">{displayVal}</span>
                                             </div>
                                         </div>
                                     );
