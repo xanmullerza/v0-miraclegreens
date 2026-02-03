@@ -34,7 +34,8 @@ import {
     Diff,
     Plus,
     Minus,
-    Trash2
+    Trash2,
+    GripVertical
 } from 'lucide-react';
 import FoodItemPicker from '@/components/recipe/food-item-picker';
 import { calculateRecipeNutrition, CalculatedNutrition, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
@@ -103,6 +104,7 @@ export default function RecipeDetailsPage() {
     const [isEditingMeasures, setIsEditingMeasures] = useState(false); // Edit Measures mode
     const [isToggling, setIsToggling] = useState(true); // Default mode: Visibility
     const [showPicker, setShowPicker] = useState(false);
+    const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null); // For DND
     const [instructions, setInstructions] = useState<Instruction[]>([]);
     const [loading, setLoading] = useState(true);
     const [showDetailedNutrients, setShowDetailedNutrients] = useState(true);
@@ -524,6 +526,31 @@ export default function RecipeDetailsPage() {
         }
     };
 
+    // Drag and Drop Handlers
+    const onDragStart = (e: React.DragEvent, index: number) => {
+        setDraggedItemIndex(index);
+        e.dataTransfer.effectAllowed = "move";
+        // Optional: Set ghost image if needed, but default is usually fine
+    };
+
+    const onDragOver = (e: React.DragEvent, index: number) => {
+        e.preventDefault(); // Necessary to allow dropping
+        e.dataTransfer.dropEffect = "move";
+    };
+
+    const onDrop = (e: React.DragEvent, dropIndex: number) => {
+        e.preventDefault();
+        if (draggedItemIndex === null || draggedItemIndex === dropIndex) return;
+
+        const updated = [...ingredients];
+        const [movedItem] = updated.splice(draggedItemIndex, 1);
+        updated.splice(dropIndex, 0, movedItem);
+
+        setIngredients(updated);
+        saveCustomization(updated);
+        setDraggedItemIndex(null);
+    };
+
     const toggleFavorite = async () => {
         if (!recipe) return;
         const newStatus = !recipe.is_favorite;
@@ -817,7 +844,7 @@ export default function RecipeDetailsPage() {
                                                 : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 hover:text-amber-500 hover:border-amber-200"
                                         )}
                                     >
-                                        <ArrowUpDown size={14} /> Sort
+                                        <GripVertical size={14} /> Sort
                                     </button>
                                 </div>
                             </div>
@@ -826,21 +853,25 @@ export default function RecipeDetailsPage() {
                                 {ingredients.map((ing: any, i) => (
                                     <div
                                         key={ing.id || i}
+                                        draggable={isReordering}
+                                        onDragStart={(e) => isReordering && onDragStart(e, i)}
+                                        onDragOver={(e) => isReordering && onDragOver(e, i)}
+                                        onDrop={(e) => isReordering && onDrop(e, i)}
                                         onClick={() => !isReordering && !isEditingIngredients && !isEditingMeasures && !isToggling && !hiddenIngredientIds.includes(ing.id) && ing.food_item_id && router.push(`/dashboard/foods/${ing.food_item_id}`)}
                                         className={cn(
                                             "flex items-center gap-4 p-4 rounded-2xl border transition-all group relative overflow-hidden",
                                             hiddenIngredientIds.includes(ing.id)
                                                 ? "bg-slate-50 dark:bg-slate-900 border-dashed border-slate-200 dark:border-slate-800 opacity-60"
                                                 : "bg-white dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 hover:border-emerald-500/20",
-                                            ing.food_item_id && !hiddenIngredientIds.includes(ing.id) && !isReordering && !isEditingIngredients && !isEditingMeasures && !isToggling ? "cursor-pointer" : ""
+                                            ing.food_item_id && !hiddenIngredientIds.includes(ing.id) && !isReordering && !isEditingIngredients && !isEditingMeasures && !isToggling ? "cursor-pointer" : "",
+                                            isReordering ? "cursor-grab active:cursor-grabbing hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700/50" : ""
                                         )}
                                     >
                                         {/* Action Buttons: Reorder OR Remove OR Toggle */}
                                         <div className="shrink-0 z-10">
                                             {isReordering ? (
-                                                <div className="flex flex-col gap-1">
-                                                    <button onClick={(e) => moveIngredient(i, 'up', e)} disabled={i === 0} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 disabled:opacity-20"><ArrowUp size={14} /></button>
-                                                    <button onClick={(e) => moveIngredient(i, 'down', e)} disabled={i === ingredients.length - 1} className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 disabled:opacity-20"><ArrowDown size={14} /></button>
+                                                <div className="p-2 text-slate-400 group-hover:text-amber-500 transition-colors">
+                                                    <GripVertical size={20} />
                                                 </div>
                                             ) : isEditingIngredients ? (
                                                 <button
