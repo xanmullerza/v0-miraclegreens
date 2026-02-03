@@ -700,9 +700,9 @@ export default function MealPlannerPage() {
                             <User size={48} className="animate-pulse" />
                         </div>
                         <div className="space-y-3">
-                            <h2 className="text-3xl font-black tracking-tight uppercase italic">Biometrics Required</h2>
+                            <h2 className="text-3xl font-black tracking-tight uppercase italic">Personalisation Required</h2>
                             <p className="text-slate-500 font-medium">
-                                To curate a precise nutritional protocol, we need your biological data (age, weight, height, and goals). These are managed in your secure laboratory profile.
+                                To curate a personalised meal plan, we need some information from you. This includes your age, weight, height, and diet goals. This is stored locally on your device and not on our servers. You are welcome to skip this and have a look at our recipes for some ideas on your next meal. We value and respect your privacy.
                             </p>
                         </div>
                         <div className="flex flex-col w-full gap-4">
