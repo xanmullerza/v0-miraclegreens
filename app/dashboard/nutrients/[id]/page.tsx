@@ -104,11 +104,12 @@ export default function NutrientDetailsPage() {
 
             const col = columnMap[nutrientId] || nutrientId.toLowerCase().replace(/ /g, '_').replace(/[()]/g, '');
 
-            // Try to find foods high in this nutrient
+            // Try to find foods high in this nutrient, but exclude herbs/spices/supplements for "practical" diet additions
             const { data, error } = await supabase
                 .from('food_items')
                 .select('id, name, common_name, image, ' + col)
                 .not(col, 'is', null)
+                .not('category', 'in', '("Flavour", "Supplements")')
                 .order(col, { ascending: false })
                 .limit(6);
 
@@ -282,7 +283,10 @@ export default function NutrientDetailsPage() {
                     {/* Top Food Sources */}
                     <div className="space-y-5">
                         <div className="flex items-center justify-between px-2">
-                            <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400">Bio-Available Foods</h4>
+                            <div className="space-y-1">
+                                <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 leading-none">Bio-Available Foods</h4>
+                                <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest leading-none">Ordered by clinical nutrient density (100g sample)</p>
+                            </div>
                             <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest underline cursor-pointer hover:text-emerald-600" onClick={() => router.push('/dashboard/foods')}>Browse All</span>
                         </div>
                         <div className="space-y-3">
@@ -314,9 +318,7 @@ export default function NutrientDetailsPage() {
                                     </button>
                                 ))
                             ) : (
-                                <div className="text-center p-10 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Scanning laboratory data for typical sources...</p>
-                                </div>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No whole food high-concentration sources identified in current laboratory data.</p>
                             )}
                         </div>
                     </div>
