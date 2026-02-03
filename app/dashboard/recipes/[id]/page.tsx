@@ -797,7 +797,7 @@ export default function RecipeDetailsPage() {
                                                     <span className={cn(
                                                         "text-xs font-bold leading-none mb-0.5",
                                                         isSelected ? "text-slate-900 dark:text-white" : "text-slate-400"
-                                                    )}>{person.name || person.nickname || 'User'}</span>
+                                                    )}>{person.name || (person as any).nickname || 'User'}</span>
                                                     <span className="text-[9px] text-slate-400 font-medium">{person.age} yrs • {person.goal}</span>
                                                 </div>
                                             </div>
