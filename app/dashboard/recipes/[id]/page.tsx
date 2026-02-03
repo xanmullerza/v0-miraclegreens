@@ -24,7 +24,9 @@ import {
     Battery,
     X,
     ChevronDown,
-    Pencil
+    Pencil,
+    Eye,
+    EyeOff
 } from 'lucide-react';
 import { calculateRecipeNutrition, CalculatedNutrition, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -43,6 +45,7 @@ const Card = ({ children, className }: { children: React.ReactNode, className?: 
 );
 
 interface Ingredient {
+    id: string; // Added ID for toggling
     item: string;
     amount: string;
     base_ingredient: string;
@@ -78,6 +81,7 @@ export default function RecipeDetailsPage() {
     const { id } = useParams();
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+    const [hiddenIngredientIds, setHiddenIngredientIds] = useState<string[]>([]); // New State
     const [instructions, setInstructions] = useState<Instruction[]>([]);
     const [loading, setLoading] = useState(true);
     const [showDetailedNutrients, setShowDetailedNutrients] = useState(true);
@@ -250,6 +254,41 @@ export default function RecipeDetailsPage() {
         } finally {
             setLoading(false);
         }
+    };
+
+    // Effect to recalculate nutrition when ingredients or hidden status changes
+    useEffect(() => {
+        if (ingredients.length === 0 || !recipe) return;
+
+        const activeIngredients = ingredients.filter(ing => !hiddenIngredientIds.includes(ing.id));
+
+        const calculated = calculateRecipeNutrition(
+            activeIngredients.map(ing => ({
+                food_item: ing.food_item,
+                weight_g: ing.weight_g || 0
+            }))
+        );
+
+        setCalculatedTotals(calculated);
+        setRecipe(prev => prev ? ({
+            ...prev,
+            calories: calculated.calories,
+            energy_kj: calculated.calories * 4.184, // Ensure KJ updates too
+            protein: calculated.protein,
+            carbs: calculated.carbs,
+            fat: calculated.fat,
+            micronutrients: calculated.micronutrients
+        }) : null);
+
+    }, [ingredients, hiddenIngredientIds]);
+
+    const toggleIngredient = (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setHiddenIngredientIds(prev =>
+            prev.includes(id)
+                ? prev.filter(hid => hid !== id)
+                : [...prev, id]
+        );
     };
 
     const toggleFavorite = async () => {
@@ -464,14 +503,36 @@ export default function RecipeDetailsPage() {
                             <div className="space-y-2">
                                 {ingredients.map((ing: any, i) => (
                                     <div
-                                        key={i}
-                                        onClick={() => ing.food_item_id && router.push(`/dashboard/foods/${ing.food_item_id}`)}
+                                        key={ing.id || i}
+                                        onClick={() => !hiddenIngredientIds.includes(ing.id) && ing.food_item_id && router.push(`/dashboard/foods/${ing.food_item_id}`)}
                                         className={cn(
-                                            "flex items-start gap-4 p-4 rounded-2xl bg-white dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/20 transition-all group",
-                                            ing.food_item_id ? "cursor-pointer" : ""
+                                            "flex items-center gap-4 p-4 rounded-2xl border transition-all group relative overflow-hidden",
+                                            hiddenIngredientIds.includes(ing.id)
+                                                ? "bg-slate-50 dark:bg-slate-900 border-dashed border-slate-200 dark:border-slate-800 opacity-60"
+                                                : "bg-white dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 hover:border-emerald-500/20",
+                                            ing.food_item_id && !hiddenIngredientIds.includes(ing.id) ? "cursor-pointer" : ""
                                         )}
                                     >
-                                        <div className="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden shrink-0 group-hover:scale-105 transition-transform duration-300">
+                                        {/* Toggle Button */}
+                                        <button
+                                            onClick={(e) => toggleIngredient(ing.id, e)}
+                                            className={cn(
+                                                "p-2 rounded-full transition-all shrink-0 z-10",
+                                                hiddenIngredientIds.includes(ing.id)
+                                                    ? "bg-slate-200 dark:bg-slate-800 text-slate-400 hover:text-slate-600"
+                                                    : "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 hover:bg-emerald-100 dark:hover:bg-emerald-500/20"
+                                            )}
+                                            title={hiddenIngredientIds.includes(ing.id) ? "Enable Ingredient" : "Disable Ingredient"}
+                                        >
+                                            {hiddenIngredientIds.includes(ing.id) ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        </button>
+
+                                        <div className={cn(
+                                            "w-12 h-12 rounded-2xl border flex items-center justify-center overflow-hidden shrink-0 transition-all duration-300",
+                                            hiddenIngredientIds.includes(ing.id)
+                                                ? "bg-slate-100 border-slate-200 grayscale opacity-50"
+                                                : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 group-hover:scale-105"
+                                        )}>
                                             {ing.food_item?.image ? (
                                                 <img src={ing.food_item.image} alt="" className="w-full h-full object-cover" />
                                             ) : (
@@ -479,11 +540,17 @@ export default function RecipeDetailsPage() {
                                             )}
                                         </div>
                                         <div className="flex-1 text-left min-w-0">
-                                            <p className="text-xs font-black text-slate-900 dark:text-white capitalize leading-relaxed">{ing.base_ingredient || ing.item}</p>
+                                            <p className={cn(
+                                                "text-xs font-black capitalize leading-relaxed transition-colors",
+                                                hiddenIngredientIds.includes(ing.id) ? "text-slate-400 decoration-slate-300 line-through" : "text-slate-900 dark:text-white"
+                                            )}>{ing.base_ingredient || ing.item}</p>
                                             <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">{ing.amount}</p>
                                         </div>
                                         <div className="text-right shrink-0 pt-0.5">
-                                            <p className="text-[10px] font-black text-slate-400">{Math.round(ing.weight_g)}g</p>
+                                            <p className={cn(
+                                                "text-[10px] font-black transition-colors",
+                                                hiddenIngredientIds.includes(ing.id) ? "text-slate-300" : "text-slate-400"
+                                            )}>{Math.round(ing.weight_g)}g</p>
                                         </div>
                                     </div>
                                 ))}
