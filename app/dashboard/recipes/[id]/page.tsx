@@ -35,9 +35,11 @@ import {
     Plus,
     Minus,
     Trash2,
-    GripVertical
+    GripVertical,
+    Download
 } from 'lucide-react';
 import FoodItemPicker from '@/components/recipe/food-item-picker';
+import NutrientExportModal from '@/components/recipe/nutrient-export-modal';
 import { calculateRecipeNutrition, calculateIndividualTargets, CalculatedNutrition, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { Badge } from '@/components/ui/badge';
@@ -112,6 +114,7 @@ export default function RecipeDetailsPage() {
     const [expandedBreakdownSections, setExpandedBreakdownSections] = useState<Record<string, boolean>>({});
     const [calculatedTotals, setCalculatedTotals] = useState<CalculatedNutrition | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [showExportModal, setShowExportModal] = useState(false);
     const { profile, nutrientDisplayMode, energyUnit, dailyTargets } = useUserPreferences();
 
     // SMART PORTION CONTROL STATE
@@ -662,6 +665,13 @@ export default function RecipeDetailsPage() {
                                 <Pencil size={32} className="group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all" />
                             </button>
                         )}
+                        <button
+                            onClick={() => setShowExportModal(true)}
+                            className="p-2 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 text-slate-400 hover:text-emerald-500 transition-all hover:scale-110 active:scale-95 group mt-1"
+                            title="Export Nutrients"
+                        >
+                            <Download size={32} className="group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all" />
+                        </button>
                     </div>
                     <div className="flex flex-wrap gap-2">
                         {recipe.source && (
@@ -1414,6 +1424,16 @@ export default function RecipeDetailsPage() {
                         </div>
                     )
                 }
+
+                {/* NUTRIENT EXPORT MODAL */}
+                {calculatedTotals && (
+                    <NutrientExportModal
+                        isOpen={showExportModal}
+                        onClose={() => setShowExportModal(false)}
+                        nutrition={calculatedTotals}
+                        recipeName={recipe.title}
+                    />
+                )}
             </div >
         </div >
     );
