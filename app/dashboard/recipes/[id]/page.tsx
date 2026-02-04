@@ -1215,7 +1215,19 @@ export default function RecipeDetailsPage() {
                                                         const rda = userRDAs?.[label] || macroRDAs[label];
                                                         const pct = rda ? Math.round((val / rda) * 100) : null;
                                                         const styles = getNutrientLevelStyles(pct || 0, label);
-                                                        const unit = label === 'Energy' ? energyUnit : (label === 'Protein' || label === 'Carbs' || label === 'Fat') ? 'g' : (label === 'Vitamin D') ? 'IU' : (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg')) ? 'µg' : 'mg';
+                                                        const isGramBased = (
+                                                            label === 'Protein' ||
+                                                            label === 'Carbs' ||
+                                                            label === 'Fat' ||
+                                                            label === 'Fiber' ||
+                                                            label === 'Sugars' ||
+                                                            label === 'Starch' ||
+                                                            label === 'Omega-3' ||
+                                                            label === 'Omega-6' ||
+                                                            label === 'Alcohol' ||
+                                                            label === 'Water'
+                                                        );
+                                                        const unit = label === 'Energy' ? energyUnit : (label === 'Vitamin D' ? 'IU' : (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg') ? 'µg' : (isGramBased ? 'g' : 'mg')));
                                                         const hasBreakdown = breakdownLabels.includes(label);
 
                                                         return (
@@ -1234,7 +1246,9 @@ export default function RecipeDetailsPage() {
                                                                     ) : (
                                                                         <>
                                                                             <div className="flex items-baseline gap-1">
-                                                                                <span className="text-lg font-bold">{val.toFixed(1)}</span>
+                                                                                <span className="text-lg font-extrabold tracking-tight">
+                                                                                    {val >= 10 ? val.toFixed(0) : (val >= 1 ? val.toFixed(1) : val.toFixed(2))}
+                                                                                </span>
                                                                                 <span className={cn("text-[10px] font-bold", (unit === 'µg') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unit}</span>
                                                                             </div>
                                                                             {(nutrientDisplayMode === 'value' || nutrientDisplayMode === 'both') && rda && (

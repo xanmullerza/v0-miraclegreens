@@ -66,6 +66,14 @@ export default function NutrientExportModal({ isOpen, onClose, nutrition, recipe
         const m = nutrition.micronutrients || {};
 
         const getVal = (names: string[]) => {
+            // Priority 1: Check top-level non-micronutrient properties
+            const lowerNames = names.map(n => n.toLowerCase());
+            if (lowerNames.includes('fat') || lowerNames.includes('total fat')) return nutrition.fat * multiplier;
+            if (lowerNames.includes('protein')) return nutrition.protein * multiplier;
+            if (lowerNames.includes('carbs') || lowerNames.includes('carbohydrates')) return nutrition.carbs * multiplier;
+            if (lowerNames.includes('calories') || lowerNames.includes('energy')) return nutrition.calories * multiplier;
+
+            // Priority 2: Check micronutrients record
             for (const name of names) {
                 if (m[name] !== undefined) return m[name] * multiplier;
                 const found = Object.keys(m).find(k => k.toLowerCase() === name.toLowerCase());
