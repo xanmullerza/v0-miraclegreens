@@ -1,15 +1,17 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { X, Copy, Check, Download, ClipboardCheck } from 'lucide-react';
+import { X, Copy, Download, ClipboardCheck, Scale, FileText } from 'lucide-react';
 import { CalculatedNutrition } from '@/lib/utils/nutrition-calculator';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface NutrientExportModalProps {
     isOpen: boolean;
     onClose: () => void;
     nutrition: CalculatedNutrition;
     recipeName: string;
+    totalWeight: number;
 }
 
 const RDA_STANDARD = {
@@ -53,81 +55,24 @@ const RDA_STANDARD = {
     'Fluoride': 4,
 };
 
-export default function NutrientExportModal({ isOpen, onClose, nutrition, recipeName }: NutrientExportModalProps) {
+export default function NutrientExportModal({ isOpen, onClose, nutrition, recipeName, totalWeight }: NutrientExportModalProps) {
     const [copied, setCopied] = useState(false);
+    const [exportMode, setExportMode] = useState<'total' | '100g'>('100g');
 
     const formattedText = useMemo(() => {
         if (!nutrition) return '';
 
+        const multiplier = exportMode === '100g' ? (100 / (totalWeight || 100)) : 1;
         const m = nutrition.micronutrients || {};
 
         const getVal = (names: string[]) => {
             for (const name of names) {
-                if (m[name] !== undefined) return m[name];
-                // Try case-insensitive
+                if (m[name] !== undefined) return m[name] * multiplier;
                 const found = Object.keys(m).find(k => k.toLowerCase() === name.toLowerCase());
-                if (found) return m[found];
+                if (found) return m[found] * multiplier;
             }
             return 0;
         };
-
-        const formatLine = (label: string, value: number | string | undefined, unit: string, rdaKey?: string, indent: number = 0) => {
-            const prefix = ' '.repeat(indent * 4);
-            let valStr = '-';
-            let dvStr = '';
-
-            if (typeof value === 'number') {
-                valStr = value.toFixed(2);
-                if (rdaKey && (RDA_STANDARD as any)[rdaKey]) {
-                    const dv = (value / (RDA_STANDARD as any)[rdaKey]) * 100;
-                    dvStr = dv < 0.1 ? '<0.1%' : `${dv.toFixed(1)}%`;
-                }
-            } else if (typeof value === 'string') {
-                valStr = value;
-            }
-
-            // The format requested is very specific:
-            // Label
-            // Amount
-            // Unit
-            // % DV (if present)
-            // But actually it looks like:
-            // Energy
-            // 155.00
-            // kcal
-            // 7.8%
-
-            const lines = [prefix + label, prefix + valStr, prefix + unit];
-            if (dvStr) lines.push(prefix + dvStr);
-            return lines.join('\n');
-        };
-
-        const lines: string[] = [];
-
-        // General
-        lines.push('General');
-        lines.push('Amount');
-        lines.push('% DV');
-        lines.push(formatLine('Energy', nutrition.calories, 'kcal', 'Energy'));
-        lines.push(formatLine('', nutrition.energy_kj, 'kJ')); // Energy KJ doesn't repeat the label in user's example? 
-        // Wait, looking at the snippet:
-        // Energy
-        // 155.00
-        // kcal
-        // 7.8%
-        // 648.95
-        // kJ
-
-        // Re-reading snippet:
-        /*
-        Energy
-        155.00
-        kcal
-        7.8%
-        648.95
-        kJ
-        */
-        // Let's adjust formatLine to handle this specific Energy case or more general cases.
 
         const output: string[] = [];
         output.push('General');
@@ -135,11 +80,13 @@ export default function NutrientExportModal({ isOpen, onClose, nutrition, recipe
         output.push('% DV');
 
         // Energy
+        const cals = nutrition.calories * multiplier;
+        const kj = nutrition.energy_kj * multiplier;
         output.push('Energy');
-        output.push(nutrition.calories.toFixed(2));
+        output.push(cals.toFixed(2));
         output.push('kcal');
-        output.push(((nutrition.calories / 2000) * 100).toFixed(1) + '%');
-        output.push(nutrition.energy_kj.toFixed(2));
+        output.push(((cals / 2000) * 100).toFixed(1) + '%');
+        output.push(kj.toFixed(2));
         output.push('kJ');
 
         const addNutrient = (label: string, names: string[], unit: string, rdaKey?: string, indent: number = 0) => {
@@ -165,7 +112,6 @@ export default function NutrientExportModal({ isOpen, onClose, nutrition, recipe
         addNutrient('Oxalate', ['Oxalate'], 'mg');
         addNutrient('Water', ['Water'], 'g');
 
-        // Carbohydrates
         output.push('Carbohydrates');
         output.push('Amount');
         output.push('% DV');
@@ -183,7 +129,6 @@ export default function NutrientExportModal({ isOpen, onClose, nutrition, recipe
         addNutrient('Added Sugars', ['Added Sugars'], 'g', 'Sugars', 1);
         addNutrient('Sugar Alcohol', ['Sugar Alcohol'], 'g', undefined, 1);
 
-        // Lipids
         output.push('Lipids');
         output.push('Amount');
         output.push('% DV');
@@ -197,7 +142,6 @@ export default function NutrientExportModal({ isOpen, onClose, nutrition, recipe
         addNutrient('Cholesterol', ['Cholesterol'], 'mg', 'Cholesterol');
         addNutrient('Phytosterol', ['Phytosterol'], 'mg');
 
-        // Protein
         output.push('Protein');
         output.push('Amount');
         output.push('% DV');
@@ -205,7 +149,6 @@ export default function NutrientExportModal({ isOpen, onClose, nutrition, recipe
         const aminos = ['Alanine', 'Arginine', 'Aspartic acid', 'Cystine', 'Glutamic acid', 'Glycine', 'Histidine', 'Hydroxyproline', 'Isoleucine', 'Leucine', 'Lysine', 'Methionine', 'Phenylalanine', 'Proline', 'Serine', 'Threonine', 'Tryptophan', 'Tyrosine', 'Valine'];
         aminos.forEach(a => addNutrient(a, [a], 'g', undefined, 1));
 
-        // Vitamins
         output.push('Vitamins');
         output.push('Amount');
         output.push('% DV');
@@ -233,7 +176,6 @@ export default function NutrientExportModal({ isOpen, onClose, nutrition, recipe
         addNutrient('Gamma Tocopherol', ['Gamma Tocopherol'], 'mg', undefined, 1);
         addNutrient('Vitamin K', ['Vitamin K'], 'µg', 'Vitamin K');
 
-        // Minerals
         output.push('Minerals');
         output.push('Amount');
         output.push('% DV');
@@ -253,7 +195,7 @@ export default function NutrientExportModal({ isOpen, onClose, nutrition, recipe
         addNutrient('Zinc', ['Zinc'], 'mg', 'Zinc');
 
         return output.join('\n');
-    }, [nutrition]);
+    }, [nutrition, exportMode, totalWeight]);
 
     const handleCopy = () => {
         navigator.clipboard.writeText(formattedText);
@@ -302,8 +244,36 @@ export default function NutrientExportModal({ isOpen, onClose, nutrition, recipe
 
                 {/* Content */}
                 <div className="flex-1 overflow-y-auto p-8 space-y-6 custom-scrollbar bg-slate-50/50 dark:bg-slate-950/20">
+                    {/* MODE TOGGLE */}
+                    <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl gap-1.5 border border-slate-200 dark:border-slate-700">
+                        <button
+                            onClick={() => setExportMode('100g')}
+                            className={cn(
+                                "flex-1 h-12 rounded-[0.9rem] text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2",
+                                exportMode === '100g'
+                                    ? "bg-white dark:bg-slate-900 text-emerald-600 shadow-sm border border-slate-200 dark:border-slate-700"
+                                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                            )}
+                        >
+                            <Scale size={14} />
+                            Per 100g (Standard)
+                        </button>
+                        <button
+                            onClick={() => setExportMode('total')}
+                            className={cn(
+                                "flex-1 h-12 rounded-[0.9rem] text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2",
+                                exportMode === 'total'
+                                    ? "bg-white dark:bg-slate-900 text-emerald-600 shadow-sm border border-slate-200 dark:border-slate-700"
+                                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                            )}
+                        >
+                            <FileText size={14} />
+                            Batch Totals ({Math.round(totalWeight)}g)
+                        </button>
+                    </div>
+
                     <div className="relative group">
-                        <pre className="w-full h-[50vh] p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl text-xs font-mono text-slate-600 dark:text-slate-400 overflow-auto whitespace-pre custom-scrollbar shadow-inner">
+                        <pre className="w-full h-[45vh] p-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl text-xs font-mono text-slate-600 dark:text-slate-400 overflow-auto whitespace-pre custom-scrollbar shadow-inner">
                             {formattedText}
                         </pre>
 
@@ -320,7 +290,10 @@ export default function NutrientExportModal({ isOpen, onClose, nutrition, recipe
 
                     <div className="p-6 bg-emerald-500/5 border border-emerald-500/10 rounded-3xl">
                         <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest leading-relaxed">
-                            <span className="opacity-50">Note:</span> This data represents the full calculated nutritional profile of "{recipeName}", normalized for copy-pasting into individual food creation forms. Values are based on a standard 2000 kcal reference diet.
+                            <span className="opacity-50 font-black">Accuracy Tip:</span> Use <span className="underline">Per 100g</span> if you are adding this as a new "Food" in a database. This ensures the app can accurately scale minor quantities (e.g., 10g of butter) later. Use <span className="underline">Batch Totals</span> only if you intend to log the entire recipe at once.
+                        </p>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed mt-2">
+                            % DV is based on a standard 2000 kcal reference diet.
                         </p>
                     </div>
                 </div>

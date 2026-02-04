@@ -115,6 +115,7 @@ export default function RecipeDetailsPage() {
     const [calculatedTotals, setCalculatedTotals] = useState<CalculatedNutrition | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
     const [showExportModal, setShowExportModal] = useState(false);
+    const [totalWeight, setTotalWeight] = useState(0);
     const { profile, nutrientDisplayMode, energyUnit, dailyTargets } = useUserPreferences();
 
     // SMART PORTION CONTROL STATE
@@ -367,6 +368,10 @@ export default function RecipeDetailsPage() {
             fat: calculated.fat,
             micronutrients: calculated.micronutrients
         }) : null);
+
+        // Calculate total weight for export normalization
+        const weight = activeIngredients.reduce((sum, ing) => sum + (ing.weight_g || 0), 0);
+        setTotalWeight(weight);
 
     }, [ingredients, hiddenIngredientIds]);
 
@@ -1432,6 +1437,7 @@ export default function RecipeDetailsPage() {
                         onClose={() => setShowExportModal(false)}
                         nutrition={calculatedTotals}
                         recipeName={recipe.title}
+                        totalWeight={totalWeight}
                     />
                 )}
             </div >
