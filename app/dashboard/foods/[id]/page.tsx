@@ -245,7 +245,18 @@ export default function FoodDetailsPage() {
             }
         }
 
-        // 2. Special Fallback for Energy: Calculate from macros if Energy/Calories is missing or 0
+        // 2. Extra Fallback for Fat: Try to sum constituents if total is 0
+        if (keys.includes('fat_g') || keys.includes('Fat')) {
+            const m = food.micronutrients || {};
+            const sat = m['Saturated Fat'] || 0;
+            const mono = m['Monounsaturated Fat'] || 0;
+            const poly = m['Polyunsaturated Fat'] || 0;
+            const trans = m['Trans Fat'] || 0;
+            const sum = sat + mono + poly + trans;
+            if (sum > 0) return sum;
+        }
+
+        // 3. Special Fallback for Energy: Calculate from macros if Energy/Calories is missing or 0
         if (keys.some(k => k.toLowerCase().includes('energy') || k.toLowerCase().includes('calorie'))) {
             const p = food.protein_g || 0;
             const c = food.carbs_g || 0;
@@ -328,7 +339,19 @@ export default function FoodDetailsPage() {
                         const rda = userRDAs?.[label] || macroRDAs[label];
                         const pct = rda ? Math.round((val / rda) * 100) : 0;
                         const styles = getNutrientLevelStyles(pct || 0, label);
-                        const unitLabel = label === 'Vitamin D' ? 'IU' : (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg') ? 'µg' : (label === 'Energy' ? energyUnit : (label === 'Protein' || label === 'Carbs' || label === 'Fat') ? 'g' : 'mg'));
+                        const isGramBased = (
+                            label === 'Protein' ||
+                            label === 'Carbs' ||
+                            label === 'Fat' ||
+                            label === 'Fiber' ||
+                            label === 'Sugars' ||
+                            label === 'Starch' ||
+                            label === 'Omega-3' ||
+                            label === 'Omega-6' ||
+                            label === 'Alcohol' ||
+                            label === 'Water'
+                        );
+                        const unitLabel = label === 'Vitamin D' ? 'IU' : (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg') ? 'µg' : (label === 'Energy' ? energyUnit : isGramBased ? 'g' : 'mg'));
                         const hasBreakdown = breakdownLabels.includes(label);
 
                         return (

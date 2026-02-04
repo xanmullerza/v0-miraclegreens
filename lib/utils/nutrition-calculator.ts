@@ -125,7 +125,19 @@ export function calculateNutrition(
     const calories = getMacro(foodItem.energy_kcal, ['Energy', 'Calories', 'energy_kcal']);
     const protein = getMacro(foodItem.protein_g, ['Protein', 'protein_g']);
     const carbs = getMacro(foodItem.carbs_g, ['Carbohydrates', 'carbs_g']);
-    const fat = getMacro(foodItem.fat_g, ['Fat', 'fat_g']);
+    let fat = getMacro(foodItem.fat_g, ['Fat', 'fat_g', 'fat']);
+
+    // Extra fallback: If fat is 0 but we have constituents, sum them
+    if (fat === 0 && foodItem.micronutrients) {
+        const m = foodItem.micronutrients;
+        const sat = m['Saturated Fat'] || m['saturated_fat_g'] || 0;
+        const mono = m['Monounsaturated Fat'] || m['monounsaturated_fat_g'] || 0;
+        const poly = m['Polyunsaturated Fat'] || m['polyunsaturated_fat_g'] || 0;
+        const trans = m['Trans Fat'] || m['trans_fat_g'] || 0;
+        const totalSum = sat + mono + poly + trans;
+        if (totalSum > 0) fat = totalSum;
+    }
+
     const energyKj = getMacro(foodItem.energy_kj, ['energy_kj']);
 
     const result: CalculatedNutrition = {
