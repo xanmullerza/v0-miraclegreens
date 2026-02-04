@@ -670,13 +670,15 @@ export default function RecipeDetailsPage() {
                                 <Pencil size={32} className="group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all" />
                             </button>
                         )}
-                        <button
-                            onClick={() => setShowExportModal(true)}
-                            className="p-2 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 text-slate-400 hover:text-emerald-500 transition-all hover:scale-110 active:scale-95 group mt-1"
-                            title="Export Nutrients"
-                        >
-                            <Download size={32} className="group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all" />
-                        </button>
+                        {isAdmin && (
+                            <button
+                                onClick={() => setShowExportModal(true)}
+                                className="p-2 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 text-slate-400 hover:text-emerald-500 transition-all hover:scale-110 active:scale-95 group mt-1"
+                                title="Export Nutrients"
+                            >
+                                <Download size={32} className="group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all" />
+                            </button>
+                        )}
                     </div>
                     <div className="flex flex-wrap gap-2">
                         {recipe.source && (
