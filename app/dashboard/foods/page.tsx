@@ -33,7 +33,8 @@ import {
     ChevronDown,
     Scale,
     ChefHat,
-    Globe
+    Globe,
+    Beaker
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -738,6 +739,16 @@ function FoodsContent() {
 
                                             {/* Action */}
                                             <div className="p-3 lg:p-0 flex justify-end lg:justify-center gap-2">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        router.push(`/dashboard/spice-converter?foodId=${food.id}`);
+                                                    }}
+                                                    className="w-8 h-8 rounded-full flex items-center justify-center transition-all border bg-slate-50 dark:bg-slate-800 text-indigo-500 hover:text-indigo-600 border-slate-100 dark:border-slate-700"
+                                                    title="Spice Lab"
+                                                >
+                                                    <Beaker size={14} />
+                                                </button>
                                                 {currentUserEmail === 'morne@miraclegreens.co.za' && (
                                                     <button
                                                         onClick={(e) => {
