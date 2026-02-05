@@ -29,6 +29,7 @@ interface FoodItem {
     micronutrients?: Record<string, number>;
     portions?: FoodMeasure[];
     image?: string;
+    source?: string;
 }
 
 export interface RecipeIngredient {
@@ -39,6 +40,7 @@ export interface RecipeIngredient {
     measure_label: string;
     modifier?: string; // New field for prep state
     image?: string;
+    source?: string;
     // Calculated nutrition
     calories: number;
     energy_kj: number;
@@ -731,7 +733,8 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
                                 carbs: details.carbs_g,
                                 micronutrients: details.micronutrients || {}
                             },
-                            available_measures: details.portions
+                            available_measures: details.portions,
+                            source: details.source || 'usda'
                         };
 
                         onChange(updated);
@@ -1317,7 +1320,8 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
                                                         if (key === 'stored') {
                                                             const name = ing.food_item_name.toLowerCase();
                                                             const isCooked = name.includes('cooked') || name.includes('boiled') || name.includes('roasted') || name.includes('fried');
-                                                            label = isCooked ? 'Cooked (Direct)' : 'Raw (Direct)';
+                                                            const source = (ing.source || 'USDA').toUpperCase();
+                                                            label = isCooked ? `Cooked (${source})` : `Raw (${source})`;
                                                         }
                                                         return <option key={key} value={key}>{label}</option>
                                                     })}

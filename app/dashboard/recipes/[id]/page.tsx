@@ -1216,7 +1216,8 @@ export default function RecipeDetailsPage() {
                                                             if (key === 'stored') {
                                                                 const name = (ing.food_item?.name || '').toLowerCase();
                                                                 const isCooked = name.includes('cooked') || name.includes('boiled') || name.includes('roasted') || name.includes('fried');
-                                                                label = isCooked ? 'Cooked (Direct)' : 'Raw (Direct)';
+                                                                const source = (ing.food_item?.source || 'USDA').toUpperCase();
+                                                                label = isCooked ? `Cooked (${source})` : `Raw (${source})`;
                                                             }
                                                             return <option key={key} value={key}>{label}</option>
                                                         })}
