@@ -140,6 +140,8 @@ function SpiceConverterContent() {
     };
 
     const renderPreview = () => {
+        if (!selectedFood || !customFactor) return null;
+
         const transformedPortions = transformPortions(selectedFood.portions || [], customFactor, targetState);
         const transformedNutrition = transformNutritionPer100g(selectedFood, customFactor, targetState);
 
