@@ -666,19 +666,28 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
 
                     if (details) {
                         let newWeight = ing.weight_g;
-                        const unit = (ing.measure_label || 'g').toLowerCase();
+                        const currentUnit = (ing.measure_label || 'g').toLowerCase();
 
-                        // Robust portion match
+                        // Robust portion matching logic
+                        const normalize = (s: string) => s.replace(/,/g, ' ').replace(/\s+/g, ' ').trim();
+                        const nUnit = normalize(currentUnit);
+                        const baseUnits = ['cup', 'tbsp', 'tsp', 'g', 'oz', 'leaf', 'bunch', 'piece', 'item'];
+                        const foundBase = baseUnits.find(bu => nUnit.startsWith(bu));
+
                         const portion = details.portions?.find((p: any) => {
                             const l = p.label.toLowerCase();
-                            return l === unit || l.includes(unit) || unit.includes(l);
+                            const nL = normalize(l);
+
+                            if (l === currentUnit || nL === nUnit) return true;
+                            if (foundBase && nL.startsWith(foundBase)) return true;
+                            return l.includes(currentUnit) || currentUnit.includes(l);
                         });
 
                         if (portion) {
                             newWeight = (ing.quantity || 1) * portion.weight_g;
-                            console.log(`[PortionMatch] Matched ${unit} to ${portion.label}, new weight: ${newWeight}`);
+                            console.log(`[PortionMatch] Matched ${currentUnit} to ${portion.label}, new weight: ${newWeight}`);
                         } else {
-                            console.warn(`[PortionMatch] No match for ${unit} in ${details.name}, keeping weight ${ing.weight_g}`);
+                            console.warn(`[PortionMatch] No match for ${currentUnit} in ${details.name}, keeping weight ${ing.weight_g}`);
                         }
 
                         updated[index] = {
