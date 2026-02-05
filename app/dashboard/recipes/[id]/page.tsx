@@ -1211,9 +1211,15 @@ export default function RecipeDetailsPage() {
                                                         onChange={(e) => handleUpdateIngredientState(i, e.target.value as CookingState)}
                                                         className="h-7 text-[10px] font-bold bg-slate-200 dark:bg-slate-700 border-none rounded-lg px-2 focus:ring-1 focus:ring-amber-500 max-w-[80px] text-amber-600 dark:text-amber-400"
                                                     >
-                                                        {Object.entries(COOKING_STATES).map(([key, state]) => (
-                                                            <option key={key} value={key}>{state.label}</option>
-                                                        ))}
+                                                        {Object.entries(COOKING_STATES).map(([key, state]) => {
+                                                            let label = state.label;
+                                                            if (key === 'stored') {
+                                                                const name = (ing.food_item?.name || '').toLowerCase();
+                                                                const isCooked = name.includes('cooked') || name.includes('boiled') || name.includes('roasted') || name.includes('fried');
+                                                                label = isCooked ? 'Cooked (Direct)' : 'Raw (Direct)';
+                                                            }
+                                                            return <option key={key} value={key}>{label}</option>
+                                                        })}
                                                     </select>
                                                 </div>
                                             ) : (

@@ -1312,9 +1312,15 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
                                                     onChange={(e) => handleUpdateState(index, e.target.value as CookingState)}
                                                     className="w-full h-11 px-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 text-amber-600 dark:text-amber-400 text-xs rounded-xl font-black focus:ring-2 focus:ring-amber-500/20 outline-none transition-all appearance-none cursor-pointer"
                                                 >
-                                                    {Object.entries(COOKING_STATES).map(([key, state]) => (
-                                                        <option key={key} value={key}>{state.label}</option>
-                                                    ))}
+                                                    {Object.entries(COOKING_STATES).map(([key, state]) => {
+                                                        let label = state.label;
+                                                        if (key === 'stored') {
+                                                            const name = ing.food_item_name.toLowerCase();
+                                                            const isCooked = name.includes('cooked') || name.includes('boiled') || name.includes('roasted') || name.includes('fried');
+                                                            label = isCooked ? 'Cooked (Direct)' : 'Raw (Direct)';
+                                                        }
+                                                        return <option key={key} value={key}>{label}</option>
+                                                    })}
                                                 </select>
                                                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-amber-400">
                                                     <ChevronDown size={14} />

@@ -59,7 +59,7 @@ export const COOKING_STATES: Record<CookingState, StateFactor> = {
         energy: 4.5, protein: 4.5, fat: 4.5, carbs: 4.5, micros: 4.0, weightRatio: 0.22
     },
     'stored': {
-        label: 'As Stored',
+        label: 'Default/Stored',
         description: 'No adjustment. Uses nutrient profile exactly as stored in database.',
         energy: 1, protein: 1, fat: 1, carbs: 1, micros: 1, weightRatio: 1
     }
