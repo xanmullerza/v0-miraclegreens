@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams, usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import {
     Heart,
@@ -36,7 +36,8 @@ import {
     Minus,
     Trash2,
     GripVertical,
-    Download
+    Download,
+    Beaker
 } from 'lucide-react';
 import FoodItemPicker from '@/components/recipe/food-item-picker';
 import NutrientExportModal from '@/components/recipe/nutrient-export-modal';
@@ -50,7 +51,7 @@ import { nutrientInfo } from '@/lib/data/nutrient-info';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRDA } from '@/hooks/use-rda';
 
-import { findSpiceFactor, SpiceState } from '@/lib/utils/spice-conversion';
+import { findSpiceFactor, SpiceState, isSpice } from '@/lib/utils/spice-conversion';
 import { COOKING_STATES, CookingState } from '@/lib/utils/cooking-states';
 import { searchLocalFood } from '@/lib/services/nutrition';
 
@@ -101,6 +102,8 @@ interface Recipe {
 export default function RecipeDetailsPage() {
     const router = useRouter();
     const { id } = useParams();
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
     const [originalIngredients, setOriginalIngredients] = useState<Ingredient[]>([]); // To support reset
@@ -130,6 +133,77 @@ export default function RecipeDetailsPage() {
         // Default to selecting the current user on load
         setSelectedMemberIds(['main-user']);
     }, []);
+
+    // HANDLE SPICE LAB RETURN
+    useEffect(() => {
+        const newFoodId = searchParams.get('newFoodId');
+        const swapId = searchParams.get('swapId');
+
+        if (newFoodId && swapId && ingredients.length > 0) {
+            const performSwap = async () => {
+                try {
+                    // Fetch the new food
+                    const { data: food, error: foodError } = await supabase
+                        .from('food_items')
+                        .select('*')
+                        .eq('id', newFoodId)
+                        .single();
+
+                    if (foodError) throw foodError;
+
+                    const oldIng = ingredients.find(i => i.id === swapId);
+                    if (!oldIng || !food) return;
+
+                    toast.success(`Swapped spice with Lab version: ${food.name}`);
+
+                    // Calculate new values
+                    const weightFactor = (oldIng.weight_g || 0) / 100;
+                    const updatedIng = {
+                        ...oldIng,
+                        food_item_id: food.id,
+                        food_item: food, // For UI display
+                        base_ingredient: food.name,
+                        calories: Math.round(food.energy_kcal * weightFactor),
+                        energy_kj: Math.round((food.energy_kj || 0) * weightFactor),
+                        protein: food.protein_g * weightFactor,
+                        fat: food.fat_g * weightFactor,
+                        carbs: food.carbs_g * weightFactor,
+                        micronutrients: Object.entries(food.micronutrients || {}).reduce((acc, [key, val]) => {
+                            acc[key] = (val as number) * weightFactor;
+                            return acc;
+                        }, {} as Record<string, number>)
+                    };
+
+                    // Update local state
+                    setIngredients(prev => prev.map(i => i.id === swapId ? updatedIng : i));
+
+                    // Update Database
+                    const { error: updateError } = await supabase
+                        .from('recipe_ingredients')
+                        .update({
+                            food_item_id: food.id,
+                            base_ingredient: food.name,
+                            calories: updatedIng.calories,
+                            energy_kj: updatedIng.energy_kj,
+                            protein: updatedIng.protein,
+                            fat: updatedIng.fat,
+                            carbs: updatedIng.carbs,
+                            micronutrients: updatedIng.micronutrients
+                        })
+                        .eq('id', swapId);
+
+                    if (updateError) throw updateError;
+
+                    // Clean URL
+                    router.replace(pathname);
+                } catch (err: any) {
+                    console.error("Error swapping spice:", err);
+                    toast.error(`Failed to swap spice: ${err.message}`);
+                }
+            };
+            performSwap();
+        }
+    }, [searchParams, ingredients, pathname, id, router]);
 
     const allPeople = React.useMemo(() => {
         const mainUserAsMember = {
@@ -1171,10 +1245,26 @@ export default function RecipeDetailsPage() {
                                             )}
                                         </div>
                                         <div className="flex-1 text-left min-w-0">
-                                            <p className={cn(
-                                                "text-xs font-black capitalize leading-relaxed transition-colors",
-                                                hiddenIngredientIds.includes(ing.id) ? "text-slate-400 decoration-slate-300 line-through" : "text-slate-900 dark:text-white"
-                                            )}>{ing.base_ingredient || ing.item}</p>
+                                            <div className="flex items-center gap-2">
+                                                <p className={cn(
+                                                    "text-xs font-black capitalize leading-relaxed transition-colors",
+                                                    hiddenIngredientIds.includes(ing.id) ? "text-slate-400 decoration-slate-300 line-through" : "text-slate-900 dark:text-white"
+                                                )}>{ing.base_ingredient || ing.item}</p>
+                                                {isSpice(ing.food_item?.name || ing.base_ingredient || ing.item) && (ing.food_item_id || ing.food_item?.id) && (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            const fid = ing.food_item_id || ing.food_item?.id;
+                                                            const returnUrl = encodeURIComponent(window.location.pathname);
+                                                            router.push(`/dashboard/spice-converter?foodId=${fid}&returnTo=${returnUrl}&swapId=${ing.id}`);
+                                                        }}
+                                                        className="p-1 text-amber-500 hover:text-amber-600 transition-colors bg-amber-50 dark:bg-amber-900/20 rounded-lg"
+                                                        title="Calibrate in Spice Lab"
+                                                    >
+                                                        <Beaker size={12} />
+                                                    </button>
+                                                )}
+                                            </div>
 
                                             {isEditingMeasures ? (
                                                 <div className="flex items-center gap-2 mt-1" onClick={(e) => e.stopPropagation()}>
