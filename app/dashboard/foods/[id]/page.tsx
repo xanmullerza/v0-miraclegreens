@@ -25,7 +25,8 @@ import {
     BookOpen,
     Globe,
     Lightbulb,
-    ShieldCheck
+    ShieldCheck,
+    Beaker
 } from 'lucide-react';
 import { FOOD_DETAILS } from '@/lib/data/food-details';
 import { Badge } from '@/components/ui/badge';
