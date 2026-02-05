@@ -629,42 +629,47 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
 
             try {
                 // Broad search for the base name
-                console.log(`[StateUpdate] Searching for direct match. Base: "${baseName}", State: "${newState}"`);
                 const matches = await searchLocalFood(baseName);
-                console.log(`[StateUpdate] Found ${matches.length} potential matches for "${baseName}"`);
 
                 const queryState = newState === 'boiled' ? 'cooked' : newState.toLowerCase();
 
                 const directMatch = matches.find((m: any) => {
                     const itemName = m.name.toLowerCase();
                     const commonName = (m.common_name || '').toLowerCase();
-                    const b = baseName.toLowerCase();
-                    const hasBase = itemName.includes(b) || commonName.includes(b);
-                    const hasState = itemName.includes(queryState) || itemName.includes('boiled') || itemName.includes('fried') || itemName.includes('roasted');
+                    const b = baseName.toLowerCase().split(' ')[0]; // Use first word of base name for broader match
 
-                    // Specific logic for boiled -> cooked
-                    if (newState === 'boiled') {
-                        return hasBase && (itemName.includes('cooked') || itemName.includes('boiled'));
-                    }
-                    return hasBase && itemName.includes(queryState);
+                    const hasBase = itemName.includes(b) || commonName.includes(b);
+                    const stateWords = newState === 'boiled' ? ['cooked', 'boiled'] : [newState.toLowerCase()];
+                    const hasState = stateWords.some(word => itemName.includes(word));
+
+                    return hasBase && hasState;
                 });
 
                 if (directMatch) {
-                    console.log(`[StateUpdate] DIRECT MATCH FOUND: ${directMatch.name}`);
-                    toast.success(`Matched to stored profile`, {
-                        description: `Using ${directMatch.name}`,
+                    toast.success(`Found match: ${directMatch.name}`, {
+                        description: `Applying profile and portion weights...`,
                         duration: 3000
                     });
+
                     // Similar to the detail page, we swap the food item data
                     // We need to fetch full details (portions) to do the weight recalculation
                     const details = directMatch.portions?.length ? directMatch : await searchLocalFood(directMatch.name).then(res => res[0]);
 
                     if (details) {
                         let newWeight = ing.weight_g;
-                        const unit = ing.measure_label || 'g';
-                        const portion = details.portions?.find((p: any) => p.label.toLowerCase() === unit.toLowerCase());
+                        const unit = (ing.measure_label || 'g').toLowerCase();
+
+                        // Robust portion match
+                        const portion = details.portions?.find((p: any) => {
+                            const l = p.label.toLowerCase();
+                            return l === unit || l.includes(unit) || unit.includes(l);
+                        });
+
                         if (portion) {
                             newWeight = (ing.quantity || 1) * portion.weight_g;
+                            console.log(`[PortionMatch] Matched ${unit} to ${portion.label}, new weight: ${newWeight}`);
+                        } else {
+                            console.warn(`[PortionMatch] No match for ${unit} in ${details.name}, keeping weight ${ing.weight_g}`);
                         }
 
                         updated[index] = {

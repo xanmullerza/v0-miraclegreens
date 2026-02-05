@@ -551,13 +551,13 @@ export default function RecipeDetailsPage() {
                 const directMatch = matches.find((m: any) => {
                     const itemName = m.name.toLowerCase();
                     const commonName = (m.common_name || '').toLowerCase();
-                    const b = baseName.toLowerCase();
+                    const b = baseName.toLowerCase().split(' ')[0];
                     const hasBase = itemName.includes(b) || commonName.includes(b);
 
-                    if (newState === 'boiled') {
-                        return hasBase && (itemName.includes('cooked') || itemName.includes('boiled'));
-                    }
-                    return hasBase && itemName.includes(queryState);
+                    const stateWords = newState === 'boiled' ? ['cooked', 'boiled'] : [newState.toLowerCase()];
+                    const hasState = stateWords.some(word => itemName.includes(word));
+
+                    return hasBase && hasState;
                 });
 
                 if (directMatch) {
@@ -572,8 +572,12 @@ export default function RecipeDetailsPage() {
 
                     // Recalculate weight for current unit
                     let newWeight = ing.weight_g;
-                    const unit = ing.measure_label || 'g';
-                    const portion = newFood.portions?.find((p: any) => p.label.toLowerCase() === unit.toLowerCase());
+                    const unit = (ing.measure_label || 'g').toLowerCase();
+                    const portion = newFood.portions?.find((p: any) => {
+                        const l = p.label.toLowerCase();
+                        return l === unit || l.includes(unit) || unit.includes(l);
+                    });
+
                     if (portion) {
                         newWeight = (ing.quantity || 1) * portion.weight_g;
                     }
