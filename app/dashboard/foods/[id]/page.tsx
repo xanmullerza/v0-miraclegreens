@@ -441,6 +441,14 @@ export default function FoodDetailsPage() {
                         <Share2 size={18} />
                     </Button>
                     <Button
+                        variant="outline"
+                        onClick={() => router.push(`/dashboard/spice-converter?foodId=${food.id}`)}
+                        className="rounded-2xl h-12 gap-2 font-black uppercase tracking-widest border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-[10px] text-indigo-600"
+                    >
+                        <Beaker size={16} />
+                        Spice Lab
+                    </Button>
+                    <Button
                         onClick={toggleFavorite}
                         variant="outline"
                         className={cn(

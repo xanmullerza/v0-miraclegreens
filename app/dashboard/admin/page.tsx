@@ -13,7 +13,8 @@ import {
     Edit3,
     FileText,
     Zap,
-    Scale
+    Scale,
+    Beaker
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -88,6 +89,14 @@ export default function AdminOverview() {
             icon: Scale,
             color: 'text-orange-500',
             bg: 'bg-orange-500/10'
+        },
+        {
+            name: 'Spice Lab',
+            desc: 'Convert whole vs ground spices.',
+            href: '/dashboard/spice-converter',
+            icon: Beaker,
+            color: 'text-indigo-500',
+            bg: 'bg-indigo-500/10'
         }
     ];
 
