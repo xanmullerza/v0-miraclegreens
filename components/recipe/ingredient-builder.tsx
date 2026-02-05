@@ -628,16 +628,30 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
             const targetTerm = newState === 'boiled' ? `${baseName}, Cooked` : `${baseName}, ${newState.charAt(0).toUpperCase() + newState.slice(1)}`;
 
             try {
+                // Broad search for the base name
+                console.log(`[StateUpdate] Searching for direct match. Base: "${baseName}", State: "${newState}"`);
                 const matches = await searchLocalFood(baseName);
+                console.log(`[StateUpdate] Found ${matches.length} potential matches for "${baseName}"`);
+
                 const queryState = newState === 'boiled' ? 'cooked' : newState.toLowerCase();
+
                 const directMatch = matches.find((m: any) => {
                     const itemName = m.name.toLowerCase();
+                    const commonName = (m.common_name || '').toLowerCase();
                     const b = baseName.toLowerCase();
-                    return itemName.includes(b) && (itemName.includes(queryState) || (newState === 'boiled' && itemName.includes('boiled')));
+                    const hasBase = itemName.includes(b) || commonName.includes(b);
+                    const hasState = itemName.includes(queryState) || itemName.includes('boiled') || itemName.includes('fried') || itemName.includes('roasted');
+
+                    // Specific logic for boiled -> cooked
+                    if (newState === 'boiled') {
+                        return hasBase && (itemName.includes('cooked') || itemName.includes('boiled'));
+                    }
+                    return hasBase && itemName.includes(queryState);
                 });
 
                 if (directMatch) {
-                    toast.success(`Matched to stored profile for ${newState} ${baseName}`, {
+                    console.log(`[StateUpdate] DIRECT MATCH FOUND: ${directMatch.name}`);
+                    toast.success(`Matched to stored profile`, {
                         description: `Using ${directMatch.name}`,
                         duration: 3000
                     });

@@ -543,27 +543,25 @@ export default function RecipeDetailsPage() {
         // If user selects 'boiled', look for 'Kale, Boiled' or 'Kale, Cooked'
         if (newState === 'boiled' || newState === 'fried' || newState === 'roasted') {
             const baseName = (food?.common_name || food?.name || '').split(',')[0].trim();
-            const searchTerms = [
-                `${baseName}, Cooked`,
-                `${baseName}, Boiled`,
-                `${baseName}, Fried`,
-                `${baseName}, Roasted`
-            ];
-
-            // Priority search for the specific state
-            const targetTerm = newState === 'boiled' ? `${baseName}, Cooked` : `${baseName}, ${newState.charAt(0).toUpperCase() + newState.slice(1)}`;
-
             try {
+                // Broad search for the base name
                 const matches = await searchLocalFood(baseName);
                 const queryState = newState === 'boiled' ? 'cooked' : newState.toLowerCase();
+
                 const directMatch = matches.find((m: any) => {
                     const itemName = m.name.toLowerCase();
+                    const commonName = (m.common_name || '').toLowerCase();
                     const b = baseName.toLowerCase();
-                    return itemName.includes(b) && (itemName.includes(queryState) || (newState === 'boiled' && itemName.includes('boiled')));
+                    const hasBase = itemName.includes(b) || commonName.includes(b);
+
+                    if (newState === 'boiled') {
+                        return hasBase && (itemName.includes('cooked') || itemName.includes('boiled'));
+                    }
+                    return hasBase && itemName.includes(queryState);
                 });
 
                 if (directMatch) {
-                    toast.success(`Matched to stored profile for ${newState} ${baseName}`, {
+                    toast.success(`Matched to stored profile`, {
                         description: `Using ${directMatch.name}`,
                         duration: 3000
                     });
