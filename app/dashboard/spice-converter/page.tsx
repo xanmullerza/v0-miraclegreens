@@ -38,6 +38,8 @@ function SpiceConverterContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const foodId = searchParams.get('foodId');
+    const returnTo = searchParams.get('returnTo');
+    const swapIndex = searchParams.get('swapIndex'); // Optional: index to swap in builder
 
     const [selectedFood, setSelectedFood] = useState<any>(null);
     const [loading, setLoading] = useState(false);
@@ -130,7 +132,13 @@ function SpiceConverterContent() {
             if (error) throw error;
 
             toast.success(`Created "${newName}" successfully!`);
-            router.push(`/dashboard/foods/${data.id}`);
+
+            if (returnTo) {
+                const connector = returnTo.includes('?') ? '&' : '?';
+                router.push(`${returnTo}${connector}newFoodId=${data.id}${swapIndex ? `&swapIndex=${swapIndex}` : ''}`);
+            } else {
+                router.push(`/dashboard/foods/${data.id}`);
+            }
         } catch (err: any) {
             console.error("Error saving food:", err);
             toast.error(`Error: ${err.message}`);
@@ -171,52 +179,78 @@ function SpiceConverterContent() {
                     </Card>
 
                     {/* Target Preview */}
-                    <Card className="p-6 border-indigo-500/20 bg-indigo-500/[0.02]">
+                    <Card className="p-6 border-indigo-500/20 bg-indigo-500/[0.02] relative overflow-hidden">
+                        {/* Molecule Shift Visualizer Backdrop */}
+                        <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-indigo-500/5 to-transparent pointer-events-none" />
+
                         <div className="flex items-center gap-3 mb-4">
                             <div className="p-2 rounded-xl bg-indigo-100 dark:bg-indigo-900/40 text-indigo-500">
                                 <ChefHat size={18} />
                             </div>
                             <h3 className="font-bold text-sm uppercase tracking-widest text-indigo-500">Target Output ({targetState})</h3>
                         </div>
-                        <div className="space-y-4">
+
+                        <div className="space-y-6 relative z-10">
                             <div>
                                 <p className="text-xl font-black italic uppercase tracking-tighter text-indigo-600 dark:text-indigo-400">
                                     {targetState === 'ground' ? `${selectedFood.name.split(',')[0]}, ground` : `${selectedFood.name.split(',')[0]}, whole`}
                                 </p>
-                                {customFactor.concentrationFactor !== 1 && (
-                                    <div className="flex items-center gap-1.5 mt-1">
-                                        <Zap size={10} className="text-amber-500" />
-                                        <span className="text-[9px] font-black uppercase text-amber-500 tracking-widest">
-                                            Nutrient Concentration Activated: {customFactor.concentrationFactor}x
+
+                                {/* MOLECULE SHIFT VISUALIZER */}
+                                <div className="mt-4 p-4 rounded-2xl bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800 shadow-sm">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-1.5">
+                                            <Zap size={10} className="text-amber-500 fill-amber-500" /> Molecule Shift
                                         </span>
+                                        <span className="text-[10px] font-black text-indigo-500">{customFactor.concentrationFactor}x Concentration</span>
                                     </div>
-                                )}
+                                    <div className="relative h-4 w-full bg-slate-100 dark:bg-slate-900 rounded-full overflow-hidden border border-slate-50 dark:border-slate-800">
+                                        {/* Baseline (1.0x) */}
+                                        <div className="absolute left-0 top-0 bottom-0 bg-slate-200 dark:bg-slate-800 w-[20%] border-r border-slate-300 dark:border-slate-700" title="Whole Baseline" />
+                                        {/* Concentration Fill */}
+                                        <div
+                                            className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-indigo-500 to-indigo-400 transition-all duration-1000 ease-out shadow-[0_0_15px_rgba(99,102,241,0.3)]"
+                                            style={{ width: `${Math.min(100, (customFactor.concentrationFactor / 5) * 100)}%` }}
+                                        />
+                                    </div>
+                                    <p className="text-[9px] text-slate-400 italic mt-2 leading-tight">
+                                        1g of {targetState} {targetState === 'ground' ? 'concentrates' : 'dilutes'} nutrients by a factor of {customFactor.concentrationFactor}x compared to the source material.
+                                    </p>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-1">
-                                    <p className="text-[10px] font-black uppercase text-indigo-400/60">Adjusted Weights</p>
-                                    {transformedPortions.map((p: any, i: number) => (
-                                        <div key={i} className="flex justify-between text-xs font-mono text-indigo-700 dark:text-indigo-300">
-                                            <span>1 {p.label}</span>
-                                            <span className="font-black">{p.weight_g}g</span>
-                                        </div>
-                                    ))}
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Scale size={10} className="text-indigo-400" />
+                                        <p className="text-[10px] font-black uppercase text-indigo-400/60 tracking-widest">Density Map</p>
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        {transformedPortions.map((p: any, i: number) => (
+                                            <div key={i} className="flex justify-between text-[11px] font-mono p-1.5 rounded-lg bg-indigo-500/5 border border-indigo-500/10">
+                                                <span className="text-indigo-600 dark:text-indigo-400 font-bold">1 {p.label}</span>
+                                                <span className="font-black text-indigo-900 dark:text-indigo-200">{p.weight_g}g</span>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                                 <div className="space-y-1">
-                                    <p className="text-[10px] font-black uppercase text-indigo-400/60">Nutrition Shift (per 100g)</p>
-                                    <div className="space-y-0.5 text-[10px] font-mono text-indigo-600 dark:text-indigo-400">
-                                        <div className="flex justify-between">
-                                            <span>Energy</span>
-                                            <span className="font-bold">{transformedNutrition.energy_kcal} kcal</span>
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Activity size={10} className="text-indigo-400" />
+                                        <p className="text-[10px] font-black uppercase text-indigo-400/60 tracking-widest">Nutrition Pulse</p>
+                                    </div>
+                                    <div className="space-y-1 text-[10px] font-mono">
+                                        <div className="flex justify-between p-1 bg-white dark:bg-slate-950 rounded border border-indigo-500/5">
+                                            <span className="text-slate-500">Kcal</span>
+                                            <span className="font-bold text-indigo-600">{transformedNutrition.energy_kcal || 0}</span>
                                         </div>
-                                        <div className="flex justify-between border-t border-indigo-500/10 pt-0.5">
-                                            <span>Protein</span>
-                                            <span className="font-bold">{transformedNutrition.protein_g}g</span>
+                                        <div className="flex justify-between p-1 bg-white dark:bg-slate-950 rounded border border-indigo-500/5">
+                                            <span className="text-slate-500">Prot</span>
+                                            <span className="font-bold text-indigo-600">{transformedNutrition.protein_g || 0}g</span>
                                         </div>
-                                        <div className="flex justify-between">
-                                            <span>Carbs</span>
-                                            <span className="font-bold">{transformedNutrition.carbs_g}g</span>
+                                        <div className="flex justify-between p-1 bg-white dark:bg-slate-950 rounded border border-indigo-500/5">
+                                            <span className="text-slate-500">Carb</span>
+                                            <span className="font-bold text-indigo-600">{transformedNutrition.carbs_g || 0}g</span>
                                         </div>
                                     </div>
                                 </div>

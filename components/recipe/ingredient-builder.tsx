@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, Zap, X as CloseIcon, ChevronDown, Layers, Gem, Droplet, Battery, Activity, Utensils, ShoppingBasket, ArrowRight } from 'lucide-react';
+import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, Zap, X as CloseIcon, ChevronDown, Layers, Gem, Droplet, Battery, Activity, Utensils, ShoppingBasket, ArrowRight, Beaker } from 'lucide-react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import FoodItemPicker from './food-item-picker';
 import { fetchFoodMeasures, FoodMeasure, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { COOKING_STATES, CookingState } from '@/lib/utils/cooking-states';
-import { findSpiceFactor } from '@/lib/utils/spice-conversion';
+import { findSpiceFactor, isSpice } from '@/lib/utils/spice-conversion';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { parseIngredientsOnly } from '@/lib/utils/recipe-parser';
 import { searchLocalFood, searchUSDAFood, getUSDAMeasures, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
@@ -76,6 +77,9 @@ interface IngredientBuilderProps {
 
 export default function IngredientBuilder({ ingredients, onChange, initialShowPicker = false, initialShowMagicPaste = false, onNext }: IngredientBuilderProps) {
     const [showPicker, setShowPicker] = useState(false);
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
     const [showMagicPaste, setShowMagicPaste] = useState(false);
     const [magicText, setMagicText] = useState('');
     const [isParsing, setIsParsing] = useState(false);
@@ -94,6 +98,77 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
         if (initialShowMagicPaste) setShowMagicPaste(true);
     }, [initialShowPicker, initialShowMagicPaste]);
 
+
+    useEffect(() => {
+        const newFoodId = searchParams.get('newFoodId');
+        const swapIndexStr = searchParams.get('swapIndex');
+        const pendingJson = sessionStorage.getItem('moringa_spice_lab_pending');
+
+        if (newFoodId && swapIndexStr !== null && pendingJson) {
+            const index = parseInt(swapIndexStr);
+            const pendingIngredients = JSON.parse(pendingJson);
+
+            // Clean up immediately so it doesn't run again on refresh
+            sessionStorage.removeItem('moringa_spice_lab_pending');
+
+            // Fetch the new food and update
+            const performSwap = async () => {
+                try {
+                    const { data: food, error } = await supabase
+                        .from('food_items')
+                        .select('*')
+                        .eq('id', newFoodId)
+                        .single();
+
+                    if (error) throw error;
+                    if (food) {
+                        toast.success(`Swapped spice with Lab version: ${food.name}`);
+                        const updated = [...pendingIngredients];
+                        const oldIng = updated[index];
+
+                        // Create the new ingredient object
+                        // We keep the quantity and unit from the old one, but update the weight and nutrition
+                        const newIng: RecipeIngredient = {
+                            ...oldIng,
+                            food_item_id: food.id,
+                            food_item_name: food.name,
+                            source: food.source || 'manual',
+                            calories: food.energy_kcal * (oldIng.weight_g / 100),
+                            energy_kj: (food.energy_kj || 0) * (oldIng.weight_g / 100),
+                            protein: food.protein_g * (oldIng.weight_g / 100),
+                            fat: food.fat_g * (oldIng.weight_g / 100),
+                            carbs: food.carbs_g * (oldIng.weight_g / 100),
+                            micronutrients: Object.entries(food.micronutrients || {}).reduce((acc, [key, val]) => {
+                                acc[key] = (val as number) * (oldIng.weight_g / 100);
+                                return acc;
+                            }, {} as Record<string, number>),
+                            base_nutrition: {
+                                calories: food.energy_kcal,
+                                energy_kj: food.energy_kj || 0,
+                                protein: food.protein_g,
+                                fat: food.fat_g,
+                                carbs: food.carbs_g,
+                                micronutrients: food.micronutrients || {}
+                            },
+                            available_measures: food.portions
+                        };
+
+                        updated[index] = newIng;
+                        onChange(updated);
+
+                        // Remove search params from URL without refresh
+                        const newUrl = pathname;
+                        window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
+                    }
+                } catch (err) {
+                    console.error("Error swapping spice:", err);
+                    toast.error("Failed to swap spice after Lab calibration");
+                }
+            };
+
+            performSwap();
+        }
+    }, [searchParams, pathname, onChange]);
 
     const handleAddIngredient = async (foodItem: FoodItem | FoodItemMatch, initialValues?: { weightG?: number, quantity?: number, unit?: string, modifier?: string }) => {
         // Fetch available measures
@@ -1248,9 +1323,23 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
                                                             <button
                                                                 onClick={() => setEditingNameIndex(index)}
                                                                 className="p-1 opacity-0 group-hover/name:opacity-100 transition-opacity text-slate-400 hover:text-emerald-500"
+                                                                title="Edit Name"
                                                             >
                                                                 <Pencil size={12} />
                                                             </button>
+                                                            {isSpice(ing.food_item_name) && ing.food_item_id && (
+                                                                <button
+                                                                    onClick={() => {
+                                                                        sessionStorage.setItem('moringa_spice_lab_pending', JSON.stringify(ingredients));
+                                                                        const returnUrl = encodeURIComponent(pathname);
+                                                                        router.push(`/dashboard/spice-converter?foodId=${ing.food_item_id}&returnTo=${returnUrl}&swapIndex=${index}`);
+                                                                    }}
+                                                                    className="p-1 opacity-0 group-hover/name:opacity-100 transition-opacity text-amber-500 hover:text-amber-600"
+                                                                    title="Calibrate in Spice Lab"
+                                                                >
+                                                                    <Beaker size={12} />
+                                                                </button>
+                                                            )}
                                                         </>
                                                     )}
                                                 </div>

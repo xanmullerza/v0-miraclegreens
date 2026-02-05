@@ -29,6 +29,8 @@ export const SPICE_TRANSFORMATIONS: Record<string, SpiceTransformationFactor> = 
     'Cloves': { name: 'Cloves', vToG: 0.75, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 2.2 },
     'Ginger': { name: 'Ginger', vToG: 1.0, concentrationFactor: 4.5, gPerTspGround: 2.0, gPerTspWhole: 5.0 },
     'Turmeric': { name: 'Turmeric', vToG: 1.0, concentrationFactor: 5.0, gPerTspGround: 2.74, gPerTspWhole: 4.8 },
+    'Nutmeg': { name: 'Nutmeg', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 2.6 },
+    'Star Anise': { name: 'Star Anise', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 2.1, gPerTspWhole: 2.1 },
 };
 
 export const DEFAULT_TRANSFORMATION: SpiceTransformationFactor = {
@@ -50,6 +52,14 @@ export function findSpiceFactor(name: string): SpiceTransformationFactor {
         }
     }
     return DEFAULT_TRANSFORMATION;
+}
+
+/**
+ * Checks if a given food name matches a known spice in our transformation library.
+ */
+export function isSpice(name: string): boolean {
+    const upperName = (name || '').toUpperCase();
+    return Object.keys(SPICE_TRANSFORMATIONS).some(key => upperName.includes(key.toUpperCase()));
 }
 
 /**
