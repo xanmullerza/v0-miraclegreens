@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import {
@@ -34,7 +34,7 @@ const Card = ({ children, className }: { children: React.ReactNode, className?: 
     </div>
 );
 
-export default function SpiceConverterPage() {
+function SpiceConverterContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const foodId = searchParams.get('foodId');
@@ -381,5 +381,18 @@ export default function SpiceConverterPage() {
                 />
             )}
         </div>
+    );
+}
+
+export default function SpiceConverterPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
+                <Loader2 className="animate-spin text-indigo-500" size={32} />
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400">Loading Lab Environment...</p>
+            </div>
+        }>
+            <SpiceConverterContent />
+        </Suspense>
     );
 }
