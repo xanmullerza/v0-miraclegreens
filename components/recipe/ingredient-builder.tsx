@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { nutrientInfo } from '@/lib/data/nutrient-info';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRDA } from '@/hooks/use-rda';
+import { toast } from 'sonner';
 
 interface FoodItem {
     id?: string;
@@ -627,10 +628,19 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
             const targetTerm = newState === 'boiled' ? `${baseName}, Cooked` : `${baseName}, ${newState.charAt(0).toUpperCase() + newState.slice(1)}`;
 
             try {
-                const matches = await searchLocalFood(targetTerm);
-                const directMatch = matches.find(m => m.name.toLowerCase().startsWith(baseName.toLowerCase()));
+                const matches = await searchLocalFood(baseName);
+                const queryState = newState === 'boiled' ? 'cooked' : newState.toLowerCase();
+                const directMatch = matches.find((m: any) => {
+                    const itemName = m.name.toLowerCase();
+                    const b = baseName.toLowerCase();
+                    return itemName.includes(b) && (itemName.includes(queryState) || (newState === 'boiled' && itemName.includes('boiled')));
+                });
 
                 if (directMatch) {
+                    toast.success(`Matched to stored profile for ${newState} ${baseName}`, {
+                        description: `Using ${directMatch.name}`,
+                        duration: 3000
+                    });
                     // Similar to the detail page, we swap the food item data
                     // We need to fetch full details (portions) to do the weight recalculation
                     const details = directMatch.portions?.length ? directMatch : await searchLocalFood(directMatch.name).then(res => res[0]);

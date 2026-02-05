@@ -554,12 +554,19 @@ export default function RecipeDetailsPage() {
             const targetTerm = newState === 'boiled' ? `${baseName}, Cooked` : `${baseName}, ${newState.charAt(0).toUpperCase() + newState.slice(1)}`;
 
             try {
-                const matches = await searchLocalFood(targetTerm);
-                // Find a match that starts with our base name to avoid unrelated items
-                const directMatch = matches.find((m: any) => m.name.toLowerCase().startsWith(baseName.toLowerCase()));
+                const matches = await searchLocalFood(baseName);
+                const queryState = newState === 'boiled' ? 'cooked' : newState.toLowerCase();
+                const directMatch = matches.find((m: any) => {
+                    const itemName = m.name.toLowerCase();
+                    const b = baseName.toLowerCase();
+                    return itemName.includes(b) && (itemName.includes(queryState) || (newState === 'boiled' && itemName.includes('boiled')));
+                });
 
                 if (directMatch) {
-                    toast.success(`Switched to stored profile for ${newState} ${baseName}`, { duration: 3000 });
+                    toast.success(`Matched to stored profile for ${newState} ${baseName}`, {
+                        description: `Using ${directMatch.name}`,
+                        duration: 3000
+                    });
 
                     // We swap the food item but keep the quantity/unit
                     // The weight_g will be recalculated based on the NEW food's portions
