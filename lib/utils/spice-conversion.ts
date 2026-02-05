@@ -12,6 +12,8 @@ export interface SpiceTransformationFactor {
     concentrationFactor: number; // Nutritional concentration per gram (e.g. 1.2 means 1g ground = 1.2g whole nutrients)
     gPerTspGround: number; // Density: grams per 1 tsp of ground powder
     gPerTspWhole?: number; // Density: grams per 1 tsp of whole spice
+    gPerTbspGround?: number; // Density: grams per 1 tbsp
+    gPerTbspWhole?: number;
 }
 
 /**
@@ -19,18 +21,18 @@ export interface SpiceTransformationFactor {
  * Source: McCormick Culinary, Food52, USDA FoodData Central.
  */
 export const SPICE_TRANSFORMATIONS: Record<string, SpiceTransformationFactor> = {
-    'Black Pepper': { name: 'Black Pepper', vToG: 1.5, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 3.1 },
-    'Coriander': { name: 'Coriander', vToG: 1.25, concentrationFactor: 1.0, gPerTspGround: 2.36, gPerTspWhole: 1.8 },
-    'Cumin': { name: 'Cumin', vToG: 1.25, concentrationFactor: 1.0, gPerTspGround: 1.96, gPerTspWhole: 2.1 },
-    'Fennel': { name: 'Fennel', vToG: 1.25, concentrationFactor: 1.0, gPerTspGround: 2.0, gPerTspWhole: 1.9 },
-    'Mustard': { name: 'Mustard', vToG: 1.5, concentrationFactor: 1.0, gPerTspGround: 2.4, gPerTspWhole: 2.8 },
-    'Cardamom': { name: 'Cardamom', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 2.31, gPerTspWhole: 2.0 },
-    'Cinnamon': { name: 'Cinnamon', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 2.5 },
-    'Cloves': { name: 'Cloves', vToG: 0.75, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 2.2 },
-    'Ginger': { name: 'Ginger', vToG: 1.0, concentrationFactor: 4.5, gPerTspGround: 2.0, gPerTspWhole: 5.0 },
-    'Turmeric': { name: 'Turmeric', vToG: 1.0, concentrationFactor: 5.0, gPerTspGround: 2.74, gPerTspWhole: 4.8 },
-    'Nutmeg': { name: 'Nutmeg', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 2.6 },
-    'Star Anise': { name: 'Star Anise', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 2.1, gPerTspWhole: 2.1 },
+    'Black Pepper': { name: 'Black Pepper', vToG: 1.5, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 3.1, gPerTbspGround: 7.8, gPerTbspWhole: 9.3 },
+    'Coriander': { name: 'Coriander', vToG: 1.25, concentrationFactor: 1.0, gPerTspGround: 2.36, gPerTspWhole: 1.8, gPerTbspGround: 7.1, gPerTbspWhole: 5.4 },
+    'Cumin': { name: 'Cumin', vToG: 1.25, concentrationFactor: 1.0, gPerTspGround: 1.96, gPerTspWhole: 2.1, gPerTbspGround: 5.9, gPerTbspWhole: 6.3 },
+    'Fennel': { name: 'Fennel', vToG: 1.25, concentrationFactor: 1.0, gPerTspGround: 2.0, gPerTspWhole: 1.9, gPerTbspGround: 6.0, gPerTbspWhole: 5.7 },
+    'Mustard': { name: 'Mustard', vToG: 1.5, concentrationFactor: 1.0, gPerTspGround: 2.4, gPerTspWhole: 2.8, gPerTbspGround: 7.2, gPerTbspWhole: 8.4 },
+    'Cardamom': { name: 'Cardamom', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 2.31, gPerTspWhole: 2.0, gPerTbspGround: 6.9, gPerTbspWhole: 6.0 },
+    'Cinnamon': { name: 'Cinnamon', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 2.5, gPerTbspGround: 7.8, gPerTbspWhole: 7.5 },
+    'Cloves': { name: 'Cloves', vToG: 0.75, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 2.2, gPerTbspGround: 7.8, gPerTbspWhole: 6.6 },
+    'Ginger': { name: 'Ginger', vToG: 1.0, concentrationFactor: 4.5, gPerTspGround: 2.0, gPerTspWhole: 5.0, gPerTbspGround: 6.0, gPerTbspWhole: 15.0 },
+    'Turmeric': { name: 'Turmeric', vToG: 1.0, concentrationFactor: 5.0, gPerTspGround: 2.74, gPerTspWhole: 4.8, gPerTbspGround: 8.2, gPerTbspWhole: 14.4 },
+    'Nutmeg': { name: 'Nutmeg', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 2.6, gPerTbspGround: 7.8, gPerTbspWhole: 7.8 },
+    'Star Anise': { name: 'Star Anise', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 2.1, gPerTspWhole: 2.1, gPerTbspGround: 6.3, gPerTbspWhole: 6.3 },
 };
 
 export const DEFAULT_TRANSFORMATION: SpiceTransformationFactor = {
@@ -60,6 +62,28 @@ export function findSpiceFactor(name: string): SpiceTransformationFactor {
 export function isSpice(name: string): boolean {
     const upperName = (name || '').toUpperCase();
     return Object.keys(SPICE_TRANSFORMATIONS).some(key => upperName.includes(key.toUpperCase()));
+}
+
+/**
+ * Returns the default allowed measures for a spice.
+ */
+export function getSpiceMeasures(name: string, state: 'whole' | 'ground' | string = 'ground') {
+    const factor = findSpiceFactor(name);
+    const useWhole = state === 'whole';
+
+    return [
+        { label: 'g', weight_g: 1 },
+        { label: 'tsp', weight_g: useWhole ? (factor.gPerTspWhole || factor.gPerTspGround) : factor.gPerTspGround },
+        { label: 'tbsp', weight_g: useWhole ? (factor.gPerTbspWhole || (factor.gPerTspWhole ? factor.gPerTspWhole * 3 : factor.gPerTspGround * 3)) : (factor.gPerTbspGround || factor.gPerTspGround * 3) }
+    ];
+}
+
+/**
+ * Returns allowed states for a spice (whole vs ground).
+ */
+export function getSpiceStates(name: string) {
+    if (!isSpice(name)) return null;
+    return ['whole', 'ground', 'stored'];
 }
 
 /**

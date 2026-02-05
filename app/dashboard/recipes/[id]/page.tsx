@@ -51,7 +51,7 @@ import { nutrientInfo } from '@/lib/data/nutrient-info';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRDA } from '@/hooks/use-rda';
 
-import { findSpiceFactor, SpiceState, isSpice } from '@/lib/utils/spice-conversion';
+import { findSpiceFactor, SpiceState, isSpice, getSpiceMeasures, getSpiceStates } from '@/lib/utils/spice-conversion';
 import { COOKING_STATES, CookingState } from '@/lib/utils/cooking-states';
 import { searchLocalFood } from '@/lib/services/nutrition';
 
@@ -531,19 +531,26 @@ export default function RecipeDetailsPage() {
 
         // Find current unit definition
         let unitWeight = 0;
-        const currentUnit = ing.measure_label || 'g';
+        const currentUnit = (ing.measure_label || 'g').toLowerCase().trim();
 
-        if (['g', 'ml', 'gram', 'grams'].includes(currentUnit.toLowerCase())) {
+        if (['g', 'ml', 'gram', 'grams'].includes(currentUnit)) {
             unitWeight = 1;
-        } else if (['kg', 'kilogram'].includes(currentUnit.toLowerCase())) {
+        } else if (['kg', 'kilogram'].includes(currentUnit)) {
             unitWeight = 1000;
-        } else if (['oz', 'ounce'].includes(currentUnit.toLowerCase())) {
-            unitWeight = 28.3495;
-        } else if (['lb', 'pound'].includes(currentUnit.toLowerCase())) {
-            unitWeight = 453.592;
+        } else if (['oz', 'ounce'].includes(currentUnit)) {
+            unitWeight = 28.35;
+        } else if (['lb', 'pound'].includes(currentUnit)) {
+            unitWeight = 453.59;
         } else {
-            // Check portions
-            const portion = food?.portions?.find((p: any) => p.label === currentUnit);
+            // Check standard portions
+            let portion = food?.portions?.find((p: any) => p.label.toLowerCase() === currentUnit);
+
+            // Check spice density
+            if (!portion && isSpice(food?.name || ing.item)) {
+                const spiceMeasures = getSpiceMeasures(food?.name || ing.item, ing.cooking_state);
+                portion = spiceMeasures.find(m => m.label.toLowerCase() === currentUnit);
+            }
+
             if (portion) {
                 unitWeight = portion.weight_g;
             } else {
@@ -551,7 +558,7 @@ export default function RecipeDetailsPage() {
                 if (ing.quantity && ing.quantity > 0 && ing.weight_g > 0) {
                     unitWeight = ing.weight_g / ing.quantity;
                 } else {
-                    unitWeight = 0; // standard fallback?
+                    unitWeight = 1; // standard fallback
                 }
             }
         }
@@ -562,7 +569,7 @@ export default function RecipeDetailsPage() {
             ...ing,
             quantity: newQty,
             weight_g: newWeight,
-            amount: `${newQty} ${currentUnit}`
+            amount: `${newQty} ${ing.measure_label || 'g'}`
         };
 
         setIngredients(updated);
@@ -574,34 +581,44 @@ export default function RecipeDetailsPage() {
         const ing = updated[index];
         const food = ing.food_item;
 
-        // Calculate unit weight for NEW unit
-        let unitWeight = 1; // Default to 1g
+        const newUnitLower = newUnit.toLowerCase().trim();
+        const oldWeight = ing.weight_g;
 
-        if (['g', 'ml', 'gram', 'grams'].includes(newUnit.toLowerCase())) {
+        // Calculate unit weight for NEW unit
+        let unitWeight = 1;
+
+        if (['g', 'ml', 'gram', 'grams', 'ml'].includes(newUnitLower)) {
             unitWeight = 1;
-        } else if (['kg', 'kilogram'].includes(newUnit.toLowerCase())) {
+        } else if (['kg', 'kilogram'].includes(newUnitLower)) {
             unitWeight = 1000;
-        } else if (['oz', 'ounce'].includes(newUnit.toLowerCase())) {
-            unitWeight = 28.3495;
-        } else if (['lb', 'pound'].includes(newUnit.toLowerCase())) {
-            unitWeight = 453.592;
+        } else if (['oz', 'ounce'].includes(newUnitLower)) {
+            unitWeight = 28.35;
+        } else if (['lb', 'pound'].includes(newUnitLower)) {
+            unitWeight = 453.59;
         } else {
-            // Check portions
-            const portion = food?.portions?.find((p: any) => p.label === newUnit);
+            // Priority 1: Direct portion match
+            let portion = food?.portions?.find((p: any) => p.label === newUnit || p.label.toLowerCase() === newUnitLower);
+
+            // Priority 2: Spice density lookup
+            if (!portion && isSpice(food?.name || ing.item)) {
+                const spiceMeasures = getSpiceMeasures(food?.name || ing.item, ing.cooking_state);
+                portion = spiceMeasures.find(m => m.label.toLowerCase() === newUnitLower);
+            }
+
             if (portion) {
                 unitWeight = portion.weight_g;
             }
         }
 
-        // Maintain quantity, update weight
-        const qty = ing.quantity || 1;
-        const newWeight = qty * unitWeight;
+        // Maintain mass constant, calculate new quantity
+        const newQty = unitWeight > 0 ? oldWeight / unitWeight : 1;
 
         updated[index] = {
             ...ing,
             measure_label: newUnit,
-            weight_g: newWeight,
-            amount: `${qty} ${newUnit}`
+            quantity: Number(newQty.toFixed(3)),
+            weight_g: oldWeight,
+            amount: `${Number(newQty.toFixed(3))} ${newUnit}`
         };
 
         setIngredients(updated);
@@ -1283,17 +1300,30 @@ export default function RecipeDetailsPage() {
                                                     >
                                                         <optgroup label="Standard">
                                                             <option value="g">g</option>
-                                                            <option value="oz">oz</option>
+                                                            <option value="kg">kg</option>
                                                             <option value="ml">ml</option>
+                                                            <option value="oz">oz</option>
                                                             <option value="lb">lb</option>
                                                         </optgroup>
-                                                        {ing.food_item?.portions?.length > 0 && (
-                                                            <optgroup label="Measures">
-                                                                {ing.food_item.portions.map((p: any, idx: number) => (
-                                                                    <option key={idx} value={p.label}>{p.label}</option>
-                                                                ))}
-                                                            </optgroup>
-                                                        )}
+                                                        {(() => {
+                                                            const measures = [...(ing.food_item?.portions || [])];
+                                                            if (isSpice(ing.food_item?.name || ing.item)) {
+                                                                const spiceMeasures = getSpiceMeasures(ing.food_item?.name || ing.item, ing.cooking_state);
+                                                                spiceMeasures.forEach(sm => {
+                                                                    if (!measures.some(m => m.label.toLowerCase() === sm.label.toLowerCase())) {
+                                                                        measures.push(sm);
+                                                                    }
+                                                                });
+                                                            }
+                                                            if (measures.length === 0) return null;
+                                                            return (
+                                                                <optgroup label="Measures">
+                                                                    {measures.map((p: any, idx: number) => (
+                                                                        <option key={idx} value={p.label}>{p.label}</option>
+                                                                    ))}
+                                                                </optgroup>
+                                                            );
+                                                        })()}
                                                     </select>
 
                                                     <select
@@ -1301,7 +1331,11 @@ export default function RecipeDetailsPage() {
                                                         onChange={(e) => handleUpdateIngredientState(i, e.target.value as CookingState)}
                                                         className="h-7 text-[10px] font-bold bg-slate-200 dark:bg-slate-700 border-none rounded-lg px-2 focus:ring-1 focus:ring-amber-500 max-w-[80px] text-amber-600 dark:text-amber-400"
                                                     >
-                                                        {Object.entries(COOKING_STATES).map(([key, state]) => {
+                                                        {Object.entries(COOKING_STATES).filter(([key]) => {
+                                                            const allowed = getSpiceStates(ing.food_item?.name || ing.item);
+                                                            if (allowed) return allowed.includes(key);
+                                                            return !['ground', 'dried', 'whole'].includes(key);
+                                                        }).map(([key, state]) => {
                                                             let label = state.label;
                                                             if (key === 'stored') {
                                                                 const name = (ing.food_item?.name || '').toLowerCase();

@@ -6,7 +6,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import FoodItemPicker from './food-item-picker';
 import { fetchFoodMeasures, FoodMeasure, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { COOKING_STATES, CookingState } from '@/lib/utils/cooking-states';
-import { findSpiceFactor, isSpice } from '@/lib/utils/spice-conversion';
+import { findSpiceFactor, isSpice, getSpiceMeasures, getSpiceStates } from '@/lib/utils/spice-conversion';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { parseIngredientsOnly } from '@/lib/utils/recipe-parser';
 import { searchLocalFood, searchUSDAFood, getUSDAMeasures, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
@@ -517,7 +517,7 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
     const handleUpdateQuantity = (index: number, newQuantity: number) => {
         const updated = [...ingredients];
         const ing = updated[index];
-        const unitLower = ing.measure_label.toLowerCase().trim();
+        const unitLower = (ing.measure_label || 'g').toLowerCase().trim();
 
         // Recalculate weight based on unit type
         let newWeight = newQuantity;
@@ -528,9 +528,14 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
             newWeight = newQuantity * 1000;
         } else {
             // Priority 1: Search standard available measures
-            const stdMeasure = ing.available_measures?.find(m => m.label.toLowerCase() === unitLower);
-            if (stdMeasure) {
-                newWeight = newQuantity * stdMeasure.weight_g;
+            let measures = [...(ing.available_measures || [])];
+            if (isSpice(ing.food_item_name)) {
+                measures = [...measures, ...getSpiceMeasures(ing.food_item_name, ing.cooking_state)];
+            }
+
+            const measure = measures.find(m => m.label.toLowerCase() === unitLower);
+            if (measure) {
+                newWeight = newQuantity * measure.weight_g;
             }
             // Priority 2: Use custom unit weight if we have one (from magic paste)
             else if (ing.customUnitWeight) {
@@ -545,8 +550,6 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
 
         const multiplier = newWeight / 100;
 
-        // If we have base_nutrition, use it for calculations to avoid drift.
-        // Otherwise use the current rounded values (safety fallback)
         if (ing.base_nutrition) {
             const base = ing.base_nutrition;
             updated[index] = {
@@ -590,60 +593,42 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
         const ing = updated[index];
         const newUnitLower = newUnit.toLowerCase().trim();
 
-        // Recalculate weight based on new unit type
+        // If we are just changing the label but want to keep the mass constant:
+        // (Molecularly, the ingredient is the same amount, we just change the ruler)
+        let newQuantity = ing.quantity;
         let newWeight = ing.weight_g;
 
+        // If switching TO mass-based, quantity IS weight
         if (newUnitLower === 'g' || newUnitLower === 'gram' || newUnitLower === 'ml') {
-            newWeight = ing.quantity;
-        } else if (newUnitLower === 'kg' || newUnitLower === 'kilogram') {
-            newWeight = ing.quantity * 1000;
-        } else {
-            // Priority 1: Search standard available measures
-            const measure = ing.available_measures?.find(m => m.label.toLowerCase() === newUnitLower);
-            if (measure) {
-                newWeight = ing.quantity * measure.weight_g;
+            newQuantity = ing.weight_g;
+            newWeight = ing.weight_g;
+        }
+        else if (newUnitLower === 'kg' || newUnitLower === 'kilogram') {
+            newQuantity = ing.weight_g / 1000;
+            newWeight = ing.weight_g;
+        }
+        else {
+            // Find density of the NEW unit
+            let measures = [...(ing.available_measures || [])];
+            if (isSpice(ing.food_item_name)) {
+                measures = [...measures, ...getSpiceMeasures(ing.food_item_name, ing.cooking_state)];
             }
-            // Priority 2: Use custom unit weight if we have one
-            else if (ing.customUnitWeight) {
-                newWeight = ing.quantity * ing.customUnitWeight;
+
+            const newMeasure = measures.find(m => m.label.toLowerCase() === newUnitLower);
+            if (newMeasure && newMeasure.weight_g > 0) {
+                newQuantity = ing.weight_g / newMeasure.weight_g;
+            } else if (ing.customUnitWeight && ing.customUnitWeight > 0) {
+                newQuantity = ing.weight_g / ing.customUnitWeight;
             }
         }
 
-        const multiplier = newWeight / 100;
+        updated[index] = {
+            ...ing,
+            measure_label: newUnit,
+            quantity: Number(newQuantity.toFixed(3)),
+            weight_g: newWeight
+        };
 
-        if (ing.base_nutrition) {
-            const base = ing.base_nutrition;
-            updated[index] = {
-                ...ing,
-                measure_label: newUnit,
-                weight_g: newWeight,
-                calories: base.calories * multiplier,
-                energy_kj: base.energy_kj * multiplier,
-                protein: base.protein * multiplier,
-                fat: base.fat * multiplier,
-                carbs: base.carbs * multiplier,
-                micronutrients: Object.entries(base.micronutrients).reduce((acc, [key, val]) => {
-                    acc[key] = (val as number) * multiplier;
-                    return acc;
-                }, {} as Record<string, number>),
-            };
-        } else {
-            const ratio = newWeight / (ing.weight_g || 1);
-            updated[index] = {
-                ...ing,
-                measure_label: newUnit,
-                weight_g: newWeight,
-                calories: ing.calories * ratio,
-                energy_kj: ing.energy_kj * ratio,
-                protein: ing.protein * ratio,
-                fat: ing.fat * ratio,
-                carbs: ing.carbs * ratio,
-                micronutrients: Object.entries(ing.micronutrients || {}).reduce((acc, [key, val]) => {
-                    acc[key] = (val as number) * ratio;
-                    return acc;
-                }, {} as Record<string, number>),
-            };
-        }
         onChange(updated);
     };
 
@@ -662,11 +647,33 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
         const multiplier = newWeight / 100;
         const stateFactor = COOKING_STATES[ing.cooking_state || 'raw'];
 
+        // Recalculate quantity based on new weight and unit density
+        let newQuantity = ing.quantity;
+        const unitLower = (ing.measure_label || 'g').toLowerCase().trim();
+
+        if (unitLower === 'g' || unitLower === 'gram' || unitLower === 'ml') {
+            newQuantity = newWeight;
+        } else if (unitLower === 'kg' || unitLower === 'kilogram') {
+            newQuantity = newWeight / 1000;
+        } else {
+            let measures = [...(ing.available_measures || [])];
+            if (isSpice(ing.food_item_name)) {
+                measures = [...measures, ...getSpiceMeasures(ing.food_item_name, ing.cooking_state)];
+            }
+            const measure = measures.find(m => m.label.toLowerCase() === unitLower);
+            if (measure && measure.weight_g > 0) {
+                newQuantity = newWeight / measure.weight_g;
+            } else if (ing.customUnitWeight && ing.customUnitWeight > 0) {
+                newQuantity = newWeight / ing.customUnitWeight;
+            }
+        }
+
         if (ing.base_nutrition) {
             const base = ing.base_nutrition;
             updated[index] = {
                 ...ing,
                 weight_g: newWeight,
+                quantity: Number(newQuantity.toFixed(3)),
                 calories: base.calories * multiplier * stateFactor.energy,
                 energy_kj: base.energy_kj * multiplier * stateFactor.energy,
                 protein: base.protein * multiplier * stateFactor.protein,
@@ -682,6 +689,7 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
             updated[index] = {
                 ...ing,
                 weight_g: newWeight,
+                quantity: Number(newQuantity.toFixed(3)),
                 calories: ing.calories * ratio,
                 energy_kj: ing.energy_kj * ratio,
                 protein: ing.protein * ratio,
@@ -1384,11 +1392,22 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
                                                 >
                                                     <option value="g">g</option>
                                                     <option value="kg">kg</option>
-                                                    {ing.available_measures?.map(m => (
-                                                        <option key={m.label} value={m.label}>{m.label}</option>
-                                                    ))}
+                                                    {(() => {
+                                                        const measures = [...(ing.available_measures || [])];
+                                                        if (isSpice(ing.food_item_name)) {
+                                                            const spiceMeasures = getSpiceMeasures(ing.food_item_name, ing.cooking_state);
+                                                            spiceMeasures.forEach(sm => {
+                                                                if (!measures.some(m => m.label.toLowerCase() === sm.label.toLowerCase())) {
+                                                                    measures.push(sm);
+                                                                }
+                                                            });
+                                                        }
+                                                        return measures.map(m => (
+                                                            <option key={m.label} value={m.label}>{m.label}</option>
+                                                        ));
+                                                    })()}
                                                     {/* If current label isn't in available, show it so it's selected */}
-                                                    {ing.measure_label !== 'g' && ing.measure_label !== 'kg' && !ing.available_measures?.some(m => m.label === ing.measure_label) && (
+                                                    {ing.measure_label !== 'g' && ing.measure_label !== 'kg' && !ing.available_measures?.some(m => m.label === ing.measure_label) && !isSpice(ing.food_item_name) && (
                                                         <option value={ing.measure_label}>{ing.measure_label}</option>
                                                     )}
                                                 </select>
@@ -1406,7 +1425,12 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
                                                     onChange={(e) => handleUpdateState(index, e.target.value as CookingState)}
                                                     className="w-full h-11 px-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 text-amber-600 dark:text-amber-400 text-xs rounded-xl font-black focus:ring-2 focus:ring-amber-500/20 outline-none transition-all appearance-none cursor-pointer"
                                                 >
-                                                    {Object.entries(COOKING_STATES).map(([key, state]) => {
+                                                    {Object.entries(COOKING_STATES).filter(([key]) => {
+                                                        const allowed = getSpiceStates(ing.food_item_name);
+                                                        if (allowed) return allowed.includes(key);
+                                                        // Filter out whole/ground/dried for non-spices to keep it clean
+                                                        return !['ground', 'dried', 'whole'].includes(key);
+                                                    }).map(([key, state]) => {
                                                         let label = state.label;
                                                         if (key === 'stored') {
                                                             const name = ing.food_item_name.toLowerCase();
