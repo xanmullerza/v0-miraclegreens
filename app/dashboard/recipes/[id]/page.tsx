@@ -584,7 +584,13 @@ export default function RecipeDetailsPage() {
                     // Recalculate weight for current unit
                     let newWeight = ing.weight_g;
                     const currentUnit = (ing.measure_label || 'g').toLowerCase();
-                    const normalize = (s: string) => s.replace(/,/g, ' ').replace(/\s+/g, ' ').trim();
+                    const normalize = (s: string) => {
+                        return s.toLowerCase()
+                            .replace(/,/g, ' ')
+                            .replace(/\b(chopped|shredded|sliced|diced|minced|cut|pieces|raw|cooked|boiled|fried|roasted)\b/g, '')
+                            .replace(/\s+/g, ' ')
+                            .trim();
+                    };
                     const nUnit = normalize(currentUnit);
                     const baseUnits = ['cup', 'tbsp', 'tsp', 'g', 'oz', 'leaf', 'bunch', 'piece', 'item'];
                     const foundBase = baseUnits.find(bu => nUnit.startsWith(bu));
@@ -594,7 +600,7 @@ export default function RecipeDetailsPage() {
                         const nL = normalize(l);
                         if (l === currentUnit || nL === nUnit) return true;
                         if (foundBase && nL.startsWith(foundBase)) return true;
-                        return l.includes(currentUnit) || currentUnit.includes(l);
+                        return l.includes(currentUnit) || currentUnit.includes(l) || nL.includes(nUnit) || nUnit.includes(nL);
                     });
 
                     if (portion) {
