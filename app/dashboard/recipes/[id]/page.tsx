@@ -50,8 +50,9 @@ import { nutrientInfo } from '@/lib/data/nutrient-info';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRDA } from '@/hooks/use-rda';
 
-import { findSpiceFactor } from '@/lib/utils/spice-conversion';
+import { findSpiceFactor, SpiceState } from '@/lib/utils/spice-conversion';
 import { COOKING_STATES, CookingState } from '@/lib/utils/cooking-states';
+import { searchLocalFood } from '@/lib/services/nutrition';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900 shadow-xl rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden", className)}>
@@ -533,12 +534,72 @@ export default function RecipeDetailsPage() {
         saveCustomization(updated);
     };
 
-    const handleUpdateIngredientState = (index: number, newState: CookingState) => {
+    const handleUpdateIngredientState = async (index: number, newState: CookingState) => {
         const updated = [...ingredients];
         const ing = updated[index];
         const food = ing.food_item;
 
-        // If it's a spice and we are switching between whole and ground, adjust quantity to keep mass equivalent
+        // 1. DIRECT MATCH LOGIC
+        // If user selects 'boiled', look for 'Kale, Boiled' or 'Kale, Cooked'
+        if (newState === 'boiled' || newState === 'fried' || newState === 'roasted') {
+            const baseName = (food?.common_name || food?.name || '').split(',')[0].trim();
+            const searchTerms = [
+                `${baseName}, Cooked`,
+                `${baseName}, Boiled`,
+                `${baseName}, Fried`,
+                `${baseName}, Roasted`
+            ];
+
+            // Priority search for the specific state
+            const targetTerm = newState === 'boiled' ? `${baseName}, Cooked` : `${baseName}, ${newState.charAt(0).toUpperCase() + newState.slice(1)}`;
+
+            try {
+                const matches = await searchLocalFood(targetTerm);
+                // Find a match that starts with our base name to avoid unrelated items
+                const directMatch = matches.find((m: any) => m.name.toLowerCase().startsWith(baseName.toLowerCase()));
+
+                if (directMatch) {
+                    toast.success(`Switched to stored profile for ${newState} ${baseName}`, { duration: 3000 });
+
+                    // We swap the food item but keep the quantity/unit
+                    // The weight_g will be recalculated based on the NEW food's portions
+                    const newFood = { ...directMatch, portions: directMatch.portions };
+
+                    // Recalculate weight for current unit
+                    let newWeight = ing.weight_g;
+                    const unit = ing.measure_label || 'g';
+                    const portion = newFood.portions?.find((p: any) => p.label.toLowerCase() === unit.toLowerCase());
+                    if (portion) {
+                        newWeight = (ing.quantity || 1) * portion.weight_g;
+                    }
+
+                    updated[index] = {
+                        ...ing,
+                        food_item: newFood,
+                        food_item_id: newFood.id,
+                        weight_g: newWeight,
+                        cooking_state: 'stored' // Set to stored since we have the direct data
+                    };
+
+                    setIngredients(updated);
+                    saveCustomization(updated);
+                    return;
+                }
+            } catch (err) {
+                console.error("Direct match search failed:", err);
+            }
+        }
+
+        // 1b. AS STORED SELECTION
+        // If user manually selects 'stored', we don't swap items, we just stop scaling
+        if (newState === 'stored') {
+            updated[index] = { ...ing, cooking_state: 'stored' };
+            setIngredients(updated);
+            saveCustomization(updated);
+            return;
+        }
+
+        // 2. SPICE LOGIC (Existing)
         const isSpice = food?.category === 'Flavour' || findSpiceFactor(food?.name || '').name !== 'Generic';
 
         if (isSpice && (newState === 'ground' || newState === 'whole')) {

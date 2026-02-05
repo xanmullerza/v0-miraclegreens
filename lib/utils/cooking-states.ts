@@ -4,7 +4,7 @@
  * Logic for scaling nutrients and adjusting measures based on the state of the ingredient.
  */
 
-export type CookingState = 'raw' | 'boiled' | 'steamed' | 'fried' | 'roasted' | 'ground' | 'dried' | 'whole';
+export type CookingState = 'raw' | 'boiled' | 'steamed' | 'fried' | 'roasted' | 'ground' | 'dried' | 'whole' | 'stored';
 
 export interface StateFactor {
     label: string;
@@ -31,7 +31,7 @@ export const COOKING_STATES: Record<CookingState, StateFactor> = {
     'boiled': {
         label: 'Boiled',
         description: 'Boiled in water. Some nutrients leach into liquid.',
-        energy: 0.95, protein: 0.98, fat: 0.9, carbs: 0.95, micros: 0.75, weightRatio: 1.25 // Gains water
+        energy: 0.9, protein: 0.95, fat: 0.8, carbs: 0.9, micros: 0.6, weightRatio: 1.25 // Gains water, significant leaching
     },
     'steamed': {
         label: 'Steamed',
@@ -57,5 +57,10 @@ export const COOKING_STATES: Record<CookingState, StateFactor> = {
         label: 'Dried/Dehydrated',
         description: 'Heavily concentrated via dehydration.',
         energy: 4.5, protein: 4.5, fat: 4.5, carbs: 4.5, micros: 4.0, weightRatio: 0.22
+    },
+    'stored': {
+        label: 'As Stored',
+        description: 'No adjustment. Uses nutrient profile exactly as stored in database.',
+        energy: 1, protein: 1, fat: 1, carbs: 1, micros: 1, weightRatio: 1
     }
 };

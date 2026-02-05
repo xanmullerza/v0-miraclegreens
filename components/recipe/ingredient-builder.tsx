@@ -617,9 +617,71 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
         onChange(updated);
     };
 
-    const handleUpdateState = (index: number, newState: CookingState) => {
+    const handleUpdateState = async (index: number, newState: CookingState) => {
         const updated = [...ingredients];
         const ing = updated[index];
+
+        // 1. DIRECT MATCH LOGIC
+        if (newState === 'boiled' || newState === 'fried' || newState === 'roasted') {
+            const baseName = (ing.food_item_name || '').split(',')[0].trim();
+            const targetTerm = newState === 'boiled' ? `${baseName}, Cooked` : `${baseName}, ${newState.charAt(0).toUpperCase() + newState.slice(1)}`;
+
+            try {
+                const matches = await searchLocalFood(targetTerm);
+                const directMatch = matches.find(m => m.name.toLowerCase().startsWith(baseName.toLowerCase()));
+
+                if (directMatch) {
+                    // Similar to the detail page, we swap the food item data
+                    // We need to fetch full details (portions) to do the weight recalculation
+                    const details = directMatch.portions?.length ? directMatch : await searchLocalFood(directMatch.name).then(res => res[0]);
+
+                    if (details) {
+                        let newWeight = ing.weight_g;
+                        const unit = ing.measure_label || 'g';
+                        const portion = details.portions?.find((p: any) => p.label.toLowerCase() === unit.toLowerCase());
+                        if (portion) {
+                            newWeight = (ing.quantity || 1) * portion.weight_g;
+                        }
+
+                        updated[index] = {
+                            ...ing,
+                            food_item_name: details.name,
+                            weight_g: newWeight,
+                            cooking_state: 'stored',
+                            calories: details.energy_kcal * (newWeight / 100),
+                            energy_kj: details.energy_kj * (newWeight / 100),
+                            protein: details.protein_g * (newWeight / 100),
+                            fat: details.fat_g * (newWeight / 100),
+                            carbs: details.carbs_g * (newWeight / 100),
+                            micronutrients: Object.entries(details.micronutrients || {}).reduce((acc, [key, val]) => {
+                                acc[key] = (val as number) * (newWeight / 100);
+                                return acc;
+                            }, {} as Record<string, number>),
+                            base_nutrition: {
+                                calories: details.energy_kcal,
+                                energy_kj: details.energy_kj,
+                                protein: details.protein_g,
+                                fat: details.fat_g,
+                                carbs: details.carbs_g,
+                                micronutrients: details.micronutrients || {}
+                            },
+                            available_measures: details.portions
+                        };
+
+                        onChange(updated);
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.error("Direct match failed in builder:", err);
+            }
+        }
+
+        if (newState === 'stored') {
+            updated[index] = { ...ing, cooking_state: 'stored' };
+            onChange(updated);
+            return;
+        }
 
         // Spice logic for volume adjustment
         const isSpice = findSpiceFactor(ing.food_item_name).name !== 'Generic';
