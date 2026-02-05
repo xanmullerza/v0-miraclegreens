@@ -30,6 +30,7 @@ interface FoodItem {
     portions?: FoodMeasure[];
     image?: string;
     source?: string;
+    fdcId?: number;
 }
 
 export interface RecipeIngredient {
