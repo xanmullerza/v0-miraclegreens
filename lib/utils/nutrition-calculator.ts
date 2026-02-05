@@ -1,4 +1,6 @@
 import { supabase } from '@/lib/supabase';
+import { COOKING_STATES, CookingState } from './cooking-states';
+import { findSpiceFactor, SpiceState } from './spice-conversion';
 
 export interface FoodItemNutrition {
     id: string;
@@ -107,9 +109,11 @@ export interface CalculatedNutrition {
  */
 export function calculateNutrition(
     foodItem: FoodItemNutrition,
-    weightGrams: number
+    weightGrams: number,
+    cookingState: CookingState = 'raw'
 ): CalculatedNutrition {
     const multiplier = weightGrams / 100;
+    const stateFactor = COOKING_STATES[cookingState] || COOKING_STATES['raw'];
 
     // Fallback helper to find macros in the micronutrients JSON
     const getMacro = (mainVal: number | undefined, keys: string[]) => {
@@ -140,12 +144,19 @@ export function calculateNutrition(
 
     const energyKj = getMacro(foodItem.energy_kj, ['energy_kj']);
 
+    // APPLY COOKING STATE SCALING
+    // We scale the per-100g density based on the cooking method
+    const scaledCalories = calories * stateFactor.energy;
+    const scaledProtein = protein * stateFactor.protein;
+    const scaledFat = fat * stateFactor.fat;
+    const scaledCarbs = carbs * stateFactor.carbs;
+
     const result: CalculatedNutrition = {
-        calories: Math.round(calories * multiplier),
-        energy_kj: Math.round((energyKj || (calories * 4.184)) * multiplier),
-        protein: Math.round(protein * multiplier * 10) / 10,
-        fat: Math.round(fat * multiplier * 10) / 10,
-        carbs: Math.round(carbs * multiplier * 10) / 10,
+        calories: Math.round(scaledCalories * multiplier),
+        energy_kj: Math.round((energyKj || (scaledCalories * 4.184)) * multiplier),
+        protein: Math.round(scaledProtein * multiplier * 10) / 10,
+        fat: Math.round(scaledFat * multiplier * 10) / 10,
+        carbs: Math.round(scaledCarbs * multiplier * 10) / 10,
     };
 
     // Calculate micronutrients
@@ -153,7 +164,7 @@ export function calculateNutrition(
         result.micronutrients = {};
         for (const [key, value] of Object.entries(foodItem.micronutrients)) {
             if (typeof value === 'number') {
-                result.micronutrients[key] = value * multiplier;
+                result.micronutrients[key] = value * multiplier * stateFactor.micros;
             }
         }
     }
@@ -314,11 +325,12 @@ export function calculateRecipeNutrition(
     ingredients: Array<{
         food_item: FoodItemNutrition;
         weight_g: number;
+        cooking_state?: CookingState;
     }>
 ): CalculatedNutrition {
     return ingredients.reduce(
         (total, ing) => {
-            const nutrition = calculateNutrition(ing.food_item, ing.weight_g);
+            const nutrition = calculateNutrition(ing.food_item, ing.weight_g, ing.cooking_state);
 
             // Deduplicate within this single ingredient FIRST
             const ingredientMicrosMapped: Record<string, number> = {};

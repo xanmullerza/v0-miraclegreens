@@ -50,6 +50,9 @@ import { nutrientInfo } from '@/lib/data/nutrient-info';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRDA } from '@/hooks/use-rda';
 
+import { findSpiceFactor } from '@/lib/utils/spice-conversion';
+import { COOKING_STATES, CookingState } from '@/lib/utils/cooking-states';
+
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900 shadow-xl rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden", className)}>
         {children}
@@ -68,6 +71,7 @@ interface Ingredient {
     measure_label?: string;
     modifier?: string;
     recipe_id?: string;
+    cooking_state?: CookingState;
 }
 
 interface Instruction {
@@ -307,7 +311,8 @@ export default function RecipeDetailsPage() {
                 const calculated = calculateRecipeNutrition(
                     fetchedIngredients.map(ing => ({
                         food_item: ing.food_item,
-                        weight_g: ing.weight_g || 0
+                        weight_g: ing.weight_g || 0,
+                        cooking_state: ing.cooking_state
                     }))
                 );
 
@@ -354,7 +359,8 @@ export default function RecipeDetailsPage() {
         const calculated = calculateRecipeNutrition(
             activeIngredients.map(ing => ({
                 food_item: ing.food_item,
-                weight_g: ing.weight_g || 0
+                weight_g: ing.weight_g || 0,
+                cooking_state: ing.cooking_state
             }))
         );
 
@@ -521,6 +527,61 @@ export default function RecipeDetailsPage() {
             measure_label: newUnit,
             weight_g: newWeight,
             amount: `${qty} ${newUnit}`
+        };
+
+        setIngredients(updated);
+        saveCustomization(updated);
+    };
+
+    const handleUpdateIngredientState = (index: number, newState: CookingState) => {
+        const updated = [...ingredients];
+        const ing = updated[index];
+        const food = ing.food_item;
+
+        // If it's a spice and we are switching between whole and ground, adjust quantity to keep mass equivalent
+        const isSpice = food?.category === 'Flavour' || findSpiceFactor(food?.name || '').name !== 'Generic';
+
+        if (isSpice && (newState === 'ground' || newState === 'whole')) {
+            const factor = findSpiceFactor(food.name);
+            const currentUnit = ing.measure_label || 'g';
+            const isVolume = ['tsp', 'teaspoon', 'tbsp', 'tablespoon', 'cup'].some(unit => currentUnit.toLowerCase().includes(unit));
+
+            if (isVolume) {
+                // Determine densities
+                const dWhole = factor.gPerTspWhole || 2.5; // g per tsp
+                const dGround = factor.gPerTspGround || 2.3; // g per tsp
+
+                // Map unit to tsp equivalent for relative density calculation
+                let unitToTsp = 1;
+                if (currentUnit.toLowerCase().includes('tbsp')) unitToTsp = 3;
+                if (currentUnit.toLowerCase().includes('cup')) unitToTsp = 48;
+
+                const currentQty = ing.quantity || 1;
+                const currentMass = currentQty * (ing.cooking_state === 'ground' ? dGround : dWhole) * unitToTsp;
+
+                // New quantity $Q = \text{Mass} / (\text{NewDensity} \times \text{UnitToTsp})$
+                const newDensity = (newState === 'ground' ? dGround : dWhole);
+                const newQty = currentMass / (newDensity * unitToTsp);
+
+                updated[index] = {
+                    ...ing,
+                    cooking_state: newState,
+                    quantity: Number(newQty.toFixed(2)),
+                    weight_g: Number(currentMass.toFixed(2)),
+                    amount: `${Number(newQty.toFixed(2))} ${currentUnit}`
+                };
+
+                setIngredients(updated);
+                saveCustomization(updated);
+                toast.info(`Adjusted measure for ${newState} state`, { duration: 2000 });
+                return;
+            }
+        }
+
+        // Generic state change
+        updated[index] = {
+            ...ing,
+            cooking_state: newState
         };
 
         setIngredients(updated);
@@ -1019,13 +1080,12 @@ export default function RecipeDetailsPage() {
                                                     <select
                                                         value={ing.measure_label}
                                                         onChange={(e) => handleUpdateIngredientUnit(i, e.target.value)}
-                                                        className="h-7 text-[10px] font-bold bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-2 focus:ring-1 focus:ring-emerald-500 max-w-[120px]"
+                                                        className="h-7 text-[10px] font-bold bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-2 focus:ring-1 focus:ring-emerald-500 max-w-[90px]"
                                                     >
                                                         <optgroup label="Standard">
                                                             <option value="g">g</option>
                                                             <option value="oz">oz</option>
                                                             <option value="ml">ml</option>
-                                                            <option value="kg">kg</option>
                                                             <option value="lb">lb</option>
                                                         </optgroup>
                                                         {ing.food_item?.portions?.length > 0 && (
@@ -1035,6 +1095,16 @@ export default function RecipeDetailsPage() {
                                                                 ))}
                                                             </optgroup>
                                                         )}
+                                                    </select>
+
+                                                    <select
+                                                        value={ing.cooking_state || 'raw'}
+                                                        onChange={(e) => handleUpdateIngredientState(i, e.target.value as CookingState)}
+                                                        className="h-7 text-[10px] font-bold bg-slate-200 dark:bg-slate-700 border-none rounded-lg px-2 focus:ring-1 focus:ring-amber-500 max-w-[80px] text-amber-600 dark:text-amber-400"
+                                                    >
+                                                        {Object.entries(COOKING_STATES).map(([key, state]) => (
+                                                            <option key={key} value={key}>{state.label}</option>
+                                                        ))}
                                                     </select>
                                                 </div>
                                             ) : (

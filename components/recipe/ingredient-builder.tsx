@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, Zap, X as CloseIcon, ChevronDown, Layers, Gem, Droplet, Battery, Activity, Utensils, ShoppingBasket, ArrowRight } from 'lucide-react';
 import FoodItemPicker from './food-item-picker';
 import { fetchFoodMeasures, FoodMeasure, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
+import { COOKING_STATES, CookingState } from '@/lib/utils/cooking-states';
+import { findSpiceFactor } from '@/lib/utils/spice-conversion';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { parseIngredientsOnly } from '@/lib/utils/recipe-parser';
 import { searchLocalFood, searchUSDAFood, getUSDAMeasures, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
@@ -57,6 +59,7 @@ export interface RecipeIngredient {
     // Parsing state
     parsedGrams?: number;
     customUnitWeight?: number;
+    cooking_state?: CookingState;
 }
 
 interface IngredientBuilderProps {
@@ -578,19 +581,20 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
         const updated = [...ingredients];
         const ing = updated[index];
         const multiplier = newWeight / 100;
+        const stateFactor = COOKING_STATES[ing.cooking_state || 'raw'];
 
         if (ing.base_nutrition) {
             const base = ing.base_nutrition;
             updated[index] = {
                 ...ing,
                 weight_g: newWeight,
-                calories: base.calories * multiplier,
-                energy_kj: base.energy_kj * multiplier,
-                protein: base.protein * multiplier,
-                fat: base.fat * multiplier,
-                carbs: base.carbs * multiplier,
+                calories: base.calories * multiplier * stateFactor.energy,
+                energy_kj: base.energy_kj * multiplier * stateFactor.energy,
+                protein: base.protein * multiplier * stateFactor.protein,
+                fat: base.fat * multiplier * stateFactor.fat,
+                carbs: base.carbs * multiplier * stateFactor.carbs,
                 micronutrients: Object.entries(base.micronutrients).reduce((acc, [key, val]) => {
-                    acc[key] = (val as number) * multiplier;
+                    acc[key] = (val as number) * multiplier * stateFactor.micros;
                     return acc;
                 }, {} as Record<string, number>),
             };
@@ -610,6 +614,88 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
                 }, {} as Record<string, number>),
             };
         }
+        onChange(updated);
+    };
+
+    const handleUpdateState = (index: number, newState: CookingState) => {
+        const updated = [...ingredients];
+        const ing = updated[index];
+
+        // Spice logic for volume adjustment
+        const isSpice = findSpiceFactor(ing.food_item_name).name !== 'Generic';
+        if (isSpice && (newState === 'ground' || newState === 'whole')) {
+            const factor = findSpiceFactor(ing.food_item_name);
+            const currentUnit = ing.measure_label;
+            const isVolume = ['tsp', 'teaspoon', 'tbsp', 'tablespoon', 'cup'].some(unit => currentUnit.toLowerCase().includes(unit));
+
+            if (isVolume) {
+                const dWhole = factor.gPerTspWhole || 2.5;
+                const dGround = factor.gPerTspGround || 2.3;
+
+                let unitToTsp = 1;
+                if (currentUnit.toLowerCase().includes('tbsp')) unitToTsp = 3;
+                if (currentUnit.toLowerCase().includes('cup')) unitToTsp = 48;
+
+                const currentQty = ing.quantity || 1;
+                const currentState = ing.cooking_state || 'whole';
+                const currentMass = currentQty * (currentState === 'ground' ? dGround : dWhole) * unitToTsp;
+
+                const newDensity = (newState === 'ground' ? dGround : dWhole);
+                const newQty = currentMass / (newDensity * unitToTsp);
+
+                updated[index] = {
+                    ...ing,
+                    cooking_state: newState,
+                    quantity: Number(newQty.toFixed(2)),
+                    weight_g: Number(currentMass.toFixed(2))
+                };
+
+                // Trigger recalculation with the updated state/weight
+                const multiplier = Number(currentMass.toFixed(2)) / 100;
+                const stateFactor = COOKING_STATES[newState];
+                const base = ing.base_nutrition;
+                if (base) {
+                    updated[index] = {
+                        ...updated[index],
+                        calories: base.calories * multiplier * stateFactor.energy,
+                        energy_kj: base.energy_kj * multiplier * stateFactor.energy,
+                        protein: base.protein * multiplier * stateFactor.protein,
+                        fat: base.fat * multiplier * stateFactor.fat,
+                        carbs: base.carbs * multiplier * stateFactor.carbs,
+                        micronutrients: Object.entries(base.micronutrients).reduce((acc, [key, val]) => {
+                            acc[key] = (val as number) * multiplier * stateFactor.micros;
+                            return acc;
+                        }, {} as Record<string, number>),
+                    };
+                }
+
+                onChange(updated);
+                return;
+            }
+        }
+
+        const stateFactor = COOKING_STATES[newState];
+        const multiplier = ing.weight_g / 100;
+        const base = ing.base_nutrition;
+
+        if (base) {
+            updated[index] = {
+                ...ing,
+                cooking_state: newState,
+                calories: base.calories * multiplier * stateFactor.energy,
+                energy_kj: base.energy_kj * multiplier * stateFactor.energy,
+                protein: base.protein * multiplier * stateFactor.protein,
+                fat: base.fat * multiplier * stateFactor.fat,
+                carbs: base.carbs * multiplier * stateFactor.carbs,
+                micronutrients: Object.entries(base.micronutrients).reduce((acc, [key, val]) => {
+                    acc[key] = (val as number) * multiplier * stateFactor.micros;
+                    return acc;
+                }, {} as Record<string, number>),
+            };
+        } else {
+            updated[index] = { ...ing, cooking_state: newState };
+        }
+
         onChange(updated);
     };
 
@@ -1091,14 +1177,21 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
                                         </div>
 
                                         <div className="space-y-1.5">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Preparation</Label>
-                                            <input
-                                                type="text"
-                                                value={ing.modifier || ''}
-                                                onChange={(e) => handleUpdateModifier(index, e.target.value)}
-                                                className="w-full h-11 px-4 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-amber-600 dark:text-amber-400 text-xs rounded-xl font-bold focus:ring-2 focus:ring-amber-500/20 outline-none transition-all"
-                                                placeholder="e.g. chopped"
-                                            />
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">End Result State</Label>
+                                            <div className="relative">
+                                                <select
+                                                    value={ing.cooking_state || 'raw'}
+                                                    onChange={(e) => handleUpdateState(index, e.target.value as CookingState)}
+                                                    className="w-full h-11 px-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 text-amber-600 dark:text-amber-400 text-xs rounded-xl font-black focus:ring-2 focus:ring-amber-500/20 outline-none transition-all appearance-none cursor-pointer"
+                                                >
+                                                    {Object.entries(COOKING_STATES).map(([key, state]) => (
+                                                        <option key={key} value={key}>{state.label}</option>
+                                                    ))}
+                                                </select>
+                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-amber-400">
+                                                    <ChevronDown size={14} />
+                                                </div>
+                                            </div>
                                         </div>
 
                                         <div className="space-y-1.5">
