@@ -638,16 +638,20 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
 
                     const hasBase = itemName.includes(firstWord) || commonName.includes(firstWord);
 
-                    let stateMatch = false;
-                    if (newState === 'boiled') {
-                        stateMatch = itemName.includes('cooked') || itemName.includes('boiled');
-                    } else if (newState === 'raw') {
-                        stateMatch = itemName.includes('raw') || itemName.includes('fresh') || itemName === b || itemName === firstWord;
-                    } else {
-                        stateMatch = itemName.includes(newState.toLowerCase());
+                    if (!hasBase) return false;
+
+                    if (newState === 'raw') {
+                        // Raw must NOT contain cooked/boiled/fried/roasted
+                        const isCooked = ['cooked', 'boiled', 'fried', 'roasted'].some(s => itemName.includes(s));
+                        if (isCooked) return false;
+                        return itemName.includes('raw') || itemName.includes('fresh') || itemName === b || itemName === firstWord;
                     }
 
-                    return hasBase && stateMatch;
+                    if (newState === 'boiled') {
+                        return itemName.includes('cooked') || itemName.includes('boiled');
+                    }
+
+                    return itemName.includes(newState.toLowerCase());
                 });
 
                 if (directMatch) {
