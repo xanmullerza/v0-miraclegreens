@@ -9,6 +9,7 @@ export type SpiceState = 'whole' | 'ground';
 export interface SpiceTransformationFactor {
     name: string;
     vToG: number; // Volume yield: 1 unit whole -> X units ground
+    concentrationFactor: number; // Nutritional concentration per gram (e.g. 1.2 means 1g ground = 1.2g whole nutrients)
     gPerTspGround: number; // Density: grams per 1 tsp of ground powder
     gPerTspWhole?: number; // Density: grams per 1 tsp of whole spice
 }
@@ -18,22 +19,22 @@ export interface SpiceTransformationFactor {
  * Source: McCormick Culinary, Food52, USDA FoodData Central.
  */
 export const SPICE_TRANSFORMATIONS: Record<string, SpiceTransformationFactor> = {
-    'Black Pepper': { name: 'Black Pepper', vToG: 1.5, gPerTspGround: 2.6, gPerTspWhole: 3.1 },
-    'Coriander': { name: 'Coriander', vToG: 1.25, gPerTspGround: 2.36, gPerTspWhole: 1.8 },
-    'Cumin': { name: 'Cumin', vToG: 1.25, gPerTspGround: 1.96, gPerTspWhole: 2.1 },
-    'Fennel': { name: 'Fennel', vToG: 1.25, gPerTspGround: 2.0, gPerTspWhole: 1.9 },
-    'Mustard': { name: 'Mustard', vToG: 1.5, gPerTspGround: 2.4, gPerTspWhole: 2.8 },
-    'Cardamom': { name: 'Cardamom', vToG: 1.0, gPerTspGround: 2.31, gPerTspWhole: 2.0 }, // pods vary
-    'Cinnamon': { name: 'Cinnamon', vToG: 1.0, gPerTspGround: 2.6, gPerTspWhole: 2.5 }, // sticks vary
-    'Cloves': { name: 'Cloves', vToG: 0.75, gPerTspGround: 2.6, gPerTspWhole: 2.2 },
-    'Ginger': { name: 'Ginger', vToG: 1.0, gPerTspGround: 2.0, gPerTspWhole: 5.0 }, // root vs powder
-    'Nutmeg': { name: 'Nutmeg', vToG: 2.5, gPerTspGround: 2.6, gPerTspWhole: 3.0 },
-    'Turmeric': { name: 'Turmeric', vToG: 1.0, gPerTspGround: 2.74, gPerTspWhole: 4.8 }, // root vs powder
+    'Black Pepper': { name: 'Black Pepper', vToG: 1.5, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 3.1 },
+    'Coriander': { name: 'Coriander', vToG: 1.25, concentrationFactor: 1.0, gPerTspGround: 2.36, gPerTspWhole: 1.8 },
+    'Cumin': { name: 'Cumin', vToG: 1.25, concentrationFactor: 1.0, gPerTspGround: 1.96, gPerTspWhole: 2.1 },
+    'Fennel': { name: 'Fennel', vToG: 1.25, concentrationFactor: 1.0, gPerTspGround: 2.0, gPerTspWhole: 1.9 },
+    'Mustard': { name: 'Mustard', vToG: 1.5, concentrationFactor: 1.0, gPerTspGround: 2.4, gPerTspWhole: 2.8 },
+    'Cardamom': { name: 'Cardamom', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 2.31, gPerTspWhole: 2.0 },
+    'Cinnamon': { name: 'Cinnamon', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 2.5 },
+    'Cloves': { name: 'Cloves', vToG: 0.75, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 2.2 },
+    'Ginger': { name: 'Ginger', vToG: 1.0, concentrationFactor: 4.5, gPerTspGround: 2.0, gPerTspWhole: 5.0 },
+    'Turmeric': { name: 'Turmeric', vToG: 1.0, concentrationFactor: 5.0, gPerTspGround: 2.74, gPerTspWhole: 4.8 },
 };
 
 export const DEFAULT_TRANSFORMATION: SpiceTransformationFactor = {
     name: 'Generic',
     vToG: 1.25,
+    concentrationFactor: 1.0,
     gPerTspGround: 2.3,
     gPerTspWhole: 2.5
 };
@@ -97,13 +98,38 @@ export function transformPortions(
 
 /**
  * Calculates new nutritional values per 100g.
- * Usually, the 100g clinical sample is identical for whole vs ground (mass is mass),
- * UNLESS there is a yield loss or significant moisture change.
- * In culinary context, we assume the per-100g data remains identical as it refers to the composition of the matter.
+ * Most spices have a 1:1 mass concentration when ground from dry states.
+ * However, roots (ginger/turmeric) become much more concentrated per gram.
  */
-export function transformNutritionPer100g(nutrition: any) {
-    // In our case, spices are usually processed via grinding without loss of nutrients vs total mass.
-    // So 100g of cumin seeds has the same nutrition as 100g of cumin powder.
-    // However, we return a copy to avoid mutation.
-    return { ...nutrition };
+export function transformNutritionPer100g(
+    food: any,
+    factor: SpiceTransformationFactor,
+    toState: SpiceState
+) {
+    const scale = toState === 'ground' ? factor.concentrationFactor : (1 / factor.concentrationFactor);
+    if (scale === 1) return {
+        protein_g: food.protein_g,
+        carbs_g: food.carbs_g,
+        fat_g: food.fat_g,
+        energy_kcal: food.energy_kcal,
+        energy_kj: food.energy_kj,
+        micronutrients: { ...food.micronutrients }
+    };
+
+    const newNutrition = {
+        protein_g: Number((food.protein_g * scale).toFixed(2)),
+        carbs_g: Number((food.carbs_g * scale).toFixed(2)),
+        fat_g: Number((food.fat_g * scale).toFixed(2)),
+        energy_kcal: Number((food.energy_kcal * scale).toFixed(0)),
+        energy_kj: Number((food.energy_kj * scale).toFixed(0)),
+        micronutrients: {} as Record<string, number>
+    };
+
+    if (food.micronutrients) {
+        Object.entries(food.micronutrients).forEach(([key, val]) => {
+            newNutrition.micronutrients[key] = Number(((val as number) * scale).toFixed(3));
+        });
+    }
+
+    return newNutrition;
 }

@@ -25,7 +25,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { findSpiceFactor, transformPortions, SpiceState, SpiceTransformationFactor } from '@/lib/utils/spice-conversion';
+import { findSpiceFactor, transformPortions, transformNutritionPer100g, SpiceState, SpiceTransformationFactor } from '@/lib/utils/spice-conversion';
 import FoodItemPicker from '@/components/recipe/food-item-picker';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
@@ -107,9 +107,11 @@ function SpiceConverterContent() {
                 : `${selectedFood.name.split(',')[0]}, whole`;
 
             const transformedPortions = transformPortions(selectedFood.portions || [], customFactor, targetState);
+            const transformedNutrition = transformNutritionPer100g(selectedFood, customFactor, targetState);
 
             const newFood = {
                 ...selectedFood,
+                ...transformedNutrition,
                 id: undefined, // Let DB generate new ID
                 name: newName,
                 common_name: `${selectedFood.common_name || selectedFood.name} (${targetState})`,
@@ -138,9 +140,8 @@ function SpiceConverterContent() {
     };
 
     const renderPreview = () => {
-        if (!selectedFood || !customFactor) return null;
-
         const transformedPortions = transformPortions(selectedFood.portions || [], customFactor, targetState);
+        const transformedNutrition = transformNutritionPer100g(selectedFood, customFactor, targetState);
 
         return (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -175,18 +176,48 @@ function SpiceConverterContent() {
                             </div>
                             <h3 className="font-bold text-sm uppercase tracking-widest text-indigo-500">Target Output ({targetState})</h3>
                         </div>
-                        <div className="space-y-3">
-                            <p className="text-xl font-black italic uppercase tracking-tighter text-indigo-600 dark:text-indigo-400">
-                                {targetState === 'ground' ? `${selectedFood.name.split(',')[0]}, ground` : `${selectedFood.name.split(',')[0]}, whole`}
-                            </p>
-                            <div className="space-y-1">
-                                <p className="text-[10px] font-black uppercase text-indigo-400/60">Adjusted Weights</p>
-                                {transformedPortions.map((p: any, i: number) => (
-                                    <div key={i} className="flex justify-between text-xs font-mono text-indigo-700 dark:text-indigo-300">
-                                        <span>1 {p.label}</span>
-                                        <span className="font-black">{p.weight_g}g</span>
+                        <div className="space-y-4">
+                            <div>
+                                <p className="text-xl font-black italic uppercase tracking-tighter text-indigo-600 dark:text-indigo-400">
+                                    {targetState === 'ground' ? `${selectedFood.name.split(',')[0]}, ground` : `${selectedFood.name.split(',')[0]}, whole`}
+                                </p>
+                                {customFactor.concentrationFactor !== 1 && (
+                                    <div className="flex items-center gap-1.5 mt-1">
+                                        <Zap size={10} className="text-amber-500" />
+                                        <span className="text-[9px] font-black uppercase text-amber-500 tracking-widest">
+                                            Nutrient Concentration Activated: {customFactor.concentrationFactor}x
+                                        </span>
                                     </div>
-                                ))}
+                                )}
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black uppercase text-indigo-400/60">Adjusted Weights</p>
+                                    {transformedPortions.map((p: any, i: number) => (
+                                        <div key={i} className="flex justify-between text-xs font-mono text-indigo-700 dark:text-indigo-300">
+                                            <span>1 {p.label}</span>
+                                            <span className="font-black">{p.weight_g}g</span>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-[10px] font-black uppercase text-indigo-400/60">Nutrition Shift (per 100g)</p>
+                                    <div className="space-y-0.5 text-[10px] font-mono text-indigo-600 dark:text-indigo-400">
+                                        <div className="flex justify-between">
+                                            <span>Energy</span>
+                                            <span className="font-bold">{transformedNutrition.energy_kcal} kcal</span>
+                                        </div>
+                                        <div className="flex justify-between border-t border-indigo-500/10 pt-0.5">
+                                            <span>Protein</span>
+                                            <span className="font-bold">{transformedNutrition.protein_g}g</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>Carbs</span>
+                                            <span className="font-bold">{transformedNutrition.carbs_g}g</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </Card>
@@ -246,6 +277,25 @@ function SpiceConverterContent() {
                                 />
                                 <p className="text-[9px] text-slate-400 italic leading-tight">
                                     The increase in volume after grinding. e.g. 1 tsp whole {'->'} 1.25 tsp ground.
+                                </p>
+                            </div>
+
+                            <div className="space-y-2">
+                                <div className="flex justify-between">
+                                    <Label className="text-[10px] uppercase font-black text-slate-400 italic">Nutrient Concentration Factor</Label>
+                                    <span className="text-xs font-bold text-indigo-500">{customFactor.concentrationFactor}x</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="1.0"
+                                    max="8.0"
+                                    step="0.1"
+                                    value={customFactor.concentrationFactor}
+                                    onChange={(e) => setCustomFactor({ ...customFactor, concentrationFactor: parseFloat(e.target.value) })}
+                                    className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                                />
+                                <p className="text-[9px] text-slate-400 italic leading-tight">
+                                    Scales nutrients per gram. Use for fresh root {'->'} dry powder transformations (e.g. Ginger/Turmeric). Spices like Pepper are usually 1.0x.
                                 </p>
                             </div>
                         </div>
