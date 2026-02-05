@@ -623,26 +623,31 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
         const ing = updated[index];
 
         // 1. DIRECT MATCH LOGIC
-        if (newState === 'boiled' || newState === 'fried' || newState === 'roasted') {
+        if (newState === 'raw' || newState === 'boiled' || newState === 'fried' || newState === 'roasted') {
             const baseName = (ing.food_item_name || '').split(',')[0].trim();
-            const targetTerm = newState === 'boiled' ? `${baseName}, Cooked` : `${baseName}, ${newState.charAt(0).toUpperCase() + newState.slice(1)}`;
 
             try {
                 // Broad search for the base name
                 const matches = await searchLocalFood(baseName);
 
-                const queryState = newState === 'boiled' ? 'cooked' : newState.toLowerCase();
-
                 const directMatch = matches.find((m: any) => {
                     const itemName = m.name.toLowerCase();
                     const commonName = (m.common_name || '').toLowerCase();
-                    const b = baseName.toLowerCase().split(' ')[0]; // Use first word of base name for broader match
+                    const b = baseName.toLowerCase();
+                    const firstWord = b.split(' ')[0];
 
-                    const hasBase = itemName.includes(b) || commonName.includes(b);
-                    const stateWords = newState === 'boiled' ? ['cooked', 'boiled'] : [newState.toLowerCase()];
-                    const hasState = stateWords.some(word => itemName.includes(word));
+                    const hasBase = itemName.includes(firstWord) || commonName.includes(firstWord);
 
-                    return hasBase && hasState;
+                    let stateMatch = false;
+                    if (newState === 'boiled') {
+                        stateMatch = itemName.includes('cooked') || itemName.includes('boiled');
+                    } else if (newState === 'raw') {
+                        stateMatch = itemName.includes('raw') || itemName.includes('fresh') || itemName === b || itemName === firstWord;
+                    } else {
+                        stateMatch = itemName.includes(newState.toLowerCase());
+                    }
+
+                    return hasBase && stateMatch;
                 });
 
                 if (directMatch) {
