@@ -125,9 +125,12 @@ export default function ManageFoodsPage() {
 
             setFoods(prev => prev.filter(f => f.id !== id));
             toast.success('Food item deleted');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error deleting food:', error);
-            toast.error('Failed to delete item');
+            const message = error.message || 'Failed to delete item';
+            toast.error(message.includes('foreign key')
+                ? 'Cannot delete: This item is being used in a recipe.'
+                : message);
         } finally {
             setIsDeleting(null);
         }
