@@ -584,27 +584,41 @@ export default function RecipeDetailsPage() {
                     // Recalculate weight for current unit
                     let newWeight = ing.weight_g;
                     const currentUnit = (ing.measure_label || 'g').toLowerCase();
-                    const normalize = (s: string) => {
-                        return s.toLowerCase()
-                            .replace(/,/g, ' ')
-                            .replace(/\b(chopped|shredded|sliced|diced|minced|cut|pieces|raw|cooked|boiled|fried|roasted)\b/g, '')
-                            .replace(/\s+/g, ' ')
-                            .trim();
-                    };
-                    const nUnit = normalize(currentUnit);
-                    const baseUnits = ['cup', 'tbsp', 'tsp', 'g', 'oz', 'leaf', 'bunch', 'piece', 'item'];
-                    const foundBase = baseUnits.find(bu => nUnit.startsWith(bu));
+                    const quantity = ing.quantity || 1;
 
-                    const portion = newFood.portions?.find((p: any) => {
-                        const l = p.label.toLowerCase();
-                        const nL = normalize(l);
-                        if (l === currentUnit || nL === nUnit) return true;
-                        if (foundBase && nL.startsWith(foundBase)) return true;
-                        return l.includes(currentUnit) || currentUnit.includes(l) || nL.includes(nUnit) || nUnit.includes(nL);
-                    });
+                    // 1. HARD OVERRIDE FOR GRAMS
+                    if (currentUnit === 'g' || currentUnit === 'gram' || currentUnit === 'grams') {
+                        newWeight = quantity;
+                    } else {
+                        // 2. Robust portion matching logic
+                        const normalize = (s: string) => {
+                            return s.toLowerCase()
+                                .replace(/,/g, ' ')
+                                .replace(/\b(chopped|shredded|sliced|diced|minced|cut|pieces|raw|cooked|boiled|fried|roasted)\b/g, '')
+                                .replace(/\s+/g, ' ')
+                                .trim();
+                        };
+                        const nUnit = normalize(currentUnit);
+                        const baseUnits = ['cup', 'tbsp', 'tsp', 'g', 'oz', 'leaf', 'bunch', 'piece', 'item'];
+                        const foundBase = baseUnits.find(bu => nUnit.startsWith(bu));
 
-                    if (portion) {
-                        newWeight = (ing.quantity || 1) * portion.weight_g;
+                        const portion = newFood.portions?.find((p: any) => {
+                            const l = p.label.toLowerCase();
+                            const nL = normalize(l);
+
+                            // Strict match for short units (g, oz)
+                            if (currentUnit.length <= 2) {
+                                return l === currentUnit || nL === nUnit;
+                            }
+
+                            if (l === currentUnit || nL === nUnit) return true;
+                            if (foundBase && nL.startsWith(foundBase)) return true;
+                            return l.includes(currentUnit) || currentUnit.includes(l) || nL.includes(nUnit) || nUnit.includes(nL);
+                        });
+
+                        if (portion) {
+                            newWeight = quantity * portion.weight_g;
+                        }
                     }
 
                     updated[index] = {

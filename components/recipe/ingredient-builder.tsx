@@ -667,34 +667,46 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
                     if (details) {
                         let newWeight = ing.weight_g;
                         const currentUnit = (ing.measure_label || 'g').toLowerCase();
+                        const quantity = ing.quantity || 1;
 
-                        // Robust portion matching logic
-                        const normalize = (s: string) => {
-                            return s.toLowerCase()
-                                .replace(/,/g, ' ')
-                                .replace(/\b(chopped|shredded|sliced|diced|minced|cut|pieces|raw|cooked|boiled|fried|roasted)\b/g, '')
-                                .replace(/\s+/g, ' ')
-                                .trim();
-                        };
-
-                        const nUnit = normalize(currentUnit);
-                        const baseUnits = ['cup', 'tbsp', 'tsp', 'g', 'oz', 'leaf', 'bunch', 'piece', 'item'];
-                        const foundBase = baseUnits.find(bu => nUnit.startsWith(bu));
-
-                        const portion = details.portions?.find((p: any) => {
-                            const l = p.label.toLowerCase();
-                            const nL = normalize(l);
-
-                            if (l === currentUnit || nL === nUnit) return true;
-                            if (foundBase && nL.startsWith(foundBase)) return true;
-                            return l.includes(currentUnit) || currentUnit.includes(l) || nL.includes(nUnit) || nUnit.includes(nL);
-                        });
-
-                        if (portion) {
-                            newWeight = (ing.quantity || 1) * portion.weight_g;
-                            console.log(`[PortionMatch] Matched ${currentUnit} to ${portion.label}, new weight: ${newWeight}`);
+                        // 1. HARD OVERRIDE FOR GRAMS
+                        // If the unit is exactly 'g', we don't need portion math, it's 1:1
+                        if (currentUnit === 'g' || currentUnit === 'gram' || currentUnit === 'grams') {
+                            newWeight = quantity;
                         } else {
-                            console.warn(`[PortionMatch] No match for ${currentUnit} in ${details.name}, keeping weight ${ing.weight_g}`);
+                            // 2. Robust portion matching logic
+                            const normalize = (s: string) => {
+                                return s.toLowerCase()
+                                    .replace(/,/g, ' ')
+                                    .replace(/\b(chopped|shredded|sliced|diced|minced|cut|pieces|raw|cooked|boiled|fried|roasted)\b/g, '')
+                                    .replace(/\s+/g, ' ')
+                                    .trim();
+                            };
+
+                            const nUnit = normalize(currentUnit);
+                            const baseUnits = ['cup', 'tbsp', 'tsp', 'g', 'oz', 'leaf', 'bunch', 'piece', 'item'];
+                            const foundBase = baseUnits.find(bu => nUnit.startsWith(bu));
+
+                            const portion = details.portions?.find((p: any) => {
+                                const l = p.label.toLowerCase();
+                                const nL = normalize(l);
+
+                                // Strict match for short units (g, oz) to avoid matching 'large'
+                                if (currentUnit.length <= 2) {
+                                    return l === currentUnit || nL === nUnit;
+                                }
+
+                                if (l === currentUnit || nL === nUnit) return true;
+                                if (foundBase && nL.startsWith(foundBase)) return true;
+                                return l.includes(currentUnit) || currentUnit.includes(l) || nL.includes(nUnit) || nUnit.includes(nL);
+                            });
+
+                            if (portion) {
+                                newWeight = quantity * portion.weight_g;
+                                console.log(`[PortionMatch] Matched ${currentUnit} to ${portion.label}, new weight: ${newWeight}`);
+                            } else {
+                                console.warn(`[PortionMatch] No match for ${currentUnit} in ${details.name}, keeping weight ${ing.weight_g}`);
+                            }
                         }
 
                         updated[index] = {
