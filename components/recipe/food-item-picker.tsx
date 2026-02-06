@@ -22,9 +22,10 @@ interface FoodItemPickerProps {
 
     onClose: () => void;
     mode?: 'all' | 'usda-only';
+    isAdmin?: boolean;
 }
 
-export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: FoodItemPickerProps) {
+export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmin = false }: FoodItemPickerProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [results, setResults] = useState<FoodItem[]>([]);
     const [usdaResults, setUsdaResults] = useState<FoodItemMatch[]>([]);
@@ -165,29 +166,31 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: Food
                         />
                     </div>
 
-                    <div className="flex gap-2">
-                        {mode === 'all' && (
+                    {isAdmin && (
+                        <div className="flex gap-2">
+                            {mode === 'all' && (
+                                <button
+                                    onClick={() => setView('local')}
+                                    className={`flex-1 h-11 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${view === 'local'
+                                        ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                                        : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                                        }`}
+                                >
+                                    Local Registry
+                                </button>
+                            )}
                             <button
-                                onClick={() => setView('local')}
-                                className={`flex-1 h-11 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all ${view === 'local'
-                                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                                    : 'bg-muted/50 text-muted-foreground hover:bg-muted'
+                                onClick={handleUSDASearch}
+                                className={`flex-1 h-11 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 ${view === 'usda'
+                                    ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/20'
+                                    : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-violet-600'
                                     }`}
                             >
-                                Local Registry
+                                <Sparkles className="w-4 h-4" />
+                                {mode === 'all' ? 'USDA Intelligence' : 'Search USDA Database'}
                             </button>
-                        )}
-                        <button
-                            onClick={handleUSDASearch}
-                            className={`flex-1 h-11 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 ${view === 'usda'
-                                ? 'bg-violet-600 text-white shadow-lg shadow-violet-500/20'
-                                : 'bg-muted/50 text-muted-foreground hover:bg-muted hover:text-violet-600'
-                                }`}
-                        >
-                            <Sparkles className="w-4 h-4" />
-                            {mode === 'all' ? 'USDA Intelligence' : 'Search USDA Database'}
-                        </button>
-                    </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Results */}
@@ -208,12 +211,14 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all' }: Food
                             ) : results.length === 0 ? (
                                 <div className="text-center py-12 space-y-4">
                                     <div className="text-muted-foreground italic text-sm">No local results for "{searchQuery}"</div>
-                                    <button
-                                        onClick={handleUSDASearch}
-                                        className="text-violet-600 font-black text-[10px] uppercase tracking-widest hover:underline flex items-center gap-2 mx-auto"
-                                    >
-                                        <Database className="w-4 h-4" /> Switch to USDA Intelligence?
-                                    </button>
+                                    {isAdmin && (
+                                        <button
+                                            onClick={handleUSDASearch}
+                                            className="text-violet-600 font-black text-[10px] uppercase tracking-widest hover:underline flex items-center gap-2 mx-auto"
+                                        >
+                                            <Database className="w-4 h-4" /> Switch to USDA Intelligence?
+                                        </button>
+                                    )}
                                 </div>
                             ) : (
                                 <div className="space-y-2">

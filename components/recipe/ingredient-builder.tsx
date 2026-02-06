@@ -90,9 +90,22 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
     const [selectedNutrientInfo, setSelectedNutrientInfo] = useState<string | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
     const [expandedBreakdownSections, setExpandedBreakdownSections] = useState<Record<string, boolean>>({});
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const { energyUnit, setEnergyUnit, nutrientDisplayMode, profile } = useUserPreferences();
     const useKilojoules = energyUnit === 'kJ';
+
+    useEffect(() => {
+        const checkAdmin = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
+                const userEmail = (user.email || user.user_metadata?.email || '').toLowerCase();
+                setIsAdmin(userEmail === adminEmail.toLowerCase() && adminEmail !== '');
+            }
+        };
+        checkAdmin();
+    }, []);
 
     useEffect(() => {
         if (initialShowPicker) setShowPicker(true);
@@ -429,19 +442,23 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
                 }
 
                 if (localMatches.length === 0) {
-                    // NEW: AUTO FALLBACK TO GLOBAL (USDA)
-                    item.status = 'searching-usda';
-                    setPendingIngredients([...updatedPending]);
+                    if (isAdmin) {
+                        // NEW: AUTO FALLBACK TO GLOBAL (USDA)
+                        item.status = 'searching-usda';
+                        setPendingIngredients([...updatedPending]);
 
-                    let globalMatches = await searchUSDAFood(coreName);
-                    if (globalMatches.length === 0 && coreName !== rawItem) {
-                        globalMatches = await searchUSDAFood(rawItem);
-                    }
+                        let globalMatches = await searchUSDAFood(coreName);
+                        if (globalMatches.length === 0 && coreName !== rawItem) {
+                            globalMatches = await searchUSDAFood(rawItem);
+                        }
 
-                    if (globalMatches.length > 0) {
-                        item.matches = globalMatches;
-                        item.status = 'matched';
-                        item.selectedMatch = globalMatches[0];
+                        if (globalMatches.length > 0) {
+                            item.matches = globalMatches;
+                            item.status = 'matched';
+                            item.selectedMatch = globalMatches[0];
+                        } else {
+                            item.status = 'no-match-local';
+                        }
                     } else {
                         item.status = 'no-match-local';
                     }
@@ -1202,12 +1219,14 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
                                                     {item.status === 'no-match-local' && (
                                                         <div className="flex items-center gap-3">
                                                             <span className="text-slate-400 font-bold uppercase tracking-tight">Registry mismatch</span>
-                                                            <button
-                                                                onClick={() => handleUSDASearchForPending(idx)}
-                                                                className="text-violet-600 hover:text-violet-700 font-black flex items-center gap-1.5 transition-all hover:gap-2"
-                                                            >
-                                                                <Sparkles size={10} /> Search Global?
-                                                            </button>
+                                                            {isAdmin && (
+                                                                <button
+                                                                    onClick={() => handleUSDASearchForPending(idx)}
+                                                                    className="text-violet-600 hover:text-violet-700 font-black flex items-center gap-1.5 transition-all hover:gap-2"
+                                                                >
+                                                                    <Sparkles size={10} /> Search Global?
+                                                                </button>
+                                                            )}
                                                         </div>
                                                     )}
 
@@ -1253,7 +1272,7 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
                                         </div>
 
                                         {/* Optional: Show tiny "Switch to Global" if matched locally but user wants to browse USDA */}
-                                        {item.status === 'matched' && item.selectedMatch?.source === 'local' && (
+                                        {item.status === 'matched' && item.selectedMatch?.source === 'local' && isAdmin && (
                                             <div className="px-1 pt-1 opacity-0 hover:opacity-100 transition-opacity">
                                                 <button
                                                     onClick={() => handleUSDASearchForPending(idx)}
@@ -1731,6 +1750,7 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
                     <FoodItemPicker
                         onSelect={handleAddIngredient}
                         onClose={() => setShowPicker(false)}
+                        isAdmin={isAdmin}
                     />
                 )
             }
