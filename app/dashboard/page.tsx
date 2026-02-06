@@ -59,23 +59,15 @@ export default function DashboardOverview() {
 
     const tools = [
         {
-            name: 'Explore Foods',
-            desc: 'Explore the global database of nutritional data.',
-            href: '/dashboard/foods',
+            name: 'Clinical Library',
+            desc: 'Unified hub for foods, recipes, and biological markers.',
+            href: '/dashboard/library',
             icon: Library,
             color: 'text-emerald-500',
             bg: 'bg-emerald-500/10'
         },
         {
-            name: 'Find Recipes',
-            desc: 'View and manage your optimized meal library.',
-            href: '/dashboard/recipes',
-            icon: ChefHat,
-            color: 'text-blue-500',
-            bg: 'bg-blue-500/10'
-        },
-        {
-            name: 'Plan Your Meals',
+            name: 'Meal Planner',
             desc: 'Generate optimized daily nutrition protocols.',
             href: '/dashboard/mealplanner',
             icon: Calendar,
@@ -87,24 +79,16 @@ export default function DashboardOverview() {
             desc: 'Manage your personal inventory of high-density staples.',
             href: '/dashboard/pantry',
             icon: ShoppingBasket,
-            color: 'text-emerald-600',
-            bg: 'bg-emerald-600/10'
+            color: 'text-blue-600',
+            bg: 'bg-blue-600/10'
         },
         {
-            name: 'Profile & Settings',
+            name: 'Account Settings',
             desc: 'Manage your personal settings and lab access.',
             href: '/dashboard/profile',
             icon: User,
             color: 'text-purple-500',
             bg: 'bg-purple-500/10'
-        },
-        {
-            name: 'Nutrient Library',
-            desc: 'Deep-dive into clinical vitamin and mineral data.',
-            href: '/dashboard/nutrients',
-            icon: Activity,
-            color: 'text-amber-500',
-            bg: 'bg-amber-500/10'
         }
     ];
 
