@@ -385,7 +385,7 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
 
                 if (localMatches.length > 0) {
                     item.matches = localMatches;
-                    item.status = 'matched';
+
                     // Smart Selection (Scoring) for the default choice
                     const queryWords = coreName.toLowerCase().split(/\s+/).filter((w: string) => w.length > 2);
                     let bestMatch = localMatches[0];
@@ -406,8 +406,19 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
                             bestMatch = cand;
                         }
                     }
-                    item.selectedMatch = bestMatch;
-                } else {
+
+                    // Strict threshold for auto-selection
+                    const reqScore = Math.min(3, queryWords.length || 1);
+                    if (maxMatches >= reqScore) {
+                        item.selectedMatch = bestMatch;
+                        item.status = 'matched';
+                    } else {
+                        // Weak match, trigger fallback
+                        localMatches = [];
+                    }
+                }
+
+                if (localMatches.length === 0) {
                     // NEW: AUTO FALLBACK TO GLOBAL (USDA)
                     item.status = 'searching-usda';
                     setPendingIngredients([...updatedPending]);

@@ -27,9 +27,14 @@ const USDA_BASE_URL = 'https://api.nal.usda.gov/fdc/v1';
  * Searches for food items in the local Supabase database.
  */
 export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
-    if (!query || query.trim().length < 2) return [];
-
     const cleanQuery = query.trim().toLowerCase();
+
+    // Skip terms that are likely non-ingredient junk from timing/headings
+    const SKIP_TERMS = [
+        'min', 'mins', 'minutes', 'hr', 'hour', 'hours', 'sec', 'seconds',
+        'yield', 'yields', 'servings', 'makes', 'instruction', 'direction'
+    ];
+    if (SKIP_TERMS.includes(cleanQuery)) return [];
 
     // 1. Literal ilike match (First Choice)
     // This handles "Olive Oil" matching "Olive Oil" or "Some Olive Oil"

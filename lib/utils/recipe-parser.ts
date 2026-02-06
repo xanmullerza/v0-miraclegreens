@@ -23,10 +23,18 @@ function isJunkLine(line: string): boolean {
     const JUNK_MARKERS = [
         'local offers', 'directions', 'method', 'instructions', 'step',
         'prep time', 'cook time', 'total time', 'servings', 'makes',
-        'print recipe', 'save recipe', 'pin it', 'share this'
+        'print recipe', 'save recipe', 'pin it', 'share this',
+        'jump to', 'nutrition facts', 'keep screen awake', 'yields',
+        'yield:', '1/2x', '1x', '2x'
     ];
 
     if (JUNK_MARKERS.some(marker => lower.includes(marker))) return true;
+
+    // Detect time durations like "20 mins", "1 hr" as standalone lines
+    if (/^\d+\s*(mins?|minutes?|hr|hours?|seconds?|sec)\s*$/i.test(line)) return true;
+
+    // Detect single numbers or list markers alone
+    if (/^[\d¼½¾⅛⅜⅝⅞*•\-]\s*$/i.test(line)) return true;
 
     // Skip lines that look like instruction steps or long descriptive text
     if (line.length > 150 && !/^[\d¼½¾⅛⅜⅝⅞*•\-]/.test(line)) return true;
@@ -46,7 +54,17 @@ export function parseIngredientsOnly(text: string): ParsedIngredient[] {
 
         const lowerLine = line.toLowerCase();
 
-        if (lowerLine.includes('ingredient') || lowerLine === 'original recipe' || lowerLine.includes('scaled to')) continue;
+        if (lowerLine.includes('ingredient') || lowerLine.includes('original recipe') || lowerLine.includes('scaled to')) continue;
+
+        // Use stricter isProbablyIngredient for mid-list filtering
+        if (!isProbablyIngredient(line)) {
+            // If we're already parsing ingredients, a non-ingredient line might be junk or a buffer
+            if (ingredients.length > 0 && !/^[\d¼½¾⅛⅜⅝⅞*•\-]/.test(line)) {
+                nameBuffer.push(line);
+                continue;
+            }
+            if (ingredients.length === 0) continue; // Skip leading junk
+        }
 
         const parsed = parseIngredientLine(line);
 
@@ -283,7 +301,8 @@ function isProbablyIngredient(line: string): boolean {
 
     if (lower.includes('minutes') || lower.includes('hours') || lower.includes('degrees') ||
         lower.includes('cook') || lower.includes('serve') || lower.includes('toss') ||
-        lower.includes('add ') || lower.includes('mix ') || lower.includes('salt and pepper')) {
+        lower.includes('add ') || lower.includes('mix ') || lower.includes('salt and pepper') ||
+        lower.includes('heat ') || lower.includes('skillet') || lower.includes('stir ')) {
         return false;
     }
 
