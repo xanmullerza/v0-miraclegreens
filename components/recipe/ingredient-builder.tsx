@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, Zap, X as CloseIcon, ChevronDown, Layers, Gem, Droplet, Battery, Activity, Utensils, ShoppingBasket, ArrowRight, Beaker } from 'lucide-react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -76,7 +76,7 @@ interface IngredientBuilderProps {
     onNext?: () => void;
 }
 
-export default function IngredientBuilder({ ingredients, onChange, initialShowPicker = false, initialShowMagicPaste = false, onNext }: IngredientBuilderProps) {
+function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = false, initialShowMagicPaste = false, onNext }: IngredientBuilderProps) {
     const [showPicker, setShowPicker] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
@@ -1819,5 +1819,18 @@ export default function IngredientBuilder({ ingredients, onChange, initialShowPi
                 )
             }
         </div >
+    );
+}
+
+export default function IngredientBuilder(props: IngredientBuilderProps) {
+    return (
+        <Suspense fallback={
+            <div className="p-12 text-center bg-slate-50/50 dark:bg-slate-900/20 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                <Loader2 className="w-8 h-8 text-slate-300 animate-spin mx-auto mb-4" />
+                <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">Initializing Protocol Lab...</p>
+            </div>
+        }>
+            <IngredientBuilderContent {...props} />
+        </Suspense>
     );
 }
