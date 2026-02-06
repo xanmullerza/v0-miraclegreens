@@ -391,15 +391,21 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
                     let bestMatch = localMatches[0];
                     let maxMatches = -1;
 
+                    const singularCore = coreName.split(/\s+/).map(w => w.length > 2 ? w.toLowerCase().replace(/ies$/, 'y').replace(/e?s$/, '') : w.toLowerCase()).join(' ');
+
                     for (const cand of localMatches) {
                         const candName = cand.name.toLowerCase();
+                        const singularCand = candName.split(/\s+/).map(w => w.length > 2 ? w.replace(/ies$/, 'y').replace(/e?s$/, '') : w).join(' ');
+
                         let matches = 0;
                         queryWords.forEach((word: string) => {
-                            if (candName.includes(word)) matches++;
+                            const sWord = word.length > 2 ? word.replace(/ies$/, 'y').replace(/e?s$/, '') : word;
+                            if (candName.includes(word) || candName.includes(sWord) || singularCand.includes(sWord)) matches++;
                         });
+
                         // Bonus for exact core name match or starting with it
-                        if (candName.startsWith(coreName.toLowerCase())) matches += 2;
-                        if (candName === coreName.toLowerCase()) matches += 5;
+                        if (candName.startsWith(coreName.toLowerCase()) || candName.startsWith(singularCore)) matches += 2;
+                        if (candName === coreName.toLowerCase() || candName === singularCore) matches += 5;
 
                         if (matches > maxMatches) {
                             maxMatches = matches;

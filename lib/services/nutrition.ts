@@ -24,6 +24,20 @@ const USDA_API_KEY = process.env.NEXT_PUBLIC_USDA_API_KEY || 'DEMO_KEY';
 const USDA_BASE_URL = 'https://api.nal.usda.gov/fdc/v1';
 
 /**
+ * Basic singularization for ingredient matching.
+ */
+function singularize(word: string): string {
+    const lower = word.toLowerCase();
+    if (lower.endsWith('ies')) return lower.slice(0, -3) + 'y';
+    if (lower.endsWith('es')) {
+        if (lower.endsWith('atoes') || lower.endsWith('oatoes')) return lower.slice(0, -2);
+        return lower.slice(0, -2);
+    }
+    if (lower.endsWith('s') && !lower.endsWith('ss')) return lower.slice(0, -1);
+    return lower;
+}
+
+/**
  * Searches for food items in the local Supabase database.
  */
 export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
@@ -45,10 +59,10 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
         .limit(10);
 
     // 2. Singularization Fallback
-    // If "Carrots" yields nothing, try "Carrot"
-    if ((!data || data.length === 0) && cleanQuery.endsWith('s')) {
-        const singular = cleanQuery.slice(0, -1);
-        if (singular.length >= 3) {
+    // If "Potatoes" yields nothing, try "Potato"
+    if (!data || data.length === 0) {
+        const singular = singularize(cleanQuery);
+        if (singular !== cleanQuery && singular.length >= 3) {
             const { data: sData } = await supabase
                 .from('food_items')
                 .select('*')
