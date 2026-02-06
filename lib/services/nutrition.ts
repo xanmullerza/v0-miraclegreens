@@ -96,6 +96,21 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
         }
     }
 
+    // 4. Last Resort: Longest Word Search
+    // If "Olive Oil" still fails, try just "Olive" (or whichever word is longest/most specific)
+    if (!data || data.length === 0) {
+        const words = cleanQuery.split(/\s+/).filter(w => w.length > 2);
+        if (words.length > 0) {
+            const longestWord = words.sort((a, b) => b.length - a.length)[0];
+            const { data: lwData } = await supabase
+                .from('food_items')
+                .select('*')
+                .or(`name.ilike.%${longestWord}%,common_name.ilike.%${longestWord}%`)
+                .limit(10);
+            if (lwData && lwData.length > 0) data = lwData;
+        }
+    }
+
     if (error || !data) return [];
 
     return data.map(item => ({
@@ -111,17 +126,52 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
         portions: item.portions || [], // Use JSONB column
         source: 'local' as const
     })).sort((a, b) => {
-        // Prioritize common_name matches
-        const aHasCommonPrefix = a.common_name?.toLowerCase().startsWith(cleanQuery);
-        const bHasCommonPrefix = b.common_name?.toLowerCase().startsWith(cleanQuery);
-        if (aHasCommonPrefix && !bHasCommonPrefix) return -1;
-        if (!aHasCommonPrefix && bHasCommonPrefix) return 1;
+        const aName = a.name.toLowerCase();
+        const bName = b.name.toLowerCase();
+        const aCommon = (a.common_name || "").toLowerCase();
+        const bCommon = (b.common_name || "").toLowerCase();
 
-        // Exact name match bonus
-        if (a.name.toLowerCase() === cleanQuery) return -1;
-        if (b.name.toLowerCase() === cleanQuery) return 1;
+        // 1. Literal Exact Match (Highest Priority)
+        if (aName === cleanQuery || aCommon === cleanQuery) return -1;
+        if (bName === cleanQuery || bCommon === cleanQuery) return 1;
 
-        return 0;
+        // 2. Singularized Exact Match
+        const singular = singularize(cleanQuery);
+        if (aName === singular || aCommon === singular) return -1;
+        if (bName === singular || bCommon === singular) return 1;
+
+        // 3. Raw/Fresh/Base Priority Boost
+        // We want to prefer the base ingredient over processed versions (Baked, Cooked, Fried)
+        const rawKeywords = ['raw', 'fresh', 'whole', 'unsalted'];
+        const processedKeywords = ['baked', 'cooked', 'boiled', 'fried', 'roasted', 'canned', 'stewed'];
+
+        const isAProcessed = processedKeywords.some(k => aName.includes(k));
+        const isBProcessed = processedKeywords.some(k => bName.includes(k));
+        const isARaw = rawKeywords.some(k => aName.includes(k));
+        const isBRaw = rawKeywords.some(k => bName.includes(k));
+
+        // If query doesn't mention a processed state, prefer raw or non-processed
+        const queryIsProcessed = processedKeywords.some(k => cleanQuery.includes(k));
+        if (!queryIsProcessed) {
+            if (isARaw && !isBRaw) return -1;
+            if (!isARaw && isBRaw) return 1;
+            if (!isAProcessed && isBProcessed) return -1;
+            if (isAProcessed && !isBProcessed) return 1;
+        }
+
+        // 4. StartsWith Boost
+        const aStarts = aName.startsWith(cleanQuery) || aCommon.startsWith(cleanQuery);
+        const bStarts = bName.startsWith(cleanQuery) || bCommon.startsWith(cleanQuery);
+        if (aStarts && !bStarts) return -1;
+        if (!aStarts && bStarts) return 1;
+
+        // 5. Word Coverage Score
+        const queryWords = cleanQuery.split(/\s+/).filter(w => w.length > 2);
+        const aWordScore = queryWords.filter(w => aName.includes(w) || aCommon.includes(w)).length;
+        const bWordScore = queryWords.filter(w => bName.includes(w) || bCommon.includes(w)).length;
+        if (aWordScore !== bWordScore) return bWordScore - aWordScore;
+
+        return aName.length - bName.length; // Prefer shorter names if scores tied
     });
 }
 
