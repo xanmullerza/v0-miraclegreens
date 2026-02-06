@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, Zap, X as CloseIcon, ChevronDown, Layers, Gem, Droplet, Battery, Activity, Utensils, ShoppingBasket, ArrowRight, Beaker } from 'lucide-react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 import FoodItemPicker from './food-item-picker';
 import { fetchFoodMeasures, FoodMeasure, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { COOKING_STATES, CookingState } from '@/lib/utils/cooking-states';
