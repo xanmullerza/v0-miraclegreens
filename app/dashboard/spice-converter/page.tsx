@@ -25,7 +25,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { findSpiceFactor, transformPortions, transformNutritionPer100g, SpiceState, SpiceTransformationFactor } from '@/lib/utils/spice-conversion';
+import { findSpiceFactor, transformPortions, transformNutritionPer100g, SpiceState, SpiceTransformationFactor, isSpice, getSpiceMeasures } from '@/lib/utils/spice-conversion';
 import FoodItemPicker from '@/components/recipe/food-item-picker';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
@@ -108,7 +108,18 @@ function SpiceConverterContent() {
                 ? `${selectedFood.name.split(',')[0]}, ground`
                 : `${selectedFood.name.split(',')[0]}, whole`;
 
-            const transformedPortions = transformPortions(selectedFood.portions || [], customFactor, targetState);
+            let basePortions = [...(selectedFood.portions || [])];
+            if (isSpice(selectedFood.name)) {
+                // For saving, we want to ensure the target state's measures are available
+                const spiceMeasures = getSpiceMeasures(selectedFood.name, targetState);
+                spiceMeasures.forEach(sm => {
+                    if (!basePortions.some(m => m.label.toLowerCase() === sm.label.toLowerCase())) {
+                        basePortions.push(sm);
+                    }
+                });
+            }
+
+            const transformedPortions = transformPortions(basePortions, customFactor, targetState);
             const transformedNutrition = transformNutritionPer100g(selectedFood, customFactor, targetState);
 
             const newFood = {
@@ -150,7 +161,17 @@ function SpiceConverterContent() {
     const renderPreview = () => {
         if (!selectedFood || !customFactor) return null;
 
-        const transformedPortions = transformPortions(selectedFood.portions || [], customFactor, targetState);
+        let basePortions = [...(selectedFood.portions || [])];
+        if (isSpice(selectedFood.name)) {
+            const spiceMeasures = getSpiceMeasures(selectedFood.name, targetState === 'ground' ? 'whole' : 'ground'); // base is opposite of target
+            spiceMeasures.forEach(sm => {
+                if (!basePortions.some(m => m.label.toLowerCase() === sm.label.toLowerCase())) {
+                    basePortions.push(sm);
+                }
+            });
+        }
+
+        const transformedPortions = transformPortions(basePortions, customFactor, targetState);
         const transformedNutrition = transformNutritionPer100g(selectedFood, customFactor, targetState);
 
         return (

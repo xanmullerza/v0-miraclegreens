@@ -21,6 +21,10 @@ export interface SpiceTransformationFactor {
  * Source: McCormick Culinary, Food52, USDA FoodData Central.
  */
 export const SPICE_TRANSFORMATIONS: Record<string, SpiceTransformationFactor> = {
+    'Pepper': { name: 'Black Pepper', vToG: 1.5, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 3.1, gPerTbspGround: 7.8, gPerTbspWhole: 9.3 },
+    'Peppers': { name: 'Black Pepper', vToG: 1.5, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 3.1, gPerTbspGround: 7.8, gPerTbspWhole: 9.3 },
+    'Peppercorn': { name: 'Black Pepper', vToG: 1.5, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 3.1, gPerTbspGround: 7.8, gPerTbspWhole: 9.3 },
+    'Peppercorns': { name: 'Black Pepper', vToG: 1.5, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 3.1, gPerTbspGround: 7.8, gPerTbspWhole: 9.3 },
     'Black Pepper': { name: 'Black Pepper', vToG: 1.5, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 3.1, gPerTbspGround: 7.8, gPerTbspWhole: 9.3 },
     'Coriander': { name: 'Coriander', vToG: 1.25, concentrationFactor: 1.0, gPerTspGround: 2.36, gPerTspWhole: 1.8, gPerTbspGround: 7.1, gPerTbspWhole: 5.4 },
     'Cumin': { name: 'Cumin', vToG: 1.25, concentrationFactor: 1.0, gPerTspGround: 1.96, gPerTspWhole: 2.1, gPerTbspGround: 5.9, gPerTbspWhole: 6.3 },
@@ -33,6 +37,15 @@ export const SPICE_TRANSFORMATIONS: Record<string, SpiceTransformationFactor> = 
     'Turmeric': { name: 'Turmeric', vToG: 1.0, concentrationFactor: 5.0, gPerTspGround: 2.74, gPerTspWhole: 4.8, gPerTbspGround: 8.2, gPerTbspWhole: 14.4 },
     'Nutmeg': { name: 'Nutmeg', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 2.6, gPerTbspGround: 7.8, gPerTbspWhole: 7.8 },
     'Star Anise': { name: 'Star Anise', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 2.1, gPerTspWhole: 2.1, gPerTbspGround: 6.3, gPerTbspWhole: 6.3 },
+    'Chili': { name: 'Chili', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 2.0, gPerTbspGround: 7.8, gPerTbspWhole: 6.0 },
+    'Chilli': { name: 'Chilli', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 2.6, gPerTspWhole: 2.0, gPerTbspGround: 7.8, gPerTbspWhole: 6.0 },
+    'Paprika': { name: 'Paprika', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 2.3, gPerTspWhole: 2.3, gPerTbspGround: 6.9, gPerTbspWhole: 6.9 },
+    'Oregano': { name: 'Oregano', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 1.5, gPerTspWhole: 1.5, gPerTbspGround: 4.5, gPerTbspWhole: 4.5 },
+    'Thyme': { name: 'Thyme', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 1.4, gPerTspWhole: 1.4, gPerTbspGround: 4.2, gPerTbspWhole: 4.2 },
+    'Basil': { name: 'Basil', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 1.5, gPerTspWhole: 1.5, gPerTbspGround: 4.5, gPerTbspWhole: 4.5 },
+    'Parsley': { name: 'Parsley', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 1.0, gPerTspWhole: 1.0, gPerTbspGround: 3.0, gPerTbspWhole: 3.0 },
+    'Rosemary': { name: 'Rosemary', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 1.2, gPerTspWhole: 1.2, gPerTbspGround: 3.6, gPerTbspWhole: 3.6 },
+    'Sage': { name: 'Sage', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 0.7, gPerTspWhole: 0.7, gPerTbspGround: 2.1, gPerTbspWhole: 2.1 },
 };
 
 export const DEFAULT_TRANSFORMATION: SpiceTransformationFactor = {
