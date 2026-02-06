@@ -99,10 +99,10 @@ export default function PantryPage() {
                         <div className="p-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
                             <ShoppingBasket className="text-emerald-600" size={24} />
                         </div>
-                        <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white uppercase italic">My Pantry</h1>
+                        <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white uppercase italic">Kitchen Staples</h1>
                     </div>
                     <p className="text-slate-500 font-medium max-w-lg">
-                        Your clinical inventory of high-density staples. Mark whole foods as 'In Pantry' to prioritize them in your protocol generation.
+                        Your personal collection of healthy ingredients. Save items here to make them easy to find when planning your meals.
                     </p>
                 </div>
 
@@ -128,7 +128,7 @@ export default function PantryPage() {
             <div className="mb-12 relative max-w-md">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <Input
-                    placeholder="Search your pantry content..."
+                    placeholder="Search your staples..."
                     className="pl-12 h-14 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm focus:ring-emerald-500 focus:border-emerald-500"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -139,16 +139,16 @@ export default function PantryPage() {
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4">
                     <Loader2 className="animate-spin text-emerald-500" size={40} />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Inventorying Registry...</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Checking your kitchen...</p>
                 </div>
             ) : filteredFoods.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-24 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[3rem] bg-white/50 dark:bg-slate-900/10 backdrop-blur-sm group">
                     <div className="w-20 h-20 rounded-3xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
                         <ShoppingBasket size={40} />
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Pantry Inventory Empty</h3>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Staples List Empty</h3>
                     <p className="text-slate-500 text-center max-w-sm mb-8 px-4">
-                        Add clinical staples to your pantry to maintain a high-performance nutritional inventory.
+                        Add your favorite healthy foods to your staples to make meal planning a breeze.
                     </p>
                     <Button
                         onClick={() => router.push('/dashboard/foods')}
@@ -162,11 +162,11 @@ export default function PantryPage() {
                     {/* List Header - Matching Explore Foods */}
                     <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_100px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
                         <div className="flex items-center gap-1.5"><Camera size={14} /> View</div>
-                        <div className="flex items-center gap-1.5"><Info size={14} /> Identity</div>
-                        <div className="flex justify-end items-center gap-1.5"><Zap size={14} className="text-emerald-500" /> kcal</div>
-                        <div className="flex justify-end items-center gap-1.5"><Wheat size={14} className="text-amber-500" /> Cho (g)</div>
-                        <div className="flex justify-end items-center gap-1.5"><Droplet size={14} className="text-amber-900" /> Fat (g)</div>
-                        <div className="flex justify-end items-center gap-1.5"><Beef size={14} className="text-rose-500" /> Pro (g)</div>
+                        <div className="flex items-center gap-1.5"><Info size={14} /> Name</div>
+                        <div className="flex justify-end items-center gap-1.5"><Zap size={14} className="text-emerald-500" /> Cals</div>
+                        <div className="flex justify-end items-center gap-1.5"><Wheat size={14} className="text-amber-500" /> Carbs</div>
+                        <div className="flex justify-end items-center gap-1.5"><Droplet size={14} className="text-amber-900" /> Fat</div>
+                        <div className="flex justify-end items-center gap-1.5"><Beef size={14} className="text-rose-500" /> Protein</div>
                         <div className="text-center">Actions</div>
                     </div>
 

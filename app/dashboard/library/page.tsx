@@ -30,7 +30,7 @@ export default function ClinicalLibrary() {
         <Suspense fallback={
             <div className="h-96 flex flex-col items-center justify-center gap-4">
                 <Loader2 className="animate-spin text-emerald-500" size={48} />
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Initializing Lab Data...</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Getting things ready...</p>
             </div>
         }>
             <LibraryContent />
@@ -59,9 +59,9 @@ function LibraryContent() {
     };
 
     const tabs = [
-        { id: 'foods', label: 'Whole Foods', icon: Apple, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-        { id: 'recipes', label: 'Optimized Meals', icon: ChefHat, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-        { id: 'nutrients', label: 'Biological Markers', icon: Activity, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+        { id: 'foods', label: 'Foods', icon: Apple, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+        { id: 'recipes', label: 'Recipes', icon: ChefHat, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+        { id: 'nutrients', label: 'Benefits', icon: Activity, color: 'text-amber-500', bg: 'bg-amber-500/10' },
     ];
 
     const { searchQuery, setSearchQuery } = useSearch();
@@ -77,9 +77,9 @@ function LibraryContent() {
                         </div>
                         <div>
                             <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85]">
-                                Clinical <span className="text-emerald-500">Registry.</span>
+                                Food & <span className="text-emerald-500">Health.</span>
                             </h1>
-                            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Laboratory Access Point v0.4</p>
+                            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Healthy Eating Made Easy v0.4</p>
                         </div>
                     </div>
                 </div>

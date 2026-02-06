@@ -270,7 +270,7 @@ export function FoodsView() {
                     className="h-14 px-8 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest gap-2 shadow-xl shadow-emerald-500/10"
                 >
                     <Plus size={18} />
-                    Add Clinical Sample
+                    Add Food
                 </Button>
             </div>
 
@@ -278,7 +278,7 @@ export function FoodsView() {
             {loading ? (
                 <div className="h-96 flex flex-col items-center justify-center gap-4 bg-white/50 dark:bg-slate-900/20 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800">
                     <Loader2 className="animate-spin text-emerald-500" size={32} />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Querying Global Registry...</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Searching...</p>
                 </div>
             ) : foods.length === 0 ? (
                 <div className="h-96 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
@@ -286,10 +286,10 @@ export function FoodsView() {
                         <Library size={32} />
                     </div>
                     <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                        {showFavoritesOnly ? "No Favorites Yet" : "No clinical matches found."}
+                        {showFavoritesOnly ? "No Favorites Yet" : "No food found."}
                     </p>
                     <p className="text-sm text-slate-500 text-center max-w-xs">
-                        Try adjusting your filters or search query to find the samples you need.
+                        Try adjusting your filters or search to find what you're looking for.
                     </p>
                 </div>
             ) : (

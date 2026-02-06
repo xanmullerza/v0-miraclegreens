@@ -245,7 +245,7 @@ export function RecipesView() {
                     className="h-14 px-8 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest gap-2 shadow-xl shadow-blue-500/10"
                 >
                     <Plus size={18} />
-                    Create Optimized Meal
+                    Add Recipe
                 </Button>
             </div>
 
@@ -253,7 +253,7 @@ export function RecipesView() {
             {loading ? (
                 <div className="h-96 flex flex-col items-center justify-center gap-4 bg-white/50 dark:bg-slate-900/20 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800">
                     <Loader2 className="animate-spin text-blue-500" size={32} />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Accessing Recipe Vault...</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Loading recipes...</p>
                 </div>
             ) : recipes.length === 0 ? (
                 <div className="h-96 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">

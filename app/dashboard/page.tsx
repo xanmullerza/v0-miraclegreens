@@ -59,16 +59,16 @@ export default function DashboardOverview() {
 
     const tools = [
         {
-            name: 'Clinical Library',
-            desc: 'Unified hub for foods, recipes, and biological markers.',
+            name: 'Food & Health',
+            desc: 'Find healthy food, recipes, and helpful tips.',
             href: '/dashboard/library',
             icon: Library,
             color: 'text-emerald-500',
             bg: 'bg-emerald-500/10'
         },
         {
-            name: 'Meal Planner',
-            desc: 'Generate optimized daily nutrition protocols.',
+            name: 'My Meal Plans',
+            desc: 'Create healthy meal plans for yourself in seconds.',
             href: '/dashboard/mealplanner',
             icon: Calendar,
             color: 'text-rose-500',
@@ -76,15 +76,15 @@ export default function DashboardOverview() {
         },
         {
             name: 'My Pantry',
-            desc: 'Manage your personal inventory of high-density staples.',
+            desc: 'Keep track of what you have at home.',
             href: '/dashboard/pantry',
             icon: ShoppingBasket,
             color: 'text-blue-600',
             bg: 'bg-blue-600/10'
         },
         {
-            name: 'Account Settings',
-            desc: 'Manage your personal settings and lab access.',
+            name: 'My Profile',
+            desc: 'Manage your settings and personal info.',
             href: '/dashboard/profile',
             icon: User,
             color: 'text-purple-500',
@@ -116,13 +116,13 @@ export default function DashboardOverview() {
                     <div className="relative z-10 max-w-xl">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-black uppercase tracking-widest mb-6">
                             <Zap size={12} className="fill-current" />
-                            Vitala Intelligence Beta
+                            Your Health Companion
                         </div>
                         <h1 className="text-3xl lg:text-5xl font-black text-white tracking-tighter leading-[0.9] mb-6">
-                            Welcome to your <span className="text-emerald-500">Dashboard.</span>
+                            Welcome <span className="text-emerald-500">Back.</span>
                         </h1>
                         <p className="text-base text-slate-400 leading-relaxed">
-                            Your unified platform for biological data, nutritional protocols, and healthy eating choices. Optimize your performance through high-density nutrition.
+                            Everything you need to find healthy food, great recipes, and plan your week. Discover how to eat well and feel your best.
                         </p>
                     </div>
                 </div>

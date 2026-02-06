@@ -92,7 +92,7 @@ export function NutrientsView() {
                     <div className="relative group flex-grow">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-amber-500 transition-colors" size={18} />
                         <Input
-                            placeholder="Biological search..."
+                            placeholder="Search..."
                             className="h-14 pl-12 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -130,11 +130,11 @@ export function NutrientsView() {
             {/* List Header */}
             <div className="hidden lg:grid lg:grid-cols-[60px_1fr_120px_120px_120px_100px] gap-6 px-10 pb-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100 dark:border-slate-800">
                 <div className="text-center"><Activity size={14} className="mx-auto" /></div>
-                <div>Metabolic Identity</div>
-                <div className="text-right">Functional Role</div>
-                <div className="text-right">Clinical Value</div>
-                <div className="text-right">Bio-Sources</div>
-                <div className="text-center">Collection</div>
+                <div>Name</div>
+                <div className="text-right">Main Use</div>
+                <div className="text-right">Benefits</div>
+                <div className="text-right">Found In</div>
+                <div className="text-center">Favorite</div>
             </div>
 
             {/* Nutrient Items */}
@@ -171,9 +171,9 @@ export function NutrientsView() {
                                     </Badge>
                                 </div>
 
-                                <div className="hidden lg:block text-right text-[10px] font-bold text-slate-400 uppercase">Functional Registry</div>
+                                <div className="hidden lg:block text-right text-[10px] font-bold text-slate-400 uppercase">Tips</div>
                                 <div className="hidden lg:block text-right font-black text-xs text-slate-600 dark:text-slate-300">{info.benefits.length} Benefits</div>
-                                <div className="hidden lg:block text-right font-black text-xs text-slate-600 dark:text-slate-300">{info.sources.length} Sources</div>
+                                <div className="hidden lg:block text-right font-black text-xs text-slate-600 dark:text-slate-300">{info.sources.length} Foods</div>
 
                                 <div className="p-3 lg:p-0 flex justify-end lg:justify-center gap-2">
                                     <button
