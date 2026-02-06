@@ -26,7 +26,8 @@ import {
     Globe,
     Lightbulb,
     ShieldCheck,
-    Beaker
+    Beaker,
+    Scale
 } from 'lucide-react';
 import { FOOD_DETAILS } from '@/lib/data/food-details';
 import { Badge } from '@/components/ui/badge';
@@ -69,6 +70,7 @@ export default function FoodDetailsPage() {
     const [food, setFood] = useState<FoodItem | null>(null);
     const [loading, setLoading] = useState(true);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
+    const [amount, setAmount] = useState(100);
 
     // Edit states
     const [isEditing, setIsEditing] = useState(false);
@@ -212,6 +214,7 @@ export default function FoodDetailsPage() {
     const getVal = (keys: string[]) => {
         if (!food) return 0;
         const m = food.micronutrients || {};
+        let baseVal = 0;
 
         // 1. Try to find a non-zero value in any of the provided keys
         for (const k of keys) {
@@ -242,33 +245,33 @@ export default function FoodDetailsPage() {
             }
 
             if (val > 0) {
-                return val;
+                baseVal = val;
+                break;
             }
         }
 
         // 2. Extra Fallback for Fat: Try to sum constituents if total is 0
-        if (keys.includes('fat_g') || keys.includes('Fat')) {
-            const m = food.micronutrients || {};
+        if (baseVal === 0 && (keys.includes('fat_g') || keys.includes('Fat'))) {
             const sat = m['Saturated Fat'] || 0;
             const mono = m['Monounsaturated Fat'] || 0;
             const poly = m['Polyunsaturated Fat'] || 0;
             const trans = m['Trans Fat'] || 0;
             const sum = sat + mono + poly + trans;
-            if (sum > 0) return sum;
+            if (sum > 0) baseVal = sum;
         }
 
         // 3. Special Fallback for Energy: Calculate from macros if Energy/Calories is missing or 0
-        if (keys.some(k => k.toLowerCase().includes('energy') || k.toLowerCase().includes('calorie'))) {
+        if (baseVal === 0 && keys.some(k => k.toLowerCase().includes('energy') || k.toLowerCase().includes('calorie'))) {
             const p = food.protein_g || 0;
             const c = food.carbs_g || 0;
             const f = food.fat_g || 0;
             if (p > 0 || c > 0 || f > 0) {
                 const kcal = (p * 4) + (c * 4) + (f * 9);
-                return energyUnit === 'kJ' ? kcal * 4.184 : kcal;
+                baseVal = energyUnit === 'kJ' ? kcal * 4.184 : kcal;
             }
         }
 
-        return 0;
+        return (baseVal * amount) / 100;
     };
 
     const NUTRIENT_BREAKDOWNS: Record<string, any[]> = {
@@ -557,9 +560,23 @@ export default function FoodDetailsPage() {
 
                 <div className="lg:col-span-2 space-y-6">
                     <div className="space-y-4">
-                        <h1 className="text-6xl font-black tracking-tighter italic uppercase text-slate-900 dark:text-white leading-[0.85]">
-                            {food.common_name || food.name}
-                        </h1>
+                        <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-8">
+                            <h1 className="text-6xl font-black tracking-tighter italic uppercase text-slate-900 dark:text-white leading-[0.85]">
+                                {food.common_name || food.name}
+                            </h1>
+                            <div className="flex items-center gap-3 bg-white dark:bg-slate-900 px-6 py-3 rounded-3xl border-2 border-slate-200 dark:border-slate-800 shadow-xl group/amount transition-all hover:border-emerald-500/50">
+                                <Scale className="w-5 h-5 text-emerald-500" />
+                                <div className="flex items-baseline gap-1">
+                                    <input
+                                        type="number"
+                                        value={amount}
+                                        onChange={(e) => setAmount(Number(e.target.value))}
+                                        className="w-20 bg-transparent text-3xl font-black italic tracking-tighter text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                    />
+                                    <span className="text-xl font-black italic text-slate-400">g</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="space-y-6">
@@ -662,7 +679,7 @@ export default function FoodDetailsPage() {
                         </div>
 
                         <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
-                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Values represent a 100g clinical sample volume</p>
+                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Values represent a customized {amount}g sample volume</p>
                         </div>
                     </div>
                 </div>
