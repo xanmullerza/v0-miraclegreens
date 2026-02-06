@@ -34,7 +34,8 @@ import {
     Scale,
     ChefHat,
     Globe,
-    Beaker
+    Beaker,
+    ShoppingBasket
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -64,6 +65,7 @@ interface FoodItem {
     image: string | null;
     micronutrients: Record<string, number>;
     is_favorite?: boolean;
+    is_in_pantry?: boolean;
     category?: string;
 }
 
@@ -244,6 +246,31 @@ function FoodsContent() {
         } catch (error: any) {
             console.error('Error toggling favorite:', error);
             toast.error(`Failed to update favorite: ${error.message}`);
+        }
+    };
+
+    const togglePantry = async (item: FoodItem, e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        try {
+            const newStatus = !item.is_in_pantry;
+            const { error } = await supabase
+                .from('food_items')
+                .update({ is_in_pantry: newStatus } as any)
+                .eq('id', item.id);
+
+            if (error) throw error;
+
+            setFoods(prev => prev.map(f => f.id === item.id ? { ...f, is_in_pantry: newStatus } : f));
+            setSelectedItem(prev => prev?.id === item.id ? { ...prev, is_in_pantry: newStatus } : prev);
+
+            if (newStatus) {
+                toast.success(`${item.common_name || item.name} added to My Pantry`);
+            } else {
+                toast.info(`${item.common_name || item.name} removed from My Pantry`);
+            }
+        } catch (error: any) {
+            console.error('Error toggling pantry:', error);
+            toast.error(`Failed to update pantry: ${error.message}`);
         }
     };
 
@@ -766,6 +793,18 @@ function FoodsContent() {
                                                         <Scale size={14} />
                                                     </button>
                                                 )}
+                                                <button
+                                                    onClick={(e) => togglePantry(food, e)}
+                                                    className={cn(
+                                                        "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
+                                                        food.is_in_pantry
+                                                            ? "bg-emerald-600 text-white border-emerald-700 shadow-md shadow-emerald-600/20"
+                                                            : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 border-slate-100 dark:border-slate-700"
+                                                    )}
+                                                    title={food.is_in_pantry ? "Remove from Pantry" : "Add to Pantry"}
+                                                >
+                                                    <ShoppingBasket size={14} />
+                                                </button>
                                                 <button
                                                     onClick={(e) => toggleFavorite(food, e)}
                                                     className={cn(

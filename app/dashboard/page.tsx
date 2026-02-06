@@ -12,7 +12,8 @@ import {
     ArrowRight,
     ShieldCheck,
     Scale,
-    Calendar
+    Calendar,
+    ShoppingBasket
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -80,6 +81,14 @@ export default function DashboardOverview() {
             icon: Calendar,
             color: 'text-rose-500',
             bg: 'bg-rose-500/10'
+        },
+        {
+            name: 'My Pantry',
+            desc: 'Manage your personal inventory of high-density staples.',
+            href: '/dashboard/pantry',
+            icon: ShoppingBasket,
+            color: 'text-emerald-600',
+            bg: 'bg-emerald-600/10'
         },
         {
             name: 'Profile & Settings',
