@@ -27,11 +27,55 @@ const USDA_BASE_URL = 'https://api.nal.usda.gov/fdc/v1';
  * Searches for food items in the local Supabase database.
  */
 export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
-    const { data, error } = await supabase
+    if (!query || query.trim().length < 2) return [];
+
+    const cleanQuery = query.trim().toLowerCase();
+
+    // 1. Literal ilike match (First Choice)
+    // This handles "Olive Oil" matching "Olive Oil" or "Some Olive Oil"
+    let { data, error } = await supabase
         .from('food_items')
         .select('*')
-        .or(`name.ilike.%${query}%,common_name.ilike.%${query}%`)
+        .or(`name.ilike.%${cleanQuery}%,common_name.ilike.%${cleanQuery}%`)
         .limit(10);
+
+    // 2. Singularization Fallback
+    // If "Carrots" yields nothing, try "Carrot"
+    if ((!data || data.length === 0) && cleanQuery.endsWith('s')) {
+        const singular = cleanQuery.slice(0, -1);
+        if (singular.length >= 3) {
+            const { data: sData } = await supabase
+                .from('food_items')
+                .select('*')
+                .or(`name.ilike.%${singular}%,common_name.ilike.%${singular}%`)
+                .limit(10);
+            if (sData && sData.length > 0) data = sData;
+        }
+    }
+
+    // 3. Multi-word AND Fallback
+    // If "Ground Cumin" yields nothing, try name containing BOTH "Ground" AND "Cumin"
+    // (This handles "Cumin, Ground" in the DB)
+    if (!data || data.length === 0) {
+        const words = cleanQuery.split(/\s+/).filter(w => w.length > 2);
+        if (words.length > 1) {
+            let chain = supabase.from('food_items').select('*');
+            words.forEach(w => {
+                chain = chain.or(`name.ilike.%${w}%,common_name.ilike.%${w}%`);
+            });
+            // Note: In Postgrest, chaining multiple .or() or .ilike() usually results in AND or OR depending on implementation.
+            // For true AND word search, we use multiple filters on 'name'.
+
+            let andChain = supabase.from('food_items').select('*');
+            words.forEach(w => {
+                // Postgrest allows multiple filters on same column to be ANDed
+                andChain = andChain.ilike('name', `%${w}%`);
+            });
+
+            const { data: andData } = await andChain.limit(10);
+            if (andData && andData.length > 0) data = andData;
+        }
+    }
 
     if (error || !data) return [];
 
@@ -49,10 +93,15 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
         source: 'local' as const
     })).sort((a, b) => {
         // Prioritize common_name matches
-        const aHasCommonPrefix = a.common_name?.toLowerCase().startsWith(query.toLowerCase());
-        const bHasCommonPrefix = b.common_name?.toLowerCase().startsWith(query.toLowerCase());
+        const aHasCommonPrefix = a.common_name?.toLowerCase().startsWith(cleanQuery);
+        const bHasCommonPrefix = b.common_name?.toLowerCase().startsWith(cleanQuery);
         if (aHasCommonPrefix && !bHasCommonPrefix) return -1;
         if (!aHasCommonPrefix && bHasCommonPrefix) return 1;
+
+        // Exact name match bonus
+        if (a.name.toLowerCase() === cleanQuery) return -1;
+        if (b.name.toLowerCase() === cleanQuery) return 1;
+
         return 0;
     });
 }

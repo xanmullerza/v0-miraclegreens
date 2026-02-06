@@ -18,6 +18,22 @@ export interface ParsedRecipe {
     instructions: string[];
 }
 
+function isJunkLine(line: string): boolean {
+    const lower = line.toLowerCase();
+    const JUNK_MARKERS = [
+        'local offers', 'directions', 'method', 'instructions', 'step',
+        'prep time', 'cook time', 'total time', 'servings', 'makes',
+        'print recipe', 'save recipe', 'pin it', 'share this'
+    ];
+
+    if (JUNK_MARKERS.some(marker => lower.includes(marker))) return true;
+
+    // Skip lines that look like instruction steps or long descriptive text
+    if (line.length > 150 && !/^[\d¼½¾⅛⅜⅝⅞*•\-]/.test(line)) return true;
+
+    return false;
+}
+
 export function parseIngredientsOnly(text: string): ParsedIngredient[] {
     const normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     const lines = normalized.split('\n').map(l => l.trim()).filter(l => l.length > 0);
@@ -26,6 +42,8 @@ export function parseIngredientsOnly(text: string): ParsedIngredient[] {
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i];
+        if (isJunkLine(line)) continue;
+
         const lowerLine = line.toLowerCase();
 
         if (lowerLine.includes('ingredient') || lowerLine === 'original recipe' || lowerLine.includes('scaled to')) continue;
@@ -45,13 +63,9 @@ export function parseIngredientsOnly(text: string): ParsedIngredient[] {
 
         // If it has a quantity, flush buffer and start new
         if (hasQuantity) {
-            // Check if this line actually has a meaningful name
-            // e.g. "1 cup" vs "1 cup spinach"
-            // If it's just "1 cup", we definitely want to check the buffer.
-
             // Heuristic: If the parsed item name is very short OR is just the unit name
-            const lowerItem = parsed.item.toLowerCase();
-            const isNameWeak = parsed.item.length < 2 ||
+            const lowerItem = (parsed.item || "").toLowerCase();
+            const isNameWeak = (parsed.item || "").length < 2 ||
                 parsed.item === parsed.amount ||
                 COMMON_UNITS.some(u => lowerItem === u || lowerItem === u + 's');
 
@@ -62,42 +76,38 @@ export function parseIngredientsOnly(text: string): ParsedIngredient[] {
                     parsed.item = prefix + (parsed.item && parsed.item !== prefix ? ' ' + parsed.item : '');
                     nameBuffer = []; // Consumed
                 } else {
-                    // The buffer was likely a list of previous items (e.g. "Salt", "Pepper")
-                    // Flush them as their own items
+                    // Flush buffer as separate items if they don't look like junk
                     nameBuffer.forEach(bufferedItem => {
-                        ingredients.push(parseIngredientLine(bufferedItem));
+                        if (!isJunkLine(bufferedItem)) {
+                            ingredients.push(parseIngredientLine(bufferedItem));
+                        }
                     });
                     nameBuffer = [];
                 }
             }
             ingredients.push(parsed);
         } else {
-            // No quantity. Is it a continuation or a new item?
-            // If the buffer is empty, assume it's a new item (or part of one)
-            // If the buffer is NOT empty, we append? 
-            // Better logic: treat every line as a potential ingredient if it doesn't look like junk.
-            // If it's short and has no quantity, it might be "Salt" or "Pepper"
+            // No quantity. Buffer it for possible multi-line name or as a standalone
             nameBuffer.push(line);
         }
     }
 
     // Flush remaining buffer
     if (nameBuffer.length > 0) {
-        // If we have ingredients, check if the buffer is actually a modifier for the last one
-        // (Often "Salt" then "to taste" on next line)
         const lastIng = ingredients[ingredients.length - 1];
         if (lastIng && nameBuffer.length === 1 && nameBuffer[0].length < 20) {
             lastIng.item += ', ' + nameBuffer[0];
         } else {
             nameBuffer.forEach(bufferedItem => {
-                ingredients.push(parseIngredientLine(bufferedItem));
+                if (!isJunkLine(bufferedItem)) {
+                    ingredients.push(parseIngredientLine(bufferedItem));
+                }
             });
         }
     }
 
-
-
-    return ingredients;
+    // Final cleanup of empty ingredients
+    return ingredients.filter(ing => ing.item && ing.item.length >= 2);
 }
 
 export function parseInstructionsOnly(text: string): string[] {
@@ -297,44 +307,62 @@ const COMMON_MODIFIERS = [
     'dried', 'fresh', 'frozen', 'raw', 'canned',
     'warm', 'hot', 'cold', 'chilled',
     'crumbled', 'cubed', 'halved', 'quartered', 'whole',
-    'finely', 'coarsely', 'thinly', 'thickly', 'roughly'
+    'finely', 'coarsely', 'thinly', 'thickly', 'roughly',
+    'sea', 'kosher', 'table', 'iodized', 'extra-virgin', 'virgin', 'light', 'dark', 'unsalted', 'salted',
+    'green', 'red', 'white', 'yellow', 'purple', 'large', 'medium', 'small'
 ];
 
 function extractModifier(text: string): { modifier?: string, cleanText: string } {
-    const words = text.split(/\s+/);
+    let currentText = text.trim();
     const potentialModifiers: string[] = [];
-    let cleanTextParts: string[] = [];
 
-    // Check first few words for modifiers
+    // 1. Handle trailing modifiers after a comma (e.g., "Carrots, thinly sliced")
+    const commaIndex = currentText.indexOf(',');
+    if (commaIndex !== -1) {
+        const itemPart = currentText.substring(0, commaIndex).trim();
+        const modifierPart = currentText.substring(commaIndex + 1).trim();
+
+        // Reliability check: Is the part after comma likely a modifier?
+        const modWords = modifierPart.toLowerCase().split(/\s+/);
+        const hasKnownMod = modWords.some(w => COMMON_MODIFIERS.includes(w.replace(/[,;:]/g, '')));
+
+        if (hasKnownMod || modifierPart.length < 30) {
+            return {
+                modifier: modifierPart,
+                cleanText: itemPart
+            };
+        }
+    }
+
+    // 2. Handle prefix modifiers (e.g., "Chopped Spinach", "Extra Virgin Olive Oil")
+    const words = currentText.split(/\s+/);
     let i = 0;
     while (i < words.length) {
-        let wordRaw = words[i].toLowerCase().replace(/,$/, '');
-        // handle composite like "finely chopped"
+        let wordRaw = words[i].toLowerCase().replace(/[,;:]$/, '');
+
         if (COMMON_MODIFIERS.includes(wordRaw)) {
-            potentialModifiers.push(words[i].replace(/,$/, ''));
+            potentialModifiers.push(words[i].replace(/[,;:]$/, ''));
             i++;
         } else {
-            // Check next word if current is an adverb like 'finely'
-            if ((wordRaw === 'finely' || wordRaw === 'coarsely' || wordRaw === 'thinly' || wordRaw === 'roughly') && i + 1 < words.length) {
-                const nextWord = words[i + 1].toLowerCase().replace(/,$/, '');
-                if (COMMON_MODIFIERS.includes(nextWord)) {
-                    potentialModifiers.push(words[i] + ' ' + words[i + 1].replace(/,$/, ''));
+            // Check for adverbs or composite descriptors
+            const adverbs = ['finely', 'coarsely', 'thinly', 'roughly', 'extra', 'lightly', 'heavily'];
+            if (adverbs.includes(wordRaw) && i + 1 < words.length) {
+                const nextWord = words[i + 1].toLowerCase().replace(/[,;:]$/, '');
+                if (COMMON_MODIFIERS.includes(nextWord) || nextWord === 'virgin') {
+                    potentialModifiers.push(words[i] + ' ' + words[i + 1].replace(/[,;:]$/, ''));
                     i += 2;
                     continue;
                 }
             }
-            break; // Stop at first non-modifier
+            break;
         }
     }
 
-    cleanTextParts = words.slice(i);
-
-    // Also check for comma-separated modifiers at the end? e.g. "Spinach, chopped"
-    // For now, let's stick to the prefix "Chopped Spinach" pattern as requested by "between measure and item" structure usually imply.
-    // If the user pasted "Spinach, chopped", the parser might leave "Spinach, chopped" as item.
-
     if (potentialModifiers.length > 0) {
-        return { modifier: potentialModifiers.join(', '), cleanText: cleanTextParts.join(' ') };
+        return {
+            modifier: potentialModifiers.join(', '),
+            cleanText: words.slice(i).join(' ')
+        };
     }
 
     return { cleanText: text };

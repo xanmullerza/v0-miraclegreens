@@ -375,17 +375,16 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
                 let coreName = parenIndex !== -1 ? rawItem.substring(0, parenIndex).trim() : rawItem;
                 coreName = coreName.replace(/[,;:]\s*$/, '').trim();
 
-                // 2. Search
+                // 2. Search Local Registry
                 let localMatches = await searchLocalFood(coreName);
 
-                // Fallback: If no results for core name, try full item if different
+                // Fallback: If no local results for core name, try full item
                 if (localMatches.length === 0 && coreName !== rawItem) {
                     localMatches = await searchLocalFood(rawItem);
                 }
 
-                item.matches = localMatches;
-
                 if (localMatches.length > 0) {
+                    item.matches = localMatches;
                     item.status = 'matched';
                     // Smart Selection (Scoring) for the default choice
                     const queryWords = coreName.toLowerCase().split(/\s+/).filter((w: string) => w.length > 2);
@@ -409,7 +408,22 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
                     }
                     item.selectedMatch = bestMatch;
                 } else {
-                    item.status = 'no-match-local';
+                    // NEW: AUTO FALLBACK TO GLOBAL (USDA)
+                    item.status = 'searching-usda';
+                    setPendingIngredients([...updatedPending]);
+
+                    let globalMatches = await searchUSDAFood(coreName);
+                    if (globalMatches.length === 0 && coreName !== rawItem) {
+                        globalMatches = await searchUSDAFood(rawItem);
+                    }
+
+                    if (globalMatches.length > 0) {
+                        item.matches = globalMatches;
+                        item.status = 'matched';
+                        item.selectedMatch = globalMatches[0];
+                    } else {
+                        item.status = 'no-match-local';
+                    }
                 }
 
                 setPendingIngredients([...updatedPending]);
