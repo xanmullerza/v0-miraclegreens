@@ -8,7 +8,6 @@ import {
     Plus,
     ShoppingBasket,
     Loader2,
-    X,
     Search,
     Trash2,
     Beef,
@@ -16,10 +15,12 @@ import {
     Wheat,
     Droplet,
     Info,
+    Camera,
     ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 interface FoodItem {
@@ -32,6 +33,7 @@ interface FoodItem {
     fat_g: number;
     image: string | null;
     is_in_pantry: boolean;
+    category?: string;
 }
 
 export default function PantryPage() {
@@ -57,8 +59,6 @@ export default function PantryPage() {
             setFoods(data || []);
         } catch (error: any) {
             console.error('Error fetching pantry:', error);
-            // If the column doesn't exist yet, we'll get an error. 
-            // We should catch it and show an informative message if it's a "column does not exist" error.
             if (error.code === '42703') {
                 toast.error("Database schema update required. Please run the latest migration.");
             } else {
@@ -102,133 +102,161 @@ export default function PantryPage() {
                         <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white uppercase italic">My Pantry</h1>
                     </div>
                     <p className="text-slate-500 font-medium max-w-lg">
-                        Manage your local inventory of high-density staples. Items added here can be quickly used in recipe builds.
+                        Your clinical inventory of high-density staples. Mark whole foods as 'In Pantry' to prioritize them in your protocol generation.
                     </p>
                 </div>
 
-                <Button
-                    onClick={() => router.push('/dashboard/foods')}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 h-14 rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-emerald-500/10 flex items-center gap-2 group transition-all"
-                >
-                    <Plus size={20} className="group-hover:rotate-90 transition-transform" />
-                    Add Items
-                </Button>
+                <div className="flex items-center gap-4">
+                    <Button
+                        onClick={() => router.push('/dashboard/foods')}
+                        variant="outline"
+                        className="h-14 px-6 rounded-2xl font-black uppercase tracking-widest border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 transition-all text-[10px]"
+                    >
+                        Browse All
+                    </Button>
+                    <Button
+                        onClick={() => router.push('/dashboard/foods')}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 h-14 rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-emerald-500/10 flex items-center gap-2 group transition-all"
+                    >
+                        <Plus size={20} className="group-hover:rotate-90 transition-transform" />
+                        Add Items
+                    </Button>
+                </div>
             </div>
 
-            {/* Search and Filters */}
-            <div className="mb-8 relative max-w-md">
+            {/* Search */}
+            <div className="mb-12 relative max-w-md">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <Input
-                    placeholder="Search your pantry..."
+                    placeholder="Search your pantry content..."
                     className="pl-12 h-14 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm focus:ring-emerald-500 focus:border-emerald-500"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
             </div>
 
-            {/* Content Area */}
+            {/* List Area */}
             {loading ? (
-                <div className="flex flex-col items-center justify-center py-20 gap-4">
+                <div className="flex flex-col items-center justify-center py-24 gap-4">
                     <Loader2 className="animate-spin text-emerald-500" size={40} />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Inventorying Pantry...</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Inventorying Registry...</p>
                 </div>
-            ) : foods.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white/50 dark:bg-slate-900/10 backdrop-blur-sm group">
+            ) : filteredFoods.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-24 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[3rem] bg-white/50 dark:bg-slate-900/10 backdrop-blur-sm group">
                     <div className="w-20 h-20 rounded-3xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 group-hover:scale-110 transition-transform">
                         <ShoppingBasket size={40} />
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Your pantry is empty</h3>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Pantry Inventory Empty</h3>
                     <p className="text-slate-500 text-center max-w-sm mb-8 px-4">
-                        Add the staples you keep on hand to quickly build recipes and track your nutrition.
+                        Add clinical staples to your pantry to maintain a high-performance nutritional inventory.
                     </p>
                     <Button
                         onClick={() => router.push('/dashboard/foods')}
-                        variant="outline"
-                        className="rounded-xl px-8 h-12 font-black uppercase tracking-widest text-[10px] border-emerald-500/30 text-emerald-600 hover:bg-emerald-50"
+                        className="rounded-xl px-10 h-14 font-black uppercase tracking-widest text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20"
                     >
-                        Browse Food Library
+                        Stock Up Now
                     </Button>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredFoods.map(food => (
-                        <div
-                            key={food.id}
-                            className="group bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-emerald-500/30 hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer"
-                            onClick={() => router.push(`/dashboard/foods/${food.id}`)}
-                        >
-                            {/* Image Header */}
-                            <div className="relative aspect-video overflow-hidden bg-slate-100 dark:bg-slate-950/50">
-                                {food.image ? (
-                                    <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                        <Beef size={40} className="opacity-20" />
+                <div className="space-y-4">
+                    {/* List Header - Matching Explore Foods */}
+                    <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_100px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center gap-1.5"><Camera size={14} /> View</div>
+                        <div className="flex items-center gap-1.5"><Info size={14} /> Identity</div>
+                        <div className="flex justify-end items-center gap-1.5"><Zap size={14} className="text-emerald-500" /> kcal</div>
+                        <div className="flex justify-end items-center gap-1.5"><Wheat size={14} className="text-amber-500" /> Cho (g)</div>
+                        <div className="flex justify-end items-center gap-1.5"><Droplet size={14} className="text-amber-900" /> Fat (g)</div>
+                        <div className="flex justify-end items-center gap-1.5"><Beef size={14} className="text-rose-500" /> Pro (g)</div>
+                        <div className="text-center">Actions</div>
+                    </div>
+
+                    {/* Food Items List */}
+                    <div className="space-y-3">
+                        {filteredFoods.map((food) => (
+                            <div
+                                key={food.id}
+                                onClick={() => router.push(`/dashboard/foods/${food.id}`)}
+                                className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
+                            >
+                                <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_100px] gap-4 lg:items-center lg:px-8">
+                                    {/* Thumbnail */}
+                                    <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
+                                        {food.image ? (
+                                            <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                <Beef size={24} className="opacity-20" />
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            removeFromPantry(food.id, food.common_name || food.name);
-                                        }}
-                                        className="w-10 h-10 rounded-xl bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-lg flex items-center justify-center text-rose-500 hover:bg-rose-500 hover:text-white transition-all transform hover:rotate-12"
-                                        title="Remove from Pantry"
-                                    >
-                                        <Trash2 size={18} />
-                                    </button>
+
+                                    {/* Identity */}
+                                    <div className="p-3 lg:p-0">
+                                        <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize group-hover:text-emerald-500 transition-colors">
+                                            {food.common_name || food.name}
+                                        </h3>
+                                        {food.common_name && (
+                                            <p className="text-[10px] text-slate-400 italic truncate uppercase tracking-tighter">{food.name}</p>
+                                        )}
+                                        {food.category && (
+                                            <Badge className="mt-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase tracking-widest font-black">
+                                                {food.category}
+                                            </Badge>
+                                        )}
+                                    </div>
+
+                                    {/* Desktop Stats */}
+                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                        {Math.round(food.energy_kcal)}
+                                    </div>
+                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                        {food.carbs_g.toFixed(1)}
+                                    </div>
+                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                        {food.fat_g.toFixed(1)}
+                                    </div>
+                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                        {food.protein_g.toFixed(1)}
+                                    </div>
+
+                                    {/* Mobile Stats Grid */}
+                                    <div className="lg:hidden grid grid-cols-4 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                        {[
+                                            { label: 'CAL', val: food.energy_kcal, sub: 'k', color: 'text-orange-500' },
+                                            { label: 'CHO', val: food.carbs_g, sub: 'g', color: 'text-amber-500' },
+                                            { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-amber-900' },
+                                            { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-rose-500' }
+                                        ].map(stat => (
+                                            <div key={stat.label} className="text-center">
+                                                <p className="text-[8px] font-black text-slate-400 mb-0.5">{stat.label}</p>
+                                                <p className={cn("text-xs font-black", stat.color)}>{Math.round(stat.val)}{stat.sub}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Actions */}
+                                    <div className="p-3 lg:p-0 flex justify-end lg:justify-center gap-2">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                removeFromPantry(food.id, food.common_name || food.name);
+                                            }}
+                                            className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 border border-slate-100 dark:border-slate-700 flex items-center justify-center transition-all shadow-sm"
+                                            title="Remove from Pantry"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                        <button
+                                            className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95"
+                                            title="View Analysis"
+                                        >
+                                            <ArrowRight size={16} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-
-                            {/* Info Section */}
-                            <div className="p-6 flex-grow flex flex-col">
-                                <h3 className="font-bold text-lg text-slate-900 dark:text-white capitalize truncate mb-4 group-hover:text-emerald-500 transition-colors">
-                                    {food.common_name || food.name}
-                                </h3>
-
-                                {/* Quick Stats */}
-                                <div className="grid grid-cols-2 gap-3 mb-6">
-                                    <div className="bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
-                                        <div className="flex items-center gap-1.5 text-[9px] font-black uppercase text-emerald-500 mb-1">
-                                            <Zap size={10} fill="currentColor" /> Energy
-                                        </div>
-                                        <div className="text-sm font-black text-slate-900 dark:text-white leading-none">
-                                            {Math.round(food.energy_kcal)} <span className="text-[10px] text-slate-400">kcal</span>
-                                        </div>
-                                    </div>
-                                    <div className="bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
-                                        <div className="flex items-center gap-1.5 text-[9px] font-black uppercase text-rose-500 mb-1">
-                                            <Beef size={10} /> Protein
-                                        </div>
-                                        <div className="text-sm font-black text-slate-900 dark:text-white leading-none">
-                                            {food.protein_g.toFixed(1)} <span className="text-[10px] text-slate-400">g</span>
-                                        </div>
-                                    </div>
-                                    <div className="bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
-                                        <div className="flex items-center gap-1.5 text-[9px] font-black uppercase text-amber-500 mb-1">
-                                            <Wheat size={10} /> Carbs
-                                        </div>
-                                        <div className="text-sm font-black text-slate-900 dark:text-white leading-none">
-                                            {food.carbs_g.toFixed(1)} <span className="text-[10px] text-slate-400">g</span>
-                                        </div>
-                                    </div>
-                                    <div className="bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
-                                        <div className="flex items-center gap-1.5 text-[9px] font-black uppercase text-amber-900 mb-1">
-                                            <Droplet size={10} /> Fat
-                                        </div>
-                                        <div className="text-sm font-black text-slate-900 dark:text-white leading-none">
-                                            {food.fat_g.toFixed(1)} <span className="text-[10px] text-slate-400">g</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover:text-emerald-500 transition-colors">
-                                    <span>Details</span>
-                                    <ArrowRight size={14} className="transform group-hover:translate-x-1 transition-transform" />
-                                </div>
-                            </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             )}
         </div>
