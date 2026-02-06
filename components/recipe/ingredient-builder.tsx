@@ -237,14 +237,10 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
                     weight_g = quantity * matchedMeasure.weight_g;
                 }
             } else if (unitLower === 'g' || unitLower === 'gram' || unitLower === 'ml') {
-                if (!hasParsedWeight) {
-                    weight_g = quantity;
-                }
+                weight_g = quantity; // Mass is mass
                 unit = 'g';
             } else if (unitLower === 'kg' || unitLower === 'kilogram') {
-                if (!hasParsedWeight) {
-                    weight_g = quantity * 1000;
-                }
+                weight_g = quantity * 1000;
                 unit = 'kg';
             } else if (!unit || ['g', 'item', 'whole', 'unit'].includes(unitLower)) {
                 // Try harder to find a "natural" count measure
@@ -296,7 +292,15 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
             // No measures in DB
             if (!unit) unit = 'g';
             if (!hasParsedWeight && weight_g === 0) {
-                weight_g = (unit === 'g' || unit === 'ml') ? quantity : (quantity * 100);
+                const uL = unit.toLowerCase();
+                const standardWeights: Record<string, number> = {
+                    'tsp': 5, 'teaspoon': 5, 'tbsp': 15, 'tablespoon': 15,
+                    'cup': 240, 'ml': 1, 'oz': 28, 'lb': 454, 'head': 800, 'medium': 150,
+                    'large': 200, 'small': 100, 'clove': 5, 'pinch': 0.5, 'dash': 0.5,
+                    'slice': 25, 'piece': 20, 'can': 400, 'jar': 400, 'bottle': 500
+                };
+                const baseWeight = standardWeights[uL] || 100;
+                weight_g = (unit === 'g' || unit === 'ml') ? quantity : (quantity * baseWeight);
             }
         }
 
@@ -493,31 +497,36 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
         const evaluateLocalQty = (amt: string): number => {
             if (!amt) return 1;
 
+            // Normalize: Replace comma with dot for decimal parsing
+            let cleanAmt = amt.replace(/,/g, '.').trim();
+
             // Handle unicode fractions
             const unicodeFractions: Record<string, number> = {
                 '¼': 0.25, '½': 0.5, '¾': 0.75, '⅛': 0.125, '⅜': 0.375, '⅝': 0.625, '⅞': 0.875
             };
             for (const [char, val] of Object.entries(unicodeFractions)) {
-                if (amt.includes(char)) {
-                    const parts = amt.split(char);
+                if (cleanAmt.includes(char)) {
+                    const parts = cleanAmt.split(char);
                     const whole = parseFloat(parts[0].trim()) || 0;
                     return whole + val;
                 }
             }
 
-            const match = amt.match(/^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?))/);
+            // Standard regex for numbers, fractions like "1 1/2", and decimals
+            const match = cleanAmt.match(/^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?))/);
             if (!match) return 1;
             const val = match[1].trim();
             if (val.includes('/')) {
                 if (val.includes(' ')) {
-                    const [whole, frac] = val.split(' ');
+                    const [whole, frac] = val.split(/\s+/);
                     const [num, den] = frac.split('/').map(n => parseFloat(n.trim()));
-                    return parseFloat(whole) + (num / den);
+                    return (parseFloat(whole) || 0) + (num / (den || 1));
                 }
                 const [num, den] = val.split('/').map(n => parseFloat(n.trim()));
-                if (den) return num / den;
+                return num / (den || 1);
             }
-            return parseFloat(val) || 1;
+            const numVal = parseFloat(val);
+            return isNaN(numVal) ? 1 : numVal;
         };
 
         const qty = evaluateLocalQty(amountStr);

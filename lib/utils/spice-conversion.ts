@@ -46,6 +46,7 @@ export const SPICE_TRANSFORMATIONS: Record<string, SpiceTransformationFactor> = 
     'Parsley': { name: 'Parsley', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 1.0, gPerTspWhole: 1.0, gPerTbspGround: 3.0, gPerTbspWhole: 3.0 },
     'Rosemary': { name: 'Rosemary', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 1.2, gPerTspWhole: 1.2, gPerTbspGround: 3.6, gPerTbspWhole: 3.6 },
     'Sage': { name: 'Sage', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 0.7, gPerTspWhole: 0.7, gPerTbspGround: 2.1, gPerTbspWhole: 2.1 },
+    'Salt': { name: 'Salt', vToG: 1.0, concentrationFactor: 1.0, gPerTspGround: 6.0, gPerTspWhole: 6.0, gPerTbspGround: 18.0, gPerTbspWhole: 18.0 },
 };
 
 export const DEFAULT_TRANSFORMATION: SpiceTransformationFactor = {
