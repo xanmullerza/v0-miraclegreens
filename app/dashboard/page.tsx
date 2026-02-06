@@ -59,7 +59,7 @@ export default function DashboardOverview() {
 
     const tools = [
         {
-            name: 'Food & Health',
+            name: 'Our Library',
             desc: 'Find healthy food, recipes, and helpful tips.',
             href: '/dashboard/library',
             icon: Library,
@@ -67,7 +67,7 @@ export default function DashboardOverview() {
             bg: 'bg-emerald-500/10'
         },
         {
-            name: 'My Meal Plans',
+            name: 'My Plans',
             desc: 'Create healthy meal plans for yourself in seconds.',
             href: '/dashboard/mealplanner',
             icon: Calendar,
@@ -119,7 +119,7 @@ export default function DashboardOverview() {
                             Your Health Companion
                         </div>
                         <h1 className="text-3xl lg:text-5xl font-black text-white tracking-tighter leading-[0.9] mb-6">
-                            Welcome <span className="text-emerald-500">Back.</span>
+                            Welcome to <span className="text-emerald-500">Vitala.</span>
                         </h1>
                         <p className="text-base text-slate-400 leading-relaxed">
                             Everything you need to find healthy food, great recipes, and plan your week. Discover how to eat well and feel your best.
