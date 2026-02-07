@@ -15,7 +15,9 @@ import {
     Sparkles,
     ChefHat,
     Package,
-    X
+    X,
+    ScanLine,
+    DollarSign
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +25,9 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { generateShoppingList, ShoppingItem, DailyPlan } from '@/lib/utils/meal-generator';
+import { BarcodeScanner } from './barcode-scanner';
+import { ScanConfirmDialog } from './scan-confirm-dialog';
+import { recordPurchase } from '@/lib/services/product-lookup';
 
 interface ShoppingListItem {
     id: string;
@@ -32,12 +37,18 @@ interface ShoppingListItem {
     checked: boolean;
     category?: string;
     is_miracle_product?: boolean;
-    source?: 'manual' | 'mealplan';
+    source?: 'manual' | 'mealplan' | 'scanned';
+    barcode?: string;
+    price?: number;
+    image_url?: string;
+    food_item_id?: string;
 }
+
 
 export function ShoppingListView() {
     const router = useRouter();
     const [items, setItems] = useState<ShoppingListItem[]>([]);
+    const [manualItems, setManualItems] = useState<ShoppingListItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [newItemName, setNewItemName] = useState('');
@@ -45,12 +56,35 @@ export function ShoppingListView() {
     const { dailyPlan } = useUserPreferences();
     const [pantryItems, setPantryItems] = useState<any[]>([]);
 
+    // Barcode scanner state
+    const [scannerOpen, setScannerOpen] = useState(false);
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+    const [scannedBarcode, setScannedBarcode] = useState('');
+
+    // Load manual items from local storage on mount
     useEffect(() => {
+        const saved = localStorage.getItem('vitala_shopping_manual_items');
+        if (saved) {
+            try {
+                setManualItems(JSON.parse(saved));
+            } catch (e) {
+                console.error('Failed to load shopping list', e);
+            }
+        }
         fetchData();
     }, []);
 
-    // Generate shopping list from meal plan
+    // Save manual items to local storage whenever they change
     useEffect(() => {
+        if (!loading) { // Avoid saving empty list on initial load before manual items are restored
+            localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(manualItems));
+        }
+    }, [manualItems, loading]);
+
+    // Combine manual items with meal plan items
+    useEffect(() => {
+        let combined = [...manualItems];
+
         if (dailyPlan) {
             const mealPlanItems = generateShoppingList(dailyPlan);
             const pantryNames = new Set(pantryItems.map(f => (f.common_name || f.name).toLowerCase().trim()));
@@ -68,15 +102,15 @@ export function ShoppingListView() {
                     source: 'mealplan' as const
                 }));
 
-            // Merge with manual items (deduping by name)
-            setItems(prev => {
-                const manualItems = prev.filter(i => i.source === 'manual');
-                const existingNames = new Set(manualItems.map(i => i.name.toLowerCase().trim()));
-                const newMealPlanItems = convertedItems.filter(i => !existingNames.has(i.name.toLowerCase().trim()));
-                return [...manualItems, ...newMealPlanItems];
-            });
+            // Deduplicate: If item exists in manual/scanned list, don't show from meal plan
+            const manualNames = new Set(manualItems.map(i => i.name.toLowerCase().trim()));
+            const newMealPlanItems = convertedItems.filter(i => !manualNames.has(i.name.toLowerCase().trim()));
+
+            combined = [...manualItems, ...newMealPlanItems];
         }
-    }, [dailyPlan, pantryItems]);
+
+        setItems(combined);
+    }, [dailyPlan, pantryItems, manualItems]);
 
     const fetchData = async () => {
         setLoading(true);
@@ -107,23 +141,83 @@ export function ShoppingListView() {
             source: 'manual'
         };
 
-        setItems(prev => [...prev, newItem]);
+        setManualItems(prev => [...prev, newItem]);
         setNewItemName('');
         setNewItemQty('');
         toast.success(`Added "${newItemName}" to shopping list`);
     };
 
+    // Barcode scanner handlers
+    const handleBarcodeScan = (barcode: string) => {
+        setScannerOpen(false);
+        setScannedBarcode(barcode);
+        setConfirmDialogOpen(true);
+    };
+
+    const handleScannedProductConfirm = async (product: {
+        name: string;
+        barcode: string;
+        quantity: number;
+        unit: string;
+        weight_g?: number;
+        price?: number;
+        store?: string;
+        food_item_id?: string;
+        image_url?: string;
+    }) => {
+        // Add to shopping list
+        const newItem: ShoppingListItem = {
+            id: `scanned-${Date.now()}`,
+            name: product.name,
+            quantity: `${product.quantity} ${product.unit}`,
+            unit: product.unit,
+            checked: false,
+            source: 'scanned',
+            barcode: product.barcode,
+            price: product.price,
+            image_url: product.image_url,
+            food_item_id: product.food_item_id
+        };
+
+        setManualItems(prev => [...prev, newItem]);
+        setConfirmDialogOpen(false);
+        setScannedBarcode('');
+
+        toast.success(`Added "${product.name}" to shopping list`);
+    };
+
     const toggleItem = (id: string) => {
-        setItems(prev => prev.map(item =>
-            item.id === id ? { ...item, checked: !item.checked } : item
-        ));
+        // We need to update either manual items OR rely on local state override for meal plan items?
+        // Simpler: Just update persisted manual items if it's manual, OR local state if it's meal plan?
+        // Actually, for check-off functionality to persist properly for meal plan items, we might need a separate 'checkedItems' persistence.
+        // For now, let's just toggling in the derived view 'items' won't persist well for meal plan items on refresh.
+        // Let's implement better toggling:
+
+        if (id.startsWith('manual-') || id.startsWith('scanned-')) {
+            setManualItems(prev => prev.map(item =>
+                item.id === id ? { ...item, checked: !item.checked } : item
+            ));
+        } else {
+            // For meal plan items, since they are regenerated, handling persistence is trickier.
+            // We'll update the local state 'items' for immediate UI feedback, 
+            // but strictly speaking this state is transient for meal plan items.
+            setItems(prev => prev.map(item =>
+                item.id === id ? { ...item, checked: !item.checked } : item
+            ));
+        }
     };
 
     const removeItem = (id: string) => {
-        setItems(prev => prev.filter(item => item.id !== id));
+        if (id.startsWith('manual-') || id.startsWith('scanned-')) {
+            setManualItems(prev => prev.filter(item => item.id !== id));
+        } else {
+            // For meal plan items, we can't 'remove' them permanently unless we ignore them.
+            // UI-wise just remove from current view
+            setItems(prev => prev.filter(item => item.id !== id));
+        }
     };
 
-    const moveToOpenNewry = async (item: ShoppingListItem) => {
+    const moveToPantry = async (item: ShoppingListItem) => {
         // For now, just remove from list and show toast
         // Future: Actually add to pantry
         removeItem(item.id);
@@ -131,8 +225,27 @@ export function ShoppingListView() {
     };
 
     const clearCheckedItems = () => {
+        const checked = items.filter(i => i.checked);
+
+        // Record purchases for items with price info
+        checked.forEach(item => {
+            if (item.price) {
+                recordPurchase({
+                    product_name: item.name,
+                    barcode: item.barcode,
+                    quantity: parseFloat(item.quantity) || 1,
+                    unit: item.unit || 'item',
+                    price: item.price
+                });
+            }
+        });
+
+        // Persist removal for manual items
+        setManualItems(prev => prev.filter(item => !item.checked));
+        // Update local view immediately
         setItems(prev => prev.filter(item => !item.checked));
-        toast.success('Cleared checked items');
+
+        toast.success(`Cleared ${checked.length} checked items`);
     };
 
     const filteredItems = items.filter(item =>
@@ -142,8 +255,31 @@ export function ShoppingListView() {
     const uncheckedItems = filteredItems.filter(i => !i.checked);
     const checkedItems = filteredItems.filter(i => i.checked);
 
+    // Calculate total price of items with prices
+    const totalPrice = items
+        .filter(i => i.price && !i.checked)
+        .reduce((sum, i) => sum + (i.price || 0), 0);
+
     return (
         <div className="space-y-8">
+            {/* Barcode Scanner Modal */}
+            <BarcodeScanner
+                isOpen={scannerOpen}
+                onClose={() => setScannerOpen(false)}
+                onScan={handleBarcodeScan}
+            />
+
+            {/* Scan Confirm Dialog */}
+            <ScanConfirmDialog
+                isOpen={confirmDialogOpen}
+                barcode={scannedBarcode}
+                onClose={() => {
+                    setConfirmDialogOpen(false);
+                    setScannedBarcode('');
+                }}
+                onConfirm={handleScannedProductConfirm}
+            />
+
             {/* Add Item Bar */}
             <div className="flex flex-col sm:flex-row gap-4 p-6 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl">
                 <div className="flex-1 flex gap-3">
@@ -162,14 +298,24 @@ export function ShoppingListView() {
                         onKeyDown={(e) => e.key === 'Enter' && addManualItem()}
                     />
                 </div>
-                <Button
-                    onClick={addManualItem}
-                    disabled={!newItemName.trim()}
-                    className="h-14 px-8 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20"
-                >
-                    <Plus size={20} className="mr-2" />
-                    Add Item
-                </Button>
+                <div className="flex gap-3">
+                    <Button
+                        onClick={() => setScannerOpen(true)}
+                        variant="outline"
+                        className="h-14 px-6 rounded-2xl border-amber-300 dark:border-amber-700 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 font-black uppercase tracking-widest"
+                    >
+                        <ScanLine size={20} className="mr-2" />
+                        Scan
+                    </Button>
+                    <Button
+                        onClick={addManualItem}
+                        disabled={!newItemName.trim()}
+                        className="h-14 px-8 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20"
+                    >
+                        <Plus size={20} className="mr-2" />
+                        Add
+                    </Button>
+                </div>
             </div>
 
             {/* Search */}
@@ -314,7 +460,7 @@ export function ShoppingListView() {
                                         <Button
                                             size="sm"
                                             variant="ghost"
-                                            onClick={(e) => { e.stopPropagation(); moveToOpenNewry(item); }}
+                                            onClick={(e) => { e.stopPropagation(); moveToPantry(item); }}
                                             className="opacity-0 group-hover:opacity-100 text-[9px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
                                         >
                                             <Package size={12} className="mr-1" /> To Pantry
