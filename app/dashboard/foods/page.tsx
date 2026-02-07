@@ -102,6 +102,7 @@ function FoodsContent() {
     const [compareItems, setCompareItems] = useState<FoodItem[]>([]);
     const [isCompareOpen, setIsCompareOpen] = useState(false);
     const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+    const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
 
     // Default RDA for comparison context
     const userRDAs = useRDA(30, 'female', 2000);
@@ -408,6 +409,28 @@ function FoodsContent() {
         );
     };
 
+    const toggleGroup = (groupName: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setExpandedGroups(prev => ({
+            ...prev,
+            [groupName]: !prev[groupName]
+        }));
+    };
+
+    const groupedFoods = foods.reduce((acc, food) => {
+        const key = food.common_name || food.name;
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(food);
+        return acc;
+    }, {} as Record<string, FoodItem[]>);
+
+    const groupNames = Object.keys(groupedFoods).sort((a, b) => {
+        if (sortField === 'common_name') {
+            return sortDirection === 'asc' ? a.localeCompare(b) : b.localeCompare(a);
+        }
+        return a.localeCompare(b);
+    });
+
     return (
         <div className="flex flex-col lg:flex-row -mx-8 -mt-8 min-h-[calc(100vh-128px)] bg-slate-50 dark:bg-[#020617] relative">
             {/* Library Panel */}
@@ -699,256 +722,291 @@ function FoodsContent() {
                                 <div></div>
                             </div>
 
-                            {/* Food Items List */}
-                            <div className="space-y-3">
-                                {foods.map((food) => (
-                                    <div
-                                        key={food.id}
-                                        onClick={() => router.push(`/dashboard/foods/${food.id}`)}
-                                        className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
-                                    >
-                                        <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_80px] gap-4 lg:items-center lg:px-8">
-                                            {/* Thumbnail */}
-                                            <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
-                                                {food.image ? (
-                                                    <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                        <Beef size={24} className="opacity-20" />
+                            {/* Food Items Grouped List */}
+                            <div className="space-y-6">
+                                {groupNames.map((groupName) => {
+                                    const items = groupedFoods[groupName];
+                                    const isExpanded = expandedGroups[groupName] || (searchQuery.length > 0 && items.length > 0);
+                                    const hasMultiple = items.length > 1;
+
+                                    return (
+                                        <div key={groupName} className="space-y-3">
+                                            {/* Group Header */}
+                                            <div
+                                                onClick={(e) => hasMultiple && toggleGroup(groupName, e)}
+                                                className={cn(
+                                                    "flex items-center gap-3 px-4 py-3 rounded-2xl border transition-all shadow-sm",
+                                                    hasMultiple ? "bg-slate-100 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700" : "bg-transparent border-transparent pointer-events-none"
+                                                )}
+                                            >
+                                                {hasMultiple && (
+                                                    <div className="w-6 h-6 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                                                        {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                                                     </div>
                                                 )}
+                                                <h2 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white flex items-center gap-2">
+                                                    {groupName}
+                                                    {hasMultiple && (
+                                                        <Badge className="bg-emerald-500/10 text-emerald-600 border-none text-[10px] px-2 py-0">
+                                                            {items.length} options
+                                                        </Badge>
+                                                    )}
+                                                </h2>
                                             </div>
 
-                                            {/* Info */}
-                                            <div className="p-3 lg:p-0">
-                                                <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
-                                                    {food.common_name || food.name}
-                                                </h3>
-                                                {food.common_name && (
-                                                    <p className="text-[10px] text-slate-400 italic truncate uppercase tracking-tighter">{food.name}</p>
-                                                )}
-                                                {food.category && (
-                                                    <Badge className="lg:hidden mt-2 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none">
-                                                        {food.category}
-                                                    </Badge>
-                                                )}
-                                            </div>
+                                            {/* Items in Group */}
+                                            <div className={cn("space-y-3", hasMultiple && "pl-6 lg:pl-10 border-l-2 border-slate-100 dark:border-slate-800 ml-3 lg:ml-7")}>
+                                                {(isExpanded || !hasMultiple) && items.map((food) => (
+                                                    <div
+                                                        key={food.id}
+                                                        onClick={() => router.push(`/dashboard/foods/${food.id}`)}
+                                                        className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
+                                                    >
+                                                        <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_80px] gap-4 lg:items-center lg:px-8">
+                                                            {/* Thumbnail */}
+                                                            <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
+                                                                {food.image ? (
+                                                                    <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                                ) : (
+                                                                    <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                                        <Beef size={24} className="opacity-20" />
+                                                                    </div>
+                                                                )}
+                                                            </div>
 
-                                            {/* Stats (Desktop View) */}
-                                            <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                                {Math.round(food.energy_kcal)}
-                                            </div>
-                                            <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                                {food.carbs_g.toFixed(1)}g
-                                            </div>
-                                            <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                                {food.fat_g.toFixed(1)}g
-                                            </div>
-                                            <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                                {food.protein_g.toFixed(1)}g
-                                            </div>
+                                                            {/* Info */}
+                                                            <div className="p-3 lg:p-0">
+                                                                <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
+                                                                    {food.name}
+                                                                </h3>
+                                                                {food.category && (
+                                                                    <Badge className="lg:hidden mt-2 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none">
+                                                                        {food.category}
+                                                                    </Badge>
+                                                                )}
+                                                            </div>
+
+                                                            {/* Stats (Desktop View) */}
+                                                            <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                                                {Math.round(food.energy_kcal)}
+                                                            </div>
+                                                            <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                                                {food.carbs_g.toFixed(1)}g
+                                                            </div>
+                                                            <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                                                {food.fat_g.toFixed(1)}g
+                                                            </div>
+                                                            <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                                                {food.protein_g.toFixed(1)}g
+                                                            </div>
 
 
-                                            {/* Mobile Stats Row */}
-                                            <div className="lg:hidden grid grid-cols-4 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-                                                {[
-                                                    { label: 'CAL', val: food.energy_kcal, sub: 'k', color: 'text-orange-500' },
-                                                    { label: 'CHO', val: food.carbs_g, sub: 'g', color: 'text-amber-500' },
-                                                    { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-amber-900' },
-                                                    { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-rose-500' }
-                                                ].map(stat => (
-                                                    <div key={stat.label} className="text-center">
-                                                        <p className="text-[8px] font-black text-slate-400 mb-0.5">{stat.label}</p>
-                                                        <p className={cn("text-xs font-black", stat.color)}>{Math.round(stat.val)}{stat.sub}</p>
+                                                            {/* Mobile Stats Row */}
+                                                            <div className="lg:hidden grid grid-cols-4 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                                                {[
+                                                                    { label: 'CAL', val: food.energy_kcal, sub: 'k', color: 'text-orange-500' },
+                                                                    { label: 'CHO', val: food.carbs_g, sub: 'g', color: 'text-amber-500' },
+                                                                    { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-amber-900' },
+                                                                    { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-rose-500' }
+                                                                ].map(stat => (
+                                                                    <div key={stat.label} className="text-center">
+                                                                        <p className="text-[8px] font-black text-slate-400 mb-0.5">{stat.label}</p>
+                                                                        <p className={cn("text-xs font-black", stat.color)}>{Math.round(stat.val)}{stat.sub}</p>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+
+                                                            {/* Action */}
+                                                            <div className="p-3 lg:p-0 flex justify-end lg:justify-center gap-2">
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        router.push(`/dashboard/spice-converter?foodId=${food.id}`);
+                                                                    }}
+                                                                    className="w-8 h-8 rounded-full flex items-center justify-center transition-all border bg-slate-50 dark:bg-slate-800 text-indigo-500 hover:text-indigo-600 border-slate-100 dark:border-slate-700"
+                                                                    title="Spice Lab"
+                                                                >
+                                                                    <Beaker size={14} />
+                                                                </button>
+                                                                {currentUserEmail === 'morne@miraclegreens.co.za' && (
+                                                                    <button
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            addToCompare(food);
+                                                                        }}
+                                                                        className={cn(
+                                                                            "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
+                                                                            compareItems.some(i => i.id === food.id)
+                                                                                ? "bg-emerald-500 text-white border-emerald-600 shadow-md shadow-emerald-500/20"
+                                                                                : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 border-slate-100 dark:border-slate-700"
+                                                                        )}
+                                                                        title="Compare Food"
+                                                                    >
+                                                                        <Scale size={14} />
+                                                                    </button>
+                                                                )}
+                                                                <button
+                                                                    onClick={(e) => togglePantry(food, e)}
+                                                                    className={cn(
+                                                                        "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
+                                                                        food.is_in_pantry ? "bg-amber-500 text-white border-amber-600 shadow-md shadow-amber-500/20" : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-amber-600 border-slate-100 dark:border-slate-700"
+                                                                    )}
+                                                                    title={food.is_in_pantry ? "In Pantry" : "Add to Pantry"}
+                                                                >
+                                                                    <ShoppingBasket size={14} />
+                                                                </button>
+                                                                <button
+                                                                    onClick={(e) => toggleFavorite(food, e)}
+                                                                    className={cn(
+                                                                        "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
+                                                                        food.is_favorite ? "bg-rose-500 text-white border-rose-600 shadow-md shadow-rose-500/20" : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 border-slate-100 dark:border-slate-700"
+                                                                    )}
+                                                                    title={food.is_favorite ? "Remove from My Foods" : "Add to My Foods"}
+                                                                >
+                                                                    <Heart size={14} fill={food.is_favorite ? "currentColor" : "none"} />
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 ))}
                                             </div>
-
-                                            {/* Action */}
-                                            <div className="p-3 lg:p-0 flex justify-end lg:justify-center gap-2">
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        router.push(`/dashboard/spice-converter?foodId=${food.id}`);
-                                                    }}
-                                                    className="w-8 h-8 rounded-full flex items-center justify-center transition-all border bg-slate-50 dark:bg-slate-800 text-indigo-500 hover:text-indigo-600 border-slate-100 dark:border-slate-700"
-                                                    title="Spice Lab"
-                                                >
-                                                    <Beaker size={14} />
-                                                </button>
-                                                {currentUserEmail === 'morne@miraclegreens.co.za' && (
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            addToCompare(food);
-                                                        }}
-                                                        className={cn(
-                                                            "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
-                                                            compareItems.some(i => i.id === food.id)
-                                                                ? "bg-emerald-500 text-white border-emerald-600 shadow-md shadow-emerald-500/20"
-                                                                : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 border-slate-100 dark:border-slate-700"
-                                                        )}
-                                                        title="Compare Food"
-                                                    >
-                                                        <Scale size={14} />
-                                                    </button>
-                                                )}
-                                                <button
-                                                    onClick={(e) => togglePantry(food, e)}
-                                                    className={cn(
-                                                        "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
-                                                        food.is_in_pantry
-                                                            ? "bg-emerald-600 text-white border-emerald-700 shadow-md shadow-emerald-600/20"
-                                                            : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 border-slate-100 dark:border-slate-700"
-                                                    )}
-                                                    title={food.is_in_pantry ? "Remove from Pantry" : "Add to Pantry"}
-                                                >
-                                                    <ShoppingBasket size={14} />
-                                                </button>
-                                                <button
-                                                    onClick={(e) => toggleFavorite(food, e)}
-                                                    className={cn(
-                                                        "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
-                                                        food.is_favorite
-                                                            ? "bg-rose-500 text-white border-rose-600 shadow-md shadow-rose-500/20"
-                                                            : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 border-slate-100 dark:border-slate-700"
-                                                    )}
-                                                >
-                                                    <Heart size={14} fill={food.is_favorite ? "currentColor" : "none"} />
-                                                </button>
-                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
 
+
                             {/* Pagination Button */}
-                            {hasMore && (
-                                <div className="flex justify-center pt-8">
-                                    <Button
-                                        onClick={handleLoadMore}
-                                        disabled={loadingMore}
-                                        className="h-14 px-8 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-[0.2em] shadow-xl group transition-all"
-                                    >
-                                        {loadingMore ? (
-                                            <>
-                                                <Loader2 className="animate-spin mr-3" size={18} />
-                                                Loading Results...
-                                            </>
-                                        ) : (
-                                            <>
-                                                View More Foods
-                                                <ArrowRight className="ml-3 group-hover:translate-x-1 transition-transform" size={18} />
-                                            </>
-                                        )}
-                                    </Button>
-                                </div>
-                            )}
-                        </div>
+                            {
+                                hasMore && (
+                                    <div className="flex justify-center pt-8">
+                                        <Button
+                                            onClick={handleLoadMore}
+                                            disabled={loadingMore}
+                                            className="h-14 px-8 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-[0.2em] shadow-xl group transition-all"
+                                        >
+                                            {loadingMore ? (
+                                                <>
+                                                    <Loader2 className="animate-spin mr-3" size={18} />
+                                                    Loading Results...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    View More Foods
+                                                    <ArrowRight className="ml-3 group-hover:translate-x-1 transition-transform" size={18} />
+                                                </>
+                                            )}
+                                        </Button>
+                                    </div>
+                                )
+                            }
+                        </div >
                     )}
 
 
-                </div>
-            </div>
+                </div >
+            </div >
 
             {/* Edit Modal (Outside panels to cover both) */}
-            {editingItem && (
-                <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="w-full max-w-md">
-                        <Card className="bg-white dark:bg-slate-900 p-6 space-y-6 shadow-2xl border-emerald-500/20">
-                            <div className="flex justify-between items-center">
-                                <h3 className="text-xl font-bold tracking-tight">Edit Food Entry</h3>
-                                <button onClick={() => setEditingItem(null)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400">
-                                    <X size={20} />
-                                </button>
-                            </div>
-
-                            <div className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Ingredient Name</Label>
-                                    <Input
-                                        value={editName}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditName(e.target.value)}
-                                        className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 font-bold"
-                                    />
+            {
+                editingItem && (
+                    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                        <div className="w-full max-w-md">
+                            <Card className="bg-white dark:bg-slate-900 p-6 space-y-6 shadow-2xl border-emerald-500/20">
+                                <div className="flex justify-between items-center">
+                                    <h3 className="text-xl font-bold tracking-tight">Edit Food Entry</h3>
+                                    <button onClick={() => setEditingItem(null)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400">
+                                        <X size={20} />
+                                    </button>
                                 </div>
 
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Common Name</Label>
-                                    <Input
-                                        value={editCommonName}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditCommonName(e.target.value)}
-                                        className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800"
-                                        placeholder="e.g. Garden Pea"
-                                    />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Category</Label>
-                                    <div className="flex flex-wrap gap-2">
-                                        {CATEGORIES.map(category => (
-                                            <button
-                                                key={category}
-                                                onClick={() => setEditCategory(category)}
-                                                className={cn(
-                                                    "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all",
-                                                    editCategory === category
-                                                        ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
-                                                        : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
-                                                )}
-                                            >
-                                                {category}
-                                            </button>
-                                        ))}
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Ingredient Name</Label>
+                                        <Input
+                                            value={editName}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditName(e.target.value)}
+                                            className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 font-bold"
+                                        />
                                     </div>
-                                </div>
 
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Reference Photo</Label>
-                                    <div className="relative aspect-video rounded-2xl bg-white dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group/upload flex items-center justify-center">
-                                        {editImage ? (
-                                            <>
-                                                <img src={editImage} alt="Preview" className="w-full h-full object-cover" />
-                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/upload:opacity-100 transition-opacity flex items-center justify-center">
-                                                    <Button variant="secondary" size="sm" className="gap-2" onClick={() => setEditImage('')}>
-                                                        <X size={14} /> Remove
-                                                    </Button>
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Common Name</Label>
+                                        <Input
+                                            value={editCommonName}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditCommonName(e.target.value)}
+                                            className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800"
+                                            placeholder="e.g. Garden Pea"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Category</Label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {CATEGORIES.map(category => (
+                                                <button
+                                                    key={category}
+                                                    onClick={() => setEditCategory(category)}
+                                                    className={cn(
+                                                        "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all",
+                                                        editCategory === category
+                                                            ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
+                                                            : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+                                                    )}
+                                                >
+                                                    {category}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Reference Photo</Label>
+                                        <div className="relative aspect-video rounded-2xl bg-white dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group/upload flex items-center justify-center">
+                                            {editImage ? (
+                                                <>
+                                                    <img src={editImage} alt="Preview" className="w-full h-full object-cover" />
+                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/upload:opacity-100 transition-opacity flex items-center justify-center">
+                                                        <Button variant="secondary" size="sm" className="gap-2" onClick={() => setEditImage('')}>
+                                                            <X size={14} /> Remove
+                                                        </Button>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <div className="text-center p-4">
+                                                    {uploading ? (
+                                                        <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mx-auto" />
+                                                    ) : (
+                                                        <>
+                                                            <Upload size={24} className="text-slate-400 mx-auto mb-2" />
+                                                            <p className="text-[10px] font-bold text-slate-500">Click to Upload</p>
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                                onChange={handleImageUpload}
+                                                            />
+                                                        </>
+                                                    )}
                                                 </div>
-                                            </>
-                                        ) : (
-                                            <div className="text-center p-4">
-                                                {uploading ? (
-                                                    <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mx-auto" />
-                                                ) : (
-                                                    <>
-                                                        <Upload size={24} className="text-slate-400 mx-auto mb-2" />
-                                                        <p className="text-[10px] font-bold text-slate-500">Click to Upload</p>
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                                            onChange={handleImageUpload}
-                                                        />
-                                                    </>
-                                                )}
-                                            </div>
-                                        )}
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="flex gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-                                <Button variant="outline" className="flex-1 rounded-xl font-bold" onClick={() => setEditingItem(null)}>
-                                    Cancel
-                                </Button>
-                                <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold gap-2" onClick={handleEditSave}>
-                                    <Save size={16} /> Save Changes
-                                </Button>
-                            </div>
-                        </Card>
+                                <div className="flex gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                    <Button variant="outline" className="flex-1 rounded-xl font-bold" onClick={() => setEditingItem(null)}>
+                                        Cancel
+                                    </Button>
+                                    <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold gap-2" onClick={handleEditSave}>
+                                        <Save size={16} /> Save Changes
+                                    </Button>
+                                </div>
+                            </Card>
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             {/* Comparison Panel */}
             <div className={cn(
@@ -1048,13 +1106,15 @@ function FoodsContent() {
             </div>
 
             {/* Mobile Backdrop */}
-            {isCompareOpen && (
-                <div
-                    className="fixed inset-0 z-[90] bg-black/20 backdrop-blur-[2px] animate-in fade-in duration-300 lg:hidden"
-                    onClick={() => setIsCompareOpen(false)}
-                />
-            )}
-        </div>
+            {
+                isCompareOpen && (
+                    <div
+                        className="fixed inset-0 z-[90] bg-black/20 backdrop-blur-[2px] animate-in fade-in duration-300 lg:hidden"
+                        onClick={() => setIsCompareOpen(false)}
+                    />
+                )
+            }
+        </div >
     );
 }
 

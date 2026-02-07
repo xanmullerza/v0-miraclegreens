@@ -14,8 +14,8 @@ import {
     Zap,
     Wheat,
     Droplet,
-    Info,
-    Camera,
+    ChevronRight,
+    ChevronDown,
     ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -41,10 +41,19 @@ export default function PantryPage() {
     const [foods, setFoods] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
+    const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
         fetchPantry();
     }, []);
+
+    const toggleGroup = (groupName: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setExpandedGroups(prev => ({
+            ...prev,
+            [groupName]: !prev[groupName]
+        }));
+    };
 
     const fetchPantry = async () => {
         setLoading(true);
@@ -87,8 +96,19 @@ export default function PantryPage() {
     };
 
     const filteredFoods = foods.filter(food =>
-        (food.common_name || food.name).toLowerCase().includes(searchQuery.toLowerCase())
+        (food.common_name || food.name).toLowerCase().includes(searchQuery.toLowerCase()) ||
+        food.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
+
+    // Grouping logic
+    const groupedFoods = filteredFoods.reduce((acc, food) => {
+        const key = food.common_name || food.name;
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(food);
+        return acc;
+    }, {} as Record<string, FoodItem[]>);
+
+    const groupNames = Object.keys(groupedFoods).sort();
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-500">
@@ -170,92 +190,128 @@ export default function PantryPage() {
                         <div className="text-center">Actions</div>
                     </div>
 
-                    {/* Food Items List */}
-                    <div className="space-y-3">
-                        {filteredFoods.map((food) => (
-                            <div
-                                key={food.id}
-                                onClick={() => router.push(`/dashboard/foods/${food.id}`)}
-                                className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
-                            >
-                                <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_100px] gap-4 lg:items-center lg:px-8">
-                                    {/* Thumbnail */}
-                                    <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
-                                        {food.image ? (
-                                            <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                <Beef size={24} className="opacity-20" />
+                    {/* Food Items Grouped List */}
+                    <div className="space-y-6">
+                        {groupNames.map((groupName) => {
+                            const items = groupedFoods[groupName];
+                            const isExpanded = expandedGroups[groupName] || (searchQuery.length > 0 && items.length > 0);
+                            const hasMultiple = items.length > 1;
+
+                            // If it's a single item and it's not grouped by common_name (i.e. name was used as key)
+                            // Or if it's just a single entry for a common name.
+
+                            return (
+                                <div key={groupName} className="space-y-2">
+                                    {/* Group Header - Show if multiple items or if we want a common name header */}
+                                    <div
+                                        onClick={(e) => hasMultiple && toggleGroup(groupName, e)}
+                                        className={cn(
+                                            "flex items-center gap-3 px-4 py-3 rounded-2xl border transition-all",
+                                            hasMultiple ? "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800" : "bg-transparent border-transparent pointer-events-none"
+                                        )}
+                                    >
+                                        {hasMultiple && (
+                                            <div className="w-6 h-6 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                                                {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                                             </div>
                                         )}
+                                        <h2 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white flex items-center gap-2">
+                                            {groupName}
+                                            {hasMultiple && (
+                                                <Badge className="bg-emerald-500/10 text-emerald-600 border-none text-[10px] px-2 py-0">
+                                                    {items.length} options
+                                                </Badge>
+                                            )}
+                                        </h2>
                                     </div>
 
-                                    {/* Identity */}
-                                    <div className="p-3 lg:p-0">
-                                        <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize group-hover:text-emerald-500 transition-colors">
-                                            {food.common_name || food.name}
-                                        </h3>
-                                        {food.common_name && (
-                                            <p className="text-[10px] text-slate-400 italic truncate uppercase tracking-tighter">{food.name}</p>
-                                        )}
-                                        {food.category && (
-                                            <Badge className="mt-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase tracking-widest font-black">
-                                                {food.category}
-                                            </Badge>
-                                        )}
-                                    </div>
+                                    {/* Items in Group */}
+                                    <div className={cn("space-y-3", hasMultiple && "pl-6 lg:pl-8 border-l-2 border-slate-100 dark:border-slate-800 ml-3 lg:ml-7")}>
+                                        {(isExpanded || !hasMultiple) && items.map((food) => (
+                                            <div
+                                                key={food.id}
+                                                onClick={() => router.push(`/dashboard/foods/${food.id}`)}
+                                                className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
+                                            >
+                                                <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_100px] gap-4 lg:items-center lg:px-8">
+                                                    {/* Thumbnail */}
+                                                    <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
+                                                        {food.image ? (
+                                                            <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                                <Beef size={24} className="opacity-20" />
+                                                            </div>
+                                                        )}
+                                                    </div>
 
-                                    {/* Desktop Stats */}
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                        {Math.round(food.energy_kcal)}
-                                    </div>
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                        {food.carbs_g.toFixed(1)}
-                                    </div>
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                        {food.fat_g.toFixed(1)}
-                                    </div>
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                        {food.protein_g.toFixed(1)}
-                                    </div>
+                                                    {/* Identity */}
+                                                    <div className="p-3 lg:p-0">
+                                                        <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize group-hover:text-emerald-500 transition-colors">
+                                                            {food.name}
+                                                        </h3>
+                                                        {food.category && (
+                                                            <Badge className="mt-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase tracking-widest font-black">
+                                                                {food.category}
+                                                            </Badge>
+                                                        )}
+                                                    </div>
 
-                                    {/* Mobile Stats Grid */}
-                                    <div className="lg:hidden grid grid-cols-4 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-                                        {[
-                                            { label: 'CAL', val: food.energy_kcal, sub: 'k', color: 'text-orange-500' },
-                                            { label: 'CHO', val: food.carbs_g, sub: 'g', color: 'text-amber-500' },
-                                            { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-amber-900' },
-                                            { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-rose-500' }
-                                        ].map(stat => (
-                                            <div key={stat.label} className="text-center">
-                                                <p className="text-[8px] font-black text-slate-400 mb-0.5">{stat.label}</p>
-                                                <p className={cn("text-xs font-black", stat.color)}>{Math.round(stat.val)}{stat.sub}</p>
+                                                    {/* Desktop Stats */}
+                                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                                        {Math.round(food.energy_kcal)}
+                                                    </div>
+                                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                                        {food.carbs_g.toFixed(1)}
+                                                    </div>
+                                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                                        {food.fat_g.toFixed(1)}
+                                                    </div>
+                                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
+                                                        {food.protein_g.toFixed(1)}
+                                                    </div>
+
+                                                    {/* Mobile Stats Grid */}
+                                                    <div className="lg:hidden grid grid-cols-4 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                                        {[
+                                                            { label: 'CAL', val: food.energy_kcal, sub: 'k', color: 'text-orange-500' },
+                                                            { label: 'CHO', val: food.carbs_g, sub: 'g', color: 'text-amber-500' },
+                                                            { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-amber-900' },
+                                                            { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-rose-500' }
+                                                        ].map(stat => (
+                                                            <div key={stat.label} className="text-center">
+                                                                <p className="text-[8px] font-black text-slate-400 mb-0.5">{stat.label}</p>
+                                                                <p className={cn("text-xs font-black", stat.color)}>{Math.round(stat.val)}{stat.sub}</p>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+
+                                                    {/* Actions */}
+                                                    <div className="p-3 lg:p-0 flex justify-end lg:justify-center gap-2">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                removeFromPantry(food.id, food.common_name || food.name);
+                                                            }}
+                                                            className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 border border-slate-100 dark:border-slate-700 flex items-center justify-center transition-all shadow-sm"
+                                                            title="Remove from Pantry"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                        <button
+                                                            className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95"
+                                                            title="View Analysis"
+                                                        >
+                                                            <ArrowRight size={16} />
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
-
-                                    {/* Actions */}
-                                    <div className="p-3 lg:p-0 flex justify-end lg:justify-center gap-2">
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                removeFromPantry(food.id, food.common_name || food.name);
-                                            }}
-                                            className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 border border-slate-100 dark:border-slate-700 flex items-center justify-center transition-all shadow-sm"
-                                            title="Remove from Pantry"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                        <button
-                                            className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95"
-                                            title="View Analysis"
-                                        >
-                                            <ArrowRight size={16} />
-                                        </button>
-                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             )}
