@@ -164,13 +164,37 @@ const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onRegenerate }: {
     );
 };
 
-const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate }: {
+const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, pantryItems = [] }: {
     recipe: Recipe,
     mealLabel: string,
     unit?: UnitType,
-    onRegenerate?: () => void
+    onRegenerate?: () => void,
+    pantryItems?: any[]
 }) => {
     const router = useRouter();
+
+    // Match Analysis Logic
+    const pantryIds = new Set(pantryItems.map(f => f.id));
+    const pantryNames = new Set(pantryItems.map(f => (f.common_name || f.name).toLowerCase().trim()));
+    const recipeIngs = recipe.ingredients || [];
+
+    let matchCount = 0;
+    const missingIngredients: string[] = [];
+
+    recipeIngs.forEach(ing => {
+        const isMatch = (ing.food_item_id && pantryIds.has(ing.food_item_id)) ||
+            (ing.baseIngredient && pantryNames.has(ing.baseIngredient.toLowerCase().trim())) ||
+            (ing.item && pantryNames.has(ing.item.toLowerCase().trim()));
+
+        if (isMatch) {
+            matchCount++;
+        } else {
+            missingIngredients.push(ing.baseIngredient || ing.item);
+        }
+    });
+
+    const matchScore = recipeIngs.length > 0 ? matchCount / recipeIngs.length : 0;
+    const uniqueMissing = Array.from(new Set(missingIngredients));
     return (
         <div
             onClick={() => router.push(`/dashboard/recipes/${recipe.id}`)}
@@ -206,6 +230,34 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate }: {
                         <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase tracking-widest px-1.5 py-0">
                             {recipe.type}
                         </Badge>
+                    </div>
+
+                    {/* Pantry Match UI */}
+                    <div className="mt-3 space-y-2">
+                        <div className="flex items-center gap-2">
+                            <div className={cn(
+                                "text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg flex items-center gap-1.5",
+                                matchScore === 1 ? "bg-emerald-500/10 text-emerald-600" : "bg-slate-100 dark:bg-slate-800 text-slate-500"
+                            )}>
+                                <ShoppingBasket size={12} />
+                                {matchCount} / {recipeIngs.length} Possessed
+                            </div>
+                            {matchScore === 1 && (
+                                <div className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg bg-emerald-500 text-white flex items-center gap-1">
+                                    <Sparkles size={10} /> Fully Stocked
+                                </div>
+                            )}
+                        </div>
+                        {uniqueMissing.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5">
+                                <span className="text-[9px] font-black uppercase tracking-widest text-rose-500/60 mt-1">Missing:</span>
+                                {uniqueMissing.map((ing, idx) => (
+                                    <span key={idx} className="text-[9px] font-bold text-rose-500 dark:text-rose-400 bg-rose-500/5 px-1.5 py-0.5 rounded-md border border-rose-500/10">
+                                        {ing}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -250,6 +302,19 @@ export default function MealPlannerPage() {
     const router = useRouter();
     const [step, setStep] = useState<1 | 2 | 3>(1);
     const [generating, setGenerating] = useState(false);
+    const [pantryItems, setPantryItems] = useState<any[]>([]);
+
+    useEffect(() => {
+        const fetchPantry = async () => {
+            const { data } = await supabase
+                .from('food_items')
+                .select('*')
+                .eq('is_in_pantry', true);
+            if (data) setPantryItems(data);
+        };
+        fetchPantry();
+    }, []);
+
     const {
         profile,
         energyUnit: unit,
@@ -414,19 +479,13 @@ export default function MealPlannerPage() {
                 setCalories(targetCals);
 
                 // Jump straight to generation
-                setGenerating(true);
-                generateDailyPlan({ targetCalories: targetCals, diet: profile.dietType as DietType, numMeals: 3 })
-                    .then(newPlan => {
-                        setPlan(newPlan);
-                        setStep(3);
-                    })
-                    .catch(console.error)
-                    .finally(() => setGenerating(false));
+                // We'll let the user click generate or handle it elsewhere to avoid race conditions with pantry fetch
+                setStep(2);
             } else {
                 setShowSummary(true);
             }
         }
-    }, [profile, skipPlannerQuiz, setPlan]);
+    }, [profile, skipPlannerQuiz]);
 
     // Update step if plan exists
     useEffect(() => {
@@ -444,7 +503,8 @@ export default function MealPlannerPage() {
                 targetCalories: calories,
                 diet,
                 numMeals: 3,
-                favoritesOnly: showFavoritesOnly
+                favoritesOnly: showFavoritesOnly,
+                pantryItems
             });
             setPlan(newPlan);
             setStep(3);
@@ -802,9 +862,9 @@ export default function MealPlannerPage() {
                         </div>
 
                         <div className="space-y-4">
-                            <RecipeListItem recipe={plan.breakfast} mealLabel="Breakfast" unit={unit} onRegenerate={() => handleRegenerateMeal('breakfast', plan.breakfast.id)} />
-                            <RecipeListItem recipe={plan.lunch} mealLabel="Lunch" unit={unit} onRegenerate={() => handleRegenerateMeal('lunch', plan.lunch.id)} />
-                            <RecipeListItem recipe={plan.dinner} mealLabel="Dinner" unit={unit} onRegenerate={() => handleRegenerateMeal('dinner', plan.dinner.id)} />
+                            <RecipeListItem recipe={plan.breakfast} mealLabel="Breakfast" unit={unit} onRegenerate={() => handleRegenerateMeal('breakfast', plan.breakfast.id)} pantryItems={pantryItems} />
+                            <RecipeListItem recipe={plan.lunch} mealLabel="Lunch" unit={unit} onRegenerate={() => handleRegenerateMeal('lunch', plan.lunch.id)} pantryItems={pantryItems} />
+                            <RecipeListItem recipe={plan.dinner} mealLabel="Dinner" unit={unit} onRegenerate={() => handleRegenerateMeal('dinner', plan.dinner.id)} pantryItems={pantryItems} />
                         </div>
 
                         <div className="space-y-4 pt-10 border-t">

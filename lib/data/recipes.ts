@@ -6,6 +6,7 @@ export interface Ingredient {
     amount: string;
     isMiracleProduct?: boolean;
     baseIngredient?: string; // What you buy (e.g., "Egg" for "Egg, Scrambled")
+    food_item_id?: string;
     weightG?: number; // Structured weight in grams (base amount before scaling)
     measureLabel?: string; // e.g., "cup", "slice"
     modifier?: string; // e.g. "chopped", "shredded"

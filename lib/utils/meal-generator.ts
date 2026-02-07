@@ -7,6 +7,7 @@ interface PlanSettings {
     diet: DietType;
     numMeals: number; // 3 or 4 or 5 (3 meals + 0/1/2 snacks)
     favoritesOnly?: boolean;
+    pantryItems?: any[];
 }
 
 export interface DailyPlan {
@@ -247,8 +248,26 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
 
     let bestPlan: DailyPlan | null = null;
     let minDiff = Infinity;
+    let maxMatchScore = -1;
 
-    for (let i = 0; i < 20; i++) {
+    // Pantry lookup for scoring
+    const pantryIds = new Set(settings.pantryItems?.map(f => f.id) || []);
+    const pantryNames = new Set(settings.pantryItems?.map(f => (f.common_name || f.name).toLowerCase().trim()) || []);
+
+    const calculateMatchScore = (recipe: Recipe) => {
+        const ings = recipe.ingredients || [];
+        if (ings.length === 0) return 0;
+        let matches = 0;
+        ings.forEach(ing => {
+            const isMatch = (ing.food_item_id && pantryIds.has(ing.food_item_id)) ||
+                (ing.baseIngredient && pantryNames.has(ing.baseIngredient.toLowerCase().trim())) ||
+                (ing.item && pantryNames.has(ing.item.toLowerCase().trim()));
+            if (isMatch) matches++;
+        });
+        return matches / ings.length;
+    };
+
+    for (let i = 0; i < 50; i++) { // Increased iterations for pantry matching
         const b = getRandom(breakfastOpts);
         const l = getRandom(lunchOpts);
         const d = getRandom(dinnerOpts);
@@ -264,40 +283,22 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
 
         const totalCalories = b.calories + l.calories + d.calories + snacks.reduce((acc, s) => acc + s.calories, 0);
         const totalEnergyKj = (b.energyKj || 0) + (l.energyKj || 0) + (d.energyKj || 0) + snacks.reduce((acc, s) => acc + (s.energyKj || 0), 0);
+        const currentMatchScore = (calculateMatchScore(b) + calculateMatchScore(l) + calculateMatchScore(d) + (snacks.length ? snacks.reduce((acc, s) => acc + calculateMatchScore(s), 0) / snacks.length : 0)) / (3 + (snacks.length ? 1 : 0));
+
         const diff = Math.abs(targetCalories - totalCalories);
+        const calScore = 1 - Math.min(1, diff / targetCalories);
 
-        const allRecipeIds = [b.id, l.id, d.id, ...snacks.map(s => s.id)];
-        const aggregatedMicro = aggregateMicronutrients(allRecipeIds);
+        // Multi-objective score: balance calories and pantry matches
+        // Weighting: 60% pantry, 40% calories if pantry is provided
+        const finalScore = settings.pantryItems ? (currentMatchScore * 0.6 + calScore * 0.4) : calScore;
 
-        const planRecipeMicros: Record<string, Record<string, number>> = {};
-        allRecipeIds.forEach(id => {
-            planRecipeMicros[id] = recipeMicronutrients[id] || {};
-        });
-
-        const currentPlan: DailyPlan = {
-            breakfast: b,
-            lunch: l,
-            dinner: d,
-            snacks,
-            totalCalories,
-            totalEnergyKj,
-            macros: {
-                protein: b.protein + l.protein + d.protein + snacks.reduce((acc, s) => acc + s.protein, 0),
-                carbs: b.carbs + l.carbs + d.carbs + snacks.reduce((acc, s) => acc + s.carbs, 0),
-                fat: b.fat + l.fat + d.fat + snacks.reduce((acc, s) => acc + s.fat, 0),
-            },
-            micronutrients: aggregatedMicro,
-            recipeMicronutrients: planRecipeMicros
-        };
-
-        if (diff < minDiff) {
-            minDiff = diff;
+        if (finalScore > maxMatchScore) {
+            maxMatchScore = finalScore;
             bestPlan = currentPlan;
         }
 
-        if (diff / targetCalories < 0.1) {
-            break;
-        }
+        // Short circuit if we found a near-perfect plan
+        if (finalScore > 0.95) break;
     }
 
     return bestPlan!;
