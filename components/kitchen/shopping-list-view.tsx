@@ -231,10 +231,43 @@ export function ShoppingListView() {
     };
 
     const moveToPantry = async (item: ShoppingListItem) => {
-        // For now, just remove from list and show toast
-        // Future: Actually add to pantry
-        removeItem(item.id);
-        toast.success(`"${item.name}" moved to pantry`);
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                toast.error('You must be logged in to manage your pantry');
+                return;
+            }
+
+            // 1. Try to find if it matches a scanned product definition
+            let scannedId = null;
+            if (item.source === 'scanned' && item.barcode) {
+                const { data: scanDef } = await supabase
+                    .from('scanned_products')
+                    .select('id')
+                    .eq('barcode', item.barcode)
+                    .single();
+                if (scanDef) scannedId = scanDef.id;
+            }
+
+            // 2. Insert into pantry_items
+            const { error } = await supabase.from('pantry_items').insert({
+                user_id: user.id,
+                name: item.name,
+                scanned_product_id: scannedId,
+                food_item_id: item.food_item_id || null,
+                quantity: item.quantity
+            });
+
+            if (error) throw error;
+
+            // 3. Remove from shopping list
+            removeItem(item.id);
+            toast.success(`"${item.name}" moved to your pantry`);
+
+        } catch (error) {
+            console.error('Error moving to pantry:', error);
+            toast.error('Failed to move item to pantry');
+        }
     };
 
     const clearCheckedItems = () => {

@@ -40,6 +40,7 @@ interface FoodItem {
     image: string | null;
     is_in_pantry: boolean;
     category?: string;
+    source_table?: 'food_items' | 'pantry_items';
 }
 
 export function PantryView() {
@@ -65,14 +66,49 @@ export function PantryView() {
     const fetchPantry = async () => {
         setLoading(true);
         try {
-            const { data, error } = await supabase
-                .from('food_items')
-                .select('*')
-                .eq('is_in_pantry', true)
-                .order('common_name', { ascending: true });
+            const { data: { user } } = await supabase.auth.getUser();
 
-            if (error) throw error;
-            setFoods(data || []);
+            const [foodItemsRes, pantryItemsRes] = await Promise.all([
+                supabase.from('food_items')
+                    .select('*')
+                    .eq('is_in_pantry', true)
+                    .order('common_name', { ascending: true }),
+                user ? supabase.from('pantry_items')
+                    .select('*, scanned_products(nutrition, image_url, default_unit), food_items(*)')
+                    .eq('user_id', user.id)
+                    : { data: [] }
+            ]);
+
+            if (foodItemsRes.error) throw foodItemsRes.error;
+
+            const curatedFoods = (foodItemsRes.data || []) as FoodItem[];
+
+            const personalFoods = (pantryItemsRes.data || []).map((item: any) => {
+                const sp = item.scanned_products;
+                const fi = item.food_items;
+                const nutrition = sp?.nutrition || {};
+
+                return {
+                    id: item.id,
+                    name: item.name,
+                    common_name: item.name,
+                    energy_kcal: nutrition.energy || fi?.energy_kcal || 0,
+                    protein_g: nutrition.protein || fi?.protein_g || 0,
+                    carbs_g: nutrition.carbs || fi?.carbs_g || 0,
+                    fat_g: nutrition.fat || fi?.fat_g || 0,
+                    image: sp?.image_url || fi?.image || null,
+                    is_in_pantry: true,
+                    category: 'Pantry',
+                    source_table: 'pantry_items'
+                } as FoodItem;
+            });
+
+            const combined = [
+                ...curatedFoods.map(f => ({ ...f, source_table: 'food_items' as const })),
+                ...personalFoods
+            ];
+
+            setFoods(combined);
         } catch (error: any) {
             console.error('Error fetching pantry:', error);
             if (error.code === '42703') {
@@ -85,12 +121,20 @@ export function PantryView() {
         }
     };
 
-    const removeFromPantry = async (id: string, name: string) => {
+    const removeFromPantry = async (id: string, name: string, source: string = 'food_items') => {
         try {
-            const { error } = await supabase
-                .from('food_items')
-                .update({ is_in_pantry: false } as any)
-                .eq('id', id);
+            let error;
+
+            if (source === 'pantry_items') {
+                const res = await supabase.from('pantry_items').delete().eq('id', id);
+                error = res.error;
+            } else {
+                const res = await supabase
+                    .from('food_items')
+                    .update({ is_in_pantry: false } as any)
+                    .eq('id', id);
+                error = res.error;
+            }
 
             if (error) throw error;
 
@@ -302,7 +346,7 @@ export function PantryView() {
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                onClick={() => removeFromPantry(food.id, food.name)}
+                                                                onClick={() => removeFromPantry(food.id, food.name, food.source_table)}
                                                                 className="h-9 w-9 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
                                                             >
                                                                 <Trash2 size={16} />
