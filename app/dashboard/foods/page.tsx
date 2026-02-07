@@ -67,6 +67,7 @@ interface FoodItem {
     is_favorite?: boolean;
     is_in_pantry?: boolean;
     category?: string;
+    portions?: { label: string; weight_g: number }[];
 }
 
 const CATEGORIES = ["General", "Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
@@ -96,6 +97,8 @@ function FoodsContent() {
     const [editCommonName, setEditCommonName] = useState('');
     const [editCategory, setEditCategory] = useState('General');
     const [editImage, setEditImage] = useState('');
+    const [editNutrientText, setEditNutrientText] = useState('');
+    const [editServingText, setEditServingText] = useState('');
     const [uploading, setUploading] = useState(false);
 
     // Comparison State
@@ -308,24 +311,61 @@ function FoodsContent() {
         }
     };
 
+    const handleEditStart = (item: FoodItem) => {
+        setEditingItem(item);
+        setEditName(item.name);
+        setEditCommonName(item.common_name || '');
+        setEditCategory(item.category || 'General');
+        setEditImage(item.image || '');
+
+        // Generate initial nutrient text
+        let nutrientText = `Calories: ${item.energy_kcal || 0}\n`;
+        nutrientText += `Protein: ${item.protein_g || 0}g\n`;
+        nutrientText += `Carbs: ${item.carbs_g || 0}g\n`;
+        nutrientText += `Fat: ${item.fat_g || 0}g\n`;
+        if (item.micronutrients) {
+            Object.entries(item.micronutrients).forEach(([name, val]) => {
+                if (val > 0) nutrientText += `${name}: ${val}\n`;
+            });
+        }
+        setEditNutrientText(nutrientText);
+
+        // Generate initial serving text
+        const servingText = (item.portions || []).map(p => `1 ${p.label} = ${p.weight_g}g`).join('\n');
+        setEditServingText(servingText);
+    };
+
     const handleEditSave = async () => {
         if (!editingItem) return;
 
         try {
+            const { parseNutritionText, parseMeasures } = await import('@/lib/utils/nutrition-parser');
+            const parsedNutrients = parseNutritionText(editNutrientText);
+            const parsedPortions = parseMeasures(editServingText);
+
+            const updatedData = {
+                name: editName,
+                common_name: editCommonName,
+                category: editCategory,
+                image: editImage,
+                energy_kcal: parsedNutrients.energy_kcal || 0,
+                energy_kj: (parsedNutrients.energy_kcal || 0) * 4.184,
+                protein_g: parsedNutrients.protein_g || 0,
+                carbs_g: parsedNutrients.carbs_g || 0,
+                fat_g: parsedNutrients.fat_g || 0,
+                micronutrients: parsedNutrients.micronutrients || {},
+                portions: parsedPortions
+            };
+
             const { error } = await supabase
                 .from('food_items')
-                .update({
-                    name: editName,
-                    common_name: editCommonName,
-                    category: editCategory,
-                    image: editImage
-                } as any)
+                .update(updatedData as any)
                 .eq('id', editingItem.id);
 
             if (error) throw error;
 
-            setFoods(prev => prev.map(f => f.id === editingItem.id ? { ...f, name: editName, common_name: editCommonName, category: editCategory, image: editImage } : f));
-            setSelectedItem(prev => prev?.id === editingItem.id ? { ...prev, name: editName, common_name: editCommonName, category: editCategory, image: editImage } : prev);
+            setFoods(prev => prev.map(f => f.id === editingItem.id ? { ...f, ...updatedData } : f));
+            setSelectedItem(prev => prev?.id === editingItem.id ? { ...prev, ...updatedData } : prev);
 
             setEditingItem(null);
             toast.success('Food item updated successfully');
@@ -829,21 +869,33 @@ function FoodsContent() {
                                                                     <Beaker size={14} />
                                                                 </button>
                                                                 {currentUserEmail === 'morne@miraclegreens.co.za' && (
-                                                                    <button
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            addToCompare(food);
-                                                                        }}
-                                                                        className={cn(
-                                                                            "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
-                                                                            compareItems.some(i => i.id === food.id)
-                                                                                ? "bg-emerald-500 text-white border-emerald-600 shadow-md shadow-emerald-500/20"
-                                                                                : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 border-slate-100 dark:border-slate-700"
-                                                                        )}
-                                                                        title="Compare Food"
-                                                                    >
-                                                                        <Scale size={14} />
-                                                                    </button>
+                                                                    <>
+                                                                        <button
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                handleEditStart(food);
+                                                                            }}
+                                                                            className="w-8 h-8 rounded-full flex items-center justify-center transition-all border bg-slate-50 dark:bg-slate-800 text-amber-500 hover:text-amber-600 border-slate-100 dark:border-slate-700"
+                                                                            title="Edit Food"
+                                                                        >
+                                                                            <Edit2 size={14} />
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                addToCompare(food);
+                                                                            }}
+                                                                            className={cn(
+                                                                                "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
+                                                                                compareItems.some(i => i.id === food.id)
+                                                                                    ? "bg-emerald-500 text-white border-emerald-600 shadow-md shadow-emerald-500/20"
+                                                                                    : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 border-slate-100 dark:border-slate-700"
+                                                                            )}
+                                                                            title="Compare Food"
+                                                                        >
+                                                                            <Scale size={14} />
+                                                                        </button>
+                                                                    </>
                                                                 )}
                                                                 <button
                                                                     onClick={(e) => togglePantry(food, e)}
@@ -911,8 +963,8 @@ function FoodsContent() {
             {
                 editingItem && (
                     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-                        <div className="w-full max-w-md">
-                            <Card className="bg-white dark:bg-slate-900 p-6 space-y-6 shadow-2xl border-emerald-500/20">
+                        <div className="w-full max-w-lg">
+                            <Card className="bg-white dark:bg-slate-900 p-8 space-y-6 shadow-2xl border-emerald-500/20 max-h-[90vh] overflow-y-auto custom-scrollbar">
                                 <div className="flex justify-between items-center">
                                     <h3 className="text-xl font-bold tracking-tight">Edit Food Entry</h3>
                                     <button onClick={() => setEditingItem(null)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400">
@@ -992,15 +1044,34 @@ function FoodsContent() {
                                             )}
                                         </div>
                                     </div>
-                                </div>
 
-                                <div className="flex gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-                                    <Button variant="outline" className="flex-1 rounded-xl font-bold" onClick={() => setEditingItem(null)}>
-                                        Cancel
-                                    </Button>
-                                    <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold gap-2" onClick={handleEditSave}>
-                                        <Save size={16} /> Save Changes
-                                    </Button>
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Nutrients per 100g</Label>
+                                        <textarea
+                                            value={editNutrientText}
+                                            onChange={(e) => setEditNutrientText(e.target.value)}
+                                            className="w-full h-32 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs font-mono outline-none focus:ring-2 focus:ring-emerald-500/20"
+                                            placeholder="Paste nutrition data..."
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Serving Sizes</Label>
+                                        <textarea
+                                            value={editServingText}
+                                            onChange={(e) => setEditServingText(e.target.value)}
+                                            className="w-full h-24 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs font-mono outline-none focus:ring-2 focus:ring-emerald-500/20"
+                                            placeholder="1 cup = 240g"
+                                        />
+                                    </div>
+                                    <div className="flex gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                        <Button variant="outline" className="flex-1 rounded-xl font-bold" onClick={() => setEditingItem(null)}>
+                                            Cancel
+                                        </Button>
+                                        <Button className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl font-bold gap-2" onClick={handleEditSave}>
+                                            <Save size={16} /> Save Changes
+                                        </Button>
+                                    </div>
                                 </div>
                             </Card>
                         </div>

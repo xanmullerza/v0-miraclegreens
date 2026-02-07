@@ -39,6 +39,8 @@ interface FoodItem {
     protein_g?: number;
     carbs_g?: number;
     fat_g?: number;
+    micronutrients?: Record<string, number>;
+    portions?: { label: string; weight_g: number }[];
 }
 
 const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
@@ -63,6 +65,8 @@ export default function ManageFoodsPage() {
     const [editProtein, setEditProtein] = useState<number>(0);
     const [editCarbs, setEditCarbs] = useState<number>(0);
     const [editFat, setEditFat] = useState<number>(0);
+    const [editNutrientText, setEditNutrientText] = useState('');
+    const [editServingText, setEditServingText] = useState('');
     const [saveLoading, setSaveLoading] = useState(false);
 
     useEffect(() => {
@@ -80,7 +84,7 @@ export default function ManageFoodsPage() {
             while (hasMore) {
                 let query = supabase
                     .from('food_items')
-                    .select('id, name, common_name, category, is_favorite, source, energy_kcal, protein_g, carbs_g, fat_g')
+                    .select('id, name, common_name, category, is_favorite, source, energy_kcal, protein_g, carbs_g, fat_g, micronutrients, portions')
                     .order('id', { ascending: true })
                     .limit(PAGE_SIZE);
 
@@ -145,6 +149,22 @@ export default function ManageFoodsPage() {
         setEditProtein(item.protein_g || 0);
         setEditCarbs(item.carbs_g || 0);
         setEditFat(item.fat_g || 0);
+
+        // Generate initial nutrient text
+        let nutrientText = `Calories: ${item.energy_kcal || 0}\n`;
+        nutrientText += `Protein: ${item.protein_g || 0}g\n`;
+        nutrientText += `Carbs: ${item.carbs_g || 0}g\n`;
+        nutrientText += `Fat: ${item.fat_g || 0}g\n`;
+        if (item.micronutrients) {
+            Object.entries(item.micronutrients).forEach(([name, val]) => {
+                if (val > 0) nutrientText += `${name}: ${val}\n`;
+            });
+        }
+        setEditNutrientText(nutrientText);
+
+        // Generate initial serving text
+        const servingText = (item.portions || []).map(p => `1 ${p.label} = ${p.weight_g}g`).join('\n');
+        setEditServingText(servingText);
     };
 
     const handleEditSave = async () => {
@@ -152,17 +172,26 @@ export default function ManageFoodsPage() {
 
         setSaveLoading(true);
         try {
+            const { parseNutritionText, parseMeasures } = await import('@/lib/utils/nutrition-parser');
+            const parsedNutrients = parseNutritionText(editNutrientText);
+            const parsedPortions = parseMeasures(editServingText);
+
+            const updatedData = {
+                name: editName,
+                common_name: editCommonName,
+                category: editCategoryState,
+                energy_kcal: parsedNutrients.energy_kcal || editEnergy || 0,
+                energy_kj: (parsedNutrients.energy_kcal || editEnergy || 0) * 4.184,
+                protein_g: parsedNutrients.protein_g || editProtein || 0,
+                carbs_g: parsedNutrients.carbs_g || editCarbs || 0,
+                fat_g: parsedNutrients.fat_g || editFat || 0,
+                micronutrients: parsedNutrients.micronutrients || {},
+                portions: parsedPortions
+            };
+
             const { error } = await supabase
                 .from('food_items')
-                .update({
-                    name: editName,
-                    common_name: editCommonName,
-                    category: editCategoryState,
-                    energy_kcal: editEnergy,
-                    protein_g: editProtein,
-                    carbs_g: editCarbs,
-                    fat_g: editFat
-                } as any)
+                .update(updatedData as any)
                 .eq('id', editingItem.id);
 
             if (error) throw error;
@@ -171,13 +200,7 @@ export default function ManageFoodsPage() {
                 f.id === editingItem.id
                     ? {
                         ...f,
-                        name: editName,
-                        common_name: editCommonName,
-                        category: editCategoryState,
-                        energy_kcal: editEnergy,
-                        protein_g: editProtein,
-                        carbs_g: editCarbs,
-                        fat_g: editFat
+                        ...updatedData
                     }
                     : f
             ));
@@ -601,8 +624,26 @@ export default function ManageFoodsPage() {
                                         </div>
                                     </div>
 
-                                    <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
-                                        <p className="text-[9px] text-slate-400 italic">Advanced micronutrient mapping is handled in the Lab section.</p>
+                                    <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-4">
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Advanced Nutrients</Label>
+                                            <textarea
+                                                value={editNutrientText}
+                                                onChange={(e) => setEditNutrientText(e.target.value)}
+                                                className="w-full h-32 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs font-mono outline-none focus:ring-2 focus:ring-emerald-500/20"
+                                                placeholder="Paste nutrition data..."
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Serving Sizes</Label>
+                                            <textarea
+                                                value={editServingText}
+                                                onChange={(e) => setEditServingText(e.target.value)}
+                                                className="w-full h-24 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs font-mono outline-none focus:ring-2 focus:ring-emerald-500/20"
+                                                placeholder="1 cup = 240g"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>

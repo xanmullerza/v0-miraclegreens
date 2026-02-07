@@ -62,6 +62,7 @@ interface FoodItem {
     is_favorite?: boolean;
     category?: string;
     details?: import('@/lib/data/food-details').FoodDetail;
+    portions?: { label: string; weight_g: number }[];
 }
 
 export default function FoodDetailsPage() {
@@ -78,6 +79,8 @@ export default function FoodDetailsPage() {
     const [editCommonName, setEditCommonName] = useState('');
     const [editCategory, setEditCategory] = useState('');
     const [editImage, setEditImage] = useState('');
+    const [editNutrientText, setEditNutrientText] = useState('');
+    const [editServingText, setEditServingText] = useState('');
     const [uploading, setUploading] = useState(false);
     const [saveLoading, setSaveLoading] = useState(false);
 
@@ -140,6 +143,23 @@ export default function FoodDetailsPage() {
         setEditCommonName(food.common_name || '');
         setEditCategory(food.category || 'General');
         setEditImage(food.image || '');
+
+        // Generate initial text for nutrients
+        let nutrientText = `Calories: ${food.energy_kcal}\n`;
+        nutrientText += `Protein: ${food.protein_g}g\n`;
+        nutrientText += `Carbs: ${food.carbs_g}g\n`;
+        nutrientText += `Fat: ${food.fat_g}g\n`;
+        if (food.micronutrients) {
+            Object.entries(food.micronutrients).forEach(([name, val]) => {
+                if (val > 0) nutrientText += `${name}: ${val}\n`;
+            });
+        }
+        setEditNutrientText(nutrientText);
+
+        // Generate initial text for servings
+        const servingText = (food.portions || []).map(p => `1 ${p.label} = ${p.weight_g}g`).join('\n');
+        setEditServingText(servingText);
+
         setIsEditing(true);
     };
 
@@ -181,24 +201,35 @@ export default function FoodDetailsPage() {
 
         setSaveLoading(true);
         try {
+            // Parse nutrient and serving text
+            const { parseNutritionText, parseMeasures } = await import('@/lib/utils/nutrition-parser');
+            const parsedNutrients = parseNutritionText(editNutrientText);
+            const parsedPortions = parseMeasures(editServingText);
+
+            const updatedData = {
+                name: editName,
+                common_name: editCommonName,
+                category: editCategory,
+                image: editImage,
+                energy_kcal: parsedNutrients.energy_kcal || 0,
+                energy_kj: (parsedNutrients.energy_kcal || 0) * 4.184,
+                protein_g: parsedNutrients.protein_g || 0,
+                carbs_g: parsedNutrients.carbs_g || 0,
+                fat_g: parsedNutrients.fat_g || 0,
+                micronutrients: parsedNutrients.micronutrients || {},
+                portions: parsedPortions
+            };
+
             const { error } = await supabase
                 .from('food_items')
-                .update({
-                    name: editName,
-                    common_name: editCommonName,
-                    category: editCategory,
-                    image: editImage
-                } as any)
+                .update(updatedData as any)
                 .eq('id', food.id);
 
             if (error) throw error;
 
             setFood({
                 ...food,
-                name: editName,
-                common_name: editCommonName,
-                category: editCategory,
-                image: editImage
+                ...updatedData
             });
 
             setIsEditing(false);
@@ -697,7 +728,7 @@ export default function FoodDetailsPage() {
                                 </button>
                             </div>
 
-                            <div className="space-y-5">
+                            <div className="space-y-5 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
                                 <div className="space-y-2">
                                     <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Ingredient Name (Scientific)</Label>
                                     <Input
@@ -768,6 +799,28 @@ export default function FoodDetailsPage() {
                                             </div>
                                         )}
                                     </div>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Nutrients per 100g</Label>
+                                    <textarea
+                                        value={editNutrientText}
+                                        onChange={(e) => setEditNutrientText(e.target.value)}
+                                        className="w-full h-32 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs font-mono focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                        placeholder="Paste nutrition data here..."
+                                    />
+                                    <p className="text-[9px] text-slate-400">Format: "Protein: 10g" or paste from USDA</p>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Serving Sizes</Label>
+                                    <textarea
+                                        value={editServingText}
+                                        onChange={(e) => setEditServingText(e.target.value)}
+                                        className="w-full h-24 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs font-mono focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                        placeholder="1 cup = 240g&#10;1 large = 150g"
+                                    />
+                                    <p className="text-[9px] text-slate-400">Format: "1 cup = 240g"</p>
                                 </div>
                             </div>
 
