@@ -418,8 +418,8 @@ export default function RecipeDetailsPage() {
 
         } catch (error) {
             console.error('Error fetching recipe:', error);
-            toast.error('Failed to load recipe details');
-            router.push('/dashboard/meals');
+            toast.error('Failed to load food details');
+            router.push('/dashboard/recipes');
         } finally {
             setLoading(false);
         }
@@ -903,7 +903,7 @@ export default function RecipeDetailsPage() {
                 <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 flex items-center justify-center">
                     <Loader2 className="animate-spin text-emerald-500" size={32} />
                 </div>
-                <p className="text-xs font-black uppercase tracking-widest text-slate-400 animate-pulse">Accessing Recipe Databank...</p>
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400 animate-pulse">Accessing Food Databank...</p>
             </div>
         );
     }
@@ -926,7 +926,7 @@ export default function RecipeDetailsPage() {
                             <button
                                 onClick={() => router.push(`/dashboard/recipes/${id}/edit`)}
                                 className="p-2 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 text-slate-400 hover:text-emerald-500 transition-all hover:scale-110 active:scale-95 group mt-1"
-                                title="Edit Recipe"
+                                title="Edit Food"
                             >
                                 <Pencil size={32} className="group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all" />
                             </button>
@@ -965,7 +965,7 @@ export default function RecipeDetailsPage() {
                                 )}
                                 <div className="absolute top-4 left-4">
                                     <Badge className="bg-white/90 dark:bg-slate-900/90 text-slate-900 dark:text-white border-none text-[10px] font-black uppercase tracking-widest px-4 py-2 backdrop-blur-md shadow-xl">
-                                        Meal Type: {recipe.type}
+                                        Food Type: {recipe.type}
                                     </Badge>
                                 </div>
                             </div>
@@ -1385,7 +1385,7 @@ export default function RecipeDetailsPage() {
                                             title="Reset to Default"
                                         >
                                             <RotateCcw size={14} className="group-hover:-rotate-180 transition-transform duration-500" />
-                                            Reset Recipe Defaults
+                                            Reset Food Defaults
                                         </button>
                                     </div>
                                 )}

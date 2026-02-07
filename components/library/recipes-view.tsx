@@ -127,7 +127,7 @@ export function RecipesView() {
             setHasMore(count ? (isNewSearch ? newItems.length : recipes.length + newItems.length) < count : false);
         } catch (error) {
             console.error('Error fetching recipes:', error);
-            toast.error('Failed to load recipe library');
+            toast.error('Failed to load food library');
         } finally {
             setLoading(false);
             setLoadingMore(false);
@@ -245,7 +245,7 @@ export function RecipesView() {
                     className="h-14 px-8 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest gap-2 shadow-xl shadow-blue-500/10"
                 >
                     <Plus size={18} />
-                    Add Recipe
+                    Add Food
                 </Button>
             </div>
 
@@ -253,7 +253,7 @@ export function RecipesView() {
             {loading ? (
                 <div className="h-96 flex flex-col items-center justify-center gap-4 bg-white/50 dark:bg-slate-900/20 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800">
                     <Loader2 className="animate-spin text-blue-500" size={32} />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Loading recipes...</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Loading food...</p>
                 </div>
             ) : recipes.length === 0 ? (
                 <div className="h-96 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
@@ -261,7 +261,7 @@ export function RecipesView() {
                         <ChefHat size={32} />
                     </div>
                     <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                        {showFavoritesOnly ? "Collection Empty" : "No recipes found."}
+                        {showFavoritesOnly ? "Collection Empty" : "No food found."}
                     </p>
                 </div>
             ) : (
@@ -373,7 +373,7 @@ export function RecipesView() {
                                 disabled={loadingMore}
                                 className="h-14 px-8 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-[0.2em] shadow-xl group transition-all"
                             >
-                                {loadingMore ? <Loader2 className="animate-spin mr-3" size={18} /> : "View More Recipes"}
+                                {loadingMore ? <Loader2 className="animate-spin mr-3" size={18} /> : "View More Food"}
                             </Button>
                         </div>
                     )}

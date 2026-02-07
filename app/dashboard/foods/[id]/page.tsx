@@ -114,7 +114,7 @@ export default function FoodDetailsPage() {
             setFood(data);
         } catch (error: any) {
             console.error('Error fetching food:', error);
-            toast.error('Failed to load food profile');
+            toast.error('Failed to load ingredient profile');
         } finally {
             setLoading(false);
         }
@@ -233,10 +233,10 @@ export default function FoodDetailsPage() {
             });
 
             setIsEditing(false);
-            toast.success('Food profile updated successfully');
+            toast.success('Ingredient profile updated successfully');
         } catch (error) {
             console.error('Error updating food:', error);
-            toast.error('Failed to update food profile');
+            toast.error('Failed to update ingredient profile');
         } finally {
             setSaveLoading(false);
         }
@@ -467,7 +467,7 @@ export default function FoodDetailsPage() {
                         className="rounded-2xl h-12 gap-2 font-black uppercase tracking-widest border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-[10px]"
                     >
                         <Edit2 size={16} />
-                        Edit Profile
+                        Edit Ingredient
                     </Button>
                     <Button
                         variant="outline"

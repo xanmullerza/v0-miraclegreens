@@ -170,7 +170,7 @@ function FoodsContent() {
             setHasMore(count ? (isNewSearch ? newItems.length : foods.length + newItems.length) < count : false);
         } catch (error) {
             console.error('Error fetching foods:', error);
-            toast.error(`Failed to load food library: ${(error as any)?.message || 'Unknown error'}`);
+            toast.error(`Failed to load ingredient library: ${(error as any)?.message || 'Unknown error'}`);
         } finally {
             setLoading(false);
             setLoadingMore(false);
@@ -243,9 +243,9 @@ function FoodsContent() {
             setSelectedItem(prev => prev?.id === item.id ? { ...prev, is_favorite: newStatus } : prev);
 
             if (newStatus) {
-                toast.success(`${item.common_name || item.name} added to My Foods`);
+                toast.success(`${item.common_name || item.name} added to My Ingredients`);
             } else {
-                toast.info(`${item.common_name || item.name} removed from My Foods`);
+                toast.info(`${item.common_name || item.name} removed from My Ingredients`);
             }
         } catch (error: any) {
             console.error('Error toggling favorite:', error);
@@ -500,10 +500,10 @@ function FoodsContent() {
                         <div className="absolute right-12 top-1/2 -translate-y-1/2 flex items-center gap-6">
                             <div className="text-right hidden sm:block">
                                 <p className="text-[10px] font-black uppercase tracking-widest text-emerald-200 mb-1">
-                                    {showFavoritesOnly ? "Favourite Foods" : "All Foods"}
+                                    {showFavoritesOnly ? "Favourite Ingredients" : "All Ingredients"}
                                 </p>
                                 <p className="text-3xl font-black text-white leading-none tracking-tighter italic">
-                                    {totalCount} <span className="text-emerald-300">FOODS</span>
+                                    {totalCount} <span className="text-emerald-300">INGREDIENTS</span>
                                 </p>
                             </div>
 
@@ -700,15 +700,15 @@ function FoodsContent() {
                             </p>
                             <p className="text-sm text-slate-500 text-center max-w-xs">
                                 {showFavoritesOnly
-                                    ? "Tap the heart icon on any food to add it to your personal collection."
-                                    : "We couldn't find any foods matching your criteria."}
+                                    ? "Tap the heart icon on any ingredient to add it to your personal collection."
+                                    : "We couldn't find any ingredients matching your criteria."}
                             </p>
                             {showFavoritesOnly && (
                                 <Button
                                     onClick={() => setShowFavoritesOnly(false)}
                                     className="mt-6 rounded-full bg-emerald-600 text-white px-8 font-black uppercase tracking-widest text-[10px]"
                                 >
-                                    Browse All Foods
+                                    Browse All Ingredients
                                 </Button>
                             )}
                         </div>
@@ -900,7 +900,7 @@ function FoodsContent() {
                                                                                 handleEditStart(food);
                                                                             }}
                                                                             className="w-8 h-8 rounded-full flex items-center justify-center transition-all border bg-slate-50 dark:bg-slate-800 text-amber-500 hover:text-amber-600 border-slate-100 dark:border-slate-700"
-                                                                            title="Edit Food"
+                                                                            title="Edit Ingredient"
                                                                         >
                                                                             <Edit2 size={14} />
                                                                         </button>
@@ -915,7 +915,7 @@ function FoodsContent() {
                                                                                     ? "bg-emerald-500 text-white border-emerald-600 shadow-md shadow-emerald-500/20"
                                                                                     : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 border-slate-100 dark:border-slate-700"
                                                                             )}
-                                                                            title="Compare Food"
+                                                                            title="Compare Ingredients"
                                                                         >
                                                                             <Scale size={14} />
                                                                         </button>
@@ -937,7 +937,7 @@ function FoodsContent() {
                                                                         "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
                                                                         food.is_favorite ? "bg-rose-500 text-white border-rose-600 shadow-md shadow-rose-500/20" : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 border-slate-100 dark:border-slate-700"
                                                                     )}
-                                                                    title={food.is_favorite ? "Remove from My Foods" : "Add to My Foods"}
+                                                                    title={food.is_favorite ? "Remove from My Ingredients" : "Add to My Ingredients"}
                                                                 >
                                                                     <Heart size={14} fill={food.is_favorite ? "currentColor" : "none"} />
                                                                 </button>
@@ -968,7 +968,7 @@ function FoodsContent() {
                                                 </>
                                             ) : (
                                                 <>
-                                                    View More Foods
+                                                    View More Ingredients
                                                     <ArrowRight className="ml-3 group-hover:translate-x-1 transition-transform" size={18} />
                                                 </>
                                             )}
@@ -990,7 +990,7 @@ function FoodsContent() {
                         <div className="w-full max-w-lg">
                             <Card className="bg-white dark:bg-slate-900 p-8 space-y-6 shadow-2xl border-emerald-500/20 max-h-[90vh] overflow-y-auto custom-scrollbar">
                                 <div className="flex justify-between items-center">
-                                    <h3 className="text-xl font-bold tracking-tight">Edit Food Entry</h3>
+                                    <h3 className="text-xl font-bold tracking-tight">Edit Ingredient Entry</h3>
                                     <button onClick={() => setEditingItem(null)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400">
                                         <X size={20} />
                                     </button>
@@ -1194,7 +1194,7 @@ function FoodsContent() {
                             className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 font-black uppercase tracking-widest text-[10px] h-11 rounded-xl shadow-lg border border-emerald-500/20 px-6"
                         >
                             <Scale size={18} />
-                            Compare Foods
+                            Compare Ingredients
                         </Button>
                     </div>
                 </div>

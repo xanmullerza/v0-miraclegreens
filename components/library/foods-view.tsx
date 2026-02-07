@@ -137,7 +137,7 @@ export function FoodsView() {
             setHasMore(count ? (isNewSearch ? newItems.length : foods.length + newItems.length) < count : false);
         } catch (error) {
             console.error('Error fetching foods:', error);
-            toast.error(`Failed to load food library`);
+            toast.error(`Failed to load ingredient library`);
         } finally {
             setLoading(false);
             setLoadingMore(false);
@@ -270,7 +270,7 @@ export function FoodsView() {
                     className="h-14 px-8 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest gap-2 shadow-xl shadow-emerald-500/10"
                 >
                     <Plus size={18} />
-                    Add Food
+                    Add Ingredient
                 </Button>
             </div>
 
@@ -286,7 +286,7 @@ export function FoodsView() {
                         <Library size={32} />
                     </div>
                     <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                        {showFavoritesOnly ? "No Favorites Yet" : "No food found."}
+                        {showFavoritesOnly ? "No Favorites Yet" : "No ingredients found."}
                     </p>
                     <p className="text-sm text-slate-500 text-center max-w-xs">
                         Try adjusting your filters or search to find what you're looking for.

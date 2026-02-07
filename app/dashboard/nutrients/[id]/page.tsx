@@ -286,10 +286,10 @@ export default function NutrientDetailsPage() {
                     <div className="space-y-5">
                         <div className="flex items-center justify-between px-2">
                             <div className="space-y-1">
-                                <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 leading-none">Bio-Available Foods</h4>
+                                <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 leading-none">Bio-Available Ingredients</h4>
                                 <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest leading-none">Ordered by clinical nutrient density (100g sample)</p>
                             </div>
-                            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest underline cursor-pointer hover:text-emerald-600" onClick={() => router.push('/dashboard/foods')}>Browse All</span>
+                            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest underline cursor-pointer hover:text-emerald-600" onClick={() => router.push('/dashboard/foods')}>Browse Ingredients</span>
                         </div>
                         <div className="space-y-3">
                             {loadingFoods ? (
