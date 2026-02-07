@@ -5,11 +5,11 @@ export function Footer() {
   return (
     <footer id="contact" className="bg-[#4A3728] text-[#E8E8E8] py-12 border-t border-[#5D4636]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-        <p className="text-xs opacity-50 mb-4">
-          © 2026 Vitala. All rights reserved. Professional Nutrition Intelligence.
-        </p>
-        <div className="flex justify-center gap-8 text-xs opacity-50">
+        <div className="flex flex-wrap justify-center items-center gap-4 text-[10px] uppercase font-bold tracking-widest opacity-50">
+          <span>© 2026 Vitala. All rights reserved. Professional Nutrition Intelligence.</span>
+          <span className="w-1 h-1 rounded-full bg-current opacity-50 hidden sm:block"></span>
           <Link href="#" className="hover:opacity-100 hover:text-white transition-all">Privacy Policy</Link>
+          <span className="w-1 h-1 rounded-full bg-current opacity-50 hidden sm:block"></span>
           <Link href="#" className="hover:opacity-100 hover:text-white transition-all">Terms of Service</Link>
         </div>
       </div>

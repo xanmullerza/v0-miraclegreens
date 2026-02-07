@@ -83,7 +83,7 @@ export default function DashboardOverview() {
             bg: 'bg-purple-500/10'
         },
         {
-            name: 'Our Library',
+            name: 'The Library',
             desc: 'Find healthy food, recipes, and helpful tips.',
             href: '/dashboard/library',
             icon: Library,
