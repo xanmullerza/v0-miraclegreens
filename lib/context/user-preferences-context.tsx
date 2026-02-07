@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { calculateIndividualTargets, GoalType, ActivityLevel, NutrientStrategy } from "@/lib/utils/nutrition-calculator";
+import { DailyPlan } from "@/lib/utils/meal-generator";
 
 export type EnergyUnit = "kcal" | "kJ";
 export type MeasurementUnit = "metric" | "imperial";
@@ -50,6 +51,8 @@ interface UserPreferencesContextType {
         carbs: number;
         fat: number;
     };
+    dailyPlan: DailyPlan | null;
+    updateDailyPlan: (plan: DailyPlan | null) => void;
 }
 
 const UserPreferencesContext = createContext<UserPreferencesContextType | undefined>(
@@ -75,6 +78,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         familyMembers: []
     });
     const [skipPlannerQuiz, setSkipPlannerQuizState] = useState(false);
+    const [dailyPlan, setDailyPlanState] = useState<DailyPlan | null>(null);
 
     useEffect(() => {
         const savedUnit = localStorage.getItem("energyUnit") as EnergyUnit;
@@ -107,6 +111,15 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         const savedSkip = localStorage.getItem("skipPlannerQuiz");
         if (savedSkip !== null) {
             setSkipPlannerQuizState(savedSkip === "true");
+        }
+
+        const savedPlan = localStorage.getItem("dailyPlan");
+        if (savedPlan) {
+            try {
+                setDailyPlanState(JSON.parse(savedPlan));
+            } catch (e) {
+                console.error("Failed to parse daily plan", e);
+            }
         }
     }, []);
 
@@ -141,6 +154,15 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         localStorage.setItem("skipPlannerQuiz", String(skip));
     };
 
+    const updateDailyPlan = (plan: DailyPlan | null) => {
+        setDailyPlanState(plan);
+        if (plan) {
+            localStorage.setItem("dailyPlan", JSON.stringify(plan));
+        } else {
+            localStorage.removeItem("dailyPlan");
+        }
+    };
+
     const dailyTargets = calculateIndividualTargets({
         weight: Number(profile.weight) || 70,
         height: Number(profile.height) || 170,
@@ -163,7 +185,9 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
             updateProfile,
             skipPlannerQuiz,
             setSkipPlannerQuiz,
-            dailyTargets
+            dailyTargets,
+            dailyPlan,
+            updateDailyPlan
         }}>
             {children}
         </UserPreferencesContext.Provider>

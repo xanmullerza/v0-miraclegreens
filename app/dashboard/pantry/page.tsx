@@ -30,6 +30,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { DailyPlan } from '@/lib/utils/meal-generator';
+import { Recipe } from '@/lib/data/recipes';
 
 interface FoodItem {
     id: string;
@@ -53,6 +56,7 @@ export default function PantryPage() {
     const [isSuggesting, setIsSuggesting] = useState(false);
     const [loadingSuggestions, setLoadingSuggestions] = useState(false);
     const [suggestions, setSuggestions] = useState<any[]>([]);
+    const { dailyPlan, updateDailyPlan } = useUserPreferences();
 
     useEffect(() => {
         fetchPantry();
@@ -103,6 +107,127 @@ export default function PantryPage() {
         } catch (error) {
             console.error('Error removing from pantry:', error);
             toast.error("Failed to remove item.");
+        }
+    };
+
+    const handleAddToPlan = async (recipeId: string, mealType: 'breakfast' | 'lunch' | 'dinner') => {
+        try {
+            // Fetch the full recipe details including ingredients for micronutrient calculation
+            const { data: r, error } = await supabase
+                .from('recipes')
+                .select(`
+                    *,
+                    ingredients (
+                        *,
+                        food_items (*)
+                    ),
+                    instructions (*)
+                `)
+                .eq('id', recipeId)
+                .single();
+
+            if (error) throw error;
+            if (!r) return;
+
+            // Transform to Recipe object
+            const ingredients = r.ingredients || [];
+            const recipe: Recipe = {
+                id: r.id,
+                title: r.title,
+                type: r.type,
+                calories: r.calories || 0,
+                protein: r.protein || 0,
+                carbs: r.carbs || 0,
+                fat: r.fat || 0,
+                prepTime: r.prep_time,
+                image: r.image,
+                diet: r.diet || [],
+                servings: 1,
+                instructions: (r.instructions || []).sort((a: any, b: any) => a.step_order - b.step_order).map((inst: any) => inst.step_text),
+                ingredients: ingredients.map((i: any) => ({
+                    item: i.item,
+                    amount: i.amount,
+                    isMiracleProduct: i.is_miracle_product,
+                    baseIngredient: i.base_ingredient,
+                    weightG: i.weight_g,
+                    measureLabel: i.measure_label
+                }))
+            };
+
+            // Calculate micronutrients
+            const micronutrients: Record<string, number> = {};
+            ingredients.forEach((ing: any) => {
+                if (ing.food_items && ing.weight_g) {
+                    const ratio = ing.weight_g / 100;
+                    if (ing.food_items.micronutrients) {
+                        Object.entries(ing.food_items.micronutrients).forEach(([k, v]) => {
+                            micronutrients[k] = (micronutrients[k] || 0) + (v as number) * ratio;
+                        });
+                    }
+                }
+            });
+
+            // Update plan - if no plan exists, we initialize it using this recipe for the selected slot
+            // For the other slots, we'll use this same recipe as a placeholder or could use a "placeholder" recipe
+            // For simplicity, let's just initialize all slots with this recipe if it's the first time
+            let up: DailyPlan;
+            if (dailyPlan) {
+                up = { ...dailyPlan };
+            } else {
+                up = {
+                    breakfast: recipe,
+                    lunch: recipe,
+                    dinner: recipe,
+                    snacks: [],
+                    totalCalories: 0,
+                    totalEnergyKj: 0,
+                    macros: { protein: 0, carbs: 0, fat: 0 },
+                    micronutrients: {},
+                    recipeMicronutrients: {}
+                };
+            }
+
+            up.recipeMicronutrients = { ...up.recipeMicronutrients, [recipe.id]: micronutrients };
+            if (mealType === 'breakfast') up.breakfast = recipe;
+            else if (mealType === 'lunch') up.lunch = recipe;
+            else if (mealType === 'dinner') up.dinner = recipe;
+
+            // Recalculate totals
+            up.totalCalories = (up.breakfast.calories * (up.breakfast.servings || 1)) +
+                (up.lunch.calories * (up.lunch.servings || 1)) +
+                (up.dinner.calories * (up.dinner.servings || 1));
+
+            up.macros = {
+                protein: (up.breakfast.protein * (up.breakfast.servings || 1)) +
+                    (up.lunch.protein * (up.lunch.servings || 1)) +
+                    (up.dinner.protein * (up.dinner.servings || 1)),
+                carbs: (up.breakfast.carbs * (up.breakfast.servings || 1)) +
+                    (up.lunch.carbs * (up.lunch.servings || 1)) +
+                    (up.dinner.carbs * (up.dinner.servings || 1)),
+                fat: (up.breakfast.fat * (up.breakfast.servings || 1)) +
+                    (up.lunch.fat * (up.lunch.servings || 1)) +
+                    (up.dinner.fat * (up.dinner.servings || 1)),
+            };
+
+            const combinedM: Record<string, number> = {};
+            [up.breakfast, up.lunch, up.dinner].forEach(r => {
+                const rm = up.recipeMicronutrients[r.id];
+                const factor = r.servings || 1;
+                if (rm) {
+                    Object.entries(rm).forEach(([k, v]) => {
+                        combinedM[k] = (combinedM[k] || 0) + ((v as number) * factor);
+                    });
+                }
+            });
+            up.micronutrients = combinedM;
+
+            updateDailyPlan(up);
+            toast.success(`Success! Added to ${mealType}.`);
+            router.push('/dashboard/mealplanner');
+
+        } catch (error) {
+            console.error('Error adding to plan:', error);
+            toast.error('Failed to add to plan.');
         }
     };
 
@@ -383,10 +508,28 @@ export default function PantryPage() {
                                                         </div>
                                                     </div>
 
-                                                    <div className="flex items-center justify-end pt-8">
-                                                        <div className="flex items-center gap-3 px-8 h-16 rounded-2xl bg-emerald-500 text-white font-black uppercase tracking-[0.2em] shadow-xl shadow-emerald-500/20 group-hover:scale-105 transition-all">
-                                                            <span>Start Cooking</span>
-                                                            <ArrowRight size={20} />
+                                                    <div className="flex flex-wrap items-center justify-end gap-3 pt-8">
+                                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-2">Plan this for:</p>
+                                                        {['Breakfast', 'Lunch', 'Dinner'].map(meal => (
+                                                            <button
+                                                                key={meal}
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleAddToPlan(recipe.id, meal.toLowerCase() as any);
+                                                                }}
+                                                                className="px-6 h-12 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 font-black uppercase tracking-widest text-[9px] hover:bg-black hover:border-emerald-500/50 transition-all shadow-lg flex items-center gap-2 group/btn"
+                                                            >
+                                                                <span>{meal}</span>
+                                                                <Plus size={14} className="group-hover/btn:rotate-90 transition-transform" />
+                                                            </button>
+                                                        ))}
+                                                        <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 mx-2" />
+                                                        <div
+                                                            onClick={() => router.push(`/dashboard/recipes/${recipe.id}`)}
+                                                            className="flex items-center gap-3 px-8 h-16 rounded-2xl bg-emerald-500 text-white font-black uppercase tracking-[0.2em] shadow-xl shadow-emerald-500/20 group/cook hover:scale-105 transition-all"
+                                                        >
+                                                            <span>Recipe</span>
+                                                            <ArrowRight size={20} className="group-hover/cook:translate-x-1 transition-transform" />
                                                         </div>
                                                     </div>
                                                 </div>

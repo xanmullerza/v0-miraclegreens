@@ -250,7 +250,15 @@ export default function MealPlannerPage() {
     const router = useRouter();
     const [step, setStep] = useState<1 | 2 | 3>(1);
     const [generating, setGenerating] = useState(false);
-    const [plan, setPlan] = useState<DailyPlan | null>(null);
+    const {
+        profile,
+        energyUnit: unit,
+        skipPlannerQuiz,
+        setSkipPlannerQuiz,
+        measurementUnit,
+        dailyPlan: plan,
+        updateDailyPlan: setPlan
+    } = useUserPreferences();
     const [showRecipeNutrients, setShowRecipeNutrients] = useState(false);
     const [recipeMoringaGrams, setRecipeMoringaGrams] = useState(0);
     const [moringaGrams, setMoringaGrams] = useState(0);
@@ -264,13 +272,6 @@ export default function MealPlannerPage() {
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [selectedTypes, setSelectedTypes] = useState<string[]>(['breakfast', 'lunch', 'dinner']);
-    const {
-        profile,
-        energyUnit: unit,
-        skipPlannerQuiz,
-        setSkipPlannerQuiz,
-        measurementUnit
-    } = useUserPreferences();
 
     const [showSummary, setShowSummary] = useState(false);
     const [alwaysSkip, setAlwaysSkip] = useState(skipPlannerQuiz);
@@ -425,7 +426,14 @@ export default function MealPlannerPage() {
                 setShowSummary(true);
             }
         }
-    }, [profile, skipPlannerQuiz]);
+    }, [profile, skipPlannerQuiz, setPlan]);
+
+    // Update step if plan exists
+    useEffect(() => {
+        if (plan && step === 1) {
+            setStep(3);
+        }
+    }, [plan, step]);
 
     const userRDAs = useRDA(age === '' ? undefined : Number(age), gender, calories);
 
@@ -464,40 +472,81 @@ export default function MealPlannerPage() {
         const result = await getRandomRecipeByType(mealType, diet, currentId, showFavoritesOnly);
         if (result) {
             const { recipe: newRecipe, micronutrients: newMicros } = result;
-            setPlan(p => {
-                if (!p) return null;
-                const up = { ...p };
-                up.recipeMicronutrients = { ...p.recipeMicronutrients, [newRecipe.id]: newMicros };
-                if (mealType === 'breakfast') up.breakfast = newRecipe;
-                else if (mealType === 'lunch') up.lunch = newRecipe;
-                else if (mealType === 'dinner') up.dinner = newRecipe;
-                up.totalCalories = up.breakfast.calories + up.lunch.calories + up.dinner.calories;
-                up.macros = {
-                    protein: up.breakfast.protein + up.lunch.protein + up.dinner.protein,
-                    carbs: up.breakfast.carbs + up.lunch.carbs + up.dinner.carbs,
-                    fat: up.breakfast.fat + up.lunch.fat + up.dinner.fat,
-                };
-                const combinedM: Record<string, number> = {};
-                [up.breakfast, up.lunch, up.dinner].forEach(r => {
-                    const rm = up.recipeMicronutrients[r.id];
-                    if (rm) Object.entries(rm).forEach(([k, v]) => { combinedM[k] = (combinedM[k] || 0) + (v as number); });
-                });
-                up.micronutrients = combinedM;
-                return up;
+            const up = { ...plan };
+            up.recipeMicronutrients = { ...plan.recipeMicronutrients, [newRecipe.id]: newMicros };
+            if (mealType === 'breakfast') up.breakfast = newRecipe;
+            else if (mealType === 'lunch') up.lunch = newRecipe;
+            else if (mealType === 'dinner') up.dinner = newRecipe;
+
+            // Recalculate totals
+            up.totalCalories = (up.breakfast.calories * (up.breakfast.servings || 1)) +
+                (up.lunch.calories * (up.lunch.servings || 1)) +
+                (up.dinner.calories * (up.dinner.servings || 1));
+
+            up.macros = {
+                protein: (up.breakfast.protein * (up.breakfast.servings || 1)) +
+                    (up.lunch.protein * (up.lunch.servings || 1)) +
+                    (up.dinner.protein * (up.dinner.servings || 1)),
+                carbs: (up.breakfast.carbs * (up.breakfast.servings || 1)) +
+                    (up.lunch.carbs * (up.lunch.servings || 1)) +
+                    (up.dinner.carbs * (up.dinner.servings || 1)),
+                fat: (up.breakfast.fat * (up.breakfast.servings || 1)) +
+                    (up.lunch.fat * (up.lunch.servings || 1)) +
+                    (up.dinner.fat * (up.dinner.servings || 1)),
+            };
+
+            const combinedM: Record<string, number> = {};
+            [up.breakfast, up.lunch, up.dinner].forEach(r => {
+                const rm = up.recipeMicronutrients[r.id];
+                const factor = r.servings || 1;
+                if (rm) {
+                    Object.entries(rm).forEach(([k, v]) => {
+                        combinedM[k] = (combinedM[k] || 0) + ((v as number) * factor);
+                    });
+                }
             });
+            up.micronutrients = combinedM;
+            setPlan(up);
         }
     };
 
     const updateServings = (rid: string, n: number) => {
         if (!plan) return;
-        setPlan(p => {
-            if (!p) return null;
-            const up = { ...p };
-            const m = (r: Recipe) => r.id === rid ? { ...r, servings: n } : r;
-            up.breakfast = m(up.breakfast); up.lunch = m(up.lunch); up.dinner = m(up.dinner);
-            up.totalCalories = (up.breakfast.calories * (up.breakfast.servings || 1)) + (up.lunch.calories * (up.lunch.servings || 1)) + (up.dinner.calories * (up.dinner.servings || 1));
-            return up;
+        const up = { ...plan };
+        const m = (r: Recipe) => r.id === rid ? { ...r, servings: n } : r;
+        up.breakfast = m(up.breakfast);
+        up.lunch = m(up.lunch);
+        up.dinner = m(up.dinner);
+
+        // Recalculate totals
+        up.totalCalories = (up.breakfast.calories * (up.breakfast.servings || 1)) +
+            (up.lunch.calories * (up.lunch.servings || 1)) +
+            (up.dinner.calories * (up.dinner.servings || 1));
+
+        up.macros = {
+            protein: (up.breakfast.protein * (up.breakfast.servings || 1)) +
+                (up.lunch.protein * (up.lunch.servings || 1)) +
+                (up.dinner.protein * (up.dinner.servings || 1)),
+            carbs: (up.breakfast.carbs * (up.breakfast.servings || 1)) +
+                (up.lunch.carbs * (up.lunch.servings || 1)) +
+                (up.dinner.carbs * (up.dinner.servings || 1)),
+            fat: (up.breakfast.fat * (up.breakfast.servings || 1)) +
+                (up.lunch.fat * (up.lunch.servings || 1)) +
+                (up.dinner.fat * (up.dinner.servings || 1)),
+        };
+
+        const combinedM: Record<string, number> = {};
+        [up.breakfast, up.lunch, up.dinner].forEach(r => {
+            const rm = up.recipeMicronutrients[r.id];
+            const factor = r.servings || 1;
+            if (rm) {
+                Object.entries(rm).forEach(([k, v]) => {
+                    combinedM[k] = (combinedM[k] || 0) + ((v as number) * factor);
+                });
+            }
         });
+        up.micronutrients = combinedM;
+        setPlan(up);
     };
 
     const isFormComplete = Boolean(age && weight && height);
