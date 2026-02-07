@@ -65,6 +65,7 @@ export function ShoppingListView() {
     // Pantry match state
     const [matchDialogOpen, setMatchDialogOpen] = useState(false);
     const [selectedMatchItem, setSelectedMatchItem] = useState<ShoppingListItem | null>(null);
+    const [scannedIdToLink, setScannedIdToLink] = useState<string | null>(null);
 
     // Load manual items from local storage on mount
     useEffect(() => {
@@ -243,36 +244,21 @@ export function ShoppingListView() {
                 return;
             }
 
-            // 1. Check if already linked or scanned
-            if ((item.source === 'scanned' && item.barcode) || item.food_item_id) {
-                // Determine identifiers
-                let scannedId = null;
-                if (item.source === 'scanned' && item.barcode) {
-                    const { data: scanDef } = await supabase
-                        .from('scanned_products')
-                        .select('id')
-                        .eq('barcode', item.barcode)
-                        .single();
-                    if (scanDef) scannedId = scanDef.id;
-                }
+            // Reset state
+            setScannedIdToLink(null);
 
-                // Insert directly
-                const { error } = await supabase.from('pantry_items').insert({
-                    user_id: user.id,
-                    name: item.name,
-                    scanned_product_id: scannedId,
-                    food_item_id: item.food_item_id || null,
-                    quantity: item.quantity
-                });
-
-                if (error) throw error;
-
-                removeItem(item.id);
-                toast.success(`"${item.name}" moved to your pantry`);
-                return;
+            // Check if already linked or scanned
+            // If scanned: determine ID to link
+            if (item.source === 'scanned' && item.barcode) {
+                const { data: scanDef } = await supabase
+                    .from('scanned_products')
+                    .select('id')
+                    .eq('barcode', item.barcode)
+                    .single();
+                if (scanDef) setScannedIdToLink(scanDef.id);
             }
 
-            // 2. If not linked, open match dialog
+            // Always open dialog to confirm quantity/match
             setSelectedMatchItem(item);
             setMatchDialogOpen(true);
 
@@ -282,19 +268,25 @@ export function ShoppingListView() {
         }
     };
 
-    const handleMatchConfirm = async (foodItemId: string, name: string, quantity: string) => {
+    const handleMatchConfirm = async (foodItemId: string | null, name: string, quantity: string) => {
         if (!selectedMatchItem) return;
 
         try {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) return;
 
+            // Determine effective IDs
+            // If foodItemId is passed (from search), use it.
+            // If null (confirmed known item), use existing item's food_item_id or scannedIdToLink
+            const effectiveFoodId = foodItemId || selectedMatchItem.food_item_id || null;
+            const effectiveScannedId = (!foodItemId && scannedIdToLink) ? scannedIdToLink : null;
+
             const { error } = await supabase.from('pantry_items').insert({
                 user_id: user.id,
-                name: name, // Use confirmed name (usually food item name)
+                name: name,
                 quantity: quantity,
-                food_item_id: foodItemId,
-                scanned_product_id: null
+                food_item_id: effectiveFoodId,
+                scanned_product_id: effectiveScannedId
             });
 
             if (error) throw error;
@@ -302,6 +294,7 @@ export function ShoppingListView() {
             removeItem(selectedMatchItem.id);
             setMatchDialogOpen(false);
             setSelectedMatchItem(null);
+            setScannedIdToLink(null);
             toast.success(`"${name}" moved to your pantry`);
 
         } catch (error) {
@@ -373,8 +366,14 @@ export function ShoppingListView() {
                 onClose={() => {
                     setMatchDialogOpen(false);
                     setSelectedMatchItem(null);
+                    setScannedIdToLink(null);
                 }}
                 onConfirm={handleMatchConfirm}
+                knownItem={(selectedMatchItem && (selectedMatchItem.source === 'scanned' || selectedMatchItem.food_item_id)) ? {
+                    name: selectedMatchItem.name,
+                    image: selectedMatchItem.image_url,
+                    quantity: selectedMatchItem.quantity
+                } : undefined}
             />
 
             {/* Add Item Bar */}
