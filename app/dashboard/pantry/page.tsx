@@ -18,7 +18,13 @@ import {
     ChevronDown,
     ArrowRight,
     Camera,
-    Info
+    Info,
+    Sparkles,
+    ChefHat,
+    Users,
+    Clock,
+    Wand2,
+    X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,6 +50,9 @@ export default function PantryPage() {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+    const [isSuggesting, setIsSuggesting] = useState(false);
+    const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+    const [suggestions, setSuggestions] = useState<any[]>([]);
 
     useEffect(() => {
         fetchPantry();
@@ -97,6 +106,69 @@ export default function PantryPage() {
         }
     };
 
+    const generateSuggestions = async () => {
+        setLoadingSuggestions(true);
+        setIsSuggesting(true);
+        try {
+            // Fetch recipes and ingredients
+            const [recipesRes, ingredientsRes] = await Promise.all([
+                supabase.from('recipes').select('*'),
+                supabase.from('ingredients').select('recipe_id, food_item_id, item, base_ingredient')
+            ]);
+
+            if (recipesRes.error) throw recipesRes.error;
+            if (ingredientsRes.error) throw ingredientsRes.error;
+
+            const recipes = recipesRes.data || [];
+            const ingredients = ingredientsRes.data || [];
+
+            // Pantry item lookup maps
+            const pantryIds = new Set(foods.map(f => f.id));
+            const pantryNames = new Set(foods.map(f => (f.common_name || f.name).toLowerCase().trim()));
+
+            // Group ingredients by recipe
+            const recipeIngredientsMap: Record<string, any[]> = {};
+            ingredients.forEach(ing => {
+                if (!recipeIngredientsMap[ing.recipe_id]) recipeIngredientsMap[ing.recipe_id] = [];
+                recipeIngredientsMap[ing.recipe_id].push(ing);
+            });
+
+            // Score recipes
+            const scoredRecipes = recipes.map(recipe => {
+                const recipeIngs = recipeIngredientsMap[recipe.id] || [];
+                if (recipeIngs.length === 0) return { ...recipe, matchScore: 0, matchCount: 0, totalCount: 0 };
+
+                let matchCount = 0;
+                recipeIngs.forEach(ing => {
+                    const isMatch = (ing.food_item_id && pantryIds.has(ing.food_item_id)) ||
+                        (ing.base_ingredient && pantryNames.has(ing.base_ingredient.toLowerCase().trim())) ||
+                        (ing.item && pantryNames.has(ing.item.toLowerCase().trim()));
+                    if (isMatch) matchCount++;
+                });
+
+                return {
+                    ...recipe,
+                    matchScore: matchCount / recipeIngs.length,
+                    matchCount,
+                    totalCount: recipeIngs.length
+                };
+            });
+
+            // Sort by match percentage and take top 6 with at least one match
+            const topSuggestions = scoredRecipes
+                .filter(r => r.matchCount > 0)
+                .sort((a, b) => b.matchScore - a.matchScore || b.matchCount - a.matchCount)
+                .slice(0, 6);
+
+            setSuggestions(topSuggestions);
+        } catch (error) {
+            console.error('Error generating suggestions:', error);
+            toast.error('Failed to analyze your kitchen.');
+        } finally {
+            setLoadingSuggestions(false);
+        }
+    };
+
     const filteredFoods = foods.filter(food =>
         (food.common_name || food.name).toLowerCase().includes(searchQuery.toLowerCase()) ||
         food.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -128,7 +200,16 @@ export default function PantryPage() {
                     </p>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3">
+                    {foods.length > 0 && (
+                        <Button
+                            onClick={generateSuggestions}
+                            className="bg-slate-900 border border-slate-800 text-slate-100 px-6 h-14 rounded-2xl font-black uppercase tracking-widest shadow-xl flex items-center gap-2 group transition-all hover:bg-black"
+                        >
+                            <Sparkles size={18} className="text-amber-400 group-hover:scale-125 transition-transform" />
+                            Generate Meals
+                        </Button>
+                    )}
                     <Button
                         onClick={() => router.push('/dashboard/foods')}
                         variant="outline"
@@ -256,8 +337,7 @@ export default function PantryPage() {
                                         {(isExpanded || !hasMultiple) && items.map((food) => (
                                             <div
                                                 key={food.id}
-                                                onClick={() => router.push(`/dashboard/foods/${food.id}`)}
-                                                className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
+                                                className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all overflow-hidden"
                                             >
                                                 <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_100px] gap-4 lg:items-center lg:px-8">
                                                     {/* Thumbnail */}
@@ -271,34 +351,56 @@ export default function PantryPage() {
                                                         )}
                                                     </div>
 
-                                                    {/* Identity */}
+                                                    {/* Info */}
                                                     <div className="p-3 lg:p-0">
-                                                        <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize group-hover:text-emerald-500 transition-colors">
+                                                        <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
                                                             {food.name}
                                                         </h3>
                                                         {food.category && (
-                                                            <Badge className="mt-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase tracking-widest font-black">
+                                                            <Badge className="mt-2 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none">
                                                                 {food.category}
                                                             </Badge>
                                                         )}
                                                     </div>
 
-                                                    {/* Desktop Stats */}
+                                                    {/* Stats (Desktop View) */}
                                                     <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
                                                         {Math.round(food.energy_kcal)}
                                                     </div>
                                                     <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                                        {food.carbs_g.toFixed(1)}
+                                                        {food.carbs_g.toFixed(1)}g
                                                     </div>
                                                     <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                                        {food.fat_g.toFixed(1)}
+                                                        {food.fat_g.toFixed(1)}g
                                                     </div>
                                                     <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                                        {food.protein_g.toFixed(1)}
+                                                        {food.protein_g.toFixed(1)}g
                                                     </div>
 
-                                                    {/* Mobile Stats Grid */}
-                                                    <div className="lg:hidden grid grid-cols-4 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                                    {/* Actions */}
+                                                    <div className="p-3 lg:p-0 flex justify-end lg:justify-center">
+                                                        <div className="flex gap-2">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => removeFromPantry(food.id, food.name)}
+                                                                className="h-9 w-9 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => router.push(`/dashboard/foods/${food.id}`)}
+                                                                className="h-9 w-9 rounded-xl text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors"
+                                                            >
+                                                                <ArrowRight size={16} />
+                                                            </Button>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Mobile Stats Row */}
+                                                    <div className="lg:hidden grid grid-cols-4 gap-2 px-3 pb-3">
                                                         {[
                                                             { label: 'CAL', val: food.energy_kcal, sub: 'k', color: 'text-orange-500' },
                                                             { label: 'CHO', val: food.carbs_g, sub: 'g', color: 'text-amber-500' },
@@ -311,26 +413,6 @@ export default function PantryPage() {
                                                             </div>
                                                         ))}
                                                     </div>
-
-                                                    {/* Actions */}
-                                                    <div className="p-3 lg:p-0 flex justify-end lg:justify-center gap-2">
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                removeFromPantry(food.id, food.common_name || food.name);
-                                                            }}
-                                                            className="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 border border-slate-100 dark:border-slate-700 flex items-center justify-center transition-all shadow-sm"
-                                                            title="Remove from Pantry"
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </button>
-                                                        <button
-                                                            className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20 transition-all hover:scale-105 active:scale-95"
-                                                            title="View Analysis"
-                                                        >
-                                                            <ArrowRight size={16} />
-                                                        </button>
-                                                    </div>
                                                 </div>
                                             </div>
                                         ))}
@@ -338,6 +420,104 @@ export default function PantryPage() {
                                 </div>
                             );
                         })}
+                    </div>
+                </div>
+            )}
+
+            {/* Suggestions Modal */}
+            {isSuggesting && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" onClick={() => setIsSuggesting(false)} />
+                    <div className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl border border-white/20 overflow-hidden animate-in zoom-in-95 duration-300">
+                        <div className="flex flex-col h-[85vh] lg:h-auto lg:max-h-[85vh]">
+                            {/* Modal Header */}
+                            <div className="p-8 pb-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-600">
+                                        <Wand2 size={24} />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-2xl font-black italic uppercase tracking-tight text-slate-900 dark:text-white">Kitchen Magic</h2>
+                                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Suggested meals based on your pantry</p>
+                                    </div>
+                                </div>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => setIsSuggesting(false)}
+                                    className="rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+                                >
+                                    <X size={20} />
+                                </Button>
+                            </div>
+
+                            {/* Modal Content */}
+                            <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                                {loadingSuggestions ? (
+                                    <div className="flex flex-col items-center justify-center py-20 gap-4">
+                                        <div className="relative">
+                                            <Loader2 className="animate-spin text-emerald-500" size={48} />
+                                            <Sparkles className="absolute -top-2 -right-2 text-amber-400 animate-pulse" size={20} />
+                                        </div>
+                                        <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-400 animate-pulse">Analyzing Inventory...</p>
+                                    </div>
+                                ) : suggestions.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center py-20 text-center">
+                                        <ChefHat size={64} className="text-slate-200 dark:text-slate-800 mb-6" />
+                                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No Clear Matches Found</h3>
+                                        <p className="text-slate-500 max-w-sm">We couldn't find recipes that strongly match your current staples. Try adding more variety to your pantry!</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {suggestions.map((recipe) => (
+                                            <div
+                                                key={recipe.id}
+                                                onClick={() => router.push(`/dashboard/recipes/${recipe.id}`)}
+                                                className="group flex gap-4 p-4 rounded-[2rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 cursor-pointer hover:border-emerald-500/50 hover:shadow-xl transition-all"
+                                            >
+                                                <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 border border-white/10">
+                                                    {recipe.image ? (
+                                                        <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-slate-200 dark:bg-slate-900 flex items-center justify-center text-slate-400">
+                                                            <ChefHat size={32} />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex-1 space-y-2 overflow-hidden">
+                                                    <div className="flex items-start justify-between gap-2">
+                                                        <h4 className="font-bold text-slate-900 dark:text-white leading-tight line-clamp-2">{recipe.title}</h4>
+                                                        <Badge className="bg-emerald-500 text-white border-none text-[9px] px-2 py-0.5 h-fit shrink-0">
+                                                            {Math.round(recipe.matchScore * 100)}% Match
+                                                        </Badge>
+                                                    </div>
+                                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+                                                        {recipe.matchCount} / {recipe.totalCount} Ingredients
+                                                    </p>
+                                                    <div className="flex items-center gap-3 pt-1">
+                                                        <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
+                                                            <Clock size={12} /> {recipe.prep_time}m
+                                                        </div>
+                                                        <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
+                                                            <ChefHat size={12} /> {recipe.type}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Modal Footer */}
+                            {!loadingSuggestions && suggestions.length > 0 && (
+                                <div className="p-8 pt-0 flex justify-center">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                                        Tap a meal to view full recipe and instructions
+                                    </p>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}
