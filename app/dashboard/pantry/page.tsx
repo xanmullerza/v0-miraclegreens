@@ -136,21 +136,29 @@ export default function PantryPage() {
             // Score recipes
             const scoredRecipes = recipes.map(recipe => {
                 const recipeIngs = recipeIngredientsMap[recipe.id] || [];
-                if (recipeIngs.length === 0) return { ...recipe, matchScore: 0, matchCount: 0, totalCount: 0 };
+                if (recipeIngs.length === 0) return { ...recipe, matchScore: 0, matchCount: 0, totalCount: 0, missingIngredients: [] };
 
                 let matchCount = 0;
+                const missingIngredients: string[] = [];
+
                 recipeIngs.forEach(ing => {
                     const isMatch = (ing.food_item_id && pantryIds.has(ing.food_item_id)) ||
                         (ing.base_ingredient && pantryNames.has(ing.base_ingredient.toLowerCase().trim())) ||
                         (ing.item && pantryNames.has(ing.item.toLowerCase().trim()));
-                    if (isMatch) matchCount++;
+
+                    if (isMatch) {
+                        matchCount++;
+                    } else {
+                        missingIngredients.push(ing.base_ingredient || ing.item);
+                    }
                 });
 
                 return {
                     ...recipe,
                     matchScore: matchCount / recipeIngs.length,
                     matchCount,
-                    totalCount: recipeIngs.length
+                    totalCount: recipeIngs.length,
+                    missingIngredients: Array.from(new Set(missingIngredients)) // Unique missing items
                 };
             });
 
@@ -281,39 +289,73 @@ export default function PantryPage() {
                                         <p className="text-slate-500 max-w-sm">We couldn't find recipes that strongly match your current staples. Try adding more variety to your pantry!</p>
                                     </div>
                                 ) : (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         {suggestions.map((recipe) => (
                                             <div
                                                 key={recipe.id}
                                                 onClick={() => router.push(`/dashboard/recipes/${recipe.id}`)}
-                                                className="group flex gap-4 p-4 rounded-[2.5rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 cursor-pointer hover:border-emerald-500/50 hover:shadow-xl hover:bg-white dark:hover:bg-slate-800 transition-all duration-300"
+                                                className="group flex flex-col lg:flex-row gap-6 p-6 rounded-[3rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 cursor-pointer hover:border-emerald-500/50 hover:shadow-2xl hover:bg-white dark:hover:bg-slate-800 transition-all duration-500"
                                             >
-                                                <div className="w-24 h-24 rounded-3xl overflow-hidden shrink-0 border border-white/10 shadow-inner">
+                                                {/* Recipe Image - Larger */}
+                                                <div className="w-full lg:w-40 h-40 rounded-[2rem] overflow-hidden shrink-0 border border-white/10 shadow-lg relative">
                                                     {recipe.image ? (
-                                                        <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                        <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1000ms]" />
                                                     ) : (
                                                         <div className="w-full h-full bg-slate-200 dark:bg-slate-900 flex items-center justify-center text-slate-400">
-                                                            <ChefHat size={32} />
+                                                            <ChefHat size={48} />
                                                         </div>
                                                     )}
-                                                </div>
-                                                <div className="flex-1 space-y-2 overflow-hidden py-1">
-                                                    <div className="flex items-start justify-between gap-2">
-                                                        <h4 className="font-bold text-sm text-slate-900 dark:text-white leading-tight line-clamp-2 uppercase tracking-tight">{recipe.title}</h4>
-                                                        <Badge className="bg-emerald-500 text-white border-none text-[8px] px-1.5 py-0 h-fit shrink-0 font-black">
-                                                            {Math.round(recipe.matchScore * 100)}%
+                                                    <div className="absolute top-3 left-3">
+                                                        <Badge className="bg-emerald-500 text-white border-none text-[10px] px-3 py-1 h-fit font-black shadow-lg">
+                                                            {Math.round(recipe.matchScore * 100)}% MATCH
                                                         </Badge>
                                                     </div>
-                                                    <p className="text-[9px] text-slate-500 font-bold uppercase tracking-[0.15em] opacity-70">
-                                                        {recipe.matchCount} / {recipe.totalCount} Ingredients
-                                                    </p>
-                                                    <div className="flex items-center gap-3 pt-1">
-                                                        <div className="flex items-center gap-1 text-[9px] text-slate-400 font-bold uppercase tracking-widest">
-                                                            <Clock size={12} className="text-emerald-500/50" /> {recipe.prep_time}M
+                                                </div>
+
+                                                <div className="flex-1 space-y-4 py-1">
+                                                    <div>
+                                                        <h4 className="text-xl font-black text-slate-900 dark:text-white leading-tight uppercase tracking-tight mb-1">{recipe.title}</h4>
+                                                        <div className="flex items-center gap-4">
+                                                            <p className="text-[11px] text-slate-500 font-black uppercase tracking-[0.2em] opacity-80">
+                                                                {recipe.matchCount} / {recipe.totalCount} ITEMS IN PANTRY
+                                                            </p>
+                                                            <div className="h-1 w-1 rounded-full bg-slate-300" />
+                                                            <div className="flex items-center gap-1.5 text-[11px] text-emerald-600 font-black uppercase tracking-widest">
+                                                                <Clock size={14} /> {recipe.prep_time}m
+                                                            </div>
                                                         </div>
-                                                        <Badge className="bg-slate-200 dark:bg-slate-800 text-slate-500 border-none text-[8px] px-2 py-0 h-fit">
+                                                    </div>
+
+                                                    {/* Missing Ingredients Section - NEW */}
+                                                    {recipe.missingIngredients.length > 0 && (
+                                                        <div className="space-y-2 p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800/50 shadow-inner">
+                                                            <div className="flex items-center gap-2 mb-1">
+                                                                <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                                                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Missing Staples</span>
+                                                            </div>
+                                                            <div className="flex flex-wrap gap-1.5">
+                                                                {recipe.missingIngredients.slice(0, 4).map((ing: string, idx: number) => (
+                                                                    <Badge key={idx} variant="outline" className="text-[9px] font-bold uppercase tracking-widest border-slate-200 bg-transparent text-rose-500 pointer-events-none">
+                                                                        {ing}
+                                                                    </Badge>
+                                                                ))}
+                                                                {recipe.missingIngredients.length > 4 && (
+                                                                    <span className="text-[10px] font-black text-slate-400 pl-1">
+                                                                        +{recipe.missingIngredients.length - 4} more
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    <div className="flex items-center justify-between pt-2">
+                                                        <Badge className="bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-none text-[10px] px-4 py-1 h-fit font-black uppercase tracking-widest">
                                                             {recipe.type}
                                                         </Badge>
+                                                        <div className="flex items-center gap-1 text-emerald-500 group-hover:translate-x-1 transition-transform">
+                                                            <span className="text-[10px] font-black uppercase tracking-widest">Recipe</span>
+                                                            <ArrowRight size={14} />
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
