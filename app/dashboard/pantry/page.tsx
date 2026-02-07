@@ -238,6 +238,106 @@ export default function PantryPage() {
                 />
             </div>
 
+            {/* Suggestions Window (Inline Focus) */}
+            {isSuggesting && (
+                <div className="mb-12 animate-in slide-in-from-top-4 duration-500 fade-in fill-mode-both">
+                    <div className="relative w-full bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                        <div className="flex flex-col">
+                            {/* Window Header */}
+                            <div className="p-8 pb-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-600">
+                                        <Wand2 size={24} />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-2xl font-black italic uppercase tracking-tight text-slate-900 dark:text-white">Kitchen Magic</h2>
+                                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Suggested meals based on your pantry</p>
+                                    </div>
+                                </div>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => setIsSuggesting(false)}
+                                    className="rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 h-10 w-10"
+                                >
+                                    <X size={20} />
+                                </Button>
+                            </div>
+
+                            {/* Window Content */}
+                            <div className="p-8">
+                                {loadingSuggestions ? (
+                                    <div className="flex flex-col items-center justify-center py-20 gap-4">
+                                        <div className="relative">
+                                            <Loader2 className="animate-spin text-emerald-500" size={48} />
+                                            <Sparkles className="absolute -top-2 -right-2 text-amber-400 animate-pulse" size={20} />
+                                        </div>
+                                        <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-400 animate-pulse">Analyzing Inventory...</p>
+                                    </div>
+                                ) : suggestions.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center py-20 text-center">
+                                        <ChefHat size={64} className="text-slate-200 dark:text-slate-800 mb-6" />
+                                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No Clear Matches Found</h3>
+                                        <p className="text-slate-500 max-w-sm">We couldn't find recipes that strongly match your current staples. Try adding more variety to your pantry!</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {suggestions.map((recipe) => (
+                                            <div
+                                                key={recipe.id}
+                                                onClick={() => router.push(`/dashboard/recipes/${recipe.id}`)}
+                                                className="group flex gap-4 p-4 rounded-[2.5rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 cursor-pointer hover:border-emerald-500/50 hover:shadow-xl hover:bg-white dark:hover:bg-slate-800 transition-all duration-300"
+                                            >
+                                                <div className="w-24 h-24 rounded-3xl overflow-hidden shrink-0 border border-white/10 shadow-inner">
+                                                    {recipe.image ? (
+                                                        <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-slate-200 dark:bg-slate-900 flex items-center justify-center text-slate-400">
+                                                            <ChefHat size={32} />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex-1 space-y-2 overflow-hidden py-1">
+                                                    <div className="flex items-start justify-between gap-2">
+                                                        <h4 className="font-bold text-sm text-slate-900 dark:text-white leading-tight line-clamp-2 uppercase tracking-tight">{recipe.title}</h4>
+                                                        <Badge className="bg-emerald-500 text-white border-none text-[8px] px-1.5 py-0 h-fit shrink-0 font-black">
+                                                            {Math.round(recipe.matchScore * 100)}%
+                                                        </Badge>
+                                                    </div>
+                                                    <p className="text-[9px] text-slate-500 font-bold uppercase tracking-[0.15em] opacity-70">
+                                                        {recipe.matchCount} / {recipe.totalCount} Ingredients
+                                                    </p>
+                                                    <div className="flex items-center gap-3 pt-1">
+                                                        <div className="flex items-center gap-1 text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+                                                            <Clock size={12} className="text-emerald-500/50" /> {recipe.prep_time}M
+                                                        </div>
+                                                        <Badge className="bg-slate-200 dark:bg-slate-800 text-slate-500 border-none text-[8px] px-2 py-0 h-fit">
+                                                            {recipe.type}
+                                                        </Badge>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Window Footer */}
+                            {!loadingSuggestions && suggestions.length > 0 && (
+                                <div className="px-8 pb-8 pt-0 flex justify-center">
+                                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-950/50 border border-slate-200/50 dark:border-slate-800/50">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
+                                            Tap any meal to view the full recipe
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* List Area */}
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4">
@@ -420,104 +520,6 @@ export default function PantryPage() {
                                 </div>
                             );
                         })}
-                    </div>
-                </div>
-            )}
-
-            {/* Suggestions Modal */}
-            {isSuggesting && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" onClick={() => setIsSuggesting(false)} />
-                    <div className="relative w-full max-w-4xl bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl border border-white/20 overflow-hidden animate-in zoom-in-95 duration-300">
-                        <div className="flex flex-col h-[85vh] lg:h-auto lg:max-h-[85vh]">
-                            {/* Modal Header */}
-                            <div className="p-8 pb-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-800">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-600">
-                                        <Wand2 size={24} />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-2xl font-black italic uppercase tracking-tight text-slate-900 dark:text-white">Kitchen Magic</h2>
-                                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Suggested meals based on your pantry</p>
-                                    </div>
-                                </div>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => setIsSuggesting(false)}
-                                    className="rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
-                                >
-                                    <X size={20} />
-                                </Button>
-                            </div>
-
-                            {/* Modal Content */}
-                            <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
-                                {loadingSuggestions ? (
-                                    <div className="flex flex-col items-center justify-center py-20 gap-4">
-                                        <div className="relative">
-                                            <Loader2 className="animate-spin text-emerald-500" size={48} />
-                                            <Sparkles className="absolute -top-2 -right-2 text-amber-400 animate-pulse" size={20} />
-                                        </div>
-                                        <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-400 animate-pulse">Analyzing Inventory...</p>
-                                    </div>
-                                ) : suggestions.length === 0 ? (
-                                    <div className="flex flex-col items-center justify-center py-20 text-center">
-                                        <ChefHat size={64} className="text-slate-200 dark:text-slate-800 mb-6" />
-                                        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">No Clear Matches Found</h3>
-                                        <p className="text-slate-500 max-w-sm">We couldn't find recipes that strongly match your current staples. Try adding more variety to your pantry!</p>
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {suggestions.map((recipe) => (
-                                            <div
-                                                key={recipe.id}
-                                                onClick={() => router.push(`/dashboard/recipes/${recipe.id}`)}
-                                                className="group flex gap-4 p-4 rounded-[2rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 cursor-pointer hover:border-emerald-500/50 hover:shadow-xl transition-all"
-                                            >
-                                                <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 border border-white/10">
-                                                    {recipe.image ? (
-                                                        <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                                    ) : (
-                                                        <div className="w-full h-full bg-slate-200 dark:bg-slate-900 flex items-center justify-center text-slate-400">
-                                                            <ChefHat size={32} />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className="flex-1 space-y-2 overflow-hidden">
-                                                    <div className="flex items-start justify-between gap-2">
-                                                        <h4 className="font-bold text-slate-900 dark:text-white leading-tight line-clamp-2">{recipe.title}</h4>
-                                                        <Badge className="bg-emerald-500 text-white border-none text-[9px] px-2 py-0.5 h-fit shrink-0">
-                                                            {Math.round(recipe.matchScore * 100)}% Match
-                                                        </Badge>
-                                                    </div>
-                                                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">
-                                                        {recipe.matchCount} / {recipe.totalCount} Ingredients
-                                                    </p>
-                                                    <div className="flex items-center gap-3 pt-1">
-                                                        <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
-                                                            <Clock size={12} /> {recipe.prep_time}m
-                                                        </div>
-                                                        <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
-                                                            <ChefHat size={12} /> {recipe.type}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Modal Footer */}
-                            {!loadingSuggestions && suggestions.length > 0 && (
-                                <div className="p-8 pt-0 flex justify-center">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                        Tap a meal to view full recipe and instructions
-                                    </p>
-                                </div>
-                            )}
-                        </div>
                     </div>
                 </div>
             )}
