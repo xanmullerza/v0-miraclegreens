@@ -28,13 +28,15 @@ export function BarcodeScanner({ isOpen, onClose, onScan }: BarcodeScannerProps)
     const [lastScanned, setLastScanned] = useState<string | null>(null);
     const scannerRef = useRef<Html5Qrcode | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const mounterRef = useRef(false);
 
     const stopScanner = useCallback(async () => {
         if (scannerRef.current) {
             try {
                 const state = scannerRef.current.getState();
-                if (state === Html5QrcodeScannerState.SCANNING) {
+                if (state === Html5QrcodeScannerState.SCANNING || state === Html5QrcodeScannerState.PAUSED) {
                     await scannerRef.current.stop();
+                    scannerRef.current.clear();
                 }
             } catch (e) {
                 console.error('Error stopping scanner:', e);
@@ -57,14 +59,25 @@ export function BarcodeScanner({ isOpen, onClose, onScan }: BarcodeScannerProps)
                     aspectRatio: 1.777778,
                 },
                 (decodedText) => {
+                    // Check if component is still active/mounted
+                    if (!mounterRef.current) return;
+
                     // Prevent duplicate scans
                     if (decodedText !== lastScanned) {
                         setLastScanned(decodedText);
+
+                        // Immediately disable further processing
+                        mounterRef.current = false;
+
                         // Vibrate on successful scan (mobile)
                         if (navigator.vibrate) {
                             navigator.vibrate(100);
                         }
-                        onScan(decodedText);
+
+                        // Stop scanner immediately to prevent background scanning
+                        stopScanner().then(() => {
+                            onScan(decodedText);
+                        });
                     }
                 },
                 () => {
@@ -74,15 +87,26 @@ export function BarcodeScanner({ isOpen, onClose, onScan }: BarcodeScannerProps)
             setIsInitializing(false);
         } catch (err: any) {
             console.error('Scanner start error:', err);
-            setError(err.message || 'Failed to start camera');
-            setIsInitializing(false);
+            // Only set error if we are still mounted
+            if (mounterRef.current) {
+                setError(err.message || 'Failed to start camera');
+                setIsInitializing(false);
+            }
         }
-    }, [lastScanned, onScan]);
+    }, [lastScanned, onScan, stopScanner]);
 
     useEffect(() => {
-        if (!isOpen) return;
+        if (!isOpen) {
+            // Ensure cleanup if isOpen becomes false
+            mounterRef.current = false;
+            return;
+        }
+
+        mounterRef.current = true;
 
         const initScanner = async () => {
+            if (!mounterRef.current) return;
+
             setIsInitializing(true);
             setError(null);
             setLastScanned(null);
