@@ -27,7 +27,7 @@ import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { generateShoppingList, ShoppingItem, DailyPlan } from '@/lib/utils/meal-generator';
 import { BarcodeScanner } from './barcode-scanner';
 import { ScanConfirmDialog } from './scan-confirm-dialog';
-import { recordPurchase } from '@/lib/services/product-lookup';
+import { recordPurchase, saveScannedProduct } from '@/lib/services/product-lookup';
 
 interface ShoppingListItem {
     id: string;
@@ -164,6 +164,7 @@ export function ShoppingListView() {
         store?: string;
         food_item_id?: string;
         image_url?: string;
+        nutrition?: any;
     }) => {
         // Add to shopping list
         const newItem: ShoppingListItem = {
@@ -182,6 +183,18 @@ export function ShoppingListView() {
         setManualItems(prev => [...prev, newItem]);
         setConfirmDialogOpen(false);
         setScannedBarcode('');
+
+        // Save the product definition to the global database for future scans
+        saveScannedProduct({
+            barcode: product.barcode,
+            name: product.name,
+            source: 'manual', // Mark as user-contributed
+            brand: undefined, // We don't capture brand in dialog yet
+            weight_g: product.weight_g,
+            default_unit: product.unit,
+            image_url: product.image_url,
+            nutrition: product.nutrition
+        });
 
         toast.success(`Added "${product.name}" to shopping list`);
     };
