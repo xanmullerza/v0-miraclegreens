@@ -28,6 +28,7 @@ import { generateShoppingList, ShoppingItem, DailyPlan } from '@/lib/utils/meal-
 import { BarcodeScanner } from './barcode-scanner';
 import { ScanConfirmDialog } from './scan-confirm-dialog';
 import { recordPurchase, saveScannedProduct } from '@/lib/services/product-lookup';
+import { PantryMatchDialog } from './pantry-match-dialog';
 
 interface ShoppingListItem {
     id: string;
@@ -60,6 +61,10 @@ export function ShoppingListView() {
     const [scannerOpen, setScannerOpen] = useState(false);
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
     const [scannedBarcode, setScannedBarcode] = useState('');
+
+    // Pantry match state
+    const [matchDialogOpen, setMatchDialogOpen] = useState(false);
+    const [selectedMatchItem, setSelectedMatchItem] = useState<ShoppingListItem | null>(null);
 
     // Load manual items from local storage on mount
     useEffect(() => {
@@ -238,34 +243,69 @@ export function ShoppingListView() {
                 return;
             }
 
-            // 1. Try to find if it matches a scanned product definition
-            let scannedId = null;
-            if (item.source === 'scanned' && item.barcode) {
-                const { data: scanDef } = await supabase
-                    .from('scanned_products')
-                    .select('id')
-                    .eq('barcode', item.barcode)
-                    .single();
-                if (scanDef) scannedId = scanDef.id;
+            // 1. Check if already linked or scanned
+            if ((item.source === 'scanned' && item.barcode) || item.food_item_id) {
+                // Determine identifiers
+                let scannedId = null;
+                if (item.source === 'scanned' && item.barcode) {
+                    const { data: scanDef } = await supabase
+                        .from('scanned_products')
+                        .select('id')
+                        .eq('barcode', item.barcode)
+                        .single();
+                    if (scanDef) scannedId = scanDef.id;
+                }
+
+                // Insert directly
+                const { error } = await supabase.from('pantry_items').insert({
+                    user_id: user.id,
+                    name: item.name,
+                    scanned_product_id: scannedId,
+                    food_item_id: item.food_item_id || null,
+                    quantity: item.quantity
+                });
+
+                if (error) throw error;
+
+                removeItem(item.id);
+                toast.success(`"${item.name}" moved to your pantry`);
+                return;
             }
 
-            // 2. Insert into pantry_items
+            // 2. If not linked, open match dialog
+            setSelectedMatchItem(item);
+            setMatchDialogOpen(true);
+
+        } catch (error) {
+            console.error('Error moving to pantry:', error);
+            toast.error('Failed to move item to pantry');
+        }
+    };
+
+    const handleMatchConfirm = async (foodItemId: string, name: string, quantity: string) => {
+        if (!selectedMatchItem) return;
+
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return;
+
             const { error } = await supabase.from('pantry_items').insert({
                 user_id: user.id,
-                name: item.name,
-                scanned_product_id: scannedId,
-                food_item_id: item.food_item_id || null,
-                quantity: item.quantity
+                name: name, // Use confirmed name (usually food item name)
+                quantity: quantity,
+                food_item_id: foodItemId,
+                scanned_product_id: null
             });
 
             if (error) throw error;
 
-            // 3. Remove from shopping list
-            removeItem(item.id);
-            toast.success(`"${item.name}" moved to your pantry`);
+            removeItem(selectedMatchItem.id);
+            setMatchDialogOpen(false);
+            setSelectedMatchItem(null);
+            toast.success(`"${name}" moved to your pantry`);
 
         } catch (error) {
-            console.error('Error moving to pantry:', error);
+            console.error('Error linking to pantry:', error);
             toast.error('Failed to move item to pantry');
         }
     };
@@ -324,6 +364,17 @@ export function ShoppingListView() {
                     setScannedBarcode('');
                 }}
                 onConfirm={handleScannedProductConfirm}
+            />
+
+            {/* Pantry Match Dialog */}
+            <PantryMatchDialog
+                isOpen={matchDialogOpen}
+                initialQuery={selectedMatchItem?.name || ''}
+                onClose={() => {
+                    setMatchDialogOpen(false);
+                    setSelectedMatchItem(null);
+                }}
+                onConfirm={handleMatchConfirm}
             />
 
             {/* Add Item Bar */}
