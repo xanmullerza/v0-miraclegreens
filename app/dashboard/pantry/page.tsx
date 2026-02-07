@@ -326,7 +326,7 @@ export default function PantryPage() {
                         <div className="p-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
                             <ShoppingBasket className="text-emerald-600" size={24} />
                         </div>
-                        <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white uppercase italic">Kitchen Staples</h1>
+                        <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white uppercase italic">My Pantry</h1>
                     </div>
                     <p className="text-slate-500 font-medium max-w-lg">
                         Your personal collection of healthy ingredients. Save items here to make them easy to find when planning your meals.
@@ -364,7 +364,7 @@ export default function PantryPage() {
             <div className="mb-12 relative max-w-md">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <Input
-                    placeholder="Search your staples..."
+                    placeholder="Search your pantry..."
                     className="pl-12 h-14 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm focus:ring-emerald-500 focus:border-emerald-500"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}

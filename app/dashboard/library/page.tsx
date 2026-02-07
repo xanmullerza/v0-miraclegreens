@@ -61,7 +61,7 @@ function LibraryContent() {
     const tabs = [
         { id: 'nutrients', label: 'Nutrients', icon: Activity, color: 'text-amber-500', bg: 'bg-amber-500/10' },
         { id: 'foods', label: 'Ingredients', icon: Apple, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-        { id: 'recipes', label: 'Food', icon: ChefHat, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+        { id: 'recipes', label: 'Meals', icon: ChefHat, color: 'text-blue-500', bg: 'bg-blue-600/10' },
     ];
 
     const { searchQuery, setSearchQuery } = useSearch();

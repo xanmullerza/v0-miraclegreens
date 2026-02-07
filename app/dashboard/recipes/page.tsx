@@ -140,7 +140,7 @@ export default function RecipesPage() {
             setHasMore(count ? (isNewSearch ? newItems.length : recipes.length + newItems.length) < count : false);
         } catch (error) {
             console.error('Error fetching recipes:', error);
-            toast.error('Failed to load food library');
+            toast.error('Failed to load meal library');
         } finally {
             setLoading(false);
             setLoadingMore(false);
@@ -359,7 +359,7 @@ export default function RecipesPage() {
                                 />
                                 <div className="absolute top-full mt-2 left-0 w-64 bg-white dark:bg-slate-900 rounded-[1.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl z-50 p-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                     <div className="space-y-3">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2">Select Food Types</p>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2">Select Meal Types</p>
                                         <div className="space-y-1">
                                             {MEAL_TYPES.map(type => {
                                                 const isActive = selectedTypes.includes(type);
@@ -433,15 +433,15 @@ export default function RecipesPage() {
                     </p>
                     <p className="text-sm text-slate-500 text-center max-w-xs">
                         {showFavoritesOnly
-                            ? "You haven't favorited any food yet. Browse the library to add some to your collection."
-                            : "We couldn't find any food matching your criteria."}
+                            ? "You haven't favorited any meals yet. Browse the library to add some to your collection."
+                            : "We couldn't find any meals matching your criteria."}
                     </p>
                     {showFavoritesOnly && (
                         <Button
                             onClick={() => setShowFavoritesOnly(false)}
                             className="mt-6 rounded-full bg-emerald-600 text-white px-8 font-black uppercase tracking-widest text-[10px]"
                         >
-                            Browse All Food
+                            Browse All Meals
                         </Button>
                     )}
                 </div>
@@ -614,7 +614,7 @@ export default function RecipesPage() {
                                     </>
                                 ) : (
                                     <>
-                                        View More Food
+                                        View More Meals
                                         <ArrowRight className="ml-3 group-hover:translate-x-1 transition-transform" size={18} />
                                     </>
                                 )}

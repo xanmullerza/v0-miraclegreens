@@ -84,7 +84,7 @@ export default function DashboardOverview() {
         },
         {
             name: 'The Library',
-            desc: 'Find healthy food, recipes, and helpful tips.',
+            desc: 'Find healthy ingredients, meals, and helpful tips.',
             href: '/dashboard/library',
             icon: Library,
             color: 'text-emerald-500',
