@@ -517,7 +517,7 @@ export default function PantryPage() {
                                                                     e.stopPropagation();
                                                                     handleAddToPlan(recipe.id, meal.toLowerCase() as any);
                                                                 }}
-                                                                className="px-6 h-12 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 font-black uppercase tracking-widest text-[9px] hover:bg-black hover:border-emerald-500/50 transition-all shadow-lg flex items-center gap-2 group/btn"
+                                                                className="px-6 h-12 rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-black uppercase tracking-widest text-[9px] hover:border-emerald-500 hover:bg-emerald-500 hover:text-white transition-all shadow-lg flex items-center gap-2 group/btn"
                                                             >
                                                                 <span>{meal}</span>
                                                                 <Plus size={14} className="group-hover/btn:rotate-90 transition-transform" />
@@ -545,7 +545,7 @@ export default function PantryPage() {
                                     <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-950/50 border border-slate-200/50 dark:border-slate-800/50">
                                         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                         <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                            Tap any meal to view the full recipe
+                                            Plan these meals for your day or tap to view details
                                         </p>
                                     </div>
                                 </div>
