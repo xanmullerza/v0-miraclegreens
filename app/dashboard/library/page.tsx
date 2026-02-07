@@ -41,7 +41,7 @@ export default function ClinicalLibrary() {
 function LibraryContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [activeTab, setActiveTab] = useState<'foods' | 'recipes' | 'nutrients'>('foods');
+    const [activeTab, setActiveTab] = useState<'foods' | 'recipes' | 'nutrients'>('nutrients');
 
     // Sync tab with URL if needed
     useEffect(() => {
@@ -59,9 +59,9 @@ function LibraryContent() {
     };
 
     const tabs = [
-        { id: 'foods', label: 'Foods', icon: Apple, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-        { id: 'recipes', label: 'Recipes', icon: ChefHat, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-        { id: 'nutrients', label: 'Benefits', icon: Activity, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+        { id: 'nutrients', label: 'Nutrients', icon: Activity, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+        { id: 'foods', label: 'Ingredients', icon: Apple, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+        { id: 'recipes', label: 'Food', icon: ChefHat, color: 'text-blue-500', bg: 'bg-blue-500/10' },
     ];
 
     const { searchQuery, setSearchQuery } = useSearch();
@@ -77,7 +77,7 @@ function LibraryContent() {
                         </div>
                         <div>
                             <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85]">
-                                Our <span className="text-emerald-500">Library.</span>
+                                The <span className="text-emerald-500">Library.</span>
                             </h1>
                             <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Healthy Eating Made Easy v0.4</p>
                         </div>
