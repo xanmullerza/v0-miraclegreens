@@ -4,16 +4,11 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
     Zap,
-    Activity,
     Sparkles,
     ChefHat,
     Library,
     User,
-    ArrowRight,
-    ShieldCheck,
-    Scale,
-    Calendar,
-    ShoppingBasket
+    ArrowRight
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -59,20 +54,12 @@ export default function DashboardOverview() {
 
     const tools = [
         {
-            name: 'My Pantry',
-            desc: 'Keep track of what you have at home.',
-            href: '/dashboard/pantry',
-            icon: ShoppingBasket,
-            color: 'text-blue-600',
-            bg: 'bg-blue-600/10'
-        },
-        {
-            name: 'My Meals',
-            desc: 'Create healthy meal plans for yourself in seconds.',
-            href: '/dashboard/mealplanner',
-            icon: Calendar,
-            color: 'text-rose-500',
-            bg: 'bg-rose-500/10'
+            name: 'The Kitchen',
+            desc: 'Plan meals, manage your pantry, and create shopping lists.',
+            href: '/dashboard/kitchen',
+            icon: ChefHat,
+            color: 'text-amber-500',
+            bg: 'bg-amber-500/10'
         },
         {
             name: 'My Profile',
