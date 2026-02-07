@@ -289,72 +289,104 @@ export default function PantryPage() {
                                         <p className="text-slate-500 max-w-sm">We couldn't find recipes that strongly match your current staples. Try adding more variety to your pantry!</p>
                                     </div>
                                 ) : (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="grid grid-cols-1 gap-10">
                                         {suggestions.map((recipe) => (
                                             <div
                                                 key={recipe.id}
                                                 onClick={() => router.push(`/dashboard/recipes/${recipe.id}`)}
-                                                className="group flex flex-col lg:flex-row gap-6 p-6 rounded-[3rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 cursor-pointer hover:border-emerald-500/50 hover:shadow-2xl hover:bg-white dark:hover:bg-slate-800 transition-all duration-500"
+                                                className="group flex flex-col xl:flex-row items-center xl:items-stretch gap-10 p-10 rounded-[4rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 cursor-pointer hover:border-emerald-500/50 hover:shadow-[0_32px_64px_-12px_rgba(0,0,0,0.15)] transition-all duration-500 hover:-translate-y-1"
                                             >
-                                                {/* Recipe Image - Larger */}
-                                                <div className="w-full lg:w-40 h-40 rounded-[2rem] overflow-hidden shrink-0 border border-white/10 shadow-lg relative">
+                                                {/* Hero Image */}
+                                                <div className="w-full xl:w-[400px] aspect-square xl:h-auto rounded-[3rem] overflow-hidden shrink-0 border border-slate-100 dark:border-slate-800 shadow-2xl relative">
                                                     {recipe.image ? (
-                                                        <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1000ms]" />
+                                                        <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[2000ms]" />
                                                     ) : (
-                                                        <div className="w-full h-full bg-slate-200 dark:bg-slate-900 flex items-center justify-center text-slate-400">
-                                                            <ChefHat size={48} />
+                                                        <div className="w-full h-full bg-slate-100 dark:bg-slate-950 flex items-center justify-center text-slate-300">
+                                                            <ChefHat size={80} className="opacity-20" />
                                                         </div>
                                                     )}
-                                                    <div className="absolute top-3 left-3">
-                                                        <Badge className="bg-emerald-500 text-white border-none text-[10px] px-3 py-1 h-fit font-black shadow-lg">
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                                                    {/* Match Overlay */}
+                                                    <div className="absolute top-6 left-6">
+                                                        <div className="px-5 py-2.5 rounded-2xl bg-emerald-500 text-white font-black text-xs tracking-[0.2em] shadow-2xl flex items-center gap-2">
+                                                            <Sparkles size={16} />
                                                             {Math.round(recipe.matchScore * 100)}% MATCH
-                                                        </Badge>
+                                                        </div>
                                                     </div>
                                                 </div>
 
-                                                <div className="flex-1 space-y-4 py-1">
-                                                    <div>
-                                                        <h4 className="text-xl font-black text-slate-900 dark:text-white leading-tight uppercase tracking-tight mb-1">{recipe.title}</h4>
-                                                        <div className="flex items-center gap-4">
-                                                            <p className="text-[11px] text-slate-500 font-black uppercase tracking-[0.2em] opacity-80">
-                                                                {recipe.matchCount} / {recipe.totalCount} ITEMS IN PANTRY
-                                                            </p>
-                                                            <div className="h-1 w-1 rounded-full bg-slate-300" />
-                                                            <div className="flex items-center gap-1.5 text-[11px] text-emerald-600 font-black uppercase tracking-widest">
-                                                                <Clock size={14} /> {recipe.prep_time}m
+                                                <div className="flex-1 flex flex-col justify-between py-4 w-full">
+                                                    <div className="space-y-6">
+                                                        <div className="space-y-2">
+                                                            <div className="flex flex-wrap items-center gap-3">
+                                                                <Badge className="bg-emerald-500/10 text-emerald-600 border-none text-[10px] px-3 py-1 font-black tracking-widest uppercase">
+                                                                    {recipe.type}
+                                                                </Badge>
+                                                                <div className="flex items-center gap-1.5 text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                                                                    <Clock size={14} className="text-emerald-500/40" /> {recipe.prep_time} MINUTES
+                                                                </div>
                                                             </div>
+                                                            <h4 className="text-4xl xl:text-5xl font-black text-slate-900 dark:text-white leading-[1.1] uppercase tracking-tighter transition-colors group-hover:text-emerald-500">
+                                                                {recipe.title}
+                                                            </h4>
+                                                        </div>
+
+                                                        {/* High-Level Nutrition Row */}
+                                                        <div className="flex flex-wrap gap-8 py-6 border-y border-slate-50 dark:border-slate-800/50">
+                                                            {[
+                                                                { label: 'CALORIES', val: Math.round(recipe.calories || 0), unit: 'kcal', color: 'text-orange-500' },
+                                                                { label: 'PROTEIN', val: (recipe.protein || 0).toFixed(1), unit: 'g', color: 'text-rose-500' },
+                                                                { label: 'CARBS', val: (recipe.carbs || 0).toFixed(1), unit: 'g', color: 'text-amber-500' },
+                                                                { label: 'FAT', val: (recipe.fat || 0).toFixed(1), unit: 'g', color: 'text-slate-900 dark:text-white' },
+                                                            ].map(stat => (
+                                                                <div key={stat.label} className="space-y-1">
+                                                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
+                                                                    <p className={cn("text-2xl font-black italic", stat.color)}>
+                                                                        {stat.val}<span className="text-sm ml-0.5 opacity-50 not-italic uppercase">{stat.unit}</span>
+                                                                    </p>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+
+                                                        {/* Dynamic Missing Items Section */}
+                                                        <div className="space-y-4">
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500">
+                                                                        <ShoppingBasket size={18} />
+                                                                    </div>
+                                                                    <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">
+                                                                        {recipe.matchCount} / {recipe.totalCount} POSSESSED
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+
+                                                            {recipe.missingIngredients.length > 0 && (
+                                                                <div className="p-6 rounded-[2rem] bg-rose-50/30 dark:bg-rose-500/5 border border-rose-100/50 dark:border-rose-500/10">
+                                                                    <div className="flex items-center gap-2 mb-4">
+                                                                        <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                                                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500">Required Purchases</span>
+                                                                    </div>
+                                                                    <div className="flex flex-wrap gap-2">
+                                                                        {recipe.missingIngredients.map((ing: string, idx: number) => (
+                                                                            <Badge
+                                                                                key={idx}
+                                                                                className="px-4 py-2 text-[10px] font-black uppercase tracking-widest bg-white dark:bg-slate-950 text-rose-500 border border-rose-100 dark:border-rose-900/50 shadow-sm"
+                                                                            >
+                                                                                {ing}
+                                                                            </Badge>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            )}
                                                         </div>
                                                     </div>
 
-                                                    {/* Missing Ingredients Section - NEW */}
-                                                    {recipe.missingIngredients.length > 0 && (
-                                                        <div className="space-y-2 p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800/50 shadow-inner">
-                                                            <div className="flex items-center gap-2 mb-1">
-                                                                <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                                                                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Missing Staples</span>
-                                                            </div>
-                                                            <div className="flex flex-wrap gap-1.5">
-                                                                {recipe.missingIngredients.slice(0, 4).map((ing: string, idx: number) => (
-                                                                    <Badge key={idx} variant="outline" className="text-[9px] font-bold uppercase tracking-widest border-slate-200 bg-transparent text-rose-500 pointer-events-none">
-                                                                        {ing}
-                                                                    </Badge>
-                                                                ))}
-                                                                {recipe.missingIngredients.length > 4 && (
-                                                                    <span className="text-[10px] font-black text-slate-400 pl-1">
-                                                                        +{recipe.missingIngredients.length - 4} more
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    <div className="flex items-center justify-between pt-2">
-                                                        <Badge className="bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-none text-[10px] px-4 py-1 h-fit font-black uppercase tracking-widest">
-                                                            {recipe.type}
-                                                        </Badge>
-                                                        <div className="flex items-center gap-1 text-emerald-500 group-hover:translate-x-1 transition-transform">
-                                                            <span className="text-[10px] font-black uppercase tracking-widest">Recipe</span>
-                                                            <ArrowRight size={14} />
+                                                    <div className="flex items-center justify-end pt-8">
+                                                        <div className="flex items-center gap-3 px-8 h-16 rounded-2xl bg-emerald-500 text-white font-black uppercase tracking-[0.2em] shadow-xl shadow-emerald-500/20 group-hover:scale-105 transition-all">
+                                                            <span>Start Cooking</span>
+                                                            <ArrowRight size={20} />
                                                         </div>
                                                     </div>
                                                 </div>
