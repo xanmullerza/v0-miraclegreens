@@ -50,10 +50,19 @@ function FoodsHubContent() {
         { id: 'compare', label: 'Compare', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
     ];
 
-    const renderTabGroup = (tabs: typeof ingredientTabs, sectionLabel: string, sectionColor: string) => (
+    const renderTabGroup = (tabs: typeof ingredientTabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
         <div className="space-y-3">
             <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>
-            <div className="flex p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl">
+            <div className="flex p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-x-auto">
+                {showHomeButton && (
+                    <button
+                        onClick={() => router.push('/dashboard')}
+                        className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all mr-2 flex-shrink-0"
+                        title="Back to Dashboard"
+                    >
+                        <LayoutGrid size={18} />
+                    </button>
+                )}
                 {tabs.map((tab) => {
                     const Icon = tab.icon;
                     const isActive = currentTab === tab.id;
@@ -62,7 +71,7 @@ function FoodsHubContent() {
                             key={tab.id}
                             onClick={() => setTab(tab.id as FoodTab)}
                             className={cn(
-                                "flex items-center gap-3 px-5 py-3.5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group",
+                                "flex items-center gap-3 px-5 py-3.5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
                                 isActive
                                     ? "bg-slate-900 dark:bg-slate-800 text-white shadow-xl translate-y-[-2px]"
                                     : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
@@ -95,16 +104,7 @@ function FoodsHubContent() {
 
                 {/* Tab Sections */}
                 <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => router.push('/dashboard')}
-                            className="p-3.5 rounded-[1.5rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl text-slate-400 hover:text-emerald-500 hover:border-emerald-500/30 transition-all"
-                            title="Back to Dashboard"
-                        >
-                            <LayoutGrid size={18} />
-                        </button>
-                        {renderTabGroup(ingredientTabs, "📦 Ingredients", "text-slate-500")}
-                    </div>
+                    {renderTabGroup(ingredientTabs, "📦 Ingredients", "text-slate-500", true)}
                     {renderTabGroup(toolsTabs, "🔬 Tools", "text-slate-500")}
                 </div>
             </div>
