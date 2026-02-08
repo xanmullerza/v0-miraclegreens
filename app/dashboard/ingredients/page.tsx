@@ -46,9 +46,6 @@ function FoodsHubContent() {
 
     // Second row: Tools section
     const toolsTabs = [
-        { id: 'explore', label: 'Explore', icon: Library, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-        { id: 'staples', label: 'Staples', icon: ShoppingBag, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-        { id: 'nutrients', label: 'Nutrients', icon: Activity, color: 'text-indigo-500', bg: 'bg-indigo-500/10' },
         { id: 'compare', label: 'Compare', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
         { id: 'lab', label: 'Lab', icon: Beaker, color: 'text-violet-500', bg: 'bg-violet-500/10' },
     ];
