@@ -56,6 +56,22 @@ export default function DashboardOverview() {
 
     const tools = [
         {
+            name: 'Ingredients',
+            desc: 'Browse and explore nutritious food items.',
+            href: '/dashboard/ingredients',
+            icon: Carrot,
+            color: 'text-sky-500',
+            bg: 'bg-sky-500/10'
+        },
+        {
+            name: 'Profile',
+            desc: 'Manage your settings and personal info.',
+            href: '/dashboard/profile',
+            icon: User,
+            color: 'text-purple-500',
+            bg: 'bg-purple-500/10'
+        },
+        {
             name: 'Recipes',
             desc: 'Plan meals, manage your pantry, and create shopping lists.',
             href: '/dashboard/recipes',
@@ -64,28 +80,12 @@ export default function DashboardOverview() {
             bg: 'bg-amber-500/10'
         },
         {
-            name: 'My Profile',
-            desc: 'Manage your settings and personal info.',
-            href: '/dashboard/profile',
-            icon: User,
-            color: 'text-purple-500',
-            bg: 'bg-purple-500/10'
-        },
-        {
-            name: 'The Library',
+            name: 'Library',
             desc: 'Find healthy ingredients, meals, and helpful tips.',
             href: '/dashboard/library',
             icon: Library,
             color: 'text-emerald-500',
             bg: 'bg-emerald-500/10'
-        },
-        {
-            name: 'Ingredients',
-            desc: 'Browse and explore nutritious food items.',
-            href: '/dashboard/ingredients',
-            icon: Carrot,
-            color: 'text-sky-500',
-            bg: 'bg-sky-500/10'
         }
     ];
 
