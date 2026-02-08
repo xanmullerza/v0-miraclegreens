@@ -314,6 +314,14 @@ export function PantryView() {
                                                                 <Beef size={24} className="opacity-20" />
                                                             </div>
                                                         )}
+
+                                                        {food.quantity && (
+                                                            <div className="absolute bottom-1 left-1 right-1 z-10">
+                                                                <div className="bg-emerald-600/90 backdrop-blur-sm text-white text-[9px] font-black px-1.5 py-1 rounded-lg text-center truncate uppercase tracking-tighter shadow-lg border border-white/20">
+                                                                    {food.quantity}
+                                                                </div>
+                                                            </div>
+                                                        )}
                                                     </div>
 
                                                     {/* Info */}
@@ -325,11 +333,6 @@ export function PantryView() {
                                                             <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase font-black">
                                                                 {food.category}
                                                             </Badge>
-                                                            {food.quantity && (
-                                                                <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[8px] border-none uppercase font-black">
-                                                                    {food.quantity}
-                                                                </Badge>
-                                                            )}
                                                         </div>
                                                     </div>
 
