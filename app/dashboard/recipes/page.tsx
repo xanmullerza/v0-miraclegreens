@@ -78,7 +78,7 @@ function KitchenContent() {
     const renderTabGroup = (tabsList: typeof mealsTabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
         <div className="space-y-3">
             <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>
-            <div className="flex p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500">
+            <div className="flex p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500 w-full max-w-[450px]">
                 <div className="flex items-center">
                     {showHomeButton && (
                         <button
