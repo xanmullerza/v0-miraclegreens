@@ -10,14 +10,19 @@ import {
     BookOpen,
     Search,
     X,
-    LayoutGrid
+    LayoutGrid,
+    Globe,
+    Heart,
+    Filter,
+    ChevronDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSearch } from '@/lib/context/search-context';
+import { Switch } from '@/components/ui/switch';
 
 import { MealPlannerView } from '@/components/kitchen/mealplanner-view';
 import { MixLabView } from '@/components/kitchen/mix-lab-view';
-import { RecipesView } from '@/components/library/recipes-view';
+import { RecipesView, MEAL_TYPES } from '@/components/library/recipes-view';
 
 type TabId = 'mixlab' | 'mealplanner' | 'browse';
 
@@ -40,6 +45,11 @@ function KitchenContent() {
     const [activeTab, setActiveTab] = useState<TabId>('mixlab');
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
     const { searchQuery, setSearchQuery } = useSearch();
+
+    // Lifted Filter State
+    const [selectedTypes, setSelectedTypes] = useState<string[]>(MEAL_TYPES);
+    const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     const allTabs: TabId[] = ['mixlab', 'mealplanner', 'browse'];
 
@@ -153,9 +163,79 @@ function KitchenContent() {
                     </div>
                 </div>
 
-                {/* Tab Section */}
-                <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+                {/* Tab Section & Filters */}
+                <div className="flex flex-col xl:flex-row gap-6 lg:gap-8 items-start xl:items-end justify-between w-full">
                     {renderTabGroup(mealsTabs, "🍽️ Meals & Recipes", "text-slate-500", true)}
+
+                    {activeTab === 'browse' && (
+                        <div className="flex items-center gap-4 animate-in fade-in slide-in-from-right-4 duration-500 w-full xl:w-auto overflow-x-auto no-scrollbar pb-2 xl:pb-0">
+                            {/* Favorites Switch Toggle */}
+                            <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl shrink-0 transition-all">
+                                <Globe
+                                    size={18}
+                                    className={cn(
+                                        "transition-all cursor-pointer",
+                                        !showFavoritesOnly ? "text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" : "text-slate-400 hover:text-slate-500"
+                                    )}
+                                    onClick={() => setShowFavoritesOnly(false)}
+                                />
+                                <Switch
+                                    id="favorites-mode"
+                                    checked={showFavoritesOnly}
+                                    onCheckedChange={setShowFavoritesOnly}
+                                    className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-blue-600 dark:data-[state=unchecked]:bg-blue-600"
+                                />
+                                <Heart
+                                    size={18}
+                                    className={cn(
+                                        "transition-all cursor-pointer",
+                                        showFavoritesOnly ? "text-rose-500 fill-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : "text-slate-400 hover:text-slate-500"
+                                    )}
+                                    onClick={() => setShowFavoritesOnly(true)}
+                                />
+                            </div>
+
+                            {/* Type Filter */}
+                            <div className="relative">
+                                <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 items-center h-14 shadow-xl">
+                                    <button
+                                        onClick={() => setIsFilterOpen(!isFilterOpen)}
+                                        className={cn(
+                                            "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300",
+                                            isFilterOpen ? "bg-blue-600 text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50"
+                                        )}
+                                    >
+                                        <Filter size={18} />
+                                        <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter</span>
+                                        <ChevronDown size={14} className={cn("transition-transform", isFilterOpen && "rotate-180")} />
+                                    </button>
+
+                                    <div className="w-px h-6 bg-slate-200 dark:border-slate-800 mx-1" />
+
+                                    {MEAL_TYPES.map(type => {
+                                        const isActive = selectedTypes.includes(type);
+                                        return (
+                                            <button
+                                                key={type}
+                                                onClick={() => isActive
+                                                    ? setSelectedTypes(prev => prev.filter(t => t !== type))
+                                                    : setSelectedTypes(prev => [...prev, type])
+                                                }
+                                                className={cn(
+                                                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
+                                                    isActive
+                                                        ? "bg-blue-600/10 text-blue-600 border border-blue-600/20"
+                                                        : "hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-500 uppercase"
+                                                )}
+                                            >
+                                                {type}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -163,7 +243,15 @@ function KitchenContent() {
             <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
                 {activeTab === 'mixlab' && <MixLabView />}
                 {activeTab === 'mealplanner' && <MealPlannerView />}
-                {activeTab === 'browse' && <RecipesView />}
+                {activeTab === 'browse' && (
+                    <RecipesView
+                        showFavoritesOnly={showFavoritesOnly}
+                        setShowFavoritesOnly={setShowFavoritesOnly}
+                        selectedTypes={selectedTypes}
+                        setSelectedTypes={setSelectedTypes}
+                        hideControls={true}
+                    />
+                )}
             </div>
         </div>
     );

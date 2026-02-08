@@ -50,9 +50,23 @@ interface Recipe {
     diet: string[];
 }
 
-const MEAL_TYPES = ["breakfast", "lunch", "dinner", "snack"];
+export const MEAL_TYPES = ["breakfast", "lunch", "dinner", "snack"];
 
-export function RecipesView() {
+interface RecipesViewProps {
+    showFavoritesOnly?: boolean;
+    setShowFavoritesOnly?: React.Dispatch<React.SetStateAction<boolean>>;
+    selectedTypes?: string[];
+    setSelectedTypes?: React.Dispatch<React.SetStateAction<string[]>>;
+    hideControls?: boolean;
+}
+
+export function RecipesView({
+    showFavoritesOnly: externalShowFavoritesOnly,
+    setShowFavoritesOnly: externalSetShowFavoritesOnly,
+    selectedTypes: externalSelectedTypes,
+    setSelectedTypes: externalSetSelectedTypes,
+    hideControls = false
+}: RecipesViewProps) {
     const router = useRouter();
     const PAGE_SIZE = 20;
     const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -62,8 +76,14 @@ export function RecipesView() {
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const { searchQuery } = useSearch();
-    const [selectedTypes, setSelectedTypes] = useState<string[]>(MEAL_TYPES);
-    const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+    const [localSelectedTypes, setLocalSelectedTypes] = useState<string[]>(MEAL_TYPES);
+    const [localShowFavoritesOnly, setLocalShowFavoritesOnly] = useState(false);
+
+    const selectedTypes = externalSelectedTypes !== undefined ? externalSelectedTypes : localSelectedTypes;
+    const setSelectedTypes = externalSetSelectedTypes !== undefined ? externalSetSelectedTypes : setLocalSelectedTypes;
+    const showFavoritesOnly = externalShowFavoritesOnly !== undefined ? externalShowFavoritesOnly : localShowFavoritesOnly;
+    const setShowFavoritesOnly = externalSetShowFavoritesOnly !== undefined ? externalSetShowFavoritesOnly : setLocalShowFavoritesOnly;
+
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [sortField, setSortField] = useState<string>('title');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -171,83 +191,85 @@ export function RecipesView() {
     return (
         <div className="space-y-6">
             {/* Controls Row */}
-            <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
-                <div className="flex items-center gap-4">
-                    {/* Favorites Switch Toggle */}
-                    <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm shrink-0 transition-all">
-                        <Globe
-                            size={18}
-                            className={cn(
-                                "transition-all cursor-pointer",
-                                !showFavoritesOnly ? "text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" : "text-slate-300 hover:text-slate-400"
-                            )}
-                            onClick={() => setShowFavoritesOnly(false)}
-                        />
-                        <Switch
-                            id="favorites-mode"
-                            checked={showFavoritesOnly}
-                            onCheckedChange={setShowFavoritesOnly}
-                            className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-blue-600 dark:data-[state=unchecked]:bg-blue-600"
-                        />
-                        <Heart
-                            size={18}
-                            className={cn(
-                                "transition-all cursor-pointer",
-                                showFavoritesOnly ? "text-rose-500 fill-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : "text-slate-300 hover:text-slate-400"
-                            )}
-                            onClick={() => setShowFavoritesOnly(true)}
-                        />
-                    </div>
-
-                    {/* Type Filter */}
-                    <div className="relative">
-                        <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar h-14 items-center shadow-sm">
-                            <button
-                                onClick={() => setIsFilterOpen(!isFilterOpen)}
+            {!hideControls && (
+                <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
+                    <div className="flex items-center gap-4">
+                        {/* Favorites Switch Toggle */}
+                        <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm shrink-0 transition-all">
+                            <Globe
+                                size={18}
                                 className={cn(
-                                    "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300",
-                                    isFilterOpen ? "bg-blue-600 text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                    "transition-all cursor-pointer",
+                                    !showFavoritesOnly ? "text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" : "text-slate-300 hover:text-slate-400"
                                 )}
-                            >
-                                <Filter size={18} />
-                                <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter</span>
-                                <ChevronDown size={14} className={cn("transition-transform", isFilterOpen && "rotate-180")} />
-                            </button>
+                                onClick={() => setShowFavoritesOnly(false)}
+                            />
+                            <Switch
+                                id="favorites-mode"
+                                checked={showFavoritesOnly}
+                                onCheckedChange={setShowFavoritesOnly}
+                                className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-blue-600 dark:data-[state=unchecked]:bg-blue-600"
+                            />
+                            <Heart
+                                size={18}
+                                className={cn(
+                                    "transition-all cursor-pointer",
+                                    showFavoritesOnly ? "text-rose-500 fill-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : "text-slate-300 hover:text-slate-400"
+                                )}
+                                onClick={() => setShowFavoritesOnly(true)}
+                            />
+                        </div>
 
-                            <div className="w-px h-6 bg-slate-200 dark:border-slate-800 mx-1" />
+                        {/* Type Filter */}
+                        <div className="relative">
+                            <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar h-14 items-center shadow-sm">
+                                <button
+                                    onClick={() => setIsFilterOpen(!isFilterOpen)}
+                                    className={cn(
+                                        "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300",
+                                        isFilterOpen ? "bg-blue-600 text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                    )}
+                                >
+                                    <Filter size={18} />
+                                    <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter</span>
+                                    <ChevronDown size={14} className={cn("transition-transform", isFilterOpen && "rotate-180")} />
+                                </button>
 
-                            {MEAL_TYPES.map(type => {
-                                const isActive = selectedTypes.includes(type);
-                                return (
-                                    <button
-                                        key={type}
-                                        onClick={() => isActive
-                                            ? setSelectedTypes(prev => prev.filter(t => t !== type))
-                                            : setSelectedTypes(prev => [...prev, type])
-                                        }
-                                        className={cn(
-                                            "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
-                                            isActive
-                                                ? "bg-blue-600/10 text-blue-600 border border-blue-600/20"
-                                                : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
-                                        )}
-                                    >
-                                        {type}
-                                    </button>
-                                );
-                            })}
+                                <div className="w-px h-6 bg-slate-200 dark:border-slate-800 mx-1" />
+
+                                {MEAL_TYPES.map(type => {
+                                    const isActive = selectedTypes.includes(type);
+                                    return (
+                                        <button
+                                            key={type}
+                                            onClick={() => isActive
+                                                ? setSelectedTypes(prev => prev.filter(t => t !== type))
+                                                : setSelectedTypes(prev => [...prev, type])
+                                            }
+                                            className={cn(
+                                                "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
+                                                isActive
+                                                    ? "bg-blue-600/10 text-blue-600 border border-blue-600/20"
+                                                    : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
+                                            )}
+                                        >
+                                            {type}
+                                        </button>
+                                    );
+                                })}
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <Button
-                    onClick={() => router.push('/dashboard/admin/recipebuilder')}
-                    className="h-14 px-8 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest gap-2 shadow-xl shadow-blue-500/10"
-                >
-                    <Plus size={18} />
-                    Add Meal
-                </Button>
-            </div>
+                    <Button
+                        onClick={() => router.push('/dashboard/admin/recipebuilder')}
+                        className="h-14 px-8 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest gap-2 shadow-xl shadow-blue-500/10"
+                    >
+                        <Plus size={18} />
+                        Add Meal
+                    </Button>
+                </div>
+            )}
 
             {/* Content Area */}
             {loading ? (

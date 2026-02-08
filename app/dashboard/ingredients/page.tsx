@@ -14,10 +14,13 @@ import {
     UtensilsCrossed,
     Search,
     X,
-    LayoutGrid
+    LayoutGrid,
+    Globe,
+    Heart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSearch } from '@/lib/context/search-context';
+import { Switch } from '@/components/ui/switch';
 
 import { ExploreView } from './views/explore-view';
 import { StaplesView } from './views/staples-view';
@@ -36,6 +39,9 @@ function FoodsHubContent() {
     const currentTab = (searchParams.get('tab') as FoodTab) || 'groceries';
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
     const { searchQuery, setSearchQuery } = useSearch();
+
+    // Lifted Filter State
+    const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
     const setTab = (tab: FoodTab) => {
         const params = new URLSearchParams(searchParams.toString());
@@ -140,10 +146,42 @@ function FoodsHubContent() {
                     </p>
                 </div>
 
-                {/* Tab Sections */}
-                <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
-                    {renderTabGroup(ingredientTabs, "📦 Ingredients", "text-slate-500", true)}
-                    {renderTabGroup(toolsTabs, "🔬 Tools", "text-slate-500")}
+                {/* Tab Sections & Filters */}
+                <div className="flex flex-col xl:flex-row gap-6 lg:gap-8 items-start xl:items-end justify-between w-full">
+                    <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+                        {renderTabGroup(ingredientTabs, "📦 Ingredients", "text-slate-500", true)}
+                        {renderTabGroup(toolsTabs, "🔬 Tools", "text-slate-500")}
+                    </div>
+
+                    {(currentTab === 'allfoods' || currentTab === 'explore') && (
+                        <div className="flex items-center gap-4 animate-in fade-in slide-in-from-right-4 duration-500 w-full xl:w-auto overflow-x-auto no-scrollbar pb-2 xl:pb-0">
+                            {/* Favorites Switch Toggle */}
+                            <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl shrink-0 transition-all">
+                                <Globe
+                                    size={18}
+                                    className={cn(
+                                        "transition-all cursor-pointer",
+                                        !showFavoritesOnly ? "text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" : "text-slate-400 hover:text-slate-500"
+                                    )}
+                                    onClick={() => setShowFavoritesOnly(false)}
+                                />
+                                <Switch
+                                    id="favorites-mode"
+                                    checked={showFavoritesOnly}
+                                    onCheckedChange={setShowFavoritesOnly}
+                                    className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-blue-600 dark:data-[state=unchecked]:bg-blue-600"
+                                />
+                                <Heart
+                                    size={18}
+                                    className={cn(
+                                        "transition-all cursor-pointer",
+                                        showFavoritesOnly ? "text-rose-500 fill-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : "text-slate-400 hover:text-slate-500"
+                                    )}
+                                    onClick={() => setShowFavoritesOnly(true)}
+                                />
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -151,8 +189,16 @@ function FoodsHubContent() {
             <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
                 {currentTab === 'groceries' && <ShoppingListView />}
                 {currentTab === 'pantry' && <PantryView />}
-                {currentTab === 'allfoods' && <ExploreView />}
-                {currentTab === 'explore' && <ExploreView />}
+                {currentTab === 'allfoods' && <ExploreView
+                    showFavoritesOnly={showFavoritesOnly}
+                    setShowFavoritesOnly={setShowFavoritesOnly}
+                    hideControls={true}
+                />}
+                {currentTab === 'explore' && <ExploreView
+                    showFavoritesOnly={showFavoritesOnly}
+                    setShowFavoritesOnly={setShowFavoritesOnly}
+                    hideControls={true}
+                />}
                 {currentTab === 'staples' && <StaplesView />}
                 {currentTab === 'shopping' && <ShoppingView />}
                 {currentTab === 'nutrients' && <NutrientsView />}

@@ -42,11 +42,26 @@ interface FoodItem {
     is_in_pantry: boolean;
 }
 
-export function ExploreView() {
+interface ExploreViewProps {
+    showFavoritesOnly?: boolean;
+    setShowFavoritesOnly?: React.Dispatch<React.SetStateAction<boolean>>;
+    hideControls?: boolean;
+}
+
+export function ExploreView({
+    showFavoritesOnly: externalShowFavoritesOnly,
+    setShowFavoritesOnly: externalSetShowFavoritesOnly,
+    hideControls = false
+}: ExploreViewProps) {
     const router = useRouter();
     const [foods, setFoods] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
     const { searchQuery, setSearchQuery } = useSearch();
+
+    const [localShowFavoritesOnly, setLocalShowFavoritesOnly] = useState(false);
+    const showFavoritesOnly = externalShowFavoritesOnly !== undefined ? externalShowFavoritesOnly : localShowFavoritesOnly;
+    const setShowFavoritesOnly = externalSetShowFavoritesOnly !== undefined ? externalSetShowFavoritesOnly : setLocalShowFavoritesOnly;
+
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
@@ -60,13 +75,8 @@ export function ExploreView() {
     const [quickAddMode, setQuickAddMode] = useState<'pantry' | 'shopping'>('pantry');
 
     useEffect(() => {
-        const checkUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) setCurrentUserEmail(user.email || null);
-        };
-        checkUser();
         fetchFoods(1, true);
-    }, []);
+    }, [searchQuery, showFavoritesOnly]);
 
     const fetchFoods = async (pageNum: number, isNewSearch = false) => {
         setLoading(true);
@@ -75,6 +85,10 @@ export function ExploreView() {
 
             if (searchQuery) {
                 query = query.or(`name.ilike.%${searchQuery}%,common_name.ilike.%${searchQuery}%`);
+            }
+
+            if (showFavoritesOnly) {
+                query = query.eq('is_favorite', true);
             }
 
             const from = (pageNum - 1) * 20;
@@ -160,27 +174,29 @@ export function ExploreView() {
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* Search and Filters */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="relative flex-1 max-w-xl">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <Input
-                        placeholder="Search clinical database..."
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                        className="pl-12 h-14 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl"
-                    />
+            {!hideControls && (
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div className="relative flex-1 max-w-xl">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                        <Input
+                            placeholder="Search clinical database..."
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            className="pl-12 h-14 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl"
+                        />
+                    </div>
+                    <div className="flex items-center gap-3">
+                        {compareItems.length > 0 && (
+                            <Button
+                                onClick={() => router.push(`/dashboard/ingredients?tab=compare&ids=${compareItems.map(i => i.id).join(',')}`)}
+                                className="bg-blue-600 hover:bg-blue-700 text-white h-14 px-6 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl animate-in zoom-in"
+                            >
+                                <Scale size={16} className="mr-2" /> Compare ({compareItems.length})
+                            </Button>
+                        )}
+                    </div>
                 </div>
-                <div className="flex items-center gap-3">
-                    {compareItems.length > 0 && (
-                        <Button
-                            onClick={() => router.push(`/dashboard/ingredients?tab=compare&ids=${compareItems.map(i => i.id).join(',')}`)}
-                            className="bg-blue-600 hover:bg-blue-700 text-white h-14 px-6 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl animate-in zoom-in"
-                        >
-                            <Scale size={16} className="mr-2" /> Compare ({compareItems.length})
-                        </Button>
-                    )}
-                </div>
-            </div>
+            )}
 
             {/* List Header */}
             <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_200px] gap-4 px-10 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
