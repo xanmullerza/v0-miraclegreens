@@ -58,8 +58,8 @@ function KitchenContent() {
     const mealsTabs = [
         { id: 'mixlab' as TabId, label: 'Mix Lab', icon: FlaskConical, color: 'text-purple-500', bg: 'bg-purple-500/10' },
         { id: 'mealplanner' as TabId, label: 'Meal-O-Matic', icon: Bot, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-        { id: 'allmeals' as TabId, label: 'All Meals', icon: BookOpen, color: 'text-orange-500', bg: 'bg-orange-500/10' },
-        { id: 'browse' as TabId, label: 'Browse', icon: Library, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+        { id: 'allmeals' as TabId, label: 'Browse', icon: Library, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+        { id: 'browse' as TabId, label: 'All Meals', icon: BookOpen, color: 'text-orange-500', bg: 'bg-orange-500/10' },
     ];
 
     const renderTabGroup = (tabs: typeof mealsTabs, sectionLabel: string, sectionColor: string) => (
