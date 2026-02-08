@@ -86,14 +86,6 @@ export default function DashboardOverview() {
             icon: Carrot,
             color: 'text-sky-500',
             bg: 'bg-sky-500/10'
-        },
-        {
-            name: 'Meals',
-            desc: 'Discover delicious and healthy meal ideas.',
-            href: '/dashboard/recipes?tab=browse',
-            icon: UtensilsCrossed,
-            color: 'text-rose-500',
-            bg: 'bg-rose-500/10'
         }
     ];
 
