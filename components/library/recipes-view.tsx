@@ -295,7 +295,7 @@ export function RecipesView() {
                         {recipes.map((recipe) => (
                             <div
                                 key={recipe.id}
-                                onClick={() => router.push(`/dashboard/recipes/${recipe.id}`)}
+                                onClick={() => router.push(`/dashboard/meals/${recipe.id}`)}
                                 className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
                             >
                                 <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_120px] gap-4 lg:items-center lg:px-8">
@@ -337,7 +337,7 @@ export function RecipesView() {
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    router.push(`/dashboard/recipes/${recipe.id}/edit`);
+                                                    router.push(`/dashboard/meals/${recipe.id}/edit`);
                                                 }}
                                                 className="w-8 h-8 rounded-full border bg-white/90 dark:bg-slate-950/90 text-slate-400 hover:text-blue-500"
                                             >

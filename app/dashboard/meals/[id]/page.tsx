@@ -419,7 +419,7 @@ export default function RecipeDetailsPage() {
         } catch (error) {
             console.error('Error fetching recipe:', error);
             toast.error('Failed to load meal details');
-            router.push('/dashboard/recipes');
+            router.push('/dashboard/meals');
         } finally {
             setLoading(false);
         }
@@ -924,7 +924,7 @@ export default function RecipeDetailsPage() {
                         </h1>
                         {isAdmin && (
                             <button
-                                onClick={() => router.push(`/dashboard/recipes/${id}/edit`)}
+                                onClick={() => router.push(`/dashboard/meals/${id}/edit`)}
                                 className="p-2 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 text-slate-400 hover:text-emerald-500 transition-all hover:scale-110 active:scale-95 group mt-1"
                                 title="Edit Meal"
                             >

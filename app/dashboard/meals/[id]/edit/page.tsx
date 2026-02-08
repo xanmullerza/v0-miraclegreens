@@ -551,7 +551,7 @@ export default function EditRecipePage() {
             if (instructionsError) throw instructionsError;
 
             toast.success('Recipe updated successfully!');
-            router.push(`/dashboard/recipes/${recipeId}`);
+            router.push(`/dashboard/meals/${recipeId}`);
         } catch (error: any) {
             console.error('Error updating recipe:', error);
             toast.error(`Failed: ${error.message}`);
