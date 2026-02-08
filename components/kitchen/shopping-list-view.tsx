@@ -268,6 +268,28 @@ export function ShoppingListView() {
         }
     };
 
+    const aggregateQuantities = (existing: string, added: string): string => {
+        if (!existing) return added;
+        if (!added) return existing;
+
+        const parse = (s: string) => {
+            const match = s.trim().match(/^(\d+(?:\.\d+)?)\s*(.*)$/);
+            if (!match) return null;
+            return { num: parseFloat(match[1]), unit: match[2].trim() };
+        };
+
+        const e = parse(existing);
+        const a = parse(added);
+
+        if (e && a && e.unit === a.unit) {
+            const sum = e.num + a.num;
+            return e.unit ? `${sum} ${e.unit}` : `${sum}`;
+        }
+
+        // If units mismatch or parsing fails, combine with +
+        return `${existing} + ${added}`;
+    };
+
     const handleMatchConfirm = async (foodItemId: string | null, name: string, quantity: string) => {
         if (!selectedMatchItem) return;
 
@@ -281,25 +303,55 @@ export function ShoppingListView() {
             const effectiveFoodId = foodItemId || selectedMatchItem.food_item_id || null;
             const effectiveScannedId = (!foodItemId && scannedIdToLink) ? scannedIdToLink : null;
 
-            const { error } = await supabase.from('pantry_items').insert({
-                user_id: user.id,
-                name: name,
-                quantity: quantity,
-                food_item_id: effectiveFoodId,
-                scanned_product_id: effectiveScannedId
-            });
+            // Aggregation check: look for an existing item with the same identifier
+            let existingItem = null;
+            if (effectiveFoodId) {
+                const { data } = await supabase
+                    .from('pantry_items')
+                    .select('id, quantity')
+                    .eq('user_id', user.id)
+                    .eq('food_item_id', effectiveFoodId)
+                    .maybeSingle();
+                existingItem = data;
+            } else if (effectiveScannedId) {
+                const { data } = await supabase
+                    .from('pantry_items')
+                    .select('id, quantity')
+                    .eq('user_id', user.id)
+                    .eq('scanned_product_id', effectiveScannedId)
+                    .maybeSingle();
+                existingItem = data;
+            }
 
-            if (error) throw error;
+            if (existingItem) {
+                // Update existing item
+                const newQuantity = aggregateQuantities(existingItem.quantity, quantity);
+                const { error } = await supabase
+                    .from('pantry_items')
+                    .update({ quantity: newQuantity })
+                    .eq('id', existingItem.id);
+                if (error) throw error;
+            } else {
+                // Insert new row
+                const { error } = await supabase.from('pantry_items').insert({
+                    user_id: user.id,
+                    name: name,
+                    quantity: quantity,
+                    food_item_id: effectiveFoodId,
+                    scanned_product_id: effectiveScannedId
+                });
+                if (error) throw error;
+            }
 
             removeItem(selectedMatchItem.id);
             setMatchDialogOpen(false);
             setSelectedMatchItem(null);
             setScannedIdToLink(null);
-            toast.success(`"${name}" moved to your pantry`);
+            toast.success(`"${name}" updated in your pantry`);
 
         } catch (error) {
             console.error('Error linking to pantry:', error);
-            toast.error('Failed to move item to pantry');
+            toast.error('Failed to update pantry');
         }
     };
 
