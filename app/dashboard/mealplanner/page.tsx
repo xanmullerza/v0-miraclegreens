@@ -298,7 +298,9 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, pantryIt
     );
 };
 
-export default function MealPlannerPage() {
+
+// Named export for use in other components (like Kitchen tabs)
+export function MealPlannerContent() {
     const router = useRouter();
     const [step, setStep] = useState<1 | 2 | 3>(1);
     const [generating, setGenerating] = useState(false);
@@ -1272,4 +1274,9 @@ export default function MealPlannerPage() {
 
         </div >
     );
+}
+
+// Default export for Next.js page routing
+export default function MealPlannerPage() {
+    return <MealPlannerContent />;
 }
