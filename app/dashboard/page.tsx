@@ -8,7 +8,9 @@ import {
     ChefHat,
     Library,
     User,
-    ArrowRight
+    ArrowRight,
+    Carrot,
+    UtensilsCrossed
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -76,6 +78,22 @@ export default function DashboardOverview() {
             icon: Library,
             color: 'text-emerald-500',
             bg: 'bg-emerald-500/10'
+        },
+        {
+            name: 'Ingredients',
+            desc: 'Browse and explore nutritious food items.',
+            href: '/dashboard/ingredients',
+            icon: Carrot,
+            color: 'text-sky-500',
+            bg: 'bg-sky-500/10'
+        },
+        {
+            name: 'Recipes',
+            desc: 'Discover delicious and healthy meal ideas.',
+            href: '/dashboard/recipes',
+            icon: UtensilsCrossed,
+            color: 'text-rose-500',
+            bg: 'bg-rose-500/10'
         }
     ];
 
