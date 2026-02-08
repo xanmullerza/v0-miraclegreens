@@ -35,7 +35,8 @@ import {
     ChefHat,
     Globe,
     Beaker,
-    ShoppingBasket
+    ShoppingBasket,
+    ShoppingCart
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -106,6 +107,11 @@ function FoodsContent() {
     const [isCompareOpen, setIsCompareOpen] = useState(false);
     const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+
+    // Quick-add state
+    const [quickAddItem, setQuickAddItem] = useState<FoodItem | null>(null);
+    const [quickAddQty, setQuickAddQty] = useState('1');
+    const [quickAddMode, setQuickAddMode] = useState<'pantry' | 'shopping'>('pantry');
 
     // Default RDA for comparison context
     const userRDAs = useRDA(30, 'female', 2000);
@@ -384,6 +390,118 @@ function FoodsContent() {
         } else {
             toast.error("Maximum 3 foods for comparison.");
         }
+    };
+
+    const addToPantry = async (food: FoodItem) => {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                toast.error('You must be logged in to manage your pantry');
+                return;
+            }
+
+            // Check if already in pantry_items
+            const { data: existing } = await supabase
+                .from('pantry_items')
+                .select('id, quantity')
+                .eq('user_id', user.id)
+                .eq('food_item_id', food.id)
+                .limit(1)
+                .single();
+
+            if (existing) {
+                // Aggregate
+                const parseQty = (s: string) => {
+                    const match = s.trim().match(/^(\d+(?:\.\d+)?)\s*(.*)$/);
+                    return match ? { num: parseFloat(match[1]), unit: match[2].trim() } : null;
+                };
+                const oldQty = parseQty(existing.quantity || '0');
+                const newQty = parseQty(quickAddQty);
+
+                let finalQty = quickAddQty;
+                if (oldQty && newQty && oldQty.unit === newQty.unit) {
+                    const sum = oldQty.num + newQty.num;
+                    finalQty = oldQty.unit ? `${sum} ${oldQty.unit}` : `${sum}`;
+                } else if (existing.quantity) {
+                    finalQty = `${existing.quantity} + ${quickAddQty}`;
+                }
+
+                await supabase
+                    .from('pantry_items')
+                    .update({ quantity: finalQty })
+                    .eq('id', existing.id);
+            } else {
+                await supabase.from('pantry_items').insert({
+                    user_id: user.id,
+                    name: food.common_name || food.name,
+                    quantity: quickAddQty,
+                    food_item_id: food.id
+                });
+            }
+
+            toast.success(`Added ${quickAddQty}× "${food.common_name || food.name}" to pantry`);
+            setQuickAddItem(null);
+            setQuickAddQty('1');
+
+            // Re-fetch to update is_in_pantry icons
+            fetchFoods(page, true);
+        } catch (error) {
+            console.error('Error adding to pantry:', error);
+            toast.error('Failed to add to pantry');
+        }
+    };
+
+    const addToShoppingList = (food: FoodItem) => {
+        const saved = localStorage.getItem('vitala_shopping_manual_items');
+        let manualItems: any[] = [];
+        try {
+            manualItems = saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            console.error('Failed to parse shopping list', e);
+        }
+
+        const itemName = food.common_name || food.name;
+
+        // Check for existing
+        const existingIndex = manualItems.findIndex(item =>
+            item.food_item_id === food.id ||
+            item.name.toLowerCase() === itemName.toLowerCase()
+        );
+
+        if (existingIndex >= 0) {
+            const existing = manualItems[existingIndex];
+            const parseQty = (s: string) => {
+                const match = s.trim().match(/^(\d+(?:\.\d+)?)\s*(.*)$/);
+                return match ? { num: parseFloat(match[1]), unit: match[2].trim() } : null;
+            };
+
+            const oldQty = parseQty(existing.quantity);
+            const newQty = parseQty(quickAddQty);
+
+            if (oldQty && newQty && oldQty.unit === newQty.unit) {
+                const sum = oldQty.num + newQty.num;
+                manualItems[existingIndex].quantity = oldQty.unit ? `${sum} ${oldQty.unit}` : `${sum}`;
+            } else {
+                manualItems[existingIndex].quantity = `${existing.quantity} + ${quickAddQty}`;
+            }
+
+            toast.success(`Updated "${itemName}" quantity in shopping list`);
+        } else {
+            manualItems.push({
+                id: `manual-${Date.now()}`,
+                name: itemName,
+                quantity: quickAddQty,
+                unit: '',
+                checked: false,
+                source: 'manual',
+                food_item_id: food.id
+            });
+            toast.success(`Added ${quickAddQty}× "${itemName}" to shopping list`);
+        }
+
+        localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(manualItems));
+        setQuickAddItem(null);
+        setQuickAddQty('1');
     };
 
     const getVal = (item: FoodItem, key: string) => {
@@ -828,12 +946,17 @@ function FoodsContent() {
                                                     >
                                                         <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_80px] gap-4 lg:items-center lg:px-8">
                                                             {/* Thumbnail */}
-                                                            <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
+                                                            <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover/item:scale-105 transition-transform duration-500">
                                                                 {food.image ? (
-                                                                    <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                                    <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
                                                                 ) : (
                                                                     <div className="w-full h-full flex items-center justify-center text-slate-300">
                                                                         <Beef size={24} className="opacity-20" />
+                                                                    </div>
+                                                                )}
+                                                                {food.is_in_pantry && (
+                                                                    <div className="absolute top-1 right-1 bg-emerald-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-md uppercase">
+                                                                        In Pantry
                                                                     </div>
                                                                 )}
                                                             </div>
@@ -880,67 +1003,142 @@ function FoodsContent() {
                                                                 ))}
                                                             </div>
 
-                                                            {/* Action */}
-                                                            <div className="p-3 lg:p-0 flex justify-end lg:justify-center gap-2">
-                                                                <button
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        router.push(`/dashboard/spice-converter?foodId=${food.id}`);
-                                                                    }}
-                                                                    className="w-8 h-8 rounded-full flex items-center justify-center transition-all border bg-slate-50 dark:bg-slate-800 text-indigo-500 hover:text-indigo-600 border-slate-100 dark:border-slate-700"
-                                                                    title="Spice Lab"
-                                                                >
-                                                                    <Beaker size={14} />
-                                                                </button>
-                                                                {currentUserEmail === 'morne@miraclegreens.co.za' && (
-                                                                    <>
-                                                                        <button
+                                                            {/* Actions */}
+                                                            <div className="p-3 lg:p-0 flex justify-end relative">
+                                                                <div className="flex gap-2 items-center">
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            setQuickAddItem(quickAddItem?.id === food.id ? null : food);
+                                                                            setQuickAddQty('1');
+                                                                            setQuickAddMode('pantry');
+                                                                        }}
+                                                                        className={cn(
+                                                                            "h-9 w-9 rounded-xl transition-colors",
+                                                                            quickAddItem?.id === food.id
+                                                                                ? "text-emerald-500 bg-emerald-50 dark:bg-emerald-500/10"
+                                                                                : "text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10"
+                                                                        )}
+                                                                        title="Add to Pantry/Shopping List"
+                                                                    >
+                                                                        <Plus size={16} />
+                                                                    </Button>
+
+                                                                    {/* Spice Lab */}
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            router.push(`/dashboard/spice-converter?foodId=${food.id}`);
+                                                                        }}
+                                                                        className="h-9 w-9 rounded-xl text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-colors"
+                                                                        title="Spice Lab"
+                                                                    >
+                                                                        <Beaker size={16} />
+                                                                    </Button>
+
+                                                                    {currentUserEmail === 'morne@miraclegreens.co.za' && (
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="icon"
                                                                             onClick={(e) => {
                                                                                 e.stopPropagation();
                                                                                 handleEditStart(food);
                                                                             }}
-                                                                            className="w-8 h-8 rounded-full flex items-center justify-center transition-all border bg-slate-50 dark:bg-slate-800 text-amber-500 hover:text-amber-600 border-slate-100 dark:border-slate-700"
+                                                                            className="h-9 w-9 rounded-xl text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-colors"
                                                                             title="Edit Ingredient"
                                                                         >
-                                                                            <Edit2 size={14} />
-                                                                        </button>
-                                                                        <button
+                                                                            <Edit2 size={16} />
+                                                                        </Button>
+                                                                    )}
+
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            addToCompare(food);
+                                                                        }}
+                                                                        className={cn(
+                                                                            "h-9 w-9 rounded-xl transition-all",
+                                                                            compareItems.some(i => i.id === food.id)
+                                                                                ? "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30"
+                                                                                : "text-slate-400 hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                                                        )}
+                                                                        title="Compare"
+                                                                    >
+                                                                        <Scale size={16} />
+                                                                    </Button>
+
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            toggleFavorite(food, e);
+                                                                        }}
+                                                                        className={cn(
+                                                                            "h-9 w-9 rounded-xl transition-all",
+                                                                            food.is_favorite
+                                                                                ? "text-rose-500 bg-rose-50 dark:bg-rose-950/30"
+                                                                                : "text-slate-400 hover:text-rose-500 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                                                        )}
+                                                                        title={food.is_favorite ? "Remove from My Ingredients" : "Add to My Ingredients"}
+                                                                    >
+                                                                        <Heart size={16} className={cn(food.is_favorite && "fill-rose-500")} />
+                                                                    </Button>
+
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            router.push(`/dashboard/foods/${food.id}`);
+                                                                        }}
+                                                                        className="h-9 w-9 rounded-xl text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
+                                                                        title="View Details"
+                                                                    >
+                                                                        <ArrowRight size={16} />
+                                                                    </Button>
+                                                                </div>
+
+                                                                {/* Quick Add Slide-out */}
+                                                                {quickAddItem?.id === food.id && (
+                                                                    <div className="absolute top-0 right-32 lg:right-40 flex items-center gap-2 bg-white dark:bg-slate-800 p-2 rounded-xl shadow-lg border border-emerald-200 dark:border-emerald-700 z-20 animate-in slide-in-from-right-2 duration-200" onClick={(e) => e.stopPropagation()}>
+                                                                        <Input
+                                                                            value={quickAddQty}
+                                                                            onChange={(e) => setQuickAddQty(e.target.value)}
+                                                                            placeholder="Qty"
+                                                                            className="w-16 h-9 text-center text-sm rounded-lg border-emerald-200 dark:border-emerald-700"
+                                                                            autoFocus
+                                                                        />
+                                                                        <Button
+                                                                            size="icon"
                                                                             onClick={(e) => {
                                                                                 e.stopPropagation();
-                                                                                addToCompare(food);
+                                                                                addToPantry(food);
                                                                             }}
-                                                                            className={cn(
-                                                                                "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
-                                                                                compareItems.some(i => i.id === food.id)
-                                                                                    ? "bg-emerald-500 text-white border-emerald-600 shadow-md shadow-emerald-500/20"
-                                                                                    : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 border-slate-100 dark:border-slate-700"
-                                                                            )}
-                                                                            title="Compare Ingredients"
+                                                                            className="h-9 w-9 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white"
+                                                                            title="Add to Pantry"
                                                                         >
-                                                                            <Scale size={14} />
-                                                                        </button>
-                                                                    </>
+                                                                            <ShoppingBasket size={14} />
+                                                                        </Button>
+                                                                        <Button
+                                                                            size="icon"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                addToShoppingList(food);
+                                                                            }}
+                                                                            className="h-9 w-9 rounded-lg bg-rose-500 hover:bg-rose-600 text-white"
+                                                                            title="Add to Shopping List"
+                                                                        >
+                                                                            <ShoppingCart size={14} />
+                                                                        </Button>
+                                                                    </div>
                                                                 )}
-                                                                <button
-                                                                    onClick={(e) => togglePantry(food, e)}
-                                                                    className={cn(
-                                                                        "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
-                                                                        food.is_in_pantry ? "bg-amber-500 text-white border-amber-600 shadow-md shadow-amber-500/20" : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-amber-600 border-slate-100 dark:border-slate-700"
-                                                                    )}
-                                                                    title={food.is_in_pantry ? "In Pantry" : "Add to Pantry"}
-                                                                >
-                                                                    <ShoppingBasket size={14} />
-                                                                </button>
-                                                                <button
-                                                                    onClick={(e) => toggleFavorite(food, e)}
-                                                                    className={cn(
-                                                                        "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
-                                                                        food.is_favorite ? "bg-rose-500 text-white border-rose-600 shadow-md shadow-rose-500/20" : "bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 border-slate-100 dark:border-slate-700"
-                                                                    )}
-                                                                    title={food.is_favorite ? "Remove from My Ingredients" : "Add to My Ingredients"}
-                                                                >
-                                                                    <Heart size={14} fill={food.is_favorite ? "currentColor" : "none"} />
-                                                                </button>
                                                             </div>
                                                         </div>
                                                     </div>
