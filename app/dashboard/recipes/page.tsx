@@ -167,7 +167,7 @@ function KitchenContent() {
                 <div className="flex flex-col xl:flex-row gap-6 lg:gap-8 items-start xl:items-end justify-between w-full">
                     {renderTabGroup(mealsTabs, "🍽️ Meals & Recipes", "text-slate-500", true)}
 
-                    {activeTab === 'browse' && (
+                    {['browse', 'mealplanner'].includes(activeTab) && (
                         <div className="flex items-center gap-4 animate-in fade-in slide-in-from-right-4 duration-500 w-full xl:w-auto overflow-x-auto no-scrollbar pb-2 xl:pb-0">
                             {/* Favorites Switch Toggle */}
                             <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl shrink-0 transition-all">
@@ -242,7 +242,17 @@ function KitchenContent() {
             {/* Dynamic Content Area */}
             <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
                 {activeTab === 'mixlab' && <MixLabView />}
-                {activeTab === 'mealplanner' && <MealPlannerView />}
+                {activeTab === 'mealplanner' && (
+                    <MealPlannerView
+                        showFavoritesOnly={showFavoritesOnly}
+                        setShowFavoritesOnly={setShowFavoritesOnly}
+                        selectedTypes={selectedTypes}
+                        setSelectedTypes={setSelectedTypes}
+                        hideControls={true}
+                        isFilterOpen={isFilterOpen}
+                        setIsFilterOpen={setIsFilterOpen}
+                    />
+                )}
                 {activeTab === 'browse' && (
                     <RecipesView
                         showFavoritesOnly={showFavoritesOnly}

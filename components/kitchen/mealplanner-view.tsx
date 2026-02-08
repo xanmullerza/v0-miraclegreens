@@ -6,6 +6,16 @@
 
 import { MealPlannerContent } from '@/app/dashboard/mealplanner/page';
 
-export function MealPlannerView() {
-    return <MealPlannerContent />;
+interface MealPlannerViewProps {
+    showFavoritesOnly?: boolean;
+    setShowFavoritesOnly?: React.Dispatch<React.SetStateAction<boolean>>;
+    selectedTypes?: string[];
+    setSelectedTypes?: React.Dispatch<React.SetStateAction<string[]>>;
+    hideControls?: boolean;
+    isFilterOpen?: boolean;
+    setIsFilterOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export function MealPlannerView(props: MealPlannerViewProps) {
+    return <MealPlannerContent {...props} />;
 }

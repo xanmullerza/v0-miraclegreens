@@ -8,6 +8,7 @@ interface PlanSettings {
     numMeals: number; // 3 or 4 or 5 (3 meals + 0/1/2 snacks)
     favoritesOnly?: boolean;
     pantryItems?: any[];
+    searchQuery?: string;
 }
 
 export interface DailyPlan {
@@ -71,7 +72,8 @@ export const getRandomRecipeByType = async (
     mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack',
     diet: DietType,
     excludeId?: string,
-    favoritesOnly?: boolean
+    favoritesOnly?: boolean,
+    searchQuery?: string
 ): Promise<{ recipe: Recipe; micronutrients: Record<string, number> } | null> => {
     let query = supabase
         .from('recipes')
@@ -87,6 +89,10 @@ export const getRandomRecipeByType = async (
 
     if (favoritesOnly) {
         query = query.eq('is_favorite', true);
+    }
+
+    if (searchQuery) {
+        query = query.ilike('title', `%${searchQuery}%`);
     }
 
     const { data: recipesData, error } = await query;
@@ -164,6 +170,10 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
 
     if (favoritesOnly) {
         query = query.eq('is_favorite', true);
+    }
+
+    if (settings.searchQuery) {
+        query = query.ilike('title', `%${settings.searchQuery}%`);
     }
 
     const { data: recipesData, error } = await query;
