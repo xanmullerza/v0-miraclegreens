@@ -372,6 +372,9 @@ export function ShoppingListView() {
             setScannedIdToLink(null);
             toast.success(`"${name}" updated in your pantry`);
 
+            // Refresh pantry data so meal plan items that are now in pantry get filtered out
+            fetchData();
+
         } catch (error) {
             console.error('Error linking to pantry:', error);
             toast.error('Failed to update pantry');

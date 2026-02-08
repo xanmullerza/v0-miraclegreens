@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase';
 import {
     Plus,
     ShoppingBasket,
+    ShoppingCart,
     Loader2,
     Search,
     Trash2,
@@ -19,7 +20,8 @@ import {
     ArrowRight,
     Camera,
     Info,
-    Sparkles
+    Sparkles,
+    Check
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -51,6 +53,10 @@ export function PantryView() {
     const [searchQuery, setSearchQuery] = useState('');
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
     const { dailyPlan, updateDailyPlan } = useUserPreferences();
+
+    // Shopping list quick-add state
+    const [buyMoreItem, setBuyMoreItem] = useState<FoodItem | null>(null);
+    const [buyMoreQty, setBuyMoreQty] = useState('1');
 
     useEffect(() => {
         fetchPantry();
@@ -146,6 +152,35 @@ export function PantryView() {
             console.error('Error removing from pantry:', error);
             toast.error("Failed to remove item.");
         }
+    };
+
+    const addToShoppingList = (food: FoodItem) => {
+        // Get existing manual items from localStorage
+        const saved = localStorage.getItem('vitala_shopping_manual_items');
+        let manualItems = [];
+        try {
+            manualItems = saved ? JSON.parse(saved) : [];
+        } catch (e) {
+            console.error('Failed to parse shopping list', e);
+        }
+
+        // Add new item
+        const newItem = {
+            id: `manual-${Date.now()}`,
+            name: food.common_name || food.name,
+            quantity: buyMoreQty,
+            unit: '',
+            checked: false,
+            source: 'manual',
+            food_item_id: food.source_table === 'food_items' ? food.id : undefined
+        };
+
+        manualItems.push(newItem);
+        localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(manualItems));
+
+        toast.success(`Added ${buyMoreQty}× "${food.common_name || food.name}" to shopping list`);
+        setBuyMoreItem(null);
+        setBuyMoreQty('1');
     };
 
     const filteredFoods = foods.filter(food =>
@@ -354,6 +389,23 @@ export function PantryView() {
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setBuyMoreItem(buyMoreItem?.id === food.id ? null : food);
+                                                                    setBuyMoreQty('1');
+                                                                }}
+                                                                className={cn(
+                                                                    "h-9 w-9 rounded-xl transition-colors",
+                                                                    buyMoreItem?.id === food.id
+                                                                        ? "text-amber-500 bg-amber-50 dark:bg-amber-500/10"
+                                                                        : "text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-500/10"
+                                                                )}
+                                                            >
+                                                                <ShoppingCart size={16} />
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
                                                                 onClick={() => removeFromPantry(food.id, food.name, food.source_table)}
                                                                 className="h-9 w-9 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
                                                             >
@@ -368,6 +420,31 @@ export function PantryView() {
                                                                 <ArrowRight size={16} />
                                                             </Button>
                                                         </div>
+
+                                                        {/* Buy More Slide-out */}
+                                                        {buyMoreItem?.id === food.id && (
+                                                            <div className="absolute top-0 right-28 lg:right-32 flex items-center gap-2 bg-white dark:bg-slate-800 p-2 rounded-xl shadow-lg border border-amber-200 dark:border-amber-700 z-20 animate-in slide-in-from-right-2 duration-200">
+                                                                <Input
+                                                                    value={buyMoreQty}
+                                                                    onChange={(e) => setBuyMoreQty(e.target.value)}
+                                                                    placeholder="Qty"
+                                                                    className="w-20 h-9 text-center text-sm rounded-lg border-amber-200 dark:border-amber-700"
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                    onKeyDown={(e) => e.key === 'Enter' && addToShoppingList(food)}
+                                                                    autoFocus
+                                                                />
+                                                                <Button
+                                                                    size="icon"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        addToShoppingList(food);
+                                                                    }}
+                                                                    className="h-9 w-9 rounded-lg bg-amber-500 hover:bg-amber-600 text-white"
+                                                                >
+                                                                    <Check size={16} />
+                                                                </Button>
+                                                            </div>
+                                                        )}
                                                     </div>
 
                                                     {/* Mobile Stats Row */}
