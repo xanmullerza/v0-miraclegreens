@@ -47,7 +47,6 @@ function FoodsHubContent() {
     // Second row: Tools section
     const toolsTabs = [
         { id: 'compare', label: 'Compare', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-        { id: 'lab', label: 'Lab', icon: Beaker, color: 'text-violet-500', bg: 'bg-violet-500/10' },
     ];
 
     const renderTabGroup = (tabs: typeof ingredientTabs, sectionLabel: string, sectionColor: string) => (
@@ -110,7 +109,6 @@ function FoodsHubContent() {
                 {currentTab === 'shopping' && <ShoppingView />}
                 {currentTab === 'nutrients' && <NutrientsView />}
                 {currentTab === 'compare' && <CompareView />}
-                {currentTab === 'lab' && <LabView />}
             </div>
         </div>
     );
