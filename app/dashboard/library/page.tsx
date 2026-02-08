@@ -43,6 +43,8 @@ function LibraryContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState<'foods' | 'recipes' | 'nutrients'>('nutrients');
+    const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+    const { searchQuery, setSearchQuery } = useSearch();
 
     // Sync tab with URL if needed
     useEffect(() => {
@@ -65,43 +67,74 @@ function LibraryContent() {
         { id: 'recipes', label: 'Meals', icon: ChefHat, color: 'text-blue-500', bg: 'bg-blue-600/10' },
     ];
 
-    const { searchQuery, setSearchQuery } = useSearch();
-
     const renderTabGroup = (tabsList: typeof tabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
         <div className="space-y-3">
             <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>
-            <div className="flex p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-x-auto">
-                {showHomeButton && (
-                    <button
-                        onClick={() => router.push('/dashboard')}
-                        className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all mr-2 flex-shrink-0"
-                        title="Back to Dashboard"
-                    >
-                        <LayoutGrid size={18} />
-                    </button>
-                )}
-                {tabsList.map((tab) => {
-                    const Icon = tab.icon;
-                    const isActive = activeTab === tab.id;
-                    return (
+            <div className="flex p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500">
+                <div className="flex items-center">
+                    {showHomeButton && (
                         <button
-                            key={tab.id}
-                            onClick={() => handleTabChange(tab.id as any)}
-                            className={cn(
-                                "flex items-center gap-3 px-5 py-3.5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
-                                isActive
-                                    ? "bg-slate-900 dark:bg-slate-800 text-white shadow-xl translate-y-[-2px]"
-                                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
-                            )}
+                            onClick={() => router.push('/dashboard')}
+                            className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all mr-2 flex-shrink-0"
+                            title="Back to Dashboard"
                         >
-                            <Icon size={15} className={cn(
-                                "transition-transform duration-500 group-hover:scale-110",
-                                isActive ? tab.color : "text-slate-400"
-                            )} />
-                            {tab.label}
+                            <LayoutGrid size={18} />
                         </button>
-                    );
-                })}
+                    )}
+                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                        {tabsList.map((tab) => {
+                            const Icon = tab.icon;
+                            const isActive = activeTab === tab.id;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => handleTabChange(tab.id as any)}
+                                    className={cn(
+                                        "flex items-center gap-3 py-3.5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
+                                        isActive
+                                            ? "bg-slate-900 dark:bg-slate-800 text-white shadow-xl translate-y-[-2px]"
+                                            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50",
+                                        isSearchExpanded ? "px-4" : "px-5"
+                                    )}
+                                >
+                                    <Icon size={15} className={cn(
+                                        "transition-transform duration-500 group-hover:scale-110",
+                                        isActive ? tab.color : "text-slate-400"
+                                    )} />
+                                    {!isSearchExpanded && tab.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <div className="flex-1 flex items-center justify-end pl-2">
+                    <div className={cn(
+                        "flex items-center transition-all duration-500 overflow-hidden",
+                        isSearchExpanded ? "flex-1 opacity-100" : "w-0 opacity-0"
+                    )}>
+                        <input
+                            type="text"
+                            autoFocus
+                            placeholder={`Search ${activeTab}...`}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full bg-slate-50 dark:bg-slate-800/50 border-none focus:ring-0 text-[10px] font-black uppercase tracking-widest h-12 rounded-[1.5rem] px-6 text-slate-900 dark:text-white"
+                        />
+                    </div>
+                    <button
+                        onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+                        className={cn(
+                            "flex items-center justify-center w-12 h-12 rounded-[1.5rem] transition-all flex-shrink-0",
+                            isSearchExpanded
+                                ? "bg-rose-50 text-rose-500 hover:bg-rose-100"
+                                : "text-slate-400 hover:text-emerald-500 hover:bg-emerald-50"
+                        )}
+                        title="Search"
+                    >
+                        {isSearchExpanded ? <X size={18} /> : <Search size={18} />}
+                    </button>
+                </div>
             </div>
         </div>
     );
@@ -128,27 +161,7 @@ function LibraryContent() {
                 </div>
             </div>
 
-            {/* Unified Search Bar */}
-            <div className="relative group max-w-4xl mx-auto w-full">
-                <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
-                    <Search className="text-slate-400 group-focus-within:text-emerald-500 transition-colors" size={20} />
-                </div>
-                <Input
-                    type="text"
-                    placeholder={`Search ${activeTab}...`}
-                    className="w-full h-16 pl-14 pr-10 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-3xl shadow-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all text-sm font-bold uppercase tracking-widest"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                {searchQuery && (
-                    <button
-                        onClick={() => setSearchQuery('')}
-                        className="absolute inset-y-0 right-6 flex items-center text-slate-400 hover:text-rose-500 transition-colors"
-                    >
-                        <X size={18} />
-                    </button>
-                )}
-            </div>
+
 
             {/* Dynamic Content Area */}
             <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">

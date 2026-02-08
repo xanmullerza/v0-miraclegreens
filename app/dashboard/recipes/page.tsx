@@ -8,9 +8,12 @@ import {
     FlaskConical,
     Bot,
     BookOpen,
+    Search,
+    X,
     LayoutGrid
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useSearch } from '@/lib/context/search-context';
 
 import { MealPlannerView } from '@/components/kitchen/mealplanner-view';
 import { MixLabView } from '@/components/kitchen/mix-lab-view';
@@ -35,6 +38,8 @@ function KitchenContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState<TabId>('mixlab');
+    const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+    const { searchQuery, setSearchQuery } = useSearch();
 
     const allTabs: TabId[] = ['mixlab', 'mealplanner', 'browse'];
 
@@ -60,41 +65,74 @@ function KitchenContent() {
         { id: 'browse' as TabId, label: 'All Meals', icon: BookOpen, color: 'text-orange-500', bg: 'bg-orange-500/10' },
     ];
 
-    const renderTabGroup = (tabs: typeof mealsTabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
+    const renderTabGroup = (tabsList: typeof mealsTabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
         <div className="space-y-3">
             <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>
-            <div className="flex p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-x-auto">
-                {showHomeButton && (
-                    <button
-                        onClick={() => router.push('/dashboard')}
-                        className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/10 transition-all mr-2 flex-shrink-0"
-                        title="Back to Dashboard"
-                    >
-                        <LayoutGrid size={18} />
-                    </button>
-                )}
-                {tabs.map((tab) => {
-                    const Icon = tab.icon;
-                    const isActive = activeTab === tab.id;
-                    return (
+            <div className="flex p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500">
+                <div className="flex items-center">
+                    {showHomeButton && (
                         <button
-                            key={tab.id}
-                            onClick={() => handleTabChange(tab.id)}
-                            className={cn(
-                                "flex items-center gap-3 px-5 py-3.5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
-                                isActive
-                                    ? "bg-slate-900 dark:bg-slate-800 text-white shadow-xl translate-y-[-2px]"
-                                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
-                            )}
+                            onClick={() => router.push('/dashboard')}
+                            className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/10 transition-all mr-2 flex-shrink-0"
+                            title="Back to Dashboard"
                         >
-                            <Icon size={15} className={cn(
-                                "transition-transform duration-500 group-hover:scale-110",
-                                isActive ? tab.color : "text-slate-400"
-                            )} />
-                            {tab.label}
+                            <LayoutGrid size={18} />
                         </button>
-                    );
-                })}
+                    )}
+                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                        {tabsList.map((tab) => {
+                            const Icon = tab.icon;
+                            const isActive = activeTab === tab.id;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => handleTabChange(tab.id)}
+                                    className={cn(
+                                        "flex items-center gap-3 py-3.5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
+                                        isActive
+                                            ? "bg-slate-900 dark:bg-slate-800 text-white shadow-xl translate-y-[-2px]"
+                                            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50",
+                                        isSearchExpanded ? "px-4" : "px-5"
+                                    )}
+                                >
+                                    <Icon size={15} className={cn(
+                                        "transition-transform duration-500 group-hover:scale-110",
+                                        isActive ? tab.color : "text-slate-400"
+                                    )} />
+                                    {!isSearchExpanded && tab.label}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <div className="flex-1 flex items-center justify-end pl-2">
+                    <div className={cn(
+                        "flex items-center transition-all duration-500 overflow-hidden",
+                        isSearchExpanded ? "flex-1 opacity-100" : "w-0 opacity-0"
+                    )}>
+                        <input
+                            type="text"
+                            autoFocus
+                            placeholder={`Search ${activeTab}...`}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full bg-slate-50 dark:bg-slate-800/50 border-none focus:ring-0 text-[10px] font-black uppercase tracking-widest h-12 rounded-[1.5rem] px-6 text-slate-900 dark:text-white"
+                        />
+                    </div>
+                    <button
+                        onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+                        className={cn(
+                            "flex items-center justify-center w-12 h-12 rounded-[1.5rem] transition-all flex-shrink-0",
+                            isSearchExpanded
+                                ? "bg-rose-50 text-rose-500 hover:bg-rose-100"
+                                : "text-slate-400 hover:text-amber-500 hover:bg-amber-50"
+                        )}
+                        title="Search"
+                    >
+                        {isSearchExpanded ? <X size={18} /> : <Search size={18} />}
+                    </button>
+                </div>
             </div>
         </div>
     );

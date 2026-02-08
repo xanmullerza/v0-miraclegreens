@@ -27,6 +27,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
+import { useSearch } from '@/lib/context/search-context';
 
 interface FoodItem {
     id: string;
@@ -45,7 +46,7 @@ export function ExploreView() {
     const router = useRouter();
     const [foods, setFoods] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
+    const { searchQuery, setSearchQuery } = useSearch();
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
@@ -100,7 +101,6 @@ export function ExploreView() {
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
-        // Debounce search
     };
 
     useEffect(() => {
