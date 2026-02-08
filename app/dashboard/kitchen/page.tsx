@@ -21,7 +21,6 @@ import { Input } from '@/components/ui/input';
 import { ShoppingListView } from '@/components/kitchen/shopping-list-view';
 import { PantryView } from '@/components/kitchen/pantry-view';
 import { MealPlannerView } from '@/components/kitchen/mealplanner-view';
-import { AllFoodsView } from '@/components/kitchen/all-foods-view';
 import { MixLabView } from '@/components/kitchen/mix-lab-view';
 import { AllMealsView } from '@/components/kitchen/all-meals-view';
 
@@ -56,6 +55,10 @@ function KitchenContent() {
     }, [searchParams]);
 
     const handleTabChange = (tab: TabId) => {
+        if (tab === 'allfoods') {
+            router.push('/dashboard/foods');
+            return;
+        }
         setActiveTab(tab);
         const params = new URLSearchParams(searchParams.toString());
         params.set('tab', tab);
@@ -133,7 +136,6 @@ function KitchenContent() {
             <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
                 {activeTab === 'shoppinglist' && <ShoppingListView />}
                 {activeTab === 'pantry' && <PantryView />}
-                {activeTab === 'allfoods' && <AllFoodsView />}
                 {activeTab === 'mixlab' && <MixLabView />}
                 {activeTab === 'mealplanner' && <MealPlannerView />}
                 {activeTab === 'allmeals' && <AllMealsView />}
