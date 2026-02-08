@@ -14,7 +14,8 @@ import {
     Plus,
     X,
     Filter,
-    ChevronDown
+    ChevronDown,
+    LayoutGrid
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -66,48 +67,64 @@ function LibraryContent() {
 
     const { searchQuery, setSearchQuery } = useSearch();
 
+    const renderTabGroup = (tabsList: typeof tabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
+        <div className="space-y-3">
+            <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>
+            <div className="flex p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-x-auto">
+                {showHomeButton && (
+                    <button
+                        onClick={() => router.push('/dashboard')}
+                        className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all mr-2 flex-shrink-0"
+                        title="Back to Dashboard"
+                    >
+                        <LayoutGrid size={18} />
+                    </button>
+                )}
+                {tabsList.map((tab) => {
+                    const Icon = tab.icon;
+                    const isActive = activeTab === tab.id;
+                    return (
+                        <button
+                            key={tab.id}
+                            onClick={() => handleTabChange(tab.id as any)}
+                            className={cn(
+                                "flex items-center gap-3 px-5 py-3.5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
+                                isActive
+                                    ? "bg-slate-900 dark:bg-slate-800 text-white shadow-xl translate-y-[-2px]"
+                                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                            )}
+                        >
+                            <Icon size={15} className={cn(
+                                "transition-transform duration-500 group-hover:scale-110",
+                                isActive ? tab.color : "text-slate-400"
+                            )} />
+                            {tab.label}
+                        </button>
+                    );
+                })}
+            </div>
+        </div>
+    );
+
     return (
         <div className="max-w-7xl mx-auto space-y-12 animate-in fade-in duration-700 pb-32">
             {/* Unified Header */}
-            <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-10">
-                <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                        <div className="p-3.5 rounded-[1.5rem] bg-emerald-600 shadow-xl shadow-emerald-500/20 text-white">
-                            <Library size={28} />
-                        </div>
-                        <div>
-                            <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85]">
-                                The <span className="text-emerald-500">Library.</span>
-                            </h1>
-                            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Healthy Eating Made Easy v0.4</p>
-                        </div>
+            <div className="flex flex-col gap-8">
+                <div className="flex items-center gap-4">
+                    <div className="p-3.5 rounded-[1.5rem] bg-emerald-600 shadow-xl shadow-emerald-500/20 text-white">
+                        <Library size={28} />
+                    </div>
+                    <div>
+                        <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85]">
+                            The <span className="text-emerald-500">Library.</span>
+                        </h1>
+                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Healthy Eating Made Easy v0.4</p>
                     </div>
                 </div>
 
-                {/* Tab Switcher */}
-                <div className="flex p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-2xl self-start">
-                    {tabs.map((tab) => {
-                        const Icon = tab.icon;
-                        const isActive = activeTab === tab.id;
-                        return (
-                            <button
-                                key={tab.id}
-                                onClick={() => handleTabChange(tab.id as any)}
-                                className={cn(
-                                    "flex items-center gap-3 px-8 py-4 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 whitespace-nowrap group",
-                                    isActive
-                                        ? "bg-slate-900 dark:bg-slate-800 text-white shadow-xl translate-y-[-2px]"
-                                        : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
-                                )}
-                            >
-                                <Icon size={16} className={cn(
-                                    "transition-transform duration-500 group-hover:scale-110",
-                                    isActive ? tab.color : "text-slate-400"
-                                )} />
-                                {tab.label}
-                            </button>
-                        );
-                    })}
+                {/* Tab Section */}
+                <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+                    {renderTabGroup(tabs, "📚 Sections", "text-slate-500", true)}
                 </div>
             </div>
 
