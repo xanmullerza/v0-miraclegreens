@@ -90,7 +90,7 @@ export default function DashboardOverview() {
         {
             name: 'Meals',
             desc: 'Discover delicious and healthy meal ideas.',
-            href: '/dashboard/meals',
+            href: '/dashboard/recipes?tab=browse',
             icon: UtensilsCrossed,
             color: 'text-rose-500',
             bg: 'bg-rose-500/10'

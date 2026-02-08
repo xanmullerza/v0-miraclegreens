@@ -7,15 +7,17 @@ import {
     Sparkles,
     FlaskConical,
     Bot,
-    BookOpen
+    BookOpen,
+    Library
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 import { MealPlannerView } from '@/components/kitchen/mealplanner-view';
 import { MixLabView } from '@/components/kitchen/mix-lab-view';
 import { AllMealsView } from '@/components/kitchen/all-meals-view';
+import { RecipesView } from '@/components/library/recipes-view';
 
-type TabId = 'mixlab' | 'mealplanner' | 'allmeals';
+type TabId = 'mixlab' | 'mealplanner' | 'allmeals' | 'browse';
 
 export default function KitchenPage() {
     return (
@@ -35,7 +37,7 @@ function KitchenContent() {
     const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState<TabId>('mixlab');
 
-    const allTabs: TabId[] = ['mixlab', 'mealplanner', 'allmeals'];
+    const allTabs: TabId[] = ['mixlab', 'mealplanner', 'allmeals', 'browse'];
 
     // Sync tab with URL if needed
     useEffect(() => {
@@ -57,6 +59,7 @@ function KitchenContent() {
         { id: 'mixlab' as TabId, label: 'Mix Lab', icon: FlaskConical, color: 'text-purple-500', bg: 'bg-purple-500/10' },
         { id: 'mealplanner' as TabId, label: 'Meal-O-Matic', icon: Bot, color: 'text-amber-500', bg: 'bg-amber-500/10' },
         { id: 'allmeals' as TabId, label: 'All Meals', icon: BookOpen, color: 'text-orange-500', bg: 'bg-orange-500/10' },
+        { id: 'browse' as TabId, label: 'Browse', icon: Library, color: 'text-blue-500', bg: 'bg-blue-500/10' },
     ];
 
     const renderTabGroup = (tabs: typeof mealsTabs, sectionLabel: string, sectionColor: string) => (
@@ -116,6 +119,7 @@ function KitchenContent() {
                 {activeTab === 'mixlab' && <MixLabView />}
                 {activeTab === 'mealplanner' && <MealPlannerView />}
                 {activeTab === 'allmeals' && <AllMealsView />}
+                {activeTab === 'browse' && <RecipesView />}
             </div>
         </div>
     );
