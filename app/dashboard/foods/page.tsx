@@ -5,11 +5,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import {
     Library,
     ShoppingBasket,
+    ShoppingCart,
     Activity,
     Scale,
     Beaker,
     ShoppingBag,
-    Loader2
+    Loader2,
+    UtensilsCrossed
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -19,13 +21,15 @@ import { ShoppingView } from './views/shopping-view';
 import { NutrientsView } from './views/nutrients-view';
 import { CompareView } from './views/compare-view';
 import { LabView } from './views/lab-view';
+import { ShoppingListView } from '@/components/kitchen/shopping-list-view';
+import { PantryView } from '@/components/kitchen/pantry-view';
 
-type FoodTab = 'explore' | 'staples' | 'shopping' | 'nutrients' | 'compare' | 'lab';
+type FoodTab = 'groceries' | 'pantry' | 'allfoods' | 'explore' | 'staples' | 'shopping' | 'nutrients' | 'compare' | 'lab';
 
 function FoodsHubContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const currentTab = (searchParams.get('tab') as FoodTab) || 'explore';
+    const currentTab = (searchParams.get('tab') as FoodTab) || 'groceries';
 
     const setTab = (tab: FoodTab) => {
         const params = new URLSearchParams(searchParams.toString());
@@ -33,60 +37,77 @@ function FoodsHubContent() {
         router.push(`/dashboard/foods?${params.toString()}`);
     };
 
-    const tabs = [
-        { id: 'explore', label: 'Explore', icon: Library, color: 'emerald' },
-        { id: 'staples', label: 'Staples', icon: ShoppingBasket, color: 'amber' },
-        { id: 'shopping', label: 'Shopping', icon: ShoppingBag, color: 'rose' },
-        { id: 'nutrients', label: 'Nutrients', icon: Activity, color: 'indigo' },
-        { id: 'compare', label: 'Compare', icon: Scale, color: 'blue' },
-        { id: 'lab', label: 'Lab', icon: Beaker, color: 'violet' },
+    // First row: Ingredients section (moved from Kitchen)
+    const ingredientTabs = [
+        { id: 'groceries', label: 'Groceries', icon: ShoppingCart, color: 'text-rose-500', bg: 'bg-rose-500/10' },
+        { id: 'pantry', label: 'Pantry', icon: ShoppingBasket, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+        { id: 'allfoods', label: 'All Foods', icon: UtensilsCrossed, color: 'text-blue-500', bg: 'bg-blue-500/10' },
     ];
 
+    // Second row: Tools section
+    const toolsTabs = [
+        { id: 'explore', label: 'Explore', icon: Library, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+        { id: 'staples', label: 'Staples', icon: ShoppingBag, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+        { id: 'nutrients', label: 'Nutrients', icon: Activity, color: 'text-indigo-500', bg: 'bg-indigo-500/10' },
+        { id: 'compare', label: 'Compare', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+        { id: 'lab', label: 'Lab', icon: Beaker, color: 'text-violet-500', bg: 'bg-violet-500/10' },
+    ];
+
+    const renderTabGroup = (tabs: typeof ingredientTabs, sectionLabel: string, sectionColor: string) => (
+        <div className="space-y-3">
+            <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>
+            <div className="flex p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl">
+                {tabs.map((tab) => {
+                    const Icon = tab.icon;
+                    const isActive = currentTab === tab.id;
+                    return (
+                        <button
+                            key={tab.id}
+                            onClick={() => setTab(tab.id as FoodTab)}
+                            className={cn(
+                                "flex items-center gap-3 px-5 py-3.5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group",
+                                isActive
+                                    ? "bg-slate-900 dark:bg-slate-800 text-white shadow-xl translate-y-[-2px]"
+                                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                            )}
+                        >
+                            <Icon size={15} className={cn(
+                                "transition-transform duration-500 group-hover:scale-110",
+                                isActive ? tab.color : "text-slate-400"
+                            )} />
+                            {tab.label}
+                        </button>
+                    );
+                })}
+            </div>
+        </div>
+    );
+
     return (
-        <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
+        <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700 pb-32">
             {/* Unified Hub Navigation */}
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-8">
                 <div>
-                    <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2">
+                    <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2">
                         Food <span className="text-emerald-500">Intelligence.</span>
                     </h1>
-                    <p className="text-slate-500 font-medium text-sm">
-                        Access the complete clinical database, manage your kitchen, and analyze molecular nutrition.
+                    <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">
+                        Manage your ingredients and explore nutritional data
                     </p>
                 </div>
 
-                {/* Tab Switcher */}
-                <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-x-auto no-scrollbar items-center gap-1">
-                    {tabs.map((tab) => {
-                        const Icon = tab.icon;
-                        const isActive = currentTab === tab.id;
-
-                        return (
-                            <button
-                                key={tab.id}
-                                onClick={() => setTab(tab.id as FoodTab)}
-                                className={cn(
-                                    "flex items-center gap-3 px-6 h-12 rounded-[1.5rem] transition-all duration-300 whitespace-nowrap group",
-                                    isActive
-                                        ? "bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-lg scale-105 z-10"
-                                        : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50"
-                                )}
-                            >
-                                <div className={cn(
-                                    "p-1.5 rounded-lg transition-colors",
-                                    isActive ? "bg-white/10 dark:bg-slate-900/10" : "bg-slate-100 dark:bg-slate-800 group-hover:bg-white/50"
-                                )}>
-                                    <Icon size={16} />
-                                </div>
-                                <span className="text-[10px] font-black uppercase tracking-widest">{tab.label}</span>
-                            </button>
-                        );
-                    })}
+                {/* Tab Sections */}
+                <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+                    {renderTabGroup(ingredientTabs, "📦 Ingredients", "text-slate-500")}
+                    {renderTabGroup(toolsTabs, "🔬 Tools", "text-slate-500")}
                 </div>
             </div>
 
             {/* View Area */}
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
+                {currentTab === 'groceries' && <ShoppingListView />}
+                {currentTab === 'pantry' && <PantryView />}
+                {currentTab === 'allfoods' && <ExploreView />}
                 {currentTab === 'explore' && <ExploreView />}
                 {currentTab === 'staples' && <StaplesView />}
                 {currentTab === 'shopping' && <ShoppingView />}

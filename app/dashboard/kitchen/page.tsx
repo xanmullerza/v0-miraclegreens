@@ -3,28 +3,19 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
-    ShoppingCart,
-    ShoppingBasket,
-    ChefHat,
     Loader2,
-    Search,
-    X,
     Sparkles,
-    UtensilsCrossed,
     FlaskConical,
     Bot,
     BookOpen
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Input } from '@/components/ui/input';
 
-import { ShoppingListView } from '@/components/kitchen/shopping-list-view';
-import { PantryView } from '@/components/kitchen/pantry-view';
 import { MealPlannerView } from '@/components/kitchen/mealplanner-view';
 import { MixLabView } from '@/components/kitchen/mix-lab-view';
 import { AllMealsView } from '@/components/kitchen/all-meals-view';
 
-type TabId = 'shoppinglist' | 'pantry' | 'allfoods' | 'mixlab' | 'mealplanner' | 'allmeals';
+type TabId = 'mixlab' | 'mealplanner' | 'allmeals';
 
 export default function KitchenPage() {
     return (
@@ -42,9 +33,9 @@ export default function KitchenPage() {
 function KitchenContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [activeTab, setActiveTab] = useState<TabId>('shoppinglist');
+    const [activeTab, setActiveTab] = useState<TabId>('mixlab');
 
-    const allTabs: TabId[] = ['shoppinglist', 'pantry', 'allfoods', 'mixlab', 'mealplanner', 'allmeals'];
+    const allTabs: TabId[] = ['mixlab', 'mealplanner', 'allmeals'];
 
     // Sync tab with URL if needed
     useEffect(() => {
@@ -55,31 +46,20 @@ function KitchenContent() {
     }, [searchParams]);
 
     const handleTabChange = (tab: TabId) => {
-        if (tab === 'allfoods') {
-            router.push('/dashboard/foods');
-            return;
-        }
         setActiveTab(tab);
         const params = new URLSearchParams(searchParams.toString());
         params.set('tab', tab);
         window.history.pushState(null, '', `?${params.toString()}`);
     };
 
-    // First row: Ingredients section
-    const ingredientTabs = [
-        { id: 'shoppinglist' as TabId, label: 'Groceries', icon: ShoppingCart, color: 'text-rose-500', bg: 'bg-rose-500/10' },
-        { id: 'pantry' as TabId, label: 'Pantry', icon: ShoppingBasket, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-        { id: 'allfoods' as TabId, label: 'All Foods', icon: UtensilsCrossed, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-    ];
-
-    // Second row: Recipes/Meals section
+    // Meals & Recipes tabs
     const mealsTabs = [
         { id: 'mixlab' as TabId, label: 'Mix Lab', icon: FlaskConical, color: 'text-purple-500', bg: 'bg-purple-500/10' },
         { id: 'mealplanner' as TabId, label: 'Meal-O-Matic', icon: Bot, color: 'text-amber-500', bg: 'bg-amber-500/10' },
         { id: 'allmeals' as TabId, label: 'All Meals', icon: BookOpen, color: 'text-orange-500', bg: 'bg-orange-500/10' },
     ];
 
-    const renderTabGroup = (tabs: typeof ingredientTabs, sectionLabel: string, sectionColor: string) => (
+    const renderTabGroup = (tabs: typeof mealsTabs, sectionLabel: string, sectionColor: string) => (
         <div className="space-y-3">
             <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>
             <div className="flex p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl">
@@ -125,17 +105,14 @@ function KitchenContent() {
                     </div>
                 </div>
 
-                {/* Tab Sections */}
+                {/* Tab Section */}
                 <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-                    {renderTabGroup(ingredientTabs, "📦 Ingredients", "text-slate-500")}
                     {renderTabGroup(mealsTabs, "🍽️ Meals & Recipes", "text-slate-500")}
                 </div>
             </div>
 
             {/* Dynamic Content Area */}
             <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
-                {activeTab === 'shoppinglist' && <ShoppingListView />}
-                {activeTab === 'pantry' && <PantryView />}
                 {activeTab === 'mixlab' && <MixLabView />}
                 {activeTab === 'mealplanner' && <MealPlannerView />}
                 {activeTab === 'allmeals' && <AllMealsView />}
@@ -143,4 +120,3 @@ function KitchenContent() {
         </div>
     );
 }
-
