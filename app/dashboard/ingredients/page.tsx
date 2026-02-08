@@ -11,7 +11,8 @@ import {
     Beaker,
     ShoppingBag,
     Loader2,
-    UtensilsCrossed
+    UtensilsCrossed,
+    LayoutGrid
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -93,8 +94,17 @@ function FoodsHubContent() {
                 </div>
 
                 {/* Tab Sections */}
-                <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-                    {renderTabGroup(ingredientTabs, "📦 Ingredients", "text-slate-500")}
+                <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => router.push('/dashboard')}
+                            className="p-3.5 rounded-[1.5rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl text-slate-400 hover:text-emerald-500 hover:border-emerald-500/30 transition-all"
+                            title="Back to Dashboard"
+                        >
+                            <LayoutGrid size={18} />
+                        </button>
+                        {renderTabGroup(ingredientTabs, "📦 Ingredients", "text-slate-500")}
+                    </div>
                     {renderTabGroup(toolsTabs, "🔬 Tools", "text-slate-500")}
                 </div>
             </div>

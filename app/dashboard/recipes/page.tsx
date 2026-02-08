@@ -7,7 +7,8 @@ import {
     Sparkles,
     FlaskConical,
     Bot,
-    BookOpen
+    BookOpen,
+    LayoutGrid
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -106,8 +107,17 @@ function KitchenContent() {
                 </div>
 
                 {/* Tab Section */}
-                <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-                    {renderTabGroup(mealsTabs, "🍽️ Meals & Recipes", "text-slate-500")}
+                <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => router.push('/dashboard')}
+                            className="p-3.5 rounded-[1.5rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl text-slate-400 hover:text-amber-500 hover:border-amber-500/30 transition-all"
+                            title="Back to Dashboard"
+                        >
+                            <LayoutGrid size={18} />
+                        </button>
+                        {renderTabGroup(mealsTabs, "🍽️ Meals & Recipes", "text-slate-500")}
+                    </div>
                 </div>
             </div>
 
