@@ -12,12 +12,14 @@ import {
     ArrowRight,
     Trash2,
     Beaker,
-    Sparkles
+    Sparkles,
+    ArrowLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { LabView } from '@/app/dashboard/ingredients/views/lab-view';
 
 interface MixItem {
     id: string;
@@ -34,6 +36,7 @@ export function MixLabView() {
     const [mixes, setMixes] = useState<MixItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
+    const [showSpiceLab, setShowSpiceLab] = useState(false);
 
     useEffect(() => {
         fetchMixes();
@@ -68,11 +71,34 @@ export function MixLabView() {
 
     // Sample categories for Mix Lab
     const mixCategories = [
-        { name: 'Spice Blends', icon: '🌶️', description: 'Garam masala, curry powder, za\'atar...' },
+        { name: 'Spice Blends', icon: '🌶️', description: 'Garam masala, curry powder, za\'atar...', action: 'spicelab' },
         { name: 'Condiments', icon: '🫙', description: 'Homemade mayo, margarine, mustard...' },
         { name: 'Sauces', icon: '🥫', description: 'Pasta sauce, BBQ sauce, hot sauce...' },
         { name: 'Dressings', icon: '🥗', description: 'Vinaigrettes, ranch, tahini...' },
     ];
+
+    const handleCategoryClick = (cat: typeof mixCategories[0]) => {
+        if (cat.action === 'spicelab') {
+            setShowSpiceLab(true);
+        }
+    };
+
+    // If showing Spice Lab, render it with a back button
+    if (showSpiceLab) {
+        return (
+            <div className="space-y-6">
+                <Button
+                    variant="ghost"
+                    onClick={() => setShowSpiceLab(false)}
+                    className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 font-black uppercase tracking-widest text-[10px]"
+                >
+                    <ArrowLeft size={16} className="mr-2" />
+                    Back to Mix Lab
+                </Button>
+                <LabView />
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-8">
@@ -114,6 +140,7 @@ export function MixLabView() {
                     {mixCategories.map((cat) => (
                         <div
                             key={cat.name}
+                            onClick={() => handleCategoryClick(cat)}
                             className="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 hover:border-purple-500/30 hover:shadow-lg transition-all cursor-pointer group"
                         >
                             <div className="text-3xl mb-3">{cat.icon}</div>
@@ -123,6 +150,11 @@ export function MixLabView() {
                             <p className="text-[10px] text-slate-400 mt-1 line-clamp-2">
                                 {cat.description}
                             </p>
+                            {cat.action === 'spicelab' && (
+                                <Badge className="mt-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-[8px] border-none uppercase font-black">
+                                    Spice Lab
+                                </Badge>
+                            )}
                         </div>
                     ))}
                 </div>
