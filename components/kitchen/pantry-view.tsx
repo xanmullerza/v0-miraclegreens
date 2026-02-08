@@ -41,6 +41,7 @@ interface FoodItem {
     is_in_pantry: boolean;
     category?: string;
     source_table?: 'food_items' | 'pantry_items';
+    quantity?: string;
 }
 
 export function PantryView() {
@@ -99,7 +100,8 @@ export function PantryView() {
                     image: sp?.image_url || fi?.image || null,
                     is_in_pantry: true,
                     category: 'Pantry',
-                    source_table: 'pantry_items'
+                    source_table: 'pantry_items',
+                    quantity: item.quantity
                 } as FoodItem;
             });
 
@@ -319,11 +321,16 @@ export function PantryView() {
                                                         <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
                                                             {food.name}
                                                         </h3>
-                                                        {food.category && (
-                                                            <Badge className="mt-2 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none">
+                                                        <div className="flex flex-wrap gap-2 mt-2">
+                                                            <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase font-black">
                                                                 {food.category}
                                                             </Badge>
-                                                        )}
+                                                            {food.quantity && (
+                                                                <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[8px] border-none uppercase font-black">
+                                                                    {food.quantity}
+                                                                </Badge>
+                                                            )}
+                                                        </div>
                                                     </div>
 
                                                     {/* Stats (Desktop View) */}
