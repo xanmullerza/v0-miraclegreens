@@ -64,7 +64,10 @@ function FoodsHubContent() {
     const renderTabGroup = (tabsList: typeof ingredientTabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
         <div className="space-y-3">
             <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>
-            <div className="flex p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500 w-full max-w-[450px]">
+            <div className={cn(
+                "flex p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500 w-full",
+                sectionLabel.includes("Ingredients") ? "md:w-[600px]" : "md:w-[350px]"
+            )}>
                 <div className="flex items-center">
                     {showHomeButton && (
                         <button
@@ -88,7 +91,7 @@ function FoodsHubContent() {
                                         isActive
                                             ? "bg-slate-900 dark:bg-slate-800 text-white shadow-xl translate-y-[-2px]"
                                             : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50",
-                                        isSearchExpanded ? "px-4" : "px-5"
+                                        "px-5"
                                     )}
                                 >
                                     <Icon size={15} className={cn(
