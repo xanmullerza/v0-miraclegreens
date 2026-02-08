@@ -315,13 +315,11 @@ export function PantryView() {
                                                             </div>
                                                         )}
 
-                                                        {food.quantity && (
-                                                            <div className="absolute bottom-1 left-1 right-1 z-10">
-                                                                <div className="bg-emerald-600/90 backdrop-blur-sm text-white text-[9px] font-black px-1.5 py-1 rounded-lg text-center truncate uppercase tracking-tighter shadow-lg border border-white/20">
-                                                                    {food.quantity}
-                                                                </div>
+                                                        <div className="absolute bottom-1 left-1 right-1 z-10">
+                                                            <div className="bg-emerald-600/90 backdrop-blur-sm text-white text-[9px] font-black px-1.5 py-1 rounded-lg text-center truncate uppercase tracking-tighter shadow-lg border border-white/20">
+                                                                {food.quantity || '1'}
                                                             </div>
-                                                        )}
+                                                        </div>
                                                     </div>
 
                                                     {/* Info */}
