@@ -303,32 +303,55 @@ export function ShoppingListView() {
             const effectiveFoodId = foodItemId || selectedMatchItem.food_item_id || null;
             const effectiveScannedId = (!foodItemId && scannedIdToLink) ? scannedIdToLink : null;
 
-            // Aggregation check: look for an existing item with the same identifier
+            // Aggregation check: look for an existing item with the same identifier or name
             let existingItem = null;
+
+            // Try to find by food_item_id first
             if (effectiveFoodId) {
                 const { data } = await supabase
                     .from('pantry_items')
                     .select('id, quantity')
                     .eq('user_id', user.id)
                     .eq('food_item_id', effectiveFoodId)
-                    .maybeSingle();
-                existingItem = data;
-            } else if (effectiveScannedId) {
+                    .limit(1)
+                    .single();
+                if (data) existingItem = data;
+            }
+
+            // Try to find by scanned_product_id if no match yet
+            if (!existingItem && effectiveScannedId) {
                 const { data } = await supabase
                     .from('pantry_items')
                     .select('id, quantity')
                     .eq('user_id', user.id)
                     .eq('scanned_product_id', effectiveScannedId)
-                    .maybeSingle();
-                existingItem = data;
+                    .limit(1)
+                    .single();
+                if (data) existingItem = data;
+            }
+
+            // Fallback: try to find by exact name match
+            if (!existingItem) {
+                const { data } = await supabase
+                    .from('pantry_items')
+                    .select('id, quantity')
+                    .eq('user_id', user.id)
+                    .ilike('name', name)
+                    .limit(1)
+                    .single();
+                if (data) existingItem = data;
             }
 
             if (existingItem) {
-                // Update existing item
-                const newQuantity = aggregateQuantities(existingItem.quantity, quantity);
+                // Update existing item with combined quantity
+                const newQuantity = aggregateQuantities(existingItem.quantity || '0', quantity);
                 const { error } = await supabase
                     .from('pantry_items')
-                    .update({ quantity: newQuantity })
+                    .update({
+                        quantity: newQuantity,
+                        food_item_id: effectiveFoodId || undefined,
+                        scanned_product_id: effectiveScannedId || undefined
+                    })
                     .eq('id', existingItem.id);
                 if (error) throw error;
             } else {
