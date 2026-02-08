@@ -157,28 +157,58 @@ export function PantryView() {
     const addToShoppingList = (food: FoodItem) => {
         // Get existing manual items from localStorage
         const saved = localStorage.getItem('vitala_shopping_manual_items');
-        let manualItems = [];
+        let manualItems: any[] = [];
         try {
             manualItems = saved ? JSON.parse(saved) : [];
         } catch (e) {
             console.error('Failed to parse shopping list', e);
         }
 
-        // Add new item
-        const newItem = {
-            id: `manual-${Date.now()}`,
-            name: food.common_name || food.name,
-            quantity: buyMoreQty,
-            unit: '',
-            checked: false,
-            source: 'manual',
-            food_item_id: food.source_table === 'food_items' ? food.id : undefined
-        };
+        const itemName = food.common_name || food.name;
+        const foodId = food.source_table === 'food_items' ? food.id : undefined;
 
-        manualItems.push(newItem);
+        // Check for existing item with same name or food_item_id
+        const existingIndex = manualItems.findIndex(item =>
+            (foodId && item.food_item_id === foodId) ||
+            item.name.toLowerCase() === itemName.toLowerCase()
+        );
+
+        if (existingIndex >= 0) {
+            // Aggregate quantities
+            const existing = manualItems[existingIndex];
+            const parseQty = (s: string) => {
+                const match = s.trim().match(/^(\d+(?:\.\d+)?)\s*(.*)$/);
+                return match ? { num: parseFloat(match[1]), unit: match[2].trim() } : null;
+            };
+
+            const oldQty = parseQty(existing.quantity);
+            const newQty = parseQty(buyMoreQty);
+
+            if (oldQty && newQty && oldQty.unit === newQty.unit) {
+                const sum = oldQty.num + newQty.num;
+                manualItems[existingIndex].quantity = oldQty.unit ? `${sum} ${oldQty.unit}` : `${sum}`;
+            } else {
+                // Different units, concatenate
+                manualItems[existingIndex].quantity = `${existing.quantity} + ${buyMoreQty}`;
+            }
+
+            toast.success(`Updated "${itemName}" quantity in shopping list`);
+        } else {
+            // Add new item
+            const newItem = {
+                id: `manual-${Date.now()}`,
+                name: itemName,
+                quantity: buyMoreQty,
+                unit: '',
+                checked: false,
+                source: 'manual',
+                food_item_id: foodId
+            };
+            manualItems.push(newItem);
+            toast.success(`Added ${buyMoreQty}× "${itemName}" to shopping list`);
+        }
+
         localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(manualItems));
-
-        toast.success(`Added ${buyMoreQty}× "${food.common_name || food.name}" to shopping list`);
         setBuyMoreItem(null);
         setBuyMoreQty('1');
     };
