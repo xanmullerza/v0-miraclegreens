@@ -89,7 +89,7 @@ function FoodsHubContent() {
             <div className="flex flex-col gap-8">
                 <div>
                     <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2">
-                        Food <span className="text-emerald-500">Intelligence.</span>
+                        <span className="text-emerald-500">Ingredients.</span>
                     </h1>
                     <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">
                         Manage your ingredients and explore nutritional data
