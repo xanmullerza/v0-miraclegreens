@@ -99,7 +99,7 @@ function KitchenContent() {
                     </div>
                     <div>
                         <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85]">
-                            The <span className="text-amber-500">Kitchen.</span>
+                            <span className="text-amber-500">Recipes.</span>
                         </h1>
                         <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Meal Planning Made Easy</p>
                     </div>
