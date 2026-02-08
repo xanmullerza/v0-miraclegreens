@@ -243,7 +243,7 @@ export function PantryView() {
                 <div className="flex items-center gap-3">
                     {foods.length > 0 && (
                         <Button
-                            onClick={() => router.push('/dashboard/kitchen?tab=mealplanner')}
+                            onClick={() => router.push('/dashboard/recipes?tab=mealplanner')}
                             className="bg-slate-900 border border-slate-800 text-slate-100 px-6 h-12 rounded-2xl font-black uppercase tracking-widest shadow-xl flex items-center gap-2 group transition-all hover:bg-black text-[10px]"
                         >
                             <Sparkles size={16} className="text-amber-400 group-hover:scale-125 transition-transform" />

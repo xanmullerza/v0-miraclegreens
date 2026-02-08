@@ -56,9 +56,9 @@ export default function DashboardOverview() {
 
     const tools = [
         {
-            name: 'The Kitchen',
+            name: 'Recipes',
             desc: 'Plan meals, manage your pantry, and create shopping lists.',
-            href: '/dashboard/kitchen',
+            href: '/dashboard/recipes',
             icon: ChefHat,
             color: 'text-amber-500',
             bg: 'bg-amber-500/10'
