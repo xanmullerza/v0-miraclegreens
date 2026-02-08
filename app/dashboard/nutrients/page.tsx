@@ -8,7 +8,7 @@ export default function NutrientsRedirect() {
     const router = useRouter();
 
     useEffect(() => {
-        router.replace('/dashboard/foods?tab=nutrients');
+        router.replace('/dashboard/ingredients?tab=nutrients');
     }, [router]);
 
     return (

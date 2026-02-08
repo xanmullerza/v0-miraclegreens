@@ -8,7 +8,7 @@ export default function SpiceRedirect() {
     const router = useRouter();
 
     useEffect(() => {
-        router.replace('/dashboard/foods?tab=lab');
+        router.replace('/dashboard/ingredients?tab=lab');
     }, [router]);
 
     return (

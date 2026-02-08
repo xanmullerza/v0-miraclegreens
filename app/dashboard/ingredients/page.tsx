@@ -34,7 +34,7 @@ function FoodsHubContent() {
     const setTab = (tab: FoodTab) => {
         const params = new URLSearchParams(searchParams.toString());
         params.set('tab', tab);
-        router.push(`/dashboard/foods?${params.toString()}`);
+        router.push(`/dashboard/ingredients?${params.toString()}`);
     };
 
     // First row: Ingredients section (moved from Kitchen)

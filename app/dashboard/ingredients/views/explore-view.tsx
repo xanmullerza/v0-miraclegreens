@@ -173,7 +173,7 @@ export function ExploreView() {
                 <div className="flex items-center gap-3">
                     {compareItems.length > 0 && (
                         <Button
-                            onClick={() => router.push(`/dashboard/foods?tab=compare&ids=${compareItems.map(i => i.id).join(',')}`)}
+                            onClick={() => router.push(`/dashboard/ingredients?tab=compare&ids=${compareItems.map(i => i.id).join(',')}`)}
                             className="bg-blue-600 hover:bg-blue-700 text-white h-14 px-6 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl animate-in zoom-in"
                         >
                             <Scale size={16} className="mr-2" /> Compare ({compareItems.length})
@@ -266,7 +266,7 @@ export function ExploreView() {
                                     size="icon"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        router.push(`/dashboard/foods?tab=lab&foodId=${food.id}`);
+                                        router.push(`/dashboard/ingredients?tab=lab&foodId=${food.id}`);
                                     }}
                                     className="h-9 w-9 rounded-xl text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-colors"
                                     title="Spice Lab"
@@ -294,7 +294,7 @@ export function ExploreView() {
                                     variant="ghost"
                                     size="icon"
                                     className="h-9 w-9 rounded-xl text-slate-400 hover:text-emerald-500 transition-all"
-                                    onClick={(e) => router.push(`/dashboard/foods/${food.id}`)}
+                                    onClick={(e) => router.push(`/dashboard/ingredients/${food.id}`)}
                                     title="View Details"
                                 >
                                     <ArrowRight size={16} />

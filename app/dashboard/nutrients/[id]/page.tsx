@@ -289,7 +289,7 @@ export default function NutrientDetailsPage() {
                                 <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 leading-none">Bio-Available Ingredients</h4>
                                 <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest leading-none">Ordered by clinical nutrient density (100g sample)</p>
                             </div>
-                            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest underline cursor-pointer hover:text-emerald-600" onClick={() => router.push('/dashboard/foods')}>Browse Ingredients</span>
+                            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest underline cursor-pointer hover:text-emerald-600" onClick={() => router.push('/dashboard/ingredients')}>Browse Ingredients</span>
                         </div>
                         <div className="space-y-3">
                             {loadingFoods ? (
@@ -298,7 +298,7 @@ export default function NutrientDetailsPage() {
                                 topFoods.map((food: any) => (
                                     <button
                                         key={food.id}
-                                        onClick={() => router.push(`/dashboard/foods/${food.id}`)}
+                                        onClick={() => router.push(`/dashboard/ingredients/${food.id}`)}
                                         className="w-full flex items-center gap-4 p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/50 hover:shadow-xl transition-all text-left group"
                                     >
                                         <div className="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0 border border-slate-100 dark:border-slate-800">

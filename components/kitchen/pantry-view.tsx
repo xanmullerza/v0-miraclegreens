@@ -251,7 +251,7 @@ export function PantryView() {
                         </Button>
                     )}
                     <Button
-                        onClick={() => router.push('/dashboard/foods')}
+                        onClick={() => router.push('/dashboard/ingredients')}
                         className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 h-12 rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-emerald-500/10 flex items-center gap-2 group transition-all text-[10px]"
                     >
                         <Plus size={18} className="group-hover:rotate-90 transition-transform" />
@@ -287,7 +287,7 @@ export function PantryView() {
                         Add your favorite healthy foods to your pantry to make meal planning a breeze.
                     </p>
                     <Button
-                        onClick={() => router.push('/dashboard/foods')}
+                        onClick={() => router.push('/dashboard/ingredients')}
                         className="rounded-xl px-10 h-14 font-black uppercase tracking-widest text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20"
                     >
                         Stock Up Now
@@ -444,7 +444,7 @@ export function PantryView() {
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                onClick={() => router.push(`/dashboard/foods/${food.id}`)}
+                                                                onClick={() => router.push(`/dashboard/ingredients/${food.id}`)}
                                                                 className="h-9 w-9 rounded-xl text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors"
                                                             >
                                                                 <ArrowRight size={16} />

@@ -1208,7 +1208,7 @@ export default function RecipeDetailsPage() {
                                         onDragStart={(e) => isReordering && onDragStart(e, i)}
                                         onDragOver={(e) => isReordering && onDragOver(e, i)}
                                         onDrop={(e) => isReordering && onDrop(e, i)}
-                                        onClick={() => !isReordering && !isEditingIngredients && !isEditingMeasures && !isToggling && !hiddenIngredientIds.includes(ing.id) && ing.food_item_id && router.push(`/dashboard/foods/${ing.food_item_id}`)}
+                                        onClick={() => !isReordering && !isEditingIngredients && !isEditingMeasures && !isToggling && !hiddenIngredientIds.includes(ing.id) && ing.food_item_id && router.push(`/dashboard/ingredients/${ing.food_item_id}`)}
                                         className={cn(
                                             "flex items-center gap-4 p-4 rounded-2xl border transition-all group relative overflow-hidden",
                                             hiddenIngredientIds.includes(ing.id)
