@@ -65,7 +65,7 @@ function FoodsHubContent() {
         <div className="space-y-3">
             <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>
             <div className={cn(
-                "flex items-center p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500 w-full md:max-w-2xl mx-auto xl:mx-0"
+                "flex items-center p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500 w-full md:w-[800px] mx-auto xl:mx-0"
             )}>
                 {/* Left side - Home Button area */}
                 <div className="flex-shrink-0 w-12 flex items-center justify-start">
@@ -82,7 +82,7 @@ function FoodsHubContent() {
 
                 {/* Center - Tabs area */}
                 <div className="flex-1 flex items-center justify-center overflow-hidden">
-                    <div className="flex items-center gap-2 overflow-hidden py-1">
+                    <div className="flex items-center gap-4 overflow-hidden py-1">
                         {tabsList.map((tab) => {
                             const Icon = tab.icon;
                             const isActive = currentTab === tab.id;
