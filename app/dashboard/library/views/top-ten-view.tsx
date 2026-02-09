@@ -9,18 +9,23 @@ import {
     Loader2,
     Info,
     TrendingUp,
-    Scale
+    Scale,
+    Zap,
+    Gem,
+    Droplet,
+    Battery,
+    Heart
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+import { Progress } from '../../../../components/ui/progress';
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "../../../../components/ui/tooltip";
 
 interface TopFood {
     id: string;
@@ -32,25 +37,40 @@ interface TopFood {
     category?: string[];
 }
 
-// Major nutrients mapping for the selector
+// Full tracked nutrients list in alphabetical order
 const NUTRIENTS = [
-    { id: 'protein_g', label: 'Protein', unit: 'g', color: 'bg-blue-500', icon: Scale },
-    { id: 'fat_g', label: 'Healthy Fats', unit: 'g', color: 'bg-amber-500', icon: Activity },
-    { id: 'fiber', label: 'Fiber', unit: 'g', color: 'bg-emerald-500', icon: Activity },
-    { id: 'Vitamin C', label: 'Vitamin C', unit: 'mg', color: 'bg-orange-500', icon: ZapIcon },
-    { id: 'Iron', label: 'Iron', unit: 'mg', color: 'bg-red-500', icon: Activity },
-    { id: 'Calcium', label: 'Calcium', unit: 'mg', color: 'bg-slate-500', icon: Activity },
-    { id: 'Magnesium', label: 'Magnesium', unit: 'mg', color: 'bg-purple-500', icon: Activity },
-    { id: 'Potassium', label: 'Potassium', unit: 'mg', color: 'bg-indigo-500', icon: Activity },
-    { id: 'Zinc', label: 'Zinc', unit: 'mg', color: 'bg-cyan-500', icon: Activity },
+    { id: 'B1 (Thiamine)', label: 'B1 (Thiamine)', unit: 'mg', color: 'bg-blue-500', icon: Droplet },
+    { id: 'B2 (Riboflavin)', label: 'B2 (Riboflavin)', unit: 'mg', color: 'bg-blue-500', icon: Droplet },
+    { id: 'B3 (Niacin)', label: 'B3 (Niacin)', unit: 'mg', color: 'bg-blue-500', icon: Droplet },
+    { id: 'B5 (Pantothenic Acid)', label: 'B5 (Pantothenic Acid)', unit: 'mg', color: 'bg-blue-500', icon: Droplet },
+    { id: 'B6 (Pyridoxine)', label: 'B6 (Pyridoxine)', unit: 'mg', color: 'bg-blue-500', icon: Droplet },
+    { id: 'B9 (Folate)', label: 'B9 (Folate)', unit: 'µg', color: 'bg-blue-500', icon: Droplet },
+    { id: 'B12 (Cobalamin)', label: 'B12 (Cobalamin)', unit: 'µg', color: 'bg-blue-500', icon: Droplet },
+    { id: 'Calcium', label: 'Calcium', unit: 'mg', color: 'bg-slate-500', icon: Gem },
+    { id: 'carbs_g', label: 'Carbs', unit: 'g', color: 'bg-orange-500', icon: Zap },
+    { id: 'Choline', label: 'Choline', unit: 'mg', color: 'bg-indigo-500', icon: Droplet },
+    { id: 'Copper', label: 'Copper', unit: 'mg', color: 'bg-rose-500', icon: Gem },
+    { id: 'energy_kcal', label: 'Energy (Calories)', unit: 'kcal', color: 'bg-amber-500', icon: Zap },
+    { id: 'fat_g', label: 'Fat', unit: 'g', color: 'bg-amber-500', icon: Zap },
+    { id: 'Fiber', label: 'Fiber', unit: 'g', color: 'bg-emerald-500', icon: Activity },
+    { id: 'Iron', label: 'Iron', unit: 'mg', color: 'bg-red-500', icon: Gem },
+    { id: 'Magnesium', label: 'Magnesium', unit: 'mg', color: 'bg-purple-500', icon: Gem },
+    { id: 'Manganese', label: 'Manganese', unit: 'mg', color: 'bg-stone-500', icon: Gem },
+    { id: 'Phosphorus', label: 'Phosphorus', unit: 'mg', color: 'bg-indigo-400', icon: Gem },
+    { id: 'Potassium', label: 'Potassium', unit: 'mg', color: 'bg-sky-500', icon: Gem },
+    { id: 'protein_g', label: 'Protein', unit: 'g', color: 'bg-blue-600', icon: Scale },
+    { id: 'Selenium', label: 'Selenium', unit: 'µg', color: 'bg-pink-500', icon: Gem },
+    { id: 'Sodium', label: 'Sodium', unit: 'mg', color: 'bg-slate-400', icon: Gem },
+    { id: 'Vitamin A', label: 'Vitamin A', unit: 'µg', color: 'bg-orange-400', icon: Battery },
+    { id: 'Vitamin C', label: 'Vitamin C', unit: 'mg', color: 'bg-yellow-400', icon: Droplet },
+    { id: 'Vitamin D', label: 'Vitamin D', unit: 'IU', color: 'bg-yellow-200', icon: Battery },
+    { id: 'Vitamin E', label: 'Vitamin E', unit: 'mg', color: 'bg-emerald-400', icon: Battery },
+    { id: 'Vitamin K', label: 'Vitamin K', unit: 'µg', color: 'bg-green-600', icon: Battery },
+    { id: 'Zinc', label: 'Zinc', unit: 'mg', color: 'bg-cyan-500', icon: Gem },
 ];
 
-function ZapIcon({ className }: { className?: string }) {
-    return <Activity className={className} />;
-}
-
 export function TopTenView() {
-    const [selectedNutrient, setSelectedNutrient] = useState(NUTRIENTS[0]);
+    const [selectedNutrient, setSelectedNutrient] = useState(NUTRIENTS[19]); // Default to Protein
     const [foods, setFoods] = useState<TopFood[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -60,15 +80,9 @@ export function TopTenView() {
             try {
                 let query = supabase.from('food_items').select('*');
 
-                // If it's a macro (protein, fat), we can sort directly on the column
-                if (['protein_g', 'fat_g'].includes(selectedNutrient.id)) {
+                // If it's a macro or top-level column, we can sort directly
+                if (['protein_g', 'fat_g', 'carbs_g', 'energy_kcal'].includes(selectedNutrient.id)) {
                     query = query.order(selectedNutrient.id, { ascending: false });
-                } else {
-                    // For micronutrients in JSONB, we need to handle it differently.
-                    // Since supabase-js direct ordering on jsonb keys without a view or computed column can be tricky,
-                    // we'll fetch a larger set and sort client-side for this MVP, or use a raw query if needed.
-                    // For performance on small datasets (~1000 items), client-side sort is acceptable.
-                    // Fetching mostly everything to sort might be heavy, so let's try to filter non-nulls first if possible.
                 }
 
                 const { data, error } = await query;
@@ -78,7 +92,7 @@ export function TopTenView() {
 
                 let processedData: TopFood[] = [];
 
-                if (['protein_g', 'fat_g'].includes(selectedNutrient.id)) {
+                if (['protein_g', 'fat_g', 'carbs_g', 'energy_kcal'].includes(selectedNutrient.id)) {
                     processedData = data.slice(0, 10).map((item: any) => ({
                         id: item.id,
                         name: item.name,
@@ -92,9 +106,7 @@ export function TopTenView() {
                     // Client-side sort for JSONB micronutrients
                     const candidates = data.map((item: any) => {
                         let val = 0;
-                        // Handle potential variations in casing or structure if needed, but assuming standard schema
                         if (item.micronutrients) {
-                            // Direct key access or simplified check
                             val = item.micronutrients[selectedNutrient.id] || 0;
                         }
                         return {
@@ -107,13 +119,6 @@ export function TopTenView() {
                             category: item.category
                         };
                     });
-
-                    if (selectedNutrient.id === 'fiber') {
-                        // Fiber might be a special case depending on how it's stored (macro vs micro)
-                        // Assuming it might be in micronutrients for now based on previous context, 
-                        // or strict access if it was migrated. 
-                        // Let's check typical structure. If logic fails, falls back to 0.
-                    }
 
                     processedData = candidates
                         .sort((a: any, b: any) => b.value - a.value)
