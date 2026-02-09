@@ -8,9 +8,7 @@ import {
     Search,
     Loader2,
     Heart,
-    Scale,
     ArrowRight,
-    Beaker,
     Edit2,
     Check,
     X,
@@ -78,9 +76,6 @@ export function ExploreView({
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
-
-    // Comparison State
-    const [compareItems, setCompareItems] = useState<FoodItem[]>([]);
 
     // Quick Add State
     const [quickAddItem, setQuickAddItem] = useState<FoodItem | null>(null);
@@ -154,17 +149,6 @@ export function ExploreView({
         } catch (error) { toast.error("Action failed"); }
     };
 
-    const addToCompare = (item: FoodItem) => {
-        if (compareItems.some(i => i.id === item.id)) {
-            setCompareItems(prev => prev.filter(i => i.id !== item.id));
-        } else {
-            if (compareItems.length >= 10) {
-                toast.error("Maximum 10 items for comparison");
-                return;
-            }
-            setCompareItems(prev => [...prev, item]);
-        }
-    };
 
     const handleQuickAdd = async () => {
         if (!quickAddItem) return;
@@ -208,14 +192,6 @@ export function ExploreView({
                         </div>
 
                         <div className="flex items-center gap-3">
-                            {compareItems.length > 0 && (
-                                <Button
-                                    onClick={() => router.push(`/dashboard/ingredients?tab=compare&ids=${compareItems.map(i => i.id).join(',')}`)}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white h-14 px-6 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl animate-in zoom-in"
-                                >
-                                    <Scale size={16} className="mr-2" /> Compare ({compareItems.length})
-                                </Button>
-                            )}
                         </div>
                     </div>
 
@@ -354,21 +330,13 @@ export function ExploreView({
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className={cn("h-9 w-9 rounded-xl transition-all", food.is_favorite ? "text-rose-500 bg-rose-50" : "text-slate-400 hover:text-rose-500")}
+                                    className={cn("h-9 w-9 rounded-xl transition-all bg-transparent", food.is_favorite ? "text-rose-500" : "text-slate-400 hover:text-rose-500")}
                                     onClick={(e) => toggleFavorite(food, e)}
                                     title="Favorite"
                                 >
                                     <Heart size={16} fill={food.is_favorite ? "currentColor" : "none"} />
                                 </Button>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className={cn("h-9 w-9 rounded-xl transition-all", compareItems.some(i => i.id === food.id) ? "text-blue-500 bg-blue-50" : "text-slate-400 hover:text-blue-500")}
-                                    onClick={(e) => { e.stopPropagation(); addToCompare(food); }}
-                                    title="Compare"
-                                >
-                                    <Scale size={16} />
-                                </Button>
+
                                 <Button
                                     variant="ghost"
                                     size="icon"
@@ -379,19 +347,7 @@ export function ExploreView({
                                     <Plus size={16} />
                                 </Button>
 
-                                {/* Spice Lab */}
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        router.push(`/dashboard/ingredients?tab=lab&foodId=${food.id}`);
-                                    }}
-                                    className="h-9 w-9 rounded-xl text-indigo-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-colors"
-                                    title="Spice Lab"
-                                >
-                                    <Beaker size={16} />
-                                </Button>
+
 
                                 {/* Admin Edit */}
                                 {currentUserEmail?.toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase() && (

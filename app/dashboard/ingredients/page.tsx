@@ -7,8 +7,6 @@ import {
     ShoppingBasket,
     ShoppingCart,
     Activity,
-    Scale,
-    Beaker,
     ShoppingBag,
     Loader2,
     UtensilsCrossed,
@@ -28,12 +26,11 @@ import { ExploreView } from './views/explore-view';
 import { StaplesView } from './views/staples-view';
 import { ShoppingView } from './views/shopping-view';
 import { NutrientsView } from './views/nutrients-view';
-import { LabView } from './views/lab-view';
 import { ShoppingListView } from '@/components/kitchen/shopping-list-view';
 import { PantryView } from '@/components/kitchen/pantry-view';
 import { CATEGORIES } from '@/components/library/foods-view';
 
-type FoodTab = 'groceries' | 'pantry' | 'allfoods' | 'explore' | 'staples' | 'shopping' | 'nutrients' | 'lab';
+type FoodTab = 'groceries' | 'pantry' | 'allfoods' | 'explore' | 'staples' | 'shopping' | 'nutrients';
 
 function FoodsHubContent() {
     const router = useRouter();
@@ -183,7 +180,7 @@ function FoodsHubContent() {
                 {(currentTab === 'allfoods' || currentTab === 'explore') && (
                     <div className="flex items-center gap-4 animate-in fade-in slide-in-from-right-4 duration-500 w-full xl:w-auto overflow-x-auto no-scrollbar pb-2 xl:pb-0">
                         {/* Favorites Switch Toggle */}
-                        <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl shrink-0 transition-all">
+                        <div className="flex items-center gap-4 bg-slate-100/50 dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl shrink-0 transition-all">
                             <Globe
                                 size={18}
                                 className={cn(
