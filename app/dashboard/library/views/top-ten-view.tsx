@@ -276,7 +276,7 @@ export function TopTenView() {
                                         className={cn(
                                             "flex items-center gap-2 pl-1.5 pr-4 py-1.5 rounded-full border transition-all duration-300",
                                             isSelected
-                                                ? "bg-slate-900 text-white border-slate-900 shadow-lg scale-105"
+                                                ? cn(nutrient.color, "text-white border-transparent shadow-md scale-105 ring-2 ring-offset-2 ring-emerald-500/20 dark:ring-offset-slate-950")
                                                 : "bg-white dark:bg-slate-900/50 text-slate-500 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
                                         )}
                                     >
