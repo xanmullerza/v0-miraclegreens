@@ -28,13 +28,12 @@ import { ExploreView } from './views/explore-view';
 import { StaplesView } from './views/staples-view';
 import { ShoppingView } from './views/shopping-view';
 import { NutrientsView } from './views/nutrients-view';
-import { CompareView } from './views/compare-view';
 import { LabView } from './views/lab-view';
 import { ShoppingListView } from '@/components/kitchen/shopping-list-view';
 import { PantryView } from '@/components/kitchen/pantry-view';
 import { CATEGORIES } from '@/components/library/foods-view';
 
-type FoodTab = 'groceries' | 'pantry' | 'allfoods' | 'explore' | 'staples' | 'shopping' | 'nutrients' | 'compare' | 'lab';
+type FoodTab = 'groceries' | 'pantry' | 'allfoods' | 'explore' | 'staples' | 'shopping' | 'nutrients' | 'lab';
 
 function FoodsHubContent() {
     const router = useRouter();
@@ -62,8 +61,7 @@ function FoodsHubContent() {
     ];
 
     // Second row: Tools section
-    const toolsTabs = [
-        { id: 'compare', label: 'Compare', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+    const toolsTabs: any[] = [
     ];
 
     const renderTabGroup = (tabsList: typeof ingredientTabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
@@ -170,7 +168,6 @@ function FoodsHubContent() {
                 {/* Tab Sections & Filters */}
                 <div className="flex flex-col gap-6 items-start w-full">
                     {renderTabGroup(ingredientTabs, "📦 Ingredients", "text-slate-500", true)}
-                    {renderTabGroup(toolsTabs, "🔬 Tools", "text-slate-500")}
                 </div>
 
                 {(currentTab === 'allfoods' || currentTab === 'explore') && (
@@ -260,7 +257,6 @@ function FoodsHubContent() {
                     {currentTab === 'staples' && <StaplesView />}
                     {currentTab === 'shopping' && <ShoppingView />}
                     {currentTab === 'nutrients' && <NutrientsView />}
-                    {currentTab === 'compare' && <CompareView />}
                 </div>
             </div>
         </div>

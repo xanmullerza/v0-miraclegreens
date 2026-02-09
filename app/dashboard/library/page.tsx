@@ -27,6 +27,7 @@ import { useSearch } from '@/lib/context/search-context';
 import { FoodsView, CATEGORIES } from '@/components/library/foods-view';
 import { RecipesView, MEAL_TYPES } from '@/components/library/recipes-view';
 import { NutrientsView } from '@/components/library/nutrients-view';
+import { CompareView } from '../ingredients/views/compare-view';
 
 export default function ClinicalLibrary() {
     return (
@@ -61,16 +62,12 @@ function LibraryContent() {
     // Sync tab with URL if needed
     useEffect(() => {
         const tab = searchParams.get('tab') as any;
-        if (tab && ['recipes', 'nutrients'].includes(tab)) {
+        if (tab && ['recipes', 'nutrients', 'compare'].includes(tab)) {
             setActiveTab(tab);
         }
     }, [searchParams]);
 
     const handleTabChange = (tab: 'recipes' | 'nutrients' | 'compare') => {
-        if (tab === 'compare') {
-            router.push('/dashboard/ingredients?tab=compare');
-            return;
-        }
         setActiveTab(tab);
         const params = new URLSearchParams(searchParams.toString());
         params.set('tab', tab);
@@ -274,6 +271,7 @@ function LibraryContent() {
                         hideControls={true}
                     />
                 )}
+                {activeTab === 'compare' && <CompareView />}
                 {activeTab === 'nutrients' && <NutrientsView />}
             </div>
         </div>
