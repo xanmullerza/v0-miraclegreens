@@ -14,7 +14,9 @@ import {
     Gem,
     Droplet,
     Battery,
-    Heart
+    Heart,
+    Filter,
+    ChevronDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -26,6 +28,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "../../../../components/ui/tooltip";
+import { CATEGORIES } from '@/components/library/foods-view';
 
 interface TopFood {
     id: string;
@@ -73,12 +76,18 @@ export function TopTenView() {
     const [selectedNutrient, setSelectedNutrient] = useState(NUTRIENTS[19]); // Default to Protein
     const [foods, setFoods] = useState<TopFood[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     useEffect(() => {
         const fetchTopFoods = async () => {
             setIsLoading(true);
             try {
                 let query = supabase.from('food_items').select('*');
+
+                if (selectedCategories.length > 0 && selectedCategories.length < CATEGORIES.length) {
+                    query = query.in('category', selectedCategories);
+                }
 
                 // If it's a macro or top-level column, we can sort directly
                 if (['protein_g', 'fat_g', 'carbs_g', 'energy_kcal'].includes(selectedNutrient.id)) {
@@ -135,12 +144,12 @@ export function TopTenView() {
         };
 
         fetchTopFoods();
-    }, [selectedNutrient]);
+    }, [selectedNutrient, selectedCategories]);
 
     const maxValue = foods.length > 0 ? foods[0].value : 100;
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-6 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                     <div className="flex items-center gap-3 mb-2">
@@ -155,6 +164,56 @@ export function TopTenView() {
                     <p className="text-slate-500 font-medium text-sm max-w-lg mt-1">
                         Discover the most potent sources of <span className="text-emerald-600 dark:text-emerald-400 font-bold">{selectedNutrient.label}</span> in our library.
                     </p>
+                </div>
+            </div>
+
+            {/* Category Filter */}
+            <div className="relative">
+                <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar items-center h-14 shadow-sm w-fit">
+                    <button
+                        onClick={() => setIsFilterOpen(!isFilterOpen)}
+                        className={cn(
+                            "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300",
+                            isFilterOpen ? "bg-emerald-600 text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                        )}
+                    >
+                        <Filter size={18} />
+                        <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter Groups</span>
+                        <ChevronDown size={14} className={cn("transition-transform", isFilterOpen && "rotate-180")} />
+                    </button>
+
+                    <div className="w-px h-6 bg-slate-200 dark:border-slate-800 mx-1" />
+
+                    <div className={cn("flex items-center gap-1 transition-all duration-300 overflow-hidden", isFilterOpen ? "w-auto opacity-100" : "w-0 opacity-0")}>
+                        {CATEGORIES.map(category => {
+                            const isActive = selectedCategories.includes(category);
+                            return (
+                                <button
+                                    key={category}
+                                    onClick={() => isActive
+                                        ? setSelectedCategories(prev => prev.filter(c => c !== category))
+                                        : setSelectedCategories(prev => [...prev, category])
+                                    }
+                                    className={cn(
+                                        "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
+                                        isActive
+                                            ? "bg-emerald-600/10 text-emerald-600 border border-emerald-600/20"
+                                            : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
+                                    )}
+                                >
+                                    {category}
+                                </button>
+                            );
+                        })}
+                    </div>
+
+                    {!isFilterOpen && (
+                        <div className="px-2">
+                            <span className="text-[10px] font-bold text-slate-400 italic">
+                                {selectedCategories.length === CATEGORIES.length ? "All Categories" : `${selectedCategories.length} selected`}
+                            </span>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -196,7 +255,7 @@ export function TopTenView() {
                     </div>
                 ) : (
                     <div className="space-y-6">
-                        {foods.map((food, index) => (
+                        {foods.length > 0 ? foods.map((food, index) => (
                             <div key={food.id} className="group relative">
                                 <div className="flex items-center gap-4 md:gap-6 relative z-10">
                                     {/* Rank Badge */}
@@ -234,7 +293,12 @@ export function TopTenView() {
                                     </div>
                                 </div>
                             </div>
-                        ))}
+                        )) : (
+                            <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+                                <Filter size={32} className="mb-4 opacity-50" />
+                                <p className="text-sm font-bold">No items found matching your filters.</p>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
