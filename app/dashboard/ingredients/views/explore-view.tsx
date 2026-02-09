@@ -387,7 +387,7 @@ export function ExploreView({
                                         </div>
                                         <div>
                                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Quick Action</p>
-                                            <h4 className="font-black text-sm uppercase italic">Add to Inventory</h4>
+                                            <h4 className="font-black text-sm uppercase italic">Add to {quickAddMode === 'pantry' ? 'Pantry' : 'Groceries'}</h4>
                                         </div>
                                     </div>
 
@@ -419,7 +419,7 @@ export function ExploreView({
                                             onClick={handleQuickAdd}
                                             className={cn("h-11 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-xl", quickAddMode === 'pantry' ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-rose-600 hover:bg-rose-700 text-white")}
                                         >
-                                            Confirm Add
+                                            Add to {quickAddMode === 'pantry' ? 'Pantry' : 'Groceries'}
                                         </Button>
                                         <Button variant="ghost" size="icon" onClick={() => setQuickAddItem(null)} className="h-11 w-11 rounded-xl"><X size={18} /></Button>
                                     </div>
