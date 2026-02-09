@@ -85,7 +85,7 @@ export function TopTenView() {
             try {
                 let query = supabase.from('food_items').select('*');
 
-                if (selectedCategories.length > 0 && selectedCategories.length < CATEGORIES.length) {
+                if (selectedCategories.length < CATEGORIES.length) {
                     query = query.in('category', selectedCategories);
                 }
 
