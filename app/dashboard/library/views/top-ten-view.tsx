@@ -150,22 +150,7 @@ export function TopTenView() {
 
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                    <div className="flex items-center gap-3 mb-2">
-                        <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 border-yellow-200 uppercase tracking-widest text-[10px] gap-1 px-3 py-1">
-                            <Trophy size={10} className="fill-yellow-600" />
-                            Leaderboard
-                        </Badge>
-                    </div>
-                    <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white uppercase italic">
-                        Top 10 Sources
-                    </h2>
-                    <p className="text-slate-500 font-medium text-sm max-w-lg mt-1">
-                        Discover the most potent sources of <span className="text-emerald-600 dark:text-emerald-400 font-bold">{selectedNutrient.label}</span> in our library.
-                    </p>
-                </div>
-            </div>
+
 
             {/* Category Filter */}
             <div className="relative">
