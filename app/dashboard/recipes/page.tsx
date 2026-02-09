@@ -286,6 +286,8 @@ function KitchenContent() {
                         selectedTypes={selectedTypes}
                         setSelectedTypes={setSelectedTypes}
                         hideControls={true}
+                        isFilterOpen={isFilterOpen}
+                        setIsFilterOpen={setIsFilterOpen}
                     />
                 )}
             </div>
