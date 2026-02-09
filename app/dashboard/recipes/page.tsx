@@ -78,18 +78,23 @@ function KitchenContent() {
     const renderTabGroup = (tabsList: typeof mealsTabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
         <div className="space-y-3">
             <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>
-            <div className="flex p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500 w-full md:w-[750px]">
-                <div className="flex items-center">
-                    {showHomeButton && (
+            <div className="flex items-center p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500 w-full md:w-[750px]">
+                {/* Left side - Home Button area */}
+                <div className="flex-shrink-0 w-12 flex items-center justify-start">
+                    {showHomeButton && !isSearchExpanded && (
                         <button
                             onClick={() => router.push('/dashboard')}
-                            className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/10 transition-all mr-2 flex-shrink-0"
+                            className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/10 transition-all flex-shrink-0"
                             title="Back to Dashboard"
                         >
                             <LayoutGrid size={18} />
                         </button>
                     )}
-                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                </div>
+
+                {/* Center - Tabs area */}
+                <div className="flex-1 flex items-center justify-center overflow-hidden">
+                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
                         {tabsList.map((tab) => {
                             const Icon = tab.icon;
                             const isActive = activeTab === tab.id;
@@ -116,7 +121,11 @@ function KitchenContent() {
                     </div>
                 </div>
 
-                <div className="flex-1 flex items-center justify-end pl-2">
+                {/* Right side - Search area */}
+                <div className={cn(
+                    "flex items-center justify-end transition-all duration-500",
+                    isSearchExpanded ? "flex-1 pl-2" : "w-12"
+                )}>
                     <div className={cn(
                         "flex items-center transition-all duration-500 overflow-hidden",
                         isSearchExpanded ? "flex-1 opacity-100" : "w-0 opacity-0"
