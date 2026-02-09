@@ -385,8 +385,8 @@ export function RecipesView({
                                                 toggleFavorite(recipe);
                                             }}
                                             className={cn(
-                                                "w-8 h-8 rounded-full border shadow-sm transition-all",
-                                                recipe.is_favorite ? "bg-rose-500 text-white" : "bg-white/90 dark:bg-slate-950/90 text-slate-400 hover:text-rose-500"
+                                                "w-8 h-8 rounded-full transition-all flex items-center justify-center",
+                                                recipe.is_favorite ? "text-rose-500" : "text-slate-400 hover:text-rose-500"
                                             )}
                                         >
                                             <Heart size={14} fill={recipe.is_favorite ? "currentColor" : "none"} />
