@@ -218,32 +218,80 @@ export function TopTenView() {
             </div>
 
             {/* Nutrient Selector */}
-            <div className="relative">
-                <div className="flex flex-wrap gap-2 pb-4">
-                    {NUTRIENTS.map((nutrient) => {
-                        const Icon = nutrient.icon;
-                        const isSelected = selectedNutrient.id === nutrient.id;
-                        return (
-                            <button
-                                key={nutrient.id}
-                                onClick={() => setSelectedNutrient(nutrient)}
-                                className={cn(
-                                    "flex items-center gap-2 pl-1.5 pr-4 py-1.5 rounded-full border transition-all duration-300",
-                                    isSelected
-                                        ? "bg-slate-900 text-white border-slate-900 shadow-lg scale-105"
-                                        : "bg-white dark:bg-slate-900/50 text-slate-500 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
-                                )}
-                            >
-                                <div className={cn("w-6 h-6 rounded-full flex items-center justify-center", isSelected ? "bg-white/20" : "bg-slate-100 dark:bg-slate-800")}>
-                                    <Icon size={12} className={isSelected ? "text-white" : "text-slate-400"} />
-                                </div>
-                                <div className="text-left">
-                                    <p className="text-[10px] font-black uppercase tracking-widest leading-none">{nutrient.label}</p>
-                                </div>
-                            </button>
-                        );
-                    })}
-                </div>
+            <div className="space-y-6">
+                {[
+                    {
+                        title: "Macronutrients",
+                        icon: Scale,
+                        align: "text-orange-500",
+                        ids: ['energy_kcal', 'protein_g', 'carbs_g', 'fat_g']
+                    },
+                    {
+                        title: "Electrolytes",
+                        icon: Zap,
+                        align: "text-blue-500",
+                        ids: ['Sodium', 'Potassium', 'Magnesium', 'Calcium', 'Phosphorus']
+                    },
+                    {
+                        title: "Daily Vitamins",
+                        icon: Droplet,
+                        align: "text-emerald-500",
+                        ids: ['Vitamin C', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Choline']
+                    },
+                    {
+                        title: "Stored Vitamins",
+                        icon: Battery,
+                        align: "text-teal-500",
+                        ids: ['Vitamin A', 'Vitamin D', 'Vitamin E', 'Vitamin K']
+                    },
+                    {
+                        title: "Trace Minerals",
+                        icon: Gem,
+                        align: "text-rose-500",
+                        ids: ['Iron', 'Zinc', 'Copper', 'Manganese', 'Selenium']
+                    },
+                    {
+                        title: "Clinical Markers",
+                        icon: Activity,
+                        align: "text-amber-500",
+                        ids: ['Fiber']
+                    }
+                ].map((group) => (
+                    <div key={group.title} className="space-y-3">
+                        <div className="flex items-center gap-2 px-2">
+                            <group.icon size={14} className={group.align} />
+                            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">{group.title}</h4>
+                            <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800" />
+                        </div>
+                        <div className="flex flex-wrap gap-2 px-2">
+                            {group.ids.map(id => {
+                                const nutrient = NUTRIENTS.find(n => n.id === id);
+                                if (!nutrient) return null;
+                                const Icon = nutrient.icon;
+                                const isSelected = selectedNutrient.id === nutrient.id;
+                                return (
+                                    <button
+                                        key={nutrient.id}
+                                        onClick={() => setSelectedNutrient(nutrient)}
+                                        className={cn(
+                                            "flex items-center gap-2 pl-1.5 pr-4 py-1.5 rounded-full border transition-all duration-300",
+                                            isSelected
+                                                ? "bg-slate-900 text-white border-slate-900 shadow-lg scale-105"
+                                                : "bg-white dark:bg-slate-900/50 text-slate-500 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+                                        )}
+                                    >
+                                        <div className={cn("w-6 h-6 rounded-full flex items-center justify-center", isSelected ? "bg-white/20" : "bg-slate-100 dark:bg-slate-800")}>
+                                            <Icon size={12} className={isSelected ? "text-white" : "text-slate-400"} />
+                                        </div>
+                                        <div className="text-left">
+                                            <p className="text-[10px] font-black uppercase tracking-widest leading-none">{nutrient.label}</p>
+                                        </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                ))}
             </div>
 
             {/* Results List */}
