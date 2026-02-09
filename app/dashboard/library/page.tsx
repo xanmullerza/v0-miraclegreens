@@ -44,7 +44,7 @@ export default function ClinicalLibrary() {
 function LibraryContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [activeTab, setActiveTab] = useState<'foods' | 'recipes' | 'nutrients'>('nutrients');
+    const [activeTab, setActiveTab] = useState<'recipes' | 'nutrients' | 'compare'>('recipes');
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
     const { searchQuery, setSearchQuery } = useSearch();
 
@@ -61,12 +61,16 @@ function LibraryContent() {
     // Sync tab with URL if needed
     useEffect(() => {
         const tab = searchParams.get('tab') as any;
-        if (tab && ['foods', 'recipes', 'nutrients'].includes(tab)) {
+        if (tab && ['recipes', 'nutrients'].includes(tab)) {
             setActiveTab(tab);
         }
     }, [searchParams]);
 
-    const handleTabChange = (tab: 'foods' | 'recipes' | 'nutrients') => {
+    const handleTabChange = (tab: 'recipes' | 'nutrients' | 'compare') => {
+        if (tab === 'compare') {
+            router.push('/dashboard/ingredients?tab=compare');
+            return;
+        }
         setActiveTab(tab);
         const params = new URLSearchParams(searchParams.toString());
         params.set('tab', tab);
@@ -74,9 +78,9 @@ function LibraryContent() {
     };
 
     const tabs = [
-        { id: 'nutrients', label: 'Nutrients', icon: Activity, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-        { id: 'foods', label: 'Ingredients', icon: Apple, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
         { id: 'recipes', label: 'Meals', icon: ChefHat, color: 'text-blue-500', bg: 'bg-blue-600/10' },
+        { id: 'compare', label: 'Compare', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+        { id: 'nutrients', label: 'Nutrients', icon: Activity, color: 'text-amber-500', bg: 'bg-amber-500/10' },
     ];
 
     const renderTabGroup = (tabsList: typeof tabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
@@ -186,70 +190,7 @@ function LibraryContent() {
                     {renderTabGroup(tabs, "📚 Sections", "text-slate-500", true)}
 
                     <div className="flex items-center gap-4 animate-in fade-in slide-in-from-right-4 duration-500 w-full xl:w-auto overflow-x-auto no-scrollbar pb-2 xl:pb-0">
-                        {activeTab === 'foods' && (
-                            <>
-                                {/* Foods Favorites Toggle */}
-                                <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl shrink-0 transition-all">
-                                    <Globe
-                                        size={18}
-                                        className={cn(
-                                            "transition-all cursor-pointer",
-                                            !showFoodFavorites ? "text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" : "text-slate-400 hover:text-slate-500"
-                                        )}
-                                        onClick={() => setShowFoodFavorites(false)}
-                                    />
-                                    <Switch
-                                        checked={showFoodFavorites}
-                                        onCheckedChange={setShowFoodFavorites}
-                                        className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-blue-600"
-                                    />
-                                    <Heart
-                                        size={18}
-                                        className={cn(
-                                            "transition-all cursor-pointer",
-                                            showFoodFavorites ? "text-rose-500 fill-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : "text-slate-400 hover:text-slate-500"
-                                        )}
-                                        onClick={() => setShowFoodFavorites(true)}
-                                    />
-                                </div>
 
-                                {/* Category Filter */}
-                                <div className="relative">
-                                    <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 items-center h-14 shadow-xl overflow-x-auto no-scrollbar">
-                                        <button
-                                            onClick={() => setIsFoodFilterOpen(!isFoodFilterOpen)}
-                                            className={cn(
-                                                "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300",
-                                                isFoodFilterOpen ? "bg-emerald-600 text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50"
-                                            )}
-                                        >
-                                            <Filter size={18} />
-                                            <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter</span>
-                                            <ChevronDown size={14} className={cn("transition-transform", isFoodFilterOpen && "rotate-180")} />
-                                        </button>
-                                        <div className="w-px h-6 bg-slate-200 dark:border-slate-800 mx-1" />
-                                        {CATEGORIES.slice(0, 5).map(category => {
-                                            const isActive = selectedCategories.includes(category);
-                                            return (
-                                                <button
-                                                    key={category}
-                                                    onClick={() => isActive
-                                                        ? setSelectedCategories(prev => prev.filter(c => c !== category))
-                                                        : setSelectedCategories(prev => [...prev, category])
-                                                    }
-                                                    className={cn(
-                                                        "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
-                                                        isActive ? "bg-emerald-600/10 text-emerald-600 border border-emerald-600/20" : "hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-500"
-                                                    )}
-                                                >
-                                                    {category}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            </>
-                        )}
 
                         {activeTab === 'recipes' && (
                             <>
@@ -323,15 +264,7 @@ function LibraryContent() {
 
             {/* Dynamic Content Area */}
             <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
-                {activeTab === 'foods' && (
-                    <FoodsView
-                        showFavoritesOnly={showFoodFavorites}
-                        setShowFavoritesOnly={setShowFoodFavorites}
-                        selectedCategories={selectedCategories}
-                        setSelectedCategories={setSelectedCategories}
-                        hideControls={true}
-                    />
-                )}
+
                 {activeTab === 'recipes' && (
                     <RecipesView
                         showFavoritesOnly={showMealFavorites}
