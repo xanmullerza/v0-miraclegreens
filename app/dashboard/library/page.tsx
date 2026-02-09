@@ -47,7 +47,7 @@ function LibraryContent() {
     const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState<'recipes' | 'nutrients' | 'compare'>('recipes');
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-    const { searchQuery, setSearchQuery } = useSearch();
+    const { searchQuery, setSearchQuery, setIsFocused } = useSearch();
 
     // Ingredients Filter State
     const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES);
@@ -146,6 +146,8 @@ function LibraryContent() {
                             placeholder={`Search ${activeTab}...`}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
+                            onFocus={() => setIsFocused(true)}
+                            onBlur={() => setIsFocused(false)}
                             className="w-full bg-slate-50 dark:bg-slate-800/50 border-none focus:ring-0 text-[10px] font-black uppercase tracking-widest h-12 rounded-[1.5rem] px-6 text-slate-900 dark:text-white"
                         />
                     </div>
