@@ -68,6 +68,8 @@ interface RecipesViewProps {
     selectedTypes?: string[];
     setSelectedTypes?: React.Dispatch<React.SetStateAction<string[]>>;
     hideControls?: boolean;
+    isFilterOpen?: boolean;
+    setIsFilterOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function RecipesView({
@@ -75,7 +77,9 @@ export function RecipesView({
     setShowFavoritesOnly: externalSetShowFavoritesOnly,
     selectedTypes: externalSelectedTypes,
     setSelectedTypes: externalSetSelectedTypes,
-    hideControls = false
+    hideControls = false,
+    isFilterOpen: externalIsFilterOpen,
+    setIsFilterOpen: externalSetIsFilterOpen
 }: RecipesViewProps) {
     const router = useRouter();
     const PAGE_SIZE = 20;
@@ -95,7 +99,10 @@ export function RecipesView({
     const showFavoritesOnly = externalShowFavoritesOnly !== undefined ? externalShowFavoritesOnly : localShowFavoritesOnly;
     const setShowFavoritesOnly = externalSetShowFavoritesOnly !== undefined ? externalSetShowFavoritesOnly : setLocalShowFavoritesOnly;
 
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [localIsFilterOpen, setLocalIsFilterOpen] = useState(false);
+    const isFilterOpen = externalIsFilterOpen !== undefined ? externalIsFilterOpen : localIsFilterOpen;
+    const setIsFilterOpen = externalSetIsFilterOpen !== undefined ? externalSetIsFilterOpen : setLocalIsFilterOpen;
+
     const [sortField, setSortField] = useState<string>('title');
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
     const [isAdmin, setIsAdmin] = useState(false);
