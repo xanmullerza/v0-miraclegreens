@@ -43,17 +43,49 @@ interface FoodItem {
     fat_g: number;
     image: string | null;
     is_in_pantry: boolean;
+    is_favorite: boolean;
     category?: string;
     source_table?: 'food_items' | 'pantry_items';
     quantity?: string;
 }
-export function PantryView() {
+
+const CAL_TO_KJ = 4.184;
+const formatEnergy = (calories: number, unit: 'kcal' | 'kJ') => {
+    if (unit === 'kJ') {
+        return `${Math.round(calories * CAL_TO_KJ).toLocaleString()} kJ`;
+    }
+    return `${Math.round(calories).toLocaleString()} kcal`;
+};
+
+interface PantryViewProps {
+    showFavoritesOnly?: boolean;
+    setShowFavoritesOnly?: React.Dispatch<React.SetStateAction<boolean>>;
+    selectedCategories?: string[];
+    setSelectedCategories?: React.Dispatch<React.SetStateAction<string[]>>;
+    hideControls?: boolean;
+}
+
+export function PantryView({
+    showFavoritesOnly: externalShowFavoritesOnly,
+    setShowFavoritesOnly: externalSetShowFavoritesOnly,
+    selectedCategories: externalSelectedCategories,
+    setSelectedCategories: externalSetSelectedCategories,
+    hideControls = false
+}: PantryViewProps) {
     const router = useRouter();
     const [foods, setFoods] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
     const { searchQuery } = useSearch();
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
-    const { dailyPlan, updateDailyPlan } = useUserPreferences();
+    const { dailyPlan, updateDailyPlan, energyUnit } = useUserPreferences();
+
+    const [localShowFavoritesOnly, setLocalShowFavoritesOnly] = useState(false);
+    const showFavoritesOnly = externalShowFavoritesOnly !== undefined ? externalShowFavoritesOnly : localShowFavoritesOnly;
+    const setShowFavoritesOnly = externalSetShowFavoritesOnly !== undefined ? externalSetShowFavoritesOnly : setLocalShowFavoritesOnly;
+
+    const [localSelectedCategories, setLocalSelectedCategories] = useState<string[]>([]);
+    const selectedCategories = externalSelectedCategories !== undefined ? externalSelectedCategories : localSelectedCategories;
+    const setSelectedCategories = externalSetSelectedCategories !== undefined ? externalSetSelectedCategories : setLocalSelectedCategories;
 
     // Shopping list quick-add state
     const [buyMoreItem, setBuyMoreItem] = useState<FoodItem | null>(null);
@@ -98,15 +130,16 @@ export function PantryView() {
 
                 return {
                     id: item.id,
-                    name: item.name,
-                    common_name: item.name,
+                    name: sp?.name || fi?.name || item.custom_name || 'Personal Item',
+                    common_name: fi?.common_name || sp?.common_name || sp?.name || fi?.name || item.custom_name || 'Personal Item',
                     energy_kcal: nutrition.energy || fi?.energy_kcal || 0,
                     protein_g: nutrition.protein || fi?.protein_g || 0,
                     carbs_g: nutrition.carbs || fi?.carbs_g || 0,
                     fat_g: nutrition.fat || fi?.fat_g || 0,
                     image: sp?.image_url || fi?.image || null,
                     is_in_pantry: true,
-                    category: 'Pantry',
+                    is_favorite: fi?.is_favorite || false,
+                    category: fi?.category || sp?.category || 'General',
                     source_table: 'pantry_items',
                     quantity: item.quantity
                 } as FoodItem;
@@ -214,10 +247,14 @@ export function PantryView() {
         setBuyMoreQty('1');
     };
 
-    const filteredFoods = foods.filter(food =>
-        (food.common_name || food.name).toLowerCase().includes(searchQuery.toLowerCase()) ||
-        food.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredFoods = foods.filter(food => {
+        const matchesSearch = (food.common_name || food.name).toLowerCase().includes(searchQuery.toLowerCase()) ||
+            food.name.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesFavorites = !showFavoritesOnly || food.is_favorite;
+        const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(food.category || 'General');
+
+        return matchesSearch && matchesFavorites && matchesCategory;
+    });
 
     // Grouping logic
     const groupedFoods = filteredFoods.reduce((acc, food) => {
@@ -258,10 +295,10 @@ export function PantryView() {
                     <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_100px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
                         <div className="flex items-center gap-1.5"><Camera size={14} /> View</div>
                         <div className="flex items-center gap-1.5"><Info size={14} /> Name</div>
-                        <div className="flex justify-end items-center gap-1.5"><Zap size={14} className="text-emerald-500" /> ENERGY</div>
-                        <div className="flex justify-end items-center gap-1.5"><Wheat size={14} className="text-amber-500" /> CARBS</div>
-                        <div className="flex justify-end items-center gap-1.5"><Droplet size={14} className="text-amber-900" /> FAT</div>
-                        <div className="flex justify-end items-center gap-1.5"><Beef size={14} className="text-rose-500" /> PROTEIN</div>
+                        <div className="flex justify-end items-center gap-1.5"><Zap size={14} className="text-emerald-500" /> ENERGY ({energyUnit})</div>
+                        <div className="flex justify-end items-center gap-1.5"><Wheat size={14} className="text-amber-500" /> CARBS (g)</div>
+                        <div className="flex justify-end items-center gap-1.5"><Droplet size={14} className="text-amber-900" /> FAT (g)</div>
+                        <div className="flex justify-end items-center gap-1.5"><Beef size={14} className="text-rose-500" /> PROTEIN (g)</div>
                         <div className="flex justify-center items-center gap-1.5">
                             <Activity size={14} className="text-slate-400" /> CONTROL
                         </div>
@@ -362,7 +399,7 @@ export function PantryView() {
 
                                                     {/* Stats (Desktop View) */}
                                                     <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                                        {Math.round(food.energy_kcal)}
+                                                        {formatEnergy(food.energy_kcal, energyUnit)}
                                                     </div>
                                                     <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
                                                         {food.carbs_g.toFixed(1)}g

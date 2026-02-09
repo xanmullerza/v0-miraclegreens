@@ -177,7 +177,7 @@ function FoodsHubContent() {
                     {renderTabGroup(ingredientTabs, "📦 Ingredients", "text-slate-500", true)}
                 </div>
 
-                {(currentTab === 'allfoods' || currentTab === 'explore') && (
+                {(currentTab === 'allfoods' || currentTab === 'explore' || currentTab === 'pantry') && (
                     <div className="flex items-center gap-4 animate-in fade-in slide-in-from-right-4 duration-500 w-full xl:w-auto overflow-x-auto no-scrollbar pb-2 xl:pb-0">
                         {/* Favorites Switch Toggle */}
                         <div className="flex items-center gap-4 bg-slate-100/50 dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl shrink-0 transition-all">
@@ -255,7 +255,13 @@ function FoodsHubContent() {
                 {/* View Area */}
                 <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
                     {currentTab === 'groceries' && <ShoppingListView />}
-                    {currentTab === 'pantry' && <PantryView />}
+                    {currentTab === 'pantry' && <PantryView
+                        showFavoritesOnly={showFavoritesOnly}
+                        setShowFavoritesOnly={setShowFavoritesOnly}
+                        selectedCategories={selectedCategories}
+                        setSelectedCategories={setSelectedCategories}
+                        hideControls={true}
+                    />}
                     {currentTab === 'allfoods' && <ExploreView
                         showFavoritesOnly={showFavoritesOnly}
                         setShowFavoritesOnly={setShowFavoritesOnly}
