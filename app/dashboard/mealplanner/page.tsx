@@ -308,8 +308,6 @@ interface MealPlannerContentProps {
     hideControls?: boolean;
     isFilterOpen?: boolean;
     setIsFilterOpen?: React.Dispatch<React.SetStateAction<boolean>>;
-    showShoppingList?: boolean;
-    setShowShoppingList?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Named export for use in other components (like Kitchen tabs)
@@ -320,9 +318,7 @@ export function MealPlannerContent({
     setSelectedTypes: externalSetSelectedTypes,
     hideControls = false,
     isFilterOpen: externalIsFilterOpen,
-    setIsFilterOpen: externalSetIsFilterOpen,
-    showShoppingList: externalShowShoppingList,
-    setShowShoppingList: externalSetShowShoppingList
+    setIsFilterOpen: externalSetIsFilterOpen
 }: MealPlannerContentProps) {
     const router = useRouter();
     const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -369,10 +365,6 @@ export function MealPlannerContent({
     const setIsFilterOpen = externalSetIsFilterOpen !== undefined ? externalSetIsFilterOpen : setLocalIsFilterOpen;
     const selectedTypes = externalSelectedTypes !== undefined ? externalSelectedTypes : localSelectedTypes;
     const setSelectedTypes = externalSetSelectedTypes !== undefined ? externalSetSelectedTypes : setLocalSelectedTypes;
-
-    const [localShowShoppingList, setLocalShowShoppingList] = useState(false);
-    const showShoppingList = externalShowShoppingList !== undefined ? externalShowShoppingList : localShowShoppingList;
-    const setShowShoppingList = externalSetShowShoppingList !== undefined ? externalSetShowShoppingList : setLocalShowShoppingList;
 
     const [showSummary, setShowSummary] = useState(false);
     const [alwaysSkip, setAlwaysSkip] = useState(skipPlannerQuiz);
@@ -735,26 +727,10 @@ export function MealPlannerContent({
                                 )}
                             </div>
                         </div>
-
-                        {/* Shopping List Toggle (Only if plan exists) */}
-                        {plan && (
-                            <Button
-                                onClick={() => setShowShoppingList(!showShoppingList)}
-                                className={cn(
-                                    "h-14 px-6 rounded-2xl border font-black uppercase tracking-widest text-[10px] transition-all flex items-center gap-3 shrink-0 shadow-sm",
-                                    showShoppingList
-                                        ? "bg-emerald-600 text-white border-emerald-600 shadow-emerald-500/20"
-                                        : "bg-white dark:bg-slate-900/50 text-emerald-600 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
-                                )}
-                            >
-                                <ShoppingBasket size={18} />
-                                <span>{showShoppingList ? "Hide Shopping List" : "Generate Shopping List"}</span>
-                                <ChevronDown size={14} className={cn("transition-transform duration-300", showShoppingList && "rotate-180")} />
-                            </Button>
-                        )}
                     </div>
                 </div>
             )}
+
 
             <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 md:p-10 shadow-sm relative overflow-hidden">
                 {step === 1 && showSummary && (
@@ -890,133 +866,130 @@ export function MealPlannerContent({
 
                         {/* Shopping List Section */}
                         <div className="space-y-4 pt-4">
-
-                            {showShoppingList && (
-                                <div className="animate-in slide-in-from-top-4 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
-                                    {/* Header */}
-                                    <div className="p-6 pb-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
-                                                    <ShoppingBasket size={20} />
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-lg font-black uppercase tracking-tight text-slate-900 dark:text-white">Shopping List</h3>
-                                                    <p className="text-xs font-medium text-slate-500">Ingredients for your meal plan</p>
-                                                </div>
+                            <div className="animate-in slide-in-from-top-4 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
+                                {/* Header */}
+                                <div className="p-6 pb-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                                                <ShoppingBasket size={20} />
                                             </div>
-                                            <Badge className="bg-emerald-500/10 text-emerald-600 border-none font-black text-[10px] uppercase tracking-widest px-3 py-1.5">
-                                                {generateShoppingList(plan).length} Items
-                                            </Badge>
+                                            <div>
+                                                <h3 className="text-lg font-black uppercase tracking-tight text-slate-900 dark:text-white">Shopping List</h3>
+                                                <p className="text-xs font-medium text-slate-500">Ingredients for your meal plan</p>
+                                            </div>
                                         </div>
-                                    </div>
-
-                                    {/* Shopping List Items */}
-                                    <div className="p-6">
-                                        {(() => {
-                                            const shoppingItems = generateShoppingList(plan);
-                                            const pantryNames = new Set(pantryItems.map(f => (f.common_name || f.name).toLowerCase().trim()));
-
-                                            // Split items into "need to buy" and "in pantry"
-                                            const needToBuy = shoppingItems.filter(item => !pantryNames.has(item.name.toLowerCase().trim()));
-                                            const inPantry = shoppingItems.filter(item => pantryNames.has(item.name.toLowerCase().trim()));
-
-                                            return (
-                                                <div className="space-y-6">
-                                                    {/* Items to Buy */}
-                                                    {needToBuy.length > 0 && (
-                                                        <div className="space-y-3">
-                                                            <div className="flex items-center gap-2">
-                                                                <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-                                                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500">
-                                                                    Need to Buy ({needToBuy.length})
-                                                                </span>
-                                                            </div>
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                                                {needToBuy.map((item, idx) => (
-                                                                    <div
-                                                                        key={idx}
-                                                                        className={cn(
-                                                                            "flex items-center justify-between p-4 rounded-xl border transition-all",
-                                                                            item.isMiracleProduct
-                                                                                ? "bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/50"
-                                                                                : "bg-slate-50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700"
-                                                                        )}
-                                                                    >
-                                                                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                                                                            {item.isMiracleProduct && (
-                                                                                <Sparkles size={14} className="text-amber-500 shrink-0" />
-                                                                            )}
-                                                                            <span className="font-bold text-slate-900 dark:text-white truncate">
-                                                                                {item.name}
-                                                                            </span>
-                                                                        </div>
-                                                                        <div className="text-right shrink-0 ml-2">
-                                                                            <span className="text-xs font-medium text-slate-500">
-                                                                                {item.amounts.join(' + ')}
-                                                                            </span>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {/* Items in Pantry */}
-                                                    {inPantry.length > 0 && (
-                                                        <div className="space-y-3">
-                                                            <div className="flex items-center gap-2">
-                                                                <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                                                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">
-                                                                    Already in Pantry ({inPantry.length})
-                                                                </span>
-                                                            </div>
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                                                {inPantry.map((item, idx) => (
-                                                                    <div
-                                                                        key={idx}
-                                                                        className="flex items-center justify-between p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/50 opacity-70"
-                                                                    >
-                                                                        <div className="flex items-center gap-3 flex-1 min-w-0">
-                                                                            <Check size={14} className="text-emerald-500 shrink-0" />
-                                                                            <span className="font-bold text-slate-700 dark:text-slate-300 truncate line-through">
-                                                                                {item.name}
-                                                                            </span>
-                                                                        </div>
-                                                                        <div className="text-right shrink-0 ml-2">
-                                                                            <span className="text-xs font-medium text-slate-400">
-                                                                                {item.amounts.join(' + ')}
-                                                                            </span>
-                                                                        </div>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {/* Empty State */}
-                                                    {shoppingItems.length === 0 && (
-                                                        <div className="flex flex-col items-center justify-center py-10 text-center">
-                                                            <ShoppingBasket size={48} className="text-slate-200 dark:text-slate-700 mb-4" />
-                                                            <p className="text-slate-500">No ingredients found in meal plan</p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            );
-                                        })()}
-                                    </div>
-
-                                    {/* Footer */}
-                                    <div className="px-6 pb-6 pt-0 flex justify-center">
-                                        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-950/50 border border-slate-200/50 dark:border-slate-800/50">
-                                            <Sparkles size={12} className="text-amber-500" />
-                                            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                                Miracle Products are highlighted in gold
-                                            </p>
-                                        </div>
+                                        <Badge className="bg-emerald-500/10 text-emerald-600 border-none font-black text-[10px] uppercase tracking-widest px-3 py-1.5">
+                                            {generateShoppingList(plan).length} Items
+                                        </Badge>
                                     </div>
                                 </div>
-                            )}
+
+                                {/* Shopping List Items */}
+                                <div className="p-6">
+                                    {(() => {
+                                        const shoppingItems = generateShoppingList(plan);
+                                        const pantryNames = new Set(pantryItems.map(f => (f.common_name || f.name).toLowerCase().trim()));
+
+                                        // Split items into "need to buy" and "in pantry"
+                                        const needToBuy = shoppingItems.filter(item => !pantryNames.has(item.name.toLowerCase().trim()));
+                                        const inPantry = shoppingItems.filter(item => pantryNames.has(item.name.toLowerCase().trim()));
+
+                                        return (
+                                            <div className="space-y-6">
+                                                {/* Items to Buy */}
+                                                {needToBuy.length > 0 && (
+                                                    <div className="space-y-3">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500">
+                                                                Need to Buy ({needToBuy.length})
+                                                            </span>
+                                                        </div>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                                            {needToBuy.map((item, idx) => (
+                                                                <div
+                                                                    key={idx}
+                                                                    className={cn(
+                                                                        "flex items-center justify-between p-4 rounded-xl border transition-all",
+                                                                        item.isMiracleProduct
+                                                                            ? "bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/50"
+                                                                            : "bg-slate-50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700"
+                                                                    )}
+                                                                >
+                                                                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                                        {item.isMiracleProduct && (
+                                                                            <Sparkles size={14} className="text-amber-500 shrink-0" />
+                                                                        )}
+                                                                        <span className="font-bold text-slate-900 dark:text-white truncate">
+                                                                            {item.name}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="text-right shrink-0 ml-2">
+                                                                        <span className="text-xs font-medium text-slate-500">
+                                                                            {item.amounts.join(' + ')}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Items in Pantry */}
+                                                {inPantry.length > 0 && (
+                                                    <div className="space-y-3">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                                                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">
+                                                                Already in Pantry ({inPantry.length})
+                                                            </span>
+                                                        </div>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                                            {inPantry.map((item, idx) => (
+                                                                <div
+                                                                    key={idx}
+                                                                    className="flex items-center justify-between p-4 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/50 opacity-70"
+                                                                >
+                                                                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                                                                        <Check size={14} className="text-emerald-500 shrink-0" />
+                                                                        <span className="font-bold text-slate-700 dark:text-slate-300 truncate line-through">
+                                                                            {item.name}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="text-right shrink-0 ml-2">
+                                                                        <span className="text-xs font-medium text-slate-400">
+                                                                            {item.amounts.join(' + ')}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Empty State */}
+                                                {shoppingItems.length === 0 && (
+                                                    <div className="flex flex-col items-center justify-center py-10 text-center">
+                                                        <ShoppingBasket size={48} className="text-slate-200 dark:text-slate-700 mb-4" />
+                                                        <p className="text-slate-500">No ingredients found in meal plan</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })()}
+                                </div>
+
+                                {/* Footer */}
+                                <div className="px-6 pb-6 pt-0 flex justify-center">
+                                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-slate-100 dark:bg-slate-950/50 border border-slate-200/50 dark:border-slate-800/50">
+                                        <Sparkles size={12} className="text-amber-500" />
+                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
+                                            Miracle Products are highlighted in gold
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div className="space-y-4 pt-10 border-t">
