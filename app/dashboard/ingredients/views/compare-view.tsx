@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import {
+    Plus,
     Scale,
     Zap,
     Sparkles,
