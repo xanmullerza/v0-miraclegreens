@@ -26,7 +26,8 @@ import {
     Wheat,
     Beef,
     Droplet,
-    Camera
+    Camera,
+    Activity
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -298,18 +299,20 @@ export function RecipesView({
                             <span>Title</span>
                         </div>
                         <div className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-blue-500" onClick={() => handleSort('calories')}>
-                            <Zap size={14} className="text-emerald-500" /> kcal
+                            <Zap size={14} className="text-emerald-500" /> ENERGY
                         </div>
                         <div className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-blue-500" onClick={() => handleSort('carbs')}>
-                            <Wheat size={14} className="text-amber-500" /> Cho
+                            <Wheat size={14} className="text-amber-500" /> CARBS
                         </div>
                         <div className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-blue-500" onClick={() => handleSort('fat')}>
-                            <Droplet size={14} className="text-amber-900" /> Fat
+                            <Droplet size={14} className="text-amber-900" /> FAT
                         </div>
                         <div className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-blue-500" onClick={() => handleSort('protein')}>
-                            <Beef size={14} className="text-rose-500" /> Pro
+                            <Beef size={14} className="text-rose-500" /> PROTEIN
                         </div>
-                        <div className="text-center">Actions</div>
+                        <div className="flex justify-end lg:justify-center items-center gap-1.5">
+                            <Activity size={14} className="text-slate-400" /> CONTROL
+                        </div>
                     </div>
 
                     {/* Recipe List */}
