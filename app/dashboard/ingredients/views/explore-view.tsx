@@ -45,12 +45,16 @@ interface FoodItem {
 interface ExploreViewProps {
     showFavoritesOnly?: boolean;
     setShowFavoritesOnly?: React.Dispatch<React.SetStateAction<boolean>>;
+    selectedCategories?: string[];
+    setSelectedCategories?: React.Dispatch<React.SetStateAction<string[]>>;
     hideControls?: boolean;
 }
 
 export function ExploreView({
     showFavoritesOnly: externalShowFavoritesOnly,
     setShowFavoritesOnly: externalSetShowFavoritesOnly,
+    selectedCategories: externalSelectedCategories,
+    setSelectedCategories: externalSetSelectedCategories,
     hideControls = false
 }: ExploreViewProps) {
     const router = useRouter();
@@ -61,6 +65,10 @@ export function ExploreView({
     const [localShowFavoritesOnly, setLocalShowFavoritesOnly] = useState(false);
     const showFavoritesOnly = externalShowFavoritesOnly !== undefined ? externalShowFavoritesOnly : localShowFavoritesOnly;
     const setShowFavoritesOnly = externalSetShowFavoritesOnly !== undefined ? externalSetShowFavoritesOnly : setLocalShowFavoritesOnly;
+
+    const [localSelectedCategories, setLocalSelectedCategories] = useState<string[]>([]);
+    const selectedCategories = externalSelectedCategories !== undefined ? externalSelectedCategories : localSelectedCategories;
+    const setSelectedCategories = externalSetSelectedCategories !== undefined ? externalSetSelectedCategories : setLocalSelectedCategories;
 
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -76,7 +84,7 @@ export function ExploreView({
 
     useEffect(() => {
         fetchFoods(1, true);
-    }, [searchQuery, showFavoritesOnly]);
+    }, [searchQuery, showFavoritesOnly, selectedCategories]);
 
     const fetchFoods = async (pageNum: number, isNewSearch = false) => {
         setLoading(true);
@@ -89,6 +97,10 @@ export function ExploreView({
 
             if (showFavoritesOnly) {
                 query = query.eq('is_favorite', true);
+            }
+
+            if (selectedCategories.length > 0) {
+                query = query.in('category', selectedCategories);
             }
 
             const from = (pageNum - 1) * 20;

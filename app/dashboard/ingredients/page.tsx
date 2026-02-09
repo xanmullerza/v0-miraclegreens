@@ -16,7 +16,9 @@ import {
     X,
     LayoutGrid,
     Globe,
-    Heart
+    Heart,
+    Filter,
+    ChevronDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSearch } from '@/lib/context/search-context';
@@ -30,6 +32,7 @@ import { CompareView } from './views/compare-view';
 import { LabView } from './views/lab-view';
 import { ShoppingListView } from '@/components/kitchen/shopping-list-view';
 import { PantryView } from '@/components/kitchen/pantry-view';
+import { CATEGORIES } from '@/components/library/foods-view';
 
 type FoodTab = 'groceries' | 'pantry' | 'allfoods' | 'explore' | 'staples' | 'shopping' | 'nutrients' | 'compare' | 'lab';
 
@@ -42,6 +45,8 @@ function FoodsHubContent() {
 
     // Lifted Filter State
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [isFoodFilterOpen, setIsFoodFilterOpen] = useState(false);
 
     const setTab = (tab: FoodTab) => {
         const params = new URLSearchParams(searchParams.toString());
@@ -195,6 +200,42 @@ function FoodsHubContent() {
                                 onClick={() => setShowFavoritesOnly(true)}
                             />
                         </div>
+
+                        {/* Category Filter */}
+                        <div className="relative">
+                            <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 items-center h-14 shadow-xl overflow-x-auto no-scrollbar">
+                                <button
+                                    onClick={() => setIsFoodFilterOpen(!isFoodFilterOpen)}
+                                    className={cn(
+                                        "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300",
+                                        isFoodFilterOpen ? "bg-emerald-600 text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50"
+                                    )}
+                                >
+                                    <Filter size={18} />
+                                    <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter</span>
+                                    <ChevronDown size={14} className={cn("transition-transform", isFoodFilterOpen && "rotate-180")} />
+                                </button>
+                                <div className="w-px h-6 bg-slate-200 dark:border-slate-800 mx-1" />
+                                {CATEGORIES.slice(0, 5).map(category => {
+                                    const isActive = selectedCategories.includes(category);
+                                    return (
+                                        <button
+                                            key={category}
+                                            onClick={() => isActive
+                                                ? setSelectedCategories(prev => prev.filter(c => c !== category))
+                                                : setSelectedCategories(prev => [...prev, category])
+                                            }
+                                            className={cn(
+                                                "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
+                                                isActive ? "bg-emerald-600/10 text-emerald-600 border border-emerald-600/20" : "hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-500"
+                                            )}
+                                        >
+                                            {category}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
                     </div>
                 )}
 
@@ -205,11 +246,15 @@ function FoodsHubContent() {
                     {currentTab === 'allfoods' && <ExploreView
                         showFavoritesOnly={showFavoritesOnly}
                         setShowFavoritesOnly={setShowFavoritesOnly}
+                        selectedCategories={selectedCategories}
+                        setSelectedCategories={setSelectedCategories}
                         hideControls={true}
                     />}
                     {currentTab === 'explore' && <ExploreView
                         showFavoritesOnly={showFavoritesOnly}
                         setShowFavoritesOnly={setShowFavoritesOnly}
+                        selectedCategories={selectedCategories}
+                        setSelectedCategories={setSelectedCategories}
                         hideControls={true}
                     />}
                     {currentTab === 'staples' && <StaplesView />}
