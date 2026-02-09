@@ -190,50 +190,6 @@ export function CompareView() {
                     ))}
                 </div>
                 {selectedItems.length > 0 && <Button variant="ghost" className="h-14 px-6 rounded-2xl text-rose-500 font-black uppercase tracking-widest text-[10px]" onClick={() => setSelectedItems([])}><RotateCcw size={16} className="mr-2" /> Reset</Button>}
-
-                {/* Local Search Results Dropdown */}
-                {searchQuery.trim() !== '' && (
-                    <div className="absolute top-full left-0 right-0 mt-2 z-[100] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 max-w-xl">
-                        {isLoading ? (
-                            <div className="p-8 text-center">
-                                <Activity className="h-6 w-6 animate-spin text-emerald-500 mx-auto" />
-                                <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-400">Analyzing...</p>
-                            </div>
-                        ) : results.length === 0 ? (
-                            <div className="p-8 text-center text-slate-500">
-                                <p className="font-bold text-sm">No items found for "{searchQuery}"</p>
-                            </div>
-                        ) : (
-                            <div className="max-h-80 overflow-y-auto custom-scrollbar">
-                                <div className="p-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-                                    <p className="text-[9px] uppercase font-black tracking-widest text-slate-400 px-3">Available Samples</p>
-                                </div>
-                                {results.map((result) => (
-                                    <button
-                                        key={result.id}
-                                        onClick={() => {
-                                            if (onResultClickRef.current) {
-                                                onResultClickRef.current(result);
-                                            }
-                                            setSearchQuery('');
-                                        }}
-                                        className="w-full text-left p-4 hover:bg-emerald-50 dark:hover:bg-emerald-500/5 transition-all flex justify-between items-center group border-b border-slate-100 dark:border-slate-800 last:border-0"
-                                    >
-                                        <div className="flex-1 min-w-0 mr-4">
-                                            <div className="font-bold text-slate-900 dark:text-white capitalize group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors text-sm">
-                                                {result.title}
-                                            </div>
-                                            {result.subtitle && (
-                                                <div className="text-[10px] text-slate-500 italic mt-0.5">{result.subtitle}</div>
-                                            )}
-                                        </div>
-                                        <Plus size={14} className="text-slate-300 group-hover:text-emerald-500" />
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-                )}
             </div>
 
             {selectedItems.length === 0 ? (

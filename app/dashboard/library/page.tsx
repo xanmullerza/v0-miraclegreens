@@ -11,10 +11,10 @@ import {
     Loader2,
     Zap,
     Scale,
-    Plus,
     X,
     Filter,
     ChevronDown,
+    Plus,
     LayoutGrid,
     Globe,
     Heart
@@ -47,7 +47,7 @@ function LibraryContent() {
     const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState<'recipes' | 'nutrients' | 'compare'>('recipes');
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-    const { searchQuery, setSearchQuery, setIsFocused } = useSearch();
+    const { searchQuery, setSearchQuery, setIsFocused, results, isLoading, onResultClickRef } = useSearch();
 
     // Ingredients Filter State
     const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES);
@@ -165,6 +165,51 @@ function LibraryContent() {
                     </button>
                 </div>
             </div>
+
+            {/* Comparison Search Results Dropdown (Pill Bar Context) */}
+            {activeTab === 'compare' && searchQuery.trim() !== '' && isSearchExpanded && (
+                <div className="absolute top-full left-0 right-0 mt-3 z-[101] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 w-full md:w-[800px] mx-auto xl:mx-0">
+                    {isLoading ? (
+                        <div className="p-8 text-center text-slate-500">
+                            <Activity className="h-6 w-6 animate-spin text-emerald-500 mx-auto" />
+                            <p className="mt-2 text-[10px] font-black uppercase tracking-widest">Analyzing Samples...</p>
+                        </div>
+                    ) : results.length === 0 ? (
+                        <div className="p-8 text-center text-slate-500">
+                            <p className="font-bold text-sm">No items found for "{searchQuery}"</p>
+                        </div>
+                    ) : (
+                        <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
+                            <div className="p-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 sticky top-0 z-10">
+                                <p className="text-[9px] uppercase font-black tracking-widest text-slate-400 px-3">Direct Matches</p>
+                            </div>
+                            {results.map((result) => (
+                                <button
+                                    key={result.id}
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        if (onResultClickRef.current) {
+                                            onResultClickRef.current(result);
+                                        }
+                                        setSearchQuery('');
+                                    }}
+                                    className="w-full text-left p-4 hover:bg-emerald-50 dark:hover:bg-emerald-500/5 transition-all flex justify-between items-center group border-b border-slate-100 dark:border-slate-800 last:border-0"
+                                >
+                                    <div className="flex-1 min-w-0 mr-4">
+                                        <div className="font-bold text-slate-900 dark:text-white capitalize group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors text-sm">
+                                            {result.title}
+                                        </div>
+                                        {result.subtitle && (
+                                            <div className="text-[10px] text-slate-500 italic mt-0.5">{result.subtitle}</div>
+                                        )}
+                                    </div>
+                                    <Plus size={14} className="text-slate-300 group-hover:text-emerald-500" />
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 
