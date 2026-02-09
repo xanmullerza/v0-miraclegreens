@@ -40,7 +40,7 @@ function FoodsHubContent() {
     const searchParams = useSearchParams();
     const currentTab = (searchParams.get('tab') as FoodTab) || 'groceries';
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-    const { searchQuery, setSearchQuery, setIsFocused } = useSearch();
+    const { searchQuery, setSearchQuery, setIsFocused, activeSearchId, setActiveSearchId } = useSearch();
 
     // Lifted Filter State
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
@@ -132,8 +132,16 @@ function FoodsHubContent() {
                             placeholder={`Search ${currentTab}...`}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            onFocus={() => setIsFocused(true)}
-                            onBlur={() => setIsFocused(false)}
+                            onFocus={() => {
+                                setIsFocused(true);
+                                setActiveSearchId('ingredients-bar');
+                            }}
+                            onBlur={() => {
+                                // Small delay to allow selections
+                                setTimeout(() => {
+                                    if (activeSearchId === 'ingredients-bar') setActiveSearchId(null);
+                                }, 200);
+                            }}
                             className="w-full bg-slate-50 dark:bg-slate-800/50 border-none focus:ring-0 text-[10px] font-black uppercase tracking-widest h-12 rounded-[1.5rem] px-6 text-slate-900 dark:text-white"
                         />
                     </div>

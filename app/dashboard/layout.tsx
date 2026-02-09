@@ -40,7 +40,19 @@ function DashboardLayoutContent({
 }) {
     const pathname = usePathname();
     const { profile } = useUserPreferences();
-    const { searchQuery, setSearchQuery, results, isLoading, isFocused, setIsFocused, onResultClickRef, searchInputRef, keepFocusAfterSelect } = useSearch();
+    const {
+        searchQuery,
+        setSearchQuery,
+        results,
+        isLoading,
+        isFocused,
+        setIsFocused,
+        activeSearchId,
+        setActiveSearchId,
+        onResultClickRef,
+        searchInputRef,
+        keepFocusAfterSelect
+    } = useSearch();
     const [user, setUser] = useState<any>(null);
 
     useEffect(() => {
@@ -100,11 +112,20 @@ function DashboardLayoutContent({
                                     placeholder="Search dashboard..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    onFocus={() => setIsFocused(true)}
+                                    onFocus={() => {
+                                        setIsFocused(true);
+                                        setActiveSearchId('global');
+                                    }}
+                                    onBlur={() => {
+                                        // Small delay to allow clicking results
+                                        setTimeout(() => {
+                                            if (activeSearchId === 'global') setActiveSearchId(null);
+                                        }, 200);
+                                    }}
                                 />
 
                                 {/* Universal Global Results Dropdown */}
-                                {isFocused && (searchQuery.trim() !== '' || isLoading) && (
+                                {isFocused && activeSearchId === 'global' && (searchQuery.trim() !== '' || isLoading) && (
                                     <>
                                         {/* Backdrop overlay within the same stacking context */}
                                         <div

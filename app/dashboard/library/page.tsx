@@ -47,7 +47,7 @@ function LibraryContent() {
     const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState<'recipes' | 'nutrients' | 'compare'>('recipes');
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-    const { searchQuery, setSearchQuery, setIsFocused, results, isLoading, onResultClickRef } = useSearch();
+    const { searchQuery, setSearchQuery, setIsFocused, activeSearchId, setActiveSearchId, results, isLoading, onResultClickRef } = useSearch();
 
     // Ingredients Filter State
     const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES);
@@ -146,8 +146,16 @@ function LibraryContent() {
                             placeholder={`Search ${activeTab}...`}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            onFocus={() => setIsFocused(true)}
-                            onBlur={() => setIsFocused(false)}
+                            onFocus={() => {
+                                setIsFocused(true);
+                                setActiveSearchId('pill-bar');
+                            }}
+                            onBlur={() => {
+                                // Small delay to allow clicking results
+                                setTimeout(() => {
+                                    if (activeSearchId === 'pill-bar') setActiveSearchId(null);
+                                }, 200);
+                            }}
                             className="w-full bg-slate-50 dark:bg-slate-800/50 border-none focus:ring-0 text-[10px] font-black uppercase tracking-widest h-12 rounded-[1.5rem] px-6 text-slate-900 dark:text-white"
                         />
                     </div>
@@ -167,7 +175,7 @@ function LibraryContent() {
             </div>
 
             {/* Comparison Search Results Dropdown (Pill Bar Context) */}
-            {activeTab === 'compare' && searchQuery.trim() !== '' && isSearchExpanded && (
+            {activeTab === 'compare' && searchQuery.trim() !== '' && isSearchExpanded && activeSearchId === 'pill-bar' && (
                 <div className="absolute top-full left-0 right-0 mt-3 z-[101] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 w-full md:w-[800px] mx-auto xl:mx-0">
                     {isLoading ? (
                         <div className="p-8 text-center text-slate-500">

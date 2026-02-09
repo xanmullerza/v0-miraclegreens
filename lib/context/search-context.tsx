@@ -20,6 +20,8 @@ interface SearchContextType {
     setIsLoading: (loading: boolean) => void;
     isFocused: boolean;
     setIsFocused: (focused: boolean) => void;
+    activeSearchId: string | null;
+    setActiveSearchId: (id: string | null) => void;
     onResultClickRef: React.MutableRefObject<((result: SearchResult) => void) | null>;
     registerResultClickHandler: (handler: (result: SearchResult) => void) => void;
     searchInputRef: React.RefObject<HTMLInputElement | null>;
@@ -34,6 +36,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
     const [results, setResults] = useState<SearchResult[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
+    const [activeSearchId, setActiveSearchId] = useState<string | null>(null);
     const onResultClickRef = useRef<((result: SearchResult) => void) | null>(null);
     const searchInputRef = useRef<HTMLInputElement | null>(null);
     const [keepFocusAfterSelect, setKeepFocusAfterSelect] = useState(false);
@@ -52,6 +55,8 @@ export function SearchProvider({ children }: { children: ReactNode }) {
             setIsLoading,
             isFocused,
             setIsFocused,
+            activeSearchId,
+            setActiveSearchId,
             onResultClickRef,
             registerResultClickHandler,
             searchInputRef,
