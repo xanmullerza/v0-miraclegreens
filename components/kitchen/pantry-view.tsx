@@ -47,7 +47,6 @@ interface FoodItem {
     source_table?: 'food_items' | 'pantry_items';
     quantity?: string;
 }
-
 export function PantryView() {
     const router = useRouter();
     const [foods, setFoods] = useState<FoodItem[]>([]);
@@ -229,40 +228,8 @@ export function PantryView() {
     }, {} as Record<string, FoodItem[]>);
 
     const groupNames = Object.keys(groupedFoods).sort();
-
     return (
         <div className="space-y-8">
-            {/* Action Bar */}
-            <div className="flex flex-wrap gap-4 items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800">
-                        <ShoppingBasket size={16} className="text-emerald-500" />
-                        <span className="text-xs font-black uppercase tracking-widest text-emerald-600">
-                            {foods.length} Items
-                        </span>
-                    </div>
-                </div>
-                <div className="flex items-center gap-3">
-                    {foods.length > 0 && (
-                        <Button
-                            onClick={() => router.push('/dashboard/recipes?tab=mealplanner')}
-                            className="bg-slate-900 border border-slate-800 text-slate-100 px-6 h-12 rounded-2xl font-black uppercase tracking-widest shadow-xl flex items-center gap-2 group transition-all hover:bg-black text-[10px]"
-                        >
-                            <Sparkles size={16} className="text-amber-400 group-hover:scale-125 transition-transform" />
-                            Generate Meals
-                        </Button>
-                    )}
-                    <Button
-                        onClick={() => router.push('/dashboard/ingredients')}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 h-12 rounded-2xl font-black uppercase tracking-widest shadow-xl shadow-emerald-500/10 flex items-center gap-2 group transition-all text-[10px]"
-                    >
-                        <Plus size={18} className="group-hover:rotate-90 transition-transform" />
-                        Add Items
-                    </Button>
-                </div>
-            </div>
-
-
             {/* List Area */}
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4">
