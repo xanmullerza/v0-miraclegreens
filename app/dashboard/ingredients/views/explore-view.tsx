@@ -438,7 +438,7 @@ export function ExploreView({
                         className="h-14 px-12 rounded-2xl border-slate-200 dark:border-slate-800 font-black uppercase tracking-widest text-[10px] hover:bg-slate-50"
                     >
                         {loading ? <Loader2 className="animate-spin mr-2" /> : <Plus size={16} className="mr-2" />}
-                        Load Scientific Markers
+                        Load More
                     </Button>
                 </div>
             )}
