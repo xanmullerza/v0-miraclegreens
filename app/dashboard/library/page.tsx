@@ -82,7 +82,7 @@ function LibraryContent() {
     const renderTabGroup = (tabsList: typeof tabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
         <div className="space-y-3">
             <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>
-            <div className="flex items-center p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500 w-full md:w-[750px]">
+            <div className="flex items-center p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500 w-full md:max-w-2xl mx-auto xl:mx-0">
                 {/* Left side - Home Button area */}
                 <div className="flex-shrink-0 w-12 flex items-center justify-start">
                     {showHomeButton && !isSearchExpanded && (
@@ -107,11 +107,11 @@ function LibraryContent() {
                                     key={tab.id}
                                     onClick={() => handleTabChange(tab.id as any)}
                                     className={cn(
-                                        "flex items-center gap-3 py-3.5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
+                                        "flex items-center gap-3 py-3.5 rounded-[1.5rem] text-[9px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
                                         isActive
                                             ? "bg-slate-900 dark:bg-slate-800 text-white shadow-xl translate-y-[-2px]"
                                             : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50",
-                                        "px-5"
+                                        "px-4 md:px-5"
                                     )}
                                 >
                                     <Icon size={15} className={cn(
