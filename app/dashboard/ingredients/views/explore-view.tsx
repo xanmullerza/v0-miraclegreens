@@ -157,7 +157,7 @@ export function ExploreView({
                 const { error } = await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', quickAddItem.id);
                 if (error) throw error;
                 setFoods(prev => prev.map(f => f.id === quickAddItem.id ? { ...f, is_in_pantry: true } : f));
-                toast.success(`"${quickAddItem.name}" added to staples`);
+                toast.success(`"${quickAddItem.name}" added to pantry`);
             } catch (error) { toast.error("Failed to update kitchen"); }
         } else {
             const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
@@ -170,7 +170,7 @@ export function ExploreView({
                 source: 'manual'
             };
             localStorage.setItem('vitala_shopping_manual_items', JSON.stringify([...currentList, newItem]));
-            toast.success(`"${quickAddItem.name}" added to shopping list`);
+            toast.success(`"${quickAddItem.name}" added to groceries`);
         }
         setQuickAddItem(null);
     };
@@ -397,13 +397,13 @@ export function ExploreView({
                                                 onClick={() => setQuickAddMode('pantry')}
                                                 className={cn("px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all", quickAddMode === 'pantry' ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "text-slate-400")}
                                             >
-                                                Staples
+                                                Pantry
                                             </button>
                                             <button
                                                 onClick={() => setQuickAddMode('shopping')}
                                                 className={cn("px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all", quickAddMode === 'shopping' ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20" : "text-slate-400")}
                                             >
-                                                Shopping
+                                                Groceries
                                             </button>
                                         </div>
                                         <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-3 h-11">
