@@ -47,7 +47,7 @@ export default function ClinicalLibrary() {
 function LibraryContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [activeTab, setActiveTab] = useState<'recipes' | 'nutrients' | 'compare' | 'top10'>('recipes');
+    const [activeTab, setActiveTab] = useState<'nutrients' | 'compare' | 'top10'>('top10');
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
     const { searchQuery, setSearchQuery, setIsFocused, activeSearchId, setActiveSearchId, results, isLoading, onResultClickRef } = useSearch();
 
@@ -56,20 +56,15 @@ function LibraryContent() {
     const [showFoodFavorites, setShowFoodFavorites] = useState(false);
     const [isFoodFilterOpen, setIsFoodFilterOpen] = useState(false);
 
-    // Meals Filter State
-    const [selectedMealTypes, setSelectedMealTypes] = useState<string[]>(MEAL_TYPES);
-    const [showMealFavorites, setShowMealFavorites] = useState(false);
-    const [isMealFilterOpen, setIsMealFilterOpen] = useState(false);
-
     // Sync tab with URL if needed
     useEffect(() => {
         const tab = searchParams.get('tab') as any;
-        if (tab && ['recipes', 'nutrients', 'compare', 'top10'].includes(tab)) {
+        if (tab && ['nutrients', 'compare', 'top10'].includes(tab)) {
             setActiveTab(tab);
         }
     }, [searchParams]);
 
-    const handleTabChange = (tab: 'recipes' | 'nutrients' | 'compare' | 'top10') => {
+    const handleTabChange = (tab: 'nutrients' | 'compare' | 'top10') => {
         setActiveTab(tab);
         const params = new URLSearchParams(searchParams.toString());
         params.set('tab', tab);
@@ -77,10 +72,9 @@ function LibraryContent() {
     };
 
     const tabs = [
-        { id: 'recipes', label: 'Meals', icon: ChefHat, color: 'text-blue-500', bg: 'bg-blue-600/10' },
-        { id: 'compare', label: 'Compare', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-        { id: 'nutrients', label: 'Nutrients', icon: Activity, color: 'text-amber-500', bg: 'bg-amber-500/10' },
         { id: 'top10', label: 'Top 10', icon: Trophy, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
+        { id: 'compare', label: 'Compare', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+        { id: 'nutrients', label: 'All Nutrients', icon: Activity, color: 'text-amber-500', bg: 'bg-amber-500/10' },
     ];
 
     const renderTabGroup = (tabsList: typeof tabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
@@ -249,70 +243,7 @@ function LibraryContent() {
                     <div className="flex items-center gap-4 animate-in fade-in slide-in-from-right-4 duration-500 w-full xl:w-auto overflow-x-auto no-scrollbar pb-2 xl:pb-0">
 
 
-                        {activeTab === 'recipes' && (
-                            <>
-                                {/* Recipes Favorites Toggle */}
-                                <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xl shrink-0 transition-all">
-                                    <Globe
-                                        size={18}
-                                        className={cn(
-                                            "transition-all cursor-pointer",
-                                            !showMealFavorites ? "text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" : "text-slate-400 hover:text-slate-500"
-                                        )}
-                                        onClick={() => setShowMealFavorites(false)}
-                                    />
-                                    <Switch
-                                        checked={showMealFavorites}
-                                        onCheckedChange={setShowMealFavorites}
-                                        className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-blue-600"
-                                    />
-                                    <Heart
-                                        size={18}
-                                        className={cn(
-                                            "transition-all cursor-pointer",
-                                            showMealFavorites ? "text-rose-500 fill-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : "text-slate-400 hover:text-slate-500"
-                                        )}
-                                        onClick={() => setShowMealFavorites(true)}
-                                    />
-                                </div>
 
-                                {/* Meal Type Filter */}
-                                <div className="relative">
-                                    <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 items-center h-14 shadow-xl overflow-x-auto no-scrollbar">
-                                        <button
-                                            onClick={() => setIsMealFilterOpen(!isMealFilterOpen)}
-                                            className={cn(
-                                                "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300",
-                                                isMealFilterOpen ? "bg-blue-600 text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50"
-                                            )}
-                                        >
-                                            <Filter size={18} />
-                                            <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter</span>
-                                            <ChevronDown size={14} className={cn("transition-transform", isMealFilterOpen && "rotate-180")} />
-                                        </button>
-                                        <div className="w-px h-6 bg-slate-200 dark:border-slate-800 mx-1" />
-                                        {MEAL_TYPES.map(type => {
-                                            const isActive = selectedMealTypes.includes(type);
-                                            return (
-                                                <button
-                                                    key={type}
-                                                    onClick={() => isActive
-                                                        ? setSelectedMealTypes(prev => prev.filter(t => t !== type))
-                                                        : setSelectedMealTypes(prev => [...prev, type])
-                                                    }
-                                                    className={cn(
-                                                        "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
-                                                        isActive ? "bg-blue-600/10 text-blue-600 border border-blue-600/20" : "hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-500"
-                                                    )}
-                                                >
-                                                    {type}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            </>
-                        )}
                     </div>
                 </div>
             </div>
@@ -322,15 +253,7 @@ function LibraryContent() {
             {/* Dynamic Content Area */}
             <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
 
-                {activeTab === 'recipes' && (
-                    <RecipesView
-                        showFavoritesOnly={showMealFavorites}
-                        setShowFavoritesOnly={setShowMealFavorites}
-                        selectedTypes={selectedMealTypes}
-                        setSelectedTypes={setSelectedMealTypes}
-                        hideControls={true}
-                    />
-                )}
+
                 {activeTab === 'compare' && <CompareView />}
                 {activeTab === 'nutrients' && <NutrientsView />}
                 {activeTab === 'top10' && <TopTenView />}
