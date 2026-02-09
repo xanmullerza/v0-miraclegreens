@@ -348,7 +348,7 @@ export function MealPlannerContent({
     const [showRecipeNutrients, setShowRecipeNutrients] = useState(false);
     const [recipeMoringaGrams, setRecipeMoringaGrams] = useState(0);
     const [moringaGrams, setMoringaGrams] = useState(0);
-    const [showDailyNutrients, setShowDailyNutrients] = useState(false);
+    const [showDailyNutrients, setShowDailyNutrients] = useState(true);
     const [dailyMoringaGrams, setDailyMoringaGrams] = useState(0);
     const [activeBoostContext, setActiveBoostContext] = useState<'daily' | 'recipe' | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
@@ -728,6 +728,23 @@ export function MealPlannerContent({
                                 )}
                             </div>
                         </div>
+
+                        {/* Shopping List Toggle (Only if plan exists) */}
+                        {plan && (
+                            <Button
+                                onClick={() => setShowShoppingList(!showShoppingList)}
+                                className={cn(
+                                    "h-14 px-6 rounded-2xl border font-black uppercase tracking-widest text-[10px] transition-all flex items-center gap-3 shrink-0 shadow-sm",
+                                    showShoppingList
+                                        ? "bg-emerald-600 text-white border-emerald-600 shadow-emerald-500/20"
+                                        : "bg-white dark:bg-slate-900/50 text-emerald-600 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                                )}
+                            >
+                                <ShoppingBasket size={18} />
+                                <span>{showShoppingList ? "Hide Shopping List" : "Generate Shopping List"}</span>
+                                <ChevronDown size={14} className={cn("transition-transform duration-300", showShoppingList && "rotate-180")} />
+                            </Button>
+                        )}
                     </div>
                 </div>
             )}
@@ -865,22 +882,7 @@ export function MealPlannerContent({
                         </div>
 
                         {/* Shopping List Section */}
-                        <div className="space-y-4 pt-10 border-t">
-                            <div className="flex justify-center mb-4">
-                                <Button
-                                    variant="outline"
-                                    size="lg"
-                                    onClick={() => setShowShoppingList(!showShoppingList)}
-                                    className="gap-2 min-w-[200px] font-bold bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/50"
-                                >
-                                    <ShoppingBasket size={18} />
-                                    {showShoppingList ? (
-                                        <>Hide Shopping List <ChevronDown className="h-4 w-4 rotate-180" /></>
-                                    ) : (
-                                        <>Generate Shopping List <ChevronDown className="h-4 w-4" /></>
-                                    )}
-                                </Button>
-                            </div>
+                        <div className="space-y-4 pt-4">
 
                             {showShoppingList && (
                                 <div className="animate-in slide-in-from-top-4 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
@@ -1011,15 +1013,6 @@ export function MealPlannerContent({
                         </div>
 
                         <div className="space-y-4 pt-10 border-t">
-                            <div className="flex justify-center mb-4">
-                                <Button variant="outline" size="lg" onClick={() => setShowDailyNutrients(!showDailyNutrients)} className="gap-2 min-w-[200px] font-bold">
-                                    {showDailyNutrients ? (
-                                        <>Collapse Report <ChevronDown className="h-4 w-4 rotate-180" /></>
-                                    ) : (
-                                        <>Expand Nutrient Report <ChevronDown className="h-4 w-4" /></>
-                                    )}
-                                </Button>
-                            </div>
 
                             {showDailyNutrients && (
                                 <div className="space-y-6 animate-in slide-in-from-top-4">
