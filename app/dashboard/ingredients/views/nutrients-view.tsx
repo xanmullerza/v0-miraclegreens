@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSearch } from '@/lib/context/search-context';
 import {
     Zap,
     Search,
@@ -38,7 +39,7 @@ const NUTRIENT_CATEGORIES_DATA = [
 
 export function NutrientsView() {
     const router = useRouter();
-    const [searchQuery, setSearchQuery] = useState('');
+    const { searchQuery } = useSearch();
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -108,17 +109,6 @@ export function NutrientsView() {
             </div>
 
             <div className="flex flex-col md:flex-row gap-4 justify-center relative z-30">
-                <div className="relative group flex-grow max-w-md">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                    <Input
-                        type="text"
-                        placeholder="Search nutrients..."
-                        className="w-full h-12 pl-12 pr-6 bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm focus:ring-2 focus:ring-amber-500/20 text-sm font-bold"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
-
                 <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm shrink-0">
                     <Globe
                         size={18}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSearch } from '@/lib/context/search-context';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import {
@@ -47,7 +48,7 @@ export function StaplesView() {
     const router = useRouter();
     const [foods, setFoods] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
+    const { searchQuery } = useSearch();
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
     const { dailyPlan, updateDailyPlan } = useUserPreferences();
 
@@ -140,16 +141,6 @@ export function StaplesView() {
                 </div>
             </div>
 
-            {/* Search */}
-            <div className="relative max-w-md">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <Input
-                    placeholder="Search staples..."
-                    className="pl-12 h-12 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm focus:ring-emerald-500 focus:border-emerald-500"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
-            </div>
 
 
             {/* List Area */}

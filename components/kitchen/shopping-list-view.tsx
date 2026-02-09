@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSearch } from '@/lib/context/search-context';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import {
@@ -51,7 +52,7 @@ export function ShoppingListView() {
     const [items, setItems] = useState<ShoppingListItem[]>([]);
     const [manualItems, setManualItems] = useState<ShoppingListItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState('');
+    const { searchQuery } = useSearch();
     const [newItemName, setNewItemName] = useState('');
     const [newItemQty, setNewItemQty] = useState('');
     const { dailyPlan } = useUserPreferences();
@@ -492,16 +493,6 @@ export function ShoppingListView() {
                 </div>
             </div>
 
-            {/* Search */}
-            <div className="relative max-w-md">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <Input
-                    placeholder="Search your list..."
-                    className="pl-12 h-14 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
-            </div>
 
             {/* Stats Row */}
             <div className="flex flex-wrap gap-4">
