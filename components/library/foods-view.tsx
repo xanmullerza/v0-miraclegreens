@@ -326,18 +326,20 @@ export function FoodsView({
                             <span>Name</span>
                         </div>
                         <div className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors" onClick={() => handleSort('energy_kcal')}>
-                            <Zap size={14} className="text-emerald-500" /> kcal
+                            <Zap size={14} className="text-emerald-500" /> ENERGY
                         </div>
                         <div className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors" onClick={() => handleSort('carbs_g')}>
-                            <Wheat size={14} className="text-amber-500" /> Cho
+                            <Wheat size={14} className="text-amber-500" /> CARBS
                         </div>
                         <div className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors" onClick={() => handleSort('fat_g')}>
-                            <Droplet size={14} className="text-amber-900" /> Fat
+                            <Droplet size={14} className="text-amber-900" /> FAT
                         </div>
                         <div className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-emerald-500 transition-colors" onClick={() => handleSort('protein_g')}>
-                            <Beef size={14} className="text-rose-500" /> Pro
+                            <Beef size={14} className="text-rose-500" /> PROTEIN
                         </div>
-                        <div className="text-center">Actions</div>
+                        <div className="flex justify-end lg:justify-center items-center gap-1.5">
+                            <Activity size={14} className="text-slate-400" /> CONTROL
+                        </div>
                     </div>
 
                     {/* Food Items List */}
