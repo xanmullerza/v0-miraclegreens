@@ -35,6 +35,15 @@ import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useSearch } from '@/lib/context/search-context';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
+
+const CAL_TO_KJ = 4.184;
+const formatEnergy = (calories: number, unit: 'kcal' | 'kJ') => {
+    if (unit === 'kJ') {
+        return `${Math.round(calories * CAL_TO_KJ).toLocaleString()} kJ`;
+    }
+    return `${Math.round(calories).toLocaleString()} kcal`;
+};
 
 interface Recipe {
     id: string;
@@ -77,6 +86,7 @@ export function RecipesView({
     const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const { searchQuery } = useSearch();
+    const { energyUnit } = useUserPreferences();
     const [localSelectedTypes, setLocalSelectedTypes] = useState<string[]>(MEAL_TYPES);
     const [localShowFavoritesOnly, setLocalShowFavoritesOnly] = useState(false);
 
@@ -300,27 +310,26 @@ export function RecipesView({
             ) : (
                 <div className="space-y-4">
                     {/* List Header */}
-                    <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_120px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
-                        <div className="flex items-center gap-1.5 cursor-pointer hover:text-blue-500" onClick={() => handleSort('image')}>
-                            <Camera size={14} />
+                    <div className="hidden lg:grid lg:grid-cols-[120px_1fr_100px_80px_80px_80px_150px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center gap-2 cursor-pointer hover:text-blue-500" onClick={() => handleSort('image')}>
+                            <Camera size={14} /> PLATE
                         </div>
-                        <div className="flex items-center gap-1.5 cursor-pointer hover:text-blue-500" onClick={() => handleSort('title')}>
-                            <ChefHat size={14} />
-                            <span>Title</span>
+                        <div className="flex items-center gap-2 cursor-pointer hover:text-blue-500" onClick={() => handleSort('title')}>
+                            <ChefHat size={14} /> MEAL DETAILS
                         </div>
-                        <div className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-blue-500" onClick={() => handleSort('calories')}>
+                        <div className="text-right flex items-center justify-end gap-2 cursor-pointer hover:text-blue-500" onClick={() => handleSort('calories')}>
                             <Zap size={14} className="text-emerald-500" /> ENERGY
                         </div>
-                        <div className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-blue-500" onClick={() => handleSort('carbs')}>
+                        <div className="text-right flex items-center justify-end gap-2 cursor-pointer hover:text-blue-500" onClick={() => handleSort('carbs')}>
                             <Wheat size={14} className="text-amber-500" /> CARBS
                         </div>
-                        <div className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-blue-500" onClick={() => handleSort('fat')}>
+                        <div className="text-right flex items-center justify-end gap-2 cursor-pointer hover:text-blue-500" onClick={() => handleSort('fat')}>
                             <Droplet size={14} className="text-amber-900" /> FAT
                         </div>
-                        <div className="flex justify-end items-center gap-1.5 cursor-pointer hover:text-blue-500" onClick={() => handleSort('protein')}>
+                        <div className="text-right flex items-center justify-end gap-2 cursor-pointer hover:text-blue-500" onClick={() => handleSort('protein')}>
                             <Beef size={14} className="text-rose-500" /> PROTEIN
                         </div>
-                        <div className="flex justify-end lg:justify-center items-center gap-1.5">
+                        <div className="text-right flex items-center justify-end gap-2">
                             <Activity size={14} className="text-slate-400" /> CONTROL
                         </div>
                     </div>
@@ -333,9 +342,9 @@ export function RecipesView({
                                 onClick={() => router.push(`/dashboard/meals/${recipe.id}`)}
                                 className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
                             >
-                                <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_120px] gap-4 lg:items-center lg:px-8">
+                                <div className="lg:grid lg:grid-cols-[120px_1fr_100px_80px_80px_80px_150px] gap-4 lg:items-center lg:px-8">
                                     {/* Thumbnail */}
-                                    <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
+                                    <div className="aspect-[4/3] lg:aspect-square w-full lg:w-30 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
                                         {recipe.image ? (
                                             <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                         ) : (
@@ -347,27 +356,42 @@ export function RecipesView({
 
                                     {/* Info */}
                                     <div className="p-3 lg:p-0">
-                                        <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
+                                        <h3 className="font-bold text-lg tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
                                             {recipe.title}
                                         </h3>
                                         <div className="flex items-center gap-3 mt-1">
-                                            <div className="flex items-center gap-1 text-[10px] text-slate-400 font-black uppercase tracking-tighter">
+                                            <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
                                                 <Clock size={10} /> {recipe.prep_time}m
                                             </div>
-                                            <Badge className="bg-blue-500/10 text-blue-600 text-[8px] border-none uppercase tracking-widest px-1.5 py-0">
+                                            <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
+                                                <Users size={10} /> {recipe.servings}P
+                                            </div>
+                                            <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase tracking-widest px-1.5 py-0">
                                                 {recipe.type}
                                             </Badge>
                                         </div>
                                     </div>
 
-                                    {/* Stats */}
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">{Math.round(recipe.calories)}</div>
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">{recipe.carbs.toFixed(1)}</div>
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">{recipe.fat.toFixed(1)}</div>
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">{recipe.protein.toFixed(1)}</div>
+                                    {/* Stats (Desktop View) */}
+                                    <div className="hidden lg:flex flex-col items-end">
+                                        <span className="text-[9px] uppercase font-black text-slate-400">Energy</span>
+                                        <span className="font-black text-sm text-slate-900 dark:text-white">{formatEnergy(recipe.calories, energyUnit)}</span>
+                                    </div>
+                                    <div className="hidden lg:flex flex-col items-end">
+                                        <span className="text-[9px] uppercase font-black text-slate-400">Carbs</span>
+                                        <span className="font-black text-sm text-slate-900 dark:text-white">{recipe.carbs.toFixed(1)}g</span>
+                                    </div>
+                                    <div className="hidden lg:flex flex-col items-end">
+                                        <span className="text-[9px] uppercase font-black text-slate-400">Fat</span>
+                                        <span className="font-black text-sm text-slate-900 dark:text-white">{recipe.fat.toFixed(1)}g</span>
+                                    </div>
+                                    <div className="hidden lg:flex flex-col items-end">
+                                        <span className="text-[9px] uppercase font-black text-slate-400">Protein</span>
+                                        <span className="font-black text-sm text-slate-900 dark:text-white">{recipe.protein.toFixed(1)}g</span>
+                                    </div>
 
                                     {/* Actions */}
-                                    <div className="p-3 lg:p-0 flex justify-end lg:justify-center gap-2">
+                                    <div className="p-3 lg:p-0 flex justify-end gap-2">
                                         {isAdmin && (
                                             <button
                                                 onClick={(e) => {
