@@ -80,8 +80,8 @@ export default function DashboardOverview() {
             bg: 'bg-amber-500/10'
         },
         {
-            name: 'Library',
-            desc: 'Find healthy ingredients, meals, and helpful tips.',
+            name: 'Nutrients',
+            desc: 'Compare nutrients, rank foods, and explore facts.',
             href: '/dashboard/library',
             icon: Library,
             color: 'text-emerald-500',

@@ -226,13 +226,13 @@ function LibraryContent() {
             <div className="flex flex-col gap-8">
                 <div className="flex items-center gap-4">
                     <div className="p-3.5 rounded-[1.5rem] bg-emerald-600 shadow-xl shadow-emerald-500/20 text-white">
-                        <Library size={28} />
+                        <Activity size={28} />
                     </div>
                     <div>
                         <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85]">
-                            The <span className="text-emerald-500">Library.</span>
+                            <span className="text-emerald-500">Nutrients.</span>
                         </h1>
-                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Healthy Eating Made Easy v0.4</p>
+                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Explore & Compare Nutrition Facts</p>
                     </div>
                 </div>
 
