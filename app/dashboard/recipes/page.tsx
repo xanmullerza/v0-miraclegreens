@@ -211,41 +211,51 @@ function KitchenContent() {
 
                             {/* Type Filter */}
                             <div className="relative">
-                                <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 items-center h-14 shadow-xl">
+                                <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar items-center h-14 shadow-xl w-fit transition-all duration-500">
                                     <button
                                         onClick={() => setIsFilterOpen(!isFilterOpen)}
                                         className={cn(
-                                            "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300",
+                                            "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300 shrink-0",
                                             isFilterOpen ? "bg-blue-600 text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800/50"
                                         )}
                                     >
                                         <Filter size={18} />
-                                        <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter</span>
-                                        <ChevronDown size={14} className={cn("transition-transform", isFilterOpen && "rotate-180")} />
+                                        <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter Types</span>
+                                        <ChevronDown size={14} className={cn("transition-transform duration-300", isFilterOpen && "rotate-180")} />
                                     </button>
 
-                                    <div className="w-px h-6 bg-slate-200 dark:border-slate-800 mx-1" />
+                                    <div className="w-px h-6 bg-slate-200 dark:border-slate-800 mx-1 shrink-0" />
 
-                                    {MEAL_TYPES.map(type => {
-                                        const isActive = selectedTypes.includes(type);
-                                        return (
-                                            <button
-                                                key={type}
-                                                onClick={() => isActive
-                                                    ? setSelectedTypes(prev => prev.filter(t => t !== type))
-                                                    : setSelectedTypes(prev => [...prev, type])
-                                                }
-                                                className={cn(
-                                                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
-                                                    isActive
-                                                        ? "bg-blue-600/10 text-blue-600 border border-blue-600/20"
-                                                        : "hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-500 uppercase"
-                                                )}
-                                            >
-                                                {type}
-                                            </button>
-                                        );
-                                    })}
+                                    <div className={cn("flex items-center gap-1 transition-all duration-500 ease-in-out overflow-hidden shrink-0", isFilterOpen ? "max-w-[1000px] opacity-100 px-1" : "max-w-0 opacity-0 px-0")}>
+                                        {MEAL_TYPES.map(type => {
+                                            const isActive = selectedTypes.includes(type);
+                                            return (
+                                                <button
+                                                    key={type}
+                                                    onClick={() => isActive
+                                                        ? setSelectedTypes(prev => prev.filter(t => t !== type))
+                                                        : setSelectedTypes(prev => [...prev, type])
+                                                    }
+                                                    className={cn(
+                                                        "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
+                                                        isActive
+                                                            ? "bg-blue-600/10 text-blue-600 border border-blue-600/20"
+                                                            : "hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-500 uppercase"
+                                                    )}
+                                                >
+                                                    {type}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+
+                                    {!isFilterOpen && (
+                                        <div className="px-4 whitespace-nowrap shrink-0">
+                                            <span className="text-[10px] font-bold text-slate-400 italic">
+                                                {selectedTypes.length === MEAL_TYPES.length ? "All Meal Types" : `${selectedTypes.length} Types Selected`}
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>

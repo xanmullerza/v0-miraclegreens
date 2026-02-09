@@ -13,11 +13,13 @@ import {
     Users,
     Zap,
     Heart,
-    ChefHat
+    ChefHat,
+    Globe
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 
 interface Recipe {
@@ -70,53 +72,53 @@ export function AllMealsView() {
     });
 
     return (
-        <div className="space-y-8">
-            {/* Header */}
-            <div className="flex flex-wrap gap-4 items-center justify-between">
-                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800">
-                    <BookOpen size={16} className="text-orange-500" />
-                    <span className="text-xs font-black uppercase tracking-widest text-orange-600">
-                        {recipes.length} Recipes
-                    </span>
+        <div className="space-y-8 animate-in fade-in duration-500">
+            {/* Header / Controls */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white uppercase italic">Recipe Library</h2>
+                    <p className="text-slate-500 font-medium text-sm">Browse your collection of healthy meals.</p>
                 </div>
 
-                {/* Filter Toggle */}
-                <div className="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-full">
-                    <button
-                        onClick={() => setFilter('all')}
-                        className={cn(
-                            "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
-                            filter === 'all'
-                                ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow"
-                                : "text-slate-500 hover:text-slate-700"
-                        )}
-                    >
-                        All
-                    </button>
-                    <button
-                        onClick={() => setFilter('favorites')}
-                        className={cn(
-                            "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
-                            filter === 'favorites'
-                                ? "bg-white dark:bg-slate-700 text-rose-500 shadow"
-                                : "text-slate-500 hover:text-slate-700"
-                        )}
-                    >
-                        <Heart size={12} />
-                        Favorites
-                    </button>
-                </div>
-            </div>
+                <div className="flex flex-wrap items-center gap-4">
+                    {/* Search */}
+                    <div className="relative group flex-grow max-w-sm">
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-orange-500 transition-colors" size={18} />
+                        <Input
+                            type="text"
+                            placeholder="Search recipes..."
+                            className="w-full h-14 pl-12 pr-6 bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm focus:ring-4 focus:ring-orange-500/10 text-sm font-bold transition-all"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
 
-            {/* Search */}
-            <div className="relative max-w-md">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                <Input
-                    placeholder="Search meals and recipes..."
-                    className="pl-12 h-14 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm focus:ring-orange-500 focus:border-orange-500"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
+                    {/* Favorites Switch Toggle */}
+                    <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm shrink-0 transition-all">
+                        <Globe
+                            size={18}
+                            className={cn(
+                                "transition-all cursor-pointer",
+                                filter === 'all' ? "text-orange-500 scale-110 drop-shadow-[0_0_8px_rgba(249,115,22,0.3)]" : "text-slate-300 hover:text-slate-400"
+                            )}
+                            onClick={() => setFilter('all')}
+                        />
+                        <Switch
+                            id="favorites-mode"
+                            checked={filter === 'favorites'}
+                            onCheckedChange={(checked) => setFilter(checked ? 'favorites' : 'all')}
+                            className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-orange-500"
+                        />
+                        <Heart
+                            size={18}
+                            className={cn(
+                                "transition-all cursor-pointer",
+                                filter === 'favorites' ? "text-rose-500 fill-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : "text-slate-300 hover:text-slate-400"
+                            )}
+                            onClick={() => setFilter('favorites')}
+                        />
+                    </div>
+                </div>
             </div>
 
             {/* List */}
@@ -198,7 +200,8 @@ export function AllMealsView() {
                         </div>
                     ))}
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 }
