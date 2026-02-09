@@ -308,6 +308,8 @@ interface MealPlannerContentProps {
     hideControls?: boolean;
     isFilterOpen?: boolean;
     setIsFilterOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+    showShoppingList?: boolean;
+    setShowShoppingList?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Named export for use in other components (like Kitchen tabs)
@@ -318,7 +320,9 @@ export function MealPlannerContent({
     setSelectedTypes: externalSetSelectedTypes,
     hideControls = false,
     isFilterOpen: externalIsFilterOpen,
-    setIsFilterOpen: externalSetIsFilterOpen
+    setIsFilterOpen: externalSetIsFilterOpen,
+    showShoppingList: externalShowShoppingList,
+    setShowShoppingList: externalSetShowShoppingList
 }: MealPlannerContentProps) {
     const router = useRouter();
     const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -366,9 +370,12 @@ export function MealPlannerContent({
     const selectedTypes = externalSelectedTypes !== undefined ? externalSelectedTypes : localSelectedTypes;
     const setSelectedTypes = externalSetSelectedTypes !== undefined ? externalSetSelectedTypes : setLocalSelectedTypes;
 
+    const [localShowShoppingList, setLocalShowShoppingList] = useState(false);
+    const showShoppingList = externalShowShoppingList !== undefined ? externalShowShoppingList : localShowShoppingList;
+    const setShowShoppingList = externalSetShowShoppingList !== undefined ? externalSetShowShoppingList : setLocalShowShoppingList;
+
     const [showSummary, setShowSummary] = useState(false);
     const [alwaysSkip, setAlwaysSkip] = useState(skipPlannerQuiz);
-    const [showShoppingList, setShowShoppingList] = useState(false);
     const { searchQuery } = useSearch();
 
     // Nutrient breakdown definitions

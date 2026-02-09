@@ -14,10 +14,12 @@ import {
     Globe,
     Heart,
     Filter,
-    ChevronDown
+    ChevronDown,
+    ShoppingBasket
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSearch } from '@/lib/context/search-context';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { Switch } from '@/components/ui/switch';
 
 import { MealPlannerView } from '@/components/kitchen/mealplanner-view';
@@ -45,11 +47,13 @@ function KitchenContent() {
     const [activeTab, setActiveTab] = useState<TabId>('mixlab');
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
     const { searchQuery, setSearchQuery } = useSearch();
+    const { dailyPlan } = useUserPreferences();
 
     // Lifted Filter State
     const [selectedTypes, setSelectedTypes] = useState<string[]>(MEAL_TYPES);
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [showShoppingList, setShowShoppingList] = useState(false);
 
     const allTabs: TabId[] = ['mixlab', 'mealplanner', 'browse'];
 
@@ -259,6 +263,23 @@ function KitchenContent() {
                                 )}
                             </div>
                         </div>
+
+                        {/* Shopping List Toggle (Only for Meal Planner if plan exists) */}
+                        {activeTab === 'mealplanner' && dailyPlan && (
+                            <button
+                                onClick={() => setShowShoppingList(!showShoppingList)}
+                                className={cn(
+                                    "h-14 px-6 rounded-2xl border font-black uppercase tracking-widest text-[10px] transition-all flex items-center gap-3 shrink-1 md:shrink-0 shadow-xl",
+                                    showShoppingList
+                                        ? "bg-emerald-600 text-white border-emerald-600 shadow-emerald-500/20"
+                                        : "bg-white dark:bg-slate-900/50 text-emerald-600 border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/20"
+                                )}
+                            >
+                                <ShoppingBasket size={18} />
+                                <span className="hidden sm:inline">{showShoppingList ? "Hide Shopping List" : "Generate Shopping List"}</span>
+                                <ChevronDown size={14} className={cn("transition-transform duration-300", showShoppingList && "rotate-180")} />
+                            </button>
+                        )}
                     </div>
                 )}
             </div>
@@ -275,6 +296,8 @@ function KitchenContent() {
                         hideControls={true}
                         isFilterOpen={isFilterOpen}
                         setIsFilterOpen={setIsFilterOpen}
+                        showShoppingList={showShoppingList}
+                        setShowShoppingList={setShowShoppingList}
                     />
                 )}
                 {activeTab === 'browse' && (

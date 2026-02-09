@@ -14,6 +14,8 @@ interface MealPlannerViewProps {
     hideControls?: boolean;
     isFilterOpen?: boolean;
     setIsFilterOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+    showShoppingList?: boolean;
+    setShowShoppingList?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function MealPlannerView(props: MealPlannerViewProps) {
