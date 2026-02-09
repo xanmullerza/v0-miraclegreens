@@ -83,7 +83,7 @@ function FoodsHubContent() {
 
                 {/* Center - Tabs area */}
                 <div className="flex-1 flex items-center justify-center overflow-hidden">
-                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+                    <div className="flex items-center gap-2 overflow-hidden py-1">
                         {tabsList.map((tab) => {
                             const Icon = tab.icon;
                             const isActive = currentTab === tab.id;
@@ -103,7 +103,12 @@ function FoodsHubContent() {
                                         "transition-transform duration-500 group-hover:scale-110",
                                         isActive ? tab.color : "text-slate-400"
                                     )} />
-                                    {!isSearchExpanded && tab.label}
+                                    <span className={cn(
+                                        "transition-all duration-300 overflow-hidden",
+                                        isSearchExpanded ? "w-0 opacity-0" : "w-auto opacity-100"
+                                    )}>
+                                        {tab.label}
+                                    </span>
                                 </button>
                             );
                         })}
