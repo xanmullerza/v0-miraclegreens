@@ -17,7 +17,8 @@ import {
     Plus,
     LayoutGrid,
     Globe,
-    Heart
+    Heart,
+    Trophy
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,7 @@ import { FoodsView, CATEGORIES } from '@/components/library/foods-view';
 import { RecipesView, MEAL_TYPES } from '@/components/library/recipes-view';
 import { NutrientsView } from '@/components/library/nutrients-view';
 import { CompareView } from '../ingredients/views/compare-view';
+import { TopTenView } from './views/top-ten-view';
 
 export default function ClinicalLibrary() {
     return (
@@ -45,7 +47,7 @@ export default function ClinicalLibrary() {
 function LibraryContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [activeTab, setActiveTab] = useState<'recipes' | 'nutrients' | 'compare'>('recipes');
+    const [activeTab, setActiveTab] = useState<'recipes' | 'nutrients' | 'compare' | 'top10'>('recipes');
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
     const { searchQuery, setSearchQuery, setIsFocused, activeSearchId, setActiveSearchId, results, isLoading, onResultClickRef } = useSearch();
 
@@ -62,12 +64,12 @@ function LibraryContent() {
     // Sync tab with URL if needed
     useEffect(() => {
         const tab = searchParams.get('tab') as any;
-        if (tab && ['recipes', 'nutrients', 'compare'].includes(tab)) {
+        if (tab && ['recipes', 'nutrients', 'compare', 'top10'].includes(tab)) {
             setActiveTab(tab);
         }
     }, [searchParams]);
 
-    const handleTabChange = (tab: 'recipes' | 'nutrients' | 'compare') => {
+    const handleTabChange = (tab: 'recipes' | 'nutrients' | 'compare' | 'top10') => {
         setActiveTab(tab);
         const params = new URLSearchParams(searchParams.toString());
         params.set('tab', tab);
@@ -78,6 +80,7 @@ function LibraryContent() {
         { id: 'recipes', label: 'Meals', icon: ChefHat, color: 'text-blue-500', bg: 'bg-blue-600/10' },
         { id: 'compare', label: 'Compare', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
         { id: 'nutrients', label: 'Nutrients', icon: Activity, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+        { id: 'top10', label: 'Top 10', icon: Trophy, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
     ];
 
     const renderTabGroup = (tabsList: typeof tabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
@@ -330,6 +333,7 @@ function LibraryContent() {
                 )}
                 {activeTab === 'compare' && <CompareView />}
                 {activeTab === 'nutrients' && <NutrientsView />}
+                {activeTab === 'top10' && <TopTenView />}
             </div>
         </div>
     );
