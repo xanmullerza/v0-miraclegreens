@@ -76,7 +76,9 @@ export function TopTenView() {
     const [selectedNutrient, setSelectedNutrient] = useState(NUTRIENTS[19]); // Default to Protein
     const [foods, setFoods] = useState<TopFood[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedCategories, setSelectedCategories] = useState<string[]>(CATEGORIES);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>(
+        CATEGORIES.filter(c => c !== 'Flavour' && c !== 'Supplements')
+    );
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     useEffect(() => {
