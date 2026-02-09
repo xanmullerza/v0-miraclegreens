@@ -170,18 +170,11 @@ export function CompareView() {
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                    <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white uppercase italic">Comparison Lab</h2>
-                    <p className="text-slate-500 font-medium text-sm max-w-lg">
-                        Select and compare up to 10 foods side-by-side to find the most nutrient-dense options.
-                    </p>
-                </div>
-            </div>
+
 
             <div className="flex flex-col md:flex-row gap-4 relative">
                 <div className="flex-1 flex flex-wrap items-center gap-2 bg-white dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 relative z-10">
-                    {selectedItems.length === 0 ? <p className="text-xs text-slate-500 italic">Select items to compare...</p> : selectedItems.map((item, idx) => (
+                    {selectedItems.length === 0 ? <p className="text-xs text-slate-500 italic">Select and compare up to 10 foods side-by-side to find the most nutrient-dense options.</p> : selectedItems.map((item, idx) => (
                         <Badge key={item.id} variant="outline" className="gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-slate-900">
                             <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COMPARISON_COLORS[idx] }} />
                             {item.common_name || item.name}
