@@ -160,7 +160,7 @@ export function TopTenView() {
 
             {/* Nutrient Selector */}
             <div className="relative">
-                <div className="flex overflow-x-auto pb-4 gap-2 no-scrollbar snap-x">
+                <div className="flex flex-wrap gap-2 pb-4">
                     {NUTRIENTS.map((nutrient) => {
                         const Icon = nutrient.icon;
                         const isSelected = selectedNutrient.id === nutrient.id;
@@ -169,25 +169,22 @@ export function TopTenView() {
                                 key={nutrient.id}
                                 onClick={() => setSelectedNutrient(nutrient)}
                                 className={cn(
-                                    "flex items-center gap-3 pl-2 pr-5 py-2 rounded-full border transition-all duration-300 flex-shrink-0 snap-start",
+                                    "flex items-center gap-2 pl-1.5 pr-4 py-1.5 rounded-full border transition-all duration-300",
                                     isSelected
                                         ? "bg-slate-900 text-white border-slate-900 shadow-lg scale-105"
                                         : "bg-white dark:bg-slate-900/50 text-slate-500 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
                                 )}
                             >
-                                <div className={cn("w-8 h-8 rounded-full flex items-center justify-center", isSelected ? "bg-white/20" : "bg-slate-100 dark:bg-slate-800")}>
-                                    <Icon size={14} className={isSelected ? "text-white" : "text-slate-400"} />
+                                <div className={cn("w-6 h-6 rounded-full flex items-center justify-center", isSelected ? "bg-white/20" : "bg-slate-100 dark:bg-slate-800")}>
+                                    <Icon size={12} className={isSelected ? "text-white" : "text-slate-400"} />
                                 </div>
                                 <div className="text-left">
-                                    <p className="text-[10px] font-black uppercase tracking-widest leading-none mb-0.5">{nutrient.label}</p>
-                                    <p className={cn("text-[9px] font-medium leading-none", isSelected ? "text-slate-400" : "text-slate-400")}>Target: High</p>
+                                    <p className="text-[10px] font-black uppercase tracking-widest leading-none">{nutrient.label}</p>
                                 </div>
                             </button>
                         );
                     })}
                 </div>
-                {/* Fade indicators for scrolling */}
-                <div className="absolute right-0 top-0 bottom-4 w-12 bg-gradient-to-l from-slate-50 dark:from-[#020617] to-transparent pointer-events-none md:hidden" />
             </div>
 
             {/* Results List */}
