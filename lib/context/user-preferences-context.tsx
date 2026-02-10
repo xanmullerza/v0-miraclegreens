@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { calculateIndividualTargets, GoalType, ActivityLevel, NutrientStrategy } from "@/lib/utils/nutrition-calculator";
 import { DailyPlan } from "@/lib/utils/meal-generator";
+import { supabase } from "@/lib/supabase";
 
 export type EnergyUnit = "kcal" | "kJ";
 export type MeasurementUnit = "metric" | "imperial";
