@@ -202,6 +202,27 @@ export function PantryView({
         }
     };
 
+    const updatePantryQuantity = async (item: FoodItem, newQty: string, newWeight: string) => {
+        const quantityString = newWeight ? `${newQty} x ${newWeight}g` : newQty;
+
+        // Optimistic UI update
+        setFoods(prev => prev.map(f => f.id === item.id ? { ...f, quantity: quantityString } : f));
+        setBuyMoreItem(null);
+        toast.success(`Updated quantity for "${item.name}"`);
+
+        try {
+            if (item.source_table === 'pantry_items') {
+                await supabase.from('pantry_items').update({ quantity: quantityString } as any).eq('id', item.id);
+            } else {
+                await supabase.from('food_items').update({ quantity: quantityString } as any).eq('id', item.id);
+            }
+        } catch (error) {
+            console.error('Failed to update quantity', error);
+            toast.error("Failed to save to database");
+            fetchPantry(); // Revert on error
+        }
+    };
+
     const addToShoppingList = (food: FoodItem) => {
         // Get existing manual items from localStorage
         const saved = localStorage.getItem('vitala_shopping_manual_items');
@@ -527,8 +548,7 @@ export function PantryView({
                                                                         if (quickAddMode === 'shopping') {
                                                                             addToShoppingList(food);
                                                                         } else {
-                                                                            toast.success(`"${food.name}" quantity updated in kitchen`);
-                                                                            setBuyMoreItem(null);
+                                                                            updatePantryQuantity(food, buyMoreQty, buyMoreWeight);
                                                                         }
                                                                     }}
                                                                     className={cn("h-11 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-xl", quickAddMode === 'pantry' ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-rose-600 hover:bg-rose-700 text-white")}
