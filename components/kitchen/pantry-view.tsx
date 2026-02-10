@@ -550,17 +550,19 @@ export function PantryView({
                                                                     >
                                                                         {measurementUnit === 'imperial' ? (
                                                                             <>
-                                                                                <option value="oz">oz</option>
-                                                                                <option value="lb">lb</option>
-                                                                                <option value="fl oz">fl oz</option>
-                                                                                <option value="gal">gal</option>
+                                                                                <option value="oz" className="bg-white dark:bg-slate-900">oz</option>
+                                                                                <option value="lb" className="bg-white dark:bg-slate-900">lb</option>
+                                                                                <option value="fl oz" className="bg-white dark:bg-slate-900">fl oz</option>
+                                                                                <option value="pt" className="bg-white dark:bg-slate-900">pt</option>
+                                                                                <option value="qt" className="bg-white dark:bg-slate-900">qt</option>
+                                                                                <option value="gal" className="bg-white dark:bg-slate-900">gal</option>
                                                                             </>
                                                                         ) : (
                                                                             <>
-                                                                                <option value="g">g</option>
-                                                                                <option value="kg">kg</option>
-                                                                                <option value="ml">ml</option>
-                                                                                <option value="L">L</option>
+                                                                                <option value="g" className="bg-white dark:bg-slate-900">g</option>
+                                                                                <option value="kg" className="bg-white dark:bg-slate-900">kg</option>
+                                                                                <option value="ml" className="bg-white dark:bg-slate-900">ml</option>
+                                                                                <option value="L" className="bg-white dark:bg-slate-900">L</option>
                                                                             </>
                                                                         )}
                                                                     </select>
