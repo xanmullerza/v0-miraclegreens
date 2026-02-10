@@ -21,7 +21,8 @@ import {
     Activity,
     Globe,
     Filter,
-    ChevronDown
+    ChevronDown,
+    CheckCircle2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,7 @@ import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { useSearch } from '@/lib/context/search-context';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 interface FoodItem {
     id: string;
@@ -79,10 +81,13 @@ export function ExploreView({
     const [hasMore, setHasMore] = useState(true);
     const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
 
-    // Quick Add State
+    // Quick Add State (Sophisticated matching Pantry)
     const [quickAddItem, setQuickAddItem] = useState<FoodItem | null>(null);
     const [quickAddQty, setQuickAddQty] = useState('1');
+    const [quickAddWeight, setQuickAddWeight] = useState('');
+    const [quickAddUnit, setQuickAddUnit] = useState('g');
     const [quickAddMode, setQuickAddMode] = useState<'pantry' | 'shopping'>('pantry');
+    const { measurementUnit } = useUserPreferences();
 
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const CATEGORIES = ["General", "Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
@@ -137,7 +142,11 @@ export function ExploreView({
                 setFoods(fetchedItems);
                 setPage(1);
             } else {
-                setFoods(prev => [...prev, ...fetchedItems]);
+                setFoods(prev => {
+                    const existingIds = new Set(prev.map(f => f.id));
+                    const uniqueNew = fetchedItems.filter(f => !existingIds.has(f.id));
+                    return [...prev, ...uniqueNew];
+                });
             }
             setHasMore(fetchedItems.length === 20);
         } catch (error) {
@@ -172,19 +181,32 @@ export function ExploreView({
 
     const handleQuickAdd = async () => {
         if (!quickAddItem) return;
+
+        const quantityString = quickAddWeight ? `${quickAddQty} x ${quickAddWeight}${quickAddUnit}` : quickAddQty;
+
         if (quickAddMode === 'pantry') {
             try {
+                // Update UI immediately
+                setFoods(prev => prev.map(f => f.id === quickAddItem.id ? { ...f, is_in_pantry: true, quantity: quantityString } : f));
+
+                // Persist to localStorage
+                const saved = localStorage.getItem('pantry_quantities');
+                const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
+                quantities[quickAddItem.id] = quantityString;
+                localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+
+                // Update DB
                 const { error } = await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', quickAddItem.id);
                 if (error) throw error;
-                setFoods(prev => prev.map(f => f.id === quickAddItem.id ? { ...f, is_in_pantry: true } : f));
-                toast.success(`"${quickAddItem.name}" added to pantry`);
-            } catch (error) { toast.error("Failed to update kitchen"); }
+
+                toast.success(`"${quickAddItem.name}" added to pantry with ${quantityString}`);
+            } catch (error) { toast.error("Failed to update pantry"); }
         } else {
             const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
             const newItem = {
                 id: `manual-${Date.now()}`,
                 name: quickAddItem.name,
-                quantity: quickAddQty,
+                quantity: quantityString,
                 unit: '',
                 checked: false,
                 source: 'manual'
@@ -408,7 +430,7 @@ export function ExploreView({
                             </div>
                         </div>
 
-                        {/* Quick Add Slide-out */}
+                        {/* Quick Add Advanced Slide-out */}
                         {quickAddItem?.id === food.id && (
                             <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-6 animate-in slide-in-from-top duration-300">
                                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
@@ -418,7 +440,7 @@ export function ExploreView({
                                         </div>
                                         <div>
                                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Quick Action</p>
-                                            <h4 className="font-black text-sm uppercase italic">Add to {quickAddMode === 'pantry' ? 'Pantry' : 'Groceries'}</h4>
+                                            <h4 className="font-black text-sm uppercase italic">Add to {quickAddMode === 'pantry' ? 'Inventory' : 'Shopping List'}</h4>
                                         </div>
                                     </div>
 
@@ -437,22 +459,61 @@ export function ExploreView({
                                                 Groceries
                                             </button>
                                         </div>
+
                                         <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-3 h-11">
                                             <span className="text-[10px] font-black text-slate-400 uppercase">Qty</span>
                                             <input
                                                 type="text"
                                                 value={quickAddQty}
                                                 onChange={(e) => setQuickAddQty(e.target.value)}
-                                                className="w-12 bg-transparent border-none text-center font-black text-sm focus:ring-0"
+                                                className="w-10 bg-transparent border-none text-center font-black text-sm focus:ring-0"
                                             />
                                         </div>
+
+                                        <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-3 h-11">
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Weight/Vol</span>
+                                            <input
+                                                type="text"
+                                                value={quickAddWeight}
+                                                onChange={(e) => setQuickAddWeight(e.target.value)}
+                                                placeholder="500"
+                                                className="w-14 bg-transparent border-none text-center font-black text-sm focus:ring-0 placeholder:text-slate-300"
+                                            />
+                                            <select
+                                                value={quickAddUnit}
+                                                onChange={(e) => setQuickAddUnit(e.target.value)}
+                                                className="bg-transparent border-none text-[10px] font-black uppercase text-slate-500 focus:ring-0 p-0 h-full cursor-pointer w-12"
+                                            >
+                                                {measurementUnit === 'imperial' ? (
+                                                    <>
+                                                        <option value="oz">oz</option>
+                                                        <option value="lb">lb</option>
+                                                        <option value="fl oz">fl oz</option>
+                                                        <option value="pt">pt</option>
+                                                        <option value="qt">qt</option>
+                                                        <option value="gal">gal</option>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <option value="g">g</option>
+                                                        <option value="kg">kg</option>
+                                                        <option value="ml">ml</option>
+                                                        <option value="L">L</option>
+                                                    </>
+                                                )}
+                                            </select>
+                                        </div>
+
                                         <Button
                                             onClick={handleQuickAdd}
                                             className={cn("h-11 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-xl", quickAddMode === 'pantry' ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-rose-600 hover:bg-rose-700 text-white")}
                                         >
-                                            Add to {quickAddMode === 'pantry' ? 'Pantry' : 'Groceries'}
+                                            Confirm
                                         </Button>
-                                        <Button variant="ghost" size="icon" onClick={() => setQuickAddItem(null)} className="h-11 w-11 rounded-xl"><X size={18} /></Button>
+
+                                        <Button variant="ghost" size="icon" onClick={() => setQuickAddItem(null)} className="h-11 w-11 rounded-xl text-slate-400">
+                                            <X size={18} />
+                                        </Button>
                                     </div>
                                 </div>
                             </div>

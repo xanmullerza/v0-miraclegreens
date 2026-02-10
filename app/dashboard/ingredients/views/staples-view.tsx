@@ -21,7 +21,10 @@ import {
     Camera,
     Info,
     Sparkles,
-    Activity
+    Check,
+    Activity,
+    ShoppingCart,
+    X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -51,7 +54,14 @@ export function StaplesView() {
     const [loading, setLoading] = useState(true);
     const { searchQuery } = useSearch();
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
-    const { dailyPlan, updateDailyPlan } = useUserPreferences();
+    const { dailyPlan, updateDailyPlan, measurementUnit } = useUserPreferences();
+
+    // Buy More State
+    const [buyMoreItem, setBuyMoreItem] = useState<FoodItem | null>(null);
+    const [buyMoreQty, setBuyMoreQty] = useState('1');
+    const [buyMoreWeight, setBuyMoreWeight] = useState('');
+    const [buyMoreUnit, setBuyMoreUnit] = useState('g');
+    const [quickAddMode, setQuickAddMode] = useState<'pantry' | 'shopping'>('pantry');
 
     useEffect(() => {
         fetchPantry();
@@ -120,6 +130,41 @@ export function StaplesView() {
             console.error('Error removing from pantry:', error);
             toast.error("Failed to remove item.");
         }
+    };
+
+    const updatePantryQuantity = async (item: FoodItem, newQty: string, newWeight: string, newUnit: string) => {
+        const quantityString = newWeight ? `${newQty} x ${newWeight}${newUnit}` : newQty;
+
+        // Update UI immediately
+        setFoods(prev => prev.map(f => f.id === item.id ? { ...f, quantity: quantityString } : f));
+
+        // Persist to localStorage
+        try {
+            const saved = localStorage.getItem('pantry_quantities');
+            const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
+            quantities[item.id] = quantityString;
+            localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+            toast.success(`Inventory updated for "${item.name}"`);
+        } catch (e) {
+            console.error('Failed to save to localStorage', e);
+        }
+        setBuyMoreItem(null);
+    };
+
+    const addToShoppingList = (food: FoodItem) => {
+        const quantityString = buyMoreWeight ? `${buyMoreQty} x ${buyMoreWeight}${buyMoreUnit}` : buyMoreQty;
+        const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
+        const newItem = {
+            id: `manual-${Date.now()}`,
+            name: food.name,
+            quantity: quantityString,
+            unit: '',
+            checked: false,
+            source: 'manual'
+        };
+        localStorage.setItem('vitala_shopping_manual_items', JSON.stringify([...currentList, newItem]));
+        toast.success(`"${food.name}" added to groceries`);
+        setBuyMoreItem(null);
     };
 
     const filteredFoods = foods.filter(food =>
@@ -305,8 +350,24 @@ export function StaplesView() {
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setBuyMoreItem(buyMoreItem?.id === food.id ? null : food);
+                                                                    setBuyMoreQty('1');
+                                                                    setBuyMoreWeight('');
+                                                                    setQuickAddMode('pantry');
+                                                                }}
+                                                                className="h-9 w-9 rounded-xl text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors"
+                                                                title="Update Quantity"
+                                                            >
+                                                                <Plus size={16} />
+                                                            </Button>
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
                                                                 onClick={() => removeFromPantry(food.id, food.name)}
                                                                 className="h-9 w-9 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
+                                                                title="Remove"
                                                             >
                                                                 <Trash2 size={16} />
                                                             </Button>
@@ -314,7 +375,8 @@ export function StaplesView() {
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 onClick={() => router.push(`/dashboard/ingredients/${food.id}`)}
-                                                                className="h-9 w-9 rounded-xl text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors"
+                                                                className="h-9 w-9 rounded-xl text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors"
+                                                                title="Details"
                                                             >
                                                                 <ArrowRight size={16} />
                                                             </Button>
@@ -336,6 +398,95 @@ export function StaplesView() {
                                                         ))}
                                                     </div>
                                                 </div>
+
+                                                {/* Advanced Update Dialog (Matching Pantry) */}
+                                                {buyMoreItem?.id === food.id && (
+                                                    <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-6 animate-in slide-in-from-top duration-300">
+                                                        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center">
+                                                                    <ShoppingCart size={24} className="text-emerald-500" />
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Update Stock</p>
+                                                                    <h4 className="font-black text-sm uppercase italic">Adjust {food.name}</h4>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="flex flex-wrap items-center gap-3">
+                                                                <div className="flex bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-1">
+                                                                    <button
+                                                                        onClick={() => setQuickAddMode('pantry')}
+                                                                        className={cn("px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all", quickAddMode === 'pantry' ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "text-slate-400")}
+                                                                    >
+                                                                        Inventory
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => setQuickAddMode('shopping')}
+                                                                        className={cn("px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all", quickAddMode === 'shopping' ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20" : "text-slate-400")}
+                                                                    >
+                                                                        Shopping
+                                                                    </button>
+                                                                </div>
+
+                                                                <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-3 h-11">
+                                                                    <span className="text-[10px] font-black text-slate-400 uppercase">Qty</span>
+                                                                    <input
+                                                                        type="text"
+                                                                        value={buyMoreQty}
+                                                                        onChange={(e) => setBuyMoreQty(e.target.value)}
+                                                                        className="w-10 bg-transparent border-none text-center font-black text-sm focus:ring-0"
+                                                                    />
+                                                                </div>
+
+                                                                <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-3 h-11">
+                                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Weight/Vol</span>
+                                                                    <input
+                                                                        type="text"
+                                                                        value={buyMoreWeight}
+                                                                        onChange={(e) => setBuyMoreWeight(e.target.value)}
+                                                                        placeholder="500"
+                                                                        className="w-14 bg-transparent border-none text-center font-black text-sm focus:ring-0 placeholder:text-slate-300"
+                                                                    />
+                                                                    <select
+                                                                        value={buyMoreUnit}
+                                                                        onChange={(e) => setBuyMoreUnit(e.target.value)}
+                                                                        className="bg-transparent border-none text-[10px] font-black uppercase text-slate-500 focus:ring-0 p-0 h-full cursor-pointer w-12"
+                                                                    >
+                                                                        {measurementUnit === 'imperial' ? (
+                                                                            <>
+                                                                                <option value="oz">oz</option>
+                                                                                <option value="lb">lb</option>
+                                                                                <option value="fl oz">fl oz</option>
+                                                                                <option value="pt">pt</option>
+                                                                                <option value="qt">qt</option>
+                                                                                <option value="gal">gal</option>
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <option value="g">g</option>
+                                                                                <option value="kg">kg</option>
+                                                                                <option value="ml">ml</option>
+                                                                                <option value="L">L</option>
+                                                                            </>
+                                                                        )}
+                                                                    </select>
+                                                                </div>
+
+                                                                <Button
+                                                                    onClick={() => quickAddMode === 'pantry' ? updatePantryQuantity(food, buyMoreQty, buyMoreWeight, buyMoreUnit) : addToShoppingList(food)}
+                                                                    className={cn("h-11 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-xl", quickAddMode === 'pantry' ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-rose-600 hover:bg-rose-700 text-white")}
+                                                                >
+                                                                    Confirm Adjustment
+                                                                </Button>
+
+                                                                <Button variant="ghost" size="icon" onClick={() => setBuyMoreItem(null)} className="h-11 w-11 rounded-xl text-slate-400">
+                                                                    <X size={18} />
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
