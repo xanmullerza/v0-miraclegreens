@@ -308,7 +308,7 @@ export function StaplesView() {
                                                     {/* Info */}
                                                     <div className="flex-1 lg:flex-none lg:p-0">
                                                         <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
-                                                            {food.name}
+                                                            {hasMultiple ? food.name : (food.common_name || food.name)}
                                                         </h3>
                                                         <div className="flex flex-wrap gap-2 mt-2">
                                                             {/* Quantity badge - always visible if present */}

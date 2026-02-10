@@ -22,6 +22,7 @@ import {
     Globe,
     Filter,
     ChevronDown,
+    ChevronRight,
     CheckCircle2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -90,6 +91,7 @@ export function ExploreView({
     const { measurementUnit } = useUserPreferences();
 
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
     const CATEGORIES = ["General", "Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
 
     useEffect(() => {
@@ -167,6 +169,23 @@ export function ExploreView({
         }, 500);
         return () => clearTimeout(timer);
     }, [searchQuery]);
+
+    const toggleGroup = (groupName: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setExpandedGroups(prev => ({
+            ...prev,
+            [groupName]: !prev[groupName]
+        }));
+    };
+
+    const groupedFoods = foods.reduce((acc, food) => {
+        const key = food.common_name || food.name;
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(food);
+        return acc;
+    }, {} as Record<string, FoodItem[]>);
+
+    const groupNames = Object.keys(groupedFoods).sort();
 
     const toggleFavorite = async (item: FoodItem, e: React.MouseEvent) => {
         e.stopPropagation();
@@ -327,193 +346,250 @@ export function ExploreView({
             </div>
 
             {/* List Area */}
-            <div className="space-y-3">
-                {foods.map((food) => (
-                    <div key={food.id} className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden">
-                        <div className="flex items-center justify-between p-4 lg:p-0 lg:grid lg:grid-cols-[80px_1fr_180px] gap-4 lg:items-center lg:px-10 py-0">
-                            {/* Thumbnail */}
-                            <div className="hidden lg:block aspect-square w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-500 mx-auto">
-                                {food.image ? (
-                                    <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                        <Beef size={24} className="opacity-10" />
-                                    </div>
-                                )}
-                                {food.is_in_pantry && (
-                                    <div className="absolute top-1 right-1 bg-emerald-500 text-white rounded-full p-0.5 shadow-md">
-                                        <Check size={8} strokeWidth={4} />
-                                    </div>
-                                )}
-                            </div>
+            <div className="space-y-6">
+                {groupNames.map((groupName) => {
+                    const items = groupedFoods[groupName];
+                    const isExpanded = expandedGroups[groupName] || (searchQuery.length > 0 && items.length > 0);
+                    const hasMultiple = items.length > 1;
 
-                            {/* Name */}
-                            <div className="flex-1 lg:flex-none lg:p-0">
-                                <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
-                                    {food.common_name || food.name}
-                                </h3>
-                                <div className="flex flex-wrap gap-2 mt-2">
-                                    {/* Quantity badge - always visible if present */}
-                                    {food.quantity && (
-                                        <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[9px] border-none uppercase font-black tracking-tight">
-                                            {food.quantity}
-                                        </Badge>
+                    return (
+                        <div key={groupName} className="space-y-2">
+                            {/* Group Header */}
+                            {hasMultiple && (
+                                <div
+                                    onClick={(e) => toggleGroup(groupName, e)}
+                                    className={cn(
+                                        "flex items-center gap-4 px-4 py-3 rounded-2xl border transition-all shadow-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 group/header",
+                                        isExpanded && "border-emerald-500/30 ring-1 ring-emerald-500/10"
                                     )}
-                                    {/* Category badge - desktop only */}
-                                    {food.category && (
-                                        <Badge className="hidden lg:inline-flex bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase font-black">
-                                            {food.category}
-                                        </Badge>
-                                    )}
+                                >
+                                    {/* Thumbnail for group */}
+                                    <div className="hidden lg:block w-16 h-12 rounded-xl bg-slate-200 dark:bg-slate-950 overflow-hidden shrink-0 border border-slate-300 dark:border-slate-700 shadow-inner group-hover/header:scale-105 transition-transform duration-300">
+                                        {items[0]?.image ? (
+                                            <img src={items[0].image} alt={groupName} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-slate-400">
+                                                <Beef size={16} />
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="flex items-center gap-3 overflow-hidden flex-1">
+                                        <div className="w-6 h-6 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600 shrink-0">
+                                            {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                                        </div>
+                                        <div className="flex flex-col overflow-hidden">
+                                            <h2 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white flex items-center gap-2 truncate">
+                                                {groupName}
+                                                <Badge className="bg-emerald-500/10 text-emerald-600 border-none text-[10px] px-2 py-0 shrink-0">
+                                                    {items.length} options
+                                                </Badge>
+                                            </h2>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
+
+                            {!hasMultiple && (
+                                <div className="px-4 py-1">
+                                    <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600">
+                                        {groupName}
+                                    </h2>
+                                </div>
+                            )}
+
+                            {/* Items in Group */}
+                            <div className={cn("space-y-3", hasMultiple && "pl-6 lg:pl-8 border-l-2 border-slate-100 dark:border-slate-800 ml-3 lg:ml-7")}>
+                                {(isExpanded || !hasMultiple) && items.map((food) => (
+                                    <div key={food.id} className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden">
+                                        <div className="flex items-center justify-between p-4 lg:p-0 lg:grid lg:grid-cols-[80px_1fr_180px] gap-4 lg:items-center lg:px-10 py-0">
+                                            {/* Thumbnail */}
+                                            <div className="hidden lg:block aspect-square w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-500 mx-auto">
+                                                {food.image ? (
+                                                    <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                        <Beef size={24} className="opacity-10" />
+                                                    </div>
+                                                )}
+                                                {food.is_in_pantry && (
+                                                    <div className="absolute top-1 right-1 bg-emerald-500 text-white rounded-full p-0.5 shadow-md">
+                                                        <Check size={8} strokeWidth={4} />
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Name */}
+                                            <div className="flex-1 lg:flex-none lg:p-0">
+                                                <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
+                                                    {hasMultiple ? food.name : (food.common_name || food.name)}
+                                                </h3>
+                                                <div className="flex flex-wrap gap-2 mt-2">
+                                                    {/* Quantity badge - always visible if present */}
+                                                    {food.quantity && (
+                                                        <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[9px] border-none uppercase font-black tracking-tight">
+                                                            {food.quantity}
+                                                        </Badge>
+                                                    )}
+                                                    {/* Category badge - desktop only */}
+                                                    {food.category && (
+                                                        <Badge className="hidden lg:inline-flex bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase font-black">
+                                                            {food.category}
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                            </div>
 
 
 
-                            {/* Actions */}
-                            <div className="p-3 lg:p-0 flex justify-center items-center gap-1">
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className={cn("h-9 w-9 rounded-xl transition-all bg-transparent", food.is_favorite ? "text-rose-500" : "text-slate-400 hover:text-rose-500")}
-                                    onClick={(e) => toggleFavorite(food, e)}
-                                    title="Favorite"
-                                >
-                                    <Heart size={16} fill={food.is_favorite ? "currentColor" : "none"} />
-                                </Button>
+                                            {/* Actions */}
+                                            <div className="p-3 lg:p-0 flex justify-center items-center gap-1">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className={cn("h-9 w-9 rounded-xl transition-all bg-transparent", food.is_favorite ? "text-rose-500" : "text-slate-400 hover:text-rose-500")}
+                                                    onClick={(e) => toggleFavorite(food, e)}
+                                                    title="Favorite"
+                                                >
+                                                    <Heart size={16} fill={food.is_favorite ? "currentColor" : "none"} />
+                                                </Button>
 
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-9 w-9 rounded-xl text-slate-400 hover:text-emerald-500 transition-all"
-                                    onClick={(e) => { e.stopPropagation(); setQuickAddItem(quickAddItem?.id === food.id ? null : food); }}
-                                    title="Quick Add"
-                                >
-                                    <Plus size={16} />
-                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-9 w-9 rounded-xl text-slate-400 hover:text-emerald-500 transition-all"
+                                                    onClick={(e) => { e.stopPropagation(); setQuickAddItem(quickAddItem?.id === food.id ? null : food); }}
+                                                    title="Quick Add"
+                                                >
+                                                    <Plus size={16} />
+                                                </Button>
 
 
 
-                                {/* Admin Edit */}
-                                {currentUserEmail?.toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase() && (
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            router.push(`/dashboard/admin/foods/${food.id}`);
-                                        }}
-                                        className="h-9 w-9 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                                        title="Admin Edit"
-                                    >
-                                        <Edit2 size={16} />
-                                    </Button>
-                                )}
+                                                {/* Admin Edit */}
+                                                {currentUserEmail?.toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase() && (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            router.push(`/dashboard/admin/foods/${food.id}`);
+                                                        }}
+                                                        className="h-9 w-9 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                                        title="Admin Edit"
+                                                    >
+                                                        <Edit2 size={16} />
+                                                    </Button>
+                                                )}
 
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-9 w-9 rounded-xl text-slate-400 hover:text-emerald-500 transition-all"
-                                    onClick={(e) => router.push(`/dashboard/ingredients/${food.id}`)}
-                                    title="View Details"
-                                >
-                                    <ArrowRight size={16} />
-                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-9 w-9 rounded-xl text-slate-400 hover:text-emerald-500 transition-all"
+                                                    onClick={(e) => router.push(`/dashboard/ingredients/${food.id}`)}
+                                                    title="View Details"
+                                                >
+                                                    <ArrowRight size={16} />
+                                                </Button>
+                                            </div>
+                                        </div>
+
+
+
+                                        {/* Quick Add Advanced Slide-out */}
+                                        {quickAddItem?.id === food.id && (
+                                            <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-6 animate-in slide-in-from-top duration-300">
+                                                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center">
+                                                            <ShoppingBasket size={24} className="text-emerald-500" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Quick Action</p>
+                                                            <h4 className="font-black text-sm uppercase italic">Add to {quickAddMode === 'pantry' ? 'Inventory' : 'Shopping List'}</h4>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex flex-wrap items-center gap-3">
+                                                        <div className="flex bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-1">
+                                                            <button
+                                                                onClick={() => setQuickAddMode('pantry')}
+                                                                className={cn("px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all", quickAddMode === 'pantry' ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "text-slate-400")}
+                                                            >
+                                                                Pantry
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setQuickAddMode('shopping')}
+                                                                className={cn("px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all", quickAddMode === 'shopping' ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20" : "text-slate-400")}
+                                                            >
+                                                                Groceries
+                                                            </button>
+                                                        </div>
+
+                                                        <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-3 h-11">
+                                                            <span className="text-[10px] font-black text-slate-400 uppercase">Qty</span>
+                                                            <input
+                                                                type="text"
+                                                                value={quickAddQty}
+                                                                onChange={(e) => setQuickAddQty(e.target.value)}
+                                                                className="w-10 bg-transparent border-none text-center font-black text-sm focus:ring-0"
+                                                            />
+                                                        </div>
+
+                                                        <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-3 h-11">
+                                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Weight/Vol</span>
+                                                            <input
+                                                                type="text"
+                                                                value={quickAddWeight}
+                                                                onChange={(e) => setQuickAddWeight(e.target.value)}
+                                                                placeholder="500"
+                                                                className="w-14 bg-transparent border-none text-center font-black text-sm focus:ring-0 placeholder:text-slate-300"
+                                                            />
+                                                            <select
+                                                                value={quickAddUnit}
+                                                                onChange={(e) => setQuickAddUnit(e.target.value)}
+                                                                className="bg-transparent border-none text-[10px] font-black uppercase text-slate-500 focus:ring-0 p-0 h-full cursor-pointer w-12"
+                                                            >
+                                                                {measurementUnit === 'imperial' ? (
+                                                                    <>
+                                                                        <option value="oz">oz</option>
+                                                                        <option value="lb">lb</option>
+                                                                        <option value="fl oz">fl oz</option>
+                                                                        <option value="pt">pt</option>
+                                                                        <option value="qt">qt</option>
+                                                                        <option value="gal">gal</option>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <option value="g">g</option>
+                                                                        <option value="kg">kg</option>
+                                                                        <option value="ml">ml</option>
+                                                                        <option value="L">L</option>
+                                                                    </>
+                                                                )}
+                                                            </select>
+                                                        </div>
+
+                                                        <Button
+                                                            onClick={handleQuickAdd}
+                                                            className={cn("h-11 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-xl", quickAddMode === 'pantry' ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-rose-600 hover:bg-rose-700 text-white")}
+                                                        >
+                                                            Confirm
+                                                        </Button>
+
+                                                        <Button variant="ghost" size="icon" onClick={() => setQuickAddItem(null)} className="h-11 w-11 rounded-xl text-slate-400">
+                                                            <X size={18} />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
                         </div>
-
-
-
-                        {/* Quick Add Advanced Slide-out */}
-                        {quickAddItem?.id === food.id && (
-                            <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-6 animate-in slide-in-from-top duration-300">
-                                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center">
-                                            <ShoppingBasket size={24} className="text-emerald-500" />
-                                        </div>
-                                        <div>
-                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Quick Action</p>
-                                            <h4 className="font-black text-sm uppercase italic">Add to {quickAddMode === 'pantry' ? 'Inventory' : 'Shopping List'}</h4>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex flex-wrap items-center gap-3">
-                                        <div className="flex bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-1">
-                                            <button
-                                                onClick={() => setQuickAddMode('pantry')}
-                                                className={cn("px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all", quickAddMode === 'pantry' ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "text-slate-400")}
-                                            >
-                                                Pantry
-                                            </button>
-                                            <button
-                                                onClick={() => setQuickAddMode('shopping')}
-                                                className={cn("px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all", quickAddMode === 'shopping' ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20" : "text-slate-400")}
-                                            >
-                                                Groceries
-                                            </button>
-                                        </div>
-
-                                        <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-3 h-11">
-                                            <span className="text-[10px] font-black text-slate-400 uppercase">Qty</span>
-                                            <input
-                                                type="text"
-                                                value={quickAddQty}
-                                                onChange={(e) => setQuickAddQty(e.target.value)}
-                                                className="w-10 bg-transparent border-none text-center font-black text-sm focus:ring-0"
-                                            />
-                                        </div>
-
-                                        <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-3 h-11">
-                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Weight/Vol</span>
-                                            <input
-                                                type="text"
-                                                value={quickAddWeight}
-                                                onChange={(e) => setQuickAddWeight(e.target.value)}
-                                                placeholder="500"
-                                                className="w-14 bg-transparent border-none text-center font-black text-sm focus:ring-0 placeholder:text-slate-300"
-                                            />
-                                            <select
-                                                value={quickAddUnit}
-                                                onChange={(e) => setQuickAddUnit(e.target.value)}
-                                                className="bg-transparent border-none text-[10px] font-black uppercase text-slate-500 focus:ring-0 p-0 h-full cursor-pointer w-12"
-                                            >
-                                                {measurementUnit === 'imperial' ? (
-                                                    <>
-                                                        <option value="oz">oz</option>
-                                                        <option value="lb">lb</option>
-                                                        <option value="fl oz">fl oz</option>
-                                                        <option value="pt">pt</option>
-                                                        <option value="qt">qt</option>
-                                                        <option value="gal">gal</option>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <option value="g">g</option>
-                                                        <option value="kg">kg</option>
-                                                        <option value="ml">ml</option>
-                                                        <option value="L">L</option>
-                                                    </>
-                                                )}
-                                            </select>
-                                        </div>
-
-                                        <Button
-                                            onClick={handleQuickAdd}
-                                            className={cn("h-11 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-xl", quickAddMode === 'pantry' ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-rose-600 hover:bg-rose-700 text-white")}
-                                        >
-                                            Confirm
-                                        </Button>
-
-                                        <Button variant="ghost" size="icon" onClick={() => setQuickAddItem(null)} className="h-11 w-11 rounded-xl text-slate-400">
-                                            <X size={18} />
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                ))}
+                    );
+                })}
             </div>
 
             {hasMore && (

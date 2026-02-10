@@ -404,6 +404,13 @@ export function PantryView({
 
                                     {/* Items in Group */}
                                     <div className={cn("space-y-3", hasMultiple && "pl-6 lg:pl-8 border-l-2 border-slate-100 dark:border-slate-800 ml-3 lg:ml-7")}>
+                                        {!hasMultiple && (
+                                            <div className="px-4 py-1">
+                                                <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600">
+                                                    {groupName}
+                                                </h2>
+                                            </div>
+                                        )}
                                         {(isExpanded || !hasMultiple) && items.map((food) => (
                                             <div
                                                 key={food.id}
@@ -431,7 +438,7 @@ export function PantryView({
                                                     {/* Info */}
                                                     <div className="flex-1 lg:flex-none lg:p-0">
                                                         <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
-                                                            {food.name}
+                                                            {hasMultiple ? food.name : (food.common_name || food.name)}
                                                         </h3>
                                                         <div className="flex flex-wrap gap-2 mt-2">
                                                             {/* Quantity badge - always visible */}
