@@ -138,13 +138,40 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         localStorage.setItem("nutrientDisplayMode", mode);
     };
 
-    const updateProfile = (updates: Partial<UserProfile>) => {
+    const updateProfile = async (updates: Partial<UserProfile>) => {
         setProfileState(prev => {
             const newProfile = { ...prev, ...updates };
             // Ensure familyMembers is preserved if not in updates
             if (!newProfile.familyMembers) newProfile.familyMembers = prev.familyMembers || [];
 
             localStorage.setItem("userProfile", JSON.stringify(newProfile));
+
+            // Attempt to sync with Supabase if logged in
+            supabase.auth.getSession().then(({ data: { session } }) => {
+                if (session?.user) {
+                    supabase.from('profiles').upsert({
+                        id: session.user.id,
+                        full_name: newProfile.name,
+                        nickname: newProfile.nickname,
+                        gender: newProfile.gender,
+                        age: newProfile.age,
+                        weight: newProfile.weight,
+                        height: newProfile.height,
+                        goal: newProfile.goal,
+                        nutrient_strategy: newProfile.nutrientStrategy,
+                        activity_level: newProfile.activityLevel,
+                        dietary_preferences: {
+                            dietType: newProfile.dietType,
+                            exclusions: newProfile.exclusions
+                        },
+                        family_members: newProfile.familyMembers,
+                        updated_at: new Date().toISOString()
+                    }).then(({ error }) => {
+                        if (error) console.error("Failed to sync profile to DB", error);
+                    });
+                }
+            });
+
             return newProfile;
         });
     };
