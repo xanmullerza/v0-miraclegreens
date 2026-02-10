@@ -225,7 +225,7 @@ export function StaplesView() {
             ) : (
                 <div className="space-y-4">
                     {/* List Header */}
-                    <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_100px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                    <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_180px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
                         <div className="flex items-center gap-1.5"><Camera size={14} /> View</div>
                         <div className="flex items-center gap-1.5"><Info size={14} /> Name</div>
                         <div className="flex justify-end items-center gap-1.5"><Zap size={14} className="text-emerald-500" /> ENERGY</div>
@@ -297,9 +297,9 @@ export function StaplesView() {
                                                 key={food.id}
                                                 className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all overflow-hidden"
                                             >
-                                                <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_100px] gap-4 lg:items-center lg:px-8">
+                                                <div className="flex items-center justify-between p-4 lg:p-0 lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_180px] gap-4 lg:items-center lg:px-8">
                                                     {/* Thumbnail */}
-                                                    <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
+                                                    <div className="hidden lg:block aspect-square w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
                                                         {food.image ? (
                                                             <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                                         ) : (
@@ -310,7 +310,7 @@ export function StaplesView() {
                                                     </div>
 
                                                     {/* Info */}
-                                                    <div className="p-3 lg:p-0">
+                                                    <div className="flex-1 lg:flex-none lg:p-0">
                                                         <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
                                                             {food.name}
                                                         </h3>
@@ -345,7 +345,7 @@ export function StaplesView() {
                                                     </div>
 
                                                     {/* Actions */}
-                                                    <div className="p-3 lg:p-0 flex justify-end lg:justify-center">
+                                                    <div className="p-0 lg:p-0 flex justify-end lg:justify-center gap-1.5">
                                                         <div className="flex gap-2">
                                                             <Button
                                                                 variant="ghost"

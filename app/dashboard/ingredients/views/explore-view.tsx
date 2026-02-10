@@ -318,7 +318,7 @@ export function ExploreView({
             )}
 
             {/* List Header */}
-            <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_200px] gap-4 px-10 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
+            <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_180px] gap-4 px-10 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-1.5"><Camera size={14} /> View</div>
                 <div className="flex items-center gap-1.5"><Info size={14} /> Name</div>
                 <div className="flex justify-end items-center gap-1.5"><Zap size={14} className="text-emerald-500" /> ENERGY</div>
@@ -333,10 +333,10 @@ export function ExploreView({
             {/* List Area */}
             <div className="space-y-3">
                 {foods.map((food) => (
-                    <div key={food.id} className="group relative bg-white dark:bg-slate-900/50 rounded-[2rem] border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-2xl transition-all duration-500 overflow-hidden">
-                        <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_200px] gap-4 lg:items-center lg:px-10 py-2">
+                    <div key={food.id} className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden">
+                        <div className="flex items-center justify-between p-4 lg:p-0 lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_180px] gap-4 lg:items-center lg:px-10 py-0">
                             {/* Thumbnail */}
-                            <div className="aspect-square w-16 lg:w-16 rounded-2xl bg-slate-100 dark:bg-slate-950 overflow-hidden relative group-hover:scale-105 transition-transform duration-500 mx-auto">
+                            <div className="hidden lg:block aspect-square w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-500 mx-auto">
                                 {food.image ? (
                                     <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
                                 ) : (
@@ -352,7 +352,7 @@ export function ExploreView({
                             </div>
 
                             {/* Name */}
-                            <div className="p-3 lg:p-0">
+                            <div className="flex-1 lg:flex-none lg:p-0">
                                 <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
                                     {food.common_name || food.name}
                                 </h3>
@@ -428,6 +428,21 @@ export function ExploreView({
                                     <ArrowRight size={16} />
                                 </Button>
                             </div>
+                        </div>
+
+                        {/* Mobile Stats Row */}
+                        <div className="lg:hidden grid grid-cols-4 gap-2 px-3 pb-4">
+                            {[
+                                { label: 'CAL', val: food.energy_kcal, sub: 'k', color: 'text-orange-500' },
+                                { label: 'CHO', val: food.carbs_g, sub: 'g', color: 'text-amber-500' },
+                                { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-amber-900' },
+                                { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-rose-500' }
+                            ].map(stat => (
+                                <div key={stat.label} className="text-center">
+                                    <p className="text-[8px] font-black text-slate-400 mb-0.5">{stat.label}</p>
+                                    <p className={cn("text-xs font-black", stat.color)}>{Math.round(stat.val || 0)}{stat.sub}</p>
+                                </div>
+                            ))}
                         </div>
 
                         {/* Quick Add Advanced Slide-out */}
