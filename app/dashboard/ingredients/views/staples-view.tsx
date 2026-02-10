@@ -225,13 +225,9 @@ export function StaplesView() {
             ) : (
                 <div className="space-y-4">
                     {/* List Header */}
-                    <div className="hidden lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_180px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
+                    <div className="hidden lg:grid lg:grid-cols-[80px_1fr_180px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
                         <div className="flex items-center gap-1.5"><Camera size={14} /> View</div>
                         <div className="flex items-center gap-1.5"><Info size={14} /> Name</div>
-                        <div className="flex justify-end items-center gap-1.5"><Zap size={14} className="text-emerald-500" /> ENERGY</div>
-                        <div className="flex justify-end items-center gap-1.5"><Wheat size={14} className="text-amber-500" /> CARBS</div>
-                        <div className="flex justify-end items-center gap-1.5"><Droplet size={14} className="text-amber-900" /> FAT</div>
-                        <div className="flex justify-end items-center gap-1.5"><Beef size={14} className="text-rose-500" /> PROTEIN</div>
                         <div className="flex justify-center items-center gap-1.5">
                             <Activity size={14} className="text-slate-400" /> CONTROL
                         </div>
@@ -297,7 +293,7 @@ export function StaplesView() {
                                                 key={food.id}
                                                 className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all overflow-hidden"
                                             >
-                                                <div className="flex items-center justify-between p-4 lg:p-0 lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_180px] gap-4 lg:items-center lg:px-8">
+                                                <div className="flex items-center justify-between p-4 lg:p-0 lg:grid lg:grid-cols-[80px_1fr_180px] gap-4 lg:items-center lg:px-8">
                                                     {/* Thumbnail */}
                                                     <div className="hidden lg:block aspect-square w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
                                                         {food.image ? (
@@ -330,19 +326,7 @@ export function StaplesView() {
                                                         </div>
                                                     </div>
 
-                                                    {/* Stats (Desktop View) */}
-                                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                                        {Math.round(food.energy_kcal)}
-                                                    </div>
-                                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                                        {food.carbs_g.toFixed(1)}g
-                                                    </div>
-                                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                                        {food.fat_g.toFixed(1)}g
-                                                    </div>
-                                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">
-                                                        {food.protein_g.toFixed(1)}g
-                                                    </div>
+
 
                                                     {/* Actions */}
                                                     <div className="p-0 lg:p-0 flex justify-end lg:justify-center gap-1.5">
@@ -383,20 +367,6 @@ export function StaplesView() {
                                                         </div>
                                                     </div>
 
-                                                    {/* Mobile Stats Row */}
-                                                    <div className="lg:hidden grid grid-cols-4 gap-2 px-3 pb-3">
-                                                        {[
-                                                            { label: 'CAL', val: food.energy_kcal, sub: 'k', color: 'text-orange-500' },
-                                                            { label: 'CHO', val: food.carbs_g, sub: 'g', color: 'text-amber-500' },
-                                                            { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-amber-900' },
-                                                            { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-rose-500' }
-                                                        ].map(stat => (
-                                                            <div key={stat.label} className="text-center">
-                                                                <p className="text-[8px] font-black text-slate-400 mb-0.5">{stat.label}</p>
-                                                                <p className={cn("text-xs font-black", stat.color)}>{Math.round(stat.val)}{stat.sub}</p>
-                                                            </div>
-                                                        ))}
-                                                    </div>
                                                 </div>
 
                                                 {/* Advanced Update Dialog (Matching Pantry) */}

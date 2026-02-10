@@ -410,7 +410,7 @@ export function PantryView({
                                                 className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all overflow-hidden"
                                             >
                                                 {/* Desktop Grid */}
-                                                <div className="flex items-center justify-between p-4 lg:p-0 lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_180px] gap-4 lg:items-center lg:px-8">
+                                                <div className="flex items-center justify-between p-4 lg:p-0 lg:grid lg:grid-cols-[80px_1fr_180px] gap-4 lg:items-center lg:px-8">
                                                     {/* Thumbnail */}
                                                     <div className="hidden lg:block aspect-square w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
                                                         {food.image ? (
@@ -447,31 +447,7 @@ export function PantryView({
                                                         </div>
                                                     </div>
 
-                                                    {/* Stats (Desktop View) */}
-                                                    <div className="hidden lg:flex flex-col items-end">
-                                                        <span className="text-[9px] uppercase font-black text-slate-400">Energy</span>
-                                                        <span className="font-black text-sm text-slate-900 dark:text-white">
-                                                            {formatEnergy(food.energy_kcal, energyUnit)}
-                                                        </span>
-                                                    </div>
-                                                    <div className="hidden lg:flex flex-col items-end">
-                                                        <span className="text-[9px] uppercase font-black text-slate-400">Carbs</span>
-                                                        <span className="font-black text-sm text-slate-900 dark:text-white">
-                                                            {food.carbs_g.toFixed(1)}g
-                                                        </span>
-                                                    </div>
-                                                    <div className="hidden lg:flex flex-col items-end">
-                                                        <span className="text-[9px] uppercase font-black text-slate-400">Fat</span>
-                                                        <span className="font-black text-sm text-slate-900 dark:text-white">
-                                                            {food.fat_g.toFixed(1)}g
-                                                        </span>
-                                                    </div>
-                                                    <div className="hidden lg:flex flex-col items-end">
-                                                        <span className="text-[9px] uppercase font-black text-slate-400">Protein</span>
-                                                        <span className="font-black text-sm text-slate-900 dark:text-white">
-                                                            {food.protein_g.toFixed(1)}g
-                                                        </span>
-                                                    </div>
+
 
                                                     {/* Actions */}
                                                     <div className="lg:p-0 flex justify-end lg:justify-center">
