@@ -79,7 +79,7 @@ export function PantryView({
     const [loading, setLoading] = useState(true);
     const { searchQuery } = useSearch();
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
-    const { dailyPlan, updateDailyPlan, energyUnit } = useUserPreferences();
+    const { dailyPlan, updateDailyPlan, energyUnit, measurementUnit } = useUserPreferences();
 
     const [localShowFavoritesOnly, setLocalShowFavoritesOnly] = useState(false);
     const showFavoritesOnly = externalShowFavoritesOnly !== undefined ? externalShowFavoritesOnly : localShowFavoritesOnly;
@@ -93,6 +93,7 @@ export function PantryView({
     const [buyMoreItem, setBuyMoreItem] = useState<FoodItem | null>(null);
     const [buyMoreQty, setBuyMoreQty] = useState('1');
     const [buyMoreWeight, setBuyMoreWeight] = useState('');
+    const [buyMoreUnit, setBuyMoreUnit] = useState('g');
     const [quickAddMode, setQuickAddMode] = useState<'pantry' | 'shopping'>('pantry');
 
     useEffect(() => {
@@ -202,8 +203,8 @@ export function PantryView({
         }
     };
 
-    const updatePantryQuantity = async (item: FoodItem, newQty: string, newWeight: string) => {
-        const quantityString = newWeight ? `${newQty} x ${newWeight}g` : newQty;
+    const updatePantryQuantity = async (item: FoodItem, newQty: string, newWeight: string, newUnit: string) => {
+        const quantityString = newWeight ? `${newQty} x ${newWeight}${newUnit}` : newQty;
 
         // Optimistic UI update
         setFoods(prev => prev.map(f => f.id === item.id ? { ...f, quantity: quantityString } : f));
@@ -251,7 +252,7 @@ export function PantryView({
             };
 
             const oldQty = parseQty(existing.quantity);
-            const quantityString = buyMoreWeight ? `${buyMoreQty} x ${buyMoreWeight}g` : buyMoreQty;
+            const quantityString = buyMoreWeight ? `${buyMoreQty} x ${buyMoreWeight}${buyMoreUnit}` : buyMoreQty;
             const newQty = parseQty(quantityString);
 
             if (oldQty && newQty && oldQty.unit === newQty.unit) {
@@ -265,7 +266,7 @@ export function PantryView({
             toast.success(`Updated "${itemName}" quantity in shopping list`);
         } else {
             // Add new item
-            const quantityString = buyMoreWeight ? `${buyMoreQty} x ${buyMoreWeight}g` : buyMoreQty;
+            const quantityString = buyMoreWeight ? `${buyMoreQty} x ${buyMoreWeight}${buyMoreUnit}` : buyMoreQty;
             const newItem = {
                 id: `manual-${Date.now()}`,
                 name: itemName,
@@ -461,6 +462,7 @@ export function PantryView({
                                                                     setBuyMoreItem(buyMoreItem?.id === food.id ? null : food);
                                                                     setBuyMoreQty('1');
                                                                     setBuyMoreWeight('');
+                                                                    setBuyMoreUnit(measurementUnit === 'imperial' ? 'oz' : 'g');
                                                                 }}
                                                                 className={cn(
                                                                     "h-9 w-9 rounded-xl transition-colors",
@@ -537,10 +539,31 @@ export function PantryView({
                                                                         type="text"
                                                                         value={buyMoreWeight}
                                                                         onChange={(e) => setBuyMoreWeight(e.target.value)}
-                                                                        placeholder="g"
                                                                         className="w-12 bg-transparent border-none text-center font-black text-sm focus:ring-0 placeholder:text-slate-300"
                                                                         onClick={(e) => e.stopPropagation()}
                                                                     />
+                                                                    <select
+                                                                        value={buyMoreUnit}
+                                                                        onChange={(e) => setBuyMoreUnit(e.target.value)}
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                        className="bg-transparent border-none text-[10px] font-black uppercase text-slate-500 focus:ring-0 p-0 h-full cursor-pointer w-10"
+                                                                    >
+                                                                        {measurementUnit === 'imperial' ? (
+                                                                            <>
+                                                                                <option value="oz">oz</option>
+                                                                                <option value="lb">lb</option>
+                                                                                <option value="fl oz">fl oz</option>
+                                                                                <option value="gal">gal</option>
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <option value="g">g</option>
+                                                                                <option value="kg">kg</option>
+                                                                                <option value="ml">ml</option>
+                                                                                <option value="L">L</option>
+                                                                            </>
+                                                                        )}
+                                                                    </select>
                                                                 </div>
                                                                 <Button
                                                                     onClick={(e) => {
@@ -548,7 +571,7 @@ export function PantryView({
                                                                         if (quickAddMode === 'shopping') {
                                                                             addToShoppingList(food);
                                                                         } else {
-                                                                            updatePantryQuantity(food, buyMoreQty, buyMoreWeight);
+                                                                            updatePantryQuantity(food, buyMoreQty, buyMoreWeight, buyMoreUnit);
                                                                         }
                                                                     }}
                                                                     className={cn("h-11 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-xl", quickAddMode === 'pantry' ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-rose-600 hover:bg-rose-700 text-white")}
