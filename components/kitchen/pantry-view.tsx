@@ -165,6 +165,21 @@ export function PantryView({
                 ...personalFoods
             ];
 
+            // Merge in locally-stored quantities (persists without login)
+            try {
+                const savedQuantities = localStorage.getItem('pantry_quantities');
+                if (savedQuantities) {
+                    const quantities: Record<string, string> = JSON.parse(savedQuantities);
+                    combined.forEach(item => {
+                        if (quantities[item.id]) {
+                            item.quantity = quantities[item.id];
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error('Failed to load saved quantities', e);
+            }
+
             setFoods(combined);
         } catch (error: any) {
             console.error('Error fetching pantry:', error);
@@ -206,55 +221,31 @@ export function PantryView({
     const updatePantryQuantity = async (item: FoodItem, newQty: string, newWeight: string, newUnit: string) => {
         const quantityString = newWeight ? `${newQty} x ${newWeight}${newUnit}` : newQty;
 
-        // Optimistic update for UI responsiveness
+        // Update UI immediately
         setFoods(prev => prev.map(f => f.id === item.id ? { ...f, quantity: quantityString } : f));
         setBuyMoreItem(null);
         toast.success(`Updated quantity for "${item.name}"`);
 
+        // Persist to localStorage (works without login)
         try {
-            const { data: { session } } = await supabase.auth.getSession();
-            const user = session?.user;
+            const saved = localStorage.getItem('pantry_quantities');
+            const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
+            quantities[item.id] = quantityString;
+            localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+        } catch (e) {
+            console.error('Failed to save quantity to localStorage', e);
+        }
 
-            if (!user) {
-                toast.error("You must be logged in to save changes");
-                return;
-            }
-
-            if (item.source_table === 'pantry_items') {
-                // It's already a personal pantry item, just update the quantity
-                const { error } = await supabase
+        // Also try to save to DB for pantry_items (best-effort, won't error if it fails)
+        if (item.source_table === 'pantry_items') {
+            try {
+                await supabase
                     .from('pantry_items')
                     .update({ quantity: quantityString } as any)
                     .eq('id', item.id);
-                if (error) throw error;
-            } else {
-                // It's a standard food item. To save quantity, we must "upgrade" it to a personal pantry item.
-                // 1. Create the personal pantry entry
-                const { error: insertError } = await supabase.from('pantry_items').insert({
-                    user_id: user.id,
-                    food_item_id: item.id,
-                    name: item.name,
-                    quantity: quantityString
-                });
-
-                if (insertError) throw insertError;
-
-                // 2. Uncheck the "is_in_pantry" flag on the global item to prevent duplication
-                // (It will now appear via the pantry_items table instead)
-                const { error: updateError } = await supabase
-                    .from('food_items')
-                    .update({ is_in_pantry: false } as any)
-                    .eq('id', item.id);
-
-                if (updateError) throw updateError;
-
-                // 3. Refresh to get the new correct ID and Source for future updates
-                fetchPantry();
+            } catch (e) {
+                console.warn('DB sync skipped', e);
             }
-        } catch (error) {
-            console.error('Failed to update quantity', error);
-            toast.error("Failed to save to database");
-            fetchPantry(); // Revert on error
         }
     };
 
