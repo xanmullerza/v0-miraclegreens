@@ -98,7 +98,7 @@ function FoodsHubContent() {
                                         isActive ? tab.color : "text-slate-400"
                                     )} />
                                     <span className={cn(
-                                        "transition-all duration-300 overflow-hidden",
+                                        "transition-all duration-300 overflow-hidden hidden md:block",
                                         isSearchExpanded ? "w-0 opacity-0" : "w-auto opacity-100"
                                     )}>
                                         {tab.label}
