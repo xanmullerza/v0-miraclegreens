@@ -72,9 +72,11 @@ export function AllFoodsView() {
 
     const addToPantry = async (food: FoodItem) => {
         try {
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { session } } = await supabase.auth.getSession();
+            const user = session?.user;
             if (!user) {
-                toast.error('You must be logged in to manage your pantry');
+                toast.info('Sign in to save pantry items to the cloud');
+                setQuickAddItem(null);
                 return;
             }
 
