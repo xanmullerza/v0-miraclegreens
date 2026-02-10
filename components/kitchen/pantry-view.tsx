@@ -352,14 +352,6 @@ export function PantryView({
                                         </div>
                                     )}
 
-                                    {!hasMultiple && (
-                                        <div className="px-4 py-1">
-                                            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600">
-                                                {groupName}
-                                            </h2>
-                                        </div>
-                                    )}
-
                                     {/* Items in Group */}
                                     <div className={cn("space-y-3", hasMultiple && "pl-6 lg:pl-8 border-l-2 border-slate-100 dark:border-slate-800 ml-3 lg:ml-7")}>
                                         {(isExpanded || !hasMultiple) && items.map((food) => (

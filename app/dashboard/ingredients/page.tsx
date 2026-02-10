@@ -63,7 +63,7 @@ function FoodsHubContent() {
 
     const renderTabGroup = (tabsList: typeof ingredientTabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
         <div className="space-y-3">
-            <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>
+            {sectionLabel && <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>}
             <div className={cn(
                 "flex items-center p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500 w-full md:w-[800px] mx-auto xl:mx-0"
             )}>
@@ -174,7 +174,7 @@ function FoodsHubContent() {
 
                 {/* Tab Sections & Filters */}
                 <div className="flex flex-col gap-6 items-start w-full">
-                    {renderTabGroup(ingredientTabs, "📦 Ingredients", "text-slate-500", true)}
+                    {renderTabGroup(ingredientTabs, "", "text-slate-500", true)}
                 </div>
 
                 {(currentTab === 'allfoods' || currentTab === 'explore' || currentTab === 'pantry') && (
