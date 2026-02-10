@@ -125,7 +125,7 @@ export function PantryView({
 
             const [foodItemsRes, pantryItemsRes] = await Promise.all([
                 supabase.from('food_items')
-                    .select('*')
+                    .select('*, quantity')
                     .eq('is_in_pantry', true)
                     .order('common_name', { ascending: true }),
                 user ? supabase.from('pantry_items')
