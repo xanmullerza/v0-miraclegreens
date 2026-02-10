@@ -104,6 +104,54 @@ export default function FoodDetailsPage() {
     const fetchFoodDetails = async () => {
         setLoading(true);
         try {
+            // Priority 1: Check if it's a personal pantry item
+            const { data: pantryData, error: pantryError } = await supabase
+                .from('pantry_items')
+                .select('*, scanned_products(*), food_items(*)')
+                .eq('id', id)
+                .maybeSingle();
+
+            if (pantryData) {
+                // Determine the nutritional source
+                const baseItem = pantryData.food_items || pantryData.scanned_products;
+
+                if (baseItem) {
+                    // Normalize the nutrition object
+                    const spNutrition = pantryData.scanned_products?.nutrition || {};
+                    const nutrition = {
+                        energy_kcal: spNutrition.energy || baseItem.energy_kcal || 0,
+                        energy_kj: spNutrition.energy_kj || baseItem.energy_kj || 0,
+                        protein_g: spNutrition.protein || baseItem.protein_g || 0,
+                        carbs_g: spNutrition.carbs || baseItem.carbs_g || 0,
+                        fat_g: spNutrition.fat || baseItem.fat_g || 0,
+                    };
+
+                    setFood({
+                        // Spread the base properties first
+                        ...baseItem,
+
+                        // Override with specific pantry instance details
+                        id: baseItem.id, // Use the UNDERLYING food ID for consistency in other lookups
+                        pantry_id: pantryData.id, // Keep a ref to the pantry wrapper
+
+                        // Ensure name is correct (custom name > scanned name > food name)
+                        name: pantryData.name || baseItem.name || 'Unknown Item',
+                        common_name: pantryData.name || baseItem.common_name || baseItem.name,
+
+                        // Merge nutrition
+                        ...nutrition,
+                        micronutrients: baseItem.micronutrients || {},
+
+                        // Ensure relations exist
+                        details: baseItem.details,
+                        portions: baseItem.portions,
+                        is_favorite: baseItem.is_favorite // Use the base item's favorited status
+                    } as any);
+                    return;
+                }
+            }
+
+            // Priority 2: Standard Food Item
             const { data, error } = await supabase
                 .from('food_items')
                 .select('*')
