@@ -63,7 +63,7 @@ function FoodsHubContent() {
                 "flex items-center p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500 w-full md:w-[800px] mx-auto xl:mx-0"
             )}>
                 {/* Left side - Home Button area */}
-                <div className="flex-shrink-0 w-12 flex items-center justify-start">
+                <div className={cn("flex-shrink-0 flex items-center justify-start transition-all duration-500", isSearchExpanded ? "w-0" : "w-12")}>
                     {showHomeButton && !isSearchExpanded && (
                         <button
                             onClick={() => router.push('/dashboard')}
@@ -76,7 +76,7 @@ function FoodsHubContent() {
                 </div>
 
                 {/* Center - Tabs area */}
-                <div className="flex-1 flex items-center justify-center overflow-hidden">
+                <div className={cn("flex items-center justify-center overflow-hidden transition-all duration-500", isSearchExpanded ? "w-0 flex-none opacity-0" : "flex-1 opacity-100")}>
                     <div className="flex items-center gap-4 overflow-hidden py-1">
                         {tabsList.map((tab) => {
                             const Icon = tab.icon;
@@ -138,7 +138,10 @@ function FoodsHubContent() {
                         />
                     </div>
                     <button
-                        onClick={() => setIsSearchExpanded(!isSearchExpanded)}
+                        onClick={() => {
+                            if (isSearchExpanded) setSearchQuery('');
+                            setIsSearchExpanded(!isSearchExpanded);
+                        }}
                         className={cn(
                             "flex items-center justify-center w-12 h-12 rounded-[1.5rem] transition-all flex-shrink-0",
                             isSearchExpanded
