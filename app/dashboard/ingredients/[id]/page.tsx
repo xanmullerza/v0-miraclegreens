@@ -159,7 +159,24 @@ export default function FoodDetailsPage() {
                 .single();
 
             if (error) throw error;
-            setFood(data);
+
+            const fetchedFood = data;
+
+            // Merge in locally-stored quantities (persists without login)
+            try {
+                const savedQuantities = localStorage.getItem('pantry_quantities');
+                if (savedQuantities && fetchedFood) {
+                    const quantities: Record<string, string> = JSON.parse(savedQuantities);
+                    if (quantities[fetchedFood.id]) {
+                        fetchedFood.quantity = quantities[fetchedFood.id];
+                        fetchedFood.is_in_pantry = true;
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load saved quantities', e);
+            }
+
+            setFood(fetchedFood);
         } catch (error: any) {
             console.error('Error fetching food:', error);
             toast.error('Failed to load ingredient profile');
@@ -558,9 +575,17 @@ export default function FoodDetailsPage() {
                                 </div>
                             )}
                             <div className="absolute top-6 left-6 flex flex-col gap-2">
-                                <Badge className="bg-emerald-600/90 text-white border-none text-[10px] font-black uppercase tracking-widest px-4 py-2 backdrop-blur-md shadow-2xl w-fit">
+                                <Badge className={cn(
+                                    "bg-emerald-600/90 text-white border-none text-[10px] font-black uppercase tracking-widest px-4 py-2 backdrop-blur-md shadow-2xl w-fit",
+                                    food.quantity && "hidden lg:inline-flex"
+                                )}>
                                     {food.category || 'General'}
                                 </Badge>
+                                {food.quantity && (
+                                    <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-none text-[10px] font-black uppercase tracking-widest px-4 py-2 backdrop-blur-md shadow-2xl w-fit">
+                                        Qty: {food.quantity}
+                                    </Badge>
+                                )}
                                 {food.protein_g > 15 && (
                                     <Badge className="bg-red-600/90 text-white border-none text-[10px] font-black uppercase tracking-widest px-4 py-2 backdrop-blur-md shadow-2xl w-fit">
                                         High Protein
@@ -640,9 +665,16 @@ export default function FoodDetailsPage() {
                 <div className="lg:col-span-2 space-y-6">
                     <div className="space-y-4">
                         <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-8">
-                            <h1 className="text-6xl font-black tracking-tighter italic uppercase text-slate-900 dark:text-white leading-[0.85]">
-                                {food.common_name || food.name}
-                            </h1>
+                            <div className="flex flex-col gap-2">
+                                <h1 className="text-6xl font-black tracking-tighter italic uppercase text-slate-900 dark:text-white leading-[0.85]">
+                                    {food.common_name || food.name}
+                                </h1>
+                                {food.quantity && (
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">
+                                        Current Stock: {food.quantity}
+                                    </p>
+                                )}
+                            </div>
                             <div className="flex items-center gap-3 bg-white dark:bg-slate-900 px-6 py-3 rounded-3xl border-2 border-slate-200 dark:border-slate-800 shadow-xl group/amount transition-all hover:border-emerald-500/50">
                                 <Scale className="w-5 h-5 text-emerald-500" />
                                 <div className="flex items-baseline gap-1">

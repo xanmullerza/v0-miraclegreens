@@ -434,7 +434,14 @@ export function PantryView({
                                                             {food.name}
                                                         </h3>
                                                         <div className="flex flex-wrap gap-2 mt-2">
-                                                            <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase font-black">
+                                                            {/* Quantity badge - always visible */}
+                                                            {food.quantity && (
+                                                                <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[9px] border-none uppercase font-black tracking-tight">
+                                                                    {food.quantity}
+                                                                </Badge>
+                                                            )}
+                                                            {/* Category badge - desktop only */}
+                                                            <Badge className="hidden lg:inline-flex bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase font-black">
                                                                 {food.category}
                                                             </Badge>
                                                         </div>
