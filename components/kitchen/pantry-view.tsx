@@ -360,9 +360,9 @@ export function PantryView({
                                                 className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all overflow-hidden"
                                             >
                                                 {/* Desktop Grid */}
-                                                <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_180px] gap-4 lg:items-center lg:px-8">
+                                                <div className="flex items-center justify-between p-4 lg:p-0 lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_180px] gap-4 lg:items-center lg:px-8">
                                                     {/* Thumbnail */}
-                                                    <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
+                                                    <div className="hidden lg:block aspect-square w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
                                                         {food.image ? (
                                                             <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                                         ) : (
@@ -379,7 +379,7 @@ export function PantryView({
                                                     </div>
 
                                                     {/* Info */}
-                                                    <div className="p-3 lg:p-0">
+                                                    <div className="flex-1 lg:flex-none lg:p-0">
                                                         <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
                                                             {food.name}
                                                         </h3>
@@ -417,7 +417,7 @@ export function PantryView({
                                                     </div>
 
                                                     {/* Actions */}
-                                                    <div className="p-3 lg:p-0 flex justify-end lg:justify-center">
+                                                    <div className="lg:p-0 flex justify-end lg:justify-center">
                                                         <div className="flex gap-2">
                                                             <Button
                                                                 variant="ghost"
@@ -465,21 +465,6 @@ export function PantryView({
                                                             </Button>
                                                         </div>
                                                     </div>
-                                                </div>
-
-                                                {/* Mobile Stats Row */}
-                                                <div className="lg:hidden grid grid-cols-4 gap-2 px-3 pb-3">
-                                                    {[
-                                                        { label: 'CAL', val: food.energy_kcal, sub: 'k', color: 'text-orange-500' },
-                                                        { label: 'CHO', val: food.carbs_g, sub: 'g', color: 'text-amber-500' },
-                                                        { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-amber-900' },
-                                                        { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-rose-500' }
-                                                    ].map(stat => (
-                                                        <div key={stat.label} className="text-center">
-                                                            <p className="text-[8px] font-black text-slate-400 mb-0.5">{stat.label}</p>
-                                                            <p className={cn("text-xs font-black", stat.color)}>{Math.round(stat.val)}{stat.sub}</p>
-                                                        </div>
-                                                    ))}
                                                 </div>
 
                                                 {/* Quick Action Slide-out */}
