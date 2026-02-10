@@ -92,6 +92,7 @@ export function PantryView({
     // Shopping list quick-add state
     const [buyMoreItem, setBuyMoreItem] = useState<FoodItem | null>(null);
     const [buyMoreQty, setBuyMoreQty] = useState('1');
+    const [buyMoreWeight, setBuyMoreWeight] = useState('');
     const [quickAddMode, setQuickAddMode] = useState<'pantry' | 'shopping'>('pantry');
 
     useEffect(() => {
@@ -229,30 +230,32 @@ export function PantryView({
             };
 
             const oldQty = parseQty(existing.quantity);
-            const newQty = parseQty(buyMoreQty);
+            const quantityString = buyMoreWeight ? `${buyMoreQty} x ${buyMoreWeight}g` : buyMoreQty;
+            const newQty = parseQty(quantityString);
 
             if (oldQty && newQty && oldQty.unit === newQty.unit) {
                 const sum = oldQty.num + newQty.num;
                 manualItems[existingIndex].quantity = oldQty.unit ? `${sum} ${oldQty.unit}` : `${sum}`;
             } else {
                 // Different units, concatenate
-                manualItems[existingIndex].quantity = `${existing.quantity} + ${buyMoreQty}`;
+                manualItems[existingIndex].quantity = `${existing.quantity} + ${quantityString}`;
             }
 
             toast.success(`Updated "${itemName}" quantity in shopping list`);
         } else {
             // Add new item
+            const quantityString = buyMoreWeight ? `${buyMoreQty} x ${buyMoreWeight}g` : buyMoreQty;
             const newItem = {
                 id: `manual-${Date.now()}`,
                 name: itemName,
-                quantity: buyMoreQty,
+                quantity: quantityString,
                 unit: '',
                 checked: false,
                 source: 'manual',
                 food_item_id: foodId
             };
             manualItems.push(newItem);
-            toast.success(`Added ${buyMoreQty}× "${itemName}" to shopping list`);
+            toast.success(`Added ${quantityString} "${itemName}" to shopping list`);
         }
 
         localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(manualItems));
@@ -436,6 +439,7 @@ export function PantryView({
                                                                     e.stopPropagation();
                                                                     setBuyMoreItem(buyMoreItem?.id === food.id ? null : food);
                                                                     setBuyMoreQty('1');
+                                                                    setBuyMoreWeight('');
                                                                 }}
                                                                 className={cn(
                                                                     "h-9 w-9 rounded-xl transition-colors",
@@ -503,6 +507,17 @@ export function PantryView({
                                                                         value={buyMoreQty}
                                                                         onChange={(e) => setBuyMoreQty(e.target.value)}
                                                                         className="w-12 bg-transparent border-none text-center font-black text-sm focus:ring-0"
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                    />
+                                                                </div>
+                                                                <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-3 h-11">
+                                                                    <span className="text-[10px] font-black text-slate-400 uppercase">Weight</span>
+                                                                    <input
+                                                                        type="text"
+                                                                        value={buyMoreWeight}
+                                                                        onChange={(e) => setBuyMoreWeight(e.target.value)}
+                                                                        placeholder="g"
+                                                                        className="w-12 bg-transparent border-none text-center font-black text-sm focus:ring-0 placeholder:text-slate-300"
                                                                         onClick={(e) => e.stopPropagation()}
                                                                     />
                                                                 </div>
