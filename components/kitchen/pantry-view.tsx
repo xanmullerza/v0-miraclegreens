@@ -323,7 +323,7 @@ export function PantryView({
                                             )}
                                         >
                                             {/* Thumbnail for group */}
-                                            <div className="w-16 h-12 rounded-xl bg-slate-200 dark:bg-slate-950 overflow-hidden shrink-0 border border-slate-300 dark:border-slate-700 shadow-inner group-hover/header:scale-105 transition-transform duration-300">
+                                            <div className="hidden lg:block w-16 h-12 rounded-xl bg-slate-200 dark:bg-slate-950 overflow-hidden shrink-0 border border-slate-300 dark:border-slate-700 shadow-inner group-hover/header:scale-105 transition-transform duration-300">
                                                 {items[0]?.image ? (
                                                     <img src={items[0].image} alt={groupName} className="w-full h-full object-cover" />
                                                 ) : (
