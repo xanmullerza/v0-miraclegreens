@@ -61,6 +61,8 @@ interface FoodItem {
     micronutrients: Record<string, number>;
     is_favorite?: boolean;
     category?: string;
+    quantity?: string;
+    is_in_pantry?: boolean;
     details?: import('@/lib/data/food-details').FoodDetail;
     portions?: { label: string; weight_g: number }[];
 }
