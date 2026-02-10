@@ -367,6 +367,7 @@ export function PantryView({
                                                 key={food.id}
                                                 className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all overflow-hidden"
                                             >
+                                                {/* Desktop Grid */}
                                                 <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_180px] gap-4 lg:items-center lg:px-8">
                                                     {/* Thumbnail */}
                                                     <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
@@ -471,83 +472,82 @@ export function PantryView({
                                                                 <ArrowRight size={16} />
                                                             </Button>
                                                         </div>
-
-                                                    </div>
-
-                                                    {/* Quick Action Slide-out */}
-                                                    {buyMoreItem?.id === food.id && (
-                                                        <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-6 animate-in slide-in-from-top duration-300">
-                                                            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                                                                <div className="flex items-center gap-4">
-                                                                    <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center">
-                                                                        <ShoppingBasket size={24} className="text-emerald-500" />
-                                                                    </div>
-                                                                    <div>
-                                                                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Quick Action</p>
-                                                                        <h4 className="font-black text-sm uppercase italic">Add to {quickAddMode === 'pantry' ? 'Pantry' : 'Groceries'}</h4>
-                                                                    </div>
-                                                                </div>
-
-                                                                <div className="flex flex-wrap items-center gap-3">
-                                                                    <div className="flex bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-1">
-                                                                        <button
-                                                                            onClick={(e) => { e.stopPropagation(); setQuickAddMode('pantry'); }}
-                                                                            className={cn("px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all", quickAddMode === 'pantry' ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "text-slate-400")}
-                                                                        >
-                                                                            Pantry
-                                                                        </button>
-                                                                        <button
-                                                                            onClick={(e) => { e.stopPropagation(); setQuickAddMode('shopping'); }}
-                                                                            className={cn("px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all", quickAddMode === 'shopping' ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20" : "text-slate-400")}
-                                                                        >
-                                                                            Groceries
-                                                                        </button>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-3 h-11">
-                                                                        <span className="text-[10px] font-black text-slate-400 uppercase">Qty</span>
-                                                                        <input
-                                                                            type="text"
-                                                                            value={buyMoreQty}
-                                                                            onChange={(e) => setBuyMoreQty(e.target.value)}
-                                                                            className="w-12 bg-transparent border-none text-center font-black text-sm focus:ring-0"
-                                                                            onClick={(e) => e.stopPropagation()}
-                                                                        />
-                                                                    </div>
-                                                                    <Button
-                                                                        onClick={(e) => {
-                                                                            e.stopPropagation();
-                                                                            if (quickAddMode === 'shopping') {
-                                                                                addToShoppingList(food);
-                                                                            } else {
-                                                                                toast.success(`"${food.name}" quantity updated in kitchen`);
-                                                                                setBuyMoreItem(null);
-                                                                            }
-                                                                        }}
-                                                                        className={cn("h-11 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-xl", quickAddMode === 'pantry' ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-rose-600 hover:bg-rose-700 text-white")}
-                                                                    >
-                                                                        Add to {quickAddMode === 'pantry' ? 'Pantry' : 'Groceries'}
-                                                                    </Button>
-                                                                    <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setBuyMoreItem(null); }} className="h-11 w-11 rounded-xl"><X size={18} /></Button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                                    {/* Mobile Stats Row */}
-                                                    <div className="lg:hidden grid grid-cols-4 gap-2 px-3 pb-3">
-                                                        {[
-                                                            { label: 'CAL', val: food.energy_kcal, sub: 'k', color: 'text-orange-500' },
-                                                            { label: 'CHO', val: food.carbs_g, sub: 'g', color: 'text-amber-500' },
-                                                            { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-amber-900' },
-                                                            { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-rose-500' }
-                                                        ].map(stat => (
-                                                            <div key={stat.label} className="text-center">
-                                                                <p className="text-[8px] font-black text-slate-400 mb-0.5">{stat.label}</p>
-                                                                <p className={cn("text-xs font-black", stat.color)}>{Math.round(stat.val)}{stat.sub}</p>
-                                                            </div>
-                                                        ))}
                                                     </div>
                                                 </div>
+
+                                                {/* Mobile Stats Row */}
+                                                <div className="lg:hidden grid grid-cols-4 gap-2 px-3 pb-3">
+                                                    {[
+                                                        { label: 'CAL', val: food.energy_kcal, sub: 'k', color: 'text-orange-500' },
+                                                        { label: 'CHO', val: food.carbs_g, sub: 'g', color: 'text-amber-500' },
+                                                        { label: 'FAT', val: food.fat_g, sub: 'g', color: 'text-amber-900' },
+                                                        { label: 'PRO', val: food.protein_g, sub: 'g', color: 'text-rose-500' }
+                                                    ].map(stat => (
+                                                        <div key={stat.label} className="text-center">
+                                                            <p className="text-[8px] font-black text-slate-400 mb-0.5">{stat.label}</p>
+                                                            <p className={cn("text-xs font-black", stat.color)}>{Math.round(stat.val)}{stat.sub}</p>
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                {/* Quick Action Slide-out */}
+                                                {buyMoreItem?.id === food.id && (
+                                                    <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-6 animate-in slide-in-from-top duration-300">
+                                                        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center">
+                                                                    <ShoppingBasket size={24} className="text-emerald-500" />
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Quick Action</p>
+                                                                    <h4 className="font-black text-sm uppercase italic">Add to {quickAddMode === 'pantry' ? 'Pantry' : 'Groceries'}</h4>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="flex flex-wrap items-center gap-3">
+                                                                <div className="flex bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-1">
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); setQuickAddMode('pantry'); }}
+                                                                        className={cn("px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all", quickAddMode === 'pantry' ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "text-slate-400")}
+                                                                    >
+                                                                        Pantry
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={(e) => { e.stopPropagation(); setQuickAddMode('shopping'); }}
+                                                                        className={cn("px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all", quickAddMode === 'shopping' ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20" : "text-slate-400")}
+                                                                    >
+                                                                        Groceries
+                                                                    </button>
+                                                                </div>
+                                                                <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-3 h-11">
+                                                                    <span className="text-[10px] font-black text-slate-400 uppercase">Qty</span>
+                                                                    <input
+                                                                        type="text"
+                                                                        value={buyMoreQty}
+                                                                        onChange={(e) => setBuyMoreQty(e.target.value)}
+                                                                        className="w-12 bg-transparent border-none text-center font-black text-sm focus:ring-0"
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                    />
+                                                                </div>
+                                                                <Button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        if (quickAddMode === 'shopping') {
+                                                                            addToShoppingList(food);
+                                                                        } else {
+                                                                            toast.success(`"${food.name}" quantity updated in kitchen`);
+                                                                            setBuyMoreItem(null);
+                                                                        }
+                                                                    }}
+                                                                    className={cn("h-11 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-xl", quickAddMode === 'pantry' ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-rose-600 hover:bg-rose-700 text-white")}
+                                                                >
+                                                                    Add to {quickAddMode === 'pantry' ? 'Pantry' : 'Groceries'}
+                                                                </Button>
+                                                                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); setBuyMoreItem(null); }} className="h-11 w-11 rounded-xl"><X size={18} /></Button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
