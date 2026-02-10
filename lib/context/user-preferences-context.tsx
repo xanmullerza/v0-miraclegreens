@@ -81,6 +81,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     const [skipPlannerQuiz, setSkipPlannerQuizState] = useState(false);
     const [dailyPlan, setDailyPlanState] = useState<DailyPlan | null>(null);
 
+    // Load initial data from localStorage and cloud
     useEffect(() => {
         const savedUnit = localStorage.getItem("energyUnit") as EnergyUnit;
         if (savedUnit === "kcal" || savedUnit === "kJ") {
@@ -97,18 +98,6 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
             setNutrientDisplayModeState(savedNMode);
         }
 
-        const savedProfile = localStorage.getItem("userProfile");
-        if (savedProfile) {
-            try {
-                const parsed = JSON.parse(savedProfile);
-                // Ensure familyMembers exists for legacy data
-                if (!parsed.familyMembers) parsed.familyMembers = [];
-                setProfileState(parsed);
-            } catch (e) {
-                console.error("Failed to parse user profile", e);
-            }
-        }
-
         const savedSkip = localStorage.getItem("skipPlannerQuiz");
         if (savedSkip !== null) {
             setSkipPlannerQuizState(savedSkip === "true");
@@ -121,6 +110,58 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
             } catch (e) {
                 console.error("Failed to parse daily plan", e);
             }
+        }
+
+        // 1. First load from LocalStorage (fast)
+        const savedProfile = localStorage.getItem("userProfile");
+        if (savedProfile) {
+            try {
+                const parsed = JSON.parse(savedProfile);
+                if (!parsed.familyMembers) parsed.familyMembers = [];
+                setProfileState(parsed);
+            } catch (e) {
+                console.error("Failed to parse user profile", e);
+            }
+        }
+
+        // 2. Then sync from Cloud (consistent across devices)
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session?.user) {
+                supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', session.user.id)
+                    .single()
+                    .then(({ data, error }) => {
+                        if (data && !error) {
+                            const cloudProfile: UserProfile = {
+                                name: data.full_name || "",
+                                nickname: data.nickname || "",
+                                gender: data.gender || "female",
+                                age: data.age || "",
+                                weight: data.weight || "",
+                                height: data.height || "",
+                                goal: data.goal || "maintain",
+                                dietType: data.dietary_preferences?.dietType || "anything",
+                                activityLevel: data.activity_level || "sedentary",
+                                nutrientStrategy: data.nutrient_strategy || "balanced",
+                                exclusions: data.dietary_preferences?.exclusions || [],
+                                familyMembers: data.family_members || []
+                            };
+                            setProfileState(cloudProfile);
+                            localStorage.setItem("userProfile", JSON.stringify(cloudProfile));
+                        }
+                    });
+            }
+        });
+
+        // 3. Request Persistent Storage (Best practice for Mobile)
+        if (typeof navigator !== 'undefined' && navigator.storage && navigator.storage.persist) {
+            navigator.storage.persist().then(persistent => {
+                if (persistent) {
+                    console.log("Storage will not be cleared except by explicit user action");
+                }
+            });
         }
     }, []);
 
@@ -139,43 +180,44 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         localStorage.setItem("nutrientDisplayMode", mode);
     };
 
-    const updateProfile = (updates: Partial<UserProfile>) => {
-        setProfileState(prev => {
-            const newProfile = { ...prev, ...updates };
-            // Ensure familyMembers is preserved if not in updates
-            if (!newProfile.familyMembers) newProfile.familyMembers = prev.familyMembers || [];
+    const updateProfile = async (updates: Partial<UserProfile>) => {
+        // Construct new profile
+        const newProfile = { ...profile, ...updates };
 
-            // Always save to device (works for everyone)
-            localStorage.setItem("userProfile", JSON.stringify(newProfile));
+        // 1. Update React State (UI responsiveness)
+        setProfileState(newProfile);
 
-            // If logged in, also sync to cloud (fire-and-forget)
-            supabase.auth.getSession().then(({ data: { session } }: any) => {
-                if (session?.user) {
-                    supabase.from('profiles').upsert({
-                        id: session.user.id,
-                        full_name: newProfile.name,
-                        nickname: newProfile.nickname,
-                        gender: newProfile.gender,
-                        age: newProfile.age || null,
-                        weight: newProfile.weight || null,
-                        height: newProfile.height || null,
-                        goal: newProfile.goal,
-                        nutrient_strategy: newProfile.nutrientStrategy,
-                        activity_level: newProfile.activityLevel,
-                        dietary_preferences: {
-                            dietType: newProfile.dietType,
-                            exclusions: newProfile.exclusions
-                        },
-                        family_members: newProfile.familyMembers,
-                        updated_at: new Date().toISOString()
-                    } as any).then(({ error }: any) => {
-                        if (error) console.warn('Cloud profile sync skipped:', error.message);
-                    });
-                }
-            });
+        // 2. Save to LocalDevice (Safety fallback)
+        localStorage.setItem("userProfile", JSON.stringify(newProfile));
 
-            return newProfile;
-        });
+        // 3. Sync to Cloud
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+            const { error } = await supabase.from('profiles').upsert({
+                id: session.user.id,
+                full_name: newProfile.name,
+                nickname: newProfile.nickname,
+                gender: newProfile.gender,
+                age: newProfile.age || null,
+                weight: newProfile.weight || null,
+                height: newProfile.height || null,
+                goal: newProfile.goal,
+                nutrient_strategy: newProfile.nutrientStrategy,
+                activity_level: newProfile.activityLevel,
+                dietary_preferences: {
+                    dietType: newProfile.dietType,
+                    exclusions: newProfile.exclusions
+                },
+                family_members: newProfile.familyMembers,
+                updated_at: new Date().toISOString()
+            } as any);
+
+            if (error) {
+                console.error('Cloud sync failed:', error.message);
+                // We don't toast error here to avoid annoying user if offline, 
+                // since it's already saved locally.
+            }
+        }
     };
 
     const setSkipPlannerQuiz = (skip: boolean) => {

@@ -47,8 +47,15 @@ import { type FamilyMember } from '@/lib/context/user-preferences-context';
 import { GoalType, ActivityLevel } from '@/lib/utils/nutrition-calculator';
 
 function FamilyMemberForm({ initialData, onSave, onCancel }: { initialData?: Partial<FamilyMember>, onSave: (data: FamilyMember) => void, onCancel: () => void }) {
+    const generateId = () => {
+        if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+            return crypto.randomUUID();
+        }
+        return Math.random().toString(36).substring(2, 11);
+    };
+
     const defaultMember: FamilyMember = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         name: '',
         age: 10,
         gender: 'male',
