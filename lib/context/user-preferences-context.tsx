@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { calculateIndividualTargets, GoalType, ActivityLevel, NutrientStrategy } from "@/lib/utils/nutrition-calculator";
 import { DailyPlan } from "@/lib/utils/meal-generator";
+import { supabase } from "@/lib/supabase";
 
 export type EnergyUnit = "kcal" | "kJ";
 export type MeasurementUnit = "metric" | "imperial";
@@ -144,7 +145,35 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
             // Ensure familyMembers is preserved if not in updates
             if (!newProfile.familyMembers) newProfile.familyMembers = prev.familyMembers || [];
 
+            // Always save to device (works for everyone)
             localStorage.setItem("userProfile", JSON.stringify(newProfile));
+
+            // If logged in, also sync to cloud (fire-and-forget)
+            supabase.auth.getSession().then(({ data: { session } }: any) => {
+                if (session?.user) {
+                    supabase.from('profiles').upsert({
+                        id: session.user.id,
+                        full_name: newProfile.name,
+                        nickname: newProfile.nickname,
+                        gender: newProfile.gender,
+                        age: newProfile.age || null,
+                        weight: newProfile.weight || null,
+                        height: newProfile.height || null,
+                        goal: newProfile.goal,
+                        nutrient_strategy: newProfile.nutrientStrategy,
+                        activity_level: newProfile.activityLevel,
+                        dietary_preferences: {
+                            dietType: newProfile.dietType,
+                            exclusions: newProfile.exclusions
+                        },
+                        family_members: newProfile.familyMembers,
+                        updated_at: new Date().toISOString()
+                    } as any).then(({ error }: any) => {
+                        if (error) console.warn('Cloud profile sync skipped:', error.message);
+                    });
+                }
+            });
+
             return newProfile;
         });
     };
