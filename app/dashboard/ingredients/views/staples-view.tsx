@@ -42,6 +42,7 @@ interface FoodItem {
     image: string | null;
     is_in_pantry: boolean;
     category?: string;
+    quantity?: string;
 }
 
 export function StaplesView() {
@@ -74,7 +75,24 @@ export function StaplesView() {
                 .order('common_name', { ascending: true });
 
             if (error) throw error;
-            setFoods(data || []);
+            const fetchedItems = data || [];
+
+            // Merge in locally-stored quantities (persists without login)
+            try {
+                const savedQuantities = localStorage.getItem('pantry_quantities');
+                if (savedQuantities) {
+                    const quantities: Record<string, string> = JSON.parse(savedQuantities);
+                    fetchedItems.forEach(item => {
+                        if (quantities[item.id]) {
+                            item.quantity = quantities[item.id];
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error('Failed to load saved quantities', e);
+            }
+
+            setFoods(fetchedItems);
         } catch (error: any) {
             console.error('Error fetching pantry:', error);
             if (error.code === '42703') {
@@ -251,11 +269,20 @@ export function StaplesView() {
                                                         <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
                                                             {food.name}
                                                         </h3>
-                                                        {food.category && (
-                                                            <Badge className="mt-2 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none">
-                                                                {food.category}
-                                                            </Badge>
-                                                        )}
+                                                        <div className="flex flex-wrap gap-2 mt-2">
+                                                            {/* Quantity badge - always visible if present */}
+                                                            {food.quantity && (
+                                                                <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[9px] border-none uppercase font-black tracking-tight">
+                                                                    {food.quantity}
+                                                                </Badge>
+                                                            )}
+                                                            {/* Category badge - desktop only */}
+                                                            {food.category && (
+                                                                <Badge className="hidden lg:inline-flex bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase font-black">
+                                                                    {food.category}
+                                                                </Badge>
+                                                            )}
+                                                        </div>
                                                     </div>
 
                                                     {/* Stats (Desktop View) */}

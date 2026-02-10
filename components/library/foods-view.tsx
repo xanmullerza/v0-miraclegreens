@@ -60,6 +60,7 @@ interface FoodItem {
     is_favorite?: boolean;
     is_in_pantry?: boolean;
     category?: string;
+    quantity?: string;
 }
 
 export const CATEGORIES = ["General", "Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
@@ -146,6 +147,23 @@ export function FoodsView({
             if (count !== null) setTotalCount(count);
 
             const newItems = data || [];
+
+            // Merge in locally-stored quantities (persists without login)
+            try {
+                const savedQuantities = localStorage.getItem('pantry_quantities');
+                if (savedQuantities) {
+                    const quantities: Record<string, string> = JSON.parse(savedQuantities);
+                    newItems.forEach(item => {
+                        if (quantities[item.id]) {
+                            item.quantity = quantities[item.id];
+                            item.is_in_pantry = true;
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error('Failed to load saved quantities', e);
+            }
+
             if (isNewSearch) {
                 setFoods(newItems);
                 setPage(0);
@@ -377,9 +395,20 @@ export function FoodsView({
                                         <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
                                             {food.common_name || food.name}
                                         </h3>
-                                        <Badge className="mt-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase tracking-widest font-black">
-                                            {food.category}
-                                        </Badge>
+                                        <div className="flex flex-wrap gap-2 mt-1.5">
+                                            {/* Quantity badge - always visible if present */}
+                                            {food.quantity && (
+                                                <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[9px] border-none uppercase font-black tracking-tight">
+                                                    {food.quantity}
+                                                </Badge>
+                                            )}
+                                            {/* Category badge - desktop only */}
+                                            {food.category && (
+                                                <Badge className="hidden lg:inline-flex bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase tracking-widest font-black">
+                                                    {food.category}
+                                                </Badge>
+                                            )}
+                                        </div>
                                     </div>
 
                                     {/* Stats (Desktop View) */}
