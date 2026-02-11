@@ -213,7 +213,7 @@ export function TopTenView({
                         title: "Clinical Markers",
                         icon: Activity,
                         align: "text-amber-500",
-                        ids: ['Fiber']
+                        ids: ['Fiber', 'Cholesterol', 'Omega-3', 'Oxalate', 'Sugar']
                     }
                 ].map((group) => (
                     <div key={group.title} className="space-y-3">
