@@ -15,12 +15,12 @@ import {
     Globe,
     Filter,
     ChevronDown,
-    Check
+    Check,
+    X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
 import { nutrientInfo } from '@/lib/data/nutrient-info';
 
 const MAIN_CATEGORIES = ["Macros", "Minerals", "Vitamins"];
@@ -108,73 +108,56 @@ export function NutrientsView() {
                 </div>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-4 justify-center relative z-30">
-                <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm shrink-0">
-                    <Globe
-                        size={18}
-                        className={cn("transition-all cursor-pointer", !showFavoritesOnly ? "text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" : "text-slate-300")}
-                        onClick={() => setShowFavoritesOnly(false)}
-                    />
-                    <Switch
-                        id="favorites-mode"
-                        checked={showFavoritesOnly}
-                        onCheckedChange={setShowFavoritesOnly}
-                    />
-                    <Heart
-                        size={18}
-                        className={cn("transition-all cursor-pointer", showFavoritesOnly ? "text-rose-500 fill-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : "text-slate-300")}
-                        onClick={() => setShowFavoritesOnly(true)}
-                    />
-                </div>
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
+                {/* Favorites Toggle */}
+                <button
+                    onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                    className={cn(
+                        "flex items-center gap-2 px-5 py-3 rounded-2xl border transition-all duration-300 shrink-0 shadow-sm group",
+                        showFavoritesOnly
+                            ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
+                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-200 hover:text-rose-500 dark:hover:border-rose-900/50"
+                    )}
+                >
+                    <Heart size={16} className={cn("transition-transform group-hover:scale-110", showFavoritesOnly && "fill-current scale-110")} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Favorites</span>
+                </button>
 
-                <div className="relative">
-                    <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar items-center h-14 shadow-sm w-fit transition-all duration-500">
+                <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
+
+                {/* Category Pills */}
+                {MAIN_CATEGORIES.map(category => {
+                    const isActive = selectedCategories.includes(category);
+                    return (
                         <button
-                            onClick={() => setIsFilterOpen(!isFilterOpen)}
+                            key={category}
+                            onClick={() => isActive
+                                ? setSelectedCategories(prev => prev.filter(c => c !== category))
+                                : setSelectedCategories(prev => [...prev, category])
+                            }
                             className={cn(
-                                "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300 shrink-0",
-                                isFilterOpen ? "bg-amber-600 text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                "px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0 border shadow-sm",
+                                isActive
+                                    ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20"
+                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-emerald-200 hover:text-emerald-600 dark:hover:border-emerald-900/50"
                             )}
                         >
-                            <Filter size={18} />
-                            <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter Groups</span>
-                            <ChevronDown size={14} className={cn("transition-transform duration-300", isFilterOpen && "rotate-180")} />
+                            {category}
                         </button>
+                    );
+                })}
 
-                        <div className="w-px h-6 bg-slate-100 dark:bg-slate-800 mx-1 shrink-0" />
-
-                        <div className={cn("flex items-center gap-1 transition-all duration-500 ease-in-out overflow-hidden", isFilterOpen ? "max-w-[1000px] opacity-100 px-1" : "max-w-0 opacity-0 px-0")}>
-                            {MAIN_CATEGORIES.map(category => {
-                                const isActive = selectedCategories.includes(category);
-                                return (
-                                    <button
-                                        key={category}
-                                        onClick={() => isActive
-                                            ? setSelectedCategories(prev => prev.filter(c => c !== category))
-                                            : setSelectedCategories(prev => [...prev, category])
-                                        }
-                                        className={cn(
-                                            "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
-                                            isActive
-                                                ? "bg-amber-600/10 text-amber-600 border border-amber-600/20"
-                                                : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
-                                        )}
-                                    >
-                                        {category}
-                                    </button>
-                                );
-                            })}
-                        </div>
-
-                        {!isFilterOpen && (
-                            <div className="px-4 whitespace-nowrap">
-                                <span className="text-[10px] font-bold text-slate-400 italic">
-                                    {selectedCategories.length === 0 ? "All Nutrients" : `${selectedCategories.length} Groups Selected`}
-                                </span>
-                            </div>
-                        )}
-                    </div>
-                </div>
+                {selectedCategories.length > 0 && (
+                    <>
+                        <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
+                        <button
+                            onClick={() => setSelectedCategories([])}
+                            className="px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all shrink-0 flex items-center gap-2"
+                        >
+                            <X size={14} /> Clear
+                        </button>
+                    </>
+                )}
             </div>
 
             <div className="space-y-3">
