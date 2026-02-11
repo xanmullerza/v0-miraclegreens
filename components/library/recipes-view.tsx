@@ -397,7 +397,7 @@ export function RecipesView({
                                         >
                                             <Heart size={14} fill={recipe.is_favorite ? "currentColor" : "none"} />
                                         </button>
-                                        <button className="w-8 h-8 rounded-full flex items-center justify-center border bg-blue-500 text-white shadow-lg shadow-blue-500/10">
+                                        <button className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-500 transition-all">
                                             <ArrowRight size={14} />
                                         </button>
                                     </div>
