@@ -284,6 +284,17 @@ export function TopTenView({
                                         {index + 1}
                                     </div>
 
+                                    {/* Food Image */}
+                                    {food.image_url && (
+                                        <div className="w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-800">
+                                            <img
+                                                src={food.image_url}
+                                                alt={food.common_name || food.name}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                            />
+                                        </div>
+                                    )}
+
                                     {/* Content */}
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between mb-2">
