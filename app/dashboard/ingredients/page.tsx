@@ -31,7 +31,7 @@ type FoodTab = 'groceries' | 'pantry' | 'allfoods' | 'explore' | 'staples' | 'sh
 function FoodsHubContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const currentTab = (searchParams.get('tab') as FoodTab) || 'groceries';
+    const currentTab = (searchParams.get('tab') as FoodTab) || 'allfoods';
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
     const { searchQuery, setSearchQuery, setIsFocused, activeSearchId, setActiveSearchId } = useSearch();
 
