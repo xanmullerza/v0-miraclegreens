@@ -380,7 +380,7 @@ export function RecipesView({
                                                     e.stopPropagation();
                                                     router.push(`/dashboard/meals/${recipe.id}/edit`);
                                                 }}
-                                                className="w-8 h-8 rounded-full border bg-white/90 dark:bg-slate-950/90 text-slate-400 hover:text-blue-500"
+                                                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-500 transition-all"
                                             >
                                                 <Pencil size={14} />
                                             </button>
