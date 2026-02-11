@@ -107,37 +107,6 @@ export function NutrientsView(props: NutrientsViewProps = {}) {
 
     return (
         <div className="space-y-6">
-            {/* Controls Row */}
-            <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
-                <div className="flex items-center gap-4 flex-grow max-w-2xl">
-                    <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm shrink-0">
-                        <Globe size={18} className={cn("transition-all cursor-pointer", !showFavoritesOnly ? "text-blue-500" : "text-slate-300")} onClick={() => setShowFavoritesOnly(false)} />
-                        <Switch checked={showFavoritesOnly} onCheckedChange={setShowFavoritesOnly} />
-                        <Heart size={18} className={cn("transition-all cursor-pointer", showFavoritesOnly ? "text-rose-500 fill-rose-500" : "text-slate-300")} onClick={() => setShowFavoritesOnly(true)} />
-                    </div>
-                </div>
-
-                <div className="relative">
-                    <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 h-14 items-center shadow-sm">
-                        {MAIN_CATEGORIES.map(category => (
-                            <button
-                                key={category}
-                                onClick={() => selectedCategories.includes(category)
-                                    ? setSelectedCategories(prev => prev.filter(c => c !== category))
-                                    : setSelectedCategories(prev => [...prev, category])
-                                }
-                                className={cn(
-                                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-                                    selectedCategories.includes(category) ? "bg-amber-600/10 text-amber-600 border border-amber-600/20" : "text-slate-500"
-                                )}
-                            >
-                                {category}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
             {/* Nutrient Items */}
             <div className="space-y-3">
                 {filteredNutrients.map(name => {
