@@ -542,55 +542,58 @@ export function ShoppingListView() {
                 </div>
             ) : (
                 /* Items List */
-                <div className="space-y-6">
+                <div className="space-y-4">
                     {/* Unchecked Items */}
                     {uncheckedItems.length > 0 && (
-                        <div className="space-y-3">
-                            <div className="flex items-center gap-2 mb-4">
-                                <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-rose-500">
-                                    Need to Buy ({uncheckedItems.length})
-                                </span>
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800/50">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                                    <span className="text-xs font-black uppercase tracking-widest text-rose-600 dark:text-rose-400">
+                                        Need to Buy
+                                    </span>
+                                </div>
+                                <span className="text-xs font-black text-rose-600 dark:text-rose-400">{uncheckedItems.length}</span>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <div className="space-y-1.5">
                                 {uncheckedItems.map((item) => (
                                     <div
                                         key={item.id}
                                         className={cn(
-                                            "flex items-center gap-4 p-4 rounded-2xl border transition-all cursor-pointer group",
+                                            "flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-all cursor-pointer group",
                                             item.is_miracle_product
-                                                ? "bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800/50"
-                                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-emerald-500/50"
+                                                ? "bg-amber-50/70 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/40 hover:border-amber-300"
+                                                : "bg-slate-50/50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800/50"
                                         )}
                                         onClick={() => toggleItem(item.id)}
                                     >
                                         <div className={cn(
-                                            "w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all",
+                                            "w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all",
                                             "border-slate-300 dark:border-slate-600 group-hover:border-emerald-500"
                                         )}>
                                             {/* Empty checkbox */}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-1.5">
                                                 {item.is_miracle_product && (
-                                                    <Sparkles size={14} className="text-amber-500 shrink-0" />
+                                                    <Sparkles size={12} className="text-amber-500 shrink-0" />
                                                 )}
-                                                <span className="font-bold text-slate-900 dark:text-white truncate">
+                                                <span className="font-semibold text-sm text-slate-900 dark:text-white truncate">
                                                     {item.name}
                                                 </span>
                                             </div>
-                                            <span className="text-xs text-slate-500">{item.quantity}</span>
+                                            <span className="text-xs text-slate-500 dark:text-slate-400">{item.quantity}</span>
                                         </div>
                                         {item.source === 'mealplan' && (
-                                            <Badge className="text-[8px] bg-blue-500/10 text-blue-600 border-none shrink-0">
-                                                <ChefHat size={10} className="mr-1" /> Meal Plan
+                                            <Badge className="text-[7px] bg-blue-500/10 text-blue-600 dark:text-blue-400 border-none shrink-0 h-5 px-1.5 flex items-center">
+                                                <ChefHat size={9} className="mr-0.5" /> Meal
                                             </Badge>
                                         )}
                                         <button
                                             onClick={(e) => { e.stopPropagation(); removeItem(item.id); }}
-                                            className="opacity-0 group-hover:opacity-100 p-2 rounded-xl hover:bg-rose-100 dark:hover:bg-rose-950/30 text-slate-400 hover:text-rose-500 transition-all"
+                                            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-500 transition-all"
                                         >
-                                            <X size={16} />
+                                            <X size={14} />
                                         </button>
                                     </div>
                                 ))}
@@ -600,36 +603,39 @@ export function ShoppingListView() {
 
                     {/* Checked Items */}
                     {checkedItems.length > 0 && (
-                        <div className="space-y-3">
-                            <div className="flex items-center gap-2 mb-4">
-                                <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">
-                                    Completed ({checkedItems.length})
-                                </span>
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/50">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                                    <span className="text-xs font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+                                        Completed
+                                    </span>
+                                </div>
+                                <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">{checkedItems.length}</span>
                             </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <div className="space-y-1.5">
                                 {checkedItems.map((item) => (
                                     <div
                                         key={item.id}
-                                        className="flex items-center gap-4 p-4 rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/50 opacity-60 cursor-pointer group"
+                                        className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40 opacity-70 cursor-pointer group hover:opacity-100 transition-all"
                                         onClick={() => toggleItem(item.id)}
                                     >
-                                        <div className="w-6 h-6 rounded-lg border-2 border-emerald-500 bg-emerald-500 flex items-center justify-center shrink-0">
-                                            <Check size={14} className="text-white" />
+                                        <div className="w-5 h-5 rounded-md border-2 border-emerald-500 bg-emerald-500 flex items-center justify-center shrink-0">
+                                            <Check size={12} className="text-white" />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <span className="font-bold text-slate-500 line-through truncate block">
+                                            <span className="font-semibold text-sm text-slate-500 dark:text-slate-400 line-through truncate block">
                                                 {item.name}
                                             </span>
-                                            <span className="text-xs text-slate-400">{item.quantity}</span>
+                                            <span className="text-xs text-slate-400 dark:text-slate-500">{item.quantity}</span>
                                         </div>
                                         <Button
                                             size="sm"
                                             variant="ghost"
                                             onClick={(e) => { e.stopPropagation(); moveToPantry(item); }}
-                                            className="opacity-0 group-hover:opacity-100 text-[9px] font-black uppercase tracking-widest text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
+                                            className="opacity-0 group-hover:opacity-100 h-6 px-2 text-[8px] font-black uppercase tracking-tight text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
                                         >
-                                            <Package size={12} className="mr-1" /> To Pantry
+                                            <Package size={10} className="mr-0.5" /> Add
                                         </Button>
                                     </div>
                                 ))}
