@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useSearch } from '@/lib/context/search-context';
+import { supabase } from '@/lib/supabase';
 
 import { ExploreView } from './views/explore-view';
 import { StaplesView } from './views/staples-view';
@@ -33,11 +34,24 @@ function FoodsHubContent() {
     const searchParams = useSearchParams();
     const currentTab = (searchParams.get('tab') as FoodTab) || 'allfoods';
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
     const { searchQuery, setSearchQuery, setIsFocused, activeSearchId, setActiveSearchId } = useSearch();
 
     // Lifted Filter State
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+
+    useEffect(() => {
+        const checkAdmin = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
+                const userEmail = (user.email || user.user_metadata?.email || '').toLowerCase();
+                setIsAdmin(userEmail === adminEmail.toLowerCase() && adminEmail !== '');
+            }
+        };
+        checkAdmin();
+    }, []);
 
     const setTab = (tab: FoodTab) => {
         const params = new URLSearchParams(searchParams.toString());
@@ -113,12 +127,17 @@ function FoodsHubContent() {
                         {tabsList.map((tab) => {
                             const Icon = tab.icon;
                             const isActive = currentTab === tab.id;
+                            const isDisabled = !isAdmin && (tab.id === 'groceries' || tab.id === 'pantry');
                             return (
                                 <button
                                     key={tab.id}
-                                    onClick={() => setTab(tab.id as FoodTab)}
+                                    onClick={() => !isDisabled && setTab(tab.id as FoodTab)}
+                                    disabled={isDisabled}
                                     className={cn(
                                         "flex items-center gap-3 py-3.5 rounded-[1.5rem] text-[9px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
+                                        isDisabled
+                                            ? "opacity-50 cursor-not-allowed"
+                                            : "",
                                         isActive
                                             ? "bg-slate-900 dark:bg-slate-800 text-white shadow-xl translate-y-[-2px]"
                                             : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50",
