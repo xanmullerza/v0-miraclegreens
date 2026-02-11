@@ -296,11 +296,11 @@ export function TopTenView({
                                     {/* Content */}
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between mb-2">
-                                            <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate pr-4 text-base">
+                                            <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate pr-4 text-sm">
                                                 {food.common_name || food.name}
                                             </h3>
                                             <div className="text-right flex-shrink-0">
-                                                <span className="font-black text-lg text-slate-900 dark:text-white tabular-nums tracking-tight">
+                                                <span className="font-black text-base text-slate-900 dark:text-white tabular-nums tracking-tight">
                                                     {food.value < 10 && food.value !== 0 ? food.value.toFixed(1) : Math.round(food.value)}
                                                 </span>
                                                 <span className="text-xs font-bold text-slate-400 ml-1">{selectedNutrient.unit}</span>
