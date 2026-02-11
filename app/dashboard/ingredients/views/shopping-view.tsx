@@ -84,7 +84,21 @@ export function ShoppingView() {
         let combined = [...manualItems];
         if (dailyPlan) {
             const mealPlanItems = generateShoppingList(dailyPlan);
-            const pantryNames = new Set(pantryItems.map(f => (f.common_name || f.name).toLowerCase().trim()));
+            const pantryNames = new Set<string>();
+            pantryItems.forEach(f => {
+                if (f.common_name) {
+                    const cn = f.common_name.toLowerCase().trim();
+                    pantryNames.add(cn);
+                    if (cn.endsWith('s')) pantryNames.add(cn.replace(/s$/, ''));
+                    else pantryNames.add(cn + 's');
+                }
+                if (f.name) {
+                    const n = f.name.toLowerCase().trim();
+                    pantryNames.add(n);
+                    if (n.endsWith('s')) pantryNames.add(n.replace(/s$/, ''));
+                    else pantryNames.add(n + 's');
+                }
+            });
 
             const convertedItems: ShoppingListItem[] = mealPlanItems
                 .filter(item => !pantryNames.has(item.name.toLowerCase().trim()))
@@ -108,11 +122,35 @@ export function ShoppingView() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const { data: pantryData } = await supabase
-                .from('food_items')
-                .select('*')
-                .eq('is_in_pantry', true);
-            if (pantryData) setPantryItems(pantryData);
+            const { data: { user } } = await supabase.auth.getUser();
+
+            const [foodItemsRes, pantryItemsRes] = await Promise.all([
+                supabase.from('food_items')
+                    .select('*')
+                    .eq('is_in_pantry', true),
+                user ? supabase.from('pantry_items')
+                    .select('*, scanned_products(name, common_name), food_items(*)')
+                    .eq('user_id', user.id)
+                    : { data: [] }
+            ]);
+
+            let items: any[] = foodItemsRes.data || [];
+
+            if (pantryItemsRes.data) {
+                const personalItems = pantryItemsRes.data.map((item: any) => {
+                    const sp = item.scanned_products;
+                    const fi = item.food_items;
+                    return {
+                        id: item.food_item_id || item.id,
+                        name: sp?.name || fi?.name || item.custom_name,
+                        common_name: fi?.common_name || sp?.common_name || sp?.name || fi?.name || item.custom_name,
+                        is_in_pantry: true,
+                    };
+                });
+                items = [...items, ...personalItems];
+            }
+
+            setPantryItems(items);
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {

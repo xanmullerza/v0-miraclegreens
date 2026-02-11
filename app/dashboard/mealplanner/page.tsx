@@ -176,7 +176,21 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, pantryIt
 
     // Match Analysis Logic
     const pantryIds = new Set(pantryItems.map(f => f.id));
-    const pantryNames = new Set(pantryItems.map(f => (f.common_name || f.name).toLowerCase().trim()));
+    const pantryNames = new Set<string>();
+    pantryItems.forEach(f => {
+        if (f.common_name) {
+            const cn = f.common_name.toLowerCase().trim();
+            pantryNames.add(cn);
+            if (cn.endsWith('s')) pantryNames.add(cn.replace(/s$/, ''));
+            else pantryNames.add(cn + 's');
+        }
+        if (f.name) {
+            const n = f.name.toLowerCase().trim();
+            pantryNames.add(n);
+            if (n.endsWith('s')) pantryNames.add(n.replace(/s$/, ''));
+            else pantryNames.add(n + 's');
+        }
+    });
     const recipeIngs = recipe.ingredients || [];
 
     let matchCount = 0;
@@ -327,11 +341,51 @@ export function MealPlannerContent({
 
     useEffect(() => {
         const fetchPantry = async () => {
-            const { data } = await supabase
-                .from('food_items')
-                .select('*')
-                .eq('is_in_pantry', true);
-            if (data) setPantryItems(data);
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+
+                const [foodItemsRes, pantryItemsRes] = await Promise.all([
+                    supabase.from('food_items')
+                        .select('*')
+                        .eq('is_in_pantry', true),
+                    user ? supabase.from('pantry_items')
+                        .select('*, scanned_products(name, common_name, nutrition, image_url), food_items(*)')
+                        .eq('user_id', user.id)
+                        : { data: [] }
+                ]);
+
+                let items: any[] = foodItemsRes.data || [];
+
+                // Transform and add personal items
+                if (pantryItemsRes.data) {
+                    const personalItems = pantryItemsRes.data.map((item: any) => {
+                        const sp = item.scanned_products;
+                        const fi = item.food_items;
+                        return {
+                            id: item.food_item_id || item.id,
+                            name: sp?.name || fi?.name || item.custom_name,
+                            common_name: fi?.common_name || sp?.common_name || sp?.name || fi?.name || item.custom_name,
+                            is_in_pantry: true,
+                        };
+                    });
+                    items = [...items, ...personalItems];
+                }
+
+                // Merge in LocalStorage quantities (even for logged out users)
+                const saved = localStorage.getItem('pantry_quantities');
+                if (saved) {
+                    const localQ = JSON.parse(saved);
+                    Object.keys(localQ).forEach(id => {
+                        if (!items.find(it => it.id === id)) {
+                            items.push({ id: id, is_in_pantry: true });
+                        }
+                    });
+                }
+
+                setPantryItems(items);
+            } catch (err) {
+                console.error('Failed to fetch pantry:', err);
+            }
         };
         fetchPantry();
     }, []);
@@ -889,7 +943,21 @@ export function MealPlannerContent({
                                 <div className="p-6">
                                     {(() => {
                                         const shoppingItems = generateShoppingList(plan);
-                                        const pantryNames = new Set(pantryItems.map(f => (f.common_name || f.name).toLowerCase().trim()));
+                                        const pantryNames = new Set<string>();
+                                        pantryItems.forEach(f => {
+                                            if (f.common_name) {
+                                                const cn = f.common_name.toLowerCase().trim();
+                                                pantryNames.add(cn);
+                                                if (cn.endsWith('s')) pantryNames.add(cn.replace(/s$/, ''));
+                                                else pantryNames.add(cn + 's');
+                                            }
+                                            if (f.name) {
+                                                const n = f.name.toLowerCase().trim();
+                                                pantryNames.add(n);
+                                                if (n.endsWith('s')) pantryNames.add(n.replace(/s$/, ''));
+                                                else pantryNames.add(n + 's');
+                                            }
+                                        });
 
                                         // Split items into "need to buy" and "in pantry"
                                         const needToBuy = shoppingItems.filter(item => !pantryNames.has(item.name.toLowerCase().trim()));

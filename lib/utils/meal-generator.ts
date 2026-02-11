@@ -262,7 +262,21 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
 
     // Pantry lookup for scoring
     const pantryIds = new Set(settings.pantryItems?.map(f => f.id) || []);
-    const pantryNames = new Set(settings.pantryItems?.map(f => (f.common_name || f.name).toLowerCase().trim()) || []);
+    const pantryNames = new Set<string>();
+    settings.pantryItems?.forEach(f => {
+        if (f.common_name) {
+            const cn = f.common_name.toLowerCase().trim();
+            pantryNames.add(cn);
+            if (cn.endsWith('s')) pantryNames.add(cn.replace(/s$/, ''));
+            else pantryNames.add(cn + 's');
+        }
+        if (f.name) {
+            const n = f.name.toLowerCase().trim();
+            pantryNames.add(n);
+            if (n.endsWith('s')) pantryNames.add(n.replace(/s$/, ''));
+            else pantryNames.add(n + 's');
+        }
+    });
 
     const calculateMatchScore = (recipe: Recipe) => {
         const ings = recipe.ingredients || [];
