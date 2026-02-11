@@ -138,7 +138,7 @@ export default function DashboardOverview() {
                 )}
 
                 {/* Cards Grid - Takes 1/3 width, grid layout */}
-                <div className={cn("grid gap-4 auto-rows-fr", hideWelcome ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-2 lg:col-span-1")}>
+                <div className={cn("grid gap-4 auto-rows-fr", hideWelcome ? "grid-cols-2 grid-rows-2 gap-6 max-w-3xl mx-auto" : "grid-cols-2 lg:col-span-1")}>
                     {tools.map((tool) => (
                         <Link key={tool.href} href={tool.href}>
                             <Card className="p-4 group hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 h-full flex flex-col">
