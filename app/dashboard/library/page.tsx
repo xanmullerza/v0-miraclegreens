@@ -47,7 +47,7 @@ export default function ClinicalLibrary() {
 function LibraryContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [activeTab, setActiveTab] = useState<'nutrients' | 'compare' | 'top10'>('top10');
+    const [activeTab, setActiveTab] = useState<'nutrients' | 'compare' | 'top10'>('nutrients');
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
     const { searchQuery, setSearchQuery, setIsFocused, activeSearchId, setActiveSearchId, results, isLoading, onResultClickRef } = useSearch();
 
