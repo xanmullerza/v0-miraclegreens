@@ -75,16 +75,20 @@ const NUTRIENTS = [
 interface TopTenViewProps {
     showFavoritesOnly?: boolean;
     setShowFavoritesOnly?: (value: boolean) => void;
+    selectedCategories?: string[];
+    setSelectedCategories?: (value: string[]) => void;
 }
 
 export function TopTenView({
     showFavoritesOnly: externalShowFavorites,
     setShowFavoritesOnly: externalSetShowFavorites,
+    selectedCategories: externalSelectedCategories,
+    setSelectedCategories: externalSetSelectedCategories,
 }: TopTenViewProps = {}) {
     const [selectedNutrient, setSelectedNutrient] = useState(NUTRIENTS[19]); // Default to Protein
     const [foods, setFoods] = useState<TopFood[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    const [localSelectedCategories, setLocalSelectedCategories] = useState<string[]>(
         CATEGORIES.filter(c => c !== 'Flavour' && c !== 'Supplements')
     );
     const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -93,6 +97,8 @@ export function TopTenView({
     // Use external state if provided, otherwise use local state
     const showFavoritesOnly = externalShowFavorites !== undefined ? externalShowFavorites : localShowFavoritesOnly;
     const setShowFavoritesOnly = externalSetShowFavorites || setLocalShowFavoritesOnly;
+    const selectedCategories = externalSelectedCategories !== undefined ? externalSelectedCategories : localSelectedCategories;
+    const setSelectedCategories = externalSetSelectedCategories || setLocalSelectedCategories;
 
     useEffect(() => {
         const fetchTopFoods = async () => {
