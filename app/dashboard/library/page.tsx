@@ -260,15 +260,64 @@ function LibraryContent() {
                 </div>
 
                 {/* Tab Section & Filters */}
-                <div className="flex flex-col xl:flex-row gap-6 lg:gap-8 items-start xl:items-end justify-between w-full">
+                <div className="flex flex-col gap-6 items-start w-full">
                     {renderTabGroup(tabs, "📚 Sections", "text-slate-500", true)}
-
-                    <div className="flex items-center gap-4 animate-in fade-in slide-in-from-right-4 duration-500 w-full xl:w-auto overflow-x-auto no-scrollbar pb-2 xl:pb-0">
-
-
-
-                    </div>
                 </div>
+
+                {activeTab === 'nutrients' && (
+                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
+                        {/* Favorites Toggle */}
+                        <button
+                            onClick={() => {}}
+                            className={cn(
+                                "flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all duration-300 shrink-0 shadow-sm group",
+                                "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-200 hover:text-rose-500 dark:hover:border-rose-900/50"
+                            )}
+                        >
+                            <Heart size={14} className="transition-transform group-hover:scale-110" />
+                            <span className="text-[9px] font-black uppercase tracking-widest">Favorites</span>
+                        </button>
+
+                        <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
+
+                        {/* Nutrient Category Pills */}
+                        <button
+                            onClick={() => {}}
+                            className={cn(
+                                "px-3.5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0 border shadow-sm",
+                                "bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-500/20"
+                            )}
+                        >
+                            Macros
+                        </button>
+                        <button
+                            onClick={() => {}}
+                            className={cn(
+                                "px-3.5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0 border shadow-sm",
+                                "bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-500/20"
+                            )}
+                        >
+                            Minerals
+                        </button>
+                        <button
+                            onClick={() => {}}
+                            className={cn(
+                                "px-3.5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0 border shadow-sm",
+                                "bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-500/20"
+                            )}
+                        >
+                            Vitamins
+                        </button>
+
+                        <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
+                        <button
+                            onClick={() => {}}
+                            className="px-2.5 py-1.5 rounded-2xl text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all shrink-0 flex items-center gap-1"
+                        >
+                            <X size={12} /> Clear
+                        </button>
+                    </div>
+                )}
             </div>
 
 
