@@ -126,13 +126,38 @@ export function ShoppingListView() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            // Fetch pantry items to compare against
-            const { data: pantryData } = await supabase
+            const { data: { user } } = await supabase.auth.getUser();
+            
+            // Fetch curated pantry items (food_items where is_in_pantry = true)
+            const { data: curatedData } = await supabase
                 .from('food_items')
                 .select('*')
                 .eq('is_in_pantry', true);
 
-            if (pantryData) setPantryItems(pantryData);
+            // Fetch personal pantry items if user is logged in
+            const { data: personalData } = user ? await supabase
+                .from('pantry_items')
+                .select('*, scanned_products(name, common_name, category), food_items(name, common_name, category)')
+                .eq('user_id', user.id)
+                : { data: [] };
+
+            // Combine both sources
+            const combinedPantry: any[] = [...(curatedData || [])];
+            
+            if (personalData) {
+                personalData.forEach((item: any) => {
+                    const foodItem = item.food_items;
+                    const scannedProduct = item.scanned_products;
+                    combinedPantry.push({
+                        id: item.id,
+                        name: foodItem?.name || scannedProduct?.name || item.custom_name || item.name,
+                        common_name: foodItem?.common_name || scannedProduct?.common_name || foodItem?.name || scannedProduct?.name || item.custom_name || item.name,
+                        category: foodItem?.category || scannedProduct?.category || 'General'
+                    });
+                });
+            }
+
+            if (combinedPantry) setPantryItems(combinedPantry);
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
