@@ -115,8 +115,8 @@ export function ExploreView({
                 query = query.in('category', selectedCategories);
             }
 
-            const from = (pageNum - 1) * 20;
-            const to = from + 19;
+            const from = (pageNum - 1) * 50;
+            const to = from + 49;
             query = query.range(from, to);
 
             const { data, error } = await query;
@@ -149,8 +149,9 @@ export function ExploreView({
                     const uniqueNew = fetchedItems.filter(f => !existingIds.has(f.id));
                     return [...prev, ...uniqueNew];
                 });
+                setPage(pageNum);
             }
-            setHasMore(fetchedItems.length === 20);
+            setHasMore(fetchedItems.length === 50);
         } catch (error) {
             console.error(error);
             toast.error("Failed to load foods");
