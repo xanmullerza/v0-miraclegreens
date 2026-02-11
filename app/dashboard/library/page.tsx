@@ -270,79 +270,79 @@ function LibraryContent() {
                 {/* Tab Section & Filters */}
                 <div className="flex flex-col gap-6 items-start w-full">
                     {renderTabGroup(tabs, "📚 Sections", "text-slate-500", true)}
+
+                    {activeTab === 'nutrients' && (
+                        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
+                            {/* Favorites Toggle */}
+                            <button
+                                onClick={() => setShowNutrientFavorites(!showNutrientFavorites)}
+                                className={cn(
+                                    "flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all duration-300 shrink-0 shadow-sm group",
+                                    showNutrientFavorites
+                                        ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
+                                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-200 hover:text-rose-500 dark:hover:border-rose-900/50"
+                                )}
+                            >
+                                <Heart size={14} className={cn("transition-transform group-hover:scale-110", showNutrientFavorites && "fill-current scale-110")} />
+                                <span className="text-[9px] font-black uppercase tracking-widest">Favorites</span>
+                            </button>
+
+                            <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
+
+                            {/* Nutrient Category Pills */}
+                            {NUTRIENT_CATEGORIES.map(category => {
+                                const isActive = selectedNutrientCategories.includes(category);
+                                return (
+                                    <button
+                                        key={category}
+                                        onClick={() => isActive
+                                            ? setSelectedNutrientCategories(prev => prev.filter(c => c !== category))
+                                            : setSelectedNutrientCategories(prev => [...prev, category])
+                                        }
+                                        className={cn(
+                                            "px-3.5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0 border shadow-sm",
+                                            isActive
+                                                ? "bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-500/20"
+                                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-amber-200 hover:text-amber-600 dark:hover:border-amber-900/50"
+                                        )}
+                                    >
+                                        {category}
+                                    </button>
+                                );
+                            })}
+
+                            {selectedNutrientCategories.length > 0 && selectedNutrientCategories.length < NUTRIENT_CATEGORIES.length && (
+                                <>
+                                    <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
+                                    <button
+                                        onClick={() => setSelectedNutrientCategories(NUTRIENT_CATEGORIES)}
+                                        className="px-2.5 py-1.5 rounded-2xl text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all shrink-0 flex items-center gap-1"
+                                    >
+                                        <X size={12} /> Clear
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    )}
+
+                    {activeTab === 'top10' && (
+                        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
+                            {/* Favorites Toggle */}
+                            <button
+                                onClick={() => setShowTop10Favorites(!showTop10Favorites)}
+                                className={cn(
+                                    "flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all duration-300 shrink-0 shadow-sm group",
+                                    showTop10Favorites
+                                        ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
+                                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-200 hover:text-rose-500 dark:hover:border-rose-900/50"
+                                )}
+                            >
+                                <Heart size={14} className={cn("transition-transform group-hover:scale-110", showTop10Favorites && "fill-current scale-110")} />
+                                <span className="text-[9px] font-black uppercase tracking-widest">Favorites</span>
+                            </button>
+                        </div>
+                    )}
                 </div>
-
-                {activeTab === 'nutrients' && (
-                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
-                        {/* Favorites Toggle */}
-                        <button
-                            onClick={() => setShowNutrientFavorites(!showNutrientFavorites)}
-                            className={cn(
-                                "flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all duration-300 shrink-0 shadow-sm group",
-                                showNutrientFavorites
-                                    ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
-                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-200 hover:text-rose-500 dark:hover:border-rose-900/50"
-                            )}
-                        >
-                            <Heart size={14} className={cn("transition-transform group-hover:scale-110", showNutrientFavorites && "fill-current scale-110")} />
-                            <span className="text-[9px] font-black uppercase tracking-widest">Favorites</span>
-                        </button>
-
-                        <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
-
-                        {/* Nutrient Category Pills */}
-                        {NUTRIENT_CATEGORIES.map(category => {
-                            const isActive = selectedNutrientCategories.includes(category);
-                            return (
-                                <button
-                                    key={category}
-                                    onClick={() => isActive
-                                        ? setSelectedNutrientCategories(prev => prev.filter(c => c !== category))
-                                        : setSelectedNutrientCategories(prev => [...prev, category])
-                                    }
-                                    className={cn(
-                                        "px-3.5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0 border shadow-sm",
-                                        isActive
-                                            ? "bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-500/20"
-                                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-amber-200 hover:text-amber-600 dark:hover:border-amber-900/50"
-                                    )}
-                                >
-                                    {category}
-                                </button>
-                            );
-                        })}
-
-                        {selectedNutrientCategories.length > 0 && selectedNutrientCategories.length < NUTRIENT_CATEGORIES.length && (
-                            <>
-                                <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
-                                <button
-                                    onClick={() => setSelectedNutrientCategories(NUTRIENT_CATEGORIES)}
-                                    className="px-2.5 py-1.5 rounded-2xl text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all shrink-0 flex items-center gap-1"
-                                >
-                                    <X size={12} /> Clear
-                                </button>
-                            </>
-                        )}
-                    </div>
-                )}
-
-                {activeTab === 'top10' && (
-                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
-                        {/* Favorites Toggle */}
-                        <button
-                            onClick={() => setShowTop10Favorites(!showTop10Favorites)}
-                            className={cn(
-                                "flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all duration-300 shrink-0 shadow-sm group",
-                                showTop10Favorites
-                                    ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
-                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-200 hover:text-rose-500 dark:hover:border-rose-900/50"
-                            )}
-                        >
-                            <Heart size={14} className={cn("transition-transform group-hover:scale-110", showTop10Favorites && "fill-current scale-110")} />
-                            <span className="text-[9px] font-black uppercase tracking-widest">Favorites</span>
-                        </button>
-                    </div>
-                )}
             </div>
 
 
