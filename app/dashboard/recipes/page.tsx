@@ -16,6 +16,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { supabase } from '@/lib/supabase';
 
 import { MealPlannerView } from '@/components/kitchen/mealplanner-view';
 import { MixLabView } from '@/components/kitchen/mix-lab-view';
@@ -41,12 +42,25 @@ function KitchenContent() {
     const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState<TabId>('browse');
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
     const { searchQuery, setSearchQuery } = useSearch();
     const { dailyPlan } = useUserPreferences();
 
     // Lifted Filter State
     const [selectedTypes, setSelectedTypes] = useState<string[]>(MEAL_TYPES);
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+
+    useEffect(() => {
+        const checkAdmin = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
+                const userEmail = (user.email || user.user_metadata?.email || '').toLowerCase();
+                setIsAdmin(userEmail === adminEmail.toLowerCase() && adminEmail !== '');
+            }
+        };
+        checkAdmin();
+    }, []);
 
     const allTabs: TabId[] = ['mixlab', 'mealplanner', 'browse'];
 
@@ -113,12 +127,17 @@ function KitchenContent() {
                         {tabsList.map((tab) => {
                             const Icon = tab.icon;
                             const isActive = activeTab === tab.id;
+                            const isDisabled = !isAdmin && (tab.id === 'mealplanner' || tab.id === 'mixlab');
                             return (
                                 <button
                                     key={tab.id}
-                                    onClick={() => handleTabChange(tab.id)}
+                                    onClick={() => !isDisabled && handleTabChange(tab.id)}
+                                    disabled={isDisabled}
                                     className={cn(
                                         "flex items-center gap-3 py-3.5 rounded-[1.5rem] text-[9px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
+                                        isDisabled
+                                            ? "opacity-50 cursor-not-allowed"
+                                            : "",
                                         isActive
                                             ? "bg-slate-900 dark:bg-slate-800 text-white shadow-xl translate-y-[-2px]"
                                             : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50",
