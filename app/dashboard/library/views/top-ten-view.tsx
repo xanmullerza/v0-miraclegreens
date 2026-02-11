@@ -72,7 +72,15 @@ const NUTRIENTS = [
     { id: 'Zinc', label: 'Zinc', unit: 'mg', color: 'bg-cyan-500', icon: Gem },
 ];
 
-export function TopTenView() {
+interface TopTenViewProps {
+    showFavoritesOnly?: boolean;
+    setShowFavoritesOnly?: (value: boolean) => void;
+}
+
+export function TopTenView({
+    showFavoritesOnly: externalShowFavorites,
+    setShowFavoritesOnly: externalSetShowFavorites,
+}: TopTenViewProps = {}) {
     const [selectedNutrient, setSelectedNutrient] = useState(NUTRIENTS[19]); // Default to Protein
     const [foods, setFoods] = useState<TopFood[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -80,6 +88,11 @@ export function TopTenView() {
         CATEGORIES.filter(c => c !== 'Flavour' && c !== 'Supplements')
     );
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [localShowFavoritesOnly, setLocalShowFavoritesOnly] = useState(false);
+
+    // Use external state if provided, otherwise use local state
+    const showFavoritesOnly = externalShowFavorites !== undefined ? externalShowFavorites : localShowFavoritesOnly;
+    const setShowFavoritesOnly = externalSetShowFavorites || setLocalShowFavoritesOnly;
 
     useEffect(() => {
         const fetchTopFoods = async () => {
@@ -152,57 +165,6 @@ export function TopTenView() {
 
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
-
-
-            {/* Category Filter */}
-            <div className="relative">
-                <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar items-center h-14 shadow-sm w-fit">
-                    <button
-                        onClick={() => setIsFilterOpen(!isFilterOpen)}
-                        className={cn(
-                            "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300",
-                            isFilterOpen ? "bg-emerald-600 text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-                        )}
-                    >
-                        <Filter size={18} />
-                        <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter Groups</span>
-                        <ChevronDown size={14} className={cn("transition-transform", isFilterOpen && "rotate-180")} />
-                    </button>
-
-                    <div className="w-px h-6 bg-slate-200 dark:border-slate-800 mx-1" />
-
-                    <div className={cn("flex items-center gap-1 transition-all duration-300 overflow-hidden", isFilterOpen ? "w-auto opacity-100" : "w-0 opacity-0")}>
-                        {CATEGORIES.map(category => {
-                            const isActive = selectedCategories.includes(category);
-                            return (
-                                <button
-                                    key={category}
-                                    onClick={() => isActive
-                                        ? setSelectedCategories(prev => prev.filter(c => c !== category))
-                                        : setSelectedCategories(prev => [...prev, category])
-                                    }
-                                    className={cn(
-                                        "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
-                                        isActive
-                                            ? "bg-emerald-600/10 text-emerald-600 border border-emerald-600/20"
-                                            : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
-                                    )}
-                                >
-                                    {category}
-                                </button>
-                            );
-                        })}
-                    </div>
-
-                    {!isFilterOpen && (
-                        <div className="px-2">
-                            <span className="text-[10px] font-bold text-slate-400 italic">
-                                {selectedCategories.length === CATEGORIES.length ? "All Categories" : `${selectedCategories.length} selected`}
-                            </span>
-                        </div>
-                    )}
-                </div>
-            </div>
 
             {/* Nutrient Selector */}
             <div className="space-y-6">

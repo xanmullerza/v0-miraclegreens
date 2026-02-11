@@ -61,6 +61,9 @@ function LibraryContent() {
     const [selectedNutrientCategories, setSelectedNutrientCategories] = useState<string[]>(NUTRIENT_CATEGORIES);
     const [showNutrientFavorites, setShowNutrientFavorites] = useState(false);
 
+    // Top 10 Filter State
+    const [showTop10Favorites, setShowTop10Favorites] = useState(false);
+
     // Sync tab with URL if needed
     useEffect(() => {
         const tab = searchParams.get('tab') as any;
@@ -322,6 +325,24 @@ function LibraryContent() {
                         )}
                     </div>
                 )}
+
+                {activeTab === 'top10' && (
+                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
+                        {/* Favorites Toggle */}
+                        <button
+                            onClick={() => setShowTop10Favorites(!showTop10Favorites)}
+                            className={cn(
+                                "flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all duration-300 shrink-0 shadow-sm group",
+                                showTop10Favorites
+                                    ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
+                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-200 hover:text-rose-500 dark:hover:border-rose-900/50"
+                            )}
+                        >
+                            <Heart size={14} className={cn("transition-transform group-hover:scale-110", showTop10Favorites && "fill-current scale-110")} />
+                            <span className="text-[9px] font-black uppercase tracking-widest">Favorites</span>
+                        </button>
+                    </div>
+                )}
             </div>
 
 
@@ -339,7 +360,12 @@ function LibraryContent() {
                         setSelectedCategories={setSelectedNutrientCategories}
                     />
                 )}
-                {activeTab === 'top10' && <TopTenView />}
+                {activeTab === 'top10' && (
+                    <TopTenView
+                        showFavoritesOnly={showTop10Favorites}
+                        setShowFavoritesOnly={setShowTop10Favorites}
+                    />
+                )}
             </div>
         </div>
     );
