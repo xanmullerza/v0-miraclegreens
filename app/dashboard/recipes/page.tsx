@@ -111,7 +111,7 @@ function KitchenContent() {
                 </div>
 
                 {/* Center - Tabs area */}
-                <div className="flex-1 flex items-center justify-center overflow-hidden">
+                <div className={cn("flex items-center justify-center overflow-hidden transition-all duration-500", isSearchExpanded ? "w-0 flex-none opacity-0" : "flex-1 opacity-100")}>
                     <div className="flex items-center gap-4 overflow-hidden py-1">
                         {tabsList.map((tab) => {
                             const Icon = tab.icon;
@@ -133,7 +133,7 @@ function KitchenContent() {
                                         isActive ? tab.color : "text-slate-400"
                                     )} />
                                     <span className={cn(
-                                        "transition-all duration-300 overflow-hidden",
+                                        "transition-all duration-300 overflow-hidden hidden md:block",
                                         isSearchExpanded ? "w-0 opacity-0" : "w-auto opacity-100"
                                     )}>
                                         {tab.label}
