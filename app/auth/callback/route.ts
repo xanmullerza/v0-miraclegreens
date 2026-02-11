@@ -34,8 +34,7 @@ export async function GET(request: Request) {
         )
         const { error } = await supabase.auth.exchangeCodeForSession(code)
         if (!error) {
-            // Redirect to the external dashboard after successful login
-            return NextResponse.redirect('https://www.yourtestsite.xyz/dashboard/')
+            return NextResponse.redirect(`${origin}${next}`)
         }
     }
 

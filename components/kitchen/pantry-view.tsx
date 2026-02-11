@@ -89,6 +89,8 @@ export function PantryView({
     const selectedCategories = externalSelectedCategories !== undefined ? externalSelectedCategories : localSelectedCategories;
     const setSelectedCategories = externalSetSelectedCategories !== undefined ? externalSetSelectedCategories : setLocalSelectedCategories;
 
+    const [user, setUser] = useState<any>(null);
+
     // Shopping list quick-add state
     const [buyMoreItem, setBuyMoreItem] = useState<FoodItem | null>(null);
     const [buyMoreQty, setBuyMoreQty] = useState('1');
@@ -102,6 +104,10 @@ export function PantryView({
 
     const toggleFavorite = async (item: FoodItem, e: React.MouseEvent) => {
         e.stopPropagation();
+        if (!user) {
+            toast.error("Please sign in to save favorites");
+            return;
+        }
         try {
             const { error } = await supabase.from('food_items').update({ is_favorite: !item.is_favorite } as any).eq('id', item.id);
             if (error) throw error;
@@ -122,6 +128,7 @@ export function PantryView({
         setLoading(true);
         try {
             const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
 
             const [foodItemsRes, pantryItemsRes] = await Promise.all([
                 supabase.from('food_items')
@@ -329,7 +336,33 @@ export function PantryView({
 
     const groupNames = Object.keys(groupedFoods).sort();
     return (
-        <div className="space-y-8">
+        <div className="space-y-8 animate-in fade-in duration-500">
+            {/* Login Prompt - Only shown if not loading and no user */}
+            {!loading && !user && (
+                <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-500/20 p-6 rounded-[2rem] flex flex-col sm:flex-row items-center justify-between gap-6 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+
+                    <div className="flex items-center gap-4 relative z-10">
+                        <div className="w-12 h-12 rounded-2xl bg-white dark:bg-emerald-900/50 flex items-center justify-center text-emerald-500 shadow-sm">
+                            <Zap size={24} className="fill-current" />
+                        </div>
+                        <div>
+                            <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-postgres-100">Unlock Cloud Sync</h3>
+                            <p className="text-[10px] text-slate-500 font-medium max-w-md mt-1">
+                                Sign in to sync your pantry across devices and enable smart meal planning features.
+                            </p>
+                        </div>
+                    </div>
+
+                    <Button
+                        onClick={() => router.push('/auth/login')}
+                        className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 rounded-xl px-6 h-11 font-black uppercase tracking-widest text-[10px] shrink-0 relative z-10"
+                    >
+                        Sign In via Google
+                    </Button>
+                </div>
+            )}
+
             {/* List Area */}
             {loading ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4">
