@@ -16,7 +16,8 @@ import {
     Battery,
     Heart,
     Filter,
-    ChevronDown
+    ChevronDown,
+    Apple
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -285,15 +286,17 @@ export function TopTenView({
                                     </div>
 
                                     {/* Food Image */}
-                                    {food.image_url && (
-                                        <div className="w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-800">
+                                    <div className="w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                                        {food.image_url ? (
                                             <img
                                                 src={food.image_url}
                                                 alt={food.common_name || food.name}
                                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                             />
-                                        </div>
-                                    )}
+                                        ) : (
+                                            <Apple size={24} className="text-slate-400" />
+                                        )}
+                                    </div>
 
                                     {/* Content */}
                                     <div className="flex-1 min-w-0">
