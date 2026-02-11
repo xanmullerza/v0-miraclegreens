@@ -70,6 +70,22 @@ function KitchenContent() {
         window.history.pushState(null, '', `?${params.toString()}`);
     };
 
+    // Tab configuration with headings and descriptions
+    const tabConfig: Record<TabId, { heading: string; description: string }> = {
+        browse: {
+            heading: 'All Meals',
+            description: 'Explore our complete recipe collection and find meals that match your nutritional goals'
+        },
+        mealplanner: {
+            heading: 'Meal-O-Matic',
+            description: 'Let AI create personalized meal plans based on your preferences and nutritional needs'
+        },
+        mixlab: {
+            heading: 'Mix Lab',
+            description: 'Create custom recipes by mixing and matching ingredients to your exact specifications'
+        }
+    };
+
     // Meals & Recipes tabs
     const mealsTabs = [
         { id: 'browse' as TabId, label: 'All Meals', icon: BookOpen, color: 'text-orange-500', bg: 'bg-orange-500/10' },
@@ -172,10 +188,12 @@ function KitchenContent() {
                         <Sparkles size={28} />
                     </div>
                     <div>
-                        <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85]">
-                            <span className="text-amber-500">Recipes.</span>
+                        <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2">
+                            <span className="text-amber-500">{tabConfig[activeTab].heading}.</span>
                         </h1>
-                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Meal Planning Made Easy</p>
+                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">
+                            {tabConfig[activeTab].description}
+                        </p>
                     </div>
                 </div>
 
