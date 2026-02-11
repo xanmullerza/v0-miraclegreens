@@ -100,7 +100,7 @@ function KitchenContent() {
                 "flex items-center p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden w-full md:max-w-[800px] mx-auto xl:mx-0"
             )}>
                 {/* Left side - Home Button area */}
-                <div className="flex-shrink-0 w-12 flex items-center justify-start">
+                <div className={cn("flex-shrink-0 flex items-center justify-start transition-all duration-500", isSearchExpanded ? "w-0" : "w-12")}>
                     {showHomeButton && !isSearchExpanded && (
                         <button
                             onClick={() => router.push('/dashboard')}
