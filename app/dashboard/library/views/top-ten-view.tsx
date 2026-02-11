@@ -274,19 +274,14 @@ export function TopTenView({
                         {foods.length > 0 ? foods.map((food, index) => (
                             <div key={food.id} className="group relative">
                                 <div className="flex items-center gap-4 md:gap-6 relative z-10">
-                                    {/* Rank Badge */}
-                                    <div className={cn(
-                                        "w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-2xl font-black text-lg italic shadow-sm transition-all duration-500 group-hover:scale-110",
-                                        index === 0 ? "bg-yellow-400 text-yellow-900 shadow-yellow-400/20" :
-                                            index === 1 ? "bg-slate-300 text-slate-800 shadow-slate-300/20" :
-                                                index === 2 ? "bg-amber-600 text-amber-100 shadow-amber-600/20" :
-                                                    "bg-slate-100 dark:bg-slate-800 text-slate-400"
-                                    )}>
-                                        {index + 1}
-                                    </div>
-
                                     {/* Food Image */}
-                                    <div className="w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                                    <div className={cn(
+                                        "w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden shadow-sm bg-slate-100 dark:bg-slate-800 flex items-center justify-center",
+                                        index === 0 ? "border-4 border-yellow-400 shadow-lg shadow-yellow-400/20" :
+                                            index === 1 ? "border-4 border-slate-300 shadow-lg shadow-slate-300/20" :
+                                                index === 2 ? "border-4 border-amber-600 shadow-lg shadow-amber-600/20" :
+                                                    "border border-slate-200 dark:border-slate-800"
+                                    )}>
                                         {food.image ? (
                                             <img
                                                 src={food.image}
