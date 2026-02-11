@@ -97,13 +97,26 @@ export function PantryView({
         const normalized = category.toLowerCase().trim();
         
         // Map DB categories to store sections
-        if (normalized === 'fruit' || normalized === 'vegetables') return 'Produce';
-        if (normalized === 'proteins' || normalized === 'legumes') return 'Proteins';
-        if (normalized === 'grains') return 'Grains';
-        if (normalized === 'oils' || normalized === 'flavour') return 'Pantry Staples';
-        if (normalized === 'nuts') return 'Nuts & Seeds';
-        if (normalized === 'supplements') return 'Supplements';
-        return 'Other';
+        switch(normalized) {
+            case 'fruit':
+            case 'vegetables':
+                return 'Produce';
+            case 'proteins':
+            case 'legumes':
+                return 'Proteins';
+            case 'grains':
+                return 'Grains';
+            case 'oils':
+            case 'flavour':
+                return 'Pantry Staples';
+            case 'nuts':
+                return 'Nuts & Seeds';
+            case 'supplements':
+                return 'Supplements';
+            case 'general':
+            default:
+                return 'Other';
+        }
     };
 
     const getCategoryColor = (group: string) => {
@@ -177,6 +190,15 @@ export function PantryView({
                 const fi = item.food_items;
                 const nutrition = sp?.nutrition || {};
 
+                // Try to extract category from notes if not linked to food_item
+                let category = fi?.category || sp?.category || 'General';
+                if (category === 'General' && item.notes) {
+                    const categoryMatch = item.notes.match(/Category:\s*(\w+)/);
+                    if (categoryMatch) {
+                        category = categoryMatch[1];
+                    }
+                }
+
                 return {
                     id: item.id,
                     name: sp?.name || fi?.name || item.custom_name || 'Personal Item',
@@ -188,7 +210,7 @@ export function PantryView({
                     image: sp?.image_url || fi?.image || null,
                     is_in_pantry: true,
                     is_favorite: fi?.is_favorite || false,
-                    category: fi?.category || sp?.category || 'General',
+                    category: category,
                     source_table: 'pantry_items',
                     quantity: item.quantity
                 } as FoodItem;

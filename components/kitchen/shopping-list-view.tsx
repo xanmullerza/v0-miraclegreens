@@ -356,7 +356,8 @@ export function ShoppingListView() {
                     .update({
                         quantity: newQuantity,
                         food_item_id: effectiveFoodId || undefined,
-                        scanned_product_id: effectiveScannedId || undefined
+                        scanned_product_id: effectiveScannedId || undefined,
+                        notes: notesWithCategory || undefined
                     })
                     .eq('id', existingItem.id);
                 if (error) throw error;
@@ -367,7 +368,8 @@ export function ShoppingListView() {
                     name: name,
                     quantity: quantity,
                     food_item_id: effectiveFoodId,
-                    scanned_product_id: effectiveScannedId
+                    scanned_product_id: effectiveScannedId,
+                    notes: notesWithCategory || undefined
                 });
                 if (error) throw error;
             }
@@ -378,6 +380,26 @@ export function ShoppingListView() {
             if (selectedMatchItem.id.startsWith('manual-') || selectedMatchItem.id.startsWith('scanned-')) {
                 setManualItems(prev => prev.filter(item => item.id !== selectedMatchItem.id));
             }
+            
+            // If no food_item was found, try to guess category from item name
+            let categoryHint = '';
+            if (!effectiveFoodId && name) {
+                const lowerName = name.toLowerCase();
+                if (lowerName.match(/(apple|banana|orange|grape|berry|mango|pineapple|melon|peach|pear|plum|cherry|lemon|lime|kiwi|avocado|coconut)/)) {
+                    categoryHint = 'Fruit';
+                } else if (lowerName.match(/(broccoli|spinach|kale|lettuce|carrot|tomato|potato|onion|garlic|pepper|cucumber|zucchini|cabbage)/)) {
+                    categoryHint = 'Vegetables';
+                } else if (lowerName.match(/(chicken|beef|pork|turkey|fish|salmon|tuna|egg|milk|cheese|yogurt|meat)/)) {
+                    categoryHint = 'Proteins';
+                } else if (lowerName.match(/(rice|wheat|oat|barley|quinoa|corn|bread|pasta|grain)/)) {
+                    categoryHint = 'Grains';
+                } else if (lowerName.match(/(peanut|almond|walnut|cashew|nut|seed)/)) {
+                    categoryHint = 'Nuts';
+                }
+            }
+            
+            // Store category hint in notes
+            const notesWithCategory = [selectedMatchItem.category || categoryHint ? `Category: ${selectedMatchItem.category || categoryHint}` : ''].filter(Boolean).join('; ');
             
             setMatchDialogOpen(false);
             setSelectedMatchItem(null);
@@ -423,13 +445,26 @@ export function ShoppingListView() {
         const normalized = category.toLowerCase().trim();
         
         // Map DB categories to store sections
-        if (normalized === 'fruit' || normalized === 'vegetables') return 'Produce';
-        if (normalized === 'proteins' || normalized === 'legumes') return 'Proteins';
-        if (normalized === 'grains') return 'Grains';
-        if (normalized === 'oils' || normalized === 'flavour') return 'Pantry Staples';
-        if (normalized === 'nuts') return 'Nuts & Seeds';
-        if (normalized === 'supplements') return 'Supplements';
-        return 'Other';
+        switch(normalized) {
+            case 'fruit':
+            case 'vegetables':
+                return 'Produce';
+            case 'proteins':
+            case 'legumes':
+                return 'Proteins';
+            case 'grains':
+                return 'Grains';
+            case 'oils':
+            case 'flavour':
+                return 'Pantry Staples';
+            case 'nuts':
+                return 'Nuts & Seeds';
+            case 'supplements':
+                return 'Supplements';
+            case 'general':
+            default:
+                return 'Other';
+        }
     };
 
     const getCategoryColor = (group: string) => {
