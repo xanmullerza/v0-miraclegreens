@@ -99,7 +99,15 @@ export function ShoppingListView() {
         if (dailyPlan) {
             const mealPlanItems = generateShoppingList(dailyPlan);
 
-            // Normalize names for more reliable matching (remove parentheses, punctuation, plurals)
+            // Build sets for filtering pantry items
+            // For food_item_id matching (most reliable)
+            const pantryFoodIds = new Set(
+                pantryItems
+                    .filter((f: any) => f.food_item_id)  // Only items with food_item_id
+                    .map((f: any) => f.food_item_id)
+            );
+            
+            // Fallback to name matching for items without food_item_id
             const normalize = (s?: string) =>
                 (s || '')
                     .toLowerCase()
@@ -107,13 +115,19 @@ export function ShoppingListView() {
                     .replace(/[^a-z0-9]/g, ' ')
                     .replace(/\s+/g, ' ')
                     .trim()
-                    .replace(/s$/,'');
-
+                    .replace(/s$/, '');
             const pantryNames = new Set(pantryItems.map(f => normalize(f.common_name || f.name)));
 
-            // Convert to our format and filter out pantry items using normalized names
+            // Convert to our format and filter out pantry items
             const convertedItems: ShoppingListItem[] = mealPlanItems
-                .filter(item => !pantryNames.has(normalize(item.name)))
+                .filter(item => {
+                    // If item has food_item_id, use ID matching
+                    if ((item as any).food_item_id) {
+                        return !pantryFoodIds.has((item as any).food_item_id);
+                    }
+                    // Otherwise use name matching
+                    return !pantryNames.has(normalize(item.name));
+                })
                 .map((item, idx) => ({
                     id: `mealplan-${idx}`,
                     name: item.name,
@@ -121,7 +135,8 @@ export function ShoppingListView() {
                     unit: '',
                     checked: false,
                     is_miracle_product: item.isMiracleProduct,
-                    source: 'mealplan' as const
+                    source: 'mealplan' as const,
+                    food_item_id: (item as any).food_item_id
                 }));
 
             // Deduplicate: If item exists in manual/scanned list, don't show from meal plan
