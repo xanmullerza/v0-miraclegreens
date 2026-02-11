@@ -195,7 +195,13 @@ export function TopTenView({
                         title: "Daily Vitamins",
                         icon: Droplet,
                         align: "text-emerald-500",
-                        ids: ['Vitamin C', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Choline']
+                        ids: ['Vitamin C', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)']
+                    },
+                    {
+                        title: "",
+                        icon: Droplet,
+                        align: "text-emerald-500",
+                        ids: ['B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Choline']
                     },
                     {
                         title: "Stored Vitamins",
@@ -216,12 +222,14 @@ export function TopTenView({
                         ids: ['Fiber', 'Cholesterol', 'Omega-3', 'Oxalate', 'Sugar']
                     }
                 ].map((group) => (
-                    <div key={group.title} className="space-y-3">
-                        <div className="flex items-center gap-2 px-2">
-                            <group.icon size={14} className={group.align} />
-                            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">{group.title}</h4>
-                            <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800" />
-                        </div>
+                    <div key={group.title || `row-${group.ids[0]}`} className="space-y-3">
+                        {group.title && (
+                            <div className="flex items-center gap-2 px-2">
+                                <group.icon size={14} className={group.align} />
+                                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">{group.title}</h4>
+                                <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800" />
+                            </div>
+                        )}
                         <div className="flex flex-wrap gap-2 px-2">
                             {group.ids.map(id => {
                                 const nutrient = NUTRIENTS.find(n => n.id === id);
