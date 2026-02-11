@@ -346,61 +346,17 @@ export function ExploreView({
             </div>
 
             {/* List Area */}
-            <div className="space-y-6">
+            <div className="space-y-0">
                 {groupNames.map((groupName) => {
                     const items = groupedFoods[groupName];
                     const isExpanded = expandedGroups[groupName] || (searchQuery.length > 0 && items.length > 0);
                     const hasMultiple = items.length > 1;
 
                     return (
-                        <div key={groupName} className="space-y-2">
-                            {/* Group Header */}
-                            {hasMultiple && (
-                                <div
-                                    onClick={(e) => toggleGroup(groupName, e)}
-                                    className={cn(
-                                        "flex items-center gap-4 px-4 py-3 rounded-2xl border transition-all shadow-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 group/header",
-                                        isExpanded && "border-emerald-500/30 ring-1 ring-emerald-500/10"
-                                    )}
-                                >
-                                    {/* Thumbnail for group */}
-                                    <div className="hidden lg:block w-16 h-12 rounded-xl bg-slate-200 dark:bg-slate-950 overflow-hidden shrink-0 border border-slate-300 dark:border-slate-700 shadow-inner group-hover/header:scale-105 transition-transform duration-300">
-                                        {items[0]?.image ? (
-                                            <img src={items[0].image} alt={groupName} className="w-full h-full object-cover" />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-slate-400">
-                                                <Beef size={16} />
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="flex items-center gap-3 overflow-hidden flex-1">
-                                        <div className="w-6 h-6 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600 shrink-0">
-                                            {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                                        </div>
-                                        <div className="flex flex-col overflow-hidden">
-                                            <h2 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white flex items-center gap-2 truncate">
-                                                {groupName}
-                                                <Badge className="bg-emerald-500/10 text-emerald-600 border-none text-[10px] px-2 py-0 shrink-0">
-                                                    {items.length} options
-                                                </Badge>
-                                            </h2>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {!hasMultiple && (
-                                <div className="px-4 py-1">
-                                    <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600">
-                                        {groupName}
-                                    </h2>
-                                </div>
-                            )}
-
+                        <div key={groupName} className="">
                             {/* Items in Group */}
-                            <div className={cn("space-y-3", hasMultiple && "pl-6 lg:pl-8 border-l-2 border-slate-100 dark:border-slate-800 ml-3 lg:ml-7")}>
-                                {(isExpanded || !hasMultiple) && items.map((food) => (
+                            <div className="space-y-2">
+                                {items.map((food) => (
                                     <div key={food.id} className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden">
                                         <div className="flex items-center justify-between p-4 lg:p-0 lg:grid lg:grid-cols-[80px_1fr_180px] gap-4 lg:items-center lg:px-10 py-0">
                                             {/* Thumbnail */}
