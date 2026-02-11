@@ -94,19 +94,15 @@ export function PantryView({
     // Category grouping for pantry
     const getCategoryGroup = (category?: string) => {
         if (!category) return 'Other';
-        const normalized = category.toLowerCase();
+        const normalized = category.toLowerCase().trim();
         
         // Map DB categories to store sections
-        if (normalized.includes('fruit')) return 'Produce';
-        if (normalized.includes('vegetable')) return 'Produce';
-        if (normalized.includes('protein')) return 'Proteins';
-        if (normalized.includes('legume')) return 'Proteins';
-        if (normalized.includes('grain')) return 'Grains';
-        if (normalized.includes('oil')) return 'Pantry Staples';
-        if (normalized.includes('flavour') || normalized.includes('flavor')) return 'Pantry Staples';
-        if (normalized.includes('nut')) return 'Nuts & Seeds';
-        if (normalized.includes('supplement')) return 'Supplements';
-        if (normalized.includes('general')) return 'Other';
+        if (normalized === 'fruit' || normalized === 'vegetables') return 'Produce';
+        if (normalized === 'proteins' || normalized === 'legumes') return 'Proteins';
+        if (normalized === 'grains') return 'Grains';
+        if (normalized === 'oils' || normalized === 'flavour') return 'Pantry Staples';
+        if (normalized === 'nuts') return 'Nuts & Seeds';
+        if (normalized === 'supplements') return 'Supplements';
         return 'Other';
     };
 
