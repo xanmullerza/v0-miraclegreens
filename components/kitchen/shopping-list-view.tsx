@@ -415,12 +415,18 @@ export function ShoppingListView() {
     const getCategoryGroup = (category?: string) => {
         if (!category) return 'Other';
         const normalized = category.toLowerCase();
-        if (normalized.includes('fruit') || normalized.includes('vegetable') || normalized.includes('salad')) return 'Produce';
-        if (normalized.includes('meat') || normalized.includes('protein') || normalized.includes('fish') || normalized.includes('chicken') || normalized.includes('beef')) return 'Proteins';
-        if (normalized.includes('dairy') || normalized.includes('milk') || normalized.includes('cheese') || normalized.includes('yogurt')) return 'Dairy';
-        if (normalized.includes('grain') || normalized.includes('bread') || normalized.includes('rice') || normalized.includes('pasta')) return 'Grains';
-        if (normalized.includes('oil') || normalized.includes('sauce') || normalized.includes('seasoning') || normalized.includes('spice')) return 'Pantry Staples';
-        if (normalized.includes('nut') || normalized.includes('seed')) return 'Nuts & Seeds';
+        
+        // Map DB categories to store sections
+        if (normalized.includes('fruit')) return 'Produce';
+        if (normalized.includes('vegetable')) return 'Produce';
+        if (normalized.includes('protein')) return 'Proteins';
+        if (normalized.includes('legume')) return 'Proteins';
+        if (normalized.includes('grain')) return 'Grains';
+        if (normalized.includes('oil')) return 'Pantry Staples';
+        if (normalized.includes('flavour') || normalized.includes('flavor')) return 'Pantry Staples';
+        if (normalized.includes('nut')) return 'Nuts & Seeds';
+        if (normalized.includes('supplement')) return 'Supplements';
+        if (normalized.includes('general')) return 'Other';
         return 'Other';
     };
 
@@ -428,10 +434,10 @@ export function ShoppingListView() {
         switch(group) {
             case 'Produce': return { bg: 'bg-green-50 dark:bg-green-950/20', border: 'border-green-200 dark:border-green-800/50', text: 'text-green-700 dark:text-green-400', icon: '🥬' };
             case 'Proteins': return { bg: 'bg-red-50 dark:bg-red-950/20', border: 'border-red-200 dark:border-red-800/50', text: 'text-red-700 dark:text-red-400', icon: '🥩' };
-            case 'Dairy': return { bg: 'bg-blue-50 dark:bg-blue-950/20', border: 'border-blue-200 dark:border-blue-800/50', text: 'text-blue-700 dark:text-blue-400', icon: '🥛' };
             case 'Grains': return { bg: 'bg-amber-50 dark:bg-amber-950/20', border: 'border-amber-200 dark:border-amber-800/50', text: 'text-amber-700 dark:text-amber-400', icon: '🌾' };
             case 'Pantry Staples': return { bg: 'bg-orange-50 dark:bg-orange-950/20', border: 'border-orange-200 dark:border-orange-800/50', text: 'text-orange-700 dark:text-orange-400', icon: '🫙' };
             case 'Nuts & Seeds': return { bg: 'bg-purple-50 dark:bg-purple-950/20', border: 'border-purple-200 dark:border-purple-800/50', text: 'text-purple-700 dark:text-purple-400', icon: '🥜' };
+            case 'Supplements': return { bg: 'bg-teal-50 dark:bg-teal-950/20', border: 'border-teal-200 dark:border-teal-800/50', text: 'text-teal-700 dark:text-teal-400', icon: '💊' };
             default: return { bg: 'bg-slate-50 dark:bg-slate-800/30', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-400', icon: '📦' };
         }
     };
