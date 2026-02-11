@@ -45,6 +45,38 @@ function FoodsHubContent() {
         router.push(`/dashboard/ingredients?${params.toString()}`);
     };
 
+    // Tab configuration with headings and descriptions
+    const tabConfig: Record<FoodTab, { heading: string; description: string }> = {
+        allfoods: {
+            heading: 'All Foods',
+            description: 'Browse our foods database and discover the ingredients for your next meal'
+        },
+        groceries: {
+            heading: 'Groceries',
+            description: 'Manage your shopping list and plan your weekly grocery haul'
+        },
+        pantry: {
+            heading: 'Pantry',
+            description: 'Organize and track the ingredients you have in stock'
+        },
+        explore: {
+            heading: 'Explore',
+            description: 'Browse our foods database and discover the ingredients for your next meal'
+        },
+        staples: {
+            heading: 'Staples',
+            description: 'View your essential ingredients and nutritional staples'
+        },
+        shopping: {
+            heading: 'Shopping',
+            description: 'Manage your shopping list and plan your grocery haul'
+        },
+        nutrients: {
+            heading: 'Nutrients',
+            description: 'Track and analyze nutritional information'
+        }
+    };
+
     // First row: Ingredients section (moved from Kitchen)
     const ingredientTabs = [
         { id: 'allfoods', label: 'All Foods', icon: UtensilsCrossed, color: 'text-blue-500', bg: 'bg-blue-500/10' },
@@ -163,10 +195,10 @@ function FoodsHubContent() {
             <div className="flex flex-col gap-8">
                 <div>
                     <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2">
-                        <span className="text-emerald-500">Ingredients.</span>
+                        <span className="text-emerald-500">{tabConfig[currentTab].heading}.</span>
                     </h1>
                     <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">
-                        Manage your ingredients and explore nutritional data
+                        {tabConfig[currentTab].description}
                     </p>
                 </div>
 
