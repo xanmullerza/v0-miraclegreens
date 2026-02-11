@@ -91,6 +91,37 @@ export function PantryView({
 
     const [user, setUser] = useState<any>(null);
 
+    // Category grouping for pantry
+    const getCategoryGroup = (category?: string) => {
+        if (!category) return 'Other';
+        const normalized = category.toLowerCase();
+        
+        // Map DB categories to store sections
+        if (normalized.includes('fruit')) return 'Produce';
+        if (normalized.includes('vegetable')) return 'Produce';
+        if (normalized.includes('protein')) return 'Proteins';
+        if (normalized.includes('legume')) return 'Proteins';
+        if (normalized.includes('grain')) return 'Grains';
+        if (normalized.includes('oil')) return 'Pantry Staples';
+        if (normalized.includes('flavour') || normalized.includes('flavor')) return 'Pantry Staples';
+        if (normalized.includes('nut')) return 'Nuts & Seeds';
+        if (normalized.includes('supplement')) return 'Supplements';
+        if (normalized.includes('general')) return 'Other';
+        return 'Other';
+    };
+
+    const getCategoryColor = (group: string) => {
+        switch(group) {
+            case 'Produce': return { bg: 'bg-green-50 dark:bg-green-950/20', border: 'border-green-200 dark:border-green-800/50', text: 'text-green-700 dark:text-green-400', icon: '🥬' };
+            case 'Proteins': return { bg: 'bg-red-50 dark:bg-red-950/20', border: 'border-red-200 dark:border-red-800/50', text: 'text-red-700 dark:text-red-400', icon: '🥩' };
+            case 'Grains': return { bg: 'bg-amber-50 dark:bg-amber-950/20', border: 'border-amber-200 dark:border-amber-800/50', text: 'text-amber-700 dark:text-amber-400', icon: '🌾' };
+            case 'Pantry Staples': return { bg: 'bg-orange-50 dark:bg-orange-950/20', border: 'border-orange-200 dark:border-orange-800/50', text: 'text-orange-700 dark:text-orange-400', icon: '🫙' };
+            case 'Nuts & Seeds': return { bg: 'bg-purple-50 dark:bg-purple-950/20', border: 'border-purple-200 dark:border-purple-800/50', text: 'text-purple-700 dark:text-purple-400', icon: '🥜' };
+            case 'Supplements': return { bg: 'bg-teal-50 dark:bg-teal-950/20', border: 'border-teal-200 dark:border-teal-800/50', text: 'text-teal-700 dark:text-teal-400', icon: '💊' };
+            default: return { bg: 'bg-slate-50 dark:bg-slate-800/30', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-400', icon: '📦' };
+        }
+    };
+
     // Shopping list quick-add state
     const [buyMoreItem, setBuyMoreItem] = useState<FoodItem | null>(null);
     const [buyMoreQty, setBuyMoreQty] = useState('1');
@@ -326,15 +357,21 @@ export function PantryView({
         return matchesSearch && matchesFavorites && matchesCategory;
     });
 
-    // Grouping logic
+    // Grouping logic - by category section instead of name
     const groupedFoods = filteredFoods.reduce((acc, food) => {
-        const key = food.common_name || food.name;
-        if (!acc[key]) acc[key] = [];
-        acc[key].push(food);
+        const categoryGroup = getCategoryGroup(food.category);
+        if (!acc[categoryGroup]) acc[categoryGroup] = [];
+        acc[categoryGroup].push(food);
         return acc;
     }, {} as Record<string, FoodItem[]>);
 
-    const groupNames = Object.keys(groupedFoods).sort();
+    // Sort groups with produce first, then proteins, grains, etc.
+    const categoryOrder = ['Produce', 'Proteins', 'Grains', 'Pantry Staples', 'Nuts & Seeds', 'Supplements', 'Other'];
+    const groupNames = Object.keys(groupedFoods).sort((a, b) => {
+        const indexA = categoryOrder.indexOf(a);
+        const indexB = categoryOrder.indexOf(b);
+        return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+    });
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* Login Prompt - Only shown if not loading and no user */}
@@ -387,30 +424,75 @@ export function PantryView({
                 </div>
             ) : (
                 <div className="space-y-4">
-                    {/* Food Items Grouped List */}
-                    <div className="space-y-6">
+                    {/* Food Items Grouped by Category */}
+                    <div className="space-y-3">
                         {groupNames.map((groupName) => {
                             const items = groupedFoods[groupName];
-                            const isExpanded = expandedGroups[groupName] || (searchQuery.length > 0 && items.length > 0);
-                            const hasMultiple = items.length > 1;
+                            const colors = getCategoryColor(groupName);
 
                             return (
-                                <div key={groupName} className="space-y-2">
-                                    {/* Group Header */}
-                                    {hasMultiple && (
-                                        <div
-                                            onClick={(e) => toggleGroup(groupName, e)}
-                                            className={cn(
-                                                "flex items-center gap-4 px-4 py-3 rounded-2xl border transition-all shadow-xl bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 group/header",
-                                                isExpanded && "border-emerald-500/30 ring-1 ring-emerald-500/10"
-                                            )}
-                                        >
-                                            {/* Thumbnail for group */}
-                                            <div className="hidden lg:block w-16 h-12 rounded-xl bg-slate-200 dark:bg-slate-950 overflow-hidden shrink-0 border border-slate-300 dark:border-slate-700 shadow-inner group-hover/header:scale-105 transition-transform duration-300">
-                                                {items[0]?.image ? (
-                                                    <img src={items[0].image} alt={groupName} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-slate-400">
+                                <div key={groupName} className={cn("rounded-xl border p-4", colors.bg, colors.border)}>
+                                    <div className={cn("text-sm font-black uppercase tracking-widest mb-3 flex items-center gap-2", colors.text)}>
+                                        <span className="text-lg">{colors.icon}</span>
+                                        {groupName}
+                                        <Badge className="ml-auto text-[9px] bg-white/50 dark:bg-slate-900/50 border-none text-slate-700 dark:text-slate-300">
+                                            {items.length}
+                                        </Badge>
+                                    </div>
+                                    <div className="space-y-1.5">
+                                        {items.map((food) => (
+                                            <div
+                                                key={food.id}
+                                                className="group flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-all cursor-pointer bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    // Could add selection state here for multi-select
+                                                }}
+                                            >
+                                                <div className="w-5 h-5 rounded-md border-2 border-emerald-500 bg-emerald-500 flex items-center justify-center shrink-0">
+                                                    <Check size={12} className="text-white" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-1.5">
+                                                        {food.is_favorite && (
+                                                            <Heart size={12} className="text-rose-500 fill-current shrink-0" />
+                                                        )}
+                                                        <span className="font-semibold text-sm text-slate-900 dark:text-white truncate">
+                                                            {food.common_name || food.name}
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-xs text-slate-500 dark:text-slate-400">{food.quantity || 'In Stock'}</span>
+                                                </div>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); setBuyMoreItem(food); }}
+                                                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-950/40 text-slate-400 hover:text-blue-500 transition-all"
+                                                    title="Add more to shopping list"
+                                                >
+                                                    <Plus size={14} />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); toggleFavorite(food, e); }}
+                                                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-500 transition-all"
+                                                    title="Favorite"
+                                                >
+                                                    <Heart size={14} fill={food.is_favorite ? "currentColor" : "none"} />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); removeFromPantry(food.id, food.name, food.source_table); }}
+                                                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-500 transition-all"
+                                                    title="Remove from pantry"
+                                                >
+                                                    <X size={14} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
                                                         <Beef size={16} />
                                                     </div>
                                                 )}
