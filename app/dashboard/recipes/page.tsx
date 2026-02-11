@@ -205,14 +205,14 @@ function KitchenContent() {
                         <button
                             onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
                             className={cn(
-                                "flex items-center gap-2 px-5 py-3 rounded-2xl border transition-all duration-300 shrink-0 shadow-sm group",
+                                "flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all duration-300 shrink-0 shadow-sm group",
                                 showFavoritesOnly
                                     ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
                                     : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-200 hover:text-rose-500 dark:hover:border-rose-900/50"
                             )}
                         >
-                            <Heart size={16} className={cn("transition-transform group-hover:scale-110", showFavoritesOnly && "fill-current scale-110")} />
-                            <span className="text-[10px] font-black uppercase tracking-widest">Favorites</span>
+                            <Heart size={14} className={cn("transition-transform group-hover:scale-110", showFavoritesOnly && "fill-current scale-110")} />
+                            <span className="text-[9px] font-black uppercase tracking-widest">Favorites</span>
                         </button>
 
                         <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
@@ -228,7 +228,7 @@ function KitchenContent() {
                                         : setSelectedTypes(prev => [...prev, type])
                                     }
                                     className={cn(
-                                        "px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0 border shadow-sm",
+                                        "px-3.5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0 border shadow-sm",
                                         isActive
                                             ? "bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-500/20"
                                             : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-amber-200 hover:text-amber-600 dark:hover:border-amber-900/50"
@@ -244,9 +244,9 @@ function KitchenContent() {
                                 <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
                                 <button
                                     onClick={() => setSelectedTypes(MEAL_TYPES)}
-                                    className="px-4 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all shrink-0 flex items-center gap-2"
+                                    className="px-2.5 py-1.5 rounded-2xl text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all shrink-0 flex items-center gap-1"
                                 >
-                                    <X size={14} /> Clear
+                                    <X size={12} /> Clear
                                 </button>
                             </>
                         )}
