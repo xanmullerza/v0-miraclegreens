@@ -39,7 +39,9 @@ function FoodsHubContent() {
 
     // Lifted Filter State
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>(
+        CATEGORIES.filter(cat => !['Flavour', 'Supplements'].includes(cat))
+    );
 
     useEffect(() => {
         const checkAdmin = async () => {
