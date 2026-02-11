@@ -424,6 +424,18 @@ export function ShoppingListView() {
         return 'Other';
     };
 
+    const getCategoryColor = (group: string) => {
+        switch(group) {
+            case 'Produce': return { bg: 'bg-green-50 dark:bg-green-950/20', border: 'border-green-200 dark:border-green-800/50', text: 'text-green-700 dark:text-green-400', icon: '🥬' };
+            case 'Proteins': return { bg: 'bg-red-50 dark:bg-red-950/20', border: 'border-red-200 dark:border-red-800/50', text: 'text-red-700 dark:text-red-400', icon: '🥩' };
+            case 'Dairy': return { bg: 'bg-blue-50 dark:bg-blue-950/20', border: 'border-blue-200 dark:border-blue-800/50', text: 'text-blue-700 dark:text-blue-400', icon: '🥛' };
+            case 'Grains': return { bg: 'bg-amber-50 dark:bg-amber-950/20', border: 'border-amber-200 dark:border-amber-800/50', text: 'text-amber-700 dark:text-amber-400', icon: '🌾' };
+            case 'Pantry Staples': return { bg: 'bg-orange-50 dark:bg-orange-950/20', border: 'border-orange-200 dark:border-orange-800/50', text: 'text-orange-700 dark:text-orange-400', icon: '🫙' };
+            case 'Nuts & Seeds': return { bg: 'bg-purple-50 dark:bg-purple-950/20', border: 'border-purple-200 dark:border-purple-800/50', text: 'text-purple-700 dark:text-purple-400', icon: '🥜' };
+            default: return { bg: 'bg-slate-50 dark:bg-slate-800/30', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-400', icon: '📦' };
+        }
+    };
+
     const filteredItems = items.filter(item => {
         // Search filter
         const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -637,12 +649,18 @@ export function ShoppingListView() {
                                 <span className="text-xs font-black text-rose-600 dark:text-rose-400">{uncheckedItems.length}</span>
                             </div>
                             <div className="space-y-3">
-                                {Object.entries(groupedUnchecked).map(([group, items]) => (
-                                    <div key={group} className="space-y-1.5">
-                                        <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-500 px-4 pt-1">
-                                            {group}
-                                        </div>
-                                        <div className="space-y-1.5">
+                                {Object.entries(groupedUnchecked).map(([group, items]) => {
+                                    const colors = getCategoryColor(group);
+                                    return (
+                                        <div key={group} className={cn("rounded-xl border p-4", colors.bg, colors.border)}>
+                                            <div className={cn("text-sm font-black uppercase tracking-widest mb-3 flex items-center gap-2", colors.text)}>
+                                                <span className="text-lg">{colors.icon}</span>
+                                                {group}
+                                                <Badge className="ml-auto text-[9px] bg-white/50 dark:bg-slate-900/50 border-none text-slate-700 dark:text-slate-300">
+                                                    {items.length}
+                                                </Badge>
+                                            </div>
+                                            <div className="space-y-1.5">
                                 {items.map((item) => (
                                     <div
                                         key={item.id}
@@ -689,9 +707,10 @@ export function ShoppingListView() {
                                         </button>
                                     </div>
                                 ))}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         </div>
                     )}
