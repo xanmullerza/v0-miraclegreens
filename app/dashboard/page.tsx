@@ -33,6 +33,14 @@ export default function DashboardOverview() {
     const [hideWelcome, setHideWelcome] = useState(false);
 
     useEffect(() => {
+        // Restore persisted preference for hiding the welcome card
+        try {
+            const saved = window.localStorage.getItem('hideWelcomeVitala');
+            if (saved === 'true') setHideWelcome(true);
+        } catch (e) {
+            // ignore (e.g., SSR guard)
+        }
+
         const fetchStats = async () => {
             try {
                 const [itemsCount, recipesCount, recent] = await Promise.all([
@@ -55,6 +63,17 @@ export default function DashboardOverview() {
 
         fetchStats();
     }, []);
+
+    const hideSession = () => setHideWelcome(true);
+
+    const hideForever = () => {
+        try {
+            window.localStorage.setItem('hideWelcomeVitala', 'true');
+        } catch (e) {
+            // ignore
+        }
+        setHideWelcome(true);
+    };
 
     const tools = [
         {
@@ -126,14 +145,24 @@ export default function DashboardOverview() {
                             </p>
                         </div>
 
-                        {/* Hide Button - Bottom Right */}
+                        {/* Hide Button - Bottom Right (session) and Don't show again - Bottom Left (persistent) */}
                         <button
-                            onClick={() => setHideWelcome(true)}
+                            onClick={hideSession}
                             className="absolute bottom-6 right-6 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-300 transition-all duration-300 group"
                             title="Hide welcome card"
                         >
                             <X size={20} className="group-hover:scale-110 transition-transform" />
                         </button>
+
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={hideForever}
+                            className="absolute bottom-6 left-6 text-xs px-3 py-1 bg-slate-800/60 hover:bg-slate-700 text-slate-300"
+                            title="Don't show this welcome message again"
+                        >
+                            Don't show again
+                        </Button>
                     </div>
                 )}
 
