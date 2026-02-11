@@ -10,7 +10,8 @@ import {
     User,
     ArrowRight,
     Carrot,
-    UtensilsCrossed
+    UtensilsCrossed,
+    X
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -29,6 +30,7 @@ export default function DashboardOverview() {
         recentAdditions: [] as any[]
     });
     const [loading, setLoading] = useState(true);
+    const [hideWelcome, setHideWelcome] = useState(false);
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -103,29 +105,40 @@ export default function DashboardOverview() {
     return (
         <div className="max-w-7xl mx-auto">
             {/* Main Layout: Hero (2/3) + Cards (1/3) */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className={cn("grid gap-6", hideWelcome ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-3")}>
                 {/* Hero Welcome - Takes 2/3 width */}
-                <div className="lg:col-span-2 relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-10 lg:p-16 flex flex-col justify-center min-h-[400px]">
-                    <div className="absolute top-0 right-0 p-10 opacity-10 blur-2xl">
-                        <Sparkles size={300} className="text-emerald-500" />
-                    </div>
-
-                    <div className="relative z-10 max-w-xl">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-black uppercase tracking-widest mb-6">
-                            <Zap size={12} className="fill-current" />
-                            Your Health Companion
+                {!hideWelcome && (
+                    <div className="lg:col-span-2 relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-10 lg:p-16 flex flex-col justify-center min-h-[400px]">
+                        <div className="absolute top-0 right-0 p-10 opacity-10 blur-2xl">
+                            <Sparkles size={300} className="text-emerald-500" />
                         </div>
-                        <h1 className="text-3xl lg:text-5xl font-black text-white tracking-tighter leading-[0.9] mb-6">
-                            Welcome to <span className="text-emerald-500">Vitala.</span>
-                        </h1>
-                        <p className="text-base text-slate-400 leading-relaxed">
-                            Everything you need to find healthy food, great recipes, and plan your week. Discover how to eat well and feel your best.
-                        </p>
+
+                        <div className="relative z-10 max-w-xl">
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-black uppercase tracking-widest mb-6">
+                                <Zap size={12} className="fill-current" />
+                                Your Health Companion
+                            </div>
+                            <h1 className="text-3xl lg:text-5xl font-black text-white tracking-tighter leading-[0.9] mb-6">
+                                Welcome to <span className="text-emerald-500">Vitala.</span>
+                            </h1>
+                            <p className="text-base text-slate-400 leading-relaxed">
+                                Everything you need to find healthy food, great recipes, and plan your week. Discover how to eat well and feel your best.
+                            </p>
+                        </div>
+
+                        {/* Hide Button - Bottom Right */}
+                        <button
+                            onClick={() => setHideWelcome(true)}
+                            className="absolute bottom-6 right-6 p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-300 transition-all duration-300 group"
+                            title="Hide welcome card"
+                        >
+                            <X size={20} className="group-hover:scale-110 transition-transform" />
+                        </button>
                     </div>
-                </div>
+                )}
 
                 {/* Cards Grid - Takes 1/3 width, grid layout */}
-                <div className="lg:col-span-1 grid grid-cols-2 gap-4 auto-rows-fr">
+                <div className={cn("grid gap-4 auto-rows-fr", hideWelcome ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-2 lg:col-span-1")}>
                     {tools.map((tool) => (
                         <Link key={tool.href} href={tool.href}>
                             <Card className="p-4 group hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300 h-full flex flex-col">
