@@ -96,7 +96,7 @@ function LibraryContent() {
         },
         top10: {
             heading: 'Top 10',
-            description: 'Discover the richest whole food sources for any nutrient',
+            description: 'Discover the richest food sources for any essential nutrient',
             color: 'text-yellow-500'
         },
         compare: {
