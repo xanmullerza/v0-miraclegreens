@@ -336,14 +336,6 @@ export function ExploreView({
                 </div>
             )}
 
-            {/* List Header */}
-            <div className="hidden lg:grid lg:grid-cols-[80px_1fr_180px] gap-4 px-10 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-1.5"><Camera size={14} /> View</div>
-                <div className="flex items-center gap-1.5"><Info size={14} /> Name</div>
-                <div className="flex justify-center items-center gap-1.5">
-                    <Activity size={14} className="text-slate-400" /> CONTROL
-                </div>
-            </div>
 
             {/* List Area */}
             <div className="space-y-0">
