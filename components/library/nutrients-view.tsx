@@ -43,7 +43,7 @@ export function NutrientsView() {
     const router = useRouter();
     const { searchQuery } = useSearch();
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>(MAIN_CATEGORIES);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [favorites, setFavorites] = useState<string[]>([]);
 
@@ -116,16 +116,6 @@ export function NutrientsView() {
                         ))}
                     </div>
                 </div>
-            </div>
-
-            {/* List Header */}
-            <div className="hidden lg:grid lg:grid-cols-[60px_1fr_120px_120px_120px_100px] gap-6 px-10 pb-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 border-b border-slate-100 dark:border-slate-800">
-                <div className="text-center"><Activity size={14} className="mx-auto" /></div>
-                <div>Name</div>
-                <div className="text-right">Main Use</div>
-                <div className="text-right">Benefits</div>
-                <div className="text-right">Found In</div>
-                <div className="text-center">Favorite</div>
             </div>
 
             {/* Nutrient Items */}

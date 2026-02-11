@@ -72,17 +72,37 @@ function LibraryContent() {
     };
 
     const tabs = [
+        { id: 'nutrients', label: 'All Nutrients', icon: Activity, color: 'text-amber-500', bg: 'bg-amber-500/10' },
         { id: 'top10', label: 'Top 10', icon: Trophy, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
         { id: 'compare', label: 'Compare', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-        { id: 'nutrients', label: 'All Nutrients', icon: Activity, color: 'text-amber-500', bg: 'bg-amber-500/10' },
     ];
 
+    const tabConfig: Record<'nutrients' | 'top10' | 'compare', { heading: string; description: string; color: string }> = {
+        nutrients: {
+            heading: 'All Nutrients',
+            description: 'Browse & explore the complete nutrition database',
+            color: 'text-amber-500'
+        },
+        top10: {
+            heading: 'Top 10 Nutrients',
+            description: 'Most important micronutrients for optimal health',
+            color: 'text-yellow-500'
+        },
+        compare: {
+            heading: 'Compare Items',
+            description: 'Side-by-side nutrition comparison tool',
+            color: 'text-blue-500'
+        }
+    };
+
     const renderTabGroup = (tabsList: typeof tabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
-        <div className="space-y-3">
+        <div className="space-y-3 w-full">
             <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>
-            <div className="flex items-center p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl transition-all duration-500 w-full md:w-[800px] mx-auto xl:mx-0 relative z-50">
+            <div className={cn(
+                "flex items-center p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden w-full md:max-w-[800px] mx-auto xl:mx-0"
+            )}>
                 {/* Left side - Home Button area */}
-                <div className="flex-shrink-0 w-12 flex items-center justify-start">
+                <div className={cn("flex-shrink-0 flex items-center justify-start transition-all duration-500", isSearchExpanded ? "w-0" : "w-12")}>
                     {showHomeButton && !isSearchExpanded && (
                         <button
                             onClick={() => router.push('/dashboard')}
@@ -95,7 +115,10 @@ function LibraryContent() {
                 </div>
 
                 {/* Center - Tabs area */}
-                <div className="flex-1 flex items-center justify-center overflow-hidden">
+                <div className={cn(
+                    "flex items-center justify-center overflow-hidden transition-all duration-500",
+                    isSearchExpanded ? "w-0 flex-none opacity-0" : "flex-1 opacity-100"
+                )}>
                     <div className="flex items-center gap-4 overflow-hidden py-1">
                         {tabsList.map((tab) => {
                             const Icon = tab.icon;
@@ -230,9 +253,9 @@ function LibraryContent() {
                     </div>
                     <div>
                         <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85]">
-                            <span className="text-emerald-500">Nutrients.</span>
+                            <span className={tabConfig[activeTab].color}>{tabConfig[activeTab].heading}.</span>
                         </h1>
-                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Explore & Compare Nutrition Facts</p>
+                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">{tabConfig[activeTab].description}</p>
                     </div>
                 </div>
 
