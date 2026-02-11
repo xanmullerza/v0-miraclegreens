@@ -58,6 +58,10 @@ export function ShoppingListView() {
     const { dailyPlan } = useUserPreferences();
     const [pantryItems, setPantryItems] = useState<any[]>([]);
 
+    // Filter state
+    const [showMealPlanOnly, setShowMealPlanOnly] = useState(false);
+    const [showManualOnly, setShowManualOnly] = useState(false);
+
     // Barcode scanner state
     const [scannerOpen, setScannerOpen] = useState(false);
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
@@ -407,16 +411,41 @@ export function ShoppingListView() {
         toast.success(`Cleared ${checked.length} checked items`);
     };
 
-    const filteredItems = items.filter(item =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    // Category mapping for better store organization
+    const getCategoryGroup = (category?: string) => {
+        if (!category) return 'Other';
+        const normalized = category.toLowerCase();
+        if (normalized.includes('fruit') || normalized.includes('vegetable') || normalized.includes('salad')) return 'Produce';
+        if (normalized.includes('meat') || normalized.includes('protein') || normalized.includes('fish') || normalized.includes('chicken') || normalized.includes('beef')) return 'Proteins';
+        if (normalized.includes('dairy') || normalized.includes('milk') || normalized.includes('cheese') || normalized.includes('yogurt')) return 'Dairy';
+        if (normalized.includes('grain') || normalized.includes('bread') || normalized.includes('rice') || normalized.includes('pasta')) return 'Grains';
+        if (normalized.includes('oil') || normalized.includes('sauce') || normalized.includes('seasoning') || normalized.includes('spice')) return 'Pantry Staples';
+        if (normalized.includes('nut') || normalized.includes('seed')) return 'Nuts & Seeds';
+        return 'Other';
+    };
+
+    const filteredItems = items.filter(item => {
+        // Search filter
+        const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+        // Source filter
+        const matchesSource = !((showMealPlanOnly && item.source !== 'mealplan') || (showManualOnly && item.source !== 'manual'));
+        return matchesSearch && matchesSource;
+    });
 
     const uncheckedItems = filteredItems.filter(i => !i.checked);
     const checkedItems = filteredItems.filter(i => i.checked);
 
+    // Group unchecked items by category
+    const groupedUnchecked = uncheckedItems.reduce((acc, item) => {
+        const group = getCategoryGroup(item.category);
+        if (!acc[group]) acc[group] = [];
+        acc[group].push(item);
+        return acc;
+    }, {} as Record<string, ShoppingListItem[]>);
+
     // Calculate total price of items with prices
-    const totalPrice = items
-        .filter(i => i.price && !i.checked)
+    const totalPrice = uncheckedItems
+        .filter(i => i.price)
         .reduce((sum, i) => sum + (i.price || 0), 0);
 
     return (
@@ -495,6 +524,64 @@ export function ShoppingListView() {
             </div>
 
 
+            {/* Filters Row */}
+            <div className="flex flex-wrap items-center gap-2 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
+                <span className="text-xs font-black uppercase tracking-widest text-slate-500 px-2">Filter:</span>
+                <Button
+                    size="sm"
+                    variant={showMealPlanOnly ? "default" : "outline"}
+                    onClick={() => {
+                        setShowMealPlanOnly(!showMealPlanOnly);
+                        if (showManualOnly) setShowManualOnly(false);
+                    }}
+                    className={cn(
+                        "h-8 text-xs font-black uppercase tracking-widest rounded-xl",
+                        showMealPlanOnly 
+                            ? "bg-blue-600 text-white hover:bg-blue-700" 
+                            : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-blue-300"
+                    )}
+                >
+                    <ChefHat size={12} className="mr-1" /> Meal Plan
+                </Button>
+                <Button
+                    size="sm"
+                    variant={showManualOnly ? "default" : "outline"}
+                    onClick={() => {
+                        setShowManualOnly(!showManualOnly);
+                        if (showMealPlanOnly) setShowMealPlanOnly(false);
+                    }}
+                    className={cn(
+                        "h-8 text-xs font-black uppercase tracking-widest rounded-xl",
+                        showManualOnly 
+                            ? "bg-emerald-600 text-white hover:bg-emerald-700" 
+                            : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-emerald-300"
+                    )}
+                >
+                    <Plus size={12} className="mr-1" /> Manual
+                </Button>
+                {(showMealPlanOnly || showManualOnly) && (
+                    <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                            setShowMealPlanOnly(false);
+                            setShowManualOnly(false);
+                        }}
+                        className="h-8 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    >
+                        <X size={12} className="mr-1" /> Reset
+                    </Button>
+                )}
+                {totalPrice > 0 && (
+                    <div className="ml-auto px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <span className="text-xs font-black text-slate-600 dark:text-slate-300">
+                            <DollarSign size={12} className="inline mr-1" />
+                            Total: ${totalPrice.toFixed(2)}
+                        </span>
+                    </div>
+                )}
+            </div>
+
             {/* Stats Row */}
             <div className="flex flex-wrap gap-4">
                 {checkedItems.length > 0 && (
@@ -537,7 +624,7 @@ export function ShoppingListView() {
             ) : (
                 /* Items List */
                 <div className="space-y-4">
-                    {/* Unchecked Items */}
+                    {/* Unchecked Items - Grouped by Category */}
                     {uncheckedItems.length > 0 && (
                         <div className="space-y-2">
                             <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800/50">
@@ -549,8 +636,14 @@ export function ShoppingListView() {
                                 </div>
                                 <span className="text-xs font-black text-rose-600 dark:text-rose-400">{uncheckedItems.length}</span>
                             </div>
-                            <div className="space-y-1.5">
-                                {uncheckedItems.map((item) => (
+                            <div className="space-y-3">
+                                {Object.entries(groupedUnchecked).map(([group, items]) => (
+                                    <div key={group} className="space-y-1.5">
+                                        <div className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-500 px-4 pt-1">
+                                            {group}
+                                        </div>
+                                        <div className="space-y-1.5">
+                                {items.map((item) => (
                                     <div
                                         key={item.id}
                                         className={cn(
@@ -583,12 +676,20 @@ export function ShoppingListView() {
                                                 <ChefHat size={9} className="mr-0.5" /> Meal
                                             </Badge>
                                         )}
+                                        {item.price && (
+                                            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 shrink-0">
+                                                ${item.price.toFixed(2)}
+                                            </span>
+                                        )}
                                         <button
                                             onClick={(e) => { e.stopPropagation(); removeItem(item.id); }}
                                             className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-500 transition-all"
                                         >
                                             <X size={14} />
                                         </button>
+                                    </div>
+                                ))}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
