@@ -351,9 +351,9 @@ export function ExploreView({
                             <div className="space-y-2">
                                 {items.map((food) => (
                                     <div key={food.id} className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden">
-                                        <div className="flex items-center justify-between p-4 lg:p-0 lg:grid lg:grid-cols-[80px_1fr_180px] gap-4 lg:items-center lg:px-10 py-0">
+                                        <div className="flex items-center justify-between p-4 lg:p-0 lg:grid lg:grid-cols-[60px_1fr_180px] gap-4 lg:items-center lg:px-10 py-0">
                                             {/* Thumbnail */}
-                                            <div className="hidden lg:block aspect-square w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-500 mx-auto">
+                                            <div className="hidden lg:block aspect-square w-12 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-500 mx-auto">
                                                 {food.image ? (
                                                     <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
                                                 ) : (
@@ -380,12 +380,7 @@ export function ExploreView({
                                                             {food.quantity}
                                                         </Badge>
                                                     )}
-                                                    {/* Category badge - desktop only */}
-                                                    {food.category && (
-                                                        <Badge className="hidden lg:inline-flex bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase font-black">
-                                                            {food.category}
-                                                        </Badge>
-                                                    )}
+
                                                 </div>
                                             </div>
 
