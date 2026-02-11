@@ -43,7 +43,7 @@ export default function KitchenPage() {
 function KitchenContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [activeTab, setActiveTab] = useState<TabId>('mixlab');
+    const [activeTab, setActiveTab] = useState<TabId>('browse');
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
     const { searchQuery, setSearchQuery } = useSearch();
     const { dailyPlan } = useUserPreferences();
