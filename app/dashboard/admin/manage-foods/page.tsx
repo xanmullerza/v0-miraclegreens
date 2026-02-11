@@ -43,7 +43,7 @@ interface FoodItem {
     portions?: { label: string; weight_g: number }[];
 }
 
-const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
+const CATEGORIES = ["General", "Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
 
 export default function ManageFoodsPage() {
     const router = useRouter();

@@ -120,6 +120,10 @@ function FoodItemCreatorContent() {
     }, [micronutrients, protein, fat, carbs]);
 
 
+    const [category, setCategory] = useState('General');
+
+    const CATEGORIES = ["General", "Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
+
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -206,6 +210,7 @@ function FoodItemCreatorContent() {
                 name,
                 common_name: commonName || null,
                 source: source || 'manual',
+                category,
                 energy_kcal: finalEnergyKcal,
                 energy_kj: finalEnergyKj,
                 protein_g: finalProtein,
@@ -452,6 +457,21 @@ Fat: ${item.fat_g || 0}g
                                     value={commonName}
                                     onChange={(e) => setCommonName(e.target.value)}
                                 />
+                            </div>
+                            <div className="space-y-1.5">
+                                <Label className="text-[10px] uppercase font-black text-slate-400">Category</Label>
+                                <div className="relative">
+                                    <select
+                                        value={category}
+                                        onChange={(e) => setCategory(e.target.value)}
+                                        className="flex h-11 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500/20 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-bold appearance-none pr-10"
+                                    >
+                                        {CATEGORIES.map(cat => (
+                                            <option key={cat} value={cat}>{cat}</option>
+                                        ))}
+                                    </select>
+                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
+                                </div>
                             </div>
                         </div>
                     </div>
