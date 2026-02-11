@@ -80,7 +80,7 @@ function LibraryContent() {
     const tabConfig: Record<'nutrients' | 'top10' | 'compare', { heading: string; description: string; color: string }> = {
         nutrients: {
             heading: 'All Nutrients',
-            description: 'Browse & explore the complete nutrition database',
+            description: 'Browse & explore our essential nutrient database',
             color: 'text-amber-500'
         },
         top10: {
