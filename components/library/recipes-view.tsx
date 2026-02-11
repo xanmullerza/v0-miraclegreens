@@ -316,31 +316,6 @@ export function RecipesView({
                 </div>
             ) : (
                 <div className="space-y-4">
-                    {/* List Header */}
-                    <div className="hidden lg:grid lg:grid-cols-[120px_1fr_100px_80px_80px_80px_150px] gap-4 px-8 pb-4 text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800">
-                        <div className="flex items-center gap-2 cursor-pointer hover:text-blue-500" onClick={() => handleSort('image')}>
-                            <Camera size={14} /> PLATE
-                        </div>
-                        <div className="flex items-center gap-2 cursor-pointer hover:text-blue-500" onClick={() => handleSort('title')}>
-                            <ChefHat size={14} /> MEAL DETAILS
-                        </div>
-                        <div className="text-right flex items-center justify-end gap-2 cursor-pointer hover:text-blue-500" onClick={() => handleSort('calories')}>
-                            <Zap size={14} className="text-emerald-500" /> ENERGY
-                        </div>
-                        <div className="text-right flex items-center justify-end gap-2 cursor-pointer hover:text-blue-500" onClick={() => handleSort('carbs')}>
-                            <Wheat size={14} className="text-amber-500" /> CARBS
-                        </div>
-                        <div className="text-right flex items-center justify-end gap-2 cursor-pointer hover:text-blue-500" onClick={() => handleSort('fat')}>
-                            <Droplet size={14} className="text-amber-900" /> FAT
-                        </div>
-                        <div className="text-right flex items-center justify-end gap-2 cursor-pointer hover:text-blue-500" onClick={() => handleSort('protein')}>
-                            <Beef size={14} className="text-rose-500" /> PROTEIN
-                        </div>
-                        <div className="text-right flex items-center justify-end gap-2">
-                            <Activity size={14} className="text-slate-400" /> CONTROL
-                        </div>
-                    </div>
-
                     {/* Recipe List */}
                     <div className="space-y-3">
                         {recipes.map((recipe) => (
