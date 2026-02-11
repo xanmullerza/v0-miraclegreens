@@ -37,7 +37,7 @@ interface TopFood {
     common_name: string;
     slug: string;
     value: number;
-    image_url?: string;
+    image?: string;
     category?: string[];
 }
 
@@ -134,7 +134,7 @@ export function TopTenView({
                         common_name: item.common_name,
                         slug: item.slug,
                         value: item[selectedNutrient.id],
-                        image_url: item.image_url,
+                        image: item.image,
                         category: item.category
                     }));
                 } else {
@@ -150,7 +150,7 @@ export function TopTenView({
                             common_name: item.common_name,
                             slug: item.slug,
                             value: val,
-                            image_url: item.image_url,
+                            image: item.image,
                             category: item.category
                         };
                     });
@@ -287,9 +287,9 @@ export function TopTenView({
 
                                     {/* Food Image */}
                                     <div className="w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden shadow-sm border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                                        {food.image_url ? (
+                                        {food.image ? (
                                             <img
-                                                src={food.image_url}
+                                                src={food.image}
                                                 alt={food.common_name || food.name}
                                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                                             />
