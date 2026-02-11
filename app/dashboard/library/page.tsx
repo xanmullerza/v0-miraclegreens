@@ -95,8 +95,8 @@ function LibraryContent() {
             color: 'text-amber-500'
         },
         top10: {
-            heading: 'Top 10 Nutrients',
-            description: 'Most important micronutrients for optimal health',
+            heading: 'Top 10',
+            description: 'Discover the richest whole food sources for any nutrient',
             color: 'text-yellow-500'
         },
         compare: {
