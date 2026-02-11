@@ -98,11 +98,22 @@ export function ShoppingListView() {
 
         if (dailyPlan) {
             const mealPlanItems = generateShoppingList(dailyPlan);
-            const pantryNames = new Set(pantryItems.map(f => (f.common_name || f.name).toLowerCase().trim()));
 
-            // Convert to our format and filter out pantry items
+            // Normalize names for more reliable matching (remove parentheses, punctuation, plurals)
+            const normalize = (s?: string) =>
+                (s || '')
+                    .toLowerCase()
+                    .replace(/\(.*?\)/g, '')
+                    .replace(/[^a-z0-9]/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim()
+                    .replace(/s$/,'');
+
+            const pantryNames = new Set(pantryItems.map(f => normalize(f.common_name || f.name)));
+
+            // Convert to our format and filter out pantry items using normalized names
             const convertedItems: ShoppingListItem[] = mealPlanItems
-                .filter(item => !pantryNames.has(item.name.toLowerCase().trim()))
+                .filter(item => !pantryNames.has(normalize(item.name)))
                 .map((item, idx) => ({
                     id: `mealplan-${idx}`,
                     name: item.name,
@@ -114,8 +125,8 @@ export function ShoppingListView() {
                 }));
 
             // Deduplicate: If item exists in manual/scanned list, don't show from meal plan
-            const manualNames = new Set(manualItems.map(i => i.name.toLowerCase().trim()));
-            const newMealPlanItems = convertedItems.filter(i => !manualNames.has(i.name.toLowerCase().trim()));
+            const manualNames = new Set(manualItems.map(i => normalize(i.name)));
+            const newMealPlanItems = convertedItems.filter(i => !manualNames.has(normalize(i.name)));
 
             combined = [...manualItems, ...newMealPlanItems];
         }
