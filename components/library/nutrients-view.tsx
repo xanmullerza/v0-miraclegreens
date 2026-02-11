@@ -39,13 +39,33 @@ const NUTRIENT_CATEGORIES_DATA = [
     { title: "Vitamins", icon: Battery, theme: "emerald", keys: ['Vitamin A', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Vitamin C', 'Vitamin D', 'Vitamin E', 'Vitamin K', 'Choline'] }
 ];
 
-export function NutrientsView() {
+interface NutrientsViewProps {
+    showFavoritesOnly?: boolean;
+    setShowFavoritesOnly?: (value: boolean) => void;
+    selectedCategories?: string[];
+    setSelectedCategories?: (value: string[]) => void;
+}
+
+export function NutrientsView(props: NutrientsViewProps = {}) {
+    const {
+        showFavoritesOnly: externalShowFavorites,
+        setShowFavoritesOnly: externalSetShowFavorites,
+        selectedCategories: externalSelectedCategories,
+        setSelectedCategories: externalSetSelectedCategories,
+    } = props;
+    
     const router = useRouter();
     const { searchQuery } = useSearch();
-    const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-    const [selectedCategories, setSelectedCategories] = useState<string[]>(MAIN_CATEGORIES);
+    const [localShowFavoritesOnly, setLocalShowFavoritesOnly] = useState(false);
+    const [localSelectedCategories, setLocalSelectedCategories] = useState<string[]>(MAIN_CATEGORIES);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [favorites, setFavorites] = useState<string[]>([]);
+
+    // Use external state if provided, otherwise use local state
+    const showFavoritesOnly = externalShowFavorites !== undefined ? externalShowFavorites : localShowFavoritesOnly;
+    const setShowFavoritesOnly = externalSetShowFavorites || setLocalShowFavoritesOnly;
+    const selectedCategories = externalSelectedCategories !== undefined ? externalSelectedCategories : localSelectedCategories;
+    const setSelectedCategories = externalSetSelectedCategories || setLocalSelectedCategories;
 
     useEffect(() => {
         const stored = localStorage.getItem('nutrient-favorites');

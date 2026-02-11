@@ -56,6 +56,11 @@ function LibraryContent() {
     const [showFoodFavorites, setShowFoodFavorites] = useState(false);
     const [isFoodFilterOpen, setIsFoodFilterOpen] = useState(false);
 
+    // Nutrients Filter State
+    const NUTRIENT_CATEGORIES = ["Macros", "Minerals", "Vitamins"];
+    const [selectedNutrientCategories, setSelectedNutrientCategories] = useState<string[]>(NUTRIENT_CATEGORIES);
+    const [showNutrientFavorites, setShowNutrientFavorites] = useState(false);
+
     // Sync tab with URL if needed
     useEffect(() => {
         const tab = searchParams.get('tab') as any;
@@ -268,54 +273,53 @@ function LibraryContent() {
                     <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
                         {/* Favorites Toggle */}
                         <button
-                            onClick={() => {}}
+                            onClick={() => setShowNutrientFavorites(!showNutrientFavorites)}
                             className={cn(
                                 "flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all duration-300 shrink-0 shadow-sm group",
-                                "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-200 hover:text-rose-500 dark:hover:border-rose-900/50"
+                                showNutrientFavorites
+                                    ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
+                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-200 hover:text-rose-500 dark:hover:border-rose-900/50"
                             )}
                         >
-                            <Heart size={14} className="transition-transform group-hover:scale-110" />
+                            <Heart size={14} className={cn("transition-transform group-hover:scale-110", showNutrientFavorites && "fill-current scale-110")} />
                             <span className="text-[9px] font-black uppercase tracking-widest">Favorites</span>
                         </button>
 
                         <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
 
                         {/* Nutrient Category Pills */}
-                        <button
-                            onClick={() => {}}
-                            className={cn(
-                                "px-3.5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0 border shadow-sm",
-                                "bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-500/20"
-                            )}
-                        >
-                            Macros
-                        </button>
-                        <button
-                            onClick={() => {}}
-                            className={cn(
-                                "px-3.5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0 border shadow-sm",
-                                "bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-500/20"
-                            )}
-                        >
-                            Minerals
-                        </button>
-                        <button
-                            onClick={() => {}}
-                            className={cn(
-                                "px-3.5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0 border shadow-sm",
-                                "bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-500/20"
-                            )}
-                        >
-                            Vitamins
-                        </button>
+                        {NUTRIENT_CATEGORIES.map(category => {
+                            const isActive = selectedNutrientCategories.includes(category);
+                            return (
+                                <button
+                                    key={category}
+                                    onClick={() => isActive
+                                        ? setSelectedNutrientCategories(prev => prev.filter(c => c !== category))
+                                        : setSelectedNutrientCategories(prev => [...prev, category])
+                                    }
+                                    className={cn(
+                                        "px-3.5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0 border shadow-sm",
+                                        isActive
+                                            ? "bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-500/20"
+                                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-amber-200 hover:text-amber-600 dark:hover:border-amber-900/50"
+                                    )}
+                                >
+                                    {category}
+                                </button>
+                            );
+                        })}
 
-                        <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
-                        <button
-                            onClick={() => {}}
-                            className="px-2.5 py-1.5 rounded-2xl text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all shrink-0 flex items-center gap-1"
-                        >
-                            <X size={12} /> Clear
-                        </button>
+                        {selectedNutrientCategories.length > 0 && selectedNutrientCategories.length < NUTRIENT_CATEGORIES.length && (
+                            <>
+                                <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
+                                <button
+                                    onClick={() => setSelectedNutrientCategories(NUTRIENT_CATEGORIES)}
+                                    className="px-2.5 py-1.5 rounded-2xl text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all shrink-0 flex items-center gap-1"
+                                >
+                                    <X size={12} /> Clear
+                                </button>
+                            </>
+                        )}
                     </div>
                 )}
             </div>
@@ -327,7 +331,14 @@ function LibraryContent() {
 
 
                 {activeTab === 'compare' && <CompareView />}
-                {activeTab === 'nutrients' && <NutrientsView />}
+                {activeTab === 'nutrients' && (
+                    <NutrientsView
+                        showFavoritesOnly={showNutrientFavorites}
+                        setShowFavoritesOnly={setShowNutrientFavorites}
+                        selectedCategories={selectedNutrientCategories}
+                        setSelectedCategories={setSelectedNutrientCategories}
+                    />
+                )}
                 {activeTab === 'top10' && <TopTenView />}
             </div>
         </div>
