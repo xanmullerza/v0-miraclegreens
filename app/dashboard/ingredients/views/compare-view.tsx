@@ -499,7 +499,7 @@ export function CompareView() {
                 {!selectedFoods.some(f => f !== null) && (
                     <div className="p-10 md:p-20 flex flex-col items-center justify-center text-center">
                         <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center mb-4 md:mb-6">
-                            <Info className="text-slate-300" size={24} className="md:w-8 md:h-8" />
+                            <Info size={24} className={cn("text-slate-300", "md:w-8 md:h-8")} />
                         </div>
                         <h3 className="text-sm md:text-xl font-black text-slate-900 dark:text-white uppercase italic mb-2">Engine Ready</h3>
                         <p className="text-slate-500 font-medium text-[10px] md:text-sm max-w-[240px] md:max-w-sm">
