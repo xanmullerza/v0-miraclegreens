@@ -97,8 +97,8 @@ function KitchenContent() {
 
     // Meals & Recipes tabs
     const mealsTabs = [
-        { id: 'browse' as TabId, label: 'All Meals', icon: BookOpen, color: 'text-orange-500', bg: 'bg-orange-500/10' },
-        { id: 'mealplanner' as TabId, label: 'Meal-O-Matic', icon: Bot, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+        { id: 'browse' as TabId, label: 'All Meals', icon: BookOpen, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
+        { id: 'mealplanner' as TabId, label: 'Meal-O-Matic', icon: Bot, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
         { id: 'mixlab' as TabId, label: 'Mix Lab', icon: FlaskConical, color: 'text-purple-500', bg: 'bg-purple-500/10' },
     ];
 
@@ -113,7 +113,7 @@ function KitchenContent() {
                     {showHomeButton && !isSearchExpanded && (
                         <button
                             onClick={() => router.push('/dashboard')}
-                            className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/10 transition-all flex-shrink-0"
+                            className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/10 transition-all flex-shrink-0"
                             title="Back to Dashboard"
                         >
                             <LayoutGrid size={18} />
@@ -184,7 +184,7 @@ function KitchenContent() {
                             "flex items-center justify-center w-12 h-12 rounded-[1.5rem] transition-all flex-shrink-0",
                             isSearchExpanded
                                 ? "bg-rose-50 text-rose-500 hover:bg-rose-100"
-                                : "text-slate-400 hover:text-amber-500 hover:bg-amber-50"
+                                : "text-slate-400 hover:text-yellow-500 hover:bg-yellow-50"
                         )}
                         title="Search"
                     >
@@ -200,12 +200,12 @@ function KitchenContent() {
             {/* Unified Header */}
             <div className="flex flex-col gap-8">
                 <div className="flex items-center gap-4">
-                    <div className="p-3.5 rounded-[1.5rem] bg-amber-500 shadow-xl shadow-amber-500/20 text-white">
+                    <div className="p-3.5 rounded-[1.5rem] bg-yellow-500 shadow-xl shadow-yellow-500/20 text-white">
                         <Sparkles size={28} />
                     </div>
                     <div>
                         <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2">
-                            <span className="text-amber-500">{tabConfig[activeTab].heading}.</span>
+                            <span className="text-yellow-500">{tabConfig[activeTab].heading}.</span>
                         </h1>
                         <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">
                             {tabConfig[activeTab].description}
@@ -249,8 +249,8 @@ function KitchenContent() {
                                     className={cn(
                                         "px-3.5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0 border shadow-sm",
                                         isActive
-                                            ? "bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-500/20"
-                                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-amber-200 hover:text-amber-600 dark:hover:border-amber-900/50"
+                                            ? "bg-yellow-600 text-white border-yellow-600 shadow-lg shadow-yellow-500/20"
+                                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-yellow-200 hover:text-yellow-600 dark:hover:border-yellow-900/50"
                                     )}
                                 >
                                     {type}

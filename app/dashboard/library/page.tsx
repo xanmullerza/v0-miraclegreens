@@ -83,7 +83,7 @@ function LibraryContent() {
     };
 
     const tabs = [
-        { id: 'nutrients', label: 'All Nutrients', icon: Activity, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+        { id: 'nutrients', label: 'All Nutrients', icon: Activity, color: 'text-blue-500', bg: 'bg-blue-500/10' },
         { id: 'top10', label: 'Top 10', icon: Trophy, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
         { id: 'compare', label: 'Compare', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
     ];
@@ -92,7 +92,7 @@ function LibraryContent() {
         nutrients: {
             heading: 'All Nutrients',
             description: 'Browse & explore our essential nutrient database',
-            color: 'text-amber-500'
+            color: 'text-blue-500'
         },
         top10: {
             heading: 'Top 10 Richest',
@@ -209,7 +209,7 @@ function LibraryContent() {
                     <div className="absolute top-full left-0 right-0 mt-3 z-[101] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-4 duration-500 w-full">
                         {isLoading ? (
                             <div className="p-8 text-center text-slate-500">
-                                <Activity className="h-6 w-6 animate-spin text-emerald-500 mx-auto" />
+                                <Activity className="h-6 w-6 animate-spin text-blue-500 mx-auto" />
                                 <p className="mt-2 text-[10px] font-black uppercase tracking-widest">Analyzing Samples...</p>
                             </div>
                         ) : results.length === 0 ? (
@@ -259,7 +259,7 @@ function LibraryContent() {
             {/* Unified Header */}
             <div className="flex flex-col gap-8">
                 <div className="flex items-center gap-4">
-                    <div className="p-3.5 rounded-[1.5rem] bg-emerald-600 shadow-xl shadow-emerald-500/20 text-white">
+                    <div className="p-3.5 rounded-[1.5rem] bg-blue-600 shadow-xl shadow-blue-500/20 text-white">
                         <Activity size={28} />
                     </div>
                     <div>
@@ -305,8 +305,8 @@ function LibraryContent() {
                                         className={cn(
                                             "px-3.5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0 border shadow-sm",
                                             isActive
-                                                ? "bg-amber-600 text-white border-amber-600 shadow-lg shadow-amber-500/20"
-                                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-amber-200 hover:text-amber-600 dark:hover:border-amber-900/50"
+                                                ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20"
+                                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-blue-200 hover:text-blue-600 dark:hover:border-blue-900/50"
                                         )}
                                     >
                                         {category}

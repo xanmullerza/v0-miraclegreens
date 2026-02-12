@@ -62,40 +62,47 @@ function FoodsHubContent() {
     };
 
     // Tab configuration with headings and descriptions
-    const tabConfig: Record<FoodTab, { heading: string; description: string }> = {
+    const tabConfig: Record<FoodTab, { heading: string; description: string; color: string }> = {
         allfoods: {
             heading: 'All Foods',
-            description: 'Browse our foods database and discover the ingredients for your next meal'
+            description: 'Browse our foods database and discover the ingredients for your next meal',
+            color: 'text-emerald-500'
         },
         groceries: {
             heading: 'Groceries',
-            description: 'Manage your shopping list and plan your weekly grocery haul'
+            description: 'Manage your shopping list and plan your weekly grocery haul',
+            color: 'text-rose-500'
         },
         pantry: {
             heading: 'Pantry',
-            description: 'Organize and track the ingredients you have in stock'
+            description: 'Organize and track the ingredients you have in stock',
+            color: 'text-emerald-500'
         },
         explore: {
             heading: 'Explore',
-            description: 'Browse our foods database and discover the ingredients for your next meal'
+            description: 'Browse our foods database and discover the ingredients for your next meal',
+            color: 'text-emerald-500'
         },
         staples: {
             heading: 'Staples',
-            description: 'View your essential ingredients and nutritional staples'
+            description: 'View your essential ingredients and nutritional staples',
+            color: 'text-emerald-500'
         },
         shopping: {
             heading: 'Shopping',
-            description: 'Manage your shopping list and plan your grocery haul'
+            description: 'Manage your shopping list and plan your grocery haul',
+            color: 'text-rose-500'
         },
         nutrients: {
             heading: 'Nutrients',
-            description: 'Track and analyze nutritional information'
+            description: 'Track and analyze nutritional information',
+            color: 'text-blue-500'
         }
     };
 
     // First row: Ingredients section (moved from Kitchen)
     const ingredientTabs = [
-        { id: 'allfoods', label: 'All Foods', icon: UtensilsCrossed, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+        { id: 'allfoods', label: 'All Foods', icon: UtensilsCrossed, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
         { id: 'groceries', label: 'Groceries', icon: ShoppingCart, color: 'text-rose-500', bg: 'bg-rose-500/10' },
         { id: 'pantry', label: 'Pantry', icon: ShoppingBasket, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
     ];
@@ -216,7 +223,7 @@ function FoodsHubContent() {
             <div className="flex flex-col gap-8">
                 <div>
                     <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2">
-                        <span className="text-emerald-500">{tabConfig[currentTab].heading}.</span>
+                        <span className={tabConfig[currentTab].color}>{tabConfig[currentTab].heading}.</span>
                     </h1>
                     <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">
                         {tabConfig[currentTab].description}

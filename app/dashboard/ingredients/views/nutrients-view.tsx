@@ -101,7 +101,7 @@ export function NutrientsView() {
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white uppercase italic">Nutrients Library</h2>
+                    <h2 className="text-2xl font-black tracking-tight text-blue-500 dark:text-blue-400 uppercase italic">Nutrients Library</h2>
                     <p className="text-slate-500 font-medium text-sm max-w-lg">
                         Deep-dive into the clinical data of vitamins, minerals, and macronutrients.
                     </p>
@@ -138,8 +138,8 @@ export function NutrientsView() {
                             className={cn(
                                 "px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0 border shadow-sm",
                                 isActive
-                                    ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20"
-                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-emerald-200 hover:text-emerald-600 dark:hover:border-emerald-900/50"
+                                    ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20"
+                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-blue-200 hover:text-blue-600 dark:hover:border-blue-900/50"
                             )}
                         >
                             {category}
@@ -173,7 +173,7 @@ export function NutrientsView() {
                             <div
                                 key={name}
                                 onClick={() => router.push(`/dashboard/nutrients/${encodeURIComponent(name)}`)}
-                                className="group bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-amber-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-4"
+                                className="group bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-4"
                             >
                                 <div className="flex items-center gap-6">
                                     <div className={cn("p-3 rounded-xl", themes[theme as keyof typeof themes])}>
