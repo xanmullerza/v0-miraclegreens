@@ -95,12 +95,12 @@ function LibraryContent() {
             color: 'text-amber-500'
         },
         top10: {
-            heading: 'Top 10',
+            heading: 'Top 10 Richest',
             description: 'Discover the richest food sources per nutrient',
             color: 'text-yellow-500'
         },
         compare: {
-            heading: 'Compare Items',
+            heading: 'Compare Foods',
             description: 'Side-by-side nutrition comparison tool',
             color: 'text-blue-500'
         }
