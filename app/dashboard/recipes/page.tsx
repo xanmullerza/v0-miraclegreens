@@ -90,7 +90,7 @@ function KitchenContent() {
             description: 'Let AI create personalized meal plans based on your preferences and nutritional needs'
         },
         mixlab: {
-            heading: 'Your DIY Mix Lab',
+            heading: 'Homemade Mix Lab',
             description: 'Create custom recipes by mixing and matching ingredients to your exact specifications'
         }
     };
