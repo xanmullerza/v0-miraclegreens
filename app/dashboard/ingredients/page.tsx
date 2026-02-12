@@ -71,7 +71,7 @@ function FoodsHubContent() {
         groceries: {
             heading: 'Groceries',
             description: 'Manage your shopping list and plan your weekly grocery haul',
-            color: 'text-rose-500'
+            color: 'text-emerald-500'
         },
         pantry: {
             heading: 'Pantry',
@@ -91,7 +91,7 @@ function FoodsHubContent() {
         shopping: {
             heading: 'Shopping',
             description: 'Manage your shopping list and plan your grocery haul',
-            color: 'text-rose-500'
+            color: 'text-emerald-500'
         },
         nutrients: {
             heading: 'Nutrients',
@@ -103,7 +103,7 @@ function FoodsHubContent() {
     // First row: Ingredients section (moved from Kitchen)
     const ingredientTabs = [
         { id: 'allfoods', label: 'All Foods', icon: UtensilsCrossed, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-        { id: 'groceries', label: 'Groceries', icon: ShoppingCart, color: 'text-rose-500', bg: 'bg-rose-500/10' },
+        { id: 'groceries', label: 'Groceries', icon: ShoppingCart, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
         { id: 'pantry', label: 'Pantry', icon: ShoppingBasket, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
     ];
 
@@ -205,7 +205,7 @@ function FoodsHubContent() {
                         className={cn(
                             "flex items-center justify-center w-12 h-12 rounded-[1.5rem] transition-all flex-shrink-0",
                             isSearchExpanded
-                                ? "bg-rose-50 text-rose-500 hover:bg-rose-100"
+                                ? "bg-emerald-50 text-emerald-500 hover:bg-emerald-100"
                                 : "text-slate-400 hover:text-emerald-500 hover:bg-emerald-50"
                         )}
                         title="Search"

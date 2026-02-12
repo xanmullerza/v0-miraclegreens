@@ -106,7 +106,7 @@ export function ShoppingListView() {
                     .filter((f: any) => f.food_item_id)  // Only items with food_item_id
                     .map((f: any) => f.food_item_id)
             );
-            
+
             // Fallback to name matching for items without food_item_id
             const normalize = (s?: string) =>
                 (s || '')
@@ -153,7 +153,7 @@ export function ShoppingListView() {
         setLoading(true);
         try {
             const { data: { user } } = await supabase.auth.getUser();
-            
+
             // Fetch curated pantry items (food_items where is_in_pantry = true)
             const { data: curatedData } = await supabase
                 .from('food_items')
@@ -169,7 +169,7 @@ export function ShoppingListView() {
 
             // Combine both sources
             const combinedPantry: any[] = [...(curatedData || [])];
-            
+
             if (personalData) {
                 personalData.forEach((item: any) => {
                     const foodItem = item.food_items;
@@ -376,7 +376,7 @@ export function ShoppingListView() {
                     categoryHint = 'Nuts';
                 }
             }
-            
+
             // Store category hint in notes
             const notesWithCategory = [selectedMatchItem.category || categoryHint ? `Category: ${selectedMatchItem.category || categoryHint}` : ''].filter(Boolean).join('; ');
 
@@ -446,12 +446,12 @@ export function ShoppingListView() {
             }
 
             removeItem(selectedMatchItem.id);
-            
+
             // Also remove from manualItems if it's a manual/scanned item
             if (selectedMatchItem.id.startsWith('manual-') || selectedMatchItem.id.startsWith('scanned-')) {
                 setManualItems(prev => prev.filter(item => item.id !== selectedMatchItem.id));
             }
-            
+
             setMatchDialogOpen(false);
             setSelectedMatchItem(null);
             setScannedIdToLink(null);
@@ -494,9 +494,9 @@ export function ShoppingListView() {
     const getCategoryGroup = (category?: string) => {
         if (!category) return 'Other';
         const normalized = category.toLowerCase().trim();
-        
+
         // Map DB categories to store sections
-        switch(normalized) {
+        switch (normalized) {
             case 'fruit':
             case 'vegetables':
                 return 'Produce';
@@ -519,7 +519,7 @@ export function ShoppingListView() {
     };
 
     const getCategoryColor = (group: string) => {
-        switch(group) {
+        switch (group) {
             case 'Produce': return { bg: 'bg-green-50 dark:bg-green-950/20', border: 'border-green-200 dark:border-green-800/50', text: 'text-green-700 dark:text-green-400', icon: '🥬' };
             case 'Proteins': return { bg: 'bg-red-50 dark:bg-red-950/20', border: 'border-red-200 dark:border-red-800/50', text: 'text-red-700 dark:text-red-400', icon: '🥩' };
             case 'Grains': return { bg: 'bg-amber-50 dark:bg-amber-950/20', border: 'border-amber-200 dark:border-amber-800/50', text: 'text-amber-700 dark:text-amber-400', icon: '🌾' };
@@ -642,8 +642,8 @@ export function ShoppingListView() {
                     }}
                     className={cn(
                         "h-8 text-xs font-black uppercase tracking-widest rounded-xl",
-                        showMealPlanOnly 
-                            ? "bg-blue-600 text-white hover:bg-blue-700" 
+                        showMealPlanOnly
+                            ? "bg-blue-600 text-white hover:bg-blue-700"
                             : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-blue-300"
                     )}
                 >
@@ -658,8 +658,8 @@ export function ShoppingListView() {
                     }}
                     className={cn(
                         "h-8 text-xs font-black uppercase tracking-widest rounded-xl",
-                        showManualOnly 
-                            ? "bg-emerald-600 text-white hover:bg-emerald-700" 
+                        showManualOnly
+                            ? "bg-emerald-600 text-white hover:bg-emerald-700"
                             : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-emerald-300"
                     )}
                 >
@@ -733,14 +733,14 @@ export function ShoppingListView() {
                     {/* Unchecked Items - Grouped by Category */}
                     {uncheckedItems.length > 0 && (
                         <div className="space-y-2">
-                            <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800/50">
+                            <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/50">
                                 <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-                                    <span className="text-xs font-black uppercase tracking-widest text-rose-600 dark:text-rose-400">
+                                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                    <span className="text-xs font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
                                         Need to Buy
                                     </span>
                                 </div>
-                                <span className="text-xs font-black text-rose-600 dark:text-rose-400">{uncheckedItems.length}</span>
+                                <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">{uncheckedItems.length}</span>
                             </div>
                             <div className="space-y-3">
                                 {Object.entries(groupedUnchecked).map(([group, items]) => {
@@ -755,52 +755,52 @@ export function ShoppingListView() {
                                                 </Badge>
                                             </div>
                                             <div className="space-y-1.5">
-                                {items.map((item) => (
-                                    <div
-                                        key={item.id}
-                                        className={cn(
-                                            "flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-all cursor-pointer group",
-                                            item.is_miracle_product
-                                                ? "bg-amber-50/70 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/40 hover:border-amber-300"
-                                                : "bg-slate-50/50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800/50"
-                                        )}
-                                        onClick={() => toggleItem(item.id)}
-                                    >
-                                        <div className={cn(
-                                            "w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all",
-                                            "border-slate-300 dark:border-slate-600 group-hover:border-emerald-500"
-                                        )}>
-                                            {/* Empty checkbox */}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-1.5">
-                                                {item.is_miracle_product && (
-                                                    <Sparkles size={12} className="text-amber-500 shrink-0" />
-                                                )}
-                                                <span className="font-semibold text-sm text-slate-900 dark:text-white truncate">
-                                                    {item.name}
-                                                </span>
-                                            </div>
-                                            <span className="text-xs text-slate-500 dark:text-slate-400">{item.quantity}</span>
-                                        </div>
-                                        {item.source === 'mealplan' && (
-                                            <Badge className="text-[7px] bg-blue-500/10 text-blue-600 dark:text-blue-400 border-none shrink-0 h-5 px-1.5 flex items-center">
-                                                <ChefHat size={9} className="mr-0.5" /> Meal
-                                            </Badge>
-                                        )}
-                                        {item.price && (
-                                            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 shrink-0">
-                                                ${item.price.toFixed(2)}
-                                            </span>
-                                        )}
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); removeItem(item.id); }}
-                                            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-500 transition-all"
-                                        >
-                                            <X size={14} />
-                                        </button>
-                                    </div>
-                                ))}
+                                                {items.map((item) => (
+                                                    <div
+                                                        key={item.id}
+                                                        className={cn(
+                                                            "flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-all cursor-pointer group",
+                                                            item.is_miracle_product
+                                                                ? "bg-amber-50/70 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/40 hover:border-amber-300"
+                                                                : "bg-slate-50/50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800/50"
+                                                        )}
+                                                        onClick={() => toggleItem(item.id)}
+                                                    >
+                                                        <div className={cn(
+                                                            "w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all",
+                                                            "border-slate-300 dark:border-slate-600 group-hover:border-emerald-500"
+                                                        )}>
+                                                            {/* Empty checkbox */}
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex items-center gap-1.5">
+                                                                {item.is_miracle_product && (
+                                                                    <Sparkles size={12} className="text-amber-500 shrink-0" />
+                                                                )}
+                                                                <span className="font-semibold text-sm text-slate-900 dark:text-white truncate">
+                                                                    {item.name}
+                                                                </span>
+                                                            </div>
+                                                            <span className="text-xs text-slate-500 dark:text-slate-400">{item.quantity}</span>
+                                                        </div>
+                                                        {item.source === 'mealplan' && (
+                                                            <Badge className="text-[7px] bg-blue-500/10 text-blue-600 dark:text-blue-400 border-none shrink-0 h-5 px-1.5 flex items-center">
+                                                                <ChefHat size={9} className="mr-0.5" /> Meal
+                                                            </Badge>
+                                                        )}
+                                                        {item.price && (
+                                                            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 shrink-0">
+                                                                ${item.price.toFixed(2)}
+                                                            </span>
+                                                        )}
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); removeItem(item.id); }}
+                                                            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-500 transition-all"
+                                                        >
+                                                            <X size={14} />
+                                                        </button>
+                                                    </div>
+                                                ))}
                                             </div>
                                         </div>
                                     );
