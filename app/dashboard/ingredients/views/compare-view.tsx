@@ -1,213 +1,405 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import React, { useState, useEffect, useRef } from 'react';
 import {
-    Plus,
-    Scale,
-    Zap,
-    Sparkles,
     Search,
     X,
-    BarChart3,
-    Gem,
+    Activity,
+    Zap,
     Droplet,
+    Gem,
     Battery,
-    FileText,
-    ArrowRight,
-    RotateCcw,
-    Activity
+    Scale,
+    Trash2,
+    Plus,
+    Info,
+    Beef
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-    PolarAngleAxis,
-    PolarGrid,
-    Radar,
-    RadarChart,
-    ResponsiveContainer,
-    Tooltip as RechartsTooltip,
-    Legend
-} from 'recharts';
 import { cn } from '@/lib/utils';
-import { useRDA } from '@/hooks/use-rda';
-import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
-import { useSearch } from '@/lib/context/search-context';
-import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { supabase } from '@/lib/supabase';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 interface FoodItem {
     id: string;
     name: string;
     common_name: string;
+    image: string | null;
+    micronutrients: Record<string, any>;
     energy_kcal: number;
-    energy_kj: number;
     protein_g: number;
     carbs_g: number;
     fat_g: number;
-    micronutrients: Record<string, number>;
+    fiber_g: number;
 }
 
-const COMPARISON_COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#f43f5e', '#06b6d4', '#84cc16', '#d946ef', '#6366f1', '#14b8a6'];
+const NUTRIENT_GROUPS = [
+    {
+        title: "Macronutrients",
+        icon: Zap,
+        theme: "orange",
+        keys: [
+            { label: 'Energy', key: 'energy_kcal', unit: 'kcal' },
+            { label: 'Protein', key: 'protein_g', unit: 'g' },
+            { label: 'Carbs', key: 'carbs_g', unit: 'g' },
+            { label: 'Fat', key: 'fat_g', unit: 'g' },
+            { label: 'Fiber', key: 'fiber_g', unit: 'g' }
+        ]
+    },
+    {
+        title: "Electrolytes",
+        icon: Droplet,
+        theme: "indigo",
+        keys: [
+            { label: 'Potassium', key: 'Potassium', unit: 'mg' },
+            { label: 'Magnesium', key: 'Magnesium', unit: 'mg' },
+            { label: 'Calcium', key: 'Calcium', unit: 'mg' },
+            { label: 'Sodium', key: 'Sodium', unit: 'mg' },
+            { label: 'Phosphorus', key: 'Phosphorus', unit: 'mg' }
+        ]
+    },
+    {
+        title: "Trace Minerals",
+        icon: Gem,
+        theme: "rose",
+        keys: [
+            { label: 'Iron', key: 'Iron', unit: 'mg' },
+            { label: 'Zinc', key: 'Zinc', unit: 'mg' },
+            { label: 'Selenium', key: 'Selenium', unit: 'µg' },
+            { label: 'Copper', key: 'Copper', unit: 'mg' },
+            { label: 'Manganese', key: 'Manganese', unit: 'mg' }
+        ]
+    },
+    {
+        title: "Vitamins",
+        icon: Battery,
+        theme: "emerald",
+        keys: [
+            { label: 'Vitamin A', key: 'Vitamin A', unit: 'µg' },
+            { label: 'Vitamin C', key: 'Vitamin C', unit: 'mg' },
+            { label: 'Vitamin D', key: 'Vitamin D', unit: 'µg' },
+            { label: 'Vitamin E', key: 'Vitamin E', unit: 'mg' },
+            { label: 'Vitamin K', key: 'Vitamin K', unit: 'µg' },
+            { label: 'B1 (Thiamine)', key: 'B1 (Thiamine)', unit: 'mg' },
+            { label: 'B2 (Riboflavin)', key: 'B2 (Riboflavin)', unit: 'mg' },
+            { label: 'B3 (Niacin)', key: 'B3 (Niacin)', unit: 'mg' },
+            { label: 'B5 (Pantothenic Acid)', key: 'B5 (Pantothenic Acid)', unit: 'mg' },
+            { label: 'B6 (Pyridoxine)', key: 'B6 (Pyridoxine)', unit: 'mg' },
+            { label: 'B9 (Folate)', key: 'B9 (Folate)', unit: 'µg' },
+            { label: 'B12 (Cobalamin)', key: 'B12 (Cobalamin)', unit: 'µg' },
+            { label: 'Choline', key: 'Choline', unit: 'mg' }
+        ]
+    }
+];
 
 export function CompareView() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const { profile, dailyTargets, energyUnit, nutrientDisplayMode } = useUserPreferences();
-    const {
-        searchQuery,
-        setSearchQuery,
-        results,
-        setResults,
-        isLoading,
-        setIsLoading,
-        onResultClickRef,
-        registerResultClickHandler,
-        setKeepFocusAfterSelect
-    } = useSearch();
-    const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
-    const [selectedItems, setSelectedItems] = useState<FoodItem[]>([]);
+    const [selectedFoods, setSelectedFoods] = useState<(FoodItem | null)[]>([null, null, null]);
+    const [searchQueries, setSearchQueries] = useState<string[]>(['', '', '']);
+    const [searchResults, setSearchResults] = useState<FoodItem[][]>([[], [], []]);
+    const [isLoading, setIsLoading] = useState<boolean[]>([false, false, false]);
+    const [activeSearchIndex, setActiveSearchIndex] = useState<number | null>(null);
+    const searchRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        setKeepFocusAfterSelect(true);
-        return () => setKeepFocusAfterSelect(false);
-    }, [setKeepFocusAfterSelect]);
-
-    useEffect(() => {
-        registerResultClickHandler((result) => {
-            const item = result.data as FoodItem;
-            if (!item) return;
-            setSelectedItems(prev => prev.some(i => i.id === item.id) ? prev.filter(i => i.id !== item.id) : prev.length < 10 ? [...prev, item] : prev);
-        });
-    }, [registerResultClickHandler]);
-
-    useEffect(() => {
-        const idsparam = searchParams.get('ids');
-        if (idsparam) {
-            const ids = idsparam.split(',');
-            if (ids.length > 0) {
-                const fetchSelected = async () => {
-                    const { data } = await supabase.from('food_items').select('*').in('id', ids);
-                    if (data) setSelectedItems(data);
-                };
-                fetchSelected();
+        const handleClickOutside = (event: MouseEvent) => {
+            if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+                setActiveSearchIndex(null);
             }
-        }
-    }, [searchParams]);
-
-    useEffect(() => {
-        const searchFoodItems = async () => {
-            if (!searchQuery.trim()) {
-                setResults([]);
-                return;
-            };
-            setIsLoading(true);
-            try {
-                const { data } = await supabase.from('food_items').select('*').or(`name.ilike.%${searchQuery.trim()}%,common_name.ilike.%${searchQuery.trim()}%`).limit(20);
-                if (data) {
-                    setResults(data.map(item => ({
-                        id: item.id,
-                        title: item.common_name || item.name,
-                        subtitle: selectedItems.some(i => i.id === item.id) ? '✓ In comparison' : 'Add to comparison',
-                        data: item
-                    })));
-                }
-            } catch (error) { console.error(error); } finally { setIsLoading(false); }
         };
-        const timer = setTimeout(searchFoodItems, 300);
-        return () => clearTimeout(timer);
-    }, [searchQuery, selectedItems, setResults, setIsLoading]);
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
-    const radarData = ['Protein', 'Carbs', 'Fat', 'Fiber', 'Calories'].map(subject => {
-        const entry: any = { subject };
-        selectedItems.forEach((item, idx) => {
-            let val = 0;
-            if (subject === 'Protein') val = item.protein_g;
-            else if (subject === 'Carbs') val = item.carbs_g;
-            else if (subject === 'Fat') val = item.fat_g;
-            else if (subject === 'Fiber') val = item.micronutrients?.['Fiber'] || 0;
-            else if (subject === 'Calories') val = item.energy_kcal / 10;
-            entry[`item${idx}`] = val;
+    const performSearch = async (query: string, index: number) => {
+        if (!query || query.length < 2) {
+            setSearchResults(prev => {
+                const next = [...prev];
+                next[index] = [];
+                return next;
+            });
+            return;
+        }
+
+        setIsLoading(prev => {
+            const next = [...prev];
+            next[index] = true;
+            return next;
         });
-        return entry;
-    });
 
-    const userRDAs = useRDA(profile.age || 30, profile.gender || 'female', dailyTargets.energy || 2000);
-    const getVal = (item: FoodItem, key: string) => {
-        if (key === 'energy_kcal') return energyUnit === 'kJ' ? item.energy_kj : item.energy_kcal;
-        return (item as any)[key] || item.micronutrients?.[key] || 0;
+        try {
+            const { data, error } = await supabase
+                .from('food_items')
+                .select('*')
+                .or(`name.ilike.%${query}%,common_name.ilike.%${query}%`)
+                .limit(5);
+
+            if (error) throw error;
+
+            setSearchResults(prev => {
+                const next = [...prev];
+                next[index] = data || [];
+                return next;
+            });
+        } catch (error) {
+            console.error('Search error:', error);
+            toast.error("Search failed");
+        } finally {
+            setIsLoading(prev => {
+                const next = [...prev];
+                next[index] = false;
+                return next;
+            });
+        }
     };
 
-    const ComparisonChart = ({ items, label }: { items: Record<string, string[]>, label: string }) => (
-        <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900 space-y-4">
-            <h4 className="font-black text-xs uppercase tracking-widest text-slate-400">{label}</h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
-                {Object.entries(items).map(([macro, keys]) => (
-                    <div key={macro} className="p-4 rounded-xl border bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800">
-                        <p className="text-[10px] uppercase font-black text-slate-400 mb-2">{macro}</p>
-                        <div className="space-y-1.5">
-                            {selectedItems.map((item, idx) => {
-                                const val = getVal(item, keys[0]);
-                                const rda = userRDAs?.[macro];
-                                const pct = rda ? Math.round((val / rda) * 100) : 0;
-                                const styles = getNutrientLevelStyles(pct, macro);
-                                return (
-                                    <div key={item.id} className="flex items-center justify-between text-[11px]">
-                                        <div className="flex items-center gap-2 truncate flex-1">
-                                            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: COMPARISON_COLORS[idx] }} />
-                                            <span className="truncate opacity-70">{item.common_name || item.name}</span>
+    const handleSearchChange = (val: string, index: number) => {
+        const nextQueries = [...searchQueries];
+        nextQueries[index] = val;
+        setSearchQueries(nextQueries);
+        performSearch(val, index);
+    };
+
+    const handleSelectFood = (food: FoodItem, index: number) => {
+        setSelectedFoods(prev => {
+            const next = [...prev];
+            next[index] = food;
+            return next;
+        });
+        setSearchQueries(prev => {
+            const next = [...prev];
+            next[index] = '';
+            return next;
+        });
+        setSearchResults(prev => {
+            const next = [...prev];
+            next[index] = [];
+            return next;
+        });
+        setActiveSearchIndex(null);
+    };
+
+    const removeFood = (index: number) => {
+        setSelectedFoods(prev => {
+            const next = [...prev];
+            next[index] = null;
+            return next;
+        });
+    };
+
+    const getNutrientValue = (food: FoodItem | null, key: string, unit: string) => {
+        if (!food) return '-';
+
+        // Check top level first for macros
+        if (key in food && typeof (food as any)[key] === 'number') {
+            return (food as any)[key].toFixed(1);
+        }
+
+        // Check micronutrients JSONB
+        if (food.micronutrients && food.micronutrients[key]) {
+            const val = food.micronutrients[key];
+            if (typeof val === 'number') return val.toFixed(1);
+            if (typeof val === 'string') return val;
+        }
+
+        return '0';
+    };
+
+    const themes = {
+        orange: "text-orange-500 bg-orange-500/10 border-orange-500/20",
+        indigo: "text-indigo-500 bg-indigo-500/10 border-indigo-500/20",
+        rose: "text-rose-500 bg-rose-500/10 border-rose-500/20",
+        emerald: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20"
+    };
+
+    return (
+        <div className="space-y-12 animate-in fade-in duration-500 pb-20">
+            {/* Search Header */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6" ref={searchRef}>
+                {[0, 1, 2].map((index) => (
+                    <div key={index} className="relative group">
+                        <div className={cn(
+                            "bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500",
+                            activeSearchIndex === index ? "ring-2 ring-emerald-500/50" : ""
+                        )}>
+                            <div className="p-4 flex flex-col items-center gap-4">
+                                {selectedFoods[index] ? (
+                                    <div className="w-full flex items-center justify-between gap-4">
+                                        <div className="flex items-center gap-4 flex-1">
+                                            <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex-shrink-0 overflow-hidden border border-slate-200 dark:border-slate-700">
+                                                {selectedFoods[index]?.image ? (
+                                                    <img src={selectedFoods[index]?.image!} alt={selectedFoods[index]?.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                        <Beef size={20} className="opacity-10" />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Selection {index + 1}</p>
+                                                <h3 className="font-black text-sm uppercase italic text-slate-900 dark:text-white truncate">
+                                                    {selectedFoods[index]?.common_name || selectedFoods[index]?.name}
+                                                </h3>
+                                            </div>
                                         </div>
-                                        <span className="font-black">{val >= 10 ? Math.round(val) : val.toFixed(1)}</span>
+                                        <button
+                                            onClick={() => removeFood(index)}
+                                            className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 flex items-center justify-center transition-all"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
                                     </div>
-                                );
-                            })}
+                                ) : (
+                                    <div className="w-full">
+                                        <div className="flex items-center gap-3 px-4 h-14 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                            <Search className="text-slate-400" size={18} />
+                                            <input
+                                                type="text"
+                                                placeholder="Search food to compare..."
+                                                value={searchQueries[index]}
+                                                onChange={(e) => handleSearchChange(e.target.value, index)}
+                                                onFocus={() => setActiveSearchIndex(index)}
+                                                className="bg-transparent border-none focus:ring-0 text-[11px] font-black uppercase tracking-widest w-full text-slate-900 dark:text-white placeholder:text-slate-300"
+                                            />
+                                            {isLoading[index] && <Activity className="animate-spin text-emerald-500" size={16} />}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
+
+                        {/* Search Results Dropdown */}
+                        {activeSearchIndex === index && searchResults[index].length > 0 && (
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl z-50 overflow-hidden animate-in slide-in-from-top-4 duration-300">
+                                {searchResults[index].map((food) => (
+                                    <button
+                                        key={food.id}
+                                        onClick={() => handleSelectFood(food, index)}
+                                        className="w-full p-4 flex items-center gap-4 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border-b last:border-none border-slate-100 dark:border-slate-800 text-left group"
+                                    >
+                                        <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex-shrink-0 overflow-hidden border border-slate-200 dark:border-slate-700 group-hover:scale-105 transition-transform">
+                                            {food.image ? (
+                                                <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                    <Beef size={16} className="opacity-10" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="font-bold text-xs uppercase text-slate-900 dark:text-white truncate">
+                                                {food.common_name || food.name}
+                                            </h4>
+                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">
+                                                {food.energy_kcal} kcal / 100g
+                                            </p>
+                                        </div>
+                                        <Plus size={14} className="text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>
-        </div>
-    );
 
-    return (
-        <div className="space-y-8 animate-in fade-in duration-500">
-
-
-            <div className="flex flex-col md:flex-row gap-4 relative">
-                <div className="flex-1 flex flex-wrap items-center gap-2 bg-white dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 relative z-10">
-                    {selectedItems.length === 0 ? <p className="text-xs text-slate-500 italic">Select and compare up to 10 foods side-by-side to find the most nutrient-dense options.</p> : selectedItems.map((item, idx) => (
-                        <Badge key={item.id} variant="outline" className="gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-slate-900">
-                            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: COMPARISON_COLORS[idx] }} />
-                            {item.common_name || item.name}
-                            <X size={12} className="cursor-pointer hover:text-rose-500" onClick={() => setSelectedItems(selectedItems.filter(i => i.id !== item.id))} />
-                        </Badge>
-                    ))}
+            {/* Comparison Table */}
+            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                        <thead>
+                            <tr className="border-b border-slate-100 dark:border-slate-800">
+                                <th className="p-8 text-left bg-slate-50/50 dark:bg-slate-800/30 w-1/4 min-w-[200px]">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                                            <Scale size={20} />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-black text-sm uppercase italic text-slate-900 dark:text-white">Nutrition Facts</h3>
+                                            <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Values per 100g</p>
+                                        </div>
+                                    </div>
+                                </th>
+                                {[0, 1, 2].map((i) => (
+                                    <th key={i} className="p-8 text-center border-l border-slate-100 dark:border-slate-800 w-1/4">
+                                        <div className="flex flex-col items-center gap-2">
+                                            {selectedFoods[i] ? (
+                                                <>
+                                                    <h4 className="font-black text-sm uppercase italic text-slate-900 dark:text-white line-clamp-1">
+                                                        {selectedFoods[i]?.common_name || selectedFoods[i]?.name}
+                                                    </h4>
+                                                    <Badge className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-none font-black text-[9px] uppercase tracking-widest">
+                                                        Clinical Sample
+                                                    </Badge>
+                                                </>
+                                            ) : (
+                                                <div className="flex flex-col items-center gap-1 opacity-20">
+                                                    <div className="w-8 h-8 rounded-full border-2 border-dashed border-slate-400 flex items-center justify-center">
+                                                        <Plus size={14} className="text-slate-400" />
+                                                    </div>
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Add food</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {NUTRIENT_GROUPS.map((group) => (
+                                <React.Fragment key={group.title}>
+                                    <tr className="bg-slate-50 dark:bg-slate-800/50">
+                                        <td colSpan={4} className="px-8 py-3">
+                                            <div className="flex items-center gap-2">
+                                                <group.icon size={14} className={cn(themes[group.theme as keyof typeof themes].split(' ')[0])} />
+                                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{group.title}</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {group.keys.map((nutrient) => (
+                                        <tr key={nutrient.key} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group">
+                                            <td className="p-6 px-12">
+                                                <div className="flex flex-col">
+                                                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 group-hover:text-emerald-500 transition-colors">
+                                                        {nutrient.label}
+                                                    </span>
+                                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+                                                        {nutrient.unit}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            {[0, 1, 2].map((i) => (
+                                                <td key={i} className="p-6 text-center border-l border-slate-100 dark:border-slate-800">
+                                                    <span className={cn(
+                                                        "text-xs font-black tracking-widest",
+                                                        selectedFoods[i] ? "text-slate-900 dark:text-white" : "text-slate-200 dark:text-slate-800"
+                                                    )}>
+                                                        {getNutrientValue(selectedFoods[i], nutrient.key, nutrient.unit)}
+                                                    </span>
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                </React.Fragment>
+                            ))}
+                        </tbody>
+                    </table>
                 </div>
-                {selectedItems.length > 0 && <Button variant="ghost" className="h-14 px-6 rounded-2xl text-rose-500 font-black uppercase tracking-widest text-[10px]" onClick={() => setSelectedItems([])}><RotateCcw size={16} className="mr-2" /> Reset</Button>}
-            </div>
 
-            {selectedItems.length === 0 ? (
-                <div className="h-64 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2rem] bg-white/30">
-                    <Scale size={32} className="text-slate-300 mb-4" />
-                    <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">Analysis Lab Ready</p>
-                </div>
-            ) : (
-                <div className="space-y-8 animate-in slide-in-from-bottom-2">
-                    <div className="bg-white dark:bg-slate-950 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 h-[400px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
-                                <PolarGrid stroke="#64748b" strokeOpacity={0.2} />
-                                <PolarAngleAxis dataKey="subject" tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }} />
-                                {selectedItems.map((item, idx) => <Radar key={item.id} name={item.common_name || item.name} dataKey={`item${idx}`} stroke={COMPARISON_COLORS[idx]} fill={COMPARISON_COLORS[idx]} fillOpacity={0.1} />)}
-                                <RechartsTooltip />
-                                <Legend />
-                            </RadarChart>
-                        </ResponsiveContainer>
+                {/* Empty State */}
+                {!selectedFoods.some(f => f !== null) && (
+                    <div className="p-20 flex flex-col items-center justify-center text-center">
+                        <div className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center mb-6">
+                            <Info className="text-slate-300" size={32} />
+                        </div>
+                        <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase italic mb-2">Comparison Engine Ready</h3>
+                        <p className="text-slate-500 font-medium text-sm max-w-sm">
+                            Search and select up to 3 clinical food samples in the boxes above to start your side-by-side nutritional analysis.
+                        </p>
                     </div>
-
-                    <ComparisonChart label="Macros & Energy" items={{ 'Energy': ['energy_kcal'], 'Protein': ['protein_g'], 'Carbs': ['carbs_g'], 'Fat': ['fat_g'] }} />
-                    <ComparisonChart label="Electrolytes" items={{ 'Sodium': ['Sodium'], 'Potassium': ['Potassium'], 'Magnesium': ['Magnesium'], 'Calcium': ['Calcium'] }} />
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 }
