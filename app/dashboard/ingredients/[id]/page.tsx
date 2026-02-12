@@ -711,6 +711,19 @@ export default function FoodDetailsPage() {
                     </div>
 
                     <div className="space-y-6">
+                        <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6">
+                            <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
+                                <Activity size={18} />
+                                Strategic Health Insights
+                            </h3>
+                        </div>
+
+                        <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Critical nutrient balances for metabolic & inflammation tracking" items={{
+                            'Na:K Ratio': ['Sodium', 'Potassium'],
+                            'Zn:Cu Ratio': ['Zinc', 'Copper'],
+                            'Omega 6:3': ['Omega-6', 'Omega-3'],
+                        }} />
+
                         <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Scientific and Clinical breakdown of caloric density" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
                             'Energy': ['Energy', 'energy_kcal', 'Calories', 'calories'],
                             'Protein': ['Protein', 'protein_g', 'protein'],
@@ -754,11 +767,6 @@ export default function FoodDetailsPage() {
                             'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
                         }} />
 
-                        <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Critical nutrient balances for metabolic & inflammation tracking" items={{
-                            'Na:K Ratio': ['Sodium', 'Potassium'],
-                            'Zn:Cu Ratio': ['Zinc', 'Copper'],
-                            'Omega 6:3': ['Omega-6', 'Omega-3'],
-                        }} />
                         <NutrientGrid title="Clinical Markers" icon={Activity} theme="amber" subtitle="Secondary markers for advanced health profile mapping" forceRaw={true} items={{
                             'Fiber': ['Fiber', 'fiber_g'],
                             'Sugars': ['Sugars', 'sugars_g'],
