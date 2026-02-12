@@ -53,7 +53,7 @@ import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRDA } from '@/hooks/use-rda';
 
 import { findSpiceFactor, SpiceState, isSpice, getSpiceMeasures, getSpiceStates } from '@/lib/utils/spice-conversion';
-import { COOKING_STATES, CookingState } from '@/lib/utils/cooking-states';
+import { COOKING_STATES, CookingState, StateFactor } from '@/lib/utils/cooking-states';
 import { searchLocalFood } from '@/lib/services/nutrition';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
@@ -1337,7 +1337,8 @@ export default function RecipeDetailsPage() {
                                                             if (allowed) return allowed.includes(key);
                                                             return !['ground', 'dried', 'whole'].includes(key);
                                                         }).map(([key, state]) => {
-                                                            let label = state.label;
+                                                            const s = state as StateFactor;
+                                                            let label = s.label;
                                                             if (key === 'stored') {
                                                                 const name = (ing.food_item?.name || '').toLowerCase();
                                                                 const isCooked = name.includes('cooked') || name.includes('boiled') || name.includes('roasted') || name.includes('fried');
@@ -1518,6 +1519,7 @@ export default function RecipeDetailsPage() {
                                                 <h4 className={cn("font-black flex items-center gap-2 mb-1 uppercase tracking-widest text-[10px]", t.text)}><Icon className="h-4 w-4" /> {title}</h4>
                                                 {subtitle && <p className={cn("text-[9px] text-slate-400 mb-4 border-b pb-2 transition-colors", t.border)}>{subtitle}</p>}
                                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                                                    {Object.entries(items).map(([label, keys]) => {
                                                         let val = 0;
                                                         let rda = null;
                                                         let unitStr = '';
@@ -1553,9 +1555,9 @@ export default function RecipeDetailsPage() {
                                                             if (label === 'Zn:Cu Ratio') ratioStatus = (val >= 8 && val <= 12) ? 'good' : (val >= 5 && val <= 15) ? 'fair' : 'poor';
                                                             if (label === 'Omega 6:3') ratioStatus = val <= 4.0 ? 'good' : val <= 10.0 ? 'fair' : 'poor';
 
-                                                            styles = ratioStatus === 'good' ? { text: "text-emerald-500", borderLight: "border-emerald-500/30", fade: "bg-emerald-500/5", ring: "ring-emerald-500/20" } :
-                                                                ratioStatus === 'fair' ? { text: "text-amber-500", borderLight: "border-amber-500/30", fade: "bg-amber-500/5", ring: "ring-amber-500/20" } :
-                                                                    { text: "text-rose-500", borderLight: "border-rose-500/30", fade: "bg-rose-500/5", ring: "ring-rose-500/20" };
+                                                            styles = ratioStatus === 'good' ? { text: "text-emerald-500", borderLight: "border-emerald-500/30", fade: "bg-emerald-500/5", textFill: "text-emerald-500", bg: "bg-emerald-500", border: "border-emerald-500" } :
+                                                                ratioStatus === 'fair' ? { text: "text-amber-500", borderLight: "border-amber-500/30", fade: "bg-amber-500/5", textFill: "text-amber-500", bg: "bg-amber-500", border: "border-amber-500" } :
+                                                                    { text: "text-rose-500", borderLight: "border-rose-500/30", fade: "bg-rose-500/5", textFill: "text-rose-500", bg: "bg-rose-500", border: "border-rose-500" };
                                                         }
                                                         const hasBreakdown = breakdownLabels.includes(label);
 
@@ -1779,7 +1781,12 @@ export default function RecipeDetailsPage() {
                                                             <div className="space-y-1 mt-3">
                                                                 <div className="h-1.5 w-full bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                                                                     <div
-                                                                        className={cn("h-full transition-all duration-1000 bg-emerald-500")}
+                                                                        className={cn("h-full transition-all duration-1000",
+                                                                            breakdownNutrient === 'Protein' ? "bg-red-500" :
+                                                                                breakdownNutrient === 'Carbs' ? "bg-amber-500" :
+                                                                                    breakdownNutrient === 'Fat' ? "bg-orange-500" :
+                                                                                        "bg-emerald-500"
+                                                                        )}
                                                                         style={{ width: `${pct}%` }}
                                                                     />
                                                                 </div>
@@ -1810,7 +1817,7 @@ export default function RecipeDetailsPage() {
                         totalWeight={totalWeight}
                     />
                 )}
-            </div >
-        </div >
+            </div>
+        </div>
     );
 }
