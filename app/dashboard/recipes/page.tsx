@@ -82,7 +82,7 @@ function KitchenContent() {
     // Tab configuration with headings and descriptions
     const tabConfig: Record<TabId, { heading: string; description: string }> = {
         browse: {
-            heading: 'All Meals',
+            heading: 'Browse All Meals',
             description: 'Explore our complete recipe collection and find meals that match your nutritional goals'
         },
         mealplanner: {
@@ -90,7 +90,7 @@ function KitchenContent() {
             description: 'Let AI create personalized meal plans based on your preferences and nutritional needs'
         },
         mixlab: {
-            heading: 'Mix Lab',
+            heading: 'DIY Mix Lab',
             description: 'Create custom recipes by mixing and matching ingredients to your exact specifications'
         }
     };
