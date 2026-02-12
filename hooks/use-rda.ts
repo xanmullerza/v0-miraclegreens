@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
-const getFallbackRDAs = (uAge: number, uGender: 'male' | 'female', uCalories: number) => {
+const getFallbackRDAs = (uAge: number, uGender: 'male' | 'female', uCalories: number, uWeight?: number) => {
     // Base RDAs (Female 19-30) - Defaults for Adults
     let rdas: Record<string, number> = {
         'Potassium': 2600,
@@ -30,8 +30,31 @@ const getFallbackRDAs = (uAge: number, uGender: 'male' | 'female', uCalories: nu
         'B9 (Folate)': 400,
         'B12 (Cobalamin)': 2.4,
         'Choline': 425,
-        'Fiber': (uCalories / 1000) * 14
+        'Fiber': (uCalories / 1000) * 14,
+        'Sugars': (uCalories * 0.10) / 4, // 10% of calories as max sugar
+        'ALA': uGender === 'male' ? 1.6 : 1.1,
+        'EPA + DHA': 0.5, // 500mg combined recommendation
     };
+
+    // --- Amino Acid Requirements (WHO/FAO/UNU 2007) ---
+    // Values in mg per kg body weight
+    const weight = uWeight || 70;
+    const aaFactors = {
+        'Histidine': 10,
+        'Isoleucine': 20,
+        'Leucine': 39,
+        'Lysine': 30,
+        'Methionine': 15,
+        'Phenylalanine': 25,
+        'Threonine': 15,
+        'Tryptophan': 4,
+        'Valine': 26
+    };
+
+    Object.entries(aaFactors).forEach(([aa, factor]) => {
+        // Convert mg to g for target
+        rdas[aa] = (factor * weight) / 1000;
+    });
 
     // --- Child Logic (Overrides Base) ---
     if (uAge <= 3) {
@@ -105,7 +128,7 @@ const getFallbackRDAs = (uAge: number, uGender: 'male' | 'female', uCalories: nu
     return rdas;
 };
 
-export const useRDA = (age: number | undefined, gender: 'male' | 'female' | undefined, calories: number) => {
+export const useRDA = (age: number | undefined, gender: 'male' | 'female' | undefined, calories: number, weight?: number) => {
     const [rdas, setRdas] = useState<Record<string, number> | null>(null);
 
     useEffect(() => {
@@ -128,7 +151,7 @@ export const useRDA = (age: number | undefined, gender: 'male' | 'female' | unde
                     if (isMounted) {
                         // If DB call fails or returns empty, use fallback
                         console.warn('Falling back to hardcoded RDAs due to:', error?.message || 'No data found');
-                        setRdas(getFallbackRDAs(age, gender, calories));
+                        setRdas(getFallbackRDAs(age, gender, calories, weight));
                     }
                     return;
                 }
@@ -139,11 +162,11 @@ export const useRDA = (age: number | undefined, gender: 'male' | 'female' | unde
                     rdaMap[row.nutrient] = Number(row.value);
                 });
 
-                // Ensure Fiber is handled if missing from DB response but present in fallback logic
-                if (!rdaMap['Fiber']) {
-                    // Default fiber calc if not in DB
-                    rdaMap['Fiber'] = (calories / 1000) * 14;
-                }
+                // Ensure Fallback Logic Items are handled if missing from DB response
+                const fallbacks = getFallbackRDAs(age, gender, calories, weight);
+                Object.entries(fallbacks).forEach(([k, v]) => {
+                    if (!rdaMap[k]) rdaMap[k] = v;
+                });
 
                 if (isMounted) {
                     setRdas(rdaMap);
@@ -152,7 +175,7 @@ export const useRDA = (age: number | undefined, gender: 'male' | 'female' | unde
             } catch (err) {
                 console.error("Error fetching RDA:", err);
                 if (isMounted) {
-                    setRdas(getFallbackRDAs(age, gender, calories));
+                    setRdas(getFallbackRDAs(age, gender, calories, weight));
                 }
             }
         };
@@ -160,7 +183,7 @@ export const useRDA = (age: number | undefined, gender: 'male' | 'female' | unde
         fetchRDAs();
 
         return () => { isMounted = false; };
-    }, [age, gender, calories]);
+    }, [age, gender, calories, weight]);
 
     return rdas;
 };

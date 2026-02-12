@@ -476,7 +476,10 @@ export function MealPlannerContent({
             { label: 'Saturated Fat', keys: ['Saturated', 'saturated_fat_g', 'saturated_g'], unit: 'g' },
             { label: 'Monounsaturated', keys: ['Monounsaturated', 'monounsaturated_fat_g'], unit: 'g' },
             { label: 'Polyunsaturated', keys: ['Polyunsaturated', 'polyunsaturated_fat_g'], unit: 'g' },
-            { label: 'Omega-3', keys: ['Omega-3', 'omega3_g', 'omega_3_g'], unit: 'g' },
+            { label: 'Omega-3', keys: ['Omega-3', 'omega3_g', 'omega_3_g'], unit: 'g', isExpandable: true },
+            { label: 'ALA', keys: ['ALA', 'alpha_linolenic_acid_g'], unit: 'g', hiddenByDefault: true },
+            { label: 'EPA', keys: ['EPA', 'eicosapentaenoic_acid_g'], unit: 'g', hiddenByDefault: true },
+            { label: 'DHA', keys: ['DHA', 'docosahexaenoic_acid_g'], unit: 'g', hiddenByDefault: true },
             { label: 'Omega-6', keys: ['Omega-6', 'omega6_g', 'omega_6_g'], unit: 'g' },
             { label: 'Trans Fat', keys: ['Trans-Fats', 'trans_fat_g'], unit: 'g' },
             { label: 'Cholesterol', keys: ['Cholesterol', 'cholesterol_mg'], unit: 'mg' },
@@ -1093,29 +1096,53 @@ export function MealPlannerContent({
                                                     {subtitle && <p className={cn("text-[9px] text-slate-400 mb-4 border-b pb-2 transition-colors", t.border)}>{subtitle}</p>}
                                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                                                         {Object.entries(items).map(([label, keys]) => {
-                                                            const val = (label === 'Energy') ? (unit === 'kJ' ? plan.totalCalories * 4.184 : plan.totalCalories) :
-                                                                (label === 'Protein') ? plan.macros.protein :
-                                                                    (label === 'Carbs') ? plan.macros.carbs :
-                                                                        (label === 'Fat') ? plan.macros.fat :
-                                                                            getVal(keys as string[]);
+                                                            let val = 0;
+                                                            let rda = null;
+                                                            let unitStr = '';
 
-                                                            const macroRDAs: Record<string, number> = {
-                                                                'Energy': unit === 'kJ' ? Math.max(1200, Math.round((profile.gender === 'male' ? ((10 * (Number(profile.weight) || 70)) + (6.25 * (Number(profile.height) || 170)) - (5 * (Number(profile.age) || 30)) + 5) : ((10 * (Number(profile.weight) || 70)) + (6.25 * (Number(profile.height) || 170)) - (5 * (Number(profile.age) || 30)) - 161)) * 1.2)) * 4.184 : Math.max(1200, Math.round((profile.gender === 'male' ? ((10 * (Number(profile.weight) || 70)) + (6.25 * (Number(profile.height) || 170)) - (5 * (Number(profile.age) || 30)) + 5) : ((10 * (Number(profile.weight) || 70)) + (6.25 * (Number(profile.height) || 170)) - (5 * (Number(profile.age) || 30)) - 161)) * 1.2)),
-                                                                // Use simple fallback RDAs if useRDA hook not perfectly aligned (though userRDAs is available in scope)
-                                                                'Protein': (Number(profile.weight) || 70) * 1.6,
-                                                                'Carbs': 250,
-                                                                'Fat': 70
-                                                            };
-                                                            // Note: userRDAs is defined in component scope, use it preferably
-                                                            const rda = userRDAs?.[label] || macroRDAs[label];
+                                                            const m_map = m || {};
+
+                                                            if (title === 'Biological Ratios') {
+                                                                const k1 = findNutrientMatch(m_map, keys[0]);
+                                                                const k2 = findNutrientMatch(m_map, keys[1]);
+                                                                const v1 = k1 ? m_map[k1] : 0;
+                                                                const v2 = k2 ? m_map[k2] : 0;
+                                                                val = v2 > 0 ? v1 / v2 : 0;
+                                                                unitStr = ': 1';
+                                                            } else {
+                                                                val = (label === 'Energy') ? (unit === 'kJ' ? plan.totalCalories * 4.184 : plan.totalCalories) :
+                                                                    (label === 'Protein') ? plan.macros.protein :
+                                                                        (label === 'Carbs') ? plan.macros.carbs :
+                                                                            (label === 'Fat') ? plan.macros.fat :
+                                                                                getVal(keys as string[]);
+
+                                                                const macroRDAs: Record<string, number> = {
+                                                                    'Energy': unit === 'kJ' ? Math.max(1200, Math.round((profile.gender === 'male' ? ((10 * (Number(profile.weight) || 70)) + (6.25 * (Number(profile.height) || 170)) - (5 * (Number(profile.age) || 30)) + 5) : ((10 * (Number(profile.weight) || 70)) + (6.25 * (Number(profile.height) || 170)) - (5 * (Number(profile.age) || 30)) - 161)) * 1.2)) * 4.184 : Math.max(1200, Math.round((profile.gender === 'male' ? ((10 * (Number(profile.weight) || 70)) + (6.25 * (Number(profile.height) || 170)) - (5 * (Number(profile.age) || 30)) + 5) : ((10 * (Number(profile.weight) || 70)) + (6.25 * (Number(profile.height) || 170)) - (5 * (Number(profile.age) || 30)) - 161)) * 1.2)),
+                                                                    'Protein': (Number(profile.weight) || 70) * 1.6,
+                                                                    'Carbs': 250,
+                                                                    'Fat': 70
+                                                                };
+                                                                rda = userRDAs?.[label] || macroRDAs[label];
+                                                                unitStr = label === 'Energy' ? unit : (label === 'Protein' || label === 'Carbs' || label === 'Fat') ? 'g' : (label === 'Vitamin D') ? 'IU' : (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg')) ? 'µg' : 'mg';
+                                                            }
 
                                                             const pct = rda ? Math.round((val / rda) * 100) : null;
-                                                            const styles = getNutrientLevelStyles(pct || 0, label);
-                                                            const u = label === 'Energy' ? unit : (label === 'Protein' || label === 'Carbs' || label === 'Fat') ? 'g' : (label === 'Vitamin D') ? 'IU' : (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg')) ? 'µg' : 'mg';
-                                                            const hasBreakdown = breakdownLabels.includes(label);
+                                                            let styles = getNutrientLevelStyles(pct || 0, label);
+
+                                                            // Custom styling for ratios
+                                                            if (title === 'Biological Ratios') {
+                                                                let ratioStatus: 'good' | 'fair' | 'poor' = 'good';
+                                                                if (label === 'Na:K Ratio') ratioStatus = val <= 1.0 ? 'good' : val <= 2.0 ? 'fair' : 'poor';
+                                                                if (label === 'Zn:Cu Ratio') ratioStatus = (val >= 8 && val <= 12) ? 'good' : (val >= 5 && val <= 15) ? 'fair' : 'poor';
+                                                                if (label === 'Omega 6:3') ratioStatus = val <= 4.0 ? 'good' : val <= 10.0 ? 'fair' : 'poor';
+
+                                                                styles = ratioStatus === 'good' ? { text: "text-emerald-500", borderLight: "border-emerald-500/30", fade: "bg-emerald-500/5", ring: "ring-emerald-500/20" } :
+                                                                    ratioStatus === 'fair' ? { text: "text-amber-500", borderLight: "border-amber-500/30", fade: "bg-amber-500/5", ring: "ring-amber-500/20" } :
+                                                                        { text: "text-rose-500", borderLight: "border-rose-500/30", fade: "bg-rose-500/5", ring: "ring-rose-500/20" };
+                                                            }
 
                                                             return (
-                                                                <div key={label} onClick={() => router.push(`/dashboard/nutrients/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
+                                                                <div key={label} onClick={() => router.push(`/dashboard/nutrients/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, (pct !== null || title === 'Biological Ratios') ? `${styles.borderLight} ${styles.fade}` : "")}>
                                                                     <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
                                                                     <div className="space-y-0.5">
                                                                         {(pct !== null && !forceRaw) ? (
@@ -1124,23 +1151,32 @@ export function MealPlannerContent({
                                                                                     <span className={cn("text-xl font-black tracking-tighter", styles.text)}>{pct}%</span>
                                                                                 </div>
                                                                                 <p className="text-[9px] font-bold text-slate-400">
-                                                                                    {val.toFixed(1)}{u}
+                                                                                    {val.toFixed(1)}{unitStr}
                                                                                 </p>
                                                                             </>
                                                                         ) : (
                                                                             <>
                                                                                 <div className="flex items-baseline gap-1">
-                                                                                    <span className="text-lg font-bold">{val.toFixed(1)}</span>
-                                                                                    <span className={cn("text-[10px] font-bold", (u === 'µg') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{u}</span>
+                                                                                    <span className={cn("text-lg font-bold", title === 'Biological Ratios' ? styles.text : "")}>{val.toFixed(2)}</span>
+                                                                                    <span className={cn("text-[10px] font-bold", (unitStr === 'µg') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unitStr}</span>
                                                                                 </div>
                                                                                 {rda && (
                                                                                     <p className="text-[9px] font-bold text-slate-400 mt-0.5">
-                                                                                        Target: {Math.round(rda)}{u === 'kcal' ? 'kcal' : u}
+                                                                                        Target: {Math.round(rda)}{unitStr === 'kcal' ? 'kcal' : unitStr}
                                                                                     </p>
                                                                                 )}
                                                                             </>
                                                                         )}
                                                                     </div>
+
+                                                                    {hasBreakdown && (
+                                                                        <button
+                                                                            onClick={(e) => { e.stopPropagation(); setBreakdownNutrient(label); }}
+                                                                            className="absolute top-2 right-2 p-1 rounded-lg bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-400 opacity-40 group-hover:opacity-100 hover:bg-orange-200 dark:hover:bg-orange-800 transition-all border border-orange-200/50 dark:border-orange-700/50"
+                                                                        >
+                                                                            <Layers className="h-3 w-3" />
+                                                                        </button>
+                                                                    )}
                                                                 </div>
                                                             );
                                                         })}
@@ -1188,11 +1224,15 @@ export function MealPlannerContent({
                                                     'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
                                                     'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
                                                 }} />
+                                                <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Critical nutrient balances for metabolic & inflammation tracking" items={{
+                                                    'Na:K Ratio': ['Sodium', 'Potassium'],
+                                                    'Zn:Cu Ratio': ['Zinc', 'Copper'],
+                                                    'Omega 6:3': ['Omega-6', 'Omega-3'],
+                                                }} />
                                                 <NutrientGrid title="Clinical Markers" icon={Activity} theme="amber" subtitle="Secondary markers for advanced health profile mapping" forceRaw={true} items={{
                                                     'Fiber': ['Fiber', 'fiber_g'],
                                                     'Sugars': ['Sugars', 'sugars_g'],
                                                     'Oxalate': ['Oxalate', 'oxalate_mg'],
-                                                    'Omega-3': ['Omega-3', 'omega3_g'],
                                                     'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
                                                 }} />
                                             </div>
@@ -1253,41 +1293,69 @@ export function MealPlannerContent({
                                         <div
                                             key={label}
                                             className={cn(
-                                                "flex items-center justify-between p-4 rounded-xl border transition-all animate-in fade-in slide-in-from-top-1 duration-200",
+                                                "p-4 rounded-xl border transition-all animate-in fade-in slide-in-from-top-1 duration-200",
                                                 isZero ? "bg-muted/30 border-border/50" : activeColor,
                                                 hiddenByDefault ? "ml-8 border-l-4 border-l-current" : "", // Indent sub-items
-                                                isExpandable ? "cursor-pointer hover:opacity-80 relative overflow-hidden" : ""
                                             )}
-                                            onClick={() => {
-                                                if (isExpandable) {
-                                                    setExpandedBreakdownSections(prev => ({ ...prev, [label]: !prev[label] }));
-                                                }
-                                            }}
                                         >
-                                            <div className="flex items-center gap-3">
-                                                <div className={cn("h-2 w-2 rounded-full flex-shrink-0",
-                                                    isZero ? "bg-muted-foreground/30" :
-                                                        breakdownNutrient === 'Protein' ? "bg-red-500" :
-                                                            breakdownNutrient === 'Carbs' ? "bg-amber-500" :
-                                                                breakdownNutrient === 'Fat' ? "bg-orange-500" :
-                                                                    "bg-emerald-500"
-                                                )} />
-                                                <div>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className={cn("font-medium block", isZero ? "text-muted-foreground" : "text-foreground")}>{label}</span>
-                                                        {isExpandable && (
-                                                            <ChevronDown className={cn("h-4 w-4 transition-transform opacity-50", isExpanded ? "rotate-180" : "")} />
-                                                        )}
+                                            <div className="flex items-center justify-between mb-2">
+                                                <div className="flex items-center gap-3">
+                                                    <div className={cn("h-2 w-2 rounded-full flex-shrink-0",
+                                                        isZero ? "bg-muted-foreground/30" :
+                                                            breakdownNutrient === 'Protein' ? "bg-red-500" :
+                                                                breakdownNutrient === 'Carbs' ? "bg-amber-500" :
+                                                                    breakdownNutrient === 'Fat' ? "bg-orange-500" :
+                                                                        "bg-emerald-500"
+                                                    )} />
+                                                    <div>
+                                                        <div className="flex items-center gap-2"
+                                                            onClick={() => {
+                                                                if (isExpandable) {
+                                                                    setExpandedBreakdownSections(prev => ({ ...prev, [label]: !prev[label] }));
+                                                                }
+                                                            }}
+                                                        >
+                                                            <span className={cn("font-medium block", isZero ? "text-muted-foreground" : "text-foreground", isExpandable ? "cursor-pointer hover:underline" : "")}>{label}</span>
+                                                            {isExpandable && (
+                                                                <ChevronDown className={cn("h-4 w-4 transition-transform opacity-50", isExpanded ? "rotate-180" : "")} />
+                                                            )}
+                                                        </div>
+                                                        {isEssential && <span className="text-[9px] uppercase font-black tracking-wider bg-black/5 dark:bg-white/10 px-1.5 py-0.5 rounded text-foreground/50">Essential</span>}
                                                     </div>
-                                                    {isEssential && <span className="text-[9px] uppercase font-black tracking-wider bg-black/5 dark:bg-white/10 px-1.5 py-0.5 rounded text-foreground/50">Essential</span>}
+                                                </div>
+                                                <div className="flex items-baseline gap-1">
+                                                    <span className={cn("text-lg font-bold tabular-nums", isZero ? "text-muted-foreground" : "")}>
+                                                        {val >= 1 ? val.toFixed(1) : val.toFixed(2)}
+                                                    </span>
+                                                    <span className="text-xs text-muted-foreground">{unit}</span>
                                                 </div>
                                             </div>
-                                            <div className="flex items-baseline gap-1">
-                                                <span className={cn("text-lg font-bold tabular-nums", isZero ? "text-muted-foreground" : "")}>
-                                                    {val >= 1 ? val.toFixed(1) : val.toFixed(2)}
-                                                </span>
-                                                <span className="text-xs text-muted-foreground">{unit}</span>
-                                            </div>
+
+                                            {/* Progress Bar for constituent */}
+                                            {(() => {
+                                                const rda = userRDAs?.[label];
+                                                if (!rda || isZero) return null;
+                                                const pct = Math.min(100, Math.round((val / rda) * 100));
+                                                return (
+                                                    <div className="space-y-1">
+                                                        <div className="h-1.5 w-full bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
+                                                            <div
+                                                                className={cn("h-full transition-all duration-1000",
+                                                                    breakdownNutrient === 'Protein' ? "bg-red-500" :
+                                                                        breakdownNutrient === 'Carbs' ? "bg-amber-500" :
+                                                                            breakdownNutrient === 'Fat' ? "bg-orange-500" :
+                                                                                "bg-emerald-500"
+                                                                )}
+                                                                style={{ width: `${pct}%` }}
+                                                            />
+                                                        </div>
+                                                        <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest opacity-40">
+                                                            <span>Target Progress</span>
+                                                            <span>{pct}% of {rda.toFixed(1)}{unit}</span>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })()}
                                         </div>
                                     );
                                 })}
