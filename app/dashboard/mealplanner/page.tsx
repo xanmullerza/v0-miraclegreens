@@ -1123,7 +1123,10 @@ export function MealPlannerContent({
                                                                     'Fat': 70
                                                                 };
                                                                 rda = userRDAs?.[label] || macroRDAs[label];
-                                                                unitStr = label === 'Energy' ? unit : (label === 'Protein' || label === 'Carbs' || label === 'Fat') ? 'g' : (label === 'Vitamin D') ? 'IU' : (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg')) ? 'µg' : 'mg';
+                                                                unitStr = (label === 'Energy') ? unit :
+                                                                    (label === 'Protein' || label === 'Carbs' || label === 'Fat' || label === 'Fiber' || label === 'Sugars') ? 'g' :
+                                                                        (label === 'Vitamin D') ? 'IU' :
+                                                                            (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg')) ? 'µg' : 'mg';
                                                             }
 
                                                             const pct = rda ? Math.round((val / rda) * 100) : null;

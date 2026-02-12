@@ -456,7 +456,10 @@ export default function FoodDetailsPage() {
                                 'Fat': dailyTargets.fat
                             };
                             rda = userRDAs?.[label] || macroRDAs[label];
-                            unitStr = label === 'Vitamin D' ? 'IU' : (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg') ? 'µg' : (label === 'Energy' ? energyUnit : (label === 'Protein' || label === 'Carbs' || label === 'Fat' || label === 'Fiber' || label === 'Sugars' || label === 'Starch' || label === 'Omega-3' || label === 'Omega-6' ? 'g' : 'mg')));
+                            unitStr = (label === 'Energy') ? energyUnit :
+                                (label === 'Protein' || label === 'Carbs' || label === 'Fat' || label === 'Fiber' || label === 'Sugars' || label === 'Starch' || label === 'Omega-3' || label === 'Omega-6') ? 'g' :
+                                    (label === 'Vitamin D') ? 'IU' :
+                                        (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg')) ? 'µg' : 'mg';
                         }
 
                         const pct = rda ? Math.round((val / rda) * 100) : 0;
