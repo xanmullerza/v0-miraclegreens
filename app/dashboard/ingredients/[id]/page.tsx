@@ -470,6 +470,8 @@ export default function FoodDetailsPage() {
                             if (label === 'Na:K Ratio') ratioStatus = val <= 1.0 ? 'good' : val <= 2.0 ? 'fair' : 'poor';
                             if (label === 'Zn:Cu Ratio') ratioStatus = (val >= 8 && val <= 12) ? 'good' : (val >= 5 && val <= 15) ? 'fair' : 'poor';
                             if (label === 'Omega 6:3') ratioStatus = val <= 4.0 ? 'good' : val <= 10.0 ? 'fair' : 'poor';
+                            if (label === 'Ca:Mg Ratio') ratioStatus = (val >= 1.7 && val <= 2.5) ? 'good' : (val >= 1.5 && val <= 3.0) ? 'fair' : 'poor';
+                            if (label === 'Ca:P Ratio') ratioStatus = (val >= 1.0 && val <= 2.0) ? 'good' : (val >= 0.8 && val <= 2.5) ? 'fair' : 'poor';
 
                             styles = ratioStatus === 'good' ? { text: "text-emerald-500", borderLight: "border-emerald-500/30", fade: "bg-emerald-500/5", textFill: "text-emerald-500", bg: "bg-emerald-500", border: "border-emerald-500" } :
                                 ratioStatus === 'fair' ? { text: "text-amber-500", borderLight: "border-amber-500/30", fade: "bg-amber-500/5", textFill: "text-amber-500", bg: "bg-amber-500", border: "border-amber-500" } :
@@ -725,6 +727,8 @@ export default function FoodDetailsPage() {
                             'Na:K Ratio': ['Sodium', 'Potassium'],
                             'Zn:Cu Ratio': ['Zinc', 'Copper'],
                             'Omega 6:3': ['Omega-6', 'Omega-3'],
+                            'Ca:Mg Ratio': ['Calcium', 'Magnesium'],
+                            'Ca:P Ratio': ['Calcium', 'Phosphorus'],
                         }} />
 
                         <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Scientific and Clinical breakdown of caloric density" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
