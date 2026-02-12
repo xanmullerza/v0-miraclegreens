@@ -183,7 +183,7 @@ export function TopTenView({
                     {
                         title: "Macronutrients",
                         icon: Scale,
-                        align: "text-orange-500",
+                        align: "text-blue-500",
                         ids: ['energy_kcal', 'protein_g', 'carbs_g', 'fat_g']
                     },
                     {
@@ -219,7 +219,7 @@ export function TopTenView({
                     {
                         title: "Clinical Markers",
                         icon: Activity,
-                        align: "text-amber-500",
+                        align: "text-blue-500",
                         ids: ['Fiber', 'Cholesterol', 'Omega-3', 'Oxalate', 'Sugar']
                     }
                 ].map((group) => (
@@ -244,7 +244,7 @@ export function TopTenView({
                                         className={cn(
                                             "flex items-center gap-2 pl-1.5 pr-4 py-1.5 rounded-full border transition-all duration-300",
                                             isSelected
-                                                ? cn(nutrient.color, "text-white border-transparent shadow-md scale-105 ring-2 ring-offset-2 ring-emerald-500/20 dark:ring-offset-slate-950")
+                                                ? cn(nutrient.color, "text-white border-transparent shadow-md scale-105 ring-2 ring-offset-2 ring-blue-500/20 dark:ring-offset-slate-950")
                                                 : "bg-white dark:bg-slate-900/50 text-slate-500 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
                                         )}
                                     >
@@ -266,7 +266,7 @@ export function TopTenView({
             <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 md:p-8 shadow-xl relative overflow-hidden">
                 {isLoading ? (
                     <div className="h-96 flex flex-col items-center justify-center gap-4">
-                        <Loader2 className="animate-spin text-emerald-500" size={32} />
+                        <Loader2 className="animate-spin text-blue-500" size={32} />
                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Analyzing Composition...</p>
                     </div>
                 ) : (
@@ -296,7 +296,7 @@ export function TopTenView({
                                     {/* Content */}
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between mb-2">
-                                            <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate pr-4 text-sm">
+                                            <h3 className="font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate pr-4 text-sm">
                                                 {food.common_name || food.name}
                                             </h3>
                                             <div className="text-right flex-shrink-0">

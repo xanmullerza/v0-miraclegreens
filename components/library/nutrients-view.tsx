@@ -53,7 +53,7 @@ export function NutrientsView(props: NutrientsViewProps = {}) {
         selectedCategories: externalSelectedCategories,
         setSelectedCategories: externalSetSelectedCategories,
     } = props;
-    
+
     const router = useRouter();
     const { searchQuery } = useSearch();
     const [localShowFavoritesOnly, setLocalShowFavoritesOnly] = useState(false);
@@ -121,7 +121,7 @@ export function NutrientsView(props: NutrientsViewProps = {}) {
                         <div
                             key={name}
                             onClick={() => router.push(`/dashboard/nutrients/${encodeURIComponent(name)}`)}
-                            className="group bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-amber-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
+                            className="group bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
                         >
                             <div className="lg:grid lg:grid-cols-[60px_1fr_120px_120px_120px_100px] gap-6 lg:items-center lg:px-10">
                                 <div className="p-3 lg:p-0">
@@ -155,7 +155,7 @@ export function NutrientsView(props: NutrientsViewProps = {}) {
                                     >
                                         <Heart size={16} fill={isFav ? "currentColor" : "none"} />
                                     </button>
-                                    <button className="w-9 h-9 rounded-xl border bg-amber-500 text-white flex items-center justify-center shadow-lg shadow-amber-500/10">
+                                    <button className="w-9 h-9 rounded-xl border bg-blue-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/10">
                                         <ChevronRight size={16} />
                                     </button>
                                 </div>

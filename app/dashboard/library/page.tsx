@@ -35,7 +35,7 @@ export default function ClinicalLibrary() {
     return (
         <Suspense fallback={
             <div className="h-96 flex flex-col items-center justify-center gap-4">
-                <Loader2 className="animate-spin text-emerald-500" size={48} />
+                <Loader2 className="animate-spin text-blue-500" size={48} />
                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Getting things ready...</p>
             </div>
         }>
@@ -84,7 +84,7 @@ function LibraryContent() {
 
     const tabs = [
         { id: 'nutrients', label: 'All Nutrients', icon: Activity, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-        { id: 'top10', label: 'Top 10', icon: Trophy, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
+        { id: 'top10', label: 'Top 10', icon: Trophy, color: 'text-blue-500', bg: 'bg-blue-500/10' },
         { id: 'compare', label: 'Compare', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
     ];
 
@@ -97,7 +97,7 @@ function LibraryContent() {
         top10: {
             heading: 'Top 10 Richest',
             description: 'Discover the richest food sources per nutrient',
-            color: 'text-yellow-500'
+            color: 'text-blue-500'
         },
         compare: {
             heading: 'Compare Foods',
@@ -117,7 +117,7 @@ function LibraryContent() {
                     {showHomeButton && !isSearchExpanded && (
                         <button
                             onClick={() => router.push('/dashboard')}
-                            className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all flex-shrink-0"
+                            className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-all flex-shrink-0"
                             title="Back to Dashboard"
                         >
                             <LayoutGrid size={18} />
@@ -196,7 +196,7 @@ function LibraryContent() {
                             "flex items-center justify-center w-12 h-12 rounded-[1.5rem] transition-all flex-shrink-0",
                             isSearchExpanded
                                 ? "bg-rose-50 text-rose-500 hover:bg-rose-100"
-                                : "text-slate-400 hover:text-emerald-500 hover:bg-emerald-50"
+                                : "text-slate-400 hover:text-blue-500 hover:bg-blue-50"
                         )}
                         title="Search"
                     >
@@ -231,17 +231,17 @@ function LibraryContent() {
                                             }
                                             setSearchQuery('');
                                         }}
-                                        className="w-full text-left p-4 hover:bg-emerald-50 dark:hover:bg-emerald-500/5 transition-all flex justify-between items-center group border-b border-slate-100 dark:border-slate-800 last:border-0"
+                                        className="w-full text-left p-4 hover:bg-blue-50 dark:hover:bg-blue-500/5 transition-all flex justify-between items-center group border-b border-slate-100 dark:border-slate-800 last:border-0"
                                     >
                                         <div className="flex-1 min-w-0 mr-4">
-                                            <div className="font-bold text-slate-900 dark:text-white capitalize group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors text-sm">
+                                            <div className="font-bold text-slate-900 dark:text-white capitalize group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors text-sm">
                                                 {result.title}
                                             </div>
                                             {result.subtitle && (
                                                 <div className="text-[10px] text-slate-500 italic mt-0.5">{result.subtitle}</div>
                                             )}
                                         </div>
-                                        <Plus size={14} className="text-slate-300 group-hover:text-emerald-500" />
+                                        <Plus size={14} className="text-slate-300 group-hover:text-blue-500" />
                                     </button>
                                 ))}
                             </div>
@@ -359,8 +359,8 @@ function LibraryContent() {
                                         className={cn(
                                             "px-3.5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0 border shadow-sm",
                                             isActive
-                                                ? "bg-yellow-600 text-white border-yellow-600 shadow-lg shadow-yellow-500/20"
-                                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-yellow-200 hover:text-yellow-600 dark:hover:border-yellow-900/50"
+                                                ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20"
+                                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-blue-200 hover:text-blue-600 dark:hover:border-blue-900/50"
                                         )}
                                     >
                                         {category}
