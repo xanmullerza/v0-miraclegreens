@@ -404,7 +404,7 @@ export function CompareView() {
                                                         )}
                                                     </div>
                                                     <h4 className="font-black text-[9px] md:text-sm uppercase italic text-slate-900 dark:text-white line-clamp-1">
-                                                        {selectedFoods[i]?.common_name || selectedFoods[index]?.name}
+                                                        {selectedFoods[i]?.common_name || selectedFoods[i]?.name}
                                                     </h4>
                                                     <div className="flex flex-col md:flex-row items-center gap-0.5 md:gap-2">
                                                         <Badge className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-none font-black text-[6px] md:text-[8px] uppercase tracking-widest px-1 md:px-2">
