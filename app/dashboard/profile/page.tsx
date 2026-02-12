@@ -190,11 +190,66 @@ function ProfilePageContent() {
     const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
     const [isAddingMember, setIsAddingMember] = useState(false);
 
+    // 1. Calculate BMR (Mifflin-St Jeor)
+    const weight = Number(formData.weight) || 70;
+    const height = Number(formData.height) || 170;
+    const age = Number(formData.age) || 30;
+    const gender = formData.gender || 'female';
+    const s = gender === 'male' ? 5 : -161;
+    const bmr = (10 * weight) + (6.25 * height) - (5 * age) + s;
+
+    // 2. Apply Activity Factor
+    const activityFactors: Record<string, number> = {
+        sedentary: 1.2,
+        light: 1.375,
+        moderate: 1.55,
+        active: 1.725
+    };
+    const factor = activityFactors[formData.activityLevel || 'sedentary'] || 1.2;
+    let tdee = bmr * factor;
+
+    // 3. Adjust for Goal
+    if (formData.goal === 'lose-fat') tdee -= 500;
+    if (formData.goal === 'build-muscle') tdee += 500;
+    tdee = Math.max(tdee, 1200); // Floor safety
+
+    // Strategy Allocation
+    let pPct = 0.25, cPct = 0.45, fPct = 0.30;
+    switch (formData.nutrientStrategy) {
+        case 'low-carb': pPct = 0.35; cPct = 0.15; fPct = 0.50; break;
+        case 'high-protein': pPct = 0.40; cPct = 0.35; fPct = 0.25; break;
+        case 'keto': pPct = 0.25; cPct = 0.05; fPct = 0.70; break;
+        case 'high-carb': pPct = 0.20; cPct = 0.60; fPct = 0.20; break;
+    }
+
+    let proteinTarget, carbsTarget, fatTarget;
+    if (age < 14) {
+        proteinTarget = weight * 1.0;
+        const remainingCals = tdee - (proteinTarget * 4);
+        const macroRatioSum = cPct + fPct;
+        carbsTarget = (remainingCals * (cPct / macroRatioSum)) / 4;
+        fatTarget = (remainingCals * (fPct / macroRatioSum)) / 9;
+    } else {
+        proteinTarget = (tdee * pPct) / 4;
+        carbsTarget = (tdee * cPct) / 4;
+        fatTarget = (tdee * fPct) / 9;
+    }
+
+    const macroRDAs: Record<string, number> = {
+        'Energy': energyUnit === 'kJ' ? tdee * 4.184 : tdee,
+        'Protein': proteinTarget,
+        'Carbs': carbsTarget,
+        'Fat': fatTarget
+    };
+
     const userRDAs = useRDA(
-        typeof formData.age === 'number' ? formData.age : 30,
-        formData.gender || 'female',
-        formData.goal === 'build-muscle' ? 3000 : formData.goal === 'lose-fat' ? 2000 : 2500
+        age,
+        gender,
+        tdee,
+        weight
     );
+
+    const combinedRDAs = { ...macroRDAs, ...(userRDAs || {}) };
 
     const handleSave = () => {
         updateProfile(formData);
@@ -595,75 +650,27 @@ function ProfilePageContent() {
                         <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors duration-700" />
 
                         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 pr-1">
-                            {(() => {
-                                // 1. Calculate BMR (Mifflin-St Jeor)
-                                const weight = Number(formData.weight) || 70;
-                                const height = Number(formData.height) || 170;
-                                const age = Number(formData.age) || 30;
-                                const s = formData.gender === 'male' ? 5 : -161;
-                                const bmr = (10 * weight) + (6.25 * height) - (5 * age) + s;
+                            {Object.entries(combinedRDAs).map(([nutrient, value]) => {
+                                const unit = (nutrient === 'Energy') ? energyUnit : (nutrient === 'Protein' || nutrient === 'Carbs' || nutrient === 'Fat' || nutrient === 'Fiber' || nutrient === 'ALA' || nutrient.includes('_g')) ? 'g' : (nutrient === 'Vitamin D') ? 'IU' : (nutrient.includes('Folate') || nutrient.includes('B12') || nutrient.includes('Biotin') || nutrient.includes('Selenium') || nutrient === 'Vitamin A' || nutrient === 'Vitamin K' || nutrient.includes('EPA')) ? 'µg' : 'mg';
 
-                                // 2. Apply Activity Factor
-                                const activityFactors: Record<string, number> = {
-                                    sedentary: 1.2,
-                                    light: 1.375,
-                                    moderate: 1.55,
-                                    active: 1.725
-                                };
-                                const factor = activityFactors[formData.activityLevel || 'sedentary'] || 1.2;
-                                let tdee = bmr * factor;
+                                const displayVal = value < 1 ? value.toFixed(2) : value < 10 ? value.toFixed(1) : Math.round(value);
 
-                                // 3. Adjust for Goal
-                                if (formData.goal === 'lose-fat') tdee -= 500;
-                                if (formData.goal === 'build-muscle') tdee += 500;
-                                tdee = Math.max(tdee, 1200); // Floor safety
-
-                                // Strategy Allocation
-                                let pPct = 0.25, cPct = 0.45, fPct = 0.30;
-                                switch (formData.nutrientStrategy) {
-                                    case 'low-carb': pPct = 0.35; cPct = 0.15; fPct = 0.50; break;
-                                    case 'high-protein': pPct = 0.40; cPct = 0.35; fPct = 0.25; break;
-                                    case 'keto': pPct = 0.25; cPct = 0.05; fPct = 0.70; break;
-                                    case 'high-carb': pPct = 0.20; cPct = 0.60; fPct = 0.20; break;
-                                }
-
-                                let proteinTarget, carbsTarget, fatTarget;
-                                if (age < 14) {
-                                    proteinTarget = weight * 1.0;
-                                    const remainingCals = tdee - (proteinTarget * 4);
-                                    const macroRatioSum = cPct + fPct;
-                                    carbsTarget = (remainingCals * (cPct / macroRatioSum)) / 4;
-                                    fatTarget = (remainingCals * (fPct / macroRatioSum)) / 9;
-                                } else {
-                                    proteinTarget = (tdee * pPct) / 4;
-                                    carbsTarget = (tdee * cPct) / 4;
-                                    fatTarget = (tdee * fPct) / 9;
-                                }
-
-                                const macroRDAs: Record<string, number> = {
-                                    'Energy': energyUnit === 'kJ' ? tdee * 4.184 : tdee,
-                                    'Protein': proteinTarget,
-                                    'Carbs': carbsTarget,
-                                    'Fat': fatTarget
-                                };
-
-                                const combinedRDAs = { ...macroRDAs, ...(userRDAs || {}) };
-
-                                return Object.entries(combinedRDAs).map(([nutrient, value]) => {
-                                    const unit = (nutrient === 'Energy') ? energyUnit : (nutrient === 'Protein' || nutrient === 'Carbs' || nutrient === 'Fat' || nutrient === 'Fiber') ? 'g' : (nutrient === 'Vitamin D') ? 'IU' : (nutrient.includes('Folate') || nutrient.includes('B12') || nutrient.includes('Biotin') || nutrient.includes('Selenium') || nutrient === 'Vitamin A' || nutrient === 'Vitamin K') ? 'µg' : 'mg';
-
-                                    const displayVal = value < 1 ? value.toFixed(2) : value < 10 ? value.toFixed(1) : Math.round(value);
-
-                                    return (
-                                        <div key={nutrient} className="bg-slate-900/50 border border-slate-800/50 px-4 py-3 rounded-2xl flex items-center justify-between hover:border-blue-500/30 transition-all hover:bg-slate-900 group/item">
-                                            <p className="text-[11px] uppercase font-black text-slate-400 group-hover/item:text-slate-300 transition-colors leading-none truncate pr-2">{nutrient}</p>
-                                            <div className="flex-shrink-0">
-                                                <span className="text-xs font-black text-white tracking-tighter italic leading-none">{displayVal}</span>
-                                            </div>
+                                return (
+                                    <div key={nutrient} className="bg-slate-900/50 border border-slate-800/50 px-4 py-3 rounded-2xl flex items-center justify-between hover:border-blue-500/30 transition-all hover:bg-slate-900 group/item">
+                                        <div className="flex flex-col min-w-0 pr-2">
+                                            <p className="text-[11px] uppercase font-black text-slate-400 group-hover/item:text-slate-300 transition-colors leading-none truncate">{nutrient}</p>
+                                            {/* Optional constituent label */}
+                                            {['ALA', 'EPA', 'Histidine', 'Leucine'].includes(nutrient) && (
+                                                <span className="text-[7px] text-blue-500 font-bold uppercase mt-1">Constituent</span>
+                                            )}
                                         </div>
-                                    );
-                                });
-                            })()}
+                                        <div className="flex-shrink-0">
+                                            <span className="text-xs font-black text-white tracking-tighter italic leading-none">{displayVal}</span>
+                                            <span className="text-[8px] ml-1 text-slate-500 font-bold uppercase">{unit}</span>
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
 
                     </div>
