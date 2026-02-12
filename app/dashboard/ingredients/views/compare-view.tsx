@@ -357,30 +357,55 @@ export function CompareView() {
                                             </div>
                                         </td>
                                     </tr>
-                                    {group.keys.map((nutrient) => (
-                                        <tr key={nutrient.key} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group">
-                                            <td className="p-6 px-12">
-                                                <div className="flex flex-col">
-                                                    <span className="text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 group-hover:text-emerald-500 transition-colors">
-                                                        {nutrient.label}
-                                                    </span>
-                                                    <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
-                                                        {nutrient.unit}
-                                                    </span>
-                                                </div>
-                                            </td>
-                                            {[0, 1, 2].map((i) => (
-                                                <td key={i} className="p-6 text-center border-l border-slate-100 dark:border-slate-800">
-                                                    <span className={cn(
-                                                        "text-xs font-black tracking-widest",
-                                                        selectedFoods[i] ? "text-slate-900 dark:text-white" : "text-slate-200 dark:text-slate-800"
-                                                    )}>
-                                                        {getNutrientValue(selectedFoods[i], nutrient.key, nutrient.unit)}
-                                                    </span>
+                                    {group.keys.map((nutrient) => {
+                                        // Calculate ranks for this row
+                                        const values = selectedFoods.map(food => {
+                                            if (!food) return null;
+                                            if (nutrient.key in food && typeof (food as any)[nutrient.key] === 'number') {
+                                                return (food as any)[nutrient.key];
+                                            }
+                                            if (food.micronutrients && food.micronutrients[nutrient.key]) {
+                                                const v = food.micronutrients[nutrient.key];
+                                                return typeof v === 'number' ? v : 0;
+                                            }
+                                            return 0;
+                                        });
+
+                                        // Get unique non-null values and sort them descending
+                                        const sortedUniqueValues = Array.from(new Set(values.filter((v): v is number => v !== null)))
+                                            .sort((a, b) => b - a);
+
+                                        return (
+                                            <tr key={nutrient.key} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group">
+                                                <td className="p-6 px-12">
+                                                    <div className="flex flex-col">
+                                                        <span className="text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 group-hover:text-emerald-500 transition-colors">
+                                                            {nutrient.label}
+                                                        </span>
+                                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+                                                            {nutrient.unit}
+                                                        </span>
+                                                    </div>
                                                 </td>
-                                            ))}
-                                        </tr>
-                                    ))}
+                                                {[0, 1, 2].map((i) => {
+                                                    const val = values[i];
+                                                    const rank = val !== null ? sortedUniqueValues.indexOf(val) : -1;
+                                                    const colorClass = rank === 0 ? "text-emerald-500" : rank === 1 ? "text-blue-500" : rank === 2 ? "text-rose-500" : "text-slate-900 dark:text-white";
+
+                                                    return (
+                                                        <td key={i} className="p-6 text-center border-l border-slate-100 dark:border-slate-800">
+                                                            <span className={cn(
+                                                                "text-xs font-black tracking-widest transition-colors duration-500",
+                                                                selectedFoods[i] ? colorClass : "text-slate-200 dark:text-slate-800"
+                                                            )}>
+                                                                {getNutrientValue(selectedFoods[i], nutrient.key, nutrient.unit)}
+                                                            </span>
+                                                        </td>
+                                                    );
+                                                })}
+                                            </tr>
+                                        );
+                                    })}
                                 </React.Fragment>
                             ))}
                         </tbody>
