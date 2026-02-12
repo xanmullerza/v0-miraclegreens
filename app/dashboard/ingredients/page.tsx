@@ -23,12 +23,11 @@ import { ExploreView } from './views/explore-view';
 import { StaplesView } from './views/staples-view';
 import { ShoppingView } from './views/shopping-view';
 import { NutrientsView } from './views/nutrients-view';
-import { CompareView } from './views/compare-view';
 import { ShoppingListView } from '@/components/kitchen/shopping-list-view';
 import { PantryView } from '@/components/kitchen/pantry-view';
 import { CATEGORIES } from '@/components/library/foods-view';
 
-type FoodTab = 'groceries' | 'pantry' | 'allfoods' | 'explore' | 'staples' | 'shopping' | 'nutrients' | 'compare';
+type FoodTab = 'groceries' | 'pantry' | 'allfoods' | 'explore' | 'staples' | 'shopping' | 'nutrients';
 
 function FoodsHubContent() {
     const router = useRouter();
@@ -98,18 +97,12 @@ function FoodsHubContent() {
             heading: 'Nutrients',
             description: 'Track and analyze nutritional information',
             color: 'text-blue-500'
-        },
-        compare: {
-            heading: 'Compare',
-            description: 'Side-by-side nutritional comparison of clinical food samples',
-            color: 'text-emerald-500'
         }
     };
 
     // First row: Ingredients section (moved from Kitchen)
     const ingredientTabs = [
         { id: 'allfoods', label: 'All Foods', icon: UtensilsCrossed, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-        { id: 'compare', label: 'Compare', icon: Activity, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
         { id: 'groceries', label: 'Groceries', icon: ShoppingCart, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
         { id: 'pantry', label: 'Pantry', icon: ShoppingBasket, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
     ];
@@ -323,7 +316,6 @@ function FoodsHubContent() {
                     {currentTab === 'staples' && <StaplesView />}
                     {currentTab === 'shopping' && <ShoppingView />}
                     {currentTab === 'nutrients' && <NutrientsView />}
-                    {currentTab === 'compare' && <CompareView />}
                 </div>
             </div>
         </div>
