@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 interface FoodItem {
     id: string;
@@ -103,6 +104,7 @@ export function CompareView() {
     const [isLoading, setIsLoading] = useState<boolean[]>([false, false, false]);
     const [activeSearchIndex, setActiveSearchIndex] = useState<number | null>(null);
     const searchRef = useRef<HTMLDivElement>(null);
+    const { energyUnit } = useUserPreferences();
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -193,19 +195,28 @@ export function CompareView() {
     const getNutrientValue = (food: FoodItem | null, key: string, unit: string) => {
         if (!food) return '-';
 
+        let val: number | string = 0;
+
         // Check top level first for macros
         if (key in food && typeof (food as any)[key] === 'number') {
-            return (food as any)[key].toFixed(1);
+            val = (food as any)[key];
+        } else if (food.micronutrients && food.micronutrients[key]) {
+            // Check micronutrients JSONB
+            const v = food.micronutrients[key];
+            if (typeof v === 'number' || typeof v === 'string') val = v;
         }
 
-        // Check micronutrients JSONB
-        if (food.micronutrients && food.micronutrients[key]) {
-            const val = food.micronutrients[key];
-            if (typeof val === 'number') return val.toFixed(1);
-            if (typeof val === 'string') return val;
+        // Special handling for Energy conversion
+        if (key === 'energy_kcal') {
+            const kcal = typeof val === 'number' ? val : 0;
+            if (energyUnit === 'kJ') {
+                return (kcal * 4.184).toFixed(0);
+            }
+            return kcal.toFixed(0);
         }
 
-        return '0';
+        if (typeof val === 'number') return val.toFixed(1);
+        return val.toString();
     };
 
     const themes = {
@@ -265,59 +276,59 @@ export function CompareView() {
     };
 
     return (
-        <div className="space-y-12 animate-in fade-in duration-500 pb-20">
+        <div className="space-y-6 md:space-y-12 animate-in fade-in duration-500 pb-20">
             {/* Search Header */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6" ref={searchRef}>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6" ref={searchRef}>
                 {[0, 1, 2].map((index) => (
                     <div key={index} className="relative group">
                         <div className={cn(
-                            "bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500",
+                            "bg-white dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500",
                             activeSearchIndex === index ? "ring-2 ring-emerald-500/50" : ""
                         )}>
-                            <div className="p-4 flex flex-col items-center gap-4">
+                            <div className="p-3 md:p-4 flex flex-col items-center gap-4">
                                 {selectedFoods[index] ? (
-                                    <div className="w-full flex items-center justify-between gap-4">
-                                        <div className="flex items-center gap-4 flex-1">
-                                            <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex-shrink-0 overflow-hidden border border-slate-200 dark:border-slate-700">
+                                    <div className="w-full flex items-center justify-between gap-3 md:gap-4">
+                                        <div className="flex items-center gap-3 md:gap-4 flex-1">
+                                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex-shrink-0 overflow-hidden border border-slate-200 dark:border-slate-700">
                                                 {selectedFoods[index]?.image ? (
                                                     <img src={selectedFoods[index]?.image!} alt={selectedFoods[index]?.name} className="w-full h-full object-cover" />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                        <Beef size={20} className="opacity-10" />
+                                                        <Beef size={18} className="opacity-10" />
                                                     </div>
                                                 )}
                                             </div>
                                             <div className="min-w-0">
                                                 <div className="flex items-center gap-2 mb-0.5">
-                                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Selection {index + 1}</p>
+                                                    <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">Box {index + 1}</p>
                                                     <div className="w-1 h-1 rounded-full bg-slate-300" />
-                                                    <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500">{scores[index]} PTS</p>
+                                                    <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-emerald-500">{scores[index]} PTS</p>
                                                 </div>
-                                                <h3 className="font-black text-sm uppercase italic text-slate-900 dark:text-white truncate">
+                                                <h3 className="font-black text-xs md:text-sm uppercase italic text-slate-900 dark:text-white truncate">
                                                     {selectedFoods[index]?.common_name || selectedFoods[index]?.name}
                                                 </h3>
                                             </div>
                                         </div>
                                         <button
                                             onClick={() => removeFood(index)}
-                                            className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 flex items-center justify-center transition-all"
+                                            className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 flex items-center justify-center transition-all"
                                         >
-                                            <Trash2 size={16} />
+                                            <Trash2 size={14} />
                                         </button>
                                     </div>
                                 ) : (
                                     <div className="w-full">
-                                        <div className="flex items-center gap-3 px-4 h-14 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
-                                            <Search className="text-slate-400" size={18} />
+                                        <div className="flex items-center gap-2 md:gap-3 px-3 md:px-4 h-12 md:h-14 bg-slate-50 dark:bg-slate-800/50 rounded-xl md:rounded-2xl border border-slate-100 dark:border-slate-700">
+                                            <Search className="text-slate-400" size={16} />
                                             <input
                                                 type="text"
-                                                placeholder="Search food to compare..."
+                                                placeholder="Search food..."
                                                 value={searchQueries[index]}
                                                 onChange={(e) => handleSearchChange(e.target.value, index)}
                                                 onFocus={() => setActiveSearchIndex(index)}
-                                                className="bg-transparent border-none focus:ring-0 text-[11px] font-black uppercase tracking-widest w-full text-slate-900 dark:text-white placeholder:text-slate-300"
+                                                className="bg-transparent border-none focus:ring-0 text-[10px] md:text-[11px] font-black uppercase tracking-widest w-full text-slate-900 dark:text-white placeholder:text-slate-300"
                                             />
-                                            {isLoading[index] && <Activity className="animate-spin text-emerald-500" size={16} />}
+                                            {isLoading[index] && <Activity className="animate-spin text-emerald-500" size={14} />}
                                         </div>
                                     </div>
                                 )}
@@ -347,7 +358,10 @@ export function CompareView() {
                                                 {food.common_name || food.name}
                                             </h4>
                                             <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">
-                                                {food.energy_kcal} kcal / 100g
+                                                {energyUnit === 'kJ'
+                                                    ? `${(food.energy_kcal * 4.184).toFixed(0)} kJ`
+                                                    : `${food.energy_kcal.toFixed(0)} kcal`
+                                                } / 100g
                                             </p>
                                         </div>
                                         <Plus size={14} className="text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -360,55 +374,55 @@ export function CompareView() {
             </div>
 
             {/* Comparison Table */}
-            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
-                <div className="overflow-x-auto">
-                    <table className="w-full border-collapse">
-                        <thead>
-                            <tr className="border-b border-slate-100 dark:border-slate-800">
-                                <th className="p-8 text-left bg-slate-50/50 dark:bg-slate-800/30 w-1/4 min-w-[200px]">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                                            <Scale size={20} />
+            <div className="bg-white dark:bg-slate-900 rounded-2xl md:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden mx-[-1rem] md:mx-0">
+                <div className="overflow-x-auto scrollbar-hide">
+                    <table className="w-full border-collapse table-fixed md:table-auto">
+                        <thead className="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-sm">
+                            <tr>
+                                <th className="p-4 md:p-8 text-left bg-slate-50/50 dark:bg-slate-800/30 w-[140px] md:w-1/4 min-w-[140px] md:min-w-[200px] sticky left-0 z-40 bg-white dark:bg-slate-900 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-slate-100 dark:border-slate-800">
+                                    <div className="flex items-center gap-2 md:gap-3">
+                                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                                            <Scale size={16} className="md:w-5 md:h-5" />
                                         </div>
                                         <div>
-                                            <h3 className="font-black text-sm uppercase italic text-slate-900 dark:text-white">Nutrition Facts</h3>
-                                            <p className="text-[9px] font-black text-emerald-500 uppercase tracking-widest">Values per 100g</p>
+                                            <h3 className="font-black text-[10px] md:text-sm uppercase italic text-slate-900 dark:text-white leading-none mb-1">Nutrition</h3>
+                                            <p className="text-[7px] md:text-[9px] font-black text-emerald-500 uppercase tracking-widest leading-none">per 100g</p>
                                         </div>
                                     </div>
                                 </th>
                                 {[0, 1, 2].map((i) => (
-                                    <th key={i} className="p-8 text-center border-l border-slate-100 dark:border-slate-800 w-1/4">
-                                        <div className="flex flex-col items-center gap-2">
+                                    <th key={i} className="p-4 md:p-8 text-center border-l border-slate-100 dark:border-slate-800 w-[100px] md:w-1/4 min-w-[100px] md:min-w-0">
+                                        <div className="flex flex-col items-center gap-1 md:gap-2">
                                             {selectedFoods[i] ? (
                                                 <>
-                                                    {getMedal(i) && (
-                                                        <div className={cn("p-2 rounded-xl mb-1 animate-in zoom-in duration-500", getMedal(i)?.bg)}>
-                                                            {React.createElement(getMedal(i)!.icon, {
-                                                                size: 24,
-                                                                className: getMedal(i)!.color
-                                                            })}
-                                                        </div>
-                                                    )}
-                                                    <h4 className="font-black text-sm uppercase italic text-slate-900 dark:text-white line-clamp-1">
-                                                        {selectedFoods[i]?.common_name || selectedFoods[i]?.name}
+                                                    <div className={cn("p-1.5 md:p-2 rounded-lg md:rounded-xl mb-0.5 md:mb-1 animate-in zoom-in duration-500", getMedal(i)?.bg)}>
+                                                        {getMedal(i) ? React.createElement(getMedal(i)!.icon, {
+                                                            size: 16,
+                                                            className: cn("md:w-6 md:h-6", getMedal(i)!.color)
+                                                        }) : (
+                                                            <div className="w-4 h-4 md:w-6 md:h-6" /> // Placeholder to maintain height
+                                                        )}
+                                                    </div>
+                                                    <h4 className="font-black text-[9px] md:text-sm uppercase italic text-slate-900 dark:text-white line-clamp-1">
+                                                        {selectedFoods[i]?.common_name || selectedFoods[index]?.name}
                                                     </h4>
-                                                    <div className="flex items-center gap-2">
-                                                        <Badge className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-none font-black text-[8px] uppercase tracking-widest">
-                                                            {scores[i]} Points
+                                                    <div className="flex flex-col md:flex-row items-center gap-0.5 md:gap-2">
+                                                        <Badge className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-none font-black text-[6px] md:text-[8px] uppercase tracking-widest px-1 md:px-2">
+                                                            {scores[i]} PTS
                                                         </Badge>
                                                         {getMedal(i) && (
-                                                            <span className={cn("text-[10px] font-black uppercase italic tracking-tighter", getMedal(i)!.color.split(' ')[0])}>
-                                                                {getMedal(i)!.label} Place
+                                                            <span className={cn("text-[7px] md:text-[10px] font-black uppercase italic tracking-tighter leading-none", getMedal(i)!.color.split(' ')[0])}>
+                                                                {getMedal(i)!.label}
                                                             </span>
                                                         )}
                                                     </div>
                                                 </>
                                             ) : (
                                                 <div className="flex flex-col items-center gap-1 opacity-20">
-                                                    <div className="w-8 h-8 rounded-full border-2 border-dashed border-slate-400 flex items-center justify-center">
-                                                        <Plus size={14} className="text-slate-400" />
+                                                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-full border border-dashed border-slate-400 flex items-center justify-center">
+                                                        <Plus size={10} className="text-slate-400" />
                                                     </div>
-                                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Add food</p>
+                                                    <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">Add</p>
                                                 </div>
                                             )}
                                         </div>
@@ -419,11 +433,11 @@ export function CompareView() {
                         <tbody>
                             {NUTRIENT_GROUPS.map((group) => (
                                 <React.Fragment key={group.title}>
-                                    <tr className="bg-slate-50 dark:bg-slate-800/50">
-                                        <td colSpan={4} className="px-8 py-3">
+                                    <tr className="bg-slate-50/80 dark:bg-slate-800/50">
+                                        <td colSpan={4} className="px-4 md:px-8 py-2 md:py-3 sticky left-0 z-20 bg-slate-50/80 dark:bg-slate-800 shadow-[2px_0_5px_rgba(0,0,0,0.02)] border-r border-slate-100 dark:border-slate-800">
                                             <div className="flex items-center gap-2">
-                                                <group.icon size={14} className={cn(themes[group.theme as keyof typeof themes].split(' ')[0])} />
-                                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{group.title}</span>
+                                                <group.icon size={12} className={cn("md:w-[14px] md:h-[14px]", themes[group.theme as keyof typeof themes].split(' ')[0])} />
+                                                <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.15em] md:tracking-[0.2em] text-slate-400">{group.title}</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -441,19 +455,18 @@ export function CompareView() {
                                             return 0;
                                         });
 
-                                        // Get unique non-null values and sort them descending
                                         const sortedUniqueValues = Array.from(new Set(values.filter((v): v is number => v !== null)))
                                             .sort((a, b) => b - a);
 
                                         return (
                                             <tr key={nutrient.key} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group">
-                                                <td className="p-6 px-12">
+                                                <td className="p-3 md:p-6 px-4 md:px-12 sticky left-0 z-20 bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] focus-within:z-30">
                                                     <div className="flex flex-col">
-                                                        <span className="text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300 group-hover:text-emerald-500 transition-colors">
+                                                        <span className="text-[9px] md:text-[11px] font-black uppercase tracking-wider md:tracking-widest text-slate-700 dark:text-slate-300 group-hover:text-emerald-500 transition-colors truncate">
                                                             {nutrient.label}
                                                         </span>
-                                                        <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
-                                                            {nutrient.unit}
+                                                        <span className="text-[7px] md:text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+                                                            {nutrient.key === 'energy_kcal' ? energyUnit : nutrient.unit}
                                                         </span>
                                                     </div>
                                                 </td>
@@ -463,9 +476,9 @@ export function CompareView() {
                                                     const colorClass = rank === 0 ? "text-emerald-500" : rank === 1 ? "text-blue-500" : rank === 2 ? "text-rose-500" : "text-slate-900 dark:text-white";
 
                                                     return (
-                                                        <td key={i} className="p-6 text-center border-l border-slate-100 dark:border-slate-800">
+                                                        <td key={i} className="p-3 md:p-6 text-center border-l border-slate-100 dark:border-slate-800">
                                                             <span className={cn(
-                                                                "text-xs font-black tracking-widest transition-colors duration-500",
+                                                                "text-[11px] md:text-xs font-black tracking-widest transition-colors duration-500",
                                                                 selectedFoods[i] ? colorClass : "text-slate-200 dark:text-slate-800"
                                                             )}>
                                                                 {getNutrientValue(selectedFoods[i], nutrient.key, nutrient.unit)}
@@ -484,13 +497,13 @@ export function CompareView() {
 
                 {/* Empty State */}
                 {!selectedFoods.some(f => f !== null) && (
-                    <div className="p-20 flex flex-col items-center justify-center text-center">
-                        <div className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center mb-6">
-                            <Info className="text-slate-300" size={32} />
+                    <div className="p-10 md:p-20 flex flex-col items-center justify-center text-center">
+                        <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center mb-4 md:mb-6">
+                            <Info className="text-slate-300" size={24} className="md:w-8 md:h-8" />
                         </div>
-                        <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase italic mb-2">Comparison Engine Ready</h3>
-                        <p className="text-slate-500 font-medium text-sm max-w-sm">
-                            Search and select up to 3 clinical food samples in the boxes above to start your side-by-side nutritional analysis.
+                        <h3 className="text-sm md:text-xl font-black text-slate-900 dark:text-white uppercase italic mb-2">Engine Ready</h3>
+                        <p className="text-slate-500 font-medium text-[10px] md:text-sm max-w-[240px] md:max-w-sm">
+                            Search and select up to 3 samples above for side-by-side analysis.
                         </p>
                     </div>
                 )}
