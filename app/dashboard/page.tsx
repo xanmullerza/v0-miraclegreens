@@ -9,7 +9,7 @@ import {
     Library,
     User,
     ArrowRight,
-    Carrot,
+    Leaf,
     UtensilsCrossed,
     X
 } from 'lucide-react';
@@ -80,9 +80,9 @@ export default function DashboardOverview() {
             name: 'Ingredients',
             desc: 'Browse and explore nutritious food items.',
             href: '/dashboard/ingredients',
-            icon: Carrot,
-            color: 'text-sky-500',
-            bg: 'bg-sky-500/10'
+            icon: Leaf,
+            color: 'text-emerald-500',
+            bg: 'bg-emerald-500/10'
         },
         {
             name: 'Profile',
