@@ -13,7 +13,9 @@ import {
     Trash2,
     Plus,
     Info,
-    Beef
+    Beef,
+    Trophy,
+    Medal
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -213,6 +215,55 @@ export function CompareView() {
         emerald: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20"
     };
 
+    // Calculate Scores
+    const scores = [0, 0, 0];
+    const totalSelected = selectedFoods.filter(f => f !== null).length;
+
+    if (totalSelected > 0) {
+        NUTRIENT_GROUPS.forEach(group => {
+            group.keys.forEach(nutrient => {
+                const values = selectedFoods.map(food => {
+                    if (!food) return null;
+                    if (nutrient.key in food && typeof (food as any)[nutrient.key] === 'number') {
+                        return (food as any)[nutrient.key];
+                    }
+                    if (food.micronutrients && food.micronutrients[nutrient.key]) {
+                        const v = food.micronutrients[nutrient.key];
+                        return typeof v === 'number' ? v : 0;
+                    }
+                    return 0;
+                });
+
+                const sortedUniqueValues = Array.from(new Set(values.filter((v): v is number => v !== null)))
+                    .sort((a, b) => b - a);
+
+                values.forEach((val, i) => {
+                    if (val !== null) {
+                        const rank = sortedUniqueValues.indexOf(val);
+                        if (rank === 0) scores[i] += 3;
+                        else if (rank === 1) scores[i] += 2;
+                        else if (rank === 2) scores[i] += 1;
+                    }
+                });
+            });
+        });
+    }
+
+    // Determine Ranks
+    const sortedScores = Array.from(new Set(scores.filter((s, i) => selectedFoods[i] !== null)))
+        .sort((a, b) => b - a);
+
+    const getMedal = (index: number) => {
+        if (selectedFoods[index] === null) return null;
+        const score = scores[index];
+        const rank = sortedScores.indexOf(score);
+
+        if (rank === 0) return { icon: Trophy, color: "text-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.3)]", label: "1st", bg: "bg-yellow-50 dark:bg-yellow-900/20" };
+        if (rank === 1) return { icon: Medal, color: "text-slate-400 shadow-[0_0_15px_rgba(148,163,184,0.3)]", label: "2nd", bg: "bg-slate-50 dark:bg-slate-800/50" };
+        if (rank === 2) return { icon: Medal, color: "text-amber-700 shadow-[0_0_15px_rgba(180,83,9,0.3)]", label: "3rd", bg: "bg-amber-50 dark:bg-amber-900/20" };
+        return null;
+    };
+
     return (
         <div className="space-y-12 animate-in fade-in duration-500 pb-20">
             {/* Search Header */}
@@ -237,7 +288,11 @@ export function CompareView() {
                                                 )}
                                             </div>
                                             <div className="min-w-0">
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Selection {index + 1}</p>
+                                                <div className="flex items-center gap-2 mb-0.5">
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Selection {index + 1}</p>
+                                                    <div className="w-1 h-1 rounded-full bg-slate-300" />
+                                                    <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500">{scores[index]} PTS</p>
+                                                </div>
                                                 <h3 className="font-black text-sm uppercase italic text-slate-900 dark:text-white truncate">
                                                     {selectedFoods[index]?.common_name || selectedFoods[index]?.name}
                                                 </h3>
@@ -326,12 +381,27 @@ export function CompareView() {
                                         <div className="flex flex-col items-center gap-2">
                                             {selectedFoods[i] ? (
                                                 <>
+                                                    {getMedal(i) && (
+                                                        <div className={cn("p-2 rounded-xl mb-1 animate-in zoom-in duration-500", getMedal(i)?.bg)}>
+                                                            {React.createElement(getMedal(i)!.icon, {
+                                                                size: 24,
+                                                                className: getMedal(i)!.color
+                                                            })}
+                                                        </div>
+                                                    )}
                                                     <h4 className="font-black text-sm uppercase italic text-slate-900 dark:text-white line-clamp-1">
                                                         {selectedFoods[i]?.common_name || selectedFoods[i]?.name}
                                                     </h4>
-                                                    <Badge className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-none font-black text-[9px] uppercase tracking-widest">
-                                                        Clinical Sample
-                                                    </Badge>
+                                                    <div className="flex items-center gap-2">
+                                                        <Badge className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-none font-black text-[8px] uppercase tracking-widest">
+                                                            {scores[i]} Points
+                                                        </Badge>
+                                                        {getMedal(i) && (
+                                                            <span className={cn("text-[10px] font-black uppercase italic tracking-tighter", getMedal(i)!.color.split(' ')[0])}>
+                                                                {getMedal(i)!.label} Place
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                 </>
                                             ) : (
                                                 <div className="flex flex-col items-center gap-1 opacity-20">
