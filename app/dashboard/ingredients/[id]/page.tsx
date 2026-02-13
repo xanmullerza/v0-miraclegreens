@@ -27,7 +27,6 @@ import {
     Lightbulb,
     ShieldCheck,
     Beaker,
-    Beaker,
     Scale,
     Dna,
     Pencil
