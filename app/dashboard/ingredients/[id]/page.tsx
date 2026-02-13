@@ -637,6 +637,34 @@ export default function FoodDetailsPage() {
                 </div>
             </div>
 
+            {/* Mobile Header (Visible on small screens) */}
+            <div className="lg:hidden mb-8 space-y-4">
+                <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                        <h1 className="text-5xl font-black tracking-tighter italic uppercase text-slate-900 dark:text-white leading-[0.85]">
+                            {food.common_name || food.name}
+                        </h1>
+                        {food.quantity && (
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">
+                                Current Stock: {food.quantity}
+                            </p>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-3 bg-white dark:bg-slate-900 px-6 py-3 rounded-3xl border-2 border-slate-200 dark:border-slate-800 shadow-xl group/amount transition-all hover:border-emerald-500/50 w-fit">
+                        <Scale className="w-5 h-5 text-emerald-500" />
+                        <div className="flex items-baseline gap-1">
+                            <input
+                                type="number"
+                                value={amount}
+                                onChange={(e) => setAmount(Number(e.target.value))}
+                                className="w-20 bg-transparent text-3xl font-black italic tracking-tighter text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            />
+                            <span className="text-xl font-black italic text-slate-400">g</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* Hero Header */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-1">
@@ -738,7 +766,7 @@ export default function FoodDetailsPage() {
                 </div>
 
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="space-y-4">
+                    <div className="space-y-4 hidden lg:block">
                         <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-8">
                             <div className="flex flex-col gap-2">
                                 <h1 className="text-6xl font-black tracking-tighter italic uppercase text-slate-900 dark:text-white leading-[0.85]">
