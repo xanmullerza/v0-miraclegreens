@@ -1135,11 +1135,11 @@ export function MealPlannerContent({
                                                             // Custom styling for ratios
                                                             if (title === 'Biological Ratios') {
                                                                 let ratioStatus: 'good' | 'fair' | 'poor' = 'good';
-                                                                if (label === 'Na:K Ratio') ratioStatus = val <= 1.0 ? 'good' : val <= 2.0 ? 'fair' : 'poor';
-                                                                if (label === 'Zn:Cu Ratio') ratioStatus = (val >= 8 && val <= 12) ? 'good' : (val >= 5 && val <= 15) ? 'fair' : 'poor';
-                                                                if (label === 'Omega 6:3') ratioStatus = val <= 4.0 ? 'good' : val <= 10.0 ? 'fair' : 'poor';
-                                                                if (label === 'Ca:Mg Ratio') ratioStatus = (val >= 1.7 && val <= 2.5) ? 'good' : (val >= 1.5 && val <= 3.0) ? 'fair' : 'poor';
-                                                                if (label === 'Ca:P Ratio') ratioStatus = (val >= 1.0 && val <= 2.0) ? 'good' : (val >= 0.8 && val <= 2.5) ? 'fair' : 'poor';
+                                                                if (label === 'Sodium:Potassium') ratioStatus = val <= 1.0 ? 'good' : val <= 2.0 ? 'fair' : 'poor';
+                                                                if (label === 'Zinc:Copper') ratioStatus = (val >= 8 && val <= 12) ? 'good' : (val >= 5 && val <= 15) ? 'fair' : 'poor';
+                                                                if (label === 'Omega 6:3 Ratio') ratioStatus = val <= 4.0 ? 'good' : val <= 10.0 ? 'fair' : 'poor';
+                                                                if (label === 'Calcium:Magnesium') ratioStatus = (val >= 1.7 && val <= 2.5) ? 'good' : (val >= 1.5 && val <= 3.0) ? 'fair' : 'poor';
+                                                                if (label === 'Calcium:Phosphorus') ratioStatus = (val >= 1.0 && val <= 2.0) ? 'good' : (val >= 0.8 && val <= 2.5) ? 'fair' : 'poor';
 
                                                                 styles = ratioStatus === 'good' ? { text: "text-emerald-500", borderLight: "border-emerald-500/30", fade: "bg-emerald-500/5", textFill: "text-emerald-500", bg: "bg-emerald-500", border: "border-emerald-500" } :
                                                                     ratioStatus === 'fair' ? { text: "text-amber-500", borderLight: "border-amber-500/30", fade: "bg-amber-500/5", textFill: "text-amber-500", bg: "bg-amber-500", border: "border-amber-500" } :
@@ -1147,11 +1147,11 @@ export function MealPlannerContent({
                                                             }
 
                                                             const ratioTarget = title === 'Biological Ratios' ? (
-                                                                label === 'Na:K Ratio' ? '< 1.0' :
-                                                                    label === 'Zn:Cu Ratio' ? '8.0 - 12.0' :
-                                                                        label === 'Omega 6:3' ? '< 4.0' :
-                                                                            label === 'Ca:Mg Ratio' ? '1.7 - 2.5' :
-                                                                                label === 'Ca:P Ratio' ? '1.0 - 2.0' : null
+                                                                label === 'Sodium:Potassium' ? 'Under 1:1' :
+                                                                    label === 'Zinc:Copper' ? '8:1 - 12:1' :
+                                                                        label === 'Omega 6:3 Ratio' ? 'Under 4:1' :
+                                                                            label === 'Calcium:Magnesium' ? '1.7:1 - 2.5:1' :
+                                                                                label === 'Calcium:Phosphorus' ? '1:1 - 2:1' : null
                                                             ) : null;
                                                             const hasBreakdown = breakdownLabels.includes(label);
 
@@ -1214,11 +1214,11 @@ export function MealPlannerContent({
                                                 </div>
 
                                                 <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Critical nutrient balances for metabolic & inflammation tracking" items={{
-                                                    'Na:K Ratio': ['Sodium', 'Potassium'],
-                                                    'Zn:Cu Ratio': ['Zinc', 'Copper'],
-                                                    'Omega 6:3': ['Omega-6', 'Omega-3'],
-                                                    'Ca:Mg Ratio': ['Calcium', 'Magnesium'],
-                                                    'Ca:P Ratio': ['Calcium', 'Phosphorus'],
+                                                    'Sodium:Potassium': ['Sodium', 'Potassium'],
+                                                    'Zinc:Copper': ['Zinc', 'Copper'],
+                                                    'Omega 6:3 Ratio': ['Omega-6', 'Omega-3'],
+                                                    'Calcium:Magnesium': ['Calcium', 'Magnesium'],
+                                                    'Calcium:Phosphorus': ['Calcium', 'Phosphorus'],
                                                 }} />
 
                                                 <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Caloric & Macro Breakdown" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
