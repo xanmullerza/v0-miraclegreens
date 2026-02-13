@@ -795,7 +795,7 @@ export default function FoodDetailsPage() {
 
                             <div className="relative group/select pl-3 pr-2">
                                 <DropdownMenu>
-                                    <DropdownMenuTrigger className="flex items-center gap-2 pr-4 text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
+                                    <DropdownMenuTrigger className="flex items-center gap-2 pr-4 text-xs font-bold text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
                                         {selectedPortion?.label || 'Gram (g)'}
                                         <ChevronDown className="w-3 h-3 text-slate-400 group-hover/select:text-emerald-500" />
                                     </DropdownMenuTrigger>
@@ -804,7 +804,7 @@ export default function FoodDetailsPage() {
                                         className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-[1.5rem] p-2 min-w-[140px] shadow-2xl animate-in zoom-in-95 duration-200"
                                     >
                                         <DropdownMenuItem
-                                            className="text-[9px] font-black uppercase tracking-widest rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
+                                            className="text-xs font-bold rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
                                             onClick={() => {
                                                 setSelectedPortion(null);
                                                 if (amount === 1) setAmount(100);
@@ -815,7 +815,7 @@ export default function FoodDetailsPage() {
                                         {food?.portions?.map(p => (
                                             <DropdownMenuItem
                                                 key={p.label}
-                                                className="text-[9px] font-black uppercase tracking-widest rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
+                                                className="text-xs font-bold rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
                                                 onClick={() => {
                                                     setSelectedPortion(p);
                                                     if (amount >= 10) setAmount(1);
