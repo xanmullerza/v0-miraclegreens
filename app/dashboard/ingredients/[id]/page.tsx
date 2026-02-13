@@ -736,7 +736,7 @@ export default function FoodDetailsPage() {
 
                         {/* Description - Moved to Badge Position & Styled */}
                         {(food.details || FOOD_DETAILS[food.id]) && (
-                            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2 mb-6 leading-relaxed max-w-2xl">
+                            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2 leading-relaxed max-w-2xl">
                                 {(food.details || FOOD_DETAILS[food.id]).description}
                                 {food.quantity && (
                                     <span className="ml-3 text-emerald-500">
