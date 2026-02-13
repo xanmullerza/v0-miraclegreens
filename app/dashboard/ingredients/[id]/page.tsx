@@ -592,7 +592,7 @@ export default function FoodDetailsPage() {
                             const v1 = k1 ? m[k1] : 0;
                             const v2 = k2 ? m[k2] : 0;
                             val = v2 > 0 ? v1 / v2 : 0;
-                            unitStr = ': 1';
+                            unitStr = ' to 1';
                         } else {
                             val = getVal(keys as string[]);
                             const macroRDAs: Record<string, number> = {
@@ -625,11 +625,11 @@ export default function FoodDetailsPage() {
                         }
 
                         const ratioTarget = title === 'Biological Ratios' ? (
-                            label === 'Sodium & Potassium' ? 'Under 1:1' :
-                                label === 'Zinc & Copper' ? '8:1 - 12:1' :
-                                    label === 'Omega 3 to 6 ratio' ? 'Under 4:1' :
-                                        label === 'Calcium & Magnesium' ? '1.7:1 - 2.5:1' :
-                                            label === 'Calcium & Phosphorus' ? '1:1 - 2:1' : null
+                            label === 'Sodium & Potassium' ? 'Under 1 to 1' :
+                                label === 'Zinc & Copper' ? '8 to 1 - 12 to 1' :
+                                    label === 'Omega 3 to 6 ratio' ? 'Under 4 to 1' :
+                                        label === 'Calcium & Magnesium' ? '1.7 to 1 - 2.5 to 1' :
+                                            label === 'Calcium & Phosphorus' ? '1 to 1 - 2 to 1' : null
                         ) : null;
 
                         const labelColor = title === 'Biological Ratios' ? (
