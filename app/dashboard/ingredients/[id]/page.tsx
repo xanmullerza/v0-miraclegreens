@@ -777,85 +777,19 @@ export default function FoodDetailsPage() {
             <div className="flex flex-col gap-6 items-start w-full">
                 {renderTabGroup(ingredientTabs, "", "text-slate-500", true)}
 
-                {/* Filter Row */}
-                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
-                    {/* Favorites Toggle */}
-                    <button
-                        onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-                        className={cn(
-                            "flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all duration-300 shrink-0 shadow-sm group",
-                            showFavoritesOnly
-                                ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
-                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-200 hover:text-rose-500 dark:hover:border-rose-900/50"
-                        )}
-                    >
-                        <Heart size={14} className={cn("transition-transform group-hover:scale-110", showFavoritesOnly && "fill-current scale-110")} />
-                        <span className="text-[9px] font-black uppercase tracking-widest">Favorites</span>
-                    </button>
-
-                    <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
-
-                    {/* Category Chips */}
-                    {CATEGORIES.map(category => {
-                        const isActive = selectedCategories.includes(category);
-                        return (
-                            <button
-                                key={category}
-                                onClick={() => isActive
-                                    ? setSelectedCategories(prev => prev.filter(c => c !== category))
-                                    : setSelectedCategories(prev => [...prev, category])
-                                }
-                                className={cn(
-                                    "px-3.5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0 border shadow-sm",
-                                    isActive
-                                        ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20"
-                                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-emerald-200 hover:text-emerald-600 dark:hover:border-emerald-900/50"
-                                )}
-                            >
-                                {category}
-                            </button>
-                        );
-                    })}
-
-                    {selectedCategories.length > 0 && (
-                        <>
-                            <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
-                            <button
-                                onClick={() => setSelectedCategories([])}
-                                className="px-2.5 py-1.5 rounded-2xl text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all shrink-0 flex items-center gap-1"
-                            >
-                                <X size={12} /> Clear
-                            </button>
-                        </>
-                    )}
-                </div>
-            </div>
-
-
-
-
-
-            {/* Nutrient Grids - Removed Hero Wrapper */}
-            <div className="space-y-6">
-                <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
-                    <h3 className="text-sm font-black uppercase tracking-[0.3em] text-emerald-500 italic flex items-center gap-2">
-                        <Activity size={18} />
-                        Essential Nutrients
-                    </h3>
-
-                    {/* Compact Measure Selector */}
-                    <div className="flex items-center gap-4 bg-white dark:bg-slate-900 pl-6 pr-4 py-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-lg group/amount transition-all hover:border-emerald-500/50 shrink-0">
+                <div className="flex items-center gap-3 animate-in fade-in slide-in-from-right-8 duration-700">
+                    <div className="flex items-center gap-4 bg-white dark:bg-slate-900 pl-6 pr-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm group/amount transition-all hover:border-emerald-500/50 shrink-0">
                         <div className="flex items-center gap-3">
                             <input
                                 type="number"
                                 value={amount}
                                 onChange={(e) => setAmount(Number(e.target.value))}
-                                className="w-24 bg-transparent text-lg font-black italic text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-right pr-4"
+                                className="w-24 bg-transparent text-lg font-black italic text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-right pr-4 border-r border-slate-100 dark:border-slate-800"
                             />
 
                             <div className="relative group/select">
                                 <select
-                                    className="appearance-none bg-transparent pr-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 focus:outline-none cursor-pointer hover:text-emerald-500 transition-colors"
+                                    className="appearance-none bg-transparent pr-4 text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 focus:outline-none cursor-pointer hover:text-emerald-500 transition-colors"
                                     value={selectedPortion?.label || 'g'}
                                     onChange={(e) => {
                                         const label = e.target.value;
@@ -882,6 +816,20 @@ export default function FoodDetailsPage() {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+
+
+
+
+            {/* Nutrient Grids - Removed Hero Wrapper */}
+            <div className="space-y-6">
+                <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6">
+                    <h3 className="text-sm font-black uppercase tracking-[0.3em] text-emerald-500 italic flex items-center gap-2">
+                        <Activity size={18} />
+                        Essential Nutrients
+                    </h3>
                 </div>
 
 
