@@ -1145,6 +1145,14 @@ export function MealPlannerContent({
                                                                     ratioStatus === 'fair' ? { text: "text-amber-500", borderLight: "border-amber-500/30", fade: "bg-amber-500/5", textFill: "text-amber-500", bg: "bg-amber-500", border: "border-amber-500" } :
                                                                         { text: "text-rose-500", borderLight: "border-rose-500/30", fade: "bg-rose-500/5", textFill: "text-rose-500", bg: "bg-rose-500", border: "border-rose-500" };
                                                             }
+
+                                                            const ratioTarget = title === 'Biological Ratios' ? (
+                                                                label === 'Na:K Ratio' ? '< 1.0' :
+                                                                    label === 'Zn:Cu Ratio' ? '8.0 - 12.0' :
+                                                                        label === 'Omega 6:3' ? '< 4.0' :
+                                                                            label === 'Ca:Mg Ratio' ? '1.7 - 2.5' :
+                                                                                label === 'Ca:P Ratio' ? '1.0 - 2.0' : null
+                                                            ) : null;
                                                             const hasBreakdown = breakdownLabels.includes(label);
 
                                                             return (
@@ -1169,6 +1177,11 @@ export function MealPlannerContent({
                                                                                 {rda && (
                                                                                     <p className="text-[9px] font-bold text-slate-400 mt-0.5">
                                                                                         Target: {Math.round(rda)}{unitStr === 'kcal' ? 'kcal' : unitStr}
+                                                                                    </p>
+                                                                                )}
+                                                                                {ratioTarget && (
+                                                                                    <p className="text-[9px] font-bold text-slate-400 mt-0.5">
+                                                                                        Ideal: {ratioTarget}
                                                                                     </p>
                                                                                 )}
                                                                             </>
