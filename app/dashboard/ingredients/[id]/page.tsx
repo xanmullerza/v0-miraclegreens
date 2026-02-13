@@ -723,6 +723,40 @@ export default function FoodDetailsPage() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
+            {/* NEW Main Header Section (Name + Measure) - Placed BEFORE tabs */}
+            <div className="flex flex-col gap-4 animate-in slide-in-from-top-4 duration-700">
+                <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+                    <div>
+                        <h1 className="text-5xl lg:text-7xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2">
+                            <span className="text-emerald-500">{food.common_name || food.name}.</span>
+                        </h1>
+                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2 flex items-center gap-2">
+                            {food.category || 'General Ingredient'}
+                            {food.quantity && (
+                                <>
+                                    <span className="w-1 h-1 rounded-full bg-slate-600"></span>
+                                    <span className="text-emerald-500">In Stock: {food.quantity}</span>
+                                </>
+                            )}
+                        </p>
+                    </div>
+
+                    {/* Editable Measure Input */}
+                    <div className="flex items-center gap-3 bg-white dark:bg-slate-900 px-6 py-3 rounded-3xl border-2 border-slate-200 dark:border-slate-800 shadow-xl group/amount transition-all hover:border-emerald-500/50 shrink-0">
+                        <Scale className="w-5 h-5 text-emerald-500" />
+                        <div className="flex items-baseline gap-1">
+                            <input
+                                type="number"
+                                value={amount}
+                                onChange={(e) => setAmount(Number(e.target.value))}
+                                className="w-20 bg-transparent text-3xl font-black italic tracking-tighter text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-right"
+                            />
+                            <span className="text-xl font-black italic text-slate-400">g</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {/* Unified Hub Navigation (Replaces Old Nav) */}
             <div className="flex flex-col gap-6 items-start w-full">
                 {renderTabGroup(ingredientTabs, "", "text-slate-500", true)}
@@ -781,34 +815,7 @@ export default function FoodDetailsPage() {
                 </div>
             </div>
 
-            {/* Mobile Header (Visible on small screens) */}
-            <div className="lg:hidden mb-6">
-                <div className="flex items-end justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                        <h1 className="text-3xl xs:text-4xl font-black tracking-tighter italic uppercase text-slate-900 dark:text-white leading-[0.85] break-words">
-                            {food.common_name || food.name}
-                        </h1>
-                    </div>
 
-                    <div className="shrink-0 flex items-center gap-1.5 bg-white dark:bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm group/amount transition-all hover:border-emerald-500/50 mb-0.5">
-                        <Pencil className="w-3 h-3 text-emerald-500" />
-                        <div className="flex items-baseline gap-0.5">
-                            <input
-                                type="number"
-                                value={amount}
-                                onChange={(e) => setAmount(Number(e.target.value))}
-                                className="w-8 bg-transparent text-sm font-black italic text-right text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                            />
-                            <span className="text-[9px] font-black italic text-slate-400">g</span>
-                        </div>
-                    </div>
-                </div>
-                {food.quantity && (
-                    <p className="mt-2 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">
-                        Current Stock: {food.quantity}
-                    </p>
-                )}
-            </div>
 
             {/* Hero Header */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -848,30 +855,7 @@ export default function FoodDetailsPage() {
 
                 <div className="lg:col-span-2 space-y-6">
                     <div className="space-y-4 hidden lg:block">
-                        <div className="flex flex-col md:flex-row md:items-end gap-4 md:gap-8">
-                            <div className="flex flex-col gap-2">
-                                <h1 className="text-6xl font-black tracking-tighter italic uppercase text-slate-900 dark:text-white leading-[0.85]">
-                                    {food.common_name || food.name}
-                                </h1>
-                                {food.quantity && (
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">
-                                        Current Stock: {food.quantity}
-                                    </p>
-                                )}
-                            </div>
-                            <div className="flex items-center gap-3 bg-white dark:bg-slate-900 px-6 py-3 rounded-3xl border-2 border-slate-200 dark:border-slate-800 shadow-xl group/amount transition-all hover:border-emerald-500/50">
-                                <Scale className="w-5 h-5 text-emerald-500" />
-                                <div className="flex items-baseline gap-1">
-                                    <input
-                                        type="number"
-                                        value={amount}
-                                        onChange={(e) => setAmount(Number(e.target.value))}
-                                        className="w-20 bg-transparent text-3xl font-black italic tracking-tighter text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                                    />
-                                    <span className="text-xl font-black italic text-slate-400">g</span>
-                                </div>
-                            </div>
-                        </div>
+                        {/* Name/Measure removed from here as it is now at the top of the page */}
                     </div>
 
                     <div className="space-y-6">
