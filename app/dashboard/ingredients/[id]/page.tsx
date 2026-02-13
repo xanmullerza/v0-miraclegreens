@@ -748,20 +748,15 @@ export default function FoodDetailsPage() {
                             </div>
                         </div>
 
-                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2 flex items-center gap-2 mb-6">
-                            {food.category || 'General Ingredient'}
-                            {food.quantity && (
-                                <>
-                                    <span className="w-1 h-1 rounded-full bg-slate-600"></span>
-                                    <span className="text-emerald-500">In Stock: {food.quantity}</span>
-                                </>
-                            )}
-                        </p>
-
-                        {/* Description as Subtext */}
+                        {/* Description - Moved to Badge Position & Styled */}
                         {(food.details || FOOD_DETAILS[food.id]) && (
-                            <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed font-medium max-w-2xl">
+                            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2 mb-6 leading-relaxed max-w-2xl">
                                 {(food.details || FOOD_DETAILS[food.id]).description}
+                                {food.quantity && (
+                                    <span className="ml-3 text-emerald-500">
+                                        In Stock: {food.quantity}
+                                    </span>
+                                )}
                             </p>
                         )}
                     </div>
@@ -779,12 +774,6 @@ export default function FoodDetailsPage() {
                                 </div>
                             )}
                             <div className="absolute top-4 left-4 flex flex-col gap-2">
-                                <Badge className={cn(
-                                    "bg-emerald-600/90 text-white border-none text-[10px] font-black uppercase tracking-widest px-3 py-1 backdrop-blur-md shadow-2xl w-fit",
-                                    food.quantity && "hidden lg:inline-flex"
-                                )}>
-                                    {food.category || 'General'}
-                                </Badge>
                                 {food.protein_g > 15 && (
                                     <Badge className="bg-red-600/90 text-white border-none text-[10px] font-black uppercase tracking-widest px-3 py-1 backdrop-blur-md shadow-2xl w-fit">
                                         High Protein
