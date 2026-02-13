@@ -729,7 +729,7 @@ export default function FoodDetailsPage() {
                 <div className="flex-1 flex flex-col justify-between gap-6">
                     <div>
                         <div className="flex items-start justify-between gap-4">
-                            <h1 className="text-5xl lg:text-7xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2">
+                            <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2">
                                 <span className="text-emerald-500">{food.common_name || food.name}</span>
                             </h1>
                         </div>
