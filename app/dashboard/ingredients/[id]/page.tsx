@@ -509,7 +509,7 @@ export default function FoodDetailsPage() {
             }
         }
 
-        const currentWeight = amount * (selectedPortion?.weight_g || 100);
+        const currentWeight = selectedPortion ? (amount * selectedPortion.weight_g) : amount;
         return (baseVal * currentWeight) / 100;
     };
 
