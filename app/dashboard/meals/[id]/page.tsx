@@ -1431,12 +1431,7 @@ export default function RecipeDetailsPage() {
 
                     {/* Right Column: Nutrient Report */}
                     <div className="lg:col-span-2 space-y-8">
-                        {recipe && Object.keys(phytoSources).length > 0 && (
-                            <DidYouKnow
-                                phytonutrientsWithSources={phytoSources}
-                                className="animate-in slide-in-from-right-4 duration-700"
-                            />
-                        )}
+
                         {/* Directions (Moved from Left Column) */}
                         <Card className="p-6">
                             <div className="flex items-center justify-between mb-6">
@@ -1756,6 +1751,13 @@ export default function RecipeDetailsPage() {
                                                 'Oxalate': ['Oxalate', 'oxalate_mg'],
                                                 'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
                                             }} />
+
+                                            {Object.keys(phytoSources).length > 0 && (
+                                                <DidYouKnow
+                                                    phytonutrientsWithSources={phytoSources}
+                                                    className="animate-in slide-in-from-right-4 duration-700 mt-8"
+                                                />
+                                            )}
                                         </div>
                                     );
                                 })()}

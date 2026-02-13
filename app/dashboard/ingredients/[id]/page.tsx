@@ -773,11 +773,7 @@ export default function FoodDetailsPage() {
                             </h3>
                         </div>
 
-                        <DidYouKnow
-                            phytonutrients={food.phytonutrients}
-                            foodName={food.common_name || food.name}
-                            className="mb-8 animate-in slide-in-from-right-4 duration-700"
-                        />
+
 
                         <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Critical nutrient balances for metabolic & inflammation tracking" items={{
                             'Sodium:Potassium': ['Sodium', 'Potassium'],
@@ -836,6 +832,12 @@ export default function FoodDetailsPage() {
                             'Oxalate': ['Oxalate', 'oxalate_mg'],
                             'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
                         }} />
+
+                        <DidYouKnow
+                            phytonutrients={food.phytonutrients}
+                            foodName={food.common_name || food.name}
+                            className="mt-8 animate-in slide-in-from-right-4 duration-700"
+                        />
                     </div>
                 </div>
             </div>
