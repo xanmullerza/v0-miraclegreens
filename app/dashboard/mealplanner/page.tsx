@@ -1153,11 +1153,46 @@ export function MealPlannerContent({
                                                                             label === 'Calcium:Magnesium' ? '1.7:1 - 2.5:1' :
                                                                                 label === 'Calcium:Phosphorus' ? '1:1 - 2:1' : null
                                                             ) : null;
+
+                                                            const labelColor = title === 'Biological Ratios' ? (
+                                                                label === 'Sodium:Potassium' ? 'text-blue-400' :
+                                                                    label === 'Zinc:Copper' ? 'text-orange-400' :
+                                                                        label === 'Omega 6:3 Ratio' ? 'text-indigo-400' :
+                                                                            label === 'Calcium:Magnesium' ? 'text-violet-400' :
+                                                                                label === 'Calcium:Phosphorus' ? 'text-cyan-400' : 'text-foreground/60'
+                                                            ) : 'text-foreground/60';
+
                                                             const hasBreakdown = breakdownLabels.includes(label);
 
                                                             return (
                                                                 <div key={label} onClick={() => router.push(`/dashboard/nutrients/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, (pct !== null || title === 'Biological Ratios') ? `${styles.borderLight} ${styles.fade}` : "")}>
-                                                                    <p className="text-[9px] uppercase font-black text-foreground/60 truncate mb-1">{label}</p>
+                                                                    <p className={cn("text-[8px] uppercase font-black truncate mb-1 flex items-center gap-0.5 whitespace-nowrap overflow-hidden")}>
+                                                                        {title === 'Biological Ratios' && label.includes(':') ? (
+                                                                            <>
+                                                                                <span className={
+                                                                                    label.startsWith('Sodium') ? 'text-blue-400' :
+                                                                                        label.startsWith('Zinc') ? 'text-orange-400' :
+                                                                                            label.startsWith('Omega') ? 'text-indigo-400' :
+                                                                                                label.startsWith('Calcium') && label.includes('Magnesium') ? 'text-violet-400' :
+                                                                                                    label.startsWith('Calcium') && label.includes('Phosphorus') ? 'text-cyan-400' : ''
+                                                                                }>
+                                                                                    {label.split(':')[0]}
+                                                                                </span>
+                                                                                <span className="opacity-30 text-slate-500">:</span>
+                                                                                <span className={
+                                                                                    label.endsWith('Potassium') ? 'text-emerald-400' :
+                                                                                        label.endsWith('Copper') ? 'text-rose-400' :
+                                                                                            label.includes('3 Ratio') ? 'text-purple-400' :
+                                                                                                label.endsWith('Magnesium') ? 'text-pink-400' :
+                                                                                                    label.endsWith('Phosphorus') ? 'text-amber-400' : ''
+                                                                                }>
+                                                                                    {label.split(':')[1]}
+                                                                                </span>
+                                                                            </>
+                                                                        ) : (
+                                                                            <span className={labelColor}>{label}</span>
+                                                                        )}
+                                                                    </p>
                                                                     <div className="space-y-0.5">
                                                                         {(pct !== null && !forceRaw) ? (
                                                                             <>
