@@ -638,31 +638,32 @@ export default function FoodDetailsPage() {
             </div>
 
             {/* Mobile Header (Visible on small screens) */}
-            <div className="lg:hidden mb-8 space-y-4">
-                <div className="flex flex-col gap-6">
-                    <div className="flex flex-col gap-2">
-                        <h1 className="text-5xl font-black tracking-tighter italic uppercase text-slate-900 dark:text-white leading-[0.85]">
+            <div className="lg:hidden mb-6">
+                <div className="flex items-end justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                        <h1 className="text-4xl xs:text-5xl font-black tracking-tighter italic uppercase text-slate-900 dark:text-white leading-[0.85] break-words">
                             {food.common_name || food.name}
                         </h1>
-                        {food.quantity && (
-                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">
-                                Current Stock: {food.quantity}
-                            </p>
-                        )}
                     </div>
-                    <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-lg group/amount transition-all hover:border-emerald-500/50 w-fit">
-                        <Scale className="w-4 h-4 text-emerald-500" />
-                        <div className="flex items-baseline gap-1">
+
+                    <div className="shrink-0 flex items-center gap-1.5 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm group/amount transition-all hover:border-emerald-500/50 mb-1">
+                        <Scale className="w-3.5 h-3.5 text-emerald-500" />
+                        <div className="flex items-baseline gap-0.5">
                             <input
                                 type="number"
                                 value={amount}
                                 onChange={(e) => setAmount(Number(e.target.value))}
-                                className="w-14 bg-transparent text-lg font-black italic tracking-tighter text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                className="w-9 bg-transparent text-base font-black italic text-right text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
-                            <span className="text-sm font-black italic text-slate-400">g</span>
+                            <span className="text-[10px] font-black italic text-slate-400">g</span>
                         </div>
                     </div>
                 </div>
+                {food.quantity && (
+                    <p className="mt-2 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">
+                        Current Stock: {food.quantity}
+                    </p>
+                )}
             </div>
 
             {/* Hero Header */}
