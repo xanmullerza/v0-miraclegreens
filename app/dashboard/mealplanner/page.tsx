@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-
-import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { DidYouKnow } from '@/components/DidYouKnow';
+import { cn } from '@/lib/utils';
+import { Switch } from '@/components/ui/switch';
 import {
     Flame,
     Check,
@@ -63,7 +64,6 @@ import { DietType, Recipe } from '@/lib/data/recipes';
 import { nutrientInfo, NutrientInfo } from '@/lib/data/nutrient-info';
 import { generateDailyPlan, DailyPlan, generateShoppingList, ShoppingItem, getRandomRecipeByType } from '@/lib/utils/meal-generator';
 import { supabase } from '@/lib/supabase';
-import { cn } from '@/lib/utils';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import Link from 'next/link';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -1247,6 +1247,11 @@ export function MealPlannerContent({
                                                         Strategic Health Insights
                                                     </h3>
                                                 </div>
+
+                                                <DidYouKnow
+                                                    phytonutrients={plan.phytonutrients}
+                                                    className="mb-8"
+                                                />
 
                                                 <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Critical nutrient balances for metabolic & inflammation tracking" items={{
                                                     'Sodium:Potassium': ['Sodium', 'Potassium'],

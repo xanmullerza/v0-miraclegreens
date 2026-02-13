@@ -24,8 +24,10 @@ export interface DailyPlan {
         fat: number;
     };
     micronutrients: Record<string, number>;
+    phytonutrients: Record<string, string>;
     // Store individual recipe micronutrients keyed by recipe ID for dynamic recalculation
     recipeMicronutrients: Record<string, Record<string, number>>;
+    recipePhytonutrients: Record<string, Record<string, string>>;
 }
 
 /**
@@ -39,6 +41,17 @@ const getRandom = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)
 const calculateNutrition = (ingredients: any[]) => {
     let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFat = 0, totalEnergyKj = 0;
     const micronutrients: Record<string, number> = {};
+    const phytonutrients: Record<string, string> = {};
+
+    const result = {
+        get calories() { return totalCalories; },
+        get energyKj() { return totalEnergyKj; },
+        get protein() { return totalProtein; },
+        get carbs() { return totalCarbs; },
+        get fat() { return totalFat; },
+        micronutrients,
+        phytonutrients
+    };
 
     for (const ing of ingredients) {
         if (ing.food_items && ing.weight_g) {
@@ -58,9 +71,17 @@ const calculateNutrition = (ingredients: any[]) => {
                     }
                 });
             }
+
+            // Aggregate phytonutrients
+            if (foodItem.phytonutrients && typeof foodItem.phytonutrients === 'object') {
+                Object.entries(foodItem.phytonutrients).forEach(([key, val]) => {
+                    const phytos = result.phytonutrients as Record<string, string>;
+                    phytos[key] = val as string;
+                });
+            }
         }
     }
-    return { calories: totalCalories, energyKj: totalEnergyKj, protein: totalProtein, carbs: totalCarbs, fat: totalFat, micronutrients };
+    return result;
 };
 
 /**
@@ -185,12 +206,14 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
 
     // Transform Supabase data to match Recipe interface
     const recipeMicronutrients: Record<string, Record<string, number>> = {};
+    const recipePhytonutrients: Record<string, Record<string, string>> = {};
 
     const allRecipes: Recipe[] = recipesData.map((r: any) => {
         const calculatedNutrition = calculateNutrition(r.ingredients);
 
         // Store micronutrients keyed by recipe ID
         recipeMicronutrients[r.id] = calculatedNutrition.micronutrients;
+        recipePhytonutrients[r.id] = calculatedNutrition.phytonutrients;
 
         return {
             id: r.id,
@@ -256,6 +279,19 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
         return result;
     };
 
+    const aggregatePhytonutrients = (recipeIds: string[]): Record<string, string> => {
+        const result: Record<string, string> = {};
+        recipeIds.forEach(id => {
+            const phytos = recipePhytonutrients[id];
+            if (phytos) {
+                Object.entries(phytos).forEach(([key, val]) => {
+                    result[key] = val;
+                });
+            }
+        });
+        return result;
+    };
+
     let bestPlan: DailyPlan | null = null;
     let minDiff = Infinity;
     let maxMatchScore = -1;
@@ -311,8 +347,10 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
         const aggregatedMicro = aggregateMicronutrients(allRecipeIds);
 
         const planRecipeMicros: Record<string, Record<string, number>> = {};
+        const planRecipePhytos: Record<string, Record<string, string>> = {};
         allRecipeIds.forEach(id => {
             planRecipeMicros[id] = recipeMicronutrients[id] || {};
+            planRecipePhytos[id] = recipePhytonutrients[id] || {};
         });
 
         const currentPlan: DailyPlan = {
@@ -328,7 +366,9 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
                 fat: b.fat + l.fat + d.fat + snacks.reduce((acc, s) => acc + s.fat, 0),
             },
             micronutrients: aggregatedMicro,
-            recipeMicronutrients: planRecipeMicros
+            phytonutrients: aggregatePhytonutrients(allRecipeIds),
+            recipeMicronutrients: planRecipeMicros,
+            recipePhytonutrients: planRecipePhytos
         };
 
         const currentMatchScore = (calculateMatchScore(b) + calculateMatchScore(l) + calculateMatchScore(d) + (snacks.length ? snacks.reduce((acc, s) => acc + calculateMatchScore(s), 0) / snacks.length : 0)) / (3 + (snacks.length ? 1 : 0));

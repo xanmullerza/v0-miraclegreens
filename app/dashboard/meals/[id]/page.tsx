@@ -55,6 +55,7 @@ import { useRDA } from '@/hooks/use-rda';
 import { findSpiceFactor, SpiceState, isSpice, getSpiceMeasures, getSpiceStates } from '@/lib/utils/spice-conversion';
 import { COOKING_STATES, CookingState, StateFactor } from '@/lib/utils/cooking-states';
 import { searchLocalFood } from '@/lib/services/nutrition';
+import { DidYouKnow } from '@/components/DidYouKnow';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900 shadow-xl rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden", className)}>
@@ -98,6 +99,8 @@ interface Recipe {
     diet: string[];
     source?: string;
     micronutrients?: Record<string, number>;
+    phytonutrients?: Record<string, string>;
+    calculated_nutrition?: import('@/lib/utils/nutrition-calculator').CalculatedNutrition;
 }
 
 export default function RecipeDetailsPage() {
@@ -1408,6 +1411,12 @@ export default function RecipeDetailsPage() {
 
                     {/* Right Column: Nutrient Report */}
                     <div className="lg:col-span-2 space-y-8">
+                        {recipe && (
+                            <DidYouKnow
+                                phytonutrients={recipe.calculated_nutrition?.phytonutrients || recipe.phytonutrients}
+                                className="animate-in slide-in-from-right-4 duration-700"
+                            />
+                        )}
                         {/* Directions (Moved from Left Column) */}
                         <Card className="p-6">
                             <div className="flex items-center justify-between mb-6">

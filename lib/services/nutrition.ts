@@ -11,6 +11,7 @@ export interface FoodItemMatch {
     carbs_g: number;
     fat_g: number;
     micronutrients: Record<string, number>;
+    phytonutrients?: Record<string, string>;
     source: 'local' | 'usda';
     fdcId?: number;
     portions?: FoodMeasure[];
@@ -123,6 +124,7 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
         carbs_g: item.carbs_g,
         fat_g: item.fat_g,
         micronutrients: item.micronutrients || {},
+        phytonutrients: item.phytonutrients || {},
         portions: item.portions || [], // Use JSONB column
         source: 'local' as const
     })).sort((a, b) => {
@@ -526,6 +528,7 @@ export async function syncToLocal(food: FoodItemMatch, measures: FoodMeasure[]):
             fat_g: food.fat_g,
             source: food.source || 'usda',
             micronutrients: food.micronutrients,
+            phytonutrients: food.phytonutrients || {},
             portions: uniquePortions // Save to JSONB
         }, { onConflict: 'name' })
         .select()

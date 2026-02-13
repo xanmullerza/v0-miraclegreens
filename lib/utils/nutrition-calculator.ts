@@ -11,6 +11,7 @@ export interface FoodItemNutrition {
     fat_g: number;
     carbs_g: number;
     micronutrients?: Record<string, number>;
+    phytonutrients?: Record<string, string>;
 }
 
 export type GoalType = 'lose-fat' | 'maintain' | 'build-muscle';
@@ -99,6 +100,7 @@ export interface CalculatedNutrition {
     fat: number;
     carbs: number;
     micronutrients?: Record<string, number>;
+    phytonutrients?: Record<string, string>;
 }
 
 /**
@@ -167,6 +169,11 @@ export function calculateNutrition(
                 result.micronutrients[key] = value * multiplier * stateFactor.micros;
             }
         }
+    }
+
+    // Pass through phytonutrients (they don't scale by weight, they are just "present")
+    if (foodItem.phytonutrients) {
+        result.phytonutrients = { ...foodItem.phytonutrients };
     }
 
     return result;
@@ -352,16 +359,33 @@ export function calculateRecipeNutrition(
                 newMicros[match] = (newMicros[match] || 0) + val;
             });
 
+            // Aggregated Phytonutrients
+            const newPhytos = { ...(total.phytonutrients || {}) };
+            if (nutrition.phytonutrients) {
+                Object.entries(nutrition.phytonutrients).forEach(([key, val]) => {
+                    newPhytos[key] = val; // Add or preserve description
+                });
+            }
+
             return {
                 calories: total.calories + nutrition.calories,
                 energy_kj: total.energy_kj + nutrition.energy_kj,
                 protein: total.protein + nutrition.protein,
                 fat: total.fat + nutrition.fat,
                 carbs: total.carbs + nutrition.carbs,
-                micronutrients: newMicros
+                micronutrients: newMicros,
+                phytonutrients: newPhytos
             };
         },
-        { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0, micronutrients: {} as Record<string, number> }
+        {
+            calories: 0,
+            energy_kj: 0,
+            protein: 0,
+            fat: 0,
+            carbs: 0,
+            micronutrients: {} as Record<string, number>,
+            phytonutrients: {} as Record<string, string>
+        }
     );
 }
 

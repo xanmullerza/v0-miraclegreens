@@ -42,6 +42,7 @@ import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRDA } from '@/hooks/use-rda';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
+import { DidYouKnow } from '@/components/DidYouKnow';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900 shadow-xl rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden", className)}>
@@ -60,8 +61,9 @@ interface FoodItem {
     fat_g: number;
     image: string | null;
     micronutrients: Record<string, number>;
+    phytonutrients?: Record<string, string>;
+    category: string;
     is_favorite?: boolean;
-    category?: string;
     quantity?: string;
     is_in_pantry?: boolean;
     details?: import('@/lib/data/food-details').FoodDetail;
@@ -770,6 +772,11 @@ export default function FoodDetailsPage() {
                                 Strategic Health Insights
                             </h3>
                         </div>
+
+                        <DidYouKnow
+                            phytonutrients={food.phytonutrients}
+                            className="mb-8 animate-in slide-in-from-right-4 duration-700"
+                        />
 
                         <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Critical nutrient balances for metabolic & inflammation tracking" items={{
                             'Sodium:Potassium': ['Sodium', 'Potassium'],
