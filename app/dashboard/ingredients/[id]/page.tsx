@@ -838,9 +838,9 @@ export default function FoodDetailsPage() {
             {/* Nutrient Grids - Removed Hero Wrapper */}
             <div className="space-y-6">
                 <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
-                    <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
+                    <h3 className="text-sm font-black uppercase tracking-[0.3em] text-emerald-500 italic flex items-center gap-2">
                         <Activity size={18} />
-                        Nutrients
+                        Essential Nutrients
                     </h3>
 
                     {/* Compact Measure Selector */}
@@ -931,18 +931,19 @@ export default function FoodDetailsPage() {
                     'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
                 }} />
 
+                <div className="pt-12 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6">
+                    <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
+                        <Dna size={18} />
+                        Advanced Nutrition
+                    </h3>
+                </div>
+
                 <NutrientGrid title="Clinical Markers" icon={Activity} theme="amber" subtitle="Secondary markers for advanced health profile mapping" forceRaw={true} items={{
                     'Fiber': ['Fiber', 'fiber_g'],
                     'Sugars': ['Sugars', 'sugars_g'],
                     'Oxalate': ['Oxalate', 'oxalate_mg'],
                     'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
                 }} />
-
-                <DidYouKnow
-                    phytonutrients={food.phytonutrients}
-                    foodName={food.common_name || food.name}
-                    className="py-4"
-                />
 
                 <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Critical nutrient balances for metabolic & inflammation tracking" items={{
                     'Sodium:Potassium': ['Sodium', 'Potassium'],
@@ -952,12 +953,26 @@ export default function FoodDetailsPage() {
                     'Calcium:Phosphorus': ['Calcium', 'Phosphorus'],
                 }} />
 
+                <DidYouKnow
+                    phytonutrients={food.phytonutrients}
+                    foodName={food.common_name || food.name}
+                    className="py-4"
+                />
+
             </div>
-            {/* Details Section - Moved to Bottom */}
+
+            {/* Know Our Food Section */}
             {(food.details || FOOD_DETAILS[food.id]) && (() => {
                 const details = food.details || FOOD_DETAILS[food.id];
                 return (
-                    <div className="max-w-4xl mx-auto space-y-12 pt-12 border-t border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+                    <div className="space-y-6 pt-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+                        <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6 font-display">
+                            <h3 className="text-sm font-black uppercase tracking-[0.3em] text-purple-500 italic flex items-center gap-2">
+                                <Search size={18} />
+                                Know Our Food
+                            </h3>
+                        </div>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                             <div className="space-y-8">
                                 {/* Producers */}
@@ -968,12 +983,12 @@ export default function FoodDetailsPage() {
                                     </p>
                                 </Card>
 
-                                {/* History - Moved between Producers and Benefits */}
+                                {/* History */}
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-black uppercase tracking-widest text-sm">
                                         <Globe size={16} /> Origin & History
                                     </div>
-                                    <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
+                                    <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
                                         {details.history}
                                     </p>
                                 </div>
@@ -987,7 +1002,7 @@ export default function FoodDetailsPage() {
                                         {details.benefits.map((benefit: string, i: number) => (
                                             <li key={i} className="flex gap-3 text-base text-slate-600 dark:text-slate-400">
                                                 <span className="text-blue-500 font-bold mt-1">•</span>
-                                                <span className="leading-snug">{benefit}</span>
+                                                <span className="leading-snug font-medium">{benefit}</span>
                                             </li>
                                         ))}
                                     </ul>
@@ -998,19 +1013,17 @@ export default function FoodDetailsPage() {
                                 {/* Facts */}
                                 <div className="space-y-4">
                                     <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-black uppercase tracking-widest text-sm">
-                                        <Lightbulb size={16} /> Did you know?
+                                        <Lightbulb size={16} /> Culinary Facts & Uses
                                     </div>
                                     <ul className="space-y-3">
                                         {details.facts.map((fact: string, i: number) => (
                                             <li key={i} className="flex gap-3 text-base text-slate-600 dark:text-slate-400 italic">
                                                 <span className="text-purple-500 mt-1">✨</span>
-                                                <span className="leading-snug">{fact}</span>
+                                                <span className="leading-snug font-medium">{fact}</span>
                                             </li>
                                         ))}
                                     </ul>
                                 </div>
-
-
                             </div>
                         </div>
                     </div>
