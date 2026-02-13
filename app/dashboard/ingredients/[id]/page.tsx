@@ -85,9 +85,10 @@ export default function FoodDetailsPage() {
     const [food, setFood] = useState<FoodItem | null>(null);
     const [loading, setLoading] = useState(true);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
-    const [amount, setAmount] = useState(100);
+    const [amount, setAmount] = useState(1);
+    const [selectedPortion, setSelectedPortion] = useState<{ label: string, weight_g: number } | null>(null);
 
-    // Edit states
+    // ... edit states ...
     const [isEditing, setIsEditing] = useState(false);
     const [editName, setEditName] = useState('');
     const [editCommonName, setEditCommonName] = useState('');
@@ -314,6 +315,15 @@ export default function FoodDetailsPage() {
             }
 
             setFood(fetchedFood);
+
+            // Set default measurement
+            if (fetchedFood.portions && fetchedFood.portions.length > 0) {
+                setSelectedPortion(fetchedFood.portions[0]);
+                setAmount(1);
+            } else {
+                setSelectedPortion(null);
+                setAmount(100);
+            }
         } catch (error: any) {
             console.error('Error fetching food:', error);
             toast.error('Failed to load ingredient profile');
@@ -504,7 +514,8 @@ export default function FoodDetailsPage() {
             }
         }
 
-        return (baseVal * amount) / 100;
+        const currentWeight = amount * (selectedPortion?.weight_g || 100);
+        return (baseVal * currentWeight) / 100;
     };
 
     const NUTRIENT_BREAKDOWNS: Record<string, any[]> = {
@@ -726,7 +737,7 @@ export default function FoodDetailsPage() {
             {/* NEW Main Header Section (Image + Name + Description) */}
             <div className="flex flex-row items-end gap-6 animate-in slide-in-from-top-4 duration-700 pb-1">
                 {/* Left Side: Image (Inline with Text) */}
-                <div className="w-20 h-20 lg:w-20 lg:h-20 shrink-0">
+                <div className="w-24 h-24 lg:w-24 lg:h-24 shrink-0">
                     <Card className="w-full h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden rounded-2xl">
                         <div className="w-full h-full rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
                             {food.image ? (
@@ -837,17 +848,44 @@ export default function FoodDetailsPage() {
                         Nutrients
                     </h3>
 
-                    {/* Editable Measure Input - Moved here */}
-                    <div className="flex items-center gap-3 bg-white dark:bg-slate-900 px-4 py-2 rounded-3xl border-2 border-slate-200 dark:border-slate-800 shadow-xl group/amount transition-all hover:border-emerald-500/50 shrink-0">
-                        <Scale className="w-4 h-4 text-emerald-500" />
-                        <div className="flex items-baseline gap-1">
+                    {/* Compact Measure Selector */}
+                    <div className="flex items-center gap-2 bg-white dark:bg-slate-900 pr-3 pl-4 py-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-lg group/amount transition-all hover:border-emerald-500/50 shrink-0">
+                        <Scale className="w-3.5 h-3.5 text-emerald-500" />
+                        <div className="flex items-center gap-1.5">
                             <input
                                 type="number"
                                 value={amount}
                                 onChange={(e) => setAmount(Number(e.target.value))}
-                                className="w-16 bg-transparent text-2xl font-black italic tracking-tighter text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-right"
+                                className="w-10 bg-transparent text-lg font-black italic tracking-tighter text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-right"
                             />
-                            <span className="text-lg font-black italic text-slate-400">g</span>
+
+                            <div className="relative group/select">
+                                <select
+                                    className="appearance-none bg-transparent pr-4 text-xs font-bold uppercase tracking-widest text-slate-400 focus:outline-none cursor-pointer hover:text-emerald-500"
+                                    value={selectedPortion?.label || 'g'}
+                                    onChange={(e) => {
+                                        const label = e.target.value;
+                                        if (label === 'g') {
+                                            setSelectedPortion(null);
+                                            // Reset amount to 100 if switching to grams for better default
+                                            if (amount === 1) setAmount(100);
+                                        } else {
+                                            const portion = food?.portions?.find(p => p.label === label);
+                                            if (portion) {
+                                                setSelectedPortion(portion);
+                                                // Reset amount to 1 if switching to units
+                                                if (amount >= 10) setAmount(1);
+                                            }
+                                        }
+                                    }}
+                                >
+                                    <option value="g">Gram (g)</option>
+                                    {food?.portions?.map(p => (
+                                        <option key={p.label} value={p.label}>{p.label}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="w-3 h-3 absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover/select:text-emerald-500" />
+                            </div>
                         </div>
                     </div>
                 </div>
