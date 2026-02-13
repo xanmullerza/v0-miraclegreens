@@ -316,14 +316,9 @@ export default function FoodDetailsPage() {
 
             setFood(fetchedFood);
 
-            // Set default measurement
-            if (fetchedFood.portions && fetchedFood.portions.length > 0) {
-                setSelectedPortion(fetchedFood.portions[0]);
-                setAmount(1);
-            } else {
-                setSelectedPortion(null);
-                setAmount(100);
-            }
+            // Set default measurement to 100g
+            setSelectedPortion(null);
+            setAmount(100);
         } catch (error: any) {
             console.error('Error fetching food:', error);
             toast.error('Failed to load ingredient profile');
@@ -856,32 +851,32 @@ export default function FoodDetailsPage() {
                                 type="number"
                                 value={amount}
                                 onChange={(e) => setAmount(Number(e.target.value))}
-                                className="w-10 bg-transparent text-lg font-black italic tracking-tighter text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-right"
+                                className="w-12 bg-transparent text-lg font-black italic tracking-tighter text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-right"
                             />
 
                             <div className="relative group/select">
                                 <select
-                                    className="appearance-none bg-transparent pr-4 text-xs font-bold uppercase tracking-widest text-slate-400 focus:outline-none cursor-pointer hover:text-emerald-500"
+                                    className="appearance-none bg-transparent pr-4 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400 focus:outline-none cursor-pointer hover:text-emerald-500 transition-colors"
                                     value={selectedPortion?.label || 'g'}
                                     onChange={(e) => {
                                         const label = e.target.value;
                                         if (label === 'g') {
                                             setSelectedPortion(null);
-                                            // Reset amount to 100 if switching to grams for better default
                                             if (amount === 1) setAmount(100);
                                         } else {
                                             const portion = food?.portions?.find(p => p.label === label);
                                             if (portion) {
                                                 setSelectedPortion(portion);
-                                                // Reset amount to 1 if switching to units
                                                 if (amount >= 10) setAmount(1);
                                             }
                                         }
                                     }}
                                 >
-                                    <option value="g">Gram (g)</option>
+                                    <option value="g" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Gram (g)</option>
                                     {food?.portions?.map(p => (
-                                        <option key={p.label} value={p.label}>{p.label}</option>
+                                        <option key={p.label} value={p.label} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
+                                            {p.label}
+                                        </option>
                                     ))}
                                 </select>
                                 <ChevronDown className="w-3 h-3 absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover/select:text-emerald-500" />
