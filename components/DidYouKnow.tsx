@@ -47,7 +47,7 @@ export function DidYouKnow({ phytonutrients, phytonutrientsWithSources, foodName
                 <Leaf className="h-4 w-4" /> PHYTONUTRIENTS
             </h4>
 
-            <div className="text-[9px] text-slate-400 mb-4 border-b border-slate-800 pb-2 transition-colors">
+            <div className="text-[10px] text-slate-400 mb-6 border-b border-slate-800 pb-3 transition-colors">
                 {isSingleFood ? (
                     <>
                         <span className="text-amber-400 font-bold">{foodName}</span> contains powerful plant-based &quot;bodyguards&quot; that protect your cells from stress.
@@ -59,32 +59,27 @@ export function DidYouKnow({ phytonutrients, phytonutrientsWithSources, foodName
                 )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {entries.map(({ name, description, sources }) => (
                     <div
                         key={name}
-                        className="p-4 rounded-2xl border border-amber-900/50 bg-white dark:bg-slate-950 hover:shadow-md transition-all relative group"
+                        className="p-6 rounded-2xl border border-amber-900/50 bg-white dark:bg-slate-950 hover:shadow-md transition-all relative group min-h-[140px] flex flex-col"
                     >
-                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 flex items-center gap-1.5">
-                            <ShieldCheck size={12} className="text-amber-500" />
+                        <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2 flex items-center gap-2">
+                            <ShieldCheck size={14} className="text-amber-500" />
                             {name}
                         </p>
-                        <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400 leading-snug">
+                        <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed flex-grow">
                             {description}
                         </p>
                         {sources.length > 0 && !isSingleFood && (
-                            <p className="text-[9px] font-bold text-emerald-500 flex items-center gap-1 mt-2 pt-2 border-t border-slate-100 dark:border-slate-900">
-                                <Leaf size={9} className="flex-shrink-0" />
+                            <p className="text-[10px] font-bold text-emerald-500 flex items-center gap-1 mt-4 pt-3 border-t border-slate-100 dark:border-slate-900">
+                                <Leaf size={10} className="flex-shrink-0" />
                                 From: {sources.join(', ')}
                             </p>
                         )}
                     </div>
                 ))}
-            </div>
-
-            <div className="mt-4 flex items-center gap-2 text-[9px] font-black text-amber-500/30 uppercase tracking-widest italic pt-2">
-                <Sparkles size={11} />
-                Molecular Health Defense Active
             </div>
         </div>
     );
