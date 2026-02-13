@@ -909,6 +909,12 @@ export default function FoodDetailsPage() {
                     'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
                 }} />
 
+                <DidYouKnow
+                    phytonutrients={food.phytonutrients}
+                    foodName={food.common_name || food.name}
+                    className="py-4"
+                />
+
                 <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Critical nutrient balances for metabolic & inflammation tracking" items={{
                     'Sodium:Potassium': ['Sodium', 'Potassium'],
                     'Zinc:Copper': ['Zinc', 'Copper'],
@@ -975,11 +981,7 @@ export default function FoodDetailsPage() {
                                     </ul>
                                 </div>
 
-                                <DidYouKnow
-                                    phytonutrients={food.phytonutrients}
-                                    foodName={food.common_name || food.name}
-                                    className="pt-8 border-t border-slate-100"
-                                />
+
                             </div>
                         </div>
                     </div>
