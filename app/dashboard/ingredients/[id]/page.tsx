@@ -700,71 +700,7 @@ export default function FoodDetailsPage() {
                         </div>
                     </Card>
 
-                    {/* Details Section - Dynamic Database or Fallback */}
-                    {(food.details || FOOD_DETAILS[food.id]) && (() => {
-                        const details = food.details || FOOD_DETAILS[food.id];
-                        return (
-                            <div className="space-y-6 pt-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-                                {/* Description */}
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-widest text-xs">
-                                        <BookOpen size={14} /> Description
-                                    </div>
-                                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                                        {details.description}
-                                    </p>
-                                </div>
 
-                                {/* History */}
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-bold uppercase tracking-widest text-xs">
-                                        <Globe size={14} /> Origin & History
-                                    </div>
-                                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                                        {details.history}
-                                    </p>
-                                </div>
-
-                                {/* Producers */}
-                                <div className="p-5 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-2">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Top Producers</span>
-                                    <p className="text-sm font-bold text-slate-700 dark:text-slate-300">
-                                        {details.producers}
-                                    </p>
-                                </div>
-
-                                {/* Benefits */}
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold uppercase tracking-widest text-xs">
-                                        <ShieldCheck size={14} /> Key Benefits
-                                    </div>
-                                    <ul className="space-y-2.5">
-                                        {details.benefits.map((benefit: string, i: number) => (
-                                            <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
-                                                <span className="text-blue-500 font-bold mt-0.5">•</span>
-                                                <span className="leading-snug">{benefit}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-
-                                {/* Facts */}
-                                <div className="space-y-3">
-                                    <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-bold uppercase tracking-widest text-xs">
-                                        <Lightbulb size={14} /> Did you know?
-                                    </div>
-                                    <ul className="space-y-3">
-                                        {details.facts.map((fact: string, i: number) => (
-                                            <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400 italic">
-                                                <span className="text-purple-500 mt-0.5">✨</span>
-                                                <span className="leading-snug">{fact}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
-                        );
-                    })()}
                 </div>
 
                 <div className="lg:col-span-2 space-y-6">
@@ -871,6 +807,78 @@ export default function FoodDetailsPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Details Section - Moved to Bottom */}
+            {(food.details || FOOD_DETAILS[food.id]) && (() => {
+                const details = food.details || FOOD_DETAILS[food.id];
+                return (
+                    <div className="max-w-4xl mx-auto space-y-12 pt-12 border-t border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                            <div className="space-y-8">
+                                {/* Description */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-black uppercase tracking-widest text-sm">
+                                        <BookOpen size={16} /> Description
+                                    </div>
+                                    <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                                        {details.description}
+                                    </p>
+                                </div>
+
+                                {/* History */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-black uppercase tracking-widest text-sm">
+                                        <Globe size={16} /> Origin & History
+                                    </div>
+                                    <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
+                                        {details.history}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-8">
+                                {/* Producers */}
+                                <Card className="p-6 bg-slate-50 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800">
+                                    <span className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2 block">Top Producers</span>
+                                    <p className="text-lg font-bold text-slate-900 dark:text-white">
+                                        {details.producers}
+                                    </p>
+                                </Card>
+
+                                {/* Benefits */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-black uppercase tracking-widest text-sm">
+                                        <ShieldCheck size={16} /> Key Benefits
+                                    </div>
+                                    <ul className="space-y-3">
+                                        {details.benefits.map((benefit: string, i: number) => (
+                                            <li key={i} className="flex gap-3 text-base text-slate-600 dark:text-slate-400">
+                                                <span className="text-blue-500 font-bold mt-1">•</span>
+                                                <span className="leading-snug">{benefit}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                {/* Facts */}
+                                <div className="space-y-4">
+                                    <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-black uppercase tracking-widest text-sm">
+                                        <Lightbulb size={16} /> Did you know?
+                                    </div>
+                                    <ul className="space-y-3">
+                                        {details.facts.map((fact: string, i: number) => (
+                                            <li key={i} className="flex gap-3 text-base text-slate-600 dark:text-slate-400 italic">
+                                                <span className="text-purple-500 mt-1">✨</span>
+                                                <span className="leading-snug">{fact}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            })()}
 
             {/* NUTRIENT BREAKDOWN MODAL */}
             {breakdownNutrient && (food.micronutrients) && (
