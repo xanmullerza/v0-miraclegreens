@@ -778,16 +778,16 @@ export default function FoodDetailsPage() {
                 {renderTabGroup(ingredientTabs, "", "text-slate-500", true)}
 
                 <div className="flex items-center gap-3 animate-in fade-in slide-in-from-right-8 duration-700">
-                    <div className="flex items-center gap-4 bg-white dark:bg-slate-900 pl-6 pr-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm group/amount transition-all hover:border-emerald-500/50 shrink-0">
-                        <div className="flex items-center gap-3">
+                    <div className="flex items-center bg-white dark:bg-slate-900 px-2 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm group/amount transition-all hover:border-emerald-500/50 shrink-0">
+                        <div className="flex items-center">
                             <input
                                 type="number"
                                 value={amount}
                                 onChange={(e) => setAmount(Number(e.target.value))}
-                                className="w-24 bg-transparent text-lg font-black italic text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-right pr-4 border-r border-slate-100 dark:border-slate-800"
+                                className="w-16 bg-transparent text-lg font-black italic text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-center border-r border-slate-100 dark:border-slate-800"
                             />
 
-                            <div className="relative group/select">
+                            <div className="relative group/select pl-3 pr-2">
                                 <select
                                     className="appearance-none bg-transparent pr-4 text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 focus:outline-none cursor-pointer hover:text-emerald-500 transition-colors"
                                     value={selectedPortion?.label || 'g'}
