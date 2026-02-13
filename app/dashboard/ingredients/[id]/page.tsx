@@ -735,21 +735,15 @@ export default function FoodDetailsPage() {
                         <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6">
                             <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
                                 <Activity size={18} />
-                                Strategic Health Insights
+                                Nutrition Report
                             </h3>
                         </div>
 
 
 
-                        <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Critical nutrient balances for metabolic & inflammation tracking" items={{
-                            'Sodium:Potassium': ['Sodium', 'Potassium'],
-                            'Zinc:Copper': ['Zinc', 'Copper'],
-                            'Omega 6:3 Ratio': ['Omega-6', 'Omega-3'],
-                            'Calcium:Magnesium': ['Calcium', 'Magnesium'],
-                            'Calcium:Phosphorus': ['Calcium', 'Phosphorus'],
-                        }} />
 
-                        <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Scientific and Clinical breakdown of caloric density" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
+
+                        <NutrientGrid title="Macronutrients" icon={Zap} theme="orange" subtitle="Scientific and Clinical breakdown of caloric density" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
                             'Energy': ['Energy', 'energy_kcal', 'Calories', 'calories'],
                             'Protein': ['Protein', 'protein_g', 'protein'],
                             'Carbs': ['Carbohydrates', 'carbs_g', 'carbs'],
@@ -764,7 +758,7 @@ export default function FoodDetailsPage() {
                             'Phosphorus': ['Phosphorus', 'phosphorus_mg']
                         }} />
 
-                        <NutrientGrid title="Trace Bio-Minerals" icon={Gem} theme="rose" subtitle="Rare essential minerals required for metabolic enzymatic reactions" items={{
+                        <NutrientGrid title="Trace Minerals" icon={Gem} theme="rose" subtitle="Rare essential minerals required for metabolic enzymatic reactions" items={{
                             'Iron': ['Iron', 'iron_mg'],
                             'Zinc': ['Zinc', 'zinc_mg'],
                             'Copper': ['Copper', 'copper_mg'],
@@ -785,7 +779,7 @@ export default function FoodDetailsPage() {
                             'Choline': ['Choline', 'choline_mg'],
                         }} />
 
-                        <NutrientGrid title="Fat-Soluble Bio-Storage" icon={Battery} theme="emerald" subtitle="Vitamins stored within cellular lipid layers" breakdownLabels={['Vitamin A', 'Vitamin E']} items={{
+                        <NutrientGrid title="Fat-Soluble Vitamins" icon={Battery} theme="emerald" subtitle="Vitamins stored within cellular lipid layers" breakdownLabels={['Vitamin A', 'Vitamin E']} items={{
                             'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
                             'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
                             'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
@@ -797,6 +791,14 @@ export default function FoodDetailsPage() {
                             'Sugars': ['Sugars', 'sugars_g'],
                             'Oxalate': ['Oxalate', 'oxalate_mg'],
                             'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
+                        }} />
+
+                        <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Critical nutrient balances for metabolic & inflammation tracking" items={{
+                            'Sodium:Potassium': ['Sodium', 'Potassium'],
+                            'Zinc:Copper': ['Zinc', 'Copper'],
+                            'Omega 6:3 Ratio': ['Omega-6', 'Omega-3'],
+                            'Calcium:Magnesium': ['Calcium', 'Magnesium'],
+                            'Calcium:Phosphorus': ['Calcium', 'Phosphorus'],
                         }} />
 
                         <DidYouKnow

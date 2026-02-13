@@ -46,7 +46,7 @@ export function DidYouKnow({ phytonutrients, phytonutrientsWithSources, foodName
             <div className="p-6 space-y-4">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-amber-500 rounded-lg text-white">
-                        <Lightbulb size={20} className="animate-pulse" />
+                        <Leaf size={20} className="animate-pulse" />
                     </div>
                     <h3 className="text-lg font-black uppercase tracking-tighter italic text-amber-600 dark:text-amber-400">
                         Phytonutrients
