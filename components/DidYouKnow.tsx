@@ -42,64 +42,50 @@ export function DidYouKnow({ phytonutrients, phytonutrientsWithSources, foodName
     const isSingleFood = !!foodName && !phytonutrientsWithSources;
 
     return (
-        <Card className={cn("overflow-hidden border-none bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20", className)}>
-            <div className="p-6 space-y-4">
-                <div className="flex items-center gap-3">
-                    <div className="p-2 bg-amber-500 rounded-lg text-white">
-                        <Leaf size={20} className="animate-pulse" />
-                    </div>
-                    <h3 className="text-lg font-black uppercase tracking-tighter italic text-amber-600 dark:text-amber-400">
-                        Phytonutrients
-                    </h3>
-                </div>
+        <div className={cn("p-6 pt-5 rounded-3xl border bg-slate-900 border-slate-800 mb-6", className)}>
+            <h4 className="font-black flex items-center gap-2 mb-1 uppercase tracking-widest text-[10px] text-amber-400">
+                <Leaf className="h-4 w-4" /> PHYTONUTRIENTS
+            </h4>
 
-                <div className="space-y-4 text-left">
-                    <p className="text-xs font-bold text-slate-600 dark:text-slate-400 leading-relaxed">
-                        {isSingleFood ? (
-                            <>
-                                <span className="text-amber-600 dark:text-amber-400 font-black">{foodName}</span> contains powerful{' '}
-                                <span className="text-amber-600 dark:text-amber-500 underline decoration-amber-200 underline-offset-4">Phytonutrients</span>
-                                {' '}— plant-based &quot;bodyguards&quot; that protect your cells from stress and help you stay youthful.
-                            </>
-                        ) : (
-                            <>
-                                This meal is loaded with{' '}
-                                <span className="text-amber-600 dark:text-amber-500 underline decoration-amber-200 underline-offset-4">Phytonutrients</span>
-                                {' '}— plant-based &quot;bodyguards&quot; sourced from the ingredients in this recipe.
-                            </>
-                        )}
-                    </p>
-
-                    <div className="grid gap-3">
-                        {entries.map(({ name, description, sources }) => (
-                            <div key={name} className="flex gap-3 items-start group">
-                                <div className="mt-1 p-1 bg-white dark:bg-slate-900 rounded border border-amber-200 dark:border-amber-800 text-amber-500 group-hover:scale-110 transition-transform flex-shrink-0">
-                                    <ShieldCheck size={14} />
-                                </div>
-                                <div className="space-y-1">
-                                    <p className="text-[11px] font-black uppercase tracking-widest text-amber-700 dark:text-amber-300">
-                                        {name}
-                                    </p>
-                                    <p className="text-[11px] font-medium text-slate-500 dark:text-slate-500 leading-snug">
-                                        {description}
-                                    </p>
-                                    {sources.length > 0 && !isSingleFood && (
-                                        <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-0.5">
-                                            <Leaf size={10} className="flex-shrink-0" />
-                                            Found in: {sources.join(', ')}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="pt-2 flex items-center gap-2 text-[10px] font-black text-amber-500/40 uppercase tracking-widest italic">
-                        <Sparkles size={12} />
-                        Molecular Health Defense Active
-                    </div>
-                </div>
+            <div className="text-[9px] text-slate-400 mb-4 border-b border-slate-800 pb-2 transition-colors">
+                {isSingleFood ? (
+                    <>
+                        <span className="text-amber-400 font-bold">{foodName}</span> contains powerful plant-based &quot;bodyguards&quot; that protect your cells from stress.
+                    </>
+                ) : (
+                    <>
+                        This profile is loaded with plant-based &quot;bodyguards&quot; sourced from the multiple ingredients.
+                    </>
+                )}
             </div>
-        </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                {entries.map(({ name, description, sources }) => (
+                    <div
+                        key={name}
+                        className="p-4 rounded-2xl border border-amber-900/50 bg-white dark:bg-slate-950 hover:shadow-md transition-all relative group"
+                    >
+                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 flex items-center gap-1.5">
+                            <ShieldCheck size={12} className="text-amber-500" />
+                            {name}
+                        </p>
+                        <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400 leading-snug">
+                            {description}
+                        </p>
+                        {sources.length > 0 && !isSingleFood && (
+                            <p className="text-[9px] font-bold text-emerald-500 flex items-center gap-1 mt-2 pt-2 border-t border-slate-100 dark:border-slate-900">
+                                <Leaf size={9} className="flex-shrink-0" />
+                                From: {sources.join(', ')}
+                            </p>
+                        )}
+                    </div>
+                ))}
+            </div>
+
+            <div className="mt-4 flex items-center gap-2 text-[9px] font-black text-amber-500/30 uppercase tracking-widest italic pt-2">
+                <Sparkles size={11} />
+                Molecular Health Defense Active
+            </div>
+        </div>
     );
 }
