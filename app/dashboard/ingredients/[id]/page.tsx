@@ -52,6 +52,12 @@ import { useRDA } from '@/hooks/use-rda';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { DidYouKnow } from '@/components/DidYouKnow';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900 shadow-xl rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden", className)}>
@@ -788,31 +794,38 @@ export default function FoodDetailsPage() {
                             />
 
                             <div className="relative group/select pl-3 pr-2">
-                                <select
-                                    className="appearance-none bg-transparent pr-4 text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 focus:outline-none cursor-pointer hover:text-emerald-500 transition-colors"
-                                    value={selectedPortion?.label || 'g'}
-                                    onChange={(e) => {
-                                        const label = e.target.value;
-                                        if (label === 'g') {
-                                            setSelectedPortion(null);
-                                            if (amount === 1) setAmount(100);
-                                        } else {
-                                            const portion = food?.portions?.find(p => p.label === label);
-                                            if (portion) {
-                                                setSelectedPortion(portion);
-                                                if (amount >= 10) setAmount(1);
-                                            }
-                                        }
-                                    }}
-                                >
-                                    <option value="g" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">Gram (g)</option>
-                                    {food?.portions?.map(p => (
-                                        <option key={p.label} value={p.label} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white">
-                                            {p.label}
-                                        </option>
-                                    ))}
-                                </select>
-                                <ChevronDown className="w-3 h-3 absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 group-hover/select:text-emerald-500" />
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger className="flex items-center gap-2 pr-4 text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
+                                        {selectedPortion?.label || 'Gram (g)'}
+                                        <ChevronDown className="w-3 h-3 text-slate-400 group-hover/select:text-emerald-500" />
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent
+                                        align="end"
+                                        className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-[1.5rem] p-2 min-w-[140px] shadow-2xl animate-in zoom-in-95 duration-200"
+                                    >
+                                        <DropdownMenuItem
+                                            className="text-[9px] font-black uppercase tracking-widest rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
+                                            onClick={() => {
+                                                setSelectedPortion(null);
+                                                if (amount === 1) setAmount(100);
+                                            }}
+                                        >
+                                            Gram (g)
+                                        </DropdownMenuItem>
+                                        {food?.portions?.map(p => (
+                                            <DropdownMenuItem
+                                                key={p.label}
+                                                className="text-[9px] font-black uppercase tracking-widest rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
+                                                onClick={() => {
+                                                    setSelectedPortion(p);
+                                                    if (amount >= 10) setAmount(1);
+                                                }}
+                                            >
+                                                {p.label}
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                         </div>
                     </div>
