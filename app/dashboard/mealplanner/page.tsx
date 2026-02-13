@@ -1248,10 +1248,31 @@ export function MealPlannerContent({
                                                     </h3>
                                                 </div>
 
-                                                <DidYouKnow
-                                                    phytonutrients={plan.phytonutrients}
-                                                    className="mb-8"
-                                                />
+                                                {(() => {
+                                                    // Build source map: phytonutrient -> { description, sources (recipe titles) }
+                                                    const allRecipes = [plan.breakfast, plan.lunch, plan.dinner, ...plan.snacks];
+                                                    const phytoSourceMap: Record<string, { description: string; sources: string[] }> = {};
+                                                    allRecipes.forEach(r => {
+                                                        const phytos = plan.recipePhytonutrients?.[r.id];
+                                                        if (phytos) {
+                                                            Object.entries(phytos).forEach(([name, desc]) => {
+                                                                if (!phytoSourceMap[name]) {
+                                                                    phytoSourceMap[name] = { description: desc, sources: [] };
+                                                                }
+                                                                if (!phytoSourceMap[name].sources.includes(r.title)) {
+                                                                    phytoSourceMap[name].sources.push(r.title);
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+                                                    if (Object.keys(phytoSourceMap).length === 0) return null;
+                                                    return (
+                                                        <DidYouKnow
+                                                            phytonutrientsWithSources={phytoSourceMap}
+                                                            className="mb-8"
+                                                        />
+                                                    );
+                                                })()}
 
                                                 <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Critical nutrient balances for metabolic & inflammation tracking" items={{
                                                     'Sodium:Potassium': ['Sodium', 'Potassium'],

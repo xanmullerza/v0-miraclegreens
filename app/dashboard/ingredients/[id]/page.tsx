@@ -775,6 +775,7 @@ export default function FoodDetailsPage() {
 
                         <DidYouKnow
                             phytonutrients={food.phytonutrients}
+                            foodName={food.common_name || food.name}
                             className="mb-8 animate-in slide-in-from-right-4 duration-700"
                         />
 

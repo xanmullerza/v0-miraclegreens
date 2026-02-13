@@ -125,6 +125,7 @@ export default function RecipeDetailsPage() {
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
     const [expandedBreakdownSections, setExpandedBreakdownSections] = useState<Record<string, boolean>>({});
     const [calculatedTotals, setCalculatedTotals] = useState<CalculatedNutrition | null>(null);
+    const [phytoSources, setPhytoSources] = useState<Record<string, { description: string; sources: string[] }>>({});
     const [isAdmin, setIsAdmin] = useState(false);
     const [showExportModal, setShowExportModal] = useState(false);
     const [totalWeight, setTotalWeight] = useState(0);
@@ -396,6 +397,24 @@ export default function RecipeDetailsPage() {
                 );
 
                 setCalculatedTotals(calculated);
+
+                // Build phytonutrient source map: which ingredient contributes which phytonutrient
+                const sourcesMap: Record<string, { description: string; sources: string[] }> = {};
+                for (const ing of fetchedIngredients) {
+                    const fi = ing.food_item;
+                    if (fi?.phytonutrients && typeof fi.phytonutrients === 'object') {
+                        const foodName = fi.common_name || fi.name || 'Unknown';
+                        Object.entries(fi.phytonutrients).forEach(([phytoName, desc]) => {
+                            if (!sourcesMap[phytoName]) {
+                                sourcesMap[phytoName] = { description: desc as string, sources: [] };
+                            }
+                            if (!sourcesMap[phytoName].sources.includes(foodName)) {
+                                sourcesMap[phytoName].sources.push(foodName);
+                            }
+                        });
+                    }
+                }
+                setPhytoSources(sourcesMap);
 
                 // Use the fresh calculation for the entire display
                 setRecipe({
@@ -1412,9 +1431,9 @@ export default function RecipeDetailsPage() {
 
                     {/* Right Column: Nutrient Report */}
                     <div className="lg:col-span-2 space-y-8">
-                        {recipe && (
+                        {recipe && Object.keys(phytoSources).length > 0 && (
                             <DidYouKnow
-                                phytonutrients={recipe.phytonutrients}
+                                phytonutrientsWithSources={phytoSources}
                                 className="animate-in slide-in-from-right-4 duration-700"
                             />
                         )}
