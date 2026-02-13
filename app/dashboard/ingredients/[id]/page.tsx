@@ -724,9 +724,9 @@ export default function FoodDetailsPage() {
     return (
         <div className="max-w-6xl mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
             {/* NEW Main Header Section (Image + Name + Description) */}
-            <div className="flex flex-row items-center gap-6 animate-in slide-in-from-top-4 duration-700">
+            <div className="flex flex-row items-end gap-6 animate-in slide-in-from-top-4 duration-700 pb-1">
                 {/* Left Side: Image (Inline with Text) */}
-                <div className="w-24 h-24 lg:w-32 lg:h-32 shrink-0">
+                <div className="w-16 h-16 lg:w-20 lg:h-20 shrink-0">
                     <Card className="w-full h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden rounded-2xl">
                         <div className="w-full h-full rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
                             {food.image ? (
@@ -748,7 +748,7 @@ export default function FoodDetailsPage() {
                 </div>
 
                 {/* Right Side: Text Content */}
-                <div className="flex-1 flex flex-col justify-center">
+                <div className="flex-1 flex flex-col">
                     <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2">
                         <span className="text-emerald-500">{food.common_name || food.name}</span>
                     </h1>
