@@ -49,7 +49,7 @@ export function DidYouKnow({ phytonutrients, phytonutrientsWithSources, foodName
                         <Lightbulb size={20} className="animate-pulse" />
                     </div>
                     <h3 className="text-lg font-black uppercase tracking-tighter italic text-amber-600 dark:text-amber-400">
-                        Did You Know?
+                        Phytonutrients
                     </h3>
                 </div>
 
