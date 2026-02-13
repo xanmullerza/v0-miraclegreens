@@ -404,7 +404,8 @@ export default function RecipeDetailsPage() {
                     protein: calculated.protein,
                     carbs: calculated.carbs,
                     fat: calculated.fat,
-                    micronutrients: calculated.micronutrients
+                    micronutrients: calculated.micronutrients,
+                    phytonutrients: calculated.phytonutrients
                 });
             } else {
                 setRecipe(recipeData);
@@ -1413,7 +1414,7 @@ export default function RecipeDetailsPage() {
                     <div className="lg:col-span-2 space-y-8">
                         {recipe && (
                             <DidYouKnow
-                                phytonutrients={recipe.calculated_nutrition?.phytonutrients || recipe.phytonutrients}
+                                phytonutrients={recipe.phytonutrients}
                                 className="animate-in slide-in-from-right-4 duration-700"
                             />
                         )}
