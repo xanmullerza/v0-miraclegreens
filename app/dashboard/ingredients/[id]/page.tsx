@@ -726,7 +726,7 @@ export default function FoodDetailsPage() {
             {/* NEW Main Header Section (Image + Name + Description) */}
             <div className="flex flex-row items-end gap-6 animate-in slide-in-from-top-4 duration-700 pb-1">
                 {/* Left Side: Image (Inline with Text) */}
-                <div className="w-12 h-12 lg:w-20 lg:h-20 shrink-0">
+                <div className="w-20 h-20 lg:w-20 lg:h-20 shrink-0">
                     <Card className="w-full h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden rounded-2xl">
                         <div className="w-full h-full rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
                             {food.image ? (
