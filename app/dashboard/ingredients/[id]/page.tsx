@@ -723,51 +723,47 @@ export default function FoodDetailsPage() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
-            {/* NEW Main Header Section (Name + Measure + Image + Description) */}
-            <div className="flex flex-col lg:flex-row gap-8 animate-in slide-in-from-top-4 duration-700">
-                {/* Left Side: Text Content */}
-                <div className="flex-1 flex flex-col justify-between gap-6">
-                    <div>
-                        <div className="flex items-start justify-between gap-4">
-                            <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2">
-                                <span className="text-emerald-500">{food.common_name || food.name}</span>
-                            </h1>
-                        </div>
-
-                        {/* Description - Moved to Badge Position & Styled */}
-                        {(food.details || FOOD_DETAILS[food.id]) && (
-                            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2 leading-relaxed max-w-2xl">
-                                {(food.details || FOOD_DETAILS[food.id]).description}
-                                {food.quantity && (
-                                    <span className="ml-3 text-emerald-500">
-                                        In Stock: {food.quantity}
-                                    </span>
-                                )}
-                            </p>
-                        )}
-                    </div>
-                </div>
-
-                {/* Right Side: Image (Scaled to Headline) */}
-                <div className="lg:w-48 shrink-0">
-                    <Card className="aspect-square lg:aspect-auto lg:h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden">
-                        <div className="w-full h-full rounded-2xl bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
+            {/* NEW Main Header Section (Image + Name + Description) */}
+            <div className="flex flex-row items-center gap-6 animate-in slide-in-from-top-4 duration-700">
+                {/* Left Side: Image (Inline with Text) */}
+                <div className="w-24 h-24 lg:w-32 lg:h-32 shrink-0">
+                    <Card className="w-full h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden rounded-2xl">
+                        <div className="w-full h-full rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
                             {food.image ? (
                                 <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-slate-200">
-                                    <Beef size={40} className="opacity-10" />
+                                    <Beef size={24} className="opacity-10" />
                                 </div>
                             )}
-                            <div className="absolute top-2 left-2 flex flex-col gap-1">
+                            <div className="absolute top-1 left-1 flex flex-col gap-1">
                                 {food.protein_g > 15 && (
-                                    <Badge className="bg-red-600/90 text-white border-none text-[8px] font-black uppercase tracking-widest px-2 py-0.5 backdrop-blur-md shadow-xl w-fit">
-                                        High Protein
+                                    <Badge className="bg-red-600/90 text-white border-none text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 backdrop-blur-md shadow-xl w-fit">
+                                        HP
                                     </Badge>
                                 )}
                             </div>
                         </div>
                     </Card>
+                </div>
+
+                {/* Right Side: Text Content */}
+                <div className="flex-1 flex flex-col justify-center">
+                    <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2">
+                        <span className="text-emerald-500">{food.common_name || food.name}</span>
+                    </h1>
+
+                    {/* Description - Styled as Subtext */}
+                    {(food.details || FOOD_DETAILS[food.id]) && (
+                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] leading-relaxed max-w-2xl">
+                            {(food.details || FOOD_DETAILS[food.id]).description}
+                            {food.quantity && (
+                                <span className="ml-3 text-emerald-500">
+                                    In Stock: {food.quantity}
+                                </span>
+                            )}
+                        </p>
+                    )}
                 </div>
             </div>
 
