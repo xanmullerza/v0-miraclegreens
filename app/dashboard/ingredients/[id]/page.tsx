@@ -650,16 +650,16 @@ export default function FoodDetailsPage() {
                             </p>
                         )}
                     </div>
-                    <div className="flex items-center gap-3 bg-white dark:bg-slate-900 px-6 py-3 rounded-3xl border-2 border-slate-200 dark:border-slate-800 shadow-xl group/amount transition-all hover:border-emerald-500/50 w-fit">
-                        <Scale className="w-5 h-5 text-emerald-500" />
+                    <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-4 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-lg group/amount transition-all hover:border-emerald-500/50 w-fit">
+                        <Scale className="w-4 h-4 text-emerald-500" />
                         <div className="flex items-baseline gap-1">
                             <input
                                 type="number"
                                 value={amount}
                                 onChange={(e) => setAmount(Number(e.target.value))}
-                                className="w-20 bg-transparent text-3xl font-black italic tracking-tighter text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                                className="w-14 bg-transparent text-lg font-black italic tracking-tighter text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
-                            <span className="text-xl font-black italic text-slate-400">g</span>
+                            <span className="text-sm font-black italic text-slate-400">g</span>
                         </div>
                     </div>
                 </div>
