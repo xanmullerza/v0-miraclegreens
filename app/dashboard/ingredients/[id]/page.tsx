@@ -844,14 +844,13 @@ export default function FoodDetailsPage() {
                     </h3>
 
                     {/* Compact Measure Selector */}
-                    <div className="flex items-center gap-2 bg-white dark:bg-slate-900 pr-3 pl-4 py-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-lg group/amount transition-all hover:border-emerald-500/50 shrink-0">
-                        <Scale className="w-3.5 h-3.5 text-emerald-500" />
-                        <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-2 bg-white dark:bg-slate-900 px-4 py-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-lg group/amount transition-all hover:border-emerald-500/50 shrink-0">
+                        <div className="flex items-center gap-2">
                             <input
                                 type="number"
                                 value={amount}
                                 onChange={(e) => setAmount(Number(e.target.value))}
-                                className="w-12 bg-transparent text-lg font-black italic tracking-tighter text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-right"
+                                className="w-14 bg-transparent text-lg font-black italic tracking-tighter text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-right"
                             />
 
                             <div className="relative group/select">
