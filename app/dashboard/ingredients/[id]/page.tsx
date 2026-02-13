@@ -29,8 +29,16 @@ import {
     Beaker,
     Scale,
     Dna,
-    Pencil
+    Pencil,
+    LayoutGrid,
+    UtensilsCrossed,
+    ShoppingCart,
+    ShoppingBasket,
+    Search,
+    Filter
 } from 'lucide-react';
+import { useSearch } from '@/lib/context/search-context';
+import { CATEGORIES } from '@/components/library/foods-view';
 import { FOOD_DETAILS } from '@/lib/data/food-details';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -90,7 +98,7 @@ export default function FoodDetailsPage() {
     const [uploading, setUploading] = useState(false);
     const [saveLoading, setSaveLoading] = useState(false);
 
-    const CATEGORIES = ["Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
+
 
     const { nutrientDisplayMode, profile, energyUnit, dailyTargets } = useUserPreferences();
 
@@ -99,6 +107,129 @@ export default function FoodDetailsPage() {
         typeof profile.age === 'number' ? profile.age : 30,
         profile.gender || 'female',
         2000 // Standard reference
+    );
+
+    // --- Navigation / Pillbox State ---
+    const { searchQuery, setSearchQuery, setIsFocused, activeSearchId, setActiveSearchId } = useSearch();
+    const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+    // Visual state for tabs - clicking them navigates back to main page
+    const currentTab = 'allfoods';
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+    const ingredientTabs = [
+        { id: 'allfoods', label: 'All Foods', icon: UtensilsCrossed, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+        { id: 'groceries', label: 'Groceries', icon: ShoppingCart, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+        { id: 'pantry', label: 'Pantry', icon: ShoppingBasket, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+    ];
+
+    const renderTabGroup = (tabsList: typeof ingredientTabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
+        <div className="space-y-3 w-full">
+            {sectionLabel && <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>}
+            <div className={cn(
+                "flex items-center p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden w-full md:max-w-[800px] mx-auto xl:mx-0"
+            )}>
+                {/* Left side - Home Button area */}
+                <div className={cn("flex-shrink-0 flex items-center justify-start transition-all duration-500", isSearchExpanded ? "w-0" : "w-12")}>
+                    {showHomeButton && !isSearchExpanded && (
+                        <button
+                            onClick={() => router.push('/dashboard')}
+                            className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all flex-shrink-0"
+                            title="Back to Dashboard"
+                        >
+                            <LayoutGrid size={18} />
+                        </button>
+                    )}
+                </div>
+
+                {/* Center - Tabs area */}
+                <div className={cn("flex items-center justify-center overflow-hidden transition-all duration-500", isSearchExpanded ? "w-0 flex-none opacity-0" : "flex-1 opacity-100")}>
+                    <div className="flex items-center gap-4 overflow-hidden py-1">
+                        {tabsList.map((tab) => {
+                            const Icon = tab.icon;
+                            // Checking if we are "on" this tab is tricky since we are in detail view. 
+                            // We'll just show them as navigable buttons.
+                            const isActive = false;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => router.push(`/dashboard/ingredients?tab=${tab.id}`)}
+                                    className={cn(
+                                        "flex items-center gap-3 py-3.5 rounded-[1.5rem] text-[9px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
+                                        isActive
+                                            ? "bg-slate-900 dark:bg-slate-800 text-white shadow-xl translate-y-[-2px]"
+                                            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50",
+                                        "px-4 md:px-5"
+                                    )}
+                                >
+                                    <Icon size={15} className={cn(
+                                        "transition-transform duration-500 group-hover:scale-110",
+                                        isActive ? tab.color : "text-slate-400"
+                                    )} />
+                                    <span className={cn(
+                                        "transition-all duration-300 overflow-hidden hidden md:block",
+                                        isSearchExpanded ? "w-0 opacity-0" : "w-auto opacity-100"
+                                    )}>
+                                        {tab.label}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* Right side - Search area */}
+                <div className={cn(
+                    "flex items-center justify-end transition-all duration-500",
+                    isSearchExpanded ? "flex-1 pl-2" : "w-12"
+                )}>
+                    <div className={cn(
+                        "flex items-center transition-all duration-500 overflow-hidden",
+                        isSearchExpanded ? "flex-1 opacity-100" : "w-0 opacity-0"
+                    )}>
+                        <input
+                            type="text"
+                            autoFocus
+                            placeholder={`Search ingredients...`}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    router.push(`/dashboard/ingredients?tab=allfoods`);
+                                }
+                            }}
+                            onFocus={() => {
+                                setIsFocused(true);
+                                setActiveSearchId('ingredients-bar');
+                            }}
+                            onBlur={() => {
+                                // Small delay to allow selections
+                                setTimeout(() => {
+                                    if (activeSearchId === 'ingredients-bar') setActiveSearchId(null);
+                                }, 200);
+                            }}
+                            className="w-full bg-slate-50 dark:bg-slate-800/50 border-none focus:ring-0 text-[10px] font-black uppercase tracking-widest h-12 rounded-[1.5rem] px-6 text-slate-900 dark:text-white"
+                        />
+                    </div>
+                    <button
+                        onClick={() => {
+                            if (isSearchExpanded) setSearchQuery('');
+                            setIsSearchExpanded(!isSearchExpanded);
+                        }}
+                        className={cn(
+                            "flex items-center justify-center w-12 h-12 rounded-[1.5rem] transition-all flex-shrink-0",
+                            isSearchExpanded
+                                ? "bg-emerald-50 text-emerald-500 hover:bg-emerald-100"
+                                : "text-slate-400 hover:text-emerald-500 hover:bg-emerald-50"
+                        )}
+                        title="Search"
+                    >
+                        {isSearchExpanded ? <X size={18} /> : <Search size={18} />}
+                    </button>
+                </div>
+            </div>
+        </div>
     );
 
     useEffect(() => {
@@ -592,49 +723,61 @@ export default function FoodDetailsPage() {
 
     return (
         <div className="max-w-6xl mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
-            {/* Nav */}
-            <div className="flex items-center justify-between">
-                <button
-                    onClick={() => router.back()}
-                    className="flex items-center gap-2 text-slate-500 hover:text-emerald-600 font-bold text-sm transition-colors group"
-                >
-                    <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-                    Back
-                </button>
-                <div className="flex gap-3">
-                    <Button
-                        variant="outline"
-                        onClick={handleEditStart}
-                        className="rounded-2xl h-12 gap-2 font-black uppercase tracking-widest border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-[10px]"
-                    >
-                        <Edit2 size={16} />
-                        Edit Ingredient
-                    </Button>
-                    <Button
-                        variant="outline"
-                        className="rounded-2xl h-12 w-12 p-0 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
-                    >
-                        <Share2 size={18} />
-                    </Button>
-                    <Button
-                        variant="outline"
-                        onClick={() => router.push(`/dashboard/spice-converter?foodId=${food.id}`)}
-                        className="rounded-2xl h-12 gap-2 font-black uppercase tracking-widest border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all text-[10px] text-indigo-600"
-                    >
-                        <Beaker size={16} />
-                        Spice Lab
-                    </Button>
-                    <Button
-                        onClick={toggleFavorite}
-                        variant="outline"
+            {/* Unified Hub Navigation (Replaces Old Nav) */}
+            <div className="flex flex-col gap-6 items-start w-full">
+                {renderTabGroup(ingredientTabs, "", "text-slate-500", true)}
+
+                {/* Filter Row */}
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
+                    {/* Favorites Toggle */}
+                    <button
+                        onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
                         className={cn(
-                            "rounded-2xl px-6 h-12 font-black uppercase tracking-widest gap-2 border-slate-200 dark:border-slate-800 transition-all shadow-sm",
-                            food.is_favorite ? "bg-rose-50 border-rose-200 text-rose-600 dark:bg-rose-900/20 dark:border-rose-800 dark:text-rose-400" : "hover:bg-slate-50 dark:hover:bg-slate-800"
+                            "flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all duration-300 shrink-0 shadow-sm group",
+                            showFavoritesOnly
+                                ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
+                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-200 hover:text-rose-500 dark:hover:border-rose-900/50"
                         )}
                     >
-                        <Heart size={18} fill={food.is_favorite ? "currentColor" : "none"} />
-                        {food.is_favorite ? 'Favorited' : 'Favorite'}
-                    </Button>
+                        <Heart size={14} className={cn("transition-transform group-hover:scale-110", showFavoritesOnly && "fill-current scale-110")} />
+                        <span className="text-[9px] font-black uppercase tracking-widest">Favorites</span>
+                    </button>
+
+                    <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
+
+                    {/* Category Chips */}
+                    {CATEGORIES.map(category => {
+                        const isActive = selectedCategories.includes(category);
+                        return (
+                            <button
+                                key={category}
+                                onClick={() => isActive
+                                    ? setSelectedCategories(prev => prev.filter(c => c !== category))
+                                    : setSelectedCategories(prev => [...prev, category])
+                                }
+                                className={cn(
+                                    "px-3.5 py-2 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap shrink-0 border shadow-sm",
+                                    isActive
+                                        ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20"
+                                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-emerald-200 hover:text-emerald-600 dark:hover:border-emerald-900/50"
+                                )}
+                            >
+                                {category}
+                            </button>
+                        );
+                    })}
+
+                    {selectedCategories.length > 0 && (
+                        <>
+                            <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
+                            <button
+                                onClick={() => setSelectedCategories([])}
+                                className="px-2.5 py-1.5 rounded-2xl text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all shrink-0 flex items-center gap-1"
+                            >
+                                <X size={12} /> Clear
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
 
