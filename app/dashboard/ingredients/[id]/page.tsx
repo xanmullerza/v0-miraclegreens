@@ -732,20 +732,6 @@ export default function FoodDetailsPage() {
                             <h1 className="text-5xl lg:text-7xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2">
                                 <span className="text-emerald-500">{food.common_name || food.name}</span>
                             </h1>
-
-                            {/* Editable Measure Input - Moved here to aline with top */}
-                            <div className="flex items-center gap-3 bg-white dark:bg-slate-900 px-4 py-2 rounded-3xl border-2 border-slate-200 dark:border-slate-800 shadow-xl group/amount transition-all hover:border-emerald-500/50 shrink-0">
-                                <Scale className="w-4 h-4 text-emerald-500" />
-                                <div className="flex items-baseline gap-1">
-                                    <input
-                                        type="number"
-                                        value={amount}
-                                        onChange={(e) => setAmount(Number(e.target.value))}
-                                        className="w-16 bg-transparent text-2xl font-black italic tracking-tighter text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-right"
-                                    />
-                                    <span className="text-lg font-black italic text-slate-400">g</span>
-                                </div>
-                            </div>
                         </div>
 
                         {/* Description - Moved to Badge Position & Styled */}
@@ -848,11 +834,25 @@ export default function FoodDetailsPage() {
 
             {/* Nutrient Grids - Removed Hero Wrapper */}
             <div className="space-y-6">
-                <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6">
+                <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
                         <Activity size={18} />
-                        Nutrition Report
+                        Nutrients
                     </h3>
+
+                    {/* Editable Measure Input - Moved here */}
+                    <div className="flex items-center gap-3 bg-white dark:bg-slate-900 px-4 py-2 rounded-3xl border-2 border-slate-200 dark:border-slate-800 shadow-xl group/amount transition-all hover:border-emerald-500/50 shrink-0">
+                        <Scale className="w-4 h-4 text-emerald-500" />
+                        <div className="flex items-baseline gap-1">
+                            <input
+                                type="number"
+                                value={amount}
+                                onChange={(e) => setAmount(Number(e.target.value))}
+                                className="w-16 bg-transparent text-2xl font-black italic tracking-tighter text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-right"
+                            />
+                            <span className="text-lg font-black italic text-slate-400">g</span>
+                        </div>
+                    </div>
                 </div>
 
 
