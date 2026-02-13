@@ -762,27 +762,6 @@ export default function FoodDetailsPage() {
                     </div>
                 </div>
 
-                {/* Right Side: Image (Same Height-ish) */}
-                <div className="lg:w-1/3 shrink-0">
-                    <Card className="aspect-video lg:aspect-square relative p-2 bg-white dark:bg-slate-900 border-none group h-full max-h-[300px] lg:max-h-[none]">
-                        <div className="w-full h-full rounded-[2rem] bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
-                            {food.image ? (
-                                <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-slate-200">
-                                    <Beef size={80} className="opacity-10" />
-                                </div>
-                            )}
-                            <div className="absolute top-4 left-4 flex flex-col gap-2">
-                                {food.protein_g > 15 && (
-                                    <Badge className="bg-red-600/90 text-white border-none text-[10px] font-black uppercase tracking-widest px-3 py-1 backdrop-blur-md shadow-2xl w-fit">
-                                        High Protein
-                                    </Badge>
-                                )}
-                            </div>
-                        </div>
-                    </Card>
-                </div>
             </div>
 
             {/* Unified Hub Navigation (Replaces Old Nav) */}
@@ -841,6 +820,28 @@ export default function FoodDetailsPage() {
                         </>
                     )}
                 </div>
+            </div>
+
+            {/* Food Image - Moved Below Filter */}
+            <div className="w-full max-w-2xl mx-auto">
+                <Card className="aspect-video relative p-2 bg-white dark:bg-slate-900 border-none group w-full">
+                    <div className="w-full h-full rounded-[2rem] bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
+                        {food.image ? (
+                            <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center text-slate-200">
+                                <Beef size={80} className="opacity-10" />
+                            </div>
+                        )}
+                        <div className="absolute top-4 left-4 flex flex-col gap-2">
+                            {food.protein_g > 15 && (
+                                <Badge className="bg-red-600/90 text-white border-none text-[10px] font-black uppercase tracking-widest px-3 py-1 backdrop-blur-md shadow-2xl w-fit">
+                                    High Protein
+                                </Badge>
+                            )}
+                        </div>
+                    </div>
+                </Card>
             </div>
 
 
