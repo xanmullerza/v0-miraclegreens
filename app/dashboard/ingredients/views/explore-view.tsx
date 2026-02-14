@@ -350,7 +350,11 @@ export function ExploreView({
                             {/* Items in Group */}
                             <div className="space-y-2">
                                 {items.map((food) => (
-                                    <div key={food.id} className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden">
+                                    <div
+                                        key={food.id}
+                                        onClick={() => router.push(`/dashboard/ingredients/${food.id}`)}
+                                        className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden cursor-pointer"
+                                    >
                                         <div className="flex items-center justify-between p-4 lg:p-0 lg:grid lg:grid-cols-[60px_1fr_180px] gap-4 lg:items-center lg:px-10 py-0">
                                             {/* Thumbnail */}
                                             <div className="hidden lg:block aspect-square w-12 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-500 mx-auto">
