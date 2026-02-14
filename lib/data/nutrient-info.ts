@@ -467,5 +467,14 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         toxicitySymptoms: ["Digestive distress", "Heart disease risk (Saturated/Trans excess)", "Inflammation"],
         upperLimit: "Varies by diet type",
         sources: ["Avocados", "Nuts", "Seeds", "Olive oil", "Fatty fish"]
+    },
+    'welcome': {
+        description: "welcome",
+        history: "welcome",
+        importance: "welcome",
+        benefits: ["welcome"],
+        deficiencySigns: ["welcome"],
+        sources: ["welcome"],
+        relatedFacts: ["welcome", "welcome", "welcome", "welcome", "welcome"]
     }
 };

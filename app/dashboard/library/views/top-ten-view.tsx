@@ -17,7 +17,8 @@ import {
     Heart,
     Filter,
     ChevronDown,
-    Apple
+    Apple,
+    Sparkles
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -75,6 +76,7 @@ export const NUTRIENTS = [
     { id: 'Omega-3', label: 'Omega-3', unit: 'g', color: 'bg-teal-500', icon: Droplet },
     { id: 'Oxalate', label: 'Oxalate', unit: 'mg', color: 'bg-amber-600', icon: Gem },
     { id: 'Sugar', label: 'Sugar', unit: 'g', color: 'bg-pink-400', icon: Zap },
+    { id: 'welcome', label: 'Welcome', unit: '', color: 'bg-emerald-500', icon: Sparkles },
 ];
 
 interface TopTenViewProps {

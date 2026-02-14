@@ -7,7 +7,8 @@ import {
     Scale,
     ChevronDown,
     Gem,
-    Battery
+    Battery,
+    Sparkles
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -26,7 +27,7 @@ export default function NutrientsPage() {
 
     // We maintain a 'selected' state just for the UI of the dropdowns (to show what was last picked or highlight hierarchy)
     // But realistically, selecting one navigates away.
-    const [selectedNutrientId, setSelectedNutrientId] = useState<string | null>(null);
+    const [selectedNutrientId, setSelectedNutrientId] = useState<string | null>('welcome');
 
     // Filter States passed to NutrientsView if we want to filter the grid (optional, but good for "Browse" feel)
     // The user asked for the "exact same filter", which usually implies the strip of dropdowns.
@@ -34,7 +35,7 @@ export default function NutrientsPage() {
     // Here, we'll use them as quick navigation or high-level filtering.
     // Since the dropdowns pick a SPECIFIC nutrient, navigation is the best UX.
 
-    const MACROS = ['energy_kcal', 'protein_g', 'carbs_g', 'fat_g', 'Fiber', 'Sugar', 'Omega-3', 'Cholesterol'];
+    const MACROS = ['welcome', 'energy_kcal', 'protein_g', 'carbs_g', 'fat_g', 'Fiber', 'Sugar', 'Omega-3', 'Cholesterol'];
     const MINERALS = ['Sodium', 'Potassium', 'Magnesium', 'Calcium', 'Phosphorus', 'Iron', 'Zinc', 'Copper', 'Manganese', 'Selenium', 'Oxalate'];
     const VITAMINS = ['Vitamin A', 'Vitamin C', 'Vitamin D', 'Vitamin E', 'Vitamin K', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Choline'];
 
@@ -43,6 +44,12 @@ export default function NutrientsPage() {
         const encodedId = encodeURIComponent(id);
         router.push(`/dashboard/nutrients/${encodedId}`);
     };
+
+    // Make 'welcome' the default view by redirecting on initial load if no other nutrient is selected
+    React.useEffect(() => {
+        const encodedId = encodeURIComponent('welcome');
+        router.push(`/dashboard/nutrients/${encodedId}`);
+    }, [router]);
 
     return (
         <div className="space-y-8 p-4 md:p-8 pb-24">
