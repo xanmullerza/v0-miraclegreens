@@ -348,113 +348,112 @@ export default function NutrientDetailsPage() {
                         </div>
                     </div>
 
-                    {/* Main Content Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                        <div className="space-y-8">
-                            {/* Biological Significance */}
-                            <div className="p-8 bg-emerald-50 dark:bg-emerald-950/20 rounded-[2.5rem] border border-emerald-100 dark:border-emerald-900/50 shadow-sm">
-                                <h4 className="font-black text-[11px] mb-4 uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-400">Why It Matters</h4>
-                                <p className="text-base font-medium text-slate-700 dark:text-slate-300 leading-relaxed italic">
-                                    {info.importance}
-                                </p>
-                            </div>
-
-                            {/* Benefits */}
-                            <div className="space-y-4">
-                                <h4 className="font-black text-[11px] px-2 uppercase tracking-[0.2em] text-slate-400">Key Benefits</h4>
-                                <div className="flex flex-wrap gap-2.5">
-                                    {info.benefits.map((b, i) => (
-                                        <span key={i} className="text-[10px] font-black uppercase tracking-widest bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-100 px-5 py-2.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-                                            {b}
-                                        </span>
-                                    ))}
+                    {/* Interactive Threshold Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
+                        {/* 1. Deficiency Box */}
+                        <div className={cn(
+                            "p-6 rounded-[2.5rem] border transition-all duration-700 relative overflow-hidden flex flex-col h-full",
+                            isDeficient
+                                ? "bg-amber-500 border-amber-400 shadow-2xl shadow-amber-500/40 text-white scale-[1.02] z-10"
+                                : "bg-amber-50 dark:bg-amber-950/10 border-amber-100 dark:border-amber-900/30 opacity-40 grayscale"
+                        )}>
+                            <div className="space-y-4 flex-grow">
+                                <div className="flex items-center justify-between">
+                                    <h4 className={cn("font-black text-[10px] uppercase tracking-[0.2em]", isDeficient ? "text-white" : "text-amber-700 dark:text-amber-400")}>Deficiency</h4>
+                                    {isDeficient && <Badge className="bg-white/20 text-white border-white/30 text-[8px] uppercase tracking-widest font-black">ACTIVE</Badge>}
                                 </div>
-                            </div>
-
-                            {/* Alternative Sources */}
-                            <div className="space-y-4">
-                                <h4 className="font-black text-[11px] px-2 uppercase tracking-[0.2em] text-slate-400">Alternative Sources</h4>
-                                <div className="flex flex-wrap gap-2">
-                                    {info.sources.map((s, i) => (
-                                        <span key={i} className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-5 py-3 rounded-2xl font-bold border border-slate-200 dark:border-slate-800/50">
-                                            {s}
-                                        </span>
-                                    ))}
+                                <div className="space-y-3">
+                                    <p className={cn("text-[9px] font-black uppercase tracking-widest leading-none", isDeficient ? "text-amber-100" : "text-amber-600/50")}>Clinical Red Flags</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {info.deficiencySigns.map((s, i) => (
+                                            <span key={i} className={cn(
+                                                "text-[8px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border",
+                                                isDeficient ? "bg-amber-400 border-amber-300 text-white" : "bg-white dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-100 dark:border-amber-800"
+                                            )}>
+                                                {s}
+                                            </span>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="space-y-8">
-                            {/* Safety & Toxicity */}
-                            <div className={cn(
-                                "p-8 rounded-[2.5rem] border transition-all duration-700 relative overflow-hidden",
-                                isToxic
-                                    ? "bg-rose-600 border-rose-400 shadow-2xl shadow-rose-600/40 text-white scale-[1.02] z-10"
-                                    : "bg-rose-50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/50 opacity-40 grayscale"
-                            )}>
-                                <div className="space-y-4">
-                                    <div className="flex items-center justify-between">
-                                        <h4 className={cn("font-black text-[11px] uppercase tracking-[0.2em]", isToxic ? "text-white" : "text-rose-700 dark:text-rose-400")}>
-                                            {isSupplementalUL ? "Supplemental Hazard" : hasNoUL ? "Whole Food Safety" : "Safety & Toxicity"}
-                                        </h4>
-                                        <div className={cn(
-                                            "px-3 py-1 rounded-lg border text-[9px] font-black uppercase",
-                                            isToxic ? "bg-rose-500 border-rose-400 text-white" : "bg-white/50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-800 text-rose-600"
-                                        )}>
-                                            {hasNoUL ? "Dietary: Safe" : `UL: ${info.upperLimit}`}
-                                        </div>
-                                    </div>
-                                    <div className="space-y-3">
-                                        <p className={cn("text-[10px] font-black uppercase tracking-widest leading-none", isToxic ? "text-rose-100" : "text-rose-600/50")}>
-                                            {isToxic ? "Symptom Onset" : "Potential Over-Dose Symptoms"}
-                                        </p>
-                                        <div className="flex flex-wrap gap-2">
-                                            {(info.toxicitySymptoms || ['No whole-food toxicity recorded.']).map((s, i) => (
-                                                <span key={i} className={cn(
-                                                    "text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border",
-                                                    isToxic ? "bg-rose-500/50 border-rose-400 text-white" : "bg-white dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 border-rose-100 dark:border-rose-800"
-                                                )}>
-                                                    {s}
-                                                </span>
-                                            ))}
-                                        </div>
+                        {/* 2. Optimal Intake Box (Replacing Key Benefits) */}
+                        <div className={cn(
+                            "p-6 rounded-[2.5rem] border transition-all duration-700 relative overflow-hidden flex flex-col h-full",
+                            isOptimal
+                                ? "bg-emerald-600 border-emerald-400 shadow-2xl shadow-emerald-600/40 text-white scale-[1.02] z-10"
+                                : "bg-emerald-50 dark:bg-emerald-950/10 border-emerald-100 dark:border-emerald-900/30 opacity-40 grayscale"
+                        )}>
+                            <div className="space-y-4 flex-grow">
+                                <div className="flex items-center justify-between">
+                                    <h4 className={cn("font-black text-[10px] uppercase tracking-[0.2em]", isOptimal ? "text-white" : "text-emerald-700 dark:text-emerald-400")}>Optimal Intake</h4>
+                                    {isOptimal && <Badge className="bg-white/20 text-white border-white/30 text-[8px] uppercase tracking-widest font-black">PEAK ZONE</Badge>}
+                                </div>
+                                <div className="space-y-3">
+                                    <p className={cn("text-[9px] font-black uppercase tracking-widest leading-none", isOptimal ? "text-emerald-100" : "text-emerald-600/50")}>Biological Benefits</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {info.benefits.map((b, i) => (
+                                            <span key={i} className={cn(
+                                                "text-[8px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border",
+                                                isOptimal ? "bg-emerald-500 border-emerald-400 text-white" : "bg-white dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-100 dark:border-emerald-800"
+                                            )}>
+                                                {b}
+                                            </span>
+                                        ))}
                                     </div>
                                 </div>
-                                {isToxic && (
-                                    <div className="absolute top-4 right-4 animate-in fade-in zoom-in duration-500">
-                                        <Badge className="bg-white/20 text-white border-white/30 text-[8px] uppercase tracking-widest font-black">CRITICAL ZONE</Badge>
-                                    </div>
-                                )}
                             </div>
+                        </div>
 
-                            {/* Deficiency Alerts */}
-                            <div className={cn(
-                                "p-8 rounded-[2.5rem] border transition-all duration-700 relative overflow-hidden",
-                                isDeficient
-                                    ? "bg-amber-500 border-amber-400 shadow-2xl shadow-amber-500/40 text-white scale-[1.02] z-10"
-                                    : "bg-amber-50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/50 opacity-40 grayscale"
-                            )}>
-                                <div className="space-y-4">
-                                    <h4 className={cn("font-black text-[11px] uppercase tracking-[0.2em]", isDeficient ? "text-white" : "text-amber-700 dark:text-amber-400")}>Deficiency Indicators</h4>
-                                    <div className="space-y-3">
-                                        <p className={cn("text-[10px] font-black uppercase tracking-widest leading-none", isDeficient ? "text-amber-100" : "text-amber-600/50")}>Clinical Red Flags</p>
-                                        <div className="flex flex-wrap gap-2">
-                                            {info.deficiencySigns.map((s, i) => (
-                                                <span key={i} className={cn(
-                                                    "text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border",
-                                                    isDeficient ? "bg-amber-400 border-amber-300 text-white" : "bg-white dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-100 dark:border-amber-800"
-                                                )}>
-                                                    {s}
-                                                </span>
-                                            ))}
-                                        </div>
+                        {/* 3. Excessive Intake Box */}
+                        <div className={cn(
+                            "p-6 rounded-[2.5rem] border transition-all duration-700 relative overflow-hidden flex flex-col h-full",
+                            isToxic
+                                ? "bg-rose-600 border-rose-400 shadow-2xl shadow-rose-600/40 text-white scale-[1.02] z-10"
+                                : "bg-rose-50 dark:bg-rose-950/10 border-rose-100 dark:border-rose-900/30 opacity-40 grayscale"
+                        )}>
+                            <div className="space-y-4 flex-grow">
+                                <div className="flex items-center justify-between">
+                                    <h4 className={cn("font-black text-[10px] uppercase tracking-[0.2em]", isToxic ? "text-white" : "text-rose-700 dark:text-rose-400")}>
+                                        {isSupplementalUL ? "Suppl. Hazard" : hasNoUL ? "Food Safety" : "Toxicity"}
+                                    </h4>
+                                    {isToxic && <Badge className="bg-white/20 text-white border-white/30 text-[8px] uppercase tracking-widest font-black">CRITICAL</Badge>}
+                                </div>
+                                <div className="space-y-3">
+                                    <p className={cn("text-[9px] font-black uppercase tracking-widest leading-none", isToxic ? "text-rose-100" : "text-rose-600/50")}>Toxicity Symptoms</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {(info.toxicitySymptoms || ['No whole-food risks recorded.']).map((s, i) => (
+                                            <span key={i} className={cn(
+                                                "text-[8px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border",
+                                                isToxic ? "bg-rose-500 border-rose-400 text-white" : "bg-white dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 border-rose-100 dark:border-rose-800"
+                                            )}>
+                                                {s}
+                                            </span>
+                                        ))}
                                     </div>
                                 </div>
-                                {isDeficient && (
-                                    <div className="absolute top-4 right-4 animate-in fade-in zoom-in duration-500">
-                                        <Badge className="bg-white/20 text-white border-white/30 text-[8px] uppercase tracking-widest font-black">WARNING ZONE</Badge>
-                                    </div>
-                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Secondary Info Area */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-12 border-t border-slate-100 dark:border-slate-800">
+                        <div className="space-y-6">
+                            <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400">Biological Significance</h4>
+                            <p className="text-xl font-medium text-slate-700 dark:text-slate-300 leading-relaxed italic">
+                                "{info.history} {info.importance}"
+                            </p>
+                        </div>
+
+                        <div className="space-y-6">
+                            <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400">Traditional Dietary Sources</h4>
+                            <div className="flex flex-wrap gap-2">
+                                {info.sources.map((s, i) => (
+                                    <span key={i} className="text-[10px] bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 px-5 py-3 rounded-2xl font-black uppercase tracking-widest border border-slate-200 dark:border-slate-800 shadow-sm">
+                                        {s}
+                                    </span>
+                                ))}
                             </div>
                         </div>
                     </div>
