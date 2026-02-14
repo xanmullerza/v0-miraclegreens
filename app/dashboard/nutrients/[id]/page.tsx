@@ -323,6 +323,7 @@ export default function NutrientDetailsPage() {
                             <p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-relaxed">
                                 {(() => {
                                     if (nutrientId === 'Magnesium') return "Safe from whole foods. The 350mg limit applies exclusively to supplemental pills. Leafy greens and seeds are zero-risk at any intake level.";
+                                    if (nutrientId === 'Sodium') return "Intrinsic vs. Added. Sodium naturally found 'inside' whole foods (like celery or meat) is virtually impossible to over-consume. The 2300mg hazard limit is a warning against added salts and industrial processing, not nature's chemistry.";
                                     if (nutrientId === 'Vitamin A') return "Source matters. Toxicity (Retinol) is linked to animal liver and supplements. Beta-carotene from plants like carrots is naturally regulated and safe.";
                                     if (nutrientId === 'Vitamin K') return "Zero known toxicity. This nutrient has no established hazard level from whole-food sources. You cannot consume too much from dietary kale or spinach.";
                                     if (nutrientId === 'Potassium') return "Naturally balanced. In healthy individuals, dietary potassium is efficiently excreted by the kidneys. Hazard is primarily a concern for clinical kidney conditions.";
