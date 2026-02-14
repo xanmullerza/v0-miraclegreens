@@ -676,45 +676,61 @@ export default function NutrientDetailsPage() {
                         </div>
                     </div>
 
-                    {/* Top Food Sources */}
-                    <div className="space-y-5">
+                    {/* Nutrient Rich Foods Section */}
+                    <div className="space-y-8 pt-8 border-t border-slate-100 dark:border-slate-800/50">
                         <div className="flex items-center justify-between px-2">
                             <div className="space-y-1">
-                                <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 leading-none">Natural Sources</h4>
-                                <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest leading-none">Ordered by nutrient richness (per 100g)</p>
+                                <h4 className="font-black text-xs uppercase tracking-[0.2em] text-emerald-500">{nutrientId} Rich Foods</h4>
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Top bioavailable sources per 100g clinical sample</p>
                             </div>
-                            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest underline cursor-pointer hover:text-emerald-600" onClick={() => router.push('/dashboard/ingredients')}>Browse Ingredients</span>
+                            <button
+                                onClick={() => {
+                                    // Map nutrient names to column names for Top 10 view if possible, or just pass the ID
+                                    router.push(`/dashboard/library?tab=top10&nutrientId=${nutrientId}`);
+                                }}
+                                className="text-[10px] font-black text-emerald-500 uppercase tracking-widest transition-all hover:text-emerald-600 hover:underline flex items-center gap-2 group"
+                            >
+                                View Top 10
+                                <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                            </button>
                         </div>
-                        <div className="space-y-3">
+
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                             {loadingFoods ? (
-                                [1, 2, 3].map(i => <div key={i} className="h-16 w-full animate-pulse bg-slate-100 dark:bg-slate-800 rounded-3xl" />)
+                                [1, 2, 3, 4, 5].map(i => <div key={i} className="aspect-square w-full animate-pulse bg-slate-50 dark:bg-slate-900/50 rounded-[2.5rem]" />)
                             ) : topFoods.length > 0 ? (
-                                topFoods.map((food: any) => (
+                                topFoods.slice(0, 5).map((food: any) => (
                                     <button
                                         key={food.id}
                                         onClick={() => router.push(`/dashboard/ingredients/${food.id}`)}
-                                        className="w-full flex items-center gap-4 p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/50 hover:shadow-xl transition-all text-left group"
+                                        className="relative aspect-square rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/50 hover:shadow-2xl transition-all group overflow-hidden flex flex-col items-center justify-center p-5 text-center"
                                     >
-                                        <div className="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0 border border-slate-100 dark:border-slate-800">
+                                        <div className="w-20 h-20 rounded-[2rem] bg-slate-50 dark:bg-slate-950 overflow-hidden mb-4 border border-slate-100 dark:border-slate-800 flex-shrink-0 shadow-sm group-hover:shadow-md transition-shadow">
                                             {food.image ? (
-                                                <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                             ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                    <Beef size={20} />
+                                                <div className="w-full h-full flex items-center justify-center text-slate-200 dark:text-slate-800">
+                                                    <Beef size={32} />
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="flex-grow min-w-0">
-                                            <p className="text-sm font-black uppercase tracking-tight text-slate-900 dark:text-white truncate italic">
+                                        <div className="space-y-1">
+                                            <p className="text-[11px] font-black uppercase tracking-tight text-slate-900 dark:text-white leading-tight italic line-clamp-2 px-1">
                                                 {food.common_name || food.name}
                                             </p>
-                                            <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">View Profile</p>
                                         </div>
-                                        <ChevronRight size={18} className="text-slate-200 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
+
+                                        {/* Hover Overlay */}
+                                        <div className="absolute inset-0 bg-emerald-600/90 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm scale-110 group-hover:scale-100">
+                                            <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] mb-1">View Details</p>
+                                            <div className="w-8 h-1 bg-white/30 rounded-full" />
+                                        </div>
                                     </button>
                                 ))
                             ) : (
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No whole food sources identified.</p>
+                                <div className="col-span-full py-16 text-center bg-slate-50/50 dark:bg-slate-900/30 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                                    <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest italic">No whole food scans recorded for this profile.</p>
+                                </div>
                             )}
                         </div>
                     </div>

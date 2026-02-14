@@ -88,11 +88,36 @@ function LibraryContent() {
     const MINERALS = ['Sodium', 'Potassium', 'Magnesium', 'Calcium', 'Phosphorus', 'Iron', 'Zinc', 'Copper', 'Manganese', 'Selenium', 'Oxalate'];
     const VITAMINS = ['Vitamin A', 'Vitamin C', 'Vitamin D', 'Vitamin E', 'Vitamin K', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Choline'];
 
-    // Sync tab with URL if needed
+    // Sync tab and nutrient from URL if needed
     useEffect(() => {
         const tab = searchParams.get('tab') as any;
+        const nutrientIdFromUrl = searchParams.get('nutrientId');
+
         if (tab && ['nutrients', 'compare', 'top10'].includes(tab)) {
             setActiveTab(tab);
+        }
+
+        if (nutrientIdFromUrl) {
+            // Mapping for common nutrient names to column names
+            const map: Record<string, string> = {
+                'Energy': 'energy_kcal',
+                'Protein': 'protein_g',
+                'Carbs': 'carbs_g',
+                'Fat': 'fat_g',
+                'Fiber': 'fiber_g',
+                'Vitamin A': 'Vitamin A',
+                'Vitamin C': 'Vitamin C',
+                'Vitamin D': 'Vitamin D',
+                'Vitamin E': 'Vitamin E',
+                'Vitamin K': 'Vitamin K',
+                'Sodium': 'Sodium',
+                'Potassium': 'Potassium',
+                'Magnesium': 'Magnesium',
+                'Calcium': 'Calcium',
+                'Iron': 'Iron'
+            };
+            const mappedId = map[nutrientIdFromUrl] || nutrientIdFromUrl;
+            setSelectedNutrientId(mappedId);
         }
     }, [searchParams]);
 
