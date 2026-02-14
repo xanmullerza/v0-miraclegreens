@@ -603,13 +603,13 @@ export default function NutrientDetailsPage() {
                                 {info.relatedFacts && info.relatedFacts.length > 0 && (
                                     <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800/50">
                                         <h5 className="font-black text-[10px] uppercase tracking-[0.2em] text-slate-400 mb-4">5 Fast Facts</h5>
-                                        <div className="grid grid-cols-1 gap-3">
+                                        <div className="grid grid-cols-1 gap-4">
                                             {info.relatedFacts.map((fact, i) => (
-                                                <div key={i} className="flex gap-3 items-start group">
-                                                    <div className="w-5 h-5 rounded-full bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform">
-                                                        <span className="text-[10px] font-black">{i + 1}</span>
+                                                <div key={i} className="flex gap-4 items-start group">
+                                                    <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform">
+                                                        <span className="text-xs font-black">{i + 1}</span>
                                                     </div>
-                                                    <p className="text-xs font-medium text-slate-600 dark:text-slate-400 leading-relaxed group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">
+                                                    <p className="text-sm font-bold text-slate-600 dark:text-slate-400 leading-relaxed group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">
                                                         {fact}
                                                     </p>
                                                 </div>
