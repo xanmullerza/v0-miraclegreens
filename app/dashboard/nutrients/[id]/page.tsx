@@ -79,13 +79,25 @@ export default function NutrientDetailsPage() {
 
     const ulMatch = info?.upperLimit?.match(/(\d+)/);
     const hasNoUL = info?.upperLimit?.includes("None") || !info?.upperLimit;
+    const isPercentUL = info?.upperLimit?.includes("%");
     const isSupplementalUL = info?.upperLimit?.toLowerCase().includes("supplemental");
-    const parsedUL = ulMatch ? parseInt(ulMatch[0]) : (targetVal > 0 ? targetVal * 4 : 100);
+
+    let rawUL = ulMatch ? parseInt(ulMatch[0]) : (targetVal > 0 ? targetVal * 4 : 100);
+
+    // Handle Percentage-based ULs (Protein, Carbs, Fat)
+    if (isPercentUL && dailyTargets.energy) {
+        const percent = rawUL / 100;
+        if (nutrientId === 'Protein') rawUL = (dailyTargets.energy * percent) / 4;
+        else if (nutrientId === 'Carbs') rawUL = (dailyTargets.energy * percent) / 4;
+        else if (nutrientId === 'Fat') rawUL = (dailyTargets.energy * percent) / 9;
+    }
+
+    const parsedUL = rawUL;
 
     // For nutrients like Magnesium, the Supplemental UL (350mg) is lower than the RDA (400mg+).
     // In these cases, we shouldn't show 'Toxicity' for total intake at the Target level.
     const effectiveUL = (isSupplementalUL && parsedUL <= targetVal) ? targetVal * 1.5 : parsedUL;
-    const ulVal = parsedUL; // Keep raw for the marker label
+    const ulVal = parsedUL; // Use for the marker label
 
     const [simValue, setSimValue] = useState(targetVal || 0);
 
@@ -322,6 +334,7 @@ export default function NutrientDetailsPage() {
                             <h4 className="font-black text-[10px] uppercase tracking-[0.2em] text-emerald-600">Whole Food Safety Advisory</h4>
                             <p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-relaxed">
                                 {(() => {
+                                    if (nutrientId === 'Protein') return "Real protein for real people. Your body is incredibly good at handling high protein from steak, eggs, or beans. The official 'limits' are just guidelines for extreme diets, not real-world safety risks.";
                                     if (nutrientId === 'Magnesium') return "Nature’s Magnesium is 100% safe. You can’t consume too many seeds or greens—your body handles them perfectly. Only concentrated pills carry a risk of over-doing it.";
                                     if (nutrientId === 'Sodium') return "The salt naturally found inside foods like celery or meat is totally safe. The real danger is almost always from added table salt and factory-made snacks, not the food itself.";
                                     if (nutrientId === 'Vitamin A') return "Carrots and leafy greens are always safe. Your body only has trouble with 'pre-made' Vitamin A from things like animal liver or high-dose supplements.";
