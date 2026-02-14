@@ -217,7 +217,7 @@ export function TopTenView({
                         ids: ['Iron', 'Zinc', 'Copper', 'Manganese', 'Selenium']
                     },
                     {
-                        title: "Clinical Markers",
+                        title: "Extra Markers",
                         icon: Activity,
                         align: "text-blue-500",
                         ids: ['Fiber', 'Cholesterol', 'Omega-3', 'Oxalate', 'Sugar']
@@ -267,7 +267,7 @@ export function TopTenView({
                 {isLoading ? (
                     <div className="h-96 flex flex-col items-center justify-center gap-4">
                         <Loader2 className="animate-spin text-blue-500" size={32} />
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Analyzing Composition...</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Loading results...</p>
                     </div>
                 ) : (
                     <div className="space-y-6">

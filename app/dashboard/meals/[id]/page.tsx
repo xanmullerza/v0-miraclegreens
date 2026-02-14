@@ -1724,7 +1724,7 @@ export default function RecipeDetailsPage() {
                                                 'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
                                             }} />
 
-                                            <NutrientGrid title="Clinical Markers" icon={Activity} theme="amber" subtitle="Extra health markers worth tracking" forceRaw={true} items={{
+                                            <NutrientGrid title="Extra Markers" icon={Activity} theme="amber" subtitle="Extra health markers worth tracking" forceRaw={true} items={{
                                                 'Fiber': ['Fiber', 'fiber_g'],
                                                 'Sugars': ['Sugars', 'sugars_g'],
                                                 'Oxalate': ['Oxalate', 'oxalate_mg'],
@@ -1765,7 +1765,7 @@ export default function RecipeDetailsPage() {
                                     </div>
                                     <div>
                                         <h3 className="text-2xl font-black uppercase tracking-tighter italic">{breakdownNutrient}</h3>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Constituent Laboratory Analysis</p>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Detailed Breakdown</p>
                                     </div>
                                 </div>
 

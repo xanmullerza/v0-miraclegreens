@@ -564,7 +564,7 @@ export default function EditRecipePage() {
         return (
             <div className="h-[70vh] flex flex-col items-center justify-center gap-4">
                 <Loader2 className="animate-spin text-violet-500" size={48} />
-                <p className="text-sm font-black uppercase tracking-widest text-slate-400">Loading Laboratory Data...</p>
+                <p className="text-sm font-black uppercase tracking-widest text-slate-400">Loading Recipe...</p>
             </div>
         );
     }
@@ -864,7 +864,7 @@ export default function EditRecipePage() {
                                     Update Recipe
                                 </Button>
                                 <p className="text-center text-[10px] text-slate-400 tracking-tighter uppercase px-4">
-                                    Updating this recipe will instantly recalibrate its clinical nutrition profile across your meal library.
+                                    Updating this recipe will instantly refresh its nutrition profile across your meal library.
                                 </p>
                             </div>
                         </div>

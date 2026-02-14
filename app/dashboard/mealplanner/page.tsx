@@ -794,7 +794,7 @@ export function MealPlannerContent({
                     <div className="space-y-8 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4">
                         <div className="text-center space-y-2">
                             <h2 className="text-3xl font-bold">Welcome back, {profile.nickname || profile.name || 'Researcher'}</h2>
-                            <p className="text-slate-500">We've loaded your stored biological and dietary parameters.</p>
+                            <p className="text-slate-500">We've loaded your saved health and dietary preferences.</p>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
@@ -1244,7 +1244,7 @@ export function MealPlannerContent({
                                                 <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6">
                                                     <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
                                                         <Activity size={18} />
-                                                        Strategic Health Insights
+                                                        Personal Health Insights
                                                     </h3>
                                                 </div>
 
@@ -1274,7 +1274,7 @@ export function MealPlannerContent({
                                                     );
                                                 })()}
 
-                                                <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Critical nutrient balances for metabolic & inflammation tracking" items={{
+                                                <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Key nutrient balances for your overall wellbeing" items={{
                                                     'Sodium:Potassium': ['Sodium', 'Potassium'],
                                                     'Zinc:Copper': ['Zinc', 'Copper'],
                                                     'Omega 6:3 Ratio': ['Omega-6', 'Omega-3'],
@@ -1319,7 +1319,7 @@ export function MealPlannerContent({
                                                     'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
                                                     'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
                                                 }} />
-                                                <NutrientGrid title="Clinical Markers" icon={Activity} theme="amber" subtitle="Secondary markers for advanced health profile mapping" forceRaw={true} items={{
+                                                <NutrientGrid title="Extra Markers" icon={Activity} theme="amber" subtitle="Extra health markers worth tracking" forceRaw={true} items={{
                                                     'Fiber': ['Fiber', 'fiber_g'],
                                                     'Sugars': ['Sugars', 'sugars_g'],
                                                     'Oxalate': ['Oxalate', 'oxalate_mg'],

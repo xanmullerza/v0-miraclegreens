@@ -103,7 +103,7 @@ export function NutrientsView() {
                 <div>
                     <h2 className="text-2xl font-black tracking-tight text-blue-500 dark:text-blue-400 uppercase italic">Nutrients Library</h2>
                     <p className="text-slate-500 font-medium text-sm max-w-lg">
-                        Deep-dive into the clinical data of vitamins, minerals, and macronutrients.
+                        Explore the role and benefits of vitamins, minerals, and macronutrients.
                     </p>
                 </div>
             </div>

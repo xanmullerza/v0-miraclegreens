@@ -138,7 +138,7 @@ function ComparisonReportContent() {
                     </span>
                 </h1>
                 <p className="text-xl text-slate-500 max-w-2xl mx-auto">
-                    Based on our clinical nutrient density scoring marked against the RDA for an average adult.
+                    Based on nutrient density scoring measured against the recommended daily intake for an average adult.
                 </p>
             </div>
 
