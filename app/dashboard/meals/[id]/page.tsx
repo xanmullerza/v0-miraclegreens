@@ -38,7 +38,8 @@ import {
     GripVertical,
     Download,
     Beaker,
-    Dna
+    Dna,
+    ChevronUp
 } from 'lucide-react';
 import FoodItemPicker from '@/components/recipe/food-item-picker';
 import NutrientExportModal from '@/components/recipe/nutrient-export-modal';
@@ -48,6 +49,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { nutrientInfo } from '@/lib/data/nutrient-info';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRDA } from '@/hooks/use-rda';
@@ -935,203 +942,174 @@ export default function RecipeDetailsPage() {
     if (!recipe) return null;
 
     return (
-        <div className="max-w-5xl mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
+        <div className="max-w-6xl mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
             {/* Navigation Header - Edit Button for Admins */}
 
 
             <div className="space-y-8">
-                {/* Title Section */}
-                <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                        <h1 className="text-5xl font-black tracking-tighter text-slate-900 dark:text-white leading-[0.95] italic uppercase">
-                            {recipe.title}
-                        </h1>
-                        {isAdmin && (
-                            <button
-                                onClick={() => router.push(`/dashboard/meals/${id}/edit`)}
-                                className="p-2 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 text-slate-400 hover:text-emerald-500 transition-all hover:scale-110 active:scale-95 group mt-1"
-                                title="Edit Meal"
-                            >
-                                <Pencil size={32} className="group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all" />
-                            </button>
-                        )}
-                        {isAdmin && (
-                            <button
-                                onClick={() => setShowExportModal(true)}
-                                className="p-2 rounded-xl bg-slate-100/50 dark:bg-slate-800/50 text-slate-400 hover:text-emerald-500 transition-all hover:scale-110 active:scale-95 group mt-1"
-                                title="Export Nutrients"
-                            >
-                                <Download size={32} className="group-hover:drop-shadow-[0_0_8px_rgba(16,185,129,0.3)] transition-all" />
-                            </button>
-                        )}
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        {recipe.source && (
-                            <Badge variant="outline" className="border-slate-200 dark:border-slate-800 text-slate-400 text-[9px] font-black uppercase tracking-widest px-3">
-                                Source: {recipe.source}
-                            </Badge>
-                        )}
-                    </div>
-                </div>
-
-                {/* Header Section: Image & Specs aligned at top */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-                    {/* Column 1: Image */}
-                    <div className="h-full">
-                        <Card className="p-3 h-full flex flex-col bg-white dark:bg-slate-900">
-                            <div className="flex-1 rounded-[2rem] bg-slate-100 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800 aspect-square lg:aspect-auto">
+                {/* Main Header Section (Image + Name) - Matching Food Page */}
+                <div className="flex flex-row items-end gap-6 animate-in slide-in-from-top-4 duration-700 pb-1">
+                    {/* Left Side: Image (Small, Inline) */}
+                    <div className="w-24 h-24 lg:w-24 lg:h-24 shrink-0">
+                        <Card className="w-full h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden rounded-2xl">
+                            <div className="w-full h-full rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
                                 {recipe.image ? (
-                                    <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover" />
+                                    <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                        <ChefHat size={84} className="opacity-10" />
+                                    <div className="w-full h-full flex items-center justify-center text-slate-200">
+                                        <ChefHat size={24} className="opacity-10" />
                                     </div>
                                 )}
-                                <div className="absolute top-4 left-4">
-                                    <Badge className="bg-white/90 dark:bg-slate-900/90 text-slate-900 dark:text-white border-none text-[10px] font-black uppercase tracking-widest px-4 py-2 backdrop-blur-md shadow-xl">
-                                        Meal Type: {recipe.type}
+                                <div className="absolute top-1 left-1">
+                                    <Badge className="bg-emerald-600/90 text-white border-none text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 backdrop-blur-md shadow-xl w-fit">
+                                        {recipe.type}
                                     </Badge>
                                 </div>
                             </div>
                         </Card>
                     </div>
 
-                    {/* Column 2: Dietary Compatibility Grid (4 Tiles) */}
-                    <div className="grid grid-cols-2 gap-4 h-full">
-                        {[
-                            { label: 'Balanced', dbKey: 'Balanced (Omnivore)' },
-                            { label: 'Pescatarian', dbKey: 'Pescetarian' },
-                            { label: 'Vegetarian', dbKey: 'Vegetarian' },
-                            { label: 'Vegan', dbKey: 'Vegan' }
-                        ].map(({ label, dbKey }) => {
-                            const hasDirectTag = recipe.diet?.includes(dbKey);
-                            let isSuitable = hasDirectTag;
-                            if (!isSuitable && recipe.diet) {
-                                if (label === 'Balanced') {
-                                    isSuitable = recipe.diet.includes('Balanced (Omnivore)') || recipe.diet.includes('Pescetarian') || recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
-                                } else if (label === 'Pescatarian') {
-                                    isSuitable = recipe.diet.includes('Pescetarian') || recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
-                                } else if (label === 'Vegetarian') {
-                                    isSuitable = recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
-                                }
-                            }
-                            const hasConflict = isSuitable && dietaryConflicts.length > 0;
+                    {/* Right Side: Text Content */}
+                    <div className="flex-1 flex flex-col">
+                        <h1 className="text-4xl lg:text-6xl font-black tracking-tighter uppercase italic leading-[0.85] mb-2">
+                            <span className="text-emerald-500">{recipe.title}</span>
+                        </h1>
+                        <div className="flex items-center gap-3 flex-wrap">
+                            {recipe.source && (
+                                <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Source: {recipe.source}</span>
+                            )}
+                            <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px] flex items-center gap-1">
+                                <Clock size={10} /> {recipe.prep_time}m
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
-                            return (
-                                <Card
-                                    key={label}
-                                    className={cn(
-                                        "p-2 rounded-[2rem] border text-center transition-all relative flex flex-col justify-center items-center h-full",
-                                        isSuitable
-                                            ? (hasConflict ? "bg-amber-50/50 dark:bg-amber-500/5 border-amber-200 dark:border-amber-500/30" : "bg-emerald-50/50 dark:bg-emerald-500/5 border-emerald-100 dark:border-emerald-500/20")
-                                            : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 opacity-60 grayscale"
-                                    )}
-                                >
-                                    <p className={cn(
-                                        "text-[10px] font-black uppercase tracking-widest mb-1",
-                                        isSuitable
-                                            ? (hasConflict ? "text-amber-600 dark:text-amber-400" : "text-emerald-600 dark:text-emerald-400")
-                                            : "text-slate-400"
-                                    )}>
+                {/* Controls Row - Like Food Page's Amount/Measure Row */}
+                <div className="flex flex-col gap-4 items-start w-full">
+                    <div className="flex items-center gap-3 flex-wrap animate-in fade-in slide-in-from-right-8 duration-700">
+                        {/* Servings Input (Mirrors Food Page's Amount Input) */}
+                        <div className="flex items-center bg-white dark:bg-slate-900 px-2 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm group/amount transition-all hover:border-emerald-500/50 shrink-0">
+                            <div className="flex items-center">
+                                <input
+                                    type="number"
+                                    value={calculations.totalServings.toFixed(1)}
+                                    readOnly
+                                    className="w-16 bg-transparent text-lg font-black italic text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-center border-r border-slate-100 dark:border-slate-800"
+                                />
+                                <div className="relative group/select pl-3 pr-2">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger className="flex items-center gap-1.5 pr-2 text-[10px] font-black uppercase tracking-tighter text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
+                                            Servings
+                                            <ChevronDown className="w-3 h-3 text-slate-400 group-hover/select:text-emerald-500" />
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent
+                                            align="end"
+                                            className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-[1.5rem] p-2 min-w-[160px] shadow-2xl animate-in zoom-in-95 duration-200"
+                                        >
+                                            <DropdownMenuItem
+                                                className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
+                                                onClick={() => setSelectedMemberIds(allPeople.map(p => p.id))}
+                                            >
+                                                Full Family ({allPeople.length})
+                                            </DropdownMenuItem>
+                                            {allPeople.map(person => (
+                                                <DropdownMenuItem
+                                                    key={person.id}
+                                                    className={cn(
+                                                        "text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all",
+                                                        selectedMemberIds.includes(person.id) ? "text-emerald-500" : "text-slate-500 dark:text-slate-400"
+                                                    )}
+                                                    onClick={() => {
+                                                        if (selectedMemberIds.includes(person.id)) {
+                                                            setSelectedMemberIds(prev => prev.filter(pid => pid !== person.id));
+                                                        } else {
+                                                            setSelectedMemberIds(prev => [...prev, person.id]);
+                                                        }
+                                                    }}
+                                                >
+                                                    {selectedMemberIds.includes(person.id) ? '✓ ' : ''}{person.name || (person as any).nickname || 'User'}
+                                                </DropdownMenuItem>
+                                            ))}
+                                            <DropdownMenuItem
+                                                className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-rose-500 focus:text-white transition-all text-slate-400"
+                                                onClick={() => setSelectedMemberIds([])}
+                                            >
+                                                Clear All
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Favorite Toggle */}
+                        <button
+                            onClick={toggleFavorite}
+                            className={cn(
+                                "p-3 rounded-2xl border transition-all hover:scale-105 active:scale-95",
+                                recipe.is_favorite
+                                    ? "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/30 text-rose-500"
+                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400 hover:text-rose-500 hover:border-rose-200"
+                            )}
+                        >
+                            <Heart size={18} fill={recipe.is_favorite ? "currentColor" : "none"} />
+                        </button>
+
+                        {/* Admin Buttons */}
+                        {isAdmin && (
+                            <button
+                                onClick={() => router.push(`/dashboard/meals/${id}/edit`)}
+                                className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-400 hover:text-emerald-500 hover:border-emerald-200 transition-all hover:scale-105 active:scale-95"
+                                title="Edit Meal"
+                            >
+                                <Pencil size={18} />
+                            </button>
+                        )}
+                        {isAdmin && (
+                            <button
+                                onClick={() => setShowExportModal(true)}
+                                className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-400 hover:text-emerald-500 hover:border-emerald-200 transition-all hover:scale-105 active:scale-95"
+                                title="Export Nutrients"
+                            >
+                                <Download size={18} />
+                            </button>
+                        )}
+
+                        {/* Compact Diet Badges */}
+                        <div className="flex items-center gap-2 ml-1">
+                            {[
+                                { label: 'Balanced', dbKey: 'Balanced (Omnivore)' },
+                                { label: 'Pescatarian', dbKey: 'Pescetarian' },
+                                { label: 'Vegetarian', dbKey: 'Vegetarian' },
+                                { label: 'Vegan', dbKey: 'Vegan' }
+                            ].map(({ label, dbKey }) => {
+                                let isSuitable = recipe.diet?.includes(dbKey);
+                                if (!isSuitable && recipe.diet) {
+                                    if (label === 'Balanced') isSuitable = recipe.diet.includes('Balanced (Omnivore)') || recipe.diet.includes('Pescetarian') || recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
+                                    else if (label === 'Pescatarian') isSuitable = recipe.diet.includes('Pescetarian') || recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
+                                    else if (label === 'Vegetarian') isSuitable = recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
+                                }
+                                if (!isSuitable) return null;
+                                return (
+                                    <Badge
+                                        key={label}
+                                        className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20 text-[8px] font-black uppercase tracking-widest px-2.5 py-1"
+                                    >
                                         {label}
-                                    </p>
-                                    <p className={cn(
-                                        "text-[9px] font-bold uppercase",
-                                        isSuitable
-                                            ? (hasConflict ? "text-amber-500/60" : "text-emerald-500/60")
-                                            : "text-slate-300"
-                                    )}>
-                                        {isSuitable ? (hasConflict ? 'Check' : 'Compatible') : 'No'}
-                                    </p>
-                                </Card>
-                            );
-                        })}
+                                    </Badge>
+                                );
+                            })}
+                        </div>
                     </div>
 
-                    {/* Column 3: Smart Portion Control */}
-                    <Card className="p-6 flex flex-col h-full bg-white dark:bg-slate-900 border-emerald-500/10 dark:border-emerald-500/20">
-                        <div className="flex items-center justify-between mb-5">
-                            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
-                                <Scale size={14} className="text-emerald-500" />
-                                Smart Portion Control
-                            </h3>
-                            {currentScalingFactor !== 1 && (
-                                <Badge variant="outline" className="border-emerald-500 text-emerald-500 text-[9px] font-black uppercase tracking-widest">
-                                    {(currentScalingFactor * 100).toFixed(0)}% Scale
-                                </Badge>
-                            )}
+                    {/* Scaling Factor Indicator */}
+                    {currentScalingFactor !== 1 && (
+                        <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-emerald-500">
+                            <Scale size={12} />
+                            Scaled to {(currentScalingFactor * 100).toFixed(0)}% · Based on {calculations.maxTDEE.toFixed(0)} {energyUnit}
                         </div>
-
-                        <div className="flex-1 flex flex-col gap-4">
-                            <div className="space-y-2 max-h-[140px] overflow-y-auto custom-scrollbar pr-2">
-                                {allPeople.map(person => {
-                                    const isSelected = selectedMemberIds.includes(person.id);
-                                    const portions = calculations.memberPortions[person.id] || 0;
-
-                                    return (
-                                        <div
-                                            key={person.id}
-                                            onClick={() => {
-                                                if (isSelected) {
-                                                    setSelectedMemberIds(prev => prev.filter(id => id !== person.id));
-                                                } else {
-                                                    setSelectedMemberIds(prev => [...prev, person.id]);
-                                                }
-                                            }}
-                                            className={cn(
-                                                "p-3 rounded-2xl border transition-all cursor-pointer flex items-center justify-between group",
-                                                isSelected
-                                                    ? "bg-emerald-50/50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30"
-                                                    : "bg-slate-50 dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-emerald-200"
-                                            )}
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <div className={cn(
-                                                    "w-4 h-4 rounded-md flex items-center justify-center border transition-colors",
-                                                    isSelected
-                                                        ? "bg-emerald-500 border-emerald-500"
-                                                        : "border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800"
-                                                )}>
-                                                    {isSelected && <CheckCircle2 size={10} className="text-white" />}
-                                                </div>
-                                                <div className="flex flex-col">
-                                                    <span className={cn(
-                                                        "text-xs font-bold leading-none mb-0.5",
-                                                        isSelected ? "text-slate-900 dark:text-white" : "text-slate-400"
-                                                    )}>{person.name || (person as any).nickname || 'User'}</span>
-                                                    <span className="text-[9px] text-slate-400 font-medium">{person.age} yrs • {person.goal}</span>
-                                                </div>
-                                            </div>
-
-                                            {isSelected && (
-                                                <div className="text-right">
-                                                    <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 block">{portions.toFixed(2)}x</span>
-                                                </div>
-                                            )}
-
-                                            {!isSelected && (
-                                                <div className="text-right opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <Plus size={14} className="text-emerald-500" />
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-
-                            <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800">
-                                <div className="flex justify-between items-end mb-1">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Yield</span>
-                                    <span className="text-2xl font-black text-slate-900 dark:text-white leading-none">
-                                        {calculations.totalServings.toFixed(1)} <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Servings</span>
-                                    </span>
-                                </div>
-                                <p className="text-[9px] text-slate-400 leading-relaxed text-right">
-                                    Based on largest eater's requirements ({calculations.maxTDEE.toFixed(0)} {energyUnit})
-                                </p>
-                            </div>
-                        </div>
-                    </Card>
+                    )}
                 </div>
 
                 {/* Ingredients Section - Full Width Horizontal Layout */}
