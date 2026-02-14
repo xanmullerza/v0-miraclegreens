@@ -1700,27 +1700,20 @@ export default function RecipeDetailsPage() {
                             return (
                                 <div className="space-y-6">
                                     <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6">
-                                        <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
+                                        <h3 className="text-sm font-black uppercase tracking-[0.3em] text-emerald-500 italic flex items-center gap-2">
                                             <Activity size={18} />
-                                            Personal Health Insights
+                                            Essential Nutrients
                                         </h3>
                                     </div>
 
-                                    <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Key nutrient balances for a healthy body" items={{
-                                        'Sodium & Potassium': ['Sodium', 'Potassium'],
-                                        'Zinc & Copper': ['Zinc', 'Copper'],
-                                        'Omega 3 to 6 ratio': ['Omega-6', 'Omega-3'],
-                                        'Calcium & Magnesium': ['Calcium', 'Magnesium'],
-                                        'Calcium & Phosphorus': ['Calcium', 'Phosphorus'],
-                                    }} />
-
-                                    <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Essential energy and building blocks" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
+                                    <NutrientGrid title="Macronutrients" icon={Zap} theme="orange" subtitle="Detailed breakdown of energy and macro density" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
                                         'Energy': ['calories'],
                                         'Protein': ['protein'],
                                         'Carbs': ['carbs'],
                                         'Fat': ['fat']
                                     }} />
-                                    <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Vital minerals for hydration and balance" items={{
+
+                                    <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Essential minerals for cellular hydration and nerve signal transmission" items={{
                                         'Sodium': ['Sodium', 'sodium_mg'],
                                         'Potassium': ['Potassium', 'potassium_mg'],
                                         'Magnesium': ['Magnesium', 'magnesium_mg'],
@@ -1736,30 +1729,46 @@ export default function RecipeDetailsPage() {
                                         'Selenium': ['Selenium', 'selenium_ug']
                                     }} />
 
-                                    <NutrientGrid title="Daily Vitamins" icon={Droplet} theme="blue" subtitle="Essential daily vitamins for a healthy mind" items={{
+                                    <NutrientGrid title="Water-Soluble Vitamins" icon={Droplet} theme="blue" subtitle="Daily vitamins for a healthy mind and body" items={{
                                         'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
                                         'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
                                         'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
                                         'B5 (Pantothenic Acid)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
                                         'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
+                                        'B7 (Biotin)': ['Biotin', 'biotin_ug'],
                                         'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
                                         'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
                                         'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
                                         'Choline': ['Choline', 'choline_mg'],
                                     }} />
 
-                                    <NutrientGrid title="Stored Vitamins" icon={Battery} theme="emerald" subtitle="Stored vitamins for long-term vitality" breakdownLabels={['Vitamin A', 'Vitamin E']} items={{
+                                    <NutrientGrid title="Fat-Soluble Vitamins" icon={Battery} theme="emerald" subtitle="Stored vitamins for long-term vitality" breakdownLabels={['Vitamin A', 'Vitamin E']} items={{
                                         'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
                                         'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
                                         'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
                                         'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
                                     }} />
 
+                                    <div className="pt-12 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6">
+                                        <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
+                                            <Dna size={18} />
+                                            Advanced Nutrition
+                                        </h3>
+                                    </div>
+
                                     <NutrientGrid title="Extra Markers" icon={Activity} theme="amber" subtitle="Extra health markers worth tracking" forceRaw={true} items={{
                                         'Fiber': ['Fiber', 'fiber_g'],
                                         'Sugars': ['Sugars', 'sugars_g'],
                                         'Oxalate': ['Oxalate', 'oxalate_mg'],
                                         'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
+                                    }} />
+
+                                    <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Key nutrient balances for a healthy body" items={{
+                                        'Sodium & Potassium': ['Sodium', 'Potassium'],
+                                        'Zinc & Copper': ['Zinc', 'Copper'],
+                                        'Omega 3 to 6 ratio': ['Omega-6', 'Omega-3'],
+                                        'Calcium & Magnesium': ['Calcium', 'Magnesium'],
+                                        'Calcium & Phosphorus': ['Calcium', 'Phosphorus'],
                                     }} />
 
                                     {Object.keys(phytoSources).length > 0 && (
