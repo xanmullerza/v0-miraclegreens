@@ -27,7 +27,8 @@ import {
     Trophy,
     X,
     Filter,
-    ChevronDown
+    ChevronDown,
+    Lightbulb
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -655,23 +656,20 @@ export default function NutrientDetailsPage() {
                         </div>
                     </div>
 
-                    {/* Secondary Info Area */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-12 border-t border-slate-100 dark:border-slate-800">
-                        <div className="space-y-6">
-                            <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400">Biological Significance</h4>
-                            <p className="text-xl font-medium text-slate-700 dark:text-slate-300 leading-relaxed italic">
-                                "{info.history} {info.importance}"
-                            </p>
-                        </div>
-
-                        <div className="space-y-6">
-                            <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400">Traditional Dietary Sources</h4>
-                            <div className="flex flex-wrap gap-2">
-                                {info.sources.map((s, i) => (
-                                    <span key={i} className="text-[10px] bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 px-5 py-3 rounded-2xl font-black uppercase tracking-widest border border-slate-200 dark:border-slate-800 shadow-sm">
-                                        {s}
-                                    </span>
-                                ))}
+                    {/* Know Our Nutrients - Educational Section */}
+                    <div className="pt-12 border-t border-slate-100 dark:border-slate-800">
+                        <div className="bg-slate-50 dark:bg-slate-900/40 rounded-[3rem] p-10 border border-slate-100 dark:border-slate-800/50 flex flex-col md:flex-row gap-10 items-start">
+                            <div className="w-16 h-16 rounded-[2rem] bg-amber-500/10 flex items-center justify-center text-amber-500 shrink-0">
+                                <Lightbulb size={32} />
+                            </div>
+                            <div className="space-y-6 flex-1">
+                                <div className="space-y-1">
+                                    <h4 className="font-black text-xs uppercase tracking-[0.3em] text-amber-500">Know Our Nutrients</h4>
+                                    <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white">Biological Heritage & Significance</h3>
+                                </div>
+                                <p className="text-xl font-medium text-slate-700 dark:text-slate-300 leading-relaxed italic border-l-4 border-amber-500/20 pl-8 py-2">
+                                    "{info.history} {info.importance}"
+                                </p>
                             </div>
                         </div>
                     </div>
