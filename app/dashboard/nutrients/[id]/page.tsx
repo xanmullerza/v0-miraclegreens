@@ -19,10 +19,18 @@ import {
     Info,
     Calendar,
     ArrowRight,
-    Heart
+    Heart,
+    UtensilsCrossed,
+    ShoppingCart,
+    ShoppingBasket,
+    LayoutGrid,
+    X,
+    Filter,
+    ChevronDown
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { useSearch } from '@/lib/context/search-context';
 import { Button } from '@/components/ui/button';
 import { nutrientInfo, NutrientInfo } from '@/lib/data/nutrient-info';
 import { supabase } from '@/lib/supabase';
@@ -49,6 +57,9 @@ export default function NutrientDetailsPage() {
         dailyTargets.energy || 2000
     );
 
+    // Hub Navigation State
+    const { searchQuery, setSearchQuery, setIsFocused, activeSearchId, setActiveSearchId } = useSearch();
+    const [isSearchExpanded, setIsSearchExpanded] = useState(false);
     const [favorites, setFavorites] = useState<string[]>([]);
     const [topFoods, setTopFoods] = useState<any[]>([]);
     const [loadingFoods, setLoadingFoods] = useState(true);
@@ -130,6 +141,118 @@ export default function NutrientDetailsPage() {
     };
 
     const isFav = favorites.includes(nutrientId);
+
+    const ingredientTabs = [
+        { id: 'allfoods', label: 'All Foods', icon: UtensilsCrossed, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+        { id: 'groceries', label: 'Groceries', icon: ShoppingCart, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+        { id: 'pantry', label: 'Pantry', icon: ShoppingBasket, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+        { id: 'nutrients', label: 'Nutrients', icon: Activity, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+    ];
+
+    const renderTabGroup = (tabsList: typeof ingredientTabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
+        <div className="space-y-3 w-full">
+            {sectionLabel && <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>}
+            <div className={cn(
+                "flex items-center p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden w-full md:max-w-[800px] mx-auto xl:mx-0"
+            )}>
+                {/* Left side - Home Button area */}
+                <div className={cn("flex-shrink-0 flex items-center justify-start transition-all duration-500", isSearchExpanded ? "w-0" : "w-12")}>
+                    {showHomeButton && !isSearchExpanded && (
+                        <button
+                            onClick={() => router.push('/dashboard')}
+                            className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all flex-shrink-0"
+                            title="Back to Dashboard"
+                        >
+                            <LayoutGrid size={18} />
+                        </button>
+                    )}
+                </div>
+
+                {/* Center - Tabs area */}
+                <div className={cn("flex items-center justify-center overflow-hidden transition-all duration-500", isSearchExpanded ? "w-0 flex-none opacity-0" : "flex-1 opacity-100")}>
+                    <div className="flex items-center gap-4 overflow-hidden py-1">
+                        {tabsList.map((tab) => {
+                            const Icon = tab.icon;
+                            const isActive = tab.id === 'nutrients';
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => router.push(`/dashboard/ingredients?tab=${tab.id}`)}
+                                    className={cn(
+                                        "flex items-center gap-3 py-3.5 rounded-[1.5rem] text-[9px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
+                                        isActive
+                                            ? "bg-slate-900 dark:bg-slate-800 text-white shadow-xl translate-y-[-2px]"
+                                            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50",
+                                        "px-4 md:px-5"
+                                    )}
+                                >
+                                    <Icon size={15} className={cn(
+                                        "transition-transform duration-500 group-hover:scale-110",
+                                        isActive ? tab.color : "text-slate-400"
+                                    )} />
+                                    <span className={cn(
+                                        "transition-all duration-300 overflow-hidden hidden md:block",
+                                        isSearchExpanded ? "w-0 opacity-0" : "w-auto opacity-100"
+                                    )}>
+                                        {tab.label}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* Right side - Search area */}
+                <div className={cn(
+                    "flex items-center justify-end transition-all duration-500",
+                    isSearchExpanded ? "flex-1 pl-2" : "w-12"
+                )}>
+                    <div className={cn(
+                        "flex items-center transition-all duration-500 overflow-hidden",
+                        isSearchExpanded ? "flex-1 opacity-100" : "w-0 opacity-0"
+                    )}>
+                        <input
+                            type="text"
+                            autoFocus
+                            placeholder={`Search nutrients...`}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    router.push(`/dashboard/ingredients?tab=nutrients`);
+                                }
+                            }}
+                            onFocus={() => {
+                                setIsFocused(true);
+                                setActiveSearchId('nutrients-bar');
+                            }}
+                            onBlur={() => {
+                                setTimeout(() => {
+                                    if (activeSearchId === 'nutrients-bar') setActiveSearchId(null);
+                                }, 200);
+                            }}
+                            className="w-full bg-slate-50 dark:bg-slate-800/50 border-none focus:ring-0 text-[10px] font-black uppercase tracking-widest h-12 rounded-[1.5rem] px-6 text-slate-900 dark:text-white"
+                        />
+                    </div>
+                    <button
+                        onClick={() => {
+                            if (isSearchExpanded) setSearchQuery('');
+                            setIsSearchExpanded(!isSearchExpanded);
+                        }}
+                        className={cn(
+                            "flex items-center justify-center w-12 h-12 rounded-[1.5rem] transition-all flex-shrink-0",
+                            isSearchExpanded
+                                ? "bg-blue-50 text-blue-500 hover:bg-blue-100"
+                                : "text-slate-400 hover:text-blue-500 hover:bg-blue-50"
+                        )}
+                        title="Search"
+                    >
+                        {isSearchExpanded ? <X size={18} /> : <Search size={18} />}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
 
     useEffect(() => {
         if (info) {
@@ -216,21 +339,32 @@ export default function NutrientDetailsPage() {
     const dynamicMax = Math.max(targetVal, effectiveUL) * 1.5;
 
     return (
-        <div className="max-w-4xl mx-auto space-y-12 pb-20 animate-in fade-in duration-700 pt-8 px-4">
-            {/* Nav */}
-            <button
-                onClick={() => router.back()}
-                className="flex items-center gap-2 text-slate-500 hover:text-emerald-600 font-bold text-sm transition-colors group"
-            >
-                <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" />
-                Back
-            </button>
+        <div className="max-w-6xl mx-auto space-y-8 pb-32 animate-in fade-in duration-700">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 animate-in slide-in-from-top-4 duration-700 pb-1">
+                <div className="flex-1 flex flex-col">
+                    <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2 flex items-center gap-4">
+                        <span className="text-emerald-500">{nutrientId}</span>
+                        <button
+                            onClick={toggleFavorite}
+                            className={cn(
+                                "w-10 h-10 rounded-full flex items-center justify-center transition-all border shrink-0",
+                                isFav
+                                    ? "bg-rose-500 text-white border-rose-600 shadow-xl shadow-rose-500/20"
+                                    : "bg-white dark:bg-slate-900 text-slate-300 border-slate-200 dark:border-slate-800 hover:text-rose-500 hover:border-rose-200"
+                            )}
+                        >
+                            <Heart size={20} fill={isFav ? "currentColor" : "none"} />
+                        </button>
+                    </h1>
+                    <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] leading-relaxed max-w-2xl italic">
+                        "{info.description}"
+                    </p>
+                </div>
 
-            {/* Header / Hero with Intake Readout */}
-            <div className="flex flex-col lg:flex-row gap-8 lg:items-center">
-                {/* Fixed Readout Square */}
+                {/* Status Readout */}
                 <div className={cn(
-                    "w-full lg:w-48 h-48 rounded-[2.5rem] border-2 transition-all duration-700 flex flex-col items-center justify-center shadow-2xl flex-shrink-0 animate-in fade-in zoom-in duration-1000",
+                    "w-full md:w-48 h-48 rounded-[2.5rem] border-2 transition-all duration-700 flex flex-col items-center justify-center shadow-2xl flex-shrink-0",
                     isDeficient ? "bg-amber-50 border-amber-300 text-amber-800 shadow-amber-200/50" :
                         isToxic ? "bg-rose-50 border-rose-300 text-rose-800 shadow-rose-200/50" :
                             "bg-emerald-50 border-emerald-300 text-emerald-800 shadow-emerald-500/10"
@@ -248,38 +382,34 @@ export default function NutrientDetailsPage() {
                             isToxic ? "bg-rose-600 text-white" :
                                 "bg-emerald-600 text-white"
                     )}>
-                        {isDeficient ? "⚠️ Deficit" : isToxic ? "☢️ Toxicity" : "✅ Optimal"}
+                        {isDeficient ? "⚠ Deficit" : isToxic ? "☢ Toxicity" : "✅ Optimal"}
                     </div>
                 </div>
+            </div>
 
-                {/* Title & Description */}
-                <div className="space-y-6 flex-grow">
-                    <div>
-                        <h1 className="text-6xl lg:text-8xl font-black text-emerald-600 dark:text-emerald-400 mb-4 uppercase tracking-tighter italic leading-none">
-                            {nutrientId}
-                        </h1>
-                        <p className="text-xl lg:text-2xl text-slate-400 italic leading-relaxed font-medium">
-                            "{info.description}"
-                        </p>
-                    </div>
+            {/* Hub Navigation Area */}
+            <div className="flex flex-col gap-6 items-start w-full">
+                {renderTabGroup(ingredientTabs, "", "text-slate-500", true)}
 
-                    <div className="flex flex-wrap gap-3">
-                        <Button
-                            onClick={toggleFavorite}
-                            variant="outline"
-                            className={cn(
-                                "rounded-2xl h-12 px-6 font-black uppercase tracking-widest text-[10px] gap-2 border-slate-200 dark:border-slate-800 transition-all shadow-sm",
-                                isFav ? "bg-rose-50 border-rose-200 text-rose-600 dark:bg-rose-900/20 dark:border-rose-800 dark:text-rose-400" : "bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800"
-                            )}
+                {/* Category Filters (Nutrient Specific) */}
+                <div className="flex items-center gap-3 animate-in fade-in slide-in-from-right-8 duration-700 overflow-x-auto no-scrollbar w-full pb-2">
+                    {["Macros", "Minerals", "Vitamins"].map(category => (
+                        <button
+                            key={category}
+                            onClick={() => router.push(`/dashboard/ingredients?tab=nutrients&category=${category}`)}
+                            className="px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-blue-200 hover:text-blue-600 shadow-sm transition-all whitespace-nowrap"
                         >
-                            <Heart size={18} fill={isFav ? "currentColor" : "none"} />
-                            {isFav ? "Favorited" : "Favorite"}
-                        </Button>
-                        <div className="px-5 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
-                            <Zap size={16} />
-                            Health Knowledge Base
-                        </div>
-                    </div>
+                            {category}
+                        </button>
+                    ))}
+                    <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-1" />
+                    <button
+                        onClick={() => router.replace('/dashboard/ingredients?tab=nutrients')}
+                        className="flex items-center gap-2 px-5 py-3 rounded-2xl border border-blue-100 dark:border-blue-900/30 bg-blue-50/50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 transition-all group shrink-0"
+                    >
+                        <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+                        <span className="text-[10px] font-black uppercase tracking-widest">Back to Library</span>
+                    </button>
                 </div>
             </div>
 
