@@ -234,13 +234,13 @@ export default function NutrientDetailsPage() {
                 </div>
 
                 <div className="space-y-8">
-                    {/* Targeted Intake Card */}
+                    {/* Daily Medical Target Card */}
                     <Card className="p-8 flex flex-col items-center justify-center text-center space-y-6 bg-emerald-600 text-white border-none shadow-2xl shadow-emerald-600/30">
                         <div className="w-16 h-16 rounded-3xl bg-white/20 flex items-center justify-center animate-pulse">
                             <Activity size={32} />
                         </div>
                         <div className="space-y-2">
-                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Targeted Daily Intake</h3>
+                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 italic">Daily Medical Target</h3>
 
                             {(() => {
                                 let val = null;
@@ -270,17 +270,52 @@ export default function NutrientDetailsPage() {
                                             <p className="text-6xl font-black tracking-tighter italic">
                                                 {val >= 100 ? Math.round(val) : val < 10 ? val.toFixed(1) : Math.round(val)}
                                             </p>
-                                            <p className="text-xl font-black opacity-80 uppercase">{unit}</p>
+                                            <p className="text-xl font-black opacity-80 uppercase leading-none">{unit}</p>
                                         </div>
                                     );
                                 }
-                                return <p className="text-4xl font-black tracking-tighter italic uppercase">Optimal Level</p>;
+                                return <p className="text-4xl font-black tracking-tighter italic uppercase">Reference Intake</p>;
                             })()}
                         </div>
                         <p className="text-[10px] font-bold opacity-70 leading-relaxed max-w-[200px]">
-                            Daily target based on your health profile and goals.
+                            Recommended minimum intake based on your clinical profile.
                         </p>
                     </Card>
+
+                    {/* Safety & Toxicity */}
+                    <div className="p-8 bg-rose-50 dark:bg-rose-950/20 rounded-[2.5rem] border border-rose-100 dark:border-rose-900/50 shadow-sm space-y-4">
+                        <div className="flex items-center justify-between">
+                            <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-rose-700 dark:text-rose-400">Safety & Toxicity</h4>
+                            <div className="px-3 py-1 bg-white/50 dark:bg-rose-950/50 rounded-lg border border-rose-200 dark:border-rose-800 text-[9px] font-black uppercase text-rose-600">
+                                UL: {info.upperLimit || 'N/A'}
+                            </div>
+                        </div>
+                        <div className="space-y-3">
+                            <p className="text-[10px] font-black text-rose-600/50 uppercase tracking-widest leading-none">Known Toxic Symptoms</p>
+                            <div className="flex flex-wrap gap-2">
+                                {(info.toxicitySymptoms || ['No common toxicity signs reported with standard dietary intake.']).map((s, i) => (
+                                    <span key={i} className="text-[9px] font-black uppercase tracking-widest bg-white dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 px-3 py-1.5 rounded-lg border border-rose-100 dark:border-rose-800">
+                                        {s}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Deficiency Alerts */}
+                    <div className="p-8 bg-amber-50 dark:bg-amber-950/20 rounded-[2.5rem] border border-amber-100 dark:border-amber-900/50 shadow-sm space-y-4">
+                        <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-amber-700 dark:text-amber-400">Deficiency Indicators</h4>
+                        <div className="space-y-3">
+                            <p className="text-[10px] font-black text-amber-600/50 uppercase tracking-widest leading-none">Clinical Red Flags</p>
+                            <div className="flex flex-wrap gap-2">
+                                {info.deficiencySigns.map((s, i) => (
+                                    <span key={i} className="text-[9px] font-black uppercase tracking-widest bg-white dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 px-3 py-1.5 rounded-lg border border-amber-100 dark:border-amber-800">
+                                        {s}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
 
                     {/* Top Food Sources */}
                     <div className="space-y-5">

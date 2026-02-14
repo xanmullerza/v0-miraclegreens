@@ -4,6 +4,8 @@ export interface NutrientInfo {
     importance: string;
     benefits: string[];
     deficiencySigns: string[];
+    toxicitySymptoms?: string[];
+    upperLimit?: string;
     sources: string[];
 }
 
@@ -15,6 +17,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Critical for nerve function, muscle contraction, and maintaining fluid balance.",
         benefits: ["Lowers blood pressure", "Protects against stroke", "Prevents kidney stones", "Reduces water retention"],
         deficiencySigns: ["Weakness", "Fatigue", "Muscle cramps", "Constipation"],
+        toxicitySymptoms: ["Muscle weakness", "Palpitations", "Numbness", "Arrhythmia"],
+        upperLimit: "None (Dietary)",
         sources: ["Bananas", "Sweet potatoes", "Spinach", "Avocados", "Coconut water"]
     },
     'Magnesium': {
@@ -23,6 +27,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Supports muscle and nerve function, energy production, and DNA synthesis.",
         benefits: ["Improves sleep", "Boosts exercise performance", "Fights depression", "Supports heart health"],
         deficiencySigns: ["Muscle twitches and cramps", "Mental disorders", "Osteoporosis", "Fatigue"],
+        toxicitySymptoms: ["Diarrhea", "Nausea", "Abdominal cramping", "Lethargy"],
+        upperLimit: "350mg (Supplemental)",
         sources: ["Dark chocolate", "Avocados", "Nuts", "Legumes", "Tofu", "Seeds"]
     },
     'Calcium': {
@@ -31,6 +37,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Vital for building and maintaining strong bones and teeth, and for heart, muscle, and nerve function.",
         benefits: ["Bone health", "Dental health", "Muscle contraction", "Cardiovascular health"],
         deficiencySigns: ["Muscle problems", "Extreme fatigue", "Nail and skin symptoms", "Osteopenia/Osteoporosis"],
+        toxicitySymptoms: ["Kidney stones", "Constipation", "Hypercalcemia", "Soft tissue calcification"],
+        upperLimit: "2500mg",
         sources: ["Dairy products", "Leafy greens", "Sardines", "Fortified foods", "Almonds"]
     },
     'Sodium': {
@@ -39,6 +47,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Crucial for nerve and muscle function and controlling blood pressure/volume.",
         benefits: ["Fluid balance", "Nerve transmission", "Muscle contraction"],
         deficiencySigns: ["Nausea and vomiting", "Headache", "Confusion", "Loss of energy", "Muscle weakness"],
+        toxicitySymptoms: ["High blood pressure", "Swelling", "Increased thirst", "Stiff joints"],
+        upperLimit: "2300mg",
         sources: ["Table salt", "Pickles", "Cheese", "Beets", "Celery"]
     },
     'Phosphorus': {
@@ -47,6 +57,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Works with calcium to build strong bones and teeth; helps filter waste in kidneys.",
         benefits: ["Bone formation", "Digestion regulation", "Protein formation", "Cell repair"],
         deficiencySigns: ["Bone pain", "Fragile bones", "Stiff joints", "Fatigue"],
+        toxicitySymptoms: ["Diarrhea", "Hardening of organs", "Mineral imbalance"],
+        upperLimit: "4000mg",
         sources: ["Chicken", "Turkey", "Organ meats", "Seafood", "Dairy", "Sunflower seeds"]
     },
 
@@ -57,6 +69,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Used to make hemoglobin, a protein in red blood cells that carries oxygen from the lungs to all parts of the body.",
         benefits: ["Reduces fatigue", "Improves muscle strength", "Boosts immunity", "Improves concentration"],
         deficiencySigns: ["Extreme fatigue", "Weakness", "Pale skin", "Chest pain", "Cold hands and feet"],
+        toxicitySymptoms: ["Stomach pain", "Nausea", "Vomiting", "Organ damage (with high doses)"],
+        upperLimit: "45mg",
         sources: ["Shellfish", "Spinach", "Liver", "Legumes", "Red meat", "Pumpkin seeds"]
     },
     'Zinc': {
@@ -65,6 +79,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Essential for immune system function, DNA synthesis, and wound healing.",
         benefits: ["Boosts immunity", "Accelerates wound healing", "Reduces inflammation", "Treats acne"],
         deficiencySigns: ["Impaired immune function", "Hair loss", "Delayed wound healing", "Loss of appetite"],
+        toxicitySymptoms: ["Metal taste", "Loss of appetite", "Headaches", "Reduced copper absorption"],
+        upperLimit: "40mg",
         sources: ["Meat", "Shellfish", "Legumes", "Seeds", "Nuts", "Dairy"]
     },
     'Selenium': {
@@ -73,6 +89,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Critical for thyroid function, DNA synthesis, and protection from oxidative damage.",
         benefits: ["Antioxidant protection", "Thyroid health", "Immune system support", "Asthma reduction"],
         deficiencySigns: ["Infertility in men", "Muscle weakness", "Fatigue", "Mental fog", "Hair loss"],
+        toxicitySymptoms: ["Garlic breath", "Hair/nail loss", "Fatigue", "Nerve damage"],
+        upperLimit: "400µg",
         sources: ["Brazil nuts", "Fish", "Ham", "Pork", "Beef", "Turkey"]
     },
     'Copper': {
@@ -81,6 +99,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Helps make red blood cells and maintains nerve cells and the immune system.",
         benefits: ["Supports collagen production", "Energy production", "Brain health", "Immune function"],
         deficiencySigns: ["Fatigue", "Weakness", "Brittle bones", "Pale skin", "Sensitivity to cold"],
+        toxicitySymptoms: ["Nausea", "Dizziness", "Stomach pain", "Liver damage"],
+        upperLimit: "10000µg",
         sources: ["Liver", "Oysters", "Spirulina", "Shiitake mushrooms", "Nuts and seeds"]
     },
     'Manganese': {
@@ -89,6 +109,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Involved in fat and carbohydrate metabolism, calcium absorption, and blood sugar regulation.",
         benefits: ["Bone health", "Antioxidant properties", "Reduces inflammation", "Blood sugar regulation"],
         deficiencySigns: ["Poor bone growth", "Skeletal defects", "Impaired glucose tolerance", "Changes in hair color"],
+        toxicitySymptoms: ["Tremors", "Muscle stiffness", "Nerve system disorders"],
+        upperLimit: "11mg",
         sources: ["Whole grains", "Clams", "Oysters", "Mussels", "Nuts", "Soybeans"]
     },
 
@@ -99,6 +121,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Critical for vision as an essential component of rhodopsin.",
         benefits: ["Protects eyes from night blindness", "Supports a healthy immune system", "Reduces acne risk", "Supports bone health"],
         deficiencySigns: ["Night blindness", "Dry skin", "Eye inflammation", "Growth retardation in children"],
+        toxicitySymptoms: ["Dizziness", "Nausea", "Headaches", "Vision blurred", "Liver damage (Excess Retinol)"],
+        upperLimit: "3000µg (Retinol)",
         sources: ["Beef liver", "Sweet potato", "Carrots", "Black-eyed peas", "Spinach"]
     },
     'B1 (Thiamine)': {
@@ -107,6 +131,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Essential for glucose metabolism, and it plays a key role in nerve, muscle, and heart function.",
         benefits: ["Energy production", "Nerve system support", "Healthy heart function", "Improved mood"],
         deficiencySigns: ["Weight loss", "Confusion", "Memory loss", "Muscle weakness", "Heart problems"],
+        toxicitySymptoms: ["No known level", "Rare digestive upset"],
+        upperLimit: "None established",
         sources: ["Whole grains", "Meat", "Fish", "Nutritional yeast", "Seeds", "Nuts"]
     },
     'B2 (Riboflavin)': {
@@ -115,6 +141,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Helps break down proteins, fats, and carbohydrates.",
         benefits: ["Energy production", "Antioxidant functions", "Healthy skin and hair", "Migraine prevention"],
         deficiencySigns: ["Cracked lips", "Sore throat", "Swelling of mouth and throat", "Skin disorders"],
+        toxicitySymptoms: ["No known level", "Harmless yellow urine"],
+        upperLimit: "None established",
         sources: ["Eggs", "Organ meats", "Lean meats", "Milk", "Green vegetables"]
     },
     'B3 (Niacin)': {
@@ -123,15 +151,18 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Helps keep your nervous system, digestive system and skin healthy.",
         benefits: ["Lowers LDL cholesterol", "Increases HDL cholesterol", "Boosts brain function", "Protects skin"],
         deficiencySigns: ["Thick, scaly pigmented rash on skin exposed to sunlight", "Swollen mouth", "Vomiting", "Depression"],
+        toxicitySymptoms: ["Skin flushing", "Itching", "Nausea", "Liver toxicity (High Supplemental)"],
+        upperLimit: "35mg",
         sources: ["Liver", "Chicken breast", "Tuna", "Turkey", "Salmon"]
     },
-    // We can map different names if needed in the UI component
     'B5 (Pantothenic Acid)': {
         description: "Essential for making blood cells and converting food into energy.",
         history: "Discovered by Roger J. Williams in 1933.",
         importance: "Critical for the manufacture of red blood cells and sex/stress-related hormones.",
         benefits: ["Hormone production", "Reduces stress", "Healthy skin and hair", "Energy stamina"],
         deficiencySigns: ["Numbness", "Burning sensation in hands/feet", "Headache", "Extreme fatigue"],
+        toxicitySymptoms: ["Diarrhea", "Water retention"],
+        upperLimit: "None established",
         sources: ["Shiitake mushrooms", "Salmon", "Avocados", "Chicken", "Beef"]
     },
     'B6 (Pyridoxine)': {
@@ -140,6 +171,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Crucial for normal brain development and for keeping the nervous system and immune system healthy.",
         benefits: ["Mood regulation", "Promotes brain health", "Treats anemia", "Eye health"],
         deficiencySigns: ["Skin rashes", "Cracked lips", "Mood changes", "Weakened immune function"],
+        toxicitySymptoms: ["Nerve damage", "Lesions", "Numbness"],
+        upperLimit: "100mg",
         sources: ["Salmon", "Chickpeas", "Poultry", "Dark leafy greens", "Bananas"]
     },
     'B9 (Folate)': {
@@ -148,6 +181,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Crucial for early pregnancy to reduce the risk of birth defects of the brain and spine.",
         benefits: ["Healthy fetal development", "Reduces depression risk", "Supports heart health", "Brain function"],
         deficiencySigns: ["Weakness", "Fatigue", "Irritability", "Palpitations", "Shortness of breath"],
+        toxicitySymptoms: ["Masks B12 deficiency", "Rare stomach issues"],
+        upperLimit: "1000µg (Folic Acid)",
         sources: ["Dark leafy greens", "Beans", "Peanuts", "Sunflower seeds", "Fresh fruits"]
     },
     'B12 (Cobalamin)': {
@@ -156,6 +191,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Key player in the function and development of the brain and nerve cells.",
         benefits: ["Red blood cell formation", "Prevents major birth defects", "Bone health", "Macular degeneration prevention"],
         deficiencySigns: ["Weakness", "Tiredness", "Lightheadedness", "Pale skin", "Nerve problems"],
+        toxicitySymptoms: ["Low risk", "None generally established"],
+        upperLimit: "None established",
         sources: ["Clams", "Liver", "Trout", "Salmon", "Fortified cereals"]
     },
     'Vitamin C': {
@@ -164,6 +201,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Necessary for the growth, development and repair of all body tissues.",
         benefits: ["Strong immunity", "Lowers blood pressure", "Prevents gout", "Improves iron absorption"],
         deficiencySigns: ["Rough, bumpy skin", "Corkscrew-shaped body hair", "Bright red hair follicles", "Slow wound healing"],
+        toxicitySymptoms: ["Diarrhea", "Nausea", "Abdominal cramps", "Kidney stones (In some)"],
+        upperLimit: "2000mg",
         sources: ["Citrus fruits", "Bell peppers", "Strawberries", "Tomatoes", "Cruciferous vegetables"]
     },
     'Vitamin D': {
@@ -172,6 +211,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Needed to keep bones, teeth and muscles healthy.",
         benefits: ["Bone health", "Enhanced immunity", "Mood regulation", "Weight management"],
         deficiencySigns: ["Getting sick often", "Fatigue", "Bone and back pain", "Depression"],
+        toxicitySymptoms: ["Hypercalcemia", "Nausea", "Vomiting", "Poor bone health (In extreme excess)"],
+        upperLimit: "4000IU (100µg)",
         sources: ["Sunlight exposure", "Fatty fish", "Egg yolks", "Fortified foods", "Mushrooms"]
     },
     'Vitamin E': {
@@ -180,6 +221,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Acts as an antioxidant, helping to protect cells from the damage caused by free radicals.",
         benefits: ["Skin health", "Cellular restoration", "Reduced oxidative stress", "Eye health"],
         deficiencySigns: ["Muscle pain/weakness", "Vision problems", "Immune system changes", "Walking difficulties"],
+        toxicitySymptoms: ["Increased bleeding risk", "Muscle weakness", "Fatigue", "Nausea"],
+        upperLimit: "1000mg",
         sources: ["Sunflower seeds", "Almonds", "Avocados", "Spinach", "Butternut squash"]
     },
     'Vitamin K': {
@@ -188,6 +231,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Essential for blood clotting and bone metabolism.",
         benefits: ["Blood clotting", "Bone health", "Heart health", "Brain function"],
         deficiencySigns: ["Easy bruising", "Excessive bleeding from wounds", "Blood in urine/stool", "Heavy periods"],
+        toxicitySymptoms: ["Rare", "Interferes with blood thinners"],
+        upperLimit: "None established",
         sources: ["Kale", "Spinach", "Collard greens", "Parsley", "Broccoli"]
     },
 
@@ -198,6 +243,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Required to make acetylcholine, an important neurotransmitter for memory, mood, muscle control.",
         benefits: ["Cell maintenance", "DNA synthesis", "Metabolism", "Nervous system function"],
         deficiencySigns: ["Muscle damage", "Liver damage", "Non-alcoholic fatty liver disease"],
+        toxicitySymptoms: ["Fishy body odor", "Sweating", "Low blood pressure", "Liver toxicity"],
+        upperLimit: "3500mg",
         sources: ["Whole eggs", "Organ meats", "Caviar", "Fish", "Shiitake mushrooms"]
     },
     'Fiber': {
@@ -206,6 +253,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Helps regulate the body's use of sugars, helping to keep hunger and blood sugar in check.",
         benefits: ["Digestive health", "Cholesterol control", "Blood sugar regulation", "Weight management"],
         deficiencySigns: ["Constipation", "Weight gain", "Blood sugar fluctuations", "Nausea/Tiredness"],
+        toxicitySymptoms: ["Bloating", "Gas", "Mineral malabsorption", "Dehydration"],
+        upperLimit: "70g+",
         sources: ["Whole grains", "Fruits", "Vegetables", "Beans", "Legumes"]
     },
 
@@ -216,6 +265,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Provides the energy necessary for all biological processes, from breathing to strenuous exercise.",
         benefits: ["Powers all body functions", "Maintains body temperature", "Enables physical movement", "Supports brain activity"],
         deficiencySigns: ["Weight loss", "Fatigue", "Brain fog", "Weakness"],
+        toxicitySymptoms: ["Weight gain", "Metabolic syndrome", "Inflammation"],
+        upperLimit: "Varies by TDEE",
         sources: ["All foods containing macronutrients", "Fats", "Carbohydrates", "Proteins"]
     },
     'Protein': {
@@ -224,6 +275,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Essential for growth, repair, and maintenance of all cells and tissues.",
         benefits: ["Muscle building", "Tissue repair", "Enzyme production", "Hormone regulation"],
         deficiencySigns: ["Muscle wasting", "Stunted growth", "Weakened immunity", "Thinning hair"],
+        toxicitySymptoms: ["Kidney strain (In predisposed)", "Dehydration", "Digestive upset"],
+        upperLimit: "35% of Total Calories",
         sources: ["Meat", "Eggs", "Legumes", "Nuts", "Dairy", "Quinoa"]
     },
     'Carbs': {
@@ -232,6 +285,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Quickly converted to glucose to fuel your brain and muscles.",
         benefits: ["Rapid energy source", "Spares protein for muscle repair", "Fuels the central nervous system", "Supports gut health (via fiber)"],
         deficiencySigns: ["Low energy", "Hypoglycemia", "Headaches", "Difficulty concentrating"],
+        toxicitySymptoms: ["Blood sugar spikes", "Insulin resistance", "Triglyceride increase"],
+        upperLimit: "Varies by activity",
         sources: ["Whole grains", "Fruits", "Vegetables", "Legumes", "Potatoes"]
     },
     'Fat': {
@@ -240,6 +295,8 @@ export const nutrientInfo: Record<string, NutrientInfo> = {
         importance: "Crucial for absorption of fat-soluble vitamins (A, D, E, K), hormone production, and cell membrane integrity.",
         benefits: ["Organ protection", "Vitamin absorption", "Long-term energy storage", "Skin and hair health"],
         deficiencySigns: ["Dry skin", "Vitamin deficiencies", "Hormonal imbalances", "Feeling cold"],
+        toxicitySymptoms: ["Digestive distress", "Heart disease risk (Saturated/Trans excess)", "Inflammation"],
+        upperLimit: "Varies by diet type",
         sources: ["Avocados", "Nuts", "Seeds", "Olive oil", "Fatty fish"]
     }
 };
