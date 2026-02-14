@@ -210,7 +210,7 @@ function LibraryContent() {
                         {isLoading ? (
                             <div className="p-8 text-center text-slate-500">
                                 <Activity className="h-6 w-6 animate-spin text-blue-500 mx-auto" />
-                                <p className="mt-2 text-[10px] font-black uppercase tracking-widest">Analyzing Samples...</p>
+                                <p className="mt-2 text-[10px] font-black uppercase tracking-widest">Searching library...</p>
                             </div>
                         ) : results.length === 0 ? (
                             <div className="p-8 text-center text-slate-500">

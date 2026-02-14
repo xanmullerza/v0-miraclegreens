@@ -1555,7 +1555,7 @@ export default function RecipeDetailsPage() {
                                                             const v1 = k1 ? m[k1] : 0;
                                                             const v2 = k2 ? m[k2] : 0;
                                                             val = v2 > 0 ? v1 / v2 : 0;
-                                                            unitStr = ': 1';
+                                                            unitStr = ' to 1';
                                                         } else {
                                                             val = (label === 'Energy' || label === 'Protein' || label === 'Carbs' || label === 'Fat')
                                                                 ? (label === 'Energy' ? (energyUnit === 'kJ' ? (recipe as any).energy_kj : (recipe as any).calories) : (recipe as any)[label.toLowerCase()])
@@ -1578,11 +1578,11 @@ export default function RecipeDetailsPage() {
 
                                                         if (title === 'Biological Ratios') {
                                                             let ratioStatus: 'good' | 'fair' | 'poor' = 'good';
-                                                            if (label === 'Sodium:Potassium') ratioStatus = val <= 1.0 ? 'good' : val <= 2.0 ? 'fair' : 'poor';
-                                                            if (label === 'Zinc:Copper') ratioStatus = (val >= 8 && val <= 12) ? 'good' : (val >= 5 && val <= 15) ? 'fair' : 'poor';
-                                                            if (label === 'Omega 6:3 Ratio') ratioStatus = val <= 4.0 ? 'good' : val <= 10.0 ? 'fair' : 'poor';
-                                                            if (label === 'Calcium:Magnesium') ratioStatus = (val >= 1.7 && val <= 2.5) ? 'good' : (val >= 1.5 && val <= 3.0) ? 'fair' : 'poor';
-                                                            if (label === 'Calcium:Phosphorus') ratioStatus = (val >= 1.0 && val <= 2.0) ? 'good' : (val >= 0.8 && val <= 2.5) ? 'fair' : 'poor';
+                                                            if (label === 'Sodium & Potassium') ratioStatus = val <= 1.0 ? 'good' : val <= 2.0 ? 'fair' : 'poor';
+                                                            if (label === 'Zinc & Copper') ratioStatus = (val >= 8 && val <= 12) ? 'good' : (val >= 5 && val <= 15) ? 'fair' : 'poor';
+                                                            if (label === 'Omega 3 to 6 ratio') ratioStatus = val <= 4.0 ? 'good' : val <= 10.0 ? 'fair' : 'poor';
+                                                            if (label === 'Calcium & Magnesium') ratioStatus = (val >= 1.7 && val <= 2.5) ? 'good' : (val >= 1.5 && val <= 3.0) ? 'fair' : 'poor';
+                                                            if (label === 'Calcium & Phosphorus') ratioStatus = (val >= 1.0 && val <= 2.0) ? 'good' : (val >= 0.8 && val <= 2.5) ? 'fair' : 'poor';
 
                                                             styles = ratioStatus === 'good' ? { text: "text-emerald-500", borderLight: "border-emerald-500/30", fade: "bg-emerald-500/5", textFill: "text-emerald-500", bg: "bg-emerald-500", border: "border-emerald-500" } :
                                                                 ratioStatus === 'fair' ? { text: "text-amber-500", borderLight: "border-amber-500/30", fade: "bg-amber-500/5", textFill: "text-amber-500", bg: "bg-amber-500", border: "border-amber-500" } :
@@ -1590,11 +1590,11 @@ export default function RecipeDetailsPage() {
                                                         }
 
                                                         const ratioTarget = title === 'Biological Ratios' ? (
-                                                            label === 'Sodium:Potassium' ? 'Under 1:1' :
-                                                                label === 'Zinc:Copper' ? '8:1 - 12:1' :
-                                                                    label === 'Omega 6:3 Ratio' ? 'Under 4:1' :
-                                                                        label === 'Calcium:Magnesium' ? '1.7:1 - 2.5:1' :
-                                                                            label === 'Calcium:Phosphorus' ? '1:1 - 2:1' : null
+                                                            label === 'Sodium & Potassium' ? 'Under 1 to 1' :
+                                                                label === 'Zinc & Copper' ? '8 to 1 - 12 to 1' :
+                                                                    label === 'Omega 3 to 6 ratio' ? 'Under 4 to 1' :
+                                                                        label === 'Calcium & Magnesium' ? '1.7 to 1 - 2.5 to 1' :
+                                                                            label === 'Calcium & Phosphorus' ? '1 to 1 - 2 to 1' : null
                                                         ) : null;
 
                                                         const labelColor = title === 'Biological Ratios' ? (
@@ -1609,32 +1609,11 @@ export default function RecipeDetailsPage() {
 
                                                         return (
                                                             <div key={label} onClick={() => router.push(`/dashboard/nutrients/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
-                                                                <p className={cn("text-[8px] uppercase font-black truncate mb-1 flex items-center gap-0.5 whitespace-nowrap overflow-hidden")}>
-                                                                    {title === 'Biological Ratios' && label.includes(':') ? (
-                                                                        <>
-                                                                            <span className={
-                                                                                label.startsWith('Sodium') ? 'text-blue-400' :
-                                                                                    label.startsWith('Zinc') ? 'text-orange-400' :
-                                                                                        label.startsWith('Omega') ? 'text-indigo-400' :
-                                                                                            label.startsWith('Calcium') && label.includes('Magnesium') ? 'text-violet-400' :
-                                                                                                label.startsWith('Calcium') && label.includes('Phosphorus') ? 'text-cyan-400' : ''
-                                                                            }>
-                                                                                {label.split(':')[0]}
-                                                                            </span>
-                                                                            <span className="opacity-30 text-slate-500">:</span>
-                                                                            <span className={
-                                                                                label.endsWith('Potassium') ? 'text-emerald-400' :
-                                                                                    label.endsWith('Copper') ? 'text-rose-400' :
-                                                                                        label.includes('3 Ratio') ? 'text-purple-400' :
-                                                                                            label.endsWith('Magnesium') ? 'text-pink-400' :
-                                                                                                label.endsWith('Phosphorus') ? 'text-amber-400' : ''
-                                                                            }>
-                                                                                {label.split(':')[1]}
-                                                                            </span>
-                                                                        </>
-                                                                    ) : (
-                                                                        <span className={labelColor}>{label}</span>
-                                                                    )}
+                                                                <p className={cn(
+                                                                    "text-[9px] font-black truncate mb-1 whitespace-nowrap overflow-hidden transition-colors",
+                                                                    title === 'Biological Ratios' ? 'text-slate-400 dark:text-slate-500' : 'uppercase text-foreground/60'
+                                                                )}>
+                                                                    {label}
                                                                 </p>
                                                                 <div className="space-y-0.5">
                                                                     {(nutrientDisplayMode === 'percentage' && pct !== null && !forceRaw) ? (
@@ -1692,25 +1671,25 @@ export default function RecipeDetailsPage() {
                                             <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6">
                                                 <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
                                                     <Activity size={18} />
-                                                    Strategic Health Insights
+                                                    Personal Health Insights
                                                 </h3>
                                             </div>
 
-                                            <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Critical nutrient balances for metabolic & inflammation tracking" items={{
-                                                'Sodium:Potassium': ['Sodium', 'Potassium'],
-                                                'Zinc:Copper': ['Zinc', 'Copper'],
-                                                'Omega 6:3 Ratio': ['Omega-6', 'Omega-3'],
-                                                'Calcium:Magnesium': ['Calcium', 'Magnesium'],
-                                                'Calcium:Phosphorus': ['Calcium', 'Phosphorus'],
+                                            <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Key nutrient balances for a healthy body" items={{
+                                                'Sodium & Potassium': ['Sodium', 'Potassium'],
+                                                'Zinc & Copper': ['Zinc', 'Copper'],
+                                                'Omega 3 to 6 ratio': ['Omega-6', 'Omega-3'],
+                                                'Calcium & Magnesium': ['Calcium', 'Magnesium'],
+                                                'Calcium & Phosphorus': ['Calcium', 'Phosphorus'],
                                             }} />
 
-                                            <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Caloric & Macro Breakdown" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
+                                            <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Essential energy and building blocks" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
                                                 'Energy': ['calories'],
                                                 'Protein': ['protein'],
                                                 'Carbs': ['carbs'],
                                                 'Fat': ['fat']
                                             }} />
-                                            <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Hydration & Mineral Balance" items={{
+                                            <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Vital minerals for hydration and balance" items={{
                                                 'Sodium': ['Sodium', 'sodium_mg'],
                                                 'Potassium': ['Potassium', 'potassium_mg'],
                                                 'Magnesium': ['Magnesium', 'magnesium_mg'],
@@ -1718,7 +1697,7 @@ export default function RecipeDetailsPage() {
                                                 'Phosphorus': ['Phosphorus', 'phosphorus_mg']
                                             }} />
 
-                                            <NutrientGrid title="Trace Minerals" icon={Gem} theme="rose" subtitle="Essential micro-nutrients" items={{
+                                            <NutrientGrid title="Trace Minerals" icon={Gem} theme="rose" subtitle="Essential minerals for energy and immune support" items={{
                                                 'Iron': ['Iron', 'iron_mg'],
                                                 'Zinc': ['Zinc', 'zinc_mg'],
                                                 'Copper': ['Copper', 'copper_mg'],
@@ -1726,7 +1705,7 @@ export default function RecipeDetailsPage() {
                                                 'Selenium': ['Selenium', 'selenium_ug']
                                             }} />
 
-                                            <NutrientGrid title="Daily Vitamins" icon={Droplet} theme="blue" subtitle="Water-soluble vitamins (B-Complex & C)" items={{
+                                            <NutrientGrid title="Daily Vitamins" icon={Droplet} theme="blue" subtitle="Essential daily vitamins for a healthy mind" items={{
                                                 'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
                                                 'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
                                                 'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
@@ -1738,14 +1717,14 @@ export default function RecipeDetailsPage() {
                                                 'Choline': ['Choline', 'choline_mg'],
                                             }} />
 
-                                            <NutrientGrid title="Stored Vitamins" icon={Battery} theme="emerald" subtitle="Fat-soluble storage (A, D, E, K)" breakdownLabels={['Vitamin A', 'Vitamin E']} items={{
+                                            <NutrientGrid title="Stored Vitamins" icon={Battery} theme="emerald" subtitle="Stored vitamins for long-term vitality" breakdownLabels={['Vitamin A', 'Vitamin E']} items={{
                                                 'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
                                                 'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
                                                 'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
                                                 'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
                                             }} />
 
-                                            <NutrientGrid title="Clinical Markers" icon={Activity} theme="amber" subtitle="Secondary markers for advanced health profile mapping" forceRaw={true} items={{
+                                            <NutrientGrid title="Clinical Markers" icon={Activity} theme="amber" subtitle="Extra health markers worth tracking" forceRaw={true} items={{
                                                 'Fiber': ['Fiber', 'fiber_g'],
                                                 'Sugars': ['Sugars', 'sugars_g'],
                                                 'Oxalate': ['Oxalate', 'oxalate_mg'],

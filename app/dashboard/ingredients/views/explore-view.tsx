@@ -246,7 +246,7 @@ export function ExploreView({
                         <div className="relative flex-1 max-w-xl">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                             <Input
-                                placeholder="Search clinical database..."
+                                placeholder="Search ingredient library..."
                                 value={searchQuery}
                                 onChange={handleSearchChange}
                                 className="pl-12 h-14 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl"

@@ -147,7 +147,7 @@ export default function NutrientDetailsPage() {
                 </div>
                 <div className="text-center space-y-2">
                     <h2 className="text-2xl font-black uppercase tracking-tighter">Nutrient Not Found</h2>
-                    <p className="text-slate-500 max-w-xs mx-auto text-sm">The requested biological marker does not exist in our reference library.</p>
+                    <p className="text-slate-500 max-w-xs mx-auto text-sm">The requested nutrient does not exist in our health guide.</p>
                 </div>
                 <Button onClick={() => router.push('/dashboard/nutrients')} className="rounded-full px-8 bg-emerald-600">
                     Back to Library
@@ -192,7 +192,7 @@ export default function NutrientDetailsPage() {
                     </Button>
                     <div className="px-5 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest">
                         <Zap size={16} />
-                        Clinical Reference Hub
+                        Health Knowledge Base
                     </div>
                 </div>
             </div>
@@ -202,7 +202,7 @@ export default function NutrientDetailsPage() {
                 <div className="space-y-8">
                     {/* Biological Significance */}
                     <div className="p-8 bg-emerald-50 dark:bg-emerald-950/20 rounded-[2.5rem] border border-emerald-100 dark:border-emerald-900/50 shadow-sm">
-                        <h4 className="font-black text-[11px] mb-4 uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-400">Biological Significance</h4>
+                        <h4 className="font-black text-[11px] mb-4 uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-400">Why It Matters</h4>
                         <p className="text-base font-medium text-slate-700 dark:text-slate-300 leading-relaxed italic">
                             {info.importance}
                         </p>
@@ -210,7 +210,7 @@ export default function NutrientDetailsPage() {
 
                     {/* Benefits */}
                     <div className="space-y-4">
-                        <h4 className="font-black text-[11px] px-2 uppercase tracking-[0.2em] text-slate-400">Biological Benefits</h4>
+                        <h4 className="font-black text-[11px] px-2 uppercase tracking-[0.2em] text-slate-400">Key Benefits</h4>
                         <div className="flex flex-wrap gap-2.5">
                             {info.benefits.map((b, i) => (
                                 <span key={i} className="text-[10px] font-black uppercase tracking-widest bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-100 px-5 py-2.5 rounded-full border border-emerald-200 dark:border-emerald-800">
@@ -278,7 +278,7 @@ export default function NutrientDetailsPage() {
                             })()}
                         </div>
                         <p className="text-[10px] font-bold opacity-70 leading-relaxed max-w-[200px]">
-                            Biometric target based on your clinical profile and nutrition strategy.
+                            Daily target based on your health profile and goals.
                         </p>
                     </Card>
 
@@ -286,8 +286,8 @@ export default function NutrientDetailsPage() {
                     <div className="space-y-5">
                         <div className="flex items-center justify-between px-2">
                             <div className="space-y-1">
-                                <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 leading-none">Bio-Available Ingredients</h4>
-                                <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest leading-none">Ordered by clinical nutrient density (100g sample)</p>
+                                <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 leading-none">Natural Sources</h4>
+                                <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest leading-none">Ordered by nutrient richness (per 100g)</p>
                             </div>
                             <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest underline cursor-pointer hover:text-emerald-600" onClick={() => router.push('/dashboard/ingredients')}>Browse Ingredients</span>
                         </div>
@@ -320,7 +320,7 @@ export default function NutrientDetailsPage() {
                                     </button>
                                 ))
                             ) : (
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No whole food high-concentration sources identified in current laboratory data.</p>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No whole food sources identified in our current health database.</p>
                             )}
                         </div>
                     </div>

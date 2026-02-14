@@ -181,7 +181,7 @@ function FoodsHubContent() {
                         <input
                             type="text"
                             autoFocus
-                            placeholder={`Search ${currentTab}...`}
+                            placeholder="Search ingredient library..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onFocus={() => {
@@ -326,8 +326,10 @@ export default function FoodsHub() {
     return (
         <Suspense fallback={
             <div className="h-[60vh] flex flex-col items-center justify-center gap-4">
-                <Loader2 className="animate-spin text-emerald-500" size={40} />
-                <p className="text-xs font-black uppercase tracking-widest text-slate-400 italic">Synchronizing Scientific Data...</p>
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-12 h-12 rounded-full border-4 border-emerald-500/30 border-t-emerald-500 animate-spin" />
+                    <p className="mt-2 text-[10px] font-black uppercase tracking-widest animate-pulse">Finding results...</p>
+                </div>
             </div>
         }>
             <FoodsHubContent />

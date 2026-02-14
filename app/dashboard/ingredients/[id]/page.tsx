@@ -828,7 +828,7 @@ export default function FoodDetailsPage() {
 
 
 
-                <NutrientGrid title="Macronutrients" icon={Zap} theme="orange" subtitle="Scientific and Clinical breakdown of caloric density" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
+                <NutrientGrid title="Macronutrients" icon={Zap} theme="orange" subtitle="Detailed breakdown of energy and macro density" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
                     'Energy': ['Energy', 'energy_kcal', 'Calories', 'calories'],
                     'Protein': ['Protein', 'protein_g', 'protein'],
                     'Carbs': ['Carbohydrates', 'carbs_g', 'carbs'],
@@ -843,7 +843,7 @@ export default function FoodDetailsPage() {
                     'Phosphorus': ['Phosphorus', 'phosphorus_mg']
                 }} />
 
-                <NutrientGrid title="Trace Minerals" icon={Gem} theme="rose" subtitle="Rare essential minerals required for metabolic enzymatic reactions" items={{
+                <NutrientGrid title="Trace Minerals" icon={Gem} theme="rose" subtitle="Essential minerals for energy and immune support" items={{
                     'Iron': ['Iron', 'iron_mg'],
                     'Zinc': ['Zinc', 'zinc_mg'],
                     'Copper': ['Copper', 'copper_mg'],
@@ -851,7 +851,7 @@ export default function FoodDetailsPage() {
                     'Selenium': ['Selenium', 'selenium_ug']
                 }} />
 
-                <NutrientGrid title="Water-Soluble Vitamins" icon={Droplet} theme="blue" subtitle="Bio-available B-Complex and Vitamin C concentrations" items={{
+                <NutrientGrid title="Water-Soluble Vitamins" icon={Droplet} theme="blue" subtitle="Daily vitamins for a healthy mind and body" items={{
                     'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
                     'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
                     'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
@@ -864,7 +864,7 @@ export default function FoodDetailsPage() {
                     'Choline': ['Choline', 'choline_mg'],
                 }} />
 
-                <NutrientGrid title="Fat-Soluble Vitamins" icon={Battery} theme="emerald" subtitle="Vitamins stored within cellular lipid layers" breakdownLabels={['Vitamin A', 'Vitamin E']} items={{
+                <NutrientGrid title="Fat-Soluble Vitamins" icon={Battery} theme="emerald" subtitle="Stored vitamins for long-term vitality" breakdownLabels={['Vitamin A', 'Vitamin E']} items={{
                     'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
                     'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
                     'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
@@ -878,14 +878,14 @@ export default function FoodDetailsPage() {
                     </h3>
                 </div>
 
-                <NutrientGrid title="Clinical Markers" icon={Activity} theme="amber" subtitle="Secondary markers for advanced health profile mapping" forceRaw={true} items={{
+                <NutrientGrid title="Clinical Markers" icon={Activity} theme="amber" subtitle="Extra health markers worth tracking" forceRaw={true} items={{
                     'Fiber': ['Fiber', 'fiber_g'],
                     'Sugars': ['Sugars', 'sugars_g'],
                     'Oxalate': ['Oxalate', 'oxalate_mg'],
                     'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
                 }} />
 
-                <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Critical nutrient balances for metabolic & inflammation tracking" items={{
+                <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Key nutrient balances for a healthy body" items={{
                     'Sodium & Potassium': ['Sodium', 'Potassium'],
                     'Zinc & Copper': ['Zinc', 'Copper'],
                     'Omega 3 to 6 ratio': ['Omega-6', 'Omega-3'],
@@ -1052,7 +1052,7 @@ export default function FoodDetailsPage() {
                         <div className="w-full max-w-md">
                             <Card className="bg-white dark:bg-slate-900 p-8 space-y-6 shadow-2xl border-emerald-500/20">
                                 <div className="flex justify-between items-center">
-                                    <h3 className="text-2xl font-black uppercase tracking-tighter italic">Edit Clinical File</h3>
+                                    <h3 className="text-2xl font-black uppercase tracking-tighter italic">Edit Ingredient Details</h3>
                                     <button onClick={() => setIsEditing(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400">
                                         <X size={24} />
                                     </button>
@@ -1099,7 +1099,7 @@ export default function FoodDetailsPage() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Reference Clinical Image</Label>
+                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Display Image</Label>
                                         <div className="relative aspect-video rounded-2xl bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group/upload flex items-center justify-center">
                                             {editImage ? (
                                                 <>
