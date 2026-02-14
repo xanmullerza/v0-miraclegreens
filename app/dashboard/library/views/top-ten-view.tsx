@@ -42,7 +42,7 @@ interface TopFood {
 }
 
 // Full tracked nutrients list in alphabetical order
-const NUTRIENTS = [
+export const NUTRIENTS = [
     { id: 'B1 (Thiamine)', label: 'B1 (Thiamine)', unit: 'mg', color: 'bg-blue-500', icon: Droplet },
     { id: 'B2 (Riboflavin)', label: 'B2 (Riboflavin)', unit: 'mg', color: 'bg-blue-500', icon: Droplet },
     { id: 'B3 (Niacin)', label: 'B3 (Niacin)', unit: 'mg', color: 'bg-blue-500', icon: Droplet },
@@ -82,6 +82,8 @@ interface TopTenViewProps {
     setShowFavoritesOnly?: (value: boolean) => void;
     selectedCategories?: string[];
     setSelectedCategories?: (value: string[]) => void;
+    selectedNutrientId?: string;
+    onNutrientChange?: (id: string) => void;
 }
 
 export function TopTenView({
@@ -89,8 +91,13 @@ export function TopTenView({
     setShowFavoritesOnly: externalSetShowFavorites,
     selectedCategories: externalSelectedCategories,
     setSelectedCategories: externalSetSelectedCategories,
+    onNutrientChange,
+    selectedNutrientId: externalSelectedNutrientId,
 }: TopTenViewProps = {}) {
-    const [selectedNutrient, setSelectedNutrient] = useState(NUTRIENTS[19]); // Default to Protein
+    const [localSelectedNutrientId, setLocalSelectedNutrientId] = useState('protein_g');
+    const selectedNutrientId = externalSelectedNutrientId || localSelectedNutrientId;
+    const selectedNutrient = NUTRIENTS.find(n => n.id === selectedNutrientId) || NUTRIENTS[19];
+
     const [foods, setFoods] = useState<TopFood[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [localSelectedCategories, setLocalSelectedCategories] = useState<string[]>(
@@ -177,90 +184,7 @@ export function TopTenView({
     return (
         <div className="space-y-6 animate-in fade-in duration-500">
 
-            {/* Nutrient Selector */}
-            <div className="space-y-6">
-                {[
-                    {
-                        title: "Macronutrients",
-                        icon: Scale,
-                        align: "text-blue-500",
-                        ids: ['energy_kcal', 'protein_g', 'carbs_g', 'fat_g']
-                    },
-                    {
-                        title: "Electrolytes",
-                        icon: Zap,
-                        align: "text-blue-500",
-                        ids: ['Sodium', 'Potassium', 'Magnesium', 'Calcium', 'Phosphorus']
-                    },
-                    {
-                        title: "Daily Vitamins",
-                        icon: Droplet,
-                        align: "text-emerald-500",
-                        ids: ['Vitamin C', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)']
-                    },
-                    {
-                        title: "",
-                        icon: Droplet,
-                        align: "text-emerald-500",
-                        ids: ['B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Choline']
-                    },
-                    {
-                        title: "Stored Vitamins",
-                        icon: Battery,
-                        align: "text-teal-500",
-                        ids: ['Vitamin A', 'Vitamin D', 'Vitamin E', 'Vitamin K']
-                    },
-                    {
-                        title: "Trace Minerals",
-                        icon: Gem,
-                        align: "text-rose-500",
-                        ids: ['Iron', 'Zinc', 'Copper', 'Manganese', 'Selenium']
-                    },
-                    {
-                        title: "Extra Markers",
-                        icon: Activity,
-                        align: "text-blue-500",
-                        ids: ['Fiber', 'Cholesterol', 'Omega-3', 'Oxalate', 'Sugar']
-                    }
-                ].map((group) => (
-                    <div key={group.title || `row-${group.ids[0]}`} className="space-y-3">
-                        {group.title && (
-                            <div className="flex items-center gap-2 px-2">
-                                <group.icon size={14} className={group.align} />
-                                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500">{group.title}</h4>
-                                <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800" />
-                            </div>
-                        )}
-                        <div className="flex flex-wrap gap-2 px-2">
-                            {group.ids.map(id => {
-                                const nutrient = NUTRIENTS.find(n => n.id === id);
-                                if (!nutrient) return null;
-                                const Icon = nutrient.icon;
-                                const isSelected = selectedNutrient.id === nutrient.id;
-                                return (
-                                    <button
-                                        key={nutrient.id}
-                                        onClick={() => setSelectedNutrient(nutrient)}
-                                        className={cn(
-                                            "flex items-center gap-2 pl-1.5 pr-4 py-1.5 rounded-full border transition-all duration-300",
-                                            isSelected
-                                                ? cn(nutrient.color, "text-white border-transparent shadow-md scale-105 ring-2 ring-offset-2 ring-blue-500/20 dark:ring-offset-slate-950")
-                                                : "bg-white dark:bg-slate-900/50 text-slate-500 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
-                                        )}
-                                    >
-                                        <div className={cn("w-6 h-6 rounded-full flex items-center justify-center", isSelected ? "bg-white/20" : "bg-slate-100 dark:bg-slate-800")}>
-                                            <Icon size={12} className={isSelected ? "text-white" : "text-slate-400"} />
-                                        </div>
-                                        <div className="text-left">
-                                            <p className="text-[10px] font-black uppercase tracking-widest leading-none">{nutrient.label}</p>
-                                        </div>
-                                    </button>
-                                );
-                            })}
-                        </div>
-                    </div>
-                ))}
-            </div>
+
 
             {/* Results List */}
             <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 md:p-8 shadow-xl relative overflow-hidden">
