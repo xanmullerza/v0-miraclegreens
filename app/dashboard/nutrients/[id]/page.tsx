@@ -357,20 +357,20 @@ export default function NutrientDetailsPage() {
             <div className="flex flex-col md:flex-row md:items-center gap-8 animate-in slide-in-from-top-4 duration-700 pb-1">
                 {/* Status Readout (Now on the left) */}
                 <div className={cn(
-                    "w-32 h-32 rounded-[2rem] border-2 transition-all duration-700 flex flex-col items-center justify-center shadow-xl flex-shrink-0",
+                    "w-24 h-24 rounded-[1.5rem] border-2 transition-all duration-700 flex flex-col items-center justify-center shadow-lg flex-shrink-0",
                     isDeficient ? "bg-amber-50 border-amber-300 text-amber-800 shadow-amber-200/50" :
                         isToxic ? "bg-rose-50 border-rose-300 text-rose-800 shadow-rose-200/50" :
                             "bg-emerald-50 border-emerald-300 text-emerald-800 shadow-emerald-500/10"
                 )}>
-                    <p className="text-[8px] font-black uppercase tracking-widest opacity-60">Intake</p>
+                    <p className="text-[7px] font-black uppercase tracking-widest opacity-60">Intake</p>
                     <div className="flex items-baseline gap-0.5">
-                        <span className="text-3xl font-black italic tracking-tighter">
+                        <span className="text-2xl font-black italic tracking-tighter leading-none">
                             {simValue >= 100 ? Math.round(simValue) : simValue.toFixed(1)}
                         </span>
-                        <span className="text-[10px] font-black uppercase">{unit}</span>
+                        <span className="text-[8px] font-black uppercase">{unit}</span>
                     </div>
                     <div className={cn(
-                        "mt-1.5 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest flex items-center gap-1",
+                        "mt-1 px-2.5 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest flex items-center gap-1",
                         isDeficient ? "bg-amber-500 text-white" :
                             isToxic ? "bg-rose-600 text-white" :
                                 "bg-emerald-600 text-white"
