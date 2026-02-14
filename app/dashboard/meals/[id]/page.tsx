@@ -1134,616 +1134,599 @@ export default function RecipeDetailsPage() {
                     </Card>
                 </div>
 
-                {/* Content Section: Ingredients & Procedure vs Nutrition */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column: Ingredients and Procedure */}
-                    <div className="lg:col-span-1 space-y-6">
-                        {/* Lab Ingredients */}
-                        <Card className="p-6">
-                            <div className="mb-6 space-y-4">
-                                <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3 italic">
-                                    <ShoppingBasket size={24} className="text-emerald-500" />
-                                    Ingredients
-                                </h3>
+                {/* Ingredients Section - Full Width Horizontal Layout */}
+                <Card className="p-6">
+                    <div className="mb-6 space-y-4">
+                        <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3 italic">
+                            <ShoppingBasket size={24} className="text-emerald-500" />
+                            Ingredients
+                        </h3>
 
 
-                                {/* Control Block */}
-                                <div className="p-2 gap-2 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-wrap items-center">
+                        {/* Control Block */}
+                        <div className="p-2 gap-2 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800 flex flex-wrap items-center">
 
-                                    {/* Show/Hide Toggle */}
-                                    <button
-                                        onClick={() => {
-                                            setIsToggling(!isToggling);
-                                            setIsEditingIngredients(false);
-                                            setIsReordering(false);
-                                            setIsEditingMeasures(false);
-                                        }}
-                                        className={cn(
-                                            "flex items-center gap-2 px-3 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center whitespace-nowrap",
-                                            isToggling
-                                                ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 border-emerald-200 dark:border-emerald-500/20"
-                                                : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 hover:text-emerald-500 hover:border-emerald-200"
-                                        )}
-                                    >
-                                        <Eye size={14} /> Show/Hide
-                                    </button>
+                            {/* Show/Hide Toggle */}
+                            <button
+                                onClick={() => {
+                                    setIsToggling(!isToggling);
+                                    setIsEditingIngredients(false);
+                                    setIsReordering(false);
+                                    setIsEditingMeasures(false);
+                                }}
+                                className={cn(
+                                    "flex items-center gap-2 px-3 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center whitespace-nowrap",
+                                    isToggling
+                                        ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 border-emerald-200 dark:border-emerald-500/20"
+                                        : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 hover:text-emerald-500 hover:border-emerald-200"
+                                )}
+                            >
+                                <Eye size={14} /> Show/Hide
+                            </button>
 
-                                    {/* Edit Mode Toggle */}
-                                    <button
-                                        onClick={() => {
-                                            setIsEditingIngredients(!isEditingIngredients);
-                                            setIsReordering(false);
-                                            setIsEditingMeasures(false);
-                                            setIsToggling(false);
-                                        }}
-                                        className={cn(
-                                            "flex items-center gap-2 px-3 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center whitespace-nowrap",
-                                            isEditingIngredients
-                                                ? "bg-rose-50 dark:bg-rose-500/10 text-rose-500 border-rose-200 dark:border-rose-500/20"
-                                                : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 hover:text-rose-500 hover:border-rose-200"
-                                        )}
-                                    >
-                                        <Diff size={14} /> Add/Remove
-                                    </button>
+                            {/* Edit Mode Toggle */}
+                            <button
+                                onClick={() => {
+                                    setIsEditingIngredients(!isEditingIngredients);
+                                    setIsReordering(false);
+                                    setIsEditingMeasures(false);
+                                    setIsToggling(false);
+                                }}
+                                className={cn(
+                                    "flex items-center gap-2 px-3 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center whitespace-nowrap",
+                                    isEditingIngredients
+                                        ? "bg-rose-50 dark:bg-rose-500/10 text-rose-500 border-rose-200 dark:border-rose-500/20"
+                                        : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 hover:text-rose-500 hover:border-rose-200"
+                                )}
+                            >
+                                <Diff size={14} /> Add/Remove
+                            </button>
 
-                                    {/* Measure Edit Toggle */}
-                                    <button
-                                        onClick={() => {
-                                            setIsEditingMeasures(!isEditingMeasures);
-                                            setIsReordering(false);
-                                            setIsEditingIngredients(false);
-                                            setIsToggling(false);
-                                        }}
-                                        className={cn(
-                                            "flex items-center gap-2 px-3 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center whitespace-nowrap",
-                                            isEditingMeasures
-                                                ? "bg-blue-50 dark:bg-blue-500/10 text-blue-500 border-blue-200 dark:border-blue-500/20"
-                                                : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 hover:text-blue-500 hover:border-blue-200"
-                                        )}
-                                    >
-                                        <Scale size={14} /> Adjust
-                                    </button>
+                            {/* Measure Edit Toggle */}
+                            <button
+                                onClick={() => {
+                                    setIsEditingMeasures(!isEditingMeasures);
+                                    setIsReordering(false);
+                                    setIsEditingIngredients(false);
+                                    setIsToggling(false);
+                                }}
+                                className={cn(
+                                    "flex items-center gap-2 px-3 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center whitespace-nowrap",
+                                    isEditingMeasures
+                                        ? "bg-blue-50 dark:bg-blue-500/10 text-blue-500 border-blue-200 dark:border-blue-500/20"
+                                        : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 hover:text-blue-500 hover:border-blue-200"
+                                )}
+                            >
+                                <Scale size={14} /> Adjust
+                            </button>
 
-                                    {/* Reorder Toggle */}
-                                    <button
-                                        onClick={() => {
-                                            setIsReordering(!isReordering);
-                                            setIsEditingIngredients(false);
-                                            setIsEditingMeasures(false);
-                                            setIsToggling(false);
-                                        }}
-                                        className={cn(
-                                            "flex items-center gap-2 px-3 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center whitespace-nowrap",
-                                            isReordering
-                                                ? "bg-amber-50 dark:bg-amber-500/10 text-amber-500 border-amber-200 dark:border-amber-500/20"
-                                                : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 hover:text-amber-500 hover:border-amber-200"
-                                        )}
-                                    >
-                                        <GripVertical size={14} /> Sort
-                                    </button>
-                                </div>
-                            </div>
+                            {/* Reorder Toggle */}
+                            <button
+                                onClick={() => {
+                                    setIsReordering(!isReordering);
+                                    setIsEditingIngredients(false);
+                                    setIsEditingMeasures(false);
+                                    setIsToggling(false);
+                                }}
+                                className={cn(
+                                    "flex items-center gap-2 px-3 py-2 rounded-xl transition-all border text-[10px] uppercase font-black tracking-widest flex-1 justify-center whitespace-nowrap",
+                                    isReordering
+                                        ? "bg-amber-50 dark:bg-amber-500/10 text-amber-500 border-amber-200 dark:border-amber-500/20"
+                                        : "bg-white dark:bg-slate-900 text-slate-400 border-slate-200 dark:border-slate-800 hover:text-amber-500 hover:border-amber-200"
+                                )}
+                            >
+                                <GripVertical size={14} /> Sort
+                            </button>
+                        </div>
+                    </div>
 
-                            <div className="space-y-2">
-                                {ingredients.map((ing: any, i) => (
-                                    <div
-                                        key={ing.id || i}
-                                        draggable={isReordering}
-                                        onDragStart={(e) => isReordering && onDragStart(e, i)}
-                                        onDragOver={(e) => isReordering && onDragOver(e, i)}
-                                        onDrop={(e) => isReordering && onDrop(e, i)}
-                                        onClick={() => !isReordering && !isEditingIngredients && !isEditingMeasures && !isToggling && !hiddenIngredientIds.includes(ing.id) && ing.food_item_id && router.push(`/dashboard/ingredients/${ing.food_item_id}`)}
-                                        className={cn(
-                                            "flex items-center gap-4 p-4 rounded-2xl border transition-all group relative overflow-hidden",
-                                            hiddenIngredientIds.includes(ing.id)
-                                                ? "bg-slate-50 dark:bg-slate-900 border-dashed border-slate-200 dark:border-slate-800 opacity-60"
-                                                : "bg-white dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 hover:border-emerald-500/20",
-                                            ing.food_item_id && !hiddenIngredientIds.includes(ing.id) && !isReordering && !isEditingIngredients && !isEditingMeasures && !isToggling ? "cursor-pointer" : "",
-                                            isReordering ? "cursor-grab active:cursor-grabbing hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700/50" : ""
-                                        )}
-                                    >
-                                        {/* Action Buttons: Reorder OR Remove OR Toggle */}
-                                        <div className="shrink-0 z-10">
-                                            {isReordering ? (
-                                                <div className="p-2 text-slate-400 group-hover:text-amber-500 transition-colors">
-                                                    <GripVertical size={20} />
-                                                </div>
-                                            ) : isEditingIngredients ? (
-                                                <button
-                                                    onClick={(e) => removeIngredient(i, e)}
-                                                    className="p-2 rounded-full bg-rose-50 dark:bg-rose-900/10 text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/30 transition-all"
-                                                    title="Remove Ingredient"
-                                                >
-                                                    <Minus size={16} />
-                                                </button>
-                                            ) : isToggling ? (
-                                                <button
-                                                    onClick={(e) => toggleIngredient(ing.id, e)}
-                                                    className={cn(
-                                                        "p-2 rounded-full transition-all",
-                                                        hiddenIngredientIds.includes(ing.id) ? "bg-slate-200 dark:bg-slate-800 text-slate-400" : "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 hover:bg-emerald-100"
-                                                    )}
-                                                >
-                                                    {hiddenIngredientIds.includes(ing.id) ? <EyeOff size={16} /> : <Eye size={16} />}
-                                                </button>
-                                            ) : (
-                                                <div className="w-8 flex justify-center">
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800" />
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className={cn(
-                                            "w-12 h-12 rounded-2xl border flex items-center justify-center overflow-hidden shrink-0 transition-all duration-300",
-                                            hiddenIngredientIds.includes(ing.id)
-                                                ? "bg-slate-100 border-slate-200 grayscale opacity-50"
-                                                : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 group-hover:scale-105"
-                                        )}>
-                                            {ing.food_item?.image ? (
-                                                <img src={ing.food_item.image} alt="" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <Utensils size={16} className="text-slate-400 opacity-40 shadow-sm" />
-                                            )}
-                                        </div>
-                                        <div className="flex-1 text-left min-w-0">
-                                            <div className="flex items-center gap-2">
-                                                <p className={cn(
-                                                    "text-xs font-black capitalize leading-relaxed transition-colors",
-                                                    hiddenIngredientIds.includes(ing.id) ? "text-slate-400 decoration-slate-300 line-through" : "text-slate-900 dark:text-white"
-                                                )}>{ing.base_ingredient || ing.item}</p>
-                                                {isSpice(ing.food_item?.name || ing.base_ingredient || ing.item) && (ing.food_item_id || ing.food_item?.id) && (
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            const fid = ing.food_item_id || ing.food_item?.id;
-                                                            const returnUrl = encodeURIComponent(window.location.pathname);
-                                                            router.push(`/dashboard/spice-converter?foodId=${fid}&returnTo=${returnUrl}&swapId=${ing.id}`);
-                                                        }}
-                                                        className="p-1 text-amber-500 hover:text-amber-600 transition-colors bg-amber-50 dark:bg-amber-900/20 rounded-lg"
-                                                        title="Calibrate in Spice Lab"
-                                                    >
-                                                        <Beaker size={12} />
-                                                    </button>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                        {ingredients.map((ing: any, i) => (
+                            <div
+                                key={ing.id || i}
+                                draggable={isReordering}
+                                onDragStart={(e) => isReordering && onDragStart(e, i)}
+                                onDragOver={(e) => isReordering && onDragOver(e, i)}
+                                onDrop={(e) => isReordering && onDrop(e, i)}
+                                onClick={() => !isReordering && !isEditingIngredients && !isEditingMeasures && !isToggling && !hiddenIngredientIds.includes(ing.id) && ing.food_item_id && router.push(`/dashboard/ingredients/${ing.food_item_id}`)}
+                                className={cn(
+                                    "flex flex-col items-center text-center p-4 rounded-2xl border transition-all group relative overflow-hidden",
+                                    hiddenIngredientIds.includes(ing.id)
+                                        ? "bg-slate-50 dark:bg-slate-900 border-dashed border-slate-200 dark:border-slate-800 opacity-60"
+                                        : "bg-white dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 hover:border-emerald-500/20 hover:shadow-md",
+                                    ing.food_item_id && !hiddenIngredientIds.includes(ing.id) && !isReordering && !isEditingIngredients && !isEditingMeasures && !isToggling ? "cursor-pointer" : "",
+                                    isReordering ? "cursor-grab active:cursor-grabbing hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700/50" : ""
+                                )}
+                            >
+                                {/* Action Buttons: Reorder OR Remove OR Toggle */}
+                                {(isReordering || isEditingIngredients || isToggling) && (
+                                    <div className="absolute top-2 right-2 z-10">
+                                        {isReordering ? (
+                                            <div className="p-1.5 text-slate-400 group-hover:text-amber-500 transition-colors">
+                                                <GripVertical size={16} />
+                                            </div>
+                                        ) : isEditingIngredients ? (
+                                            <button
+                                                onClick={(e) => removeIngredient(i, e)}
+                                                className="p-1.5 rounded-full bg-rose-50 dark:bg-rose-900/10 text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/30 transition-all"
+                                                title="Remove Ingredient"
+                                            >
+                                                <Minus size={14} />
+                                            </button>
+                                        ) : isToggling ? (
+                                            <button
+                                                onClick={(e) => toggleIngredient(ing.id, e)}
+                                                className={cn(
+                                                    "p-1.5 rounded-full transition-all",
+                                                    hiddenIngredientIds.includes(ing.id) ? "bg-slate-200 dark:bg-slate-800 text-slate-400" : "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-500 hover:bg-emerald-100"
                                                 )}
-                                            </div>
-
-                                            {isEditingMeasures ? (
-                                                <div className="flex items-center gap-2 mt-1" onClick={(e) => e.stopPropagation()}>
-                                                    <input
-                                                        type="number"
-                                                        min="0"
-                                                        step="0.1"
-                                                        value={ing.quantity || 0}
-                                                        onChange={(e) => handleUpdateIngredientQuantity(i, parseFloat(e.target.value) || 0)}
-                                                        className="w-16 h-7 text-[10px] font-bold bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-2 focus:ring-1 focus:ring-emerald-500"
-                                                    />
-                                                    <select
-                                                        value={ing.measure_label}
-                                                        onChange={(e) => handleUpdateIngredientUnit(i, e.target.value)}
-                                                        className="h-7 text-[10px] font-bold bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-2 focus:ring-1 focus:ring-emerald-500 max-w-[90px]"
-                                                    >
-                                                        <optgroup label="Standard">
-                                                            <option value="g">g</option>
-                                                            <option value="kg">kg</option>
-                                                            <option value="ml">ml</option>
-                                                            <option value="oz">oz</option>
-                                                            <option value="lb">lb</option>
-                                                        </optgroup>
-                                                        {(() => {
-                                                            const measures = [...(ing.food_item?.portions || [])];
-                                                            if (isSpice(ing.food_item?.name || ing.item)) {
-                                                                const spiceMeasures = getSpiceMeasures(ing.food_item?.name || ing.item, ing.cooking_state);
-                                                                spiceMeasures.forEach(sm => {
-                                                                    if (!measures.some(m => m.label.toLowerCase() === sm.label.toLowerCase())) {
-                                                                        measures.push(sm);
-                                                                    }
-                                                                });
-                                                            }
-                                                            if (measures.length === 0) return null;
-                                                            return (
-                                                                <optgroup label="Measures">
-                                                                    {measures.map((p: any, idx: number) => (
-                                                                        <option key={idx} value={p.label}>{p.label}</option>
-                                                                    ))}
-                                                                </optgroup>
-                                                            );
-                                                        })()}
-                                                    </select>
-
-                                                    <select
-                                                        value={ing.cooking_state || 'raw'}
-                                                        onChange={(e) => handleUpdateIngredientState(i, e.target.value as CookingState)}
-                                                        className="h-7 text-[10px] font-bold bg-slate-200 dark:bg-slate-700 border-none rounded-lg px-2 focus:ring-1 focus:ring-amber-500 max-w-[80px] text-amber-600 dark:text-amber-400"
-                                                    >
-                                                        {Object.entries(COOKING_STATES).filter(([key]) => {
-                                                            const allowed = getSpiceStates(ing.food_item?.name || ing.item);
-                                                            if (allowed) return allowed.includes(key);
-                                                            return !['ground', 'dried', 'whole'].includes(key);
-                                                        }).map(([key, state]) => {
-                                                            const s = state as StateFactor;
-                                                            let label = s.label;
-                                                            if (key === 'stored') {
-                                                                const name = (ing.food_item?.name || '').toLowerCase();
-                                                                const isCooked = name.includes('cooked') || name.includes('boiled') || name.includes('roasted') || name.includes('fried');
-                                                                const source = (ing.food_item?.source || 'USDA').toUpperCase();
-                                                                label = isCooked ? `Cooked (${source})` : `Raw (${source})`;
-                                                            }
-                                                            return <option key={key} value={key}>{label}</option>
-                                                        })}
-                                                    </select>
-                                                </div>
-                                            ) : (
-                                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">
-                                                    {/* Smart Portion Scaling Display */}
-                                                    {ing.quantity && ing.measure_label
-                                                        ? `${(ing.quantity * currentScalingFactor).toLocaleString(undefined, { maximumFractionDigits: 1 })} ${ing.measure_label}`
-                                                        : (ing.amount ? `${ing.amount} (Approx.)` : '')}
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="text-right shrink-0 pt-0.5">
-                                            <p className={cn(
-                                                "text-[10px] font-black transition-colors",
-                                                hiddenIngredientIds.includes(ing.id) ? "text-slate-300" : "text-slate-400"
-                                            )}>{Math.round((ing.weight_g || 0) * currentScalingFactor)}g</p>
-                                        </div>
+                                            >
+                                                {hiddenIngredientIds.includes(ing.id) ? <EyeOff size={14} /> : <Eye size={14} />}
+                                            </button>
+                                        ) : null}
                                     </div>
-                                ))}
-
-                                {/* Add Button (Only in Edit Mode) */}
-                                {isEditingIngredients && (
-                                    <button
-                                        onClick={() => setShowPicker(true)}
-                                        className="w-full py-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-center gap-2 text-slate-400 hover:text-emerald-500 hover:border-emerald-200/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/5 transition-all group"
-                                    >
-                                        <Plus size={20} className="group-hover:scale-110 transition-transform" />
-                                        <span className="text-xs font-black uppercase tracking-widest">Add Ingredient</span>
-                                    </button>
                                 )}
 
-                                {/* Reset Button (Visible if customizations exist) */}
-                                {(ingredients.length !== originalIngredients.length || JSON.stringify(ingredients) !== JSON.stringify(originalIngredients) || hiddenIngredientIds.length > 0) && (
-                                    <div className="pt-2">
+                                <div className={cn(
+                                    "w-14 h-14 rounded-2xl border flex items-center justify-center overflow-hidden shrink-0 transition-all duration-300 mb-2",
+                                    hiddenIngredientIds.includes(ing.id)
+                                        ? "bg-slate-100 border-slate-200 grayscale opacity-50"
+                                        : "bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 group-hover:scale-105"
+                                )}>
+                                    {ing.food_item?.image ? (
+                                        <img src={ing.food_item.image} alt="" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <Utensils size={16} className="text-slate-400 opacity-40 shadow-sm" />
+                                    )}
+                                </div>
+                                <div className="w-full min-w-0">
+                                    <p className={cn(
+                                        "text-[11px] font-black capitalize leading-tight transition-colors line-clamp-2",
+                                        hiddenIngredientIds.includes(ing.id) ? "text-slate-400 decoration-slate-300 line-through" : "text-slate-900 dark:text-white"
+                                    )}>{ing.base_ingredient || ing.item}</p>
+                                    {isSpice(ing.food_item?.name || ing.base_ingredient || ing.item) && (ing.food_item_id || ing.food_item?.id) && (
                                         <button
-                                            onClick={resetOrder}
-                                            className="w-full flex items-center justify-center gap-2 px-3 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all border border-slate-100 dark:border-slate-800 text-[10px] font-black uppercase tracking-widest group"
-                                            title="Reset to Default"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                const fid = ing.food_item_id || ing.food_item?.id;
+                                                const returnUrl = encodeURIComponent(window.location.pathname);
+                                                router.push(`/dashboard/spice-converter?foodId=${fid}&returnTo=${returnUrl}&swapId=${ing.id}`);
+                                            }}
+                                            className="p-1 text-amber-500 hover:text-amber-600 transition-colors bg-amber-50 dark:bg-amber-900/20 rounded-lg mt-1"
+                                            title="Calibrate in Spice Lab"
                                         >
-                                            <RotateCcw size={14} className="group-hover:-rotate-180 transition-transform duration-500" />
-                                            Reset Meal Defaults
+                                            <Beaker size={12} />
                                         </button>
-                                    </div>
-                                )}
-                            </div>
-                        </Card>
+                                    )}
 
-                        {/* Food Item Picker Modal */}
-                        {showPicker && (
-                            <FoodItemPicker
-                                onSelect={handleAddIngredient}
-                                onClose={() => setShowPicker(false)}
-                                mode="all"
-                            />
-                        )}
+                                    {isEditingMeasures ? (
+                                        <div className="flex items-center gap-2 mt-1" onClick={(e) => e.stopPropagation()}>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                step="0.1"
+                                                value={ing.quantity || 0}
+                                                onChange={(e) => handleUpdateIngredientQuantity(i, parseFloat(e.target.value) || 0)}
+                                                className="w-16 h-7 text-[10px] font-bold bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-2 focus:ring-1 focus:ring-emerald-500"
+                                            />
+                                            <select
+                                                value={ing.measure_label}
+                                                onChange={(e) => handleUpdateIngredientUnit(i, e.target.value)}
+                                                className="h-7 text-[10px] font-bold bg-slate-100 dark:bg-slate-800 border-none rounded-lg px-2 focus:ring-1 focus:ring-emerald-500 max-w-[90px]"
+                                            >
+                                                <optgroup label="Standard">
+                                                    <option value="g">g</option>
+                                                    <option value="kg">kg</option>
+                                                    <option value="ml">ml</option>
+                                                    <option value="oz">oz</option>
+                                                    <option value="lb">lb</option>
+                                                </optgroup>
+                                                {(() => {
+                                                    const measures = [...(ing.food_item?.portions || [])];
+                                                    if (isSpice(ing.food_item?.name || ing.item)) {
+                                                        const spiceMeasures = getSpiceMeasures(ing.food_item?.name || ing.item, ing.cooking_state);
+                                                        spiceMeasures.forEach(sm => {
+                                                            if (!measures.some(m => m.label.toLowerCase() === sm.label.toLowerCase())) {
+                                                                measures.push(sm);
+                                                            }
+                                                        });
+                                                    }
+                                                    if (measures.length === 0) return null;
+                                                    return (
+                                                        <optgroup label="Measures">
+                                                            {measures.map((p: any, idx: number) => (
+                                                                <option key={idx} value={p.label}>{p.label}</option>
+                                                            ))}
+                                                        </optgroup>
+                                                    );
+                                                })()}
+                                            </select>
 
-
-                    </div>
-
-                    {/* Right Column: Nutrient Report */}
-                    <div className="lg:col-span-2 space-y-8">
-
-                        {/* Directions (Moved from Left Column) */}
-                        <Card className="p-6">
-                            <div className="flex items-center justify-between mb-6">
-                                <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3 italic text-amber-500">
-                                    <ChefHat size={24} />
-                                    Directions
-                                </h3>
-                                <div className="flex gap-2">
-                                    <Badge variant="outline" className="border-slate-200 dark:border-slate-800 text-slate-400 text-[10px] font-black uppercase tracking-widest px-3 py-1 gap-2 flex items-center">
-                                        <Clock size={12} /> {recipe.prep_time}m
-                                    </Badge>
-                                    <Badge variant="outline" className="border-slate-200 dark:border-slate-800 text-slate-400 text-[10px] font-black uppercase tracking-widest px-3 py-1 gap-2 flex items-center">
-                                        <Users size={12} /> {recipe.servings}P
-                                    </Badge>
+                                            <select
+                                                value={ing.cooking_state || 'raw'}
+                                                onChange={(e) => handleUpdateIngredientState(i, e.target.value as CookingState)}
+                                                className="h-7 text-[10px] font-bold bg-slate-200 dark:bg-slate-700 border-none rounded-lg px-2 focus:ring-1 focus:ring-amber-500 max-w-[80px] text-amber-600 dark:text-amber-400"
+                                            >
+                                                {Object.entries(COOKING_STATES).filter(([key]) => {
+                                                    const allowed = getSpiceStates(ing.food_item?.name || ing.item);
+                                                    if (allowed) return allowed.includes(key);
+                                                    return !['ground', 'dried', 'whole'].includes(key);
+                                                }).map(([key, state]) => {
+                                                    const s = state as StateFactor;
+                                                    let label = s.label;
+                                                    if (key === 'stored') {
+                                                        const name = (ing.food_item?.name || '').toLowerCase();
+                                                        const isCooked = name.includes('cooked') || name.includes('boiled') || name.includes('roasted') || name.includes('fried');
+                                                        const source = (ing.food_item?.source || 'USDA').toUpperCase();
+                                                        label = isCooked ? `Cooked (${source})` : `Raw (${source})`;
+                                                    }
+                                                    return <option key={key} value={key}>{label}</option>
+                                                })}
+                                            </select>
+                                        </div>
+                                    ) : (
+                                        <p className="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">
+                                            {/* Smart Portion Scaling Display */}
+                                            {ing.quantity && ing.measure_label
+                                                ? `${(ing.quantity * currentScalingFactor).toLocaleString(undefined, { maximumFractionDigits: 1 })} ${ing.measure_label}`
+                                                : (ing.amount ? `${ing.amount}` : '')}
+                                        </p>
+                                    )}
+                                    <p className={cn(
+                                        "text-[10px] font-black transition-colors mt-1",
+                                        hiddenIngredientIds.includes(ing.id) ? "text-slate-300" : "text-emerald-500"
+                                    )}>{Math.round((ing.weight_g || 0) * currentScalingFactor)}g</p>
                                 </div>
                             </div>
-                            <div className="space-y-6 relative before:absolute before:inset-y-0 before:left-5 before:w-px before:bg-slate-100 dark:before:bg-slate-800 pl-2">
-                                {instructions.map((ins, i) => (
-                                    <div key={i} className="relative pl-10 space-y-2 group text-left">
-                                        <div className="absolute left-0 top-0 w-10 h-10 rounded-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 flex items-center justify-center z-10 group-hover:border-amber-500 transition-colors shadow-sm">
-                                            <span className="text-xs font-black text-slate-400 group-hover:text-amber-500">{ins.step_order}</span>
-                                        </div>
-                                        <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400 font-bold pt-2">
-                                            {ins.step_text}
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
-                        </Card>
+                        ))}
 
+                        {/* Add Button (Only in Edit Mode) */}
+                        {isEditingIngredients && (
+                            <button
+                                onClick={() => setShowPicker(true)}
+                                className="w-full py-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-center gap-2 text-slate-400 hover:text-emerald-500 hover:border-emerald-200/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/5 transition-all group"
+                            >
+                                <Plus size={20} className="group-hover:scale-110 transition-transform" />
+                                <span className="text-xs font-black uppercase tracking-widest">Add Ingredient</span>
+                            </button>
+                        )}
 
-                        {showDetailedNutrients && recipe && (
-                            <div className="animate-in slide-in-from-top-4 duration-500">
-                                {(() => {
-                                    const m = recipe.micronutrients || {};
-                                    const getVal = (keys: string[]) => {
-                                        for (const k of keys) {
-                                            // 1. Try direct match
-                                            if (m[k] !== undefined) {
-                                                return m[k];
-                                            }
-                                            // 2. Try fuzzy match
-                                            const match = findNutrientMatch(m, k);
-                                            if (match) {
-                                                return m[match];
-                                            }
-                                        }
-                                        return 0;
-                                    };
-
-                                    const NUTRIENT_BREAKDOWNS: Record<string, any[]> = {
-                                        'Vitamin A': [
-                                            { label: 'Retinol', keys: ['Retinol', 'retinol_ug'], unit: 'µg' },
-                                            { label: 'Alpha-carotene', keys: ['Alpha-carotene', 'alpha_carotene_ug'], unit: 'µg' },
-                                            { label: 'Beta-carotene', keys: ['Beta-carotene', 'beta_carotene_ug'], unit: 'µg' },
-                                            { label: 'Beta-cryptoxanthin', keys: ['Beta-cryptoxanthin', 'beta_cryptoxanthin_ug'], unit: 'µg' },
-                                            { label: 'Lutein + Zeaxanthin', keys: ['Lutein + Zeaxanthin', 'Lutein+Zeaxanthin', 'lutein_zeaxanthin_ug'], unit: 'µg' },
-                                            { label: 'Lycopene', keys: ['Lycopene', 'lycopene_ug'], unit: 'µg' },
-                                        ],
-                                        'Vitamin E': [
-                                            { label: 'Alpha-tocopherol', keys: ['Alpha-tocopherol', 'Vitamin E', 'alpha_tocopherol_mg'], unit: 'mg' },
-                                            { label: 'Beta-tocopherol', keys: ['Beta-tocopherol', 'beta_tocopherol_mg'], unit: 'mg' },
-                                            { label: 'Delta-tocopherol', keys: ['Delta-tocopherol', 'delta_tocopherol_mg'], unit: 'mg' },
-                                            { label: 'Gamma-tocopherol', keys: ['Gamma-tocopherol', 'gamma_tocopherol_mg'], unit: 'mg' },
-                                        ],
-                                        'Protein': [
-                                            { label: 'Histidine', keys: ['Histidine', 'histidine_g'], unit: 'g', isEssential: true },
-                                            { label: 'Isoleucine', keys: ['Isoleucine', 'isoleucine_g'], unit: 'g', isEssential: true },
-                                            { label: 'Leucine', keys: ['Leucine', 'leucine_g'], unit: 'g', isEssential: true },
-                                            { label: 'Lysine', keys: ['Lysine', 'lysine_g'], unit: 'g', isEssential: true },
-                                            { label: 'Methionine', keys: ['Methionine', 'methionine_g'], unit: 'g', isEssential: true },
-                                            { label: 'Phenylalanine', keys: ['Phenylalanine', 'phenylalanine_g'], unit: 'g', isEssential: true },
-                                            { label: 'Threonine', keys: ['Threonine', 'threonine_g'], unit: 'g', isEssential: true },
-                                            { label: 'Tryptophan', keys: ['Tryptophan', 'tryptophan_g'], unit: 'g', isEssential: true },
-                                            { label: 'Valine', keys: ['Valine', 'valine_g'], unit: 'g', isEssential: true },
-                                        ],
-                                        'Carbs': [
-                                            { label: 'Fiber', keys: ['Fiber', 'fiber_g'], unit: 'g' },
-                                            { label: 'Starch', keys: ['Starch', 'starch_g'], unit: 'g' },
-                                            { label: 'Sugars', keys: ['Sugars', 'sugars_g'], unit: 'g' },
-                                        ],
-                                        'Fat': [
-                                            { label: 'Saturated Fat', keys: ['Saturated Fat'], unit: 'g' },
-                                            { label: 'Monounsaturated', keys: ['Monounsaturated Fat'], unit: 'g' },
-                                            { label: 'Polyunsaturated', keys: ['Polyunsaturated Fat'], unit: 'g' },
-                                            { label: 'Omega-3', keys: ['Omega-3'], unit: 'g', isExpandable: true },
-                                            { label: 'ALA', keys: ['ALA', 'alpha_linolenic_acid_g'], unit: 'g', hiddenByDefault: true },
-                                            { label: 'EPA', keys: ['EPA', 'eicosapentaenoic_acid_g'], unit: 'g', hiddenByDefault: true },
-                                            { label: 'DHA', keys: ['DHA', 'docosahexaenoic_acid_g'], unit: 'g', hiddenByDefault: true },
-                                            { label: 'Omega-6', keys: ['Omega-6'], unit: 'g' },
-                                            { label: 'Trans Fat', keys: ['Trans Fat'], unit: 'g' },
-                                            { label: 'Cholesterol', keys: ['Cholesterol'], unit: 'mg' },
-                                        ],
-                                    };
-
-                                    const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle, breakdownLabels = [], forceRaw = false }: { title: string, items: Record<string, any[]>, icon: any, theme?: string, subtitle?: string, breakdownLabels?: string[], forceRaw?: boolean }) => {
-                                        const themes = {
-                                            indigo: { bg: "bg-slate-900 border-slate-800", text: "text-indigo-400", border: "border-slate-800", itemBorder: "border-indigo-900/50" },
-                                            rose: { bg: "bg-slate-900 border-slate-800", text: "text-rose-400", border: "border-slate-800", itemBorder: "border-rose-900/50" },
-                                            orange: { bg: "bg-slate-900 border-slate-800", text: "text-orange-400", border: "border-slate-800", itemBorder: "border-orange-900/50" },
-                                            emerald: { bg: "bg-slate-900 border-slate-800", text: "text-emerald-400", border: "border-slate-800", itemBorder: "border-emerald-900/50" },
-                                            blue: { bg: "bg-slate-900 border-slate-800", text: "text-blue-400", border: "border-slate-800", itemBorder: "border-blue-900/50" },
-                                            amber: { bg: "bg-slate-900 border-slate-800", text: "text-amber-400", border: "border-slate-800", itemBorder: "border-amber-900/50" }
-                                        };
-                                        const t = (themes as any)[theme] || themes.indigo;
-
-                                        return (
-                                            <div className={cn("p-6 pt-5 rounded-3xl border bg-gradient-to-br mb-6", t.bg)}>
-                                                <h4 className={cn("font-black flex items-center gap-2 mb-1 uppercase tracking-widest text-[10px]", t.text)}><Icon className="h-4 w-4" /> {title}</h4>
-                                                {subtitle && <p className={cn("text-[9px] text-slate-400 mb-4 border-b pb-2 transition-colors", t.border)}>{subtitle}</p>}
-                                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-                                                    {Object.entries(items).map(([label, keys]) => {
-                                                        let val = 0;
-                                                        let rda = null;
-                                                        let unitStr = '';
-                                                        const m = recipe.micronutrients || {};
-
-                                                        if (title === 'Biological Ratios') {
-                                                            const k1 = findNutrientMatch(m, keys[0]);
-                                                            const k2 = findNutrientMatch(m, keys[1]);
-                                                            const v1 = k1 ? m[k1] : 0;
-                                                            const v2 = k2 ? m[k2] : 0;
-                                                            val = v2 > 0 ? v1 / v2 : 0;
-                                                            unitStr = ' to 1';
-                                                        } else {
-                                                            val = (label === 'Energy' || label === 'Protein' || label === 'Carbs' || label === 'Fat')
-                                                                ? (label === 'Energy' ? (energyUnit === 'kJ' ? (recipe as any).energy_kj : (recipe as any).calories) : (recipe as any)[label.toLowerCase()])
-                                                                : getVal(keys as string[]);
-                                                            const macroRDAs: Record<string, number> = {
-                                                                'Energy': energyUnit === 'kJ' ? dailyTargets.energy * 4.184 : dailyTargets.energy,
-                                                                'Protein': dailyTargets.protein,
-                                                                'Carbs': dailyTargets.carbs,
-                                                                'Fat': dailyTargets.fat
-                                                            };
-                                                            rda = userRDAs?.[label] || macroRDAs[label];
-                                                            unitStr = (label === 'Energy') ? energyUnit :
-                                                                (label === 'Protein' || label === 'Carbs' || label === 'Fat' || label === 'Fiber' || label === 'Sugars' || label === 'Starch' || label === 'Omega-3' || label === 'Omega-6') ? 'g' :
-                                                                    (label === 'Vitamin D') ? 'IU' :
-                                                                        (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg')) ? 'µg' : 'mg';
-                                                        }
-
-                                                        const pct = rda ? Math.round((val / rda) * 100) : null;
-                                                        let styles = getNutrientLevelStyles(pct || 0, label);
-
-                                                        if (title === 'Biological Ratios') {
-                                                            let ratioStatus: 'good' | 'fair' | 'poor' = 'good';
-                                                            if (label === 'Sodium & Potassium') ratioStatus = val <= 1.0 ? 'good' : val <= 2.0 ? 'fair' : 'poor';
-                                                            if (label === 'Zinc & Copper') ratioStatus = (val >= 8 && val <= 12) ? 'good' : (val >= 5 && val <= 15) ? 'fair' : 'poor';
-                                                            if (label === 'Omega 3 to 6 ratio') ratioStatus = val <= 4.0 ? 'good' : val <= 10.0 ? 'fair' : 'poor';
-                                                            if (label === 'Calcium & Magnesium') ratioStatus = (val >= 1.7 && val <= 2.5) ? 'good' : (val >= 1.5 && val <= 3.0) ? 'fair' : 'poor';
-                                                            if (label === 'Calcium & Phosphorus') ratioStatus = (val >= 1.0 && val <= 2.0) ? 'good' : (val >= 0.8 && val <= 2.5) ? 'fair' : 'poor';
-
-                                                            styles = ratioStatus === 'good' ? { text: "text-emerald-500", borderLight: "border-emerald-500/30", fade: "bg-emerald-500/5", textFill: "text-emerald-500", bg: "bg-emerald-500", border: "border-emerald-500" } :
-                                                                ratioStatus === 'fair' ? { text: "text-amber-500", borderLight: "border-amber-500/30", fade: "bg-amber-500/5", textFill: "text-amber-500", bg: "bg-amber-500", border: "border-amber-500" } :
-                                                                    { text: "text-rose-500", borderLight: "border-rose-500/30", fade: "bg-rose-500/5", textFill: "text-rose-500", bg: "bg-rose-500", border: "border-rose-500" };
-                                                        }
-
-                                                        const ratioTarget = title === 'Biological Ratios' ? (
-                                                            label === 'Sodium & Potassium' ? 'Under 1 to 1' :
-                                                                label === 'Zinc & Copper' ? '8 to 1 - 12 to 1' :
-                                                                    label === 'Omega 3 to 6 ratio' ? 'Under 4 to 1' :
-                                                                        label === 'Calcium & Magnesium' ? '1.7 to 1 - 2.5 to 1' :
-                                                                            label === 'Calcium & Phosphorus' ? '1 to 1 - 2 to 1' : null
-                                                        ) : null;
-
-                                                        const labelColor = title === 'Biological Ratios' ? (
-                                                            label === 'Sodium:Potassium' ? 'text-blue-400' :
-                                                                label === 'Zinc:Copper' ? 'text-orange-400' :
-                                                                    label === 'Omega 6:3 Ratio' ? 'text-indigo-400' :
-                                                                        label === 'Calcium:Magnesium' ? 'text-violet-400' :
-                                                                            label === 'Calcium:Phosphorus' ? 'text-cyan-400' : 'text-foreground/60'
-                                                        ) : 'text-foreground/60';
-
-                                                        const hasBreakdown = breakdownLabels.includes(label);
-
-                                                        return (
-                                                            <div key={label} onClick={() => router.push(`/dashboard/nutrients/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
-                                                                <p className={cn(
-                                                                    "text-[9px] font-black truncate mb-1 whitespace-nowrap overflow-hidden transition-colors",
-                                                                    title === 'Biological Ratios' ? 'text-slate-400 dark:text-slate-500' : 'uppercase text-foreground/60'
-                                                                )}>
-                                                                    {label}
-                                                                </p>
-                                                                <div className="space-y-0.5">
-                                                                    {(nutrientDisplayMode === 'percentage' && pct !== null && !forceRaw) ? (
-                                                                        <>
-                                                                            <div className="flex items-baseline gap-1">
-                                                                                <span className={cn("text-xl font-black tracking-tighter", styles.text)}>{pct}%</span>
-                                                                            </div>
-                                                                            <p className="text-[9px] font-bold text-slate-400">
-                                                                                {val.toFixed(1)}{unitStr}
-                                                                            </p>
-                                                                        </>
-                                                                    ) : (
-                                                                        <>
-                                                                            <div className="flex items-baseline gap-1">
-                                                                                <span className={cn("text-lg font-extrabold tracking-tight", title === 'Biological Ratios' ? styles.text : "")}>
-                                                                                    {val >= 10 ? val.toFixed(0) : (val >= 1 ? val.toFixed(1) : val.toFixed(2))}
-                                                                                </span>
-                                                                                <span className={cn("text-[10px] font-bold", (unitStr === 'µg') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unitStr}</span>
-                                                                            </div>
-                                                                            {(nutrientDisplayMode === 'value' || nutrientDisplayMode === 'both') && rda && (
-                                                                                <p className="text-[9px] font-bold text-slate-400 mt-0.5">
-                                                                                    Target: {Math.round(rda)}{unitStr === 'kcal' ? 'kcal' : unitStr}
-                                                                                </p>
-                                                                            )}
-                                                                            {ratioTarget && (
-                                                                                <p className="text-[9px] font-bold text-slate-400 mt-0.5">
-                                                                                    Ideal: {ratioTarget}
-                                                                                </p>
-                                                                            )}
-                                                                            {nutrientDisplayMode === 'both' && pct !== null && !forceRaw && (
-                                                                                <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>
-                                                                            )}
-                                                                        </>
-                                                                    )}
-                                                                </div>
-
-                                                                {hasBreakdown && (
-                                                                    <button
-                                                                        onClick={(e) => { e.stopPropagation(); setBreakdownNutrient(label); }}
-                                                                        className="absolute top-2 right-2 p-1 rounded-lg bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-400 opacity-40 group-hover:opacity-100 hover:bg-orange-200 dark:hover:bg-orange-800 transition-all border border-orange-200/50 dark:border-orange-700/50"
-                                                                    >
-                                                                        <Layers className="h-3 w-3" />
-                                                                    </button>
-                                                                )}
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                        );
-                                    };
-
-                                    return (
-                                        <div className="space-y-6">
-                                            <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6">
-                                                <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
-                                                    <Activity size={18} />
-                                                    Personal Health Insights
-                                                </h3>
-                                            </div>
-
-                                            <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Key nutrient balances for a healthy body" items={{
-                                                'Sodium & Potassium': ['Sodium', 'Potassium'],
-                                                'Zinc & Copper': ['Zinc', 'Copper'],
-                                                'Omega 3 to 6 ratio': ['Omega-6', 'Omega-3'],
-                                                'Calcium & Magnesium': ['Calcium', 'Magnesium'],
-                                                'Calcium & Phosphorus': ['Calcium', 'Phosphorus'],
-                                            }} />
-
-                                            <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Essential energy and building blocks" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
-                                                'Energy': ['calories'],
-                                                'Protein': ['protein'],
-                                                'Carbs': ['carbs'],
-                                                'Fat': ['fat']
-                                            }} />
-                                            <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Vital minerals for hydration and balance" items={{
-                                                'Sodium': ['Sodium', 'sodium_mg'],
-                                                'Potassium': ['Potassium', 'potassium_mg'],
-                                                'Magnesium': ['Magnesium', 'magnesium_mg'],
-                                                'Calcium': ['Calcium', 'calcium_mg'],
-                                                'Phosphorus': ['Phosphorus', 'phosphorus_mg']
-                                            }} />
-
-                                            <NutrientGrid title="Trace Minerals" icon={Gem} theme="rose" subtitle="Essential minerals for energy and immune support" items={{
-                                                'Iron': ['Iron', 'iron_mg'],
-                                                'Zinc': ['Zinc', 'zinc_mg'],
-                                                'Copper': ['Copper', 'copper_mg'],
-                                                'Manganese': ['Manganese', 'manganese_mg'],
-                                                'Selenium': ['Selenium', 'selenium_ug']
-                                            }} />
-
-                                            <NutrientGrid title="Daily Vitamins" icon={Droplet} theme="blue" subtitle="Essential daily vitamins for a healthy mind" items={{
-                                                'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
-                                                'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
-                                                'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
-                                                'B5 (Pantothenic Acid)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
-                                                'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
-                                                'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
-                                                'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
-                                                'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
-                                                'Choline': ['Choline', 'choline_mg'],
-                                            }} />
-
-                                            <NutrientGrid title="Stored Vitamins" icon={Battery} theme="emerald" subtitle="Stored vitamins for long-term vitality" breakdownLabels={['Vitamin A', 'Vitamin E']} items={{
-                                                'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
-                                                'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
-                                                'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
-                                                'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
-                                            }} />
-
-                                            <NutrientGrid title="Extra Markers" icon={Activity} theme="amber" subtitle="Extra health markers worth tracking" forceRaw={true} items={{
-                                                'Fiber': ['Fiber', 'fiber_g'],
-                                                'Sugars': ['Sugars', 'sugars_g'],
-                                                'Oxalate': ['Oxalate', 'oxalate_mg'],
-                                                'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
-                                            }} />
-
-                                            {Object.keys(phytoSources).length > 0 && (
-                                                <DidYouKnow
-                                                    phytonutrientsWithSources={phytoSources}
-                                                    className="animate-in slide-in-from-right-4 duration-700 mt-8"
-                                                />
-                                            )}
-                                        </div>
-                                    );
-                                })()}
+                        {/* Reset Button (Visible if customizations exist) */}
+                        {(ingredients.length !== originalIngredients.length || JSON.stringify(ingredients) !== JSON.stringify(originalIngredients) || hiddenIngredientIds.length > 0) && (
+                            <div className="pt-2">
+                                <button
+                                    onClick={resetOrder}
+                                    className="w-full flex items-center justify-center gap-2 px-3 py-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all border border-slate-100 dark:border-slate-800 text-[10px] font-black uppercase tracking-widest group"
+                                    title="Reset to Default"
+                                >
+                                    <RotateCcw size={14} className="group-hover:-rotate-180 transition-transform duration-500" />
+                                    Reset Meal Defaults
+                                </button>
                             </div>
                         )}
                     </div>
-                </div>
+                </Card>
+
+                {/* Food Item Picker Modal */}
+                {showPicker && (
+                    <FoodItemPicker
+                        onSelect={handleAddIngredient}
+                        onClose={() => setShowPicker(false)}
+                        mode="all"
+                    />
+                )}
+
+                {/* Directions */}
+                <Card className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-xl font-black uppercase tracking-tighter flex items-center gap-3 italic text-amber-500">
+                            <ChefHat size={24} />
+                            Directions
+                        </h3>
+                        <div className="flex gap-2">
+                            <Badge variant="outline" className="border-slate-200 dark:border-slate-800 text-slate-400 text-[10px] font-black uppercase tracking-widest px-3 py-1 gap-2 flex items-center">
+                                <Clock size={12} /> {recipe.prep_time}m
+                            </Badge>
+                            <Badge variant="outline" className="border-slate-200 dark:border-slate-800 text-slate-400 text-[10px] font-black uppercase tracking-widest px-3 py-1 gap-2 flex items-center">
+                                <Users size={12} /> {recipe.servings}P
+                            </Badge>
+                        </div>
+                    </div>
+                    <div className="space-y-6 relative before:absolute before:inset-y-0 before:left-5 before:w-px before:bg-slate-100 dark:before:bg-slate-800 pl-2">
+                        {instructions.map((ins, i) => (
+                            <div key={i} className="relative pl-10 space-y-2 group text-left">
+                                <div className="absolute left-0 top-0 w-10 h-10 rounded-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 flex items-center justify-center z-10 group-hover:border-amber-500 transition-colors shadow-sm">
+                                    <span className="text-xs font-black text-slate-400 group-hover:text-amber-500">{ins.step_order}</span>
+                                </div>
+                                <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400 font-bold pt-2">
+                                    {ins.step_text}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </Card>
+
+
+                {showDetailedNutrients && recipe && (
+                    <div className="animate-in slide-in-from-top-4 duration-500">
+                        {(() => {
+                            const m = recipe.micronutrients || {};
+                            const getVal = (keys: string[]) => {
+                                for (const k of keys) {
+                                    // 1. Try direct match
+                                    if (m[k] !== undefined) {
+                                        return m[k];
+                                    }
+                                    // 2. Try fuzzy match
+                                    const match = findNutrientMatch(m, k);
+                                    if (match) {
+                                        return m[match];
+                                    }
+                                }
+                                return 0;
+                            };
+
+                            const NUTRIENT_BREAKDOWNS: Record<string, any[]> = {
+                                'Vitamin A': [
+                                    { label: 'Retinol', keys: ['Retinol', 'retinol_ug'], unit: 'µg' },
+                                    { label: 'Alpha-carotene', keys: ['Alpha-carotene', 'alpha_carotene_ug'], unit: 'µg' },
+                                    { label: 'Beta-carotene', keys: ['Beta-carotene', 'beta_carotene_ug'], unit: 'µg' },
+                                    { label: 'Beta-cryptoxanthin', keys: ['Beta-cryptoxanthin', 'beta_cryptoxanthin_ug'], unit: 'µg' },
+                                    { label: 'Lutein + Zeaxanthin', keys: ['Lutein + Zeaxanthin', 'Lutein+Zeaxanthin', 'lutein_zeaxanthin_ug'], unit: 'µg' },
+                                    { label: 'Lycopene', keys: ['Lycopene', 'lycopene_ug'], unit: 'µg' },
+                                ],
+                                'Vitamin E': [
+                                    { label: 'Alpha-tocopherol', keys: ['Alpha-tocopherol', 'Vitamin E', 'alpha_tocopherol_mg'], unit: 'mg' },
+                                    { label: 'Beta-tocopherol', keys: ['Beta-tocopherol', 'beta_tocopherol_mg'], unit: 'mg' },
+                                    { label: 'Delta-tocopherol', keys: ['Delta-tocopherol', 'delta_tocopherol_mg'], unit: 'mg' },
+                                    { label: 'Gamma-tocopherol', keys: ['Gamma-tocopherol', 'gamma_tocopherol_mg'], unit: 'mg' },
+                                ],
+                                'Protein': [
+                                    { label: 'Histidine', keys: ['Histidine', 'histidine_g'], unit: 'g', isEssential: true },
+                                    { label: 'Isoleucine', keys: ['Isoleucine', 'isoleucine_g'], unit: 'g', isEssential: true },
+                                    { label: 'Leucine', keys: ['Leucine', 'leucine_g'], unit: 'g', isEssential: true },
+                                    { label: 'Lysine', keys: ['Lysine', 'lysine_g'], unit: 'g', isEssential: true },
+                                    { label: 'Methionine', keys: ['Methionine', 'methionine_g'], unit: 'g', isEssential: true },
+                                    { label: 'Phenylalanine', keys: ['Phenylalanine', 'phenylalanine_g'], unit: 'g', isEssential: true },
+                                    { label: 'Threonine', keys: ['Threonine', 'threonine_g'], unit: 'g', isEssential: true },
+                                    { label: 'Tryptophan', keys: ['Tryptophan', 'tryptophan_g'], unit: 'g', isEssential: true },
+                                    { label: 'Valine', keys: ['Valine', 'valine_g'], unit: 'g', isEssential: true },
+                                ],
+                                'Carbs': [
+                                    { label: 'Fiber', keys: ['Fiber', 'fiber_g'], unit: 'g' },
+                                    { label: 'Starch', keys: ['Starch', 'starch_g'], unit: 'g' },
+                                    { label: 'Sugars', keys: ['Sugars', 'sugars_g'], unit: 'g' },
+                                ],
+                                'Fat': [
+                                    { label: 'Saturated Fat', keys: ['Saturated Fat'], unit: 'g' },
+                                    { label: 'Monounsaturated', keys: ['Monounsaturated Fat'], unit: 'g' },
+                                    { label: 'Polyunsaturated', keys: ['Polyunsaturated Fat'], unit: 'g' },
+                                    { label: 'Omega-3', keys: ['Omega-3'], unit: 'g', isExpandable: true },
+                                    { label: 'ALA', keys: ['ALA', 'alpha_linolenic_acid_g'], unit: 'g', hiddenByDefault: true },
+                                    { label: 'EPA', keys: ['EPA', 'eicosapentaenoic_acid_g'], unit: 'g', hiddenByDefault: true },
+                                    { label: 'DHA', keys: ['DHA', 'docosahexaenoic_acid_g'], unit: 'g', hiddenByDefault: true },
+                                    { label: 'Omega-6', keys: ['Omega-6'], unit: 'g' },
+                                    { label: 'Trans Fat', keys: ['Trans Fat'], unit: 'g' },
+                                    { label: 'Cholesterol', keys: ['Cholesterol'], unit: 'mg' },
+                                ],
+                            };
+
+                            const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle, breakdownLabels = [], forceRaw = false }: { title: string, items: Record<string, any[]>, icon: any, theme?: string, subtitle?: string, breakdownLabels?: string[], forceRaw?: boolean }) => {
+                                const themes = {
+                                    indigo: { bg: "bg-slate-900 border-slate-800", text: "text-indigo-400", border: "border-slate-800", itemBorder: "border-indigo-900/50" },
+                                    rose: { bg: "bg-slate-900 border-slate-800", text: "text-rose-400", border: "border-slate-800", itemBorder: "border-rose-900/50" },
+                                    orange: { bg: "bg-slate-900 border-slate-800", text: "text-orange-400", border: "border-slate-800", itemBorder: "border-orange-900/50" },
+                                    emerald: { bg: "bg-slate-900 border-slate-800", text: "text-emerald-400", border: "border-slate-800", itemBorder: "border-emerald-900/50" },
+                                    blue: { bg: "bg-slate-900 border-slate-800", text: "text-blue-400", border: "border-slate-800", itemBorder: "border-blue-900/50" },
+                                    amber: { bg: "bg-slate-900 border-slate-800", text: "text-amber-400", border: "border-slate-800", itemBorder: "border-amber-900/50" }
+                                };
+                                const t = (themes as any)[theme] || themes.indigo;
+
+                                return (
+                                    <div className={cn("p-6 pt-5 rounded-3xl border bg-gradient-to-br mb-6", t.bg)}>
+                                        <h4 className={cn("font-black flex items-center gap-2 mb-1 uppercase tracking-widest text-[10px]", t.text)}><Icon className="h-4 w-4" /> {title}</h4>
+                                        {subtitle && <p className={cn("text-[9px] text-slate-400 mb-4 border-b pb-2 transition-colors", t.border)}>{subtitle}</p>}
+                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                                            {Object.entries(items).map(([label, keys]) => {
+                                                let val = 0;
+                                                let rda = null;
+                                                let unitStr = '';
+                                                const m = recipe.micronutrients || {};
+
+                                                if (title === 'Biological Ratios') {
+                                                    const k1 = findNutrientMatch(m, keys[0]);
+                                                    const k2 = findNutrientMatch(m, keys[1]);
+                                                    const v1 = k1 ? m[k1] : 0;
+                                                    const v2 = k2 ? m[k2] : 0;
+                                                    val = v2 > 0 ? v1 / v2 : 0;
+                                                    unitStr = ' to 1';
+                                                } else {
+                                                    val = (label === 'Energy' || label === 'Protein' || label === 'Carbs' || label === 'Fat')
+                                                        ? (label === 'Energy' ? (energyUnit === 'kJ' ? (recipe as any).energy_kj : (recipe as any).calories) : (recipe as any)[label.toLowerCase()])
+                                                        : getVal(keys as string[]);
+                                                    const macroRDAs: Record<string, number> = {
+                                                        'Energy': energyUnit === 'kJ' ? dailyTargets.energy * 4.184 : dailyTargets.energy,
+                                                        'Protein': dailyTargets.protein,
+                                                        'Carbs': dailyTargets.carbs,
+                                                        'Fat': dailyTargets.fat
+                                                    };
+                                                    rda = userRDAs?.[label] || macroRDAs[label];
+                                                    unitStr = (label === 'Energy') ? energyUnit :
+                                                        (label === 'Protein' || label === 'Carbs' || label === 'Fat' || label === 'Fiber' || label === 'Sugars' || label === 'Starch' || label === 'Omega-3' || label === 'Omega-6') ? 'g' :
+                                                            (label === 'Vitamin D') ? 'IU' :
+                                                                (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg')) ? 'µg' : 'mg';
+                                                }
+
+                                                const pct = rda ? Math.round((val / rda) * 100) : null;
+                                                let styles = getNutrientLevelStyles(pct || 0, label);
+
+                                                if (title === 'Biological Ratios') {
+                                                    let ratioStatus: 'good' | 'fair' | 'poor' = 'good';
+                                                    if (label === 'Sodium & Potassium') ratioStatus = val <= 1.0 ? 'good' : val <= 2.0 ? 'fair' : 'poor';
+                                                    if (label === 'Zinc & Copper') ratioStatus = (val >= 8 && val <= 12) ? 'good' : (val >= 5 && val <= 15) ? 'fair' : 'poor';
+                                                    if (label === 'Omega 3 to 6 ratio') ratioStatus = val <= 4.0 ? 'good' : val <= 10.0 ? 'fair' : 'poor';
+                                                    if (label === 'Calcium & Magnesium') ratioStatus = (val >= 1.7 && val <= 2.5) ? 'good' : (val >= 1.5 && val <= 3.0) ? 'fair' : 'poor';
+                                                    if (label === 'Calcium & Phosphorus') ratioStatus = (val >= 1.0 && val <= 2.0) ? 'good' : (val >= 0.8 && val <= 2.5) ? 'fair' : 'poor';
+
+                                                    styles = ratioStatus === 'good' ? { text: "text-emerald-500", borderLight: "border-emerald-500/30", fade: "bg-emerald-500/5", textFill: "text-emerald-500", bg: "bg-emerald-500", border: "border-emerald-500" } :
+                                                        ratioStatus === 'fair' ? { text: "text-amber-500", borderLight: "border-amber-500/30", fade: "bg-amber-500/5", textFill: "text-amber-500", bg: "bg-amber-500", border: "border-amber-500" } :
+                                                            { text: "text-rose-500", borderLight: "border-rose-500/30", fade: "bg-rose-500/5", textFill: "text-rose-500", bg: "bg-rose-500", border: "border-rose-500" };
+                                                }
+
+                                                const ratioTarget = title === 'Biological Ratios' ? (
+                                                    label === 'Sodium & Potassium' ? 'Under 1 to 1' :
+                                                        label === 'Zinc & Copper' ? '8 to 1 - 12 to 1' :
+                                                            label === 'Omega 3 to 6 ratio' ? 'Under 4 to 1' :
+                                                                label === 'Calcium & Magnesium' ? '1.7 to 1 - 2.5 to 1' :
+                                                                    label === 'Calcium & Phosphorus' ? '1 to 1 - 2 to 1' : null
+                                                ) : null;
+
+                                                const labelColor = title === 'Biological Ratios' ? (
+                                                    label === 'Sodium:Potassium' ? 'text-blue-400' :
+                                                        label === 'Zinc:Copper' ? 'text-orange-400' :
+                                                            label === 'Omega 6:3 Ratio' ? 'text-indigo-400' :
+                                                                label === 'Calcium:Magnesium' ? 'text-violet-400' :
+                                                                    label === 'Calcium:Phosphorus' ? 'text-cyan-400' : 'text-foreground/60'
+                                                ) : 'text-foreground/60';
+
+                                                const hasBreakdown = breakdownLabels.includes(label);
+
+                                                return (
+                                                    <div key={label} onClick={() => router.push(`/dashboard/nutrients/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
+                                                        <p className={cn(
+                                                            "text-[9px] font-black truncate mb-1 whitespace-nowrap overflow-hidden transition-colors",
+                                                            title === 'Biological Ratios' ? 'text-slate-400 dark:text-slate-500' : 'uppercase text-foreground/60'
+                                                        )}>
+                                                            {label}
+                                                        </p>
+                                                        <div className="space-y-0.5">
+                                                            {(nutrientDisplayMode === 'percentage' && pct !== null && !forceRaw) ? (
+                                                                <>
+                                                                    <div className="flex items-baseline gap-1">
+                                                                        <span className={cn("text-xl font-black tracking-tighter", styles.text)}>{pct}%</span>
+                                                                    </div>
+                                                                    <p className="text-[9px] font-bold text-slate-400">
+                                                                        {val.toFixed(1)}{unitStr}
+                                                                    </p>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <div className="flex items-baseline gap-1">
+                                                                        <span className={cn("text-lg font-extrabold tracking-tight", title === 'Biological Ratios' ? styles.text : "")}>
+                                                                            {val >= 10 ? val.toFixed(0) : (val >= 1 ? val.toFixed(1) : val.toFixed(2))}
+                                                                        </span>
+                                                                        <span className={cn("text-[10px] font-bold", (unitStr === 'µg') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unitStr}</span>
+                                                                    </div>
+                                                                    {(nutrientDisplayMode === 'value' || nutrientDisplayMode === 'both') && rda && (
+                                                                        <p className="text-[9px] font-bold text-slate-400 mt-0.5">
+                                                                            Target: {Math.round(rda)}{unitStr === 'kcal' ? 'kcal' : unitStr}
+                                                                        </p>
+                                                                    )}
+                                                                    {ratioTarget && (
+                                                                        <p className="text-[9px] font-bold text-slate-400 mt-0.5">
+                                                                            Ideal: {ratioTarget}
+                                                                        </p>
+                                                                    )}
+                                                                    {nutrientDisplayMode === 'both' && pct !== null && !forceRaw && (
+                                                                        <div className={cn("text-[10px] font-black", styles.text)}>{pct}%</div>
+                                                                    )}
+                                                                </>
+                                                            )}
+                                                        </div>
+
+                                                        {hasBreakdown && (
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); setBreakdownNutrient(label); }}
+                                                                className="absolute top-2 right-2 p-1 rounded-lg bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-400 opacity-40 group-hover:opacity-100 hover:bg-orange-200 dark:hover:bg-orange-800 transition-all border border-orange-200/50 dark:border-orange-700/50"
+                                                            >
+                                                                <Layers className="h-3 w-3" />
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                );
+                            };
+
+                            return (
+                                <div className="space-y-6">
+                                    <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6">
+                                        <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
+                                            <Activity size={18} />
+                                            Personal Health Insights
+                                        </h3>
+                                    </div>
+
+                                    <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Key nutrient balances for a healthy body" items={{
+                                        'Sodium & Potassium': ['Sodium', 'Potassium'],
+                                        'Zinc & Copper': ['Zinc', 'Copper'],
+                                        'Omega 3 to 6 ratio': ['Omega-6', 'Omega-3'],
+                                        'Calcium & Magnesium': ['Calcium', 'Magnesium'],
+                                        'Calcium & Phosphorus': ['Calcium', 'Phosphorus'],
+                                    }} />
+
+                                    <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Essential energy and building blocks" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
+                                        'Energy': ['calories'],
+                                        'Protein': ['protein'],
+                                        'Carbs': ['carbs'],
+                                        'Fat': ['fat']
+                                    }} />
+                                    <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Vital minerals for hydration and balance" items={{
+                                        'Sodium': ['Sodium', 'sodium_mg'],
+                                        'Potassium': ['Potassium', 'potassium_mg'],
+                                        'Magnesium': ['Magnesium', 'magnesium_mg'],
+                                        'Calcium': ['Calcium', 'calcium_mg'],
+                                        'Phosphorus': ['Phosphorus', 'phosphorus_mg']
+                                    }} />
+
+                                    <NutrientGrid title="Trace Minerals" icon={Gem} theme="rose" subtitle="Essential minerals for energy and immune support" items={{
+                                        'Iron': ['Iron', 'iron_mg'],
+                                        'Zinc': ['Zinc', 'zinc_mg'],
+                                        'Copper': ['Copper', 'copper_mg'],
+                                        'Manganese': ['Manganese', 'manganese_mg'],
+                                        'Selenium': ['Selenium', 'selenium_ug']
+                                    }} />
+
+                                    <NutrientGrid title="Daily Vitamins" icon={Droplet} theme="blue" subtitle="Essential daily vitamins for a healthy mind" items={{
+                                        'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
+                                        'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
+                                        'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
+                                        'B5 (Pantothenic Acid)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
+                                        'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
+                                        'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
+                                        'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
+                                        'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
+                                        'Choline': ['Choline', 'choline_mg'],
+                                    }} />
+
+                                    <NutrientGrid title="Stored Vitamins" icon={Battery} theme="emerald" subtitle="Stored vitamins for long-term vitality" breakdownLabels={['Vitamin A', 'Vitamin E']} items={{
+                                        'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
+                                        'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
+                                        'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
+                                        'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
+                                    }} />
+
+                                    <NutrientGrid title="Extra Markers" icon={Activity} theme="amber" subtitle="Extra health markers worth tracking" forceRaw={true} items={{
+                                        'Fiber': ['Fiber', 'fiber_g'],
+                                        'Sugars': ['Sugars', 'sugars_g'],
+                                        'Oxalate': ['Oxalate', 'oxalate_mg'],
+                                        'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
+                                    }} />
+
+                                    {Object.keys(phytoSources).length > 0 && (
+                                        <DidYouKnow
+                                            phytonutrientsWithSources={phytoSources}
+                                            className="animate-in slide-in-from-right-4 duration-700 mt-8"
+                                        />
+                                    )}
+                                </div>
+                            );
+                        })()}
+                    </div>
+                )}
+
 
 
 
