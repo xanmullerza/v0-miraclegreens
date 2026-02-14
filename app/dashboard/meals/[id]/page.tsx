@@ -43,7 +43,10 @@ import {
     LayoutGrid,
     Search,
     UtensilsCrossed,
-    Filter
+    Filter,
+    BookOpen,
+    Bot,
+    FlaskConical
 } from 'lucide-react';
 import { useSearch } from '@/lib/context/search-context';
 import FoodItemPicker from '@/components/recipe/food-item-picker';
@@ -907,9 +910,9 @@ export default function RecipeDetailsPage() {
     const { searchQuery, setSearchQuery, setIsFocused, activeSearchId, setActiveSearchId } = useSearch();
 
     const mealTabs = [
-        { id: 'allmeals', label: 'All Meals', icon: UtensilsCrossed, color: 'text-emerald-500', bg: 'bg-emerald-500/10', path: '/dashboard/meals' },
-        { id: 'collections', label: 'Collections', icon: Heart, color: 'text-emerald-500', bg: 'bg-emerald-500/10', path: '/dashboard/meals?tab=collections' },
-        { id: 'planner', label: 'Planner', icon: Activity, color: 'text-emerald-500', bg: 'bg-emerald-500/10', path: '/dashboard/mealplanner' },
+        { id: 'browse', label: 'All Meals', icon: BookOpen, color: 'text-yellow-500', bg: 'bg-yellow-500/10', path: '/dashboard/recipes?tab=browse' },
+        { id: 'mealplanner', label: 'Meal-O-Matic', icon: Bot, color: 'text-yellow-500', bg: 'bg-yellow-500/10', path: '/dashboard/recipes?tab=mealplanner' },
+        { id: 'mixlab', label: 'Mix Lab', icon: FlaskConical, color: 'text-purple-500', bg: 'bg-purple-500/10', path: '/dashboard/recipes?tab=mixlab' },
     ];
 
     const renderTabGroup = (tabsList: typeof mealTabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
@@ -923,7 +926,7 @@ export default function RecipeDetailsPage() {
                     {showHomeButton && !isSearchExpanded && (
                         <button
                             onClick={() => router.push('/dashboard')}
-                            className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all flex-shrink-0"
+                            className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/10 transition-all flex-shrink-0"
                             title="Back to Dashboard"
                         >
                             <LayoutGrid size={18} />
@@ -1005,8 +1008,8 @@ export default function RecipeDetailsPage() {
                         className={cn(
                             "flex items-center justify-center w-12 h-12 rounded-[1.5rem] transition-all flex-shrink-0",
                             isSearchExpanded
-                                ? "bg-emerald-50 text-emerald-500 hover:bg-emerald-100"
-                                : "text-slate-400 hover:text-emerald-500 hover:bg-emerald-50"
+                                ? "bg-rose-50 text-rose-500 hover:bg-rose-100"
+                                : "text-slate-400 hover:text-yellow-500 hover:bg-yellow-50"
                         )}
                         title="Search"
                     >
@@ -1106,7 +1109,7 @@ export default function RecipeDetailsPage() {
 
                 {/* Tab Navigation Hub */}
                 <div className="flex flex-col gap-6 items-start w-full">
-                    {renderTabGroup(mealTabs, "", "text-slate-500", true)}
+                    {renderTabGroup(mealTabs, "🍽️ Meals & Recipes", "text-slate-500", true)}
                 </div>
 
                 {/* Controls Row - Like Food Page's Amount/Measure Row */}
