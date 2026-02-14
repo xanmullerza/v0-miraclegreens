@@ -75,7 +75,7 @@ const SHORTHAND_MAP: Record<string, string> = {
 };
 
 const NUTRIENT_CATEGORIES_DATA = [
-    { title: "Macronutrients", icon: Zap, theme: "orange", keys: ['welcome', 'Energy', 'Protein', 'Carbs', 'Fat', 'Fiber', 'Sugar', 'Omega-3', 'Cholesterol'] },
+    { title: "Macronutrients", icon: Zap, theme: "orange", keys: ['Energy', 'Protein', 'Carbs', 'Fat', 'Fiber', 'Sugar', 'Omega-3', 'Cholesterol'] },
     { title: "Electrolytes", icon: Droplet, theme: "indigo", keys: ['Potassium', 'Magnesium', 'Calcium', 'Sodium', 'Phosphorus'] },
     { title: "Trace Minerals", icon: Gem, theme: "blue", keys: ['Iron', 'Zinc', 'Selenium', 'Copper', 'Manganese', 'Oxalate'] },
     { title: "Vitamins", icon: Battery, theme: "emerald", keys: ['Vitamin A', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Vitamin C', 'Vitamin D', 'Vitamin E', 'Vitamin K', 'Choline'] }

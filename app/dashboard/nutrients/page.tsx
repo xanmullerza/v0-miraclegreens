@@ -35,7 +35,7 @@ export default function NutrientsPage() {
     // Here, we'll use them as quick navigation or high-level filtering.
     // Since the dropdowns pick a SPECIFIC nutrient, navigation is the best UX.
 
-    const MACROS = ['welcome', 'energy_kcal', 'protein_g', 'carbs_g', 'fat_g', 'Fiber', 'Sugar', 'Omega-3', 'Cholesterol'];
+    const MACROS = ['energy_kcal', 'protein_g', 'carbs_g', 'fat_g', 'Fiber', 'Sugar', 'Omega-3', 'Cholesterol'];
     const MINERALS = ['Sodium', 'Potassium', 'Magnesium', 'Calcium', 'Phosphorus', 'Iron', 'Zinc', 'Copper', 'Manganese', 'Selenium', 'Oxalate'];
     const VITAMINS = ['Vitamin A', 'Vitamin C', 'Vitamin D', 'Vitamin E', 'Vitamin K', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Choline'];
 
@@ -56,6 +56,20 @@ export default function NutrientsPage() {
 
                 {/* The Filter Bar */}
                 <div className="flex items-center gap-2">
+                    {/* Welcome Button */}
+                    <button
+                        onClick={() => handleNutrientSelect('welcome')}
+                        className={cn(
+                            "px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
+                            selectedNutrientId === 'welcome'
+                                ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20 px-5"
+                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-emerald-500"
+                        )}
+                    >
+                        <Sparkles size={14} />
+                        <span>Welcome</span>
+                    </button>
+
                     {/* Macro Dropdown */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>

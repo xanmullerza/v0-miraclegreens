@@ -48,7 +48,7 @@ import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useRDA } from '@/hooks/use-rda';
 
 // Category Groups for Navigation
-const MACROS_LIST = ['welcome', 'Energy', 'Protein', 'Carbs', 'Fat', 'Fiber', 'Sugar', 'Omega-3', 'Cholesterol'];
+const MACROS_LIST = ['Energy', 'Protein', 'Carbs', 'Fat', 'Fiber', 'Sugar', 'Omega-3', 'Cholesterol'];
 const MINERALS_LIST = ['Sodium', 'Potassium', 'Magnesium', 'Calcium', 'Phosphorus', 'Iron', 'Zinc', 'Copper', 'Manganese', 'Selenium', 'Oxalate'];
 const VITAMINS_LIST = ['Vitamin A', 'Vitamin C', 'Vitamin D', 'Vitamin E', 'Vitamin K', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Choline'];
 
@@ -407,6 +407,20 @@ export default function NutrientDetailsPage() {
 
                 {/* Perspective Selection (Triple Dropdown Filter) */}
                 <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
+                    {/* Welcome Button */}
+                    <button
+                        onClick={() => router.push('/dashboard/nutrients/welcome')}
+                        className={cn(
+                            "px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
+                            nutrientId === 'welcome'
+                                ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20 px-5"
+                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-emerald-500"
+                        )}
+                    >
+                        <Sparkles size={14} />
+                        <span>Welcome</span>
+                    </button>
+
                     {/* Macro Dropdown */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
