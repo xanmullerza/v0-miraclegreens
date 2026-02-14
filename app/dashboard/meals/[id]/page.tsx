@@ -39,8 +39,13 @@ import {
     Download,
     Beaker,
     Dna,
-    ChevronUp
+    ChevronUp,
+    LayoutGrid,
+    Search,
+    UtensilsCrossed,
+    Filter
 } from 'lucide-react';
+import { useSearch } from '@/lib/context/search-context';
 import FoodItemPicker from '@/components/recipe/food-item-picker';
 import NutrientExportModal from '@/components/recipe/nutrient-export-modal';
 import { calculateRecipeNutrition, calculateIndividualTargets, CalculatedNutrition, findNutrientMatch } from '@/lib/utils/nutrition-calculator';
@@ -898,6 +903,120 @@ export default function RecipeDetailsPage() {
         e.dataTransfer.dropEffect = "move";
     };
 
+    const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+    const { searchQuery, setSearchQuery, setIsFocused, activeSearchId, setActiveSearchId } = useSearch();
+
+    const mealTabs = [
+        { id: 'allmeals', label: 'All Meals', icon: UtensilsCrossed, color: 'text-emerald-500', bg: 'bg-emerald-500/10', path: '/dashboard/meals' },
+        { id: 'collections', label: 'Collections', icon: Heart, color: 'text-emerald-500', bg: 'bg-emerald-500/10', path: '/dashboard/meals?tab=collections' },
+        { id: 'planner', label: 'Planner', icon: Activity, color: 'text-emerald-500', bg: 'bg-emerald-500/10', path: '/dashboard/mealplanner' },
+    ];
+
+    const renderTabGroup = (tabsList: typeof mealTabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
+        <div className="space-y-3 w-full">
+            {sectionLabel && <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>}
+            <div className={cn(
+                "flex items-center p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden w-full md:max-w-[800px] mx-auto xl:mx-0"
+            )}>
+                {/* Left side - Home Button area */}
+                <div className={cn("flex-shrink-0 flex items-center justify-start transition-all duration-500", isSearchExpanded ? "w-0" : "w-12")}>
+                    {showHomeButton && !isSearchExpanded && (
+                        <button
+                            onClick={() => router.push('/dashboard')}
+                            className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all flex-shrink-0"
+                            title="Back to Dashboard"
+                        >
+                            <LayoutGrid size={18} />
+                        </button>
+                    )}
+                </div>
+
+                {/* Center - Tabs area */}
+                <div className={cn("flex items-center justify-center overflow-hidden transition-all duration-500", isSearchExpanded ? "w-0 flex-none opacity-0" : "flex-1 opacity-100")}>
+                    <div className="flex items-center gap-4 overflow-hidden py-1">
+                        {tabsList.map((tab) => {
+                            const Icon = tab.icon;
+                            const isActive = false;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => router.push(tab.path)}
+                                    className={cn(
+                                        "flex items-center gap-3 py-3.5 rounded-[1.5rem] text-[9px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
+                                        isActive
+                                            ? "bg-slate-900 dark:bg-slate-800 text-white shadow-xl translate-y-[-2px]"
+                                            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50",
+                                        "px-4 md:px-5"
+                                    )}
+                                >
+                                    <Icon size={15} className={cn(
+                                        "transition-transform duration-500 group-hover:scale-110",
+                                        isActive ? tab.color : "text-slate-400"
+                                    )} />
+                                    <span className={cn(
+                                        "transition-all duration-300 overflow-hidden hidden md:block",
+                                        isSearchExpanded ? "w-0 opacity-0" : "w-auto opacity-100"
+                                    )}>
+                                        {tab.label}
+                                    </span>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {/* Right side - Search area */}
+                <div className={cn(
+                    "flex items-center justify-end transition-all duration-500",
+                    isSearchExpanded ? "flex-1 pl-2" : "w-12"
+                )}>
+                    <div className={cn(
+                        "flex items-center transition-all duration-500 overflow-hidden",
+                        isSearchExpanded ? "flex-1 opacity-100" : "w-0 opacity-0"
+                    )}>
+                        <input
+                            type="text"
+                            autoFocus
+                            placeholder={`Search meals...`}
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    router.push(`/dashboard/meals?q=${searchQuery}`);
+                                }
+                            }}
+                            onFocus={() => {
+                                setIsFocused(true);
+                                setActiveSearchId('meals-bar');
+                            }}
+                            onBlur={() => {
+                                setTimeout(() => {
+                                    if (activeSearchId === 'meals-bar') setActiveSearchId(null);
+                                }, 200);
+                            }}
+                            className="w-full bg-slate-50 dark:bg-slate-800/50 border-none focus:ring-0 text-[10px] font-black uppercase tracking-widest h-12 rounded-[1.5rem] px-6 text-slate-900 dark:text-white"
+                        />
+                    </div>
+                    <button
+                        onClick={() => {
+                            if (isSearchExpanded) setSearchQuery('');
+                            setIsSearchExpanded(!isSearchExpanded);
+                        }}
+                        className={cn(
+                            "flex items-center justify-center w-12 h-12 rounded-[1.5rem] transition-all flex-shrink-0",
+                            isSearchExpanded
+                                ? "bg-emerald-50 text-emerald-500 hover:bg-emerald-100"
+                                : "text-slate-400 hover:text-emerald-500 hover:bg-emerald-50"
+                        )}
+                        title="Search"
+                    >
+                        {isSearchExpanded ? <X size={18} /> : <Search size={18} />}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+
     const onDrop = (e: React.DragEvent, dropIndex: number) => {
         e.preventDefault();
         if (draggedItemIndex === null || draggedItemIndex === dropIndex) return;
@@ -983,6 +1102,11 @@ export default function RecipeDetailsPage() {
                             </span>
                         </div>
                     </div>
+                </div>
+
+                {/* Tab Navigation Hub */}
+                <div className="flex flex-col gap-6 items-start w-full">
+                    {renderTabGroup(mealTabs, "", "text-slate-500", true)}
                 </div>
 
                 {/* Controls Row - Like Food Page's Amount/Measure Row */}
