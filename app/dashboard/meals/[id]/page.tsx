@@ -1064,7 +1064,7 @@ export default function RecipeDetailsPage() {
     if (!recipe) return null;
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
+        <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700 pb-32">
             {/* Navigation Header - Edit Button for Admins */}
 
 
