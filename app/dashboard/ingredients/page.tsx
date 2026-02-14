@@ -248,7 +248,7 @@ function FoodsHubContent() {
                     {renderTabGroup(ingredientTabs, "", "text-slate-500", true)}
                 </div>
 
-                {(currentTab === 'allfoods' || currentTab === 'explore' || currentTab === 'pantry') && (
+                {(currentTab === 'allfoods' || currentTab === 'explore' || currentTab === 'pantry' || currentTab === 'nutrients') && (
                     <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
                         {/* Scope/Favorites Dropdown */}
                         <DropdownMenu>
