@@ -197,169 +197,297 @@ export default function NutrientDetailsPage() {
                 </div>
             </div>
 
-            {/* Main Content Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                <div className="space-y-8">
-                    {/* Biological Significance */}
-                    <div className="p-8 bg-emerald-50 dark:bg-emerald-950/20 rounded-[2.5rem] border border-emerald-100 dark:border-emerald-900/50 shadow-sm">
-                        <h4 className="font-black text-[11px] mb-4 uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-400">Why It Matters</h4>
-                        <p className="text-base font-medium text-slate-700 dark:text-slate-300 leading-relaxed italic">
-                            {info.importance}
-                        </p>
-                    </div>
-
-                    {/* Benefits */}
-                    <div className="space-y-4">
-                        <h4 className="font-black text-[11px] px-2 uppercase tracking-[0.2em] text-slate-400">Key Benefits</h4>
-                        <div className="flex flex-wrap gap-2.5">
-                            {info.benefits.map((b, i) => (
-                                <span key={i} className="text-[10px] font-black uppercase tracking-widest bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-100 px-5 py-2.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-                                    {b}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Typical Sources */}
-                    <div className="space-y-4">
-                        <h4 className="font-black text-[11px] px-2 uppercase tracking-[0.2em] text-slate-400">Alternative Sources</h4>
-                        <div className="flex flex-wrap gap-2">
-                            {info.sources.map((s, i) => (
-                                <span key={i} className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-5 py-3 rounded-2xl font-bold border border-slate-200 dark:border-slate-800/50">
-                                    {s}
-                                </span>
-                            ))}
-                        </div>
+            {/* Dose Simulator Section */}
+            <div className="space-y-6">
+                <div className="flex items-center justify-between px-2">
+                    <div className="space-y-1">
+                        <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">Clinical Dose Simulator</h4>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase">Simulate intake levels to see biological thresholds</p>
                     </div>
                 </div>
 
-                <div className="space-y-8">
-                    {/* Daily Medical Target Card */}
-                    <Card className="p-8 flex flex-col items-center justify-center text-center space-y-6 bg-emerald-600 text-white border-none shadow-2xl shadow-emerald-600/30">
-                        <div className="w-16 h-16 rounded-3xl bg-white/20 flex items-center justify-center animate-pulse">
-                            <Activity size={32} />
-                        </div>
-                        <div className="space-y-2">
-                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 italic">Daily Medical Target</h3>
+                {(() => {
+                    // Extract values for simulation
+                    let targetVal = 0;
+                    let unit = 'mg';
 
-                            {(() => {
-                                let val = null;
-                                let unit = 'mg';
+                    if (nutrientId === 'Energy') {
+                        targetVal = energyUnit === 'kJ' ? dailyTargets.energy * 4.184 : dailyTargets.energy;
+                        unit = energyUnit;
+                    } else if (nutrientId === 'Protein') {
+                        targetVal = dailyTargets.protein;
+                        unit = 'g';
+                    } else if (nutrientId === 'Carbs') {
+                        targetVal = dailyTargets.carbs;
+                        unit = 'g';
+                    } else if (nutrientId === 'Fat') {
+                        targetVal = dailyTargets.fat;
+                        unit = 'g';
+                    } else if (userRDAs?.[nutrientId]) {
+                        targetVal = userRDAs[nutrientId];
+                        if (nutrientId === 'Vitamin D') unit = 'IU';
+                        else if (nutrientId.includes('Folate') || nutrientId.includes('B12') || nutrientId.includes('Biotin') || nutrientId.includes('Selenium') || nutrientId === 'Vitamin A' || nutrientId === 'Vitamin K' || nutrientId.includes('µg')) unit = 'µg';
+                    }
 
-                                if (nutrientId === 'Energy') {
-                                    val = energyUnit === 'kJ' ? dailyTargets.energy * 4.184 : dailyTargets.energy;
-                                    unit = energyUnit;
-                                } else if (nutrientId === 'Protein') {
-                                    val = dailyTargets.protein;
-                                    unit = 'g';
-                                } else if (nutrientId === 'Carbs') {
-                                    val = dailyTargets.carbs;
-                                    unit = 'g';
-                                } else if (nutrientId === 'Fat') {
-                                    val = dailyTargets.fat;
-                                    unit = 'g';
-                                } else if (userRDAs?.[nutrientId]) {
-                                    val = userRDAs[nutrientId];
-                                    if (nutrientId === 'Vitamin D') unit = 'IU';
-                                    else if (nutrientId.includes('Folate') || nutrientId.includes('B12') || nutrientId.includes('Biotin') || nutrientId.includes('Selenium') || nutrientId === 'Vitamin A' || nutrientId === 'Vitamin K' || nutrientId.includes('µg')) unit = 'µg';
-                                }
+                    // Parse UL safely
+                    const ulMatch = info.upperLimit?.match(/(\d+)/);
+                    const hasNoUL = info.upperLimit?.includes("None") || !info.upperLimit;
+                    const ulVal = ulMatch ? parseInt(ulMatch[0]) : (targetVal > 0 ? targetVal * 4 : 100);
 
-                                if (val) {
-                                    return (
-                                        <div className="flex flex-col items-center">
-                                            <p className="text-6xl font-black tracking-tighter italic">
-                                                {val >= 100 ? Math.round(val) : val < 10 ? val.toFixed(1) : Math.round(val)}
-                                            </p>
-                                            <p className="text-xl font-black opacity-80 uppercase leading-none">{unit}</p>
-                                        </div>
-                                    );
-                                }
-                                return <p className="text-4xl font-black tracking-tighter italic uppercase">Reference Intake</p>;
-                            })()}
-                        </div>
-                        <p className="text-[10px] font-bold opacity-70 leading-relaxed max-w-[200px]">
-                            Recommended minimum intake based on your clinical profile.
-                        </p>
-                    </Card>
+                    // Simulation state
+                    const [simValue, setSimValue] = useState(targetVal || 0);
 
-                    {/* Safety & Toxicity */}
-                    <div className="p-8 bg-rose-50 dark:bg-rose-950/20 rounded-[2.5rem] border border-rose-100 dark:border-rose-900/50 shadow-sm space-y-4">
-                        <div className="flex items-center justify-between">
-                            <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-rose-700 dark:text-rose-400">Safety & Toxicity</h4>
-                            <div className="px-3 py-1 bg-white/50 dark:bg-rose-950/50 rounded-lg border border-rose-200 dark:border-rose-800 text-[9px] font-black uppercase text-rose-600">
-                                UL: {info.upperLimit || 'N/A'}
-                            </div>
-                        </div>
-                        <div className="space-y-3">
-                            <p className="text-[10px] font-black text-rose-600/50 uppercase tracking-widest leading-none">Known Toxic Symptoms</p>
-                            <div className="flex flex-wrap gap-2">
-                                {(info.toxicitySymptoms || ['No common toxicity signs reported with standard dietary intake.']).map((s, i) => (
-                                    <span key={i} className="text-[9px] font-black uppercase tracking-widest bg-white dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 px-3 py-1.5 rounded-lg border border-rose-100 dark:border-rose-800">
-                                        {s}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+                    // Sync initial value
+                    useEffect(() => {
+                        if (targetVal > 0 && simValue === 0) setSimValue(targetVal);
+                    }, [targetVal]);
 
-                    {/* Deficiency Alerts */}
-                    <div className="p-8 bg-amber-50 dark:bg-amber-950/20 rounded-[2.5rem] border border-amber-100 dark:border-amber-900/50 shadow-sm space-y-4">
-                        <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-amber-700 dark:text-amber-400">Deficiency Indicators</h4>
-                        <div className="space-y-3">
-                            <p className="text-[10px] font-black text-amber-600/50 uppercase tracking-widest leading-none">Clinical Red Flags</p>
-                            <div className="flex flex-wrap gap-2">
-                                {info.deficiencySigns.map((s, i) => (
-                                    <span key={i} className="text-[9px] font-black uppercase tracking-widest bg-white dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 px-3 py-1.5 rounded-lg border border-amber-100 dark:border-amber-800">
-                                        {s}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+                    const isDeficient = simValue < (targetVal * 0.8) && targetVal > 0;
+                    const isToxic = !hasNoUL && simValue >= ulVal;
+                    const isOptimal = !isDeficient && !isToxic;
 
-                    {/* Top Food Sources */}
-                    <div className="space-y-5">
-                        <div className="flex items-center justify-between px-2">
-                            <div className="space-y-1">
-                                <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 leading-none">Natural Sources</h4>
-                                <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest leading-none">Ordered by nutrient richness (per 100g)</p>
-                            </div>
-                            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest underline cursor-pointer hover:text-emerald-600" onClick={() => router.push('/dashboard/ingredients')}>Browse Ingredients</span>
-                        </div>
-                        <div className="space-y-3">
-                            {loadingFoods ? (
-                                [1, 2, 3].map(i => <div key={i} className="h-16 w-full animate-pulse bg-slate-100 dark:bg-slate-800 rounded-3xl" />)
-                            ) : topFoods.length > 0 ? (
-                                topFoods.map((food: any) => (
-                                    <button
-                                        key={food.id}
-                                        onClick={() => router.push(`/dashboard/ingredients/${food.id}`)}
-                                        className="w-full flex items-center gap-4 p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/50 hover:shadow-xl transition-all text-left group"
+                    return (
+                        <div className="space-y-12">
+                            {/* Simulator Interface */}
+                            <div className="relative pt-6 pb-2">
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max={ulVal * 1.5}
+                                    step={(ulVal * 1.5) / 100}
+                                    value={simValue}
+                                    onChange={(e) => setSimValue(parseFloat(e.target.value))}
+                                    className="w-full h-3 bg-slate-200 dark:bg-slate-800 rounded-full appearance-none cursor-pointer accent-emerald-500 hover:accent-emerald-600 transition-all [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-emerald-500 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:appearance-none"
+                                />
+
+                                <div className="absolute top-0 left-0 w-full flex justify-between px-1 text-[8px] font-black uppercase text-slate-400 tracking-widest pointer-events-none">
+                                    <span>Zero</span>
+                                    <div
+                                        className="absolute h-4 border-l-2 border-dashed border-emerald-500/50 flex flex-col items-center"
+                                        style={{ left: `${(targetVal / (ulVal * 1.5)) * 100}%` }}
                                     >
-                                        <div className="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0 border border-slate-100 dark:border-slate-800">
-                                            {food.image ? (
-                                                <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                    <Beef size={20} />
+                                        <span className="mt-4 text-emerald-600 font-black">Target</span>
+                                    </div>
+                                    {!hasNoUL && (
+                                        <div
+                                            className="absolute h-4 border-l-2 border-dashed border-rose-500/50 flex flex-col items-center"
+                                            style={{ left: `${(ulVal / (ulVal * 1.5)) * 100}%` }}
+                                        >
+                                            <span className="mt-4 text-rose-600 font-black">UL</span>
+                                        </div>
+                                    )}
+                                    <span>Extreme</span>
+                                </div>
+
+                                <div className="mt-14 flex justify-center">
+                                    <div className={cn(
+                                        "px-10 py-4 rounded-[2rem] border-2 transition-all duration-700 flex flex-col items-center shadow-2xl scale-110",
+                                        isDeficient ? "bg-amber-50 border-amber-300 text-amber-800 shadow-amber-200/50" :
+                                            isToxic ? "bg-rose-50 border-rose-300 text-rose-800 shadow-rose-200/50" :
+                                                "bg-emerald-50 border-emerald-300 text-emerald-800 shadow-emerald-200/50"
+                                    )}>
+                                        <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Simulated Intake</p>
+                                        <div className="flex items-baseline gap-1">
+                                            <span className="text-5xl font-black italic tracking-tighter">
+                                                {simValue >= 100 ? Math.round(simValue) : simValue.toFixed(1)}
+                                            </span>
+                                            <span className="text-sm font-black uppercase">{unit}</span>
+                                        </div>
+                                        <div className={cn(
+                                            "mt-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5",
+                                            isDeficient ? "bg-amber-500 text-white" :
+                                                isToxic ? "bg-rose-600 text-white" :
+                                                    "bg-emerald-600 text-white"
+                                        )}>
+                                            {isDeficient ? "⚠️ Deficiency" : isToxic ? "☢️ Toxicity" : "✅ Optimal"}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Main Content Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                                <div className="space-y-8">
+                                    {/* Biological Significance */}
+                                    <div className="p-8 bg-emerald-50 dark:bg-emerald-950/20 rounded-[2.5rem] border border-emerald-100 dark:border-emerald-900/50 shadow-sm">
+                                        <h4 className="font-black text-[11px] mb-4 uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-400">Why It Matters</h4>
+                                        <p className="text-base font-medium text-slate-700 dark:text-slate-300 leading-relaxed italic">
+                                            {info.importance}
+                                        </p>
+                                    </div>
+
+                                    {/* Benefits */}
+                                    <div className="space-y-4">
+                                        <h4 className="font-black text-[11px] px-2 uppercase tracking-[0.2em] text-slate-400">Key Benefits</h4>
+                                        <div className="flex flex-wrap gap-2.5">
+                                            {info.benefits.map((b, i) => (
+                                                <span key={i} className="text-[10px] font-black uppercase tracking-widest bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-100 px-5 py-2.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                                                    {b}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Alternative Sources */}
+                                    <div className="space-y-4">
+                                        <h4 className="font-black text-[11px] px-2 uppercase tracking-[0.2em] text-slate-400">Alternative Sources</h4>
+                                        <div className="flex flex-wrap gap-2">
+                                            {info.sources.map((s, i) => (
+                                                <span key={i} className="text-xs bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-5 py-3 rounded-2xl font-bold border border-slate-200 dark:border-slate-800/50">
+                                                    {s}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-8">
+                                    {/* Daily Medical Target Card */}
+                                    <Card className={cn(
+                                        "p-8 flex flex-col items-center justify-center text-center space-y-6 border-none transition-all duration-700 relative overflow-hidden",
+                                        isOptimal ? "bg-emerald-600 text-white shadow-2xl shadow-emerald-600/40 scale-[1.02] z-10" : "bg-slate-100 dark:bg-slate-900/50 text-slate-400 dark:text-slate-700 grayscale opacity-40"
+                                    )}>
+                                        {isOptimal && <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />}
+                                        <div className={cn(
+                                            "w-16 h-16 rounded-3xl flex items-center justify-center transition-all duration-700",
+                                            isOptimal ? "bg-white/20 animate-pulse" : "bg-slate-200 dark:bg-slate-800"
+                                        )}>
+                                            <Activity size={32} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 italic">Daily Medical Target</h3>
+                                            <div className="flex flex-col items-center">
+                                                <p className="text-6xl font-black tracking-tighter italic">
+                                                    {targetVal >= 100 ? Math.round(targetVal) : targetVal < 10 ? targetVal.toFixed(1) : Math.round(targetVal)}
+                                                </p>
+                                                <p className="text-xl font-black opacity-80 uppercase leading-none">{unit}</p>
+                                            </div>
+                                        </div>
+                                        <p className="text-[10px] font-bold opacity-70 leading-relaxed max-w-[200px]">
+                                            Recommended minimum intake based on your clinical profile.
+                                        </p>
+                                        {isOptimal && (
+                                            <div className="absolute top-4 right-4 animate-in fade-in zoom-in duration-500">
+                                                <Badge className="bg-white/20 text-white border-white/30 text-[8px] uppercase tracking-widest font-black">ACTIVE ZONE</Badge>
+                                            </div>
+                                        )}
+                                    </Card>
+
+                                    {/* Safety & Toxicity */}
+                                    <div className={cn(
+                                        "p-8 rounded-[2.5rem] border transition-all duration-700 relative overflow-hidden",
+                                        isToxic
+                                            ? "bg-rose-600 border-rose-400 shadow-2xl shadow-rose-600/40 text-white scale-[1.02] z-10"
+                                            : "bg-rose-50 dark:bg-rose-950/20 border-rose-100 dark:border-rose-900/50 opacity-40 grayscale"
+                                    )}>
+                                        <div className="space-y-4">
+                                            <div className="flex items-center justify-between">
+                                                <h4 className={cn("font-black text-[11px] uppercase tracking-[0.2em]", isToxic ? "text-white" : "text-rose-700 dark:text-rose-400")}>Safety & Toxicity</h4>
+                                                <div className={cn(
+                                                    "px-3 py-1 rounded-lg border text-[9px] font-black uppercase",
+                                                    isToxic ? "bg-rose-500 border-rose-400 text-white" : "bg-white/50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-800 text-rose-600"
+                                                )}>
+                                                    UL: {info.upperLimit || 'N/A'}
                                                 </div>
-                                            )}
+                                            </div>
+                                            <div className="space-y-3">
+                                                <p className={cn("text-[10px] font-black uppercase tracking-widest leading-none", isToxic ? "text-rose-100" : "text-rose-600/50")}>Known Toxic Symptoms</p>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {(info.toxicitySymptoms || ['No common toxicity signs reported.']).map((s, i) => (
+                                                        <span key={i} className={cn(
+                                                            "text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border",
+                                                            isToxic ? "bg-rose-500/50 border-rose-400 text-white" : "bg-white dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 border-rose-100 dark:border-rose-800"
+                                                        )}>
+                                                            {s}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="flex-grow min-w-0">
-                                            <p className="text-sm font-black uppercase tracking-tight text-slate-900 dark:text-white truncate italic">
-                                                {food.common_name || food.name}
-                                            </p>
-                                            <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">View Profile</p>
+                                        {isToxic && (
+                                            <div className="absolute top-4 right-4 animate-in fade-in zoom-in duration-500">
+                                                <Badge className="bg-white/20 text-white border-white/30 text-[8px] uppercase tracking-widest font-black">CRITICAL ZONE</Badge>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Deficiency Alerts */}
+                                    <div className={cn(
+                                        "p-8 rounded-[2.5rem] border transition-all duration-700 relative overflow-hidden",
+                                        isDeficient
+                                            ? "bg-amber-500 border-amber-400 shadow-2xl shadow-amber-500/40 text-white scale-[1.02] z-10"
+                                            : "bg-amber-50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/50 opacity-40 grayscale"
+                                    )}>
+                                        <div className="space-y-4">
+                                            <h4 className={cn("font-black text-[11px] uppercase tracking-[0.2em]", isDeficient ? "text-white" : "text-amber-700 dark:text-amber-400")}>Deficiency Indicators</h4>
+                                            <div className="space-y-3">
+                                                <p className={cn("text-[10px] font-black uppercase tracking-widest leading-none", isDeficient ? "text-amber-100" : "text-amber-600/50")}>Clinical Red Flags</p>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {info.deficiencySigns.map((s, i) => (
+                                                        <span key={i} className={cn(
+                                                            "text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border",
+                                                            isDeficient ? "bg-amber-400 border-amber-300 text-white" : "bg-white dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-100 dark:border-amber-800"
+                                                        )}>
+                                                            {s}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
                                         </div>
-                                        <ChevronRight size={18} className="text-slate-200 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
-                                    </button>
-                                ))
-                            ) : (
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No whole food sources identified in our current health database.</p>
-                            )}
+                                        {isDeficient && (
+                                            <div className="absolute top-4 right-4 animate-in fade-in zoom-in duration-500">
+                                                <Badge className="bg-white/20 text-white border-white/30 text-[8px] uppercase tracking-widest font-black">WARNING ZONE</Badge>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Top Food Sources */}
+                            <div className="space-y-5">
+                                <div className="flex items-center justify-between px-2">
+                                    <div className="space-y-1">
+                                        <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-slate-400 leading-none">Natural Sources</h4>
+                                        <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest leading-none">Ordered by nutrient richness (per 100g)</p>
+                                    </div>
+                                    <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest underline cursor-pointer hover:text-emerald-600" onClick={() => router.push('/dashboard/ingredients')}>Browse Ingredients</span>
+                                </div>
+                                <div className="space-y-3">
+                                    {loadingFoods ? (
+                                        [1, 2, 3].map(i => <div key={i} className="h-16 w-full animate-pulse bg-slate-100 dark:bg-slate-800 rounded-3xl" />)
+                                    ) : topFoods.length > 0 ? (
+                                        topFoods.map((food: any) => (
+                                            <button
+                                                key={food.id}
+                                                onClick={() => router.push(`/dashboard/ingredients/${food.id}`)}
+                                                className="w-full flex items-center gap-4 p-4 rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/50 hover:shadow-xl transition-all text-left group"
+                                            >
+                                                <div className="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0 border border-slate-100 dark:border-slate-800">
+                                                    {food.image ? (
+                                                        <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                            <Beef size={20} />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex-grow min-w-0">
+                                                    <p className="text-sm font-black uppercase tracking-tight text-slate-900 dark:text-white truncate italic">
+                                                        {food.common_name || food.name}
+                                                    </p>
+                                                    <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">View Profile</p>
+                                                </div>
+                                                <ChevronRight size={18} className="text-slate-200 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
+                                            </button>
+                                        ))
+                                    ) : (
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No whole food sources identified.</p>
+                                    )}
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                    );
+                })()}
             </div>
         </div>
     );
