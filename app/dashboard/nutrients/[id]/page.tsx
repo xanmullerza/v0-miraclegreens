@@ -354,9 +354,33 @@ export default function NutrientDetailsPage() {
     return (
         <div className="max-w-7xl mx-auto space-y-8 pb-32 animate-in fade-in duration-700">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 animate-in slide-in-from-top-4 duration-700 pb-1">
+            <div className="flex flex-col md:flex-row md:items-center gap-8 animate-in slide-in-from-top-4 duration-700 pb-1">
+                {/* Status Readout (Now on the left) */}
+                <div className={cn(
+                    "w-32 h-32 rounded-[2rem] border-2 transition-all duration-700 flex flex-col items-center justify-center shadow-xl flex-shrink-0",
+                    isDeficient ? "bg-amber-50 border-amber-300 text-amber-800 shadow-amber-200/50" :
+                        isToxic ? "bg-rose-50 border-rose-300 text-rose-800 shadow-rose-200/50" :
+                            "bg-emerald-50 border-emerald-300 text-emerald-800 shadow-emerald-500/10"
+                )}>
+                    <p className="text-[8px] font-black uppercase tracking-widest opacity-60">Intake</p>
+                    <div className="flex items-baseline gap-0.5">
+                        <span className="text-3xl font-black italic tracking-tighter">
+                            {simValue >= 100 ? Math.round(simValue) : simValue.toFixed(1)}
+                        </span>
+                        <span className="text-[10px] font-black uppercase">{unit}</span>
+                    </div>
+                    <div className={cn(
+                        "mt-1.5 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest flex items-center gap-1",
+                        isDeficient ? "bg-amber-500 text-white" :
+                            isToxic ? "bg-rose-600 text-white" :
+                                "bg-emerald-600 text-white"
+                    )}>
+                        {isDeficient ? "Deficit" : isToxic ? "Toxicity" : "Optimal"}
+                    </div>
+                </div>
+
                 <div className="flex-1 flex flex-col">
-                    <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2 flex items-center gap-4">
+                    <h1 className="text-4xl lg:text-7xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.8] mb-2 flex items-center gap-4">
                         <span className="text-emerald-500">{nutrientId}</span>
                         <button
                             onClick={toggleFavorite}
@@ -370,33 +394,9 @@ export default function NutrientDetailsPage() {
                             <Heart size={20} fill={isFav ? "currentColor" : "none"} />
                         </button>
                     </h1>
-                    <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] leading-relaxed max-w-2xl italic">
+                    <p className="text-slate-400 font-bold uppercase tracking-widest text-[11px] leading-relaxed max-w-2xl italic">
                         "{info.description}"
                     </p>
-                </div>
-
-                {/* Status Readout */}
-                <div className={cn(
-                    "w-full md:w-48 h-48 rounded-[2.5rem] border-2 transition-all duration-700 flex flex-col items-center justify-center shadow-2xl flex-shrink-0",
-                    isDeficient ? "bg-amber-50 border-amber-300 text-amber-800 shadow-amber-200/50" :
-                        isToxic ? "bg-rose-50 border-rose-300 text-rose-800 shadow-rose-200/50" :
-                            "bg-emerald-50 border-emerald-300 text-emerald-800 shadow-emerald-500/10"
-                )}>
-                    <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Intake</p>
-                    <div className="flex items-baseline gap-1">
-                        <span className="text-5xl font-black italic tracking-tighter">
-                            {simValue >= 100 ? Math.round(simValue) : simValue.toFixed(1)}
-                        </span>
-                        <span className="text-sm font-black uppercase">{unit}</span>
-                    </div>
-                    <div className={cn(
-                        "mt-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5",
-                        isDeficient ? "bg-amber-500 text-white" :
-                            isToxic ? "bg-rose-600 text-white" :
-                                "bg-emerald-600 text-white"
-                    )}>
-                        {isDeficient ? "⚠ Deficit" : isToxic ? "☢ Toxicity" : "✅ Optimal"}
-                    </div>
                 </div>
             </div>
 
@@ -406,16 +406,6 @@ export default function NutrientDetailsPage() {
 
                 {/* Perspective Selection (Triple Dropdown Filter) */}
                 <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
-                    <button
-                        onClick={() => router.replace('/dashboard/library?tab=top10')}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-blue-100 dark:border-blue-900/30 bg-blue-50/50 dark:bg-blue-900/10 text-blue-600 dark:text-blue-400 transition-all group shrink-0"
-                    >
-                        <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Global Library</span>
-                    </button>
-
-                    <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
-
                     {/* Macro Dropdown */}
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
