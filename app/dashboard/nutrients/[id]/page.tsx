@@ -342,37 +342,6 @@ export default function NutrientDetailsPage() {
                         </div>
 
                         <div className="space-y-8">
-                            {/* Daily Medical Target Card */}
-                            <Card className={cn(
-                                "p-8 flex flex-col items-center justify-center text-center space-y-6 border-none transition-all duration-700 relative overflow-hidden",
-                                isOptimal ? "bg-emerald-600 text-white shadow-2xl shadow-emerald-600/40 scale-[1.02] z-10" : "bg-slate-100 dark:bg-slate-900/50 text-slate-400 dark:text-slate-700 grayscale opacity-40"
-                            )}>
-                                {isOptimal && <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />}
-                                <div className={cn(
-                                    "w-16 h-16 rounded-3xl flex items-center justify-center transition-all duration-700",
-                                    isOptimal ? "bg-white/20 animate-pulse" : "bg-slate-200 dark:bg-slate-800"
-                                )}>
-                                    <Activity size={32} />
-                                </div>
-                                <div className="space-y-2">
-                                    <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80 italic">Daily Medical Target</h3>
-                                    <div className="flex flex-col items-center">
-                                        <p className="text-6xl font-black tracking-tighter italic">
-                                            {targetVal >= 100 ? Math.round(targetVal) : targetVal < 10 ? targetVal.toFixed(1) : Math.round(targetVal)}
-                                        </p>
-                                        <p className="text-xl font-black opacity-80 uppercase leading-none">{unit}</p>
-                                    </div>
-                                </div>
-                                <p className="text-[10px] font-bold opacity-70 leading-relaxed max-w-[200px]">
-                                    Recommended minimum intake based on your clinical profile.
-                                </p>
-                                {isOptimal && (
-                                    <div className="absolute top-4 right-4 animate-in fade-in zoom-in duration-500">
-                                        <Badge className="bg-white/20 text-white border-white/30 text-[8px] uppercase tracking-widest font-black">ACTIVE ZONE</Badge>
-                                    </div>
-                                )}
-                            </Card>
-
                             {/* Safety & Toxicity */}
                             <div className={cn(
                                 "p-8 rounded-[2.5rem] border transition-all duration-700 relative overflow-hidden",
