@@ -322,112 +322,105 @@ function LibraryContent() {
 
                     {activeTab === 'nutrients' && (
                         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
-                            {/* Scope/Favorites Dropdown */}
+                            {/* Macro Dropdown */}
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <button className={cn(
-                                        "flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all duration-300 shrink-0 shadow-sm group outline-none",
-                                        showNutrientFavorites
-                                            ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
-                                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-200 hover:text-rose-500"
+                                        "px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
+                                        selectedNutrientCategories.includes("Macros") && selectedNutrientCategories.length === 1
+                                            ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20 px-5"
+                                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
                                     )}>
-                                        <Heart size={14} className={cn("transition-transform group-hover:scale-110", showNutrientFavorites && "fill-current")} />
-                                        <span className="text-[9px] font-black uppercase tracking-widest">
-                                            {showNutrientFavorites ? "Favorites Only" : "All Results"}
-                                        </span>
+                                        <Scale size={14} />
+                                        <span>Macros</span>
                                         <ChevronDown size={12} className="opacity-50" />
                                     </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="start" className="w-48 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
-                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Filter Scope</DropdownMenuLabel>
+                                <DropdownMenuContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
+                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Quick Jump</DropdownMenuLabel>
                                     <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
-                                    <DropdownMenuCheckboxItem
-                                        checked={!showNutrientFavorites}
-                                        onCheckedChange={(checked) => checked && setShowNutrientFavorites(false)}
-                                        className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-slate-50 py-2.5 cursor-pointer"
-                                    >
-                                        Show All Nutrients
-                                    </DropdownMenuCheckboxItem>
-                                    <DropdownMenuCheckboxItem
-                                        checked={showNutrientFavorites}
-                                        onCheckedChange={(checked) => checked && setShowNutrientFavorites(true)}
-                                        className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-rose-50 dark:focus:bg-rose-900/10 focus:text-rose-600 py-2.5 cursor-pointer"
-                                    >
-                                        Favorites Only
-                                    </DropdownMenuCheckboxItem>
+                                    {MACROS.map(id => {
+                                        const nutrient = NUTRIENTS.find(n => n.id === id);
+                                        if (!nutrient) return null;
+                                        return (
+                                            <DropdownMenuCheckboxItem
+                                                key={id}
+                                                checked={false}
+                                                onCheckedChange={() => router.push(`/dashboard/nutrients/${encodeURIComponent(id)}`)}
+                                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
+                                            >
+                                                {nutrient.label}
+                                            </DropdownMenuCheckboxItem>
+                                        )
+                                    })}
                                 </DropdownMenuContent>
                             </DropdownMenu>
 
-                            <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
-
-                            {/* Nutrient Category Dropdown Filter */}
+                            {/* Mineral Dropdown */}
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <button className={cn(
-                                        "px-5 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
-                                        selectedNutrientCategories.length < NUTRIENT_CATEGORIES.length
-                                            ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20"
-                                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-blue-200 hover:text-blue-600"
+                                        "px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
+                                        selectedNutrientCategories.includes("Minerals") && selectedNutrientCategories.length === 1
+                                            ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20 px-5"
+                                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
                                     )}>
-                                        <Filter size={14} />
-                                        <span>
-                                            {selectedNutrientCategories.length === 0 ? "No Groups" :
-                                                selectedNutrientCategories.length === NUTRIENT_CATEGORIES.length ? "Nutrient Groups" :
-                                                    `${selectedNutrientCategories.length} Groups`}
-                                        </span>
-                                        <ChevronDown size={12} className={cn("transition-transform duration-300")} />
+                                        <Gem size={14} />
+                                        <span>Minerals</span>
+                                        <ChevronDown size={12} className="opacity-50" />
                                     </button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="start" className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
-                                    <div className="flex items-center justify-between pr-2">
-                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Groups</DropdownMenuLabel>
-                                        <div className="flex items-center gap-1">
-                                            <button
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    setSelectedNutrientCategories(NUTRIENT_CATEGORIES);
-                                                }}
-                                                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-blue-500 transition-colors"
-                                                title="Select All"
-                                            >
-                                                <CheckSquare size={14} />
-                                            </button>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    setSelectedNutrientCategories([]);
-                                                }}
-                                                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
-                                                title="Select None"
-                                            >
-                                                <Square size={14} />
-                                            </button>
-                                        </div>
-                                    </div>
+                                <DropdownMenuContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 max-h-[400px] overflow-y-auto no-scrollbar">
+                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Quick Jump</DropdownMenuLabel>
                                     <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
-                                    <div className="py-1 max-h-[300px] overflow-y-auto no-scrollbar">
-                                        {NUTRIENT_CATEGORIES.map(category => {
-                                            const isActive = selectedNutrientCategories.includes(category);
-                                            return (
-                                                <DropdownMenuCheckboxItem
-                                                    key={category}
-                                                    checked={isActive}
-                                                    onCheckedChange={(checked) => {
-                                                        if (checked) {
-                                                            setSelectedNutrientCategories(prev => [...prev, category]);
-                                                        } else {
-                                                            setSelectedNutrientCategories(prev => prev.filter(c => c !== category));
-                                                        }
-                                                    }}
-                                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
-                                                >
-                                                    {category}
-                                                </DropdownMenuCheckboxItem>
-                                            );
-                                        })}
-                                    </div>
+                                    {MINERALS.map(id => {
+                                        const nutrient = NUTRIENTS.find(n => n.id === id);
+                                        if (!nutrient) return null;
+                                        return (
+                                            <DropdownMenuCheckboxItem
+                                                key={id}
+                                                checked={false}
+                                                onCheckedChange={() => router.push(`/dashboard/nutrients/${encodeURIComponent(id)}`)}
+                                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
+                                            >
+                                                {nutrient.label}
+                                            </DropdownMenuCheckboxItem>
+                                        )
+                                    })}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+
+                            {/* Vitamin Dropdown */}
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className={cn(
+                                        "px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
+                                        selectedNutrientCategories.includes("Vitamins") && selectedNutrientCategories.length === 1
+                                            ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20 px-5"
+                                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
+                                    )}>
+                                        <Battery size={14} />
+                                        <span>Vitamins</span>
+                                        <ChevronDown size={12} className="opacity-50" />
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 max-h-[400px] overflow-y-auto no-scrollbar">
+                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Quick Jump</DropdownMenuLabel>
+                                    <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
+                                    {VITAMINS.map(id => {
+                                        const nutrient = NUTRIENTS.find(n => n.id === id);
+                                        if (!nutrient) return null;
+                                        return (
+                                            <DropdownMenuCheckboxItem
+                                                key={id}
+                                                checked={false}
+                                                onCheckedChange={() => router.push(`/dashboard/nutrients/${encodeURIComponent(id)}`)}
+                                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
+                                            >
+                                                {nutrient.label}
+                                            </DropdownMenuCheckboxItem>
+                                        )
+                                    })}
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
