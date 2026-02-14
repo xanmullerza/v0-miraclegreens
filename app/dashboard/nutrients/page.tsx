@@ -45,12 +45,6 @@ export default function NutrientsPage() {
         router.push(`/dashboard/nutrients/${encodedId}`);
     };
 
-    // Make 'welcome' the default view by redirecting on initial load if no other nutrient is selected
-    React.useEffect(() => {
-        const encodedId = encodeURIComponent('welcome');
-        router.push(`/dashboard/nutrients/${encodedId}`);
-    }, [router]);
-
     return (
         <div className="space-y-8 p-4 md:p-8 pb-24">
             {/* Header Section */}

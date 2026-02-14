@@ -6,6 +6,15 @@ const nextConfig = {
   images: {
     unoptimized: false,
   },
+  async redirects() {
+    return [
+      {
+        source: '/dashboard/nutrients',
+        destination: '/dashboard/nutrients/welcome',
+        permanent: false,
+      },
+    ]
+  },
 }
 
 export default nextConfig
