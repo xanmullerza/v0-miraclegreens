@@ -541,96 +541,25 @@ export default function NutrientDetailsPage() {
                         </div>
                     </div>
 
-                    {/* Full-width Conditional Diagnostic Box */}
-                    <div className="pt-4">
-                        {isDeficient && (
-                            <div className="p-10 rounded-[3rem] border-2 border-amber-500 bg-white dark:bg-slate-900 shadow-2xl shadow-amber-500/10 text-amber-600 dark:text-amber-400 animate-in fade-in zoom-in-95 duration-500">
-                                <div className="space-y-8">
-                                    <div className="flex items-center justify-between">
-                                        <div className="space-y-1">
-                                            <h4 className="font-black text-xs uppercase tracking-[0.3em] text-amber-500">Diagnostic Category</h4>
-                                            <h3 className="text-4xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white">Deficiency Zone</h3>
-                                        </div>
-                                        <Badge className="bg-amber-500 text-white px-4 py-2 rounded-xl text-[10px] uppercase tracking-widest font-black shrink-0 border-none shadow-lg shadow-amber-500/20">ACTIVE RISK</Badge>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <p className="text-[11px] font-black uppercase tracking-[0.2em] text-amber-600/60">Clinical Red Flags & Symptoms</p>
-                                        <div className="flex flex-wrap gap-3">
-                                            {info.deficiencySigns.map((s, i) => (
-                                                <span key={i} className="text-[11px] font-black uppercase tracking-widest px-6 py-4 rounded-2xl bg-amber-50 dark:bg-amber-400/5 border border-amber-200 dark:border-amber-400/20 text-amber-700 dark:text-amber-400 shadow-sm">
-                                                    {s}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <p className="text-xs font-bold text-slate-500 dark:text-slate-400 italic max-w-2xl leading-relaxed">
-                                        "Prolonged intake below this threshold specifically correlates with the physiological markers listed above. Consult a clinical professional if symptoms persist."
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-
-                        {isOptimal && (
-                            <div className="p-10 rounded-[3rem] border-2 border-emerald-500 bg-white dark:bg-slate-900 shadow-2xl shadow-emerald-500/10 text-emerald-600 dark:text-emerald-400 animate-in fade-in zoom-in-95 duration-500">
-                                <div className="space-y-8">
-                                    <div className="flex items-center justify-between">
-                                        <div className="space-y-1">
-                                            <h4 className="font-black text-xs uppercase tracking-[0.3em] text-emerald-500">Diagnostic Category</h4>
-                                            <h3 className="text-4xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white">Peak Zone (Optimal)</h3>
-                                        </div>
-                                        <Badge className="bg-emerald-500 text-white px-4 py-2 rounded-xl text-[10px] uppercase tracking-widest font-black shrink-0 border-none shadow-lg shadow-emerald-500/20">OPTIMAL RANGE</Badge>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <p className="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-600/60">Core Biological Benefits</p>
-                                        <div className="flex flex-wrap gap-3">
-                                            {info.benefits.map((b, i) => (
-                                                <span key={i} className="text-[11px] font-black uppercase tracking-widest px-6 py-4 rounded-2xl bg-emerald-50 dark:bg-emerald-400/5 border border-emerald-200 dark:border-emerald-400/20 text-emerald-700 dark:text-emerald-400 shadow-sm">
-                                                    {b}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <p className="text-xs font-bold text-slate-500 dark:text-slate-400 italic max-w-2xl leading-relaxed">
-                                        "Intake within this range supports maximum biological efficiency and homeostatic balance for the specified metabolic pathways."
-                                    </p>
-                                </div>
-                            </div>
-                        )}
-
-                        {isToxic && (
-                            <div className="p-10 rounded-[3rem] border-2 border-rose-500 bg-white dark:bg-slate-900 shadow-2xl shadow-rose-500/10 text-rose-600 dark:text-rose-400 animate-in fade-in zoom-in-95 duration-500">
-                                <div className="space-y-8">
-                                    <div className="flex items-center justify-between">
-                                        <div className="space-y-1">
-                                            <h4 className="font-black text-xs uppercase tracking-[0.3em] text-rose-500">Diagnostic Category</h4>
-                                            <h3 className="text-4xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white">
-                                                {isSupplementalUL ? "Toxicity Hazard" : hasNoUL ? "Food Safety Zone" : "Toxic Threshold"}
-                                            </h3>
-                                        </div>
-                                        <Badge className="bg-rose-600 text-white px-4 py-2 rounded-xl text-[10px] uppercase tracking-widest font-black shrink-0 border-none shadow-lg shadow-rose-500/20">CRITICAL LIMIT</Badge>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <p className="text-[11px] font-black uppercase tracking-[0.2em] text-rose-600/60">Excessive Intake Symptoms</p>
-                                        <div className="flex flex-wrap gap-3">
-                                            {(info.toxicitySymptoms || ['No whole-food risks recorded.']).map((s, i) => (
-                                                <span key={i} className="text-[11px] font-black uppercase tracking-widest px-6 py-4 rounded-2xl bg-rose-50 dark:bg-rose-400/5 border border-rose-200 dark:border-rose-400/20 text-rose-700 dark:text-rose-400 shadow-sm">
-                                                    {s}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <p className="text-xs font-bold text-slate-500 dark:text-slate-400 italic max-w-2xl leading-relaxed">
-                                        "Exceeding this threshold is clinically associated with the adverse effects listed above. Focus on whole-food sources to minimize biological stress."
-                                    </p>
-                                </div>
-                            </div>
-                        )}
+                    {/* Simplified Status Tags Section */}
+                    <div className="pt-6 pb-2 min-h-[80px]">
+                        <div className="flex flex-wrap gap-2.5 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            {isDeficient && info.deficiencySigns.map((s, i) => (
+                                <span key={i} className="text-[10px] font-black uppercase tracking-widest px-5 py-3 rounded-2xl bg-amber-50 dark:bg-amber-400/5 border border-amber-200 dark:border-amber-400/20 text-amber-700 dark:text-amber-400 shadow-sm">
+                                    {s}
+                                </span>
+                            ))}
+                            {isOptimal && info.benefits.map((b, i) => (
+                                <span key={i} className="text-[10px] font-black uppercase tracking-widest px-5 py-3 rounded-2xl bg-emerald-50 dark:bg-emerald-400/5 border border-emerald-200 dark:border-emerald-400/20 text-emerald-700 dark:text-emerald-400 shadow-sm">
+                                    {b}
+                                </span>
+                            ))}
+                            {isToxic && (info.toxicitySymptoms || ['No whole-food risks recorded.']).map((s, i) => (
+                                <span key={i} className="text-[10px] font-black uppercase tracking-widest px-5 py-3 rounded-2xl bg-rose-50 dark:bg-rose-400/5 border border-rose-200 dark:border-rose-400/20 text-rose-700 dark:text-rose-400 shadow-sm">
+                                    {s}
+                                </span>
+                            ))}
+                        </div>
                     </div>
 
                     {/* Whole Food Safety Advisory */}
