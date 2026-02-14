@@ -42,7 +42,7 @@ function LibraryContent() {
 
     const [showTop10Favorites, setShowTop10Favorites] = useState(false);
     const [selectedTop10Categories, setSelectedTop10Categories] = useState<string[]>([]);
-    const [selectedNutrientId, setSelectedNutrientId] = useState<string | null>(null);
+    const [selectedNutrientId, setSelectedNutrientId] = useState<string | undefined>(undefined);
 
     // Sync from URL
     useEffect(() => {
