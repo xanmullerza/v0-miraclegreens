@@ -1167,64 +1167,9 @@ export default function RecipeDetailsPage() {
                             </div>
                         </div>
 
-                        {/* Favorite Toggle */}
-                        <button
-                            onClick={toggleFavorite}
-                            className={cn(
-                                "p-3 rounded-2xl border transition-all hover:scale-105 active:scale-95",
-                                recipe.is_favorite
-                                    ? "bg-rose-50 dark:bg-rose-500/10 border-rose-200 dark:border-rose-500/30 text-rose-500"
-                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400 hover:text-rose-500 hover:border-rose-200"
-                            )}
-                        >
-                            <Heart size={18} fill={recipe.is_favorite ? "currentColor" : "none"} />
-                        </button>
 
-                        {/* Admin Buttons */}
-                        {isAdmin && (
-                            <button
-                                onClick={() => router.push(`/dashboard/meals/${id}/edit`)}
-                                className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-400 hover:text-emerald-500 hover:border-emerald-200 transition-all hover:scale-105 active:scale-95"
-                                title="Edit Meal"
-                            >
-                                <Pencil size={18} />
-                            </button>
-                        )}
-                        {isAdmin && (
-                            <button
-                                onClick={() => setShowExportModal(true)}
-                                className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-400 hover:text-emerald-500 hover:border-emerald-200 transition-all hover:scale-105 active:scale-95"
-                                title="Export Nutrients"
-                            >
-                                <Download size={18} />
-                            </button>
-                        )}
 
-                        {/* Compact Diet Badges */}
-                        <div className="flex items-center gap-2 ml-1">
-                            {[
-                                { label: 'Balanced', dbKey: 'Balanced (Omnivore)' },
-                                { label: 'Pescatarian', dbKey: 'Pescetarian' },
-                                { label: 'Vegetarian', dbKey: 'Vegetarian' },
-                                { label: 'Vegan', dbKey: 'Vegan' }
-                            ].map(({ label, dbKey }) => {
-                                let isSuitable = recipe.diet?.includes(dbKey);
-                                if (!isSuitable && recipe.diet) {
-                                    if (label === 'Balanced') isSuitable = recipe.diet.includes('Balanced (Omnivore)') || recipe.diet.includes('Pescetarian') || recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
-                                    else if (label === 'Pescatarian') isSuitable = recipe.diet.includes('Pescetarian') || recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
-                                    else if (label === 'Vegetarian') isSuitable = recipe.diet.includes('Vegetarian') || recipe.diet.includes('Vegan');
-                                }
-                                if (!isSuitable) return null;
-                                return (
-                                    <Badge
-                                        key={label}
-                                        className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/20 text-[8px] font-black uppercase tracking-widest px-2.5 py-1"
-                                    >
-                                        {label}
-                                    </Badge>
-                                );
-                            })}
-                        </div>
+
                     </div>
 
                     {/* Scaling Factor Indicator */}
