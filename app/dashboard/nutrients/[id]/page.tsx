@@ -640,35 +640,34 @@ export default function NutrientDetailsPage() {
                             </button>
                         </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {loadingFoods ? (
-                                [1, 2, 3, 4, 5].map(i => <div key={i} className="aspect-square w-full animate-pulse bg-slate-50 dark:bg-slate-900/50 rounded-[2.5rem]" />)
+                                [1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-32 w-full animate-pulse bg-slate-50 dark:bg-slate-900/50 rounded-[2rem]" />)
                             ) : topFoods.length > 0 ? (
-                                topFoods.slice(0, 5).map((food: any) => (
+                                topFoods.slice(0, 6).map((food: any) => (
                                     <button
                                         key={food.id}
                                         onClick={() => router.push(`/dashboard/ingredients/${food.id}`)}
-                                        className="relative aspect-square rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/50 hover:shadow-2xl transition-all group overflow-hidden flex flex-col items-center justify-center p-5 text-center"
+                                        className="relative flex items-center gap-6 p-5 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/5 transition-all group overflow-hidden text-left"
                                     >
-                                        <div className="w-20 h-20 rounded-[2rem] bg-slate-50 dark:bg-slate-950 overflow-hidden mb-4 border border-slate-100 dark:border-slate-800 flex-shrink-0 shadow-sm group-hover:shadow-md transition-shadow">
+                                        <div className="w-20 h-20 rounded-2xl bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500">
                                             {food.image ? (
-                                                <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                                <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-slate-200 dark:text-slate-800">
-                                                    <Beef size={32} />
+                                                    <Beef size={28} />
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="space-y-1">
-                                            <p className="text-[11px] font-black uppercase tracking-tight text-slate-900 dark:text-white leading-tight italic line-clamp-2 px-1">
+
+                                        <div className="space-y-1 z-10 min-w-0">
+                                            <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none mb-1 opacity-0 group-hover:opacity-100 transition-opacity -translate-y-2 group-hover:translate-y-0 duration-300">
+                                                View Source
+                                            </p>
+                                            <p className="text-sm font-black uppercase tracking-tight text-slate-900 dark:text-white leading-tight italic truncate pr-2">
                                                 {food.common_name || food.name}
                                             </p>
-                                        </div>
-
-                                        {/* Hover Overlay */}
-                                        <div className="absolute inset-0 bg-emerald-600/90 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 backdrop-blur-sm scale-110 group-hover:scale-100">
-                                            <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] mb-1">View Details</p>
-                                            <div className="w-8 h-1 bg-white/30 rounded-full" />
+                                            <div className="h-0.5 w-8 bg-slate-100 dark:bg-slate-800 group-hover:w-full group-hover:bg-emerald-500 transition-all duration-500" />
                                         </div>
                                     </button>
                                 ))
