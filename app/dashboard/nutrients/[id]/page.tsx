@@ -546,21 +546,21 @@ export default function NutrientDetailsPage() {
                         <div className={cn(
                             "p-6 rounded-[2.5rem] border transition-all duration-700 relative overflow-hidden flex flex-col h-full",
                             isDeficient
-                                ? "bg-amber-500 border-amber-400 shadow-2xl shadow-amber-500/40 text-white scale-[1.02] z-10"
-                                : "bg-amber-50 dark:bg-amber-950/10 border-amber-100 dark:border-amber-900/30 opacity-40 grayscale"
+                                ? "bg-white dark:bg-slate-900 border-amber-500 shadow-2xl shadow-amber-500/20 text-amber-600 dark:text-amber-400 scale-[1.02] z-10"
+                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 opacity-40 grayscale"
                         )}>
                             <div className="space-y-4 flex-grow">
                                 <div className="flex items-center justify-between">
-                                    <h4 className={cn("font-black text-[10px] uppercase tracking-[0.2em]", isDeficient ? "text-white" : "text-amber-700 dark:text-amber-400")}>Deficiency</h4>
-                                    {isDeficient && <Badge className="bg-white/20 text-white border-white/30 text-[8px] uppercase tracking-widest font-black">ACTIVE</Badge>}
+                                    <h4 className={cn("font-black text-[10px] uppercase tracking-[0.2em]", isDeficient ? "text-amber-600 dark:text-amber-400" : "text-amber-700 dark:text-amber-400")}>Deficiency</h4>
+                                    {isDeficient && <Badge className="bg-amber-500 text-white border-none text-[8px] uppercase tracking-widest font-black">ACTIVE</Badge>}
                                 </div>
                                 <div className="space-y-3">
-                                    <p className={cn("text-[9px] font-black uppercase tracking-widest leading-none", isDeficient ? "text-amber-100" : "text-amber-600/50")}>Clinical Red Flags</p>
+                                    <p className={cn("text-[9px] font-black uppercase tracking-widest leading-none", isDeficient ? "text-amber-500" : "text-amber-600/50")}>Clinical Red Flags</p>
                                     <div className="flex flex-wrap gap-2">
                                         {info.deficiencySigns.map((s, i) => (
                                             <span key={i} className={cn(
                                                 "text-[8px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border",
-                                                isDeficient ? "bg-amber-400 border-amber-300 text-white" : "bg-white dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-100 dark:border-amber-800"
+                                                isDeficient ? "bg-amber-50 dark:bg-amber-400/10 border-amber-200 dark:border-amber-400/30 text-amber-600 dark:text-amber-400" : "bg-white dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 border-amber-100 dark:border-amber-800"
                                             )}>
                                                 {s}
                                             </span>
@@ -574,21 +574,21 @@ export default function NutrientDetailsPage() {
                         <div className={cn(
                             "p-6 rounded-[2.5rem] border transition-all duration-700 relative overflow-hidden flex flex-col h-full",
                             isOptimal
-                                ? "bg-emerald-600 border-emerald-400 shadow-2xl shadow-emerald-600/40 text-white scale-[1.02] z-10"
-                                : "bg-emerald-50 dark:bg-emerald-950/10 border-emerald-100 dark:border-emerald-900/30 opacity-40 grayscale"
+                                ? "bg-white dark:bg-slate-900 border-emerald-500 shadow-2xl shadow-emerald-500/20 text-emerald-600 dark:text-emerald-400 scale-[1.02] z-10"
+                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 opacity-40 grayscale"
                         )}>
                             <div className="space-y-4 flex-grow">
                                 <div className="flex items-center justify-between">
-                                    <h4 className={cn("font-black text-[10px] uppercase tracking-[0.2em]", isOptimal ? "text-white" : "text-emerald-700 dark:text-emerald-400")}>Optimal Intake</h4>
-                                    {isOptimal && <Badge className="bg-white/20 text-white border-white/30 text-[8px] uppercase tracking-widest font-black">PEAK ZONE</Badge>}
+                                    <h4 className={cn("font-black text-[10px] uppercase tracking-[0.2em]", isOptimal ? "text-emerald-600 dark:text-emerald-400" : "text-emerald-700 dark:text-emerald-400")}>Optimal Intake</h4>
+                                    {isOptimal && <Badge className="bg-emerald-500 text-white border-none text-[8px] uppercase tracking-widest font-black">PEAK ZONE</Badge>}
                                 </div>
                                 <div className="space-y-3">
-                                    <p className={cn("text-[9px] font-black uppercase tracking-widest leading-none", isOptimal ? "text-emerald-100" : "text-emerald-600/50")}>Biological Benefits</p>
+                                    <p className={cn("text-[9px] font-black uppercase tracking-widest leading-none", isOptimal ? "text-emerald-500" : "text-emerald-600/50")}>Biological Benefits</p>
                                     <div className="flex flex-wrap gap-2">
                                         {info.benefits.map((b, i) => (
                                             <span key={i} className={cn(
                                                 "text-[8px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border",
-                                                isOptimal ? "bg-emerald-500 border-emerald-400 text-white" : "bg-white dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-100 dark:border-emerald-800"
+                                                isOptimal ? "bg-emerald-50 dark:bg-emerald-400/10 border-emerald-200 dark:border-emerald-400/30 text-emerald-600 dark:text-emerald-400" : "bg-white dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 border-emerald-100 dark:border-emerald-800"
                                             )}>
                                                 {b}
                                             </span>
@@ -602,23 +602,23 @@ export default function NutrientDetailsPage() {
                         <div className={cn(
                             "p-6 rounded-[2.5rem] border transition-all duration-700 relative overflow-hidden flex flex-col h-full",
                             isToxic
-                                ? "bg-rose-600 border-rose-400 shadow-2xl shadow-rose-600/40 text-white scale-[1.02] z-10"
-                                : "bg-rose-50 dark:bg-rose-950/10 border-rose-100 dark:border-rose-900/30 opacity-40 grayscale"
+                                ? "bg-white dark:bg-slate-900 border-rose-500 shadow-2xl shadow-rose-500/20 text-rose-600 dark:text-rose-400 scale-[1.02] z-10"
+                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 opacity-40 grayscale"
                         )}>
                             <div className="space-y-4 flex-grow">
                                 <div className="flex items-center justify-between">
-                                    <h4 className={cn("font-black text-[10px] uppercase tracking-[0.2em]", isToxic ? "text-white" : "text-rose-700 dark:text-rose-400")}>
+                                    <h4 className={cn("font-black text-[10px] uppercase tracking-[0.2em]", isToxic ? "text-rose-600 dark:text-rose-400" : "text-rose-700 dark:text-rose-400")}>
                                         {isSupplementalUL ? "Suppl. Hazard" : hasNoUL ? "Food Safety" : "Toxicity"}
                                     </h4>
-                                    {isToxic && <Badge className="bg-white/20 text-white border-white/30 text-[8px] uppercase tracking-widest font-black">CRITICAL</Badge>}
+                                    {isToxic && <Badge className="bg-rose-600 text-white border-none text-[8px] uppercase tracking-widest font-black">CRITICAL</Badge>}
                                 </div>
                                 <div className="space-y-3">
-                                    <p className={cn("text-[9px] font-black uppercase tracking-widest leading-none", isToxic ? "text-rose-100" : "text-rose-600/50")}>Toxicity Symptoms</p>
+                                    <p className={cn("text-[9px] font-black uppercase tracking-widest leading-none", isToxic ? "text-rose-500" : "text-rose-600/50")}>Toxicity Symptoms</p>
                                     <div className="flex flex-wrap gap-2">
                                         {(info.toxicitySymptoms || ['No whole-food risks recorded.']).map((s, i) => (
                                             <span key={i} className={cn(
                                                 "text-[8px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border",
-                                                isToxic ? "bg-rose-500 border-rose-400 text-white" : "bg-white dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 border-rose-100 dark:border-rose-800"
+                                                isToxic ? "bg-rose-50 dark:bg-rose-400/10 border-rose-200 dark:border-rose-400/30 text-rose-600 dark:text-rose-400" : "bg-white dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 border-rose-100 dark:border-rose-800"
                                             )}>
                                                 {s}
                                             </span>
