@@ -322,14 +322,14 @@ export default function NutrientDetailsPage() {
                             <h4 className="font-black text-[10px] uppercase tracking-[0.2em] text-emerald-600">Whole Food Safety Advisory</h4>
                             <p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-relaxed">
                                 {(() => {
-                                    if (nutrientId === 'Magnesium') return "Safe from whole foods. The 350mg limit applies exclusively to supplemental pills. Leafy greens and seeds are zero-risk at any intake level.";
-                                    if (nutrientId === 'Sodium') return "Intrinsic vs. Added. Sodium naturally found 'inside' whole foods (like celery or meat) is virtually impossible to over-consume. The 2300mg hazard limit is a warning against added salts and industrial processing, not nature's chemistry.";
-                                    if (nutrientId === 'Vitamin A') return "Source matters. Toxicity (Retinol) is linked to animal liver and supplements. Beta-carotene from plants like carrots is naturally regulated and safe.";
-                                    if (nutrientId === 'Vitamin K') return "Zero known toxicity. This nutrient has no established hazard level from whole-food sources. You cannot consume too much from dietary kale or spinach.";
-                                    if (nutrientId === 'Potassium') return "Naturally balanced. In healthy individuals, dietary potassium is efficiently excreted by the kidneys. Hazard is primarily a concern for clinical kidney conditions.";
-                                    if (nutrientId === 'Vitamin D') return "Sunlight is self-regulating. Diet and sun exposure are almost never toxic; hazard is almost exclusively a result of extremely high-dose synthetic supplements.";
-                                    if (hasNoUL) return "Uncapped potential. This nutrient has no documented toxicity from natural food consumption. Your body safely manages and absorbs what it needs.";
-                                    return `Whole Food Safe. Clinical hazards are typically observed with isolated synthetic doses, not complex whole-food matrixes.`;
+                                    if (nutrientId === 'Magnesium') return "Nature’s Magnesium is 100% safe. You can’t consume too many seeds or greens—your body handles them perfectly. Only concentrated pills carry a risk of over-doing it.";
+                                    if (nutrientId === 'Sodium') return "The salt naturally found inside foods like celery or meat is totally safe. The real danger is almost always from added table salt and factory-made snacks, not the food itself.";
+                                    if (nutrientId === 'Vitamin A') return "Carrots and leafy greens are always safe. Your body only has trouble with 'pre-made' Vitamin A from things like animal liver or high-dose supplements.";
+                                    if (nutrientId === 'Vitamin K') return "Eat as much as you like! There is no known way to eat too much Vitamin K from natural foods like kale or spinach. Your body handles it all beautifully.";
+                                    if (nutrientId === 'Potassium') return "Healthy bodies are experts at balancing potassium. Unless you have specific kidney issues, your body safely flushes out what it doesn't need from your diet.";
+                                    if (nutrientId === 'Vitamin D') return "Sunlight and real food are safe. It’s almost impossible to get too much Vitamin D naturally. Hazards only happen with extremely high doses of synthetic pills.";
+                                    if (hasNoUL) return "This nutrient is naturally safe. When you eat whole foods, your body knows exactly how to absorb what it needs and simply ignores the rest.";
+                                    return `Whole foods are naturally balanced. Your body handles real food much better than it handles concentrated chemical supplements.`;
                                 })()}
                             </p>
                         </div>
