@@ -79,7 +79,13 @@ export default function NutrientDetailsPage() {
 
     const ulMatch = info?.upperLimit?.match(/(\d+)/);
     const hasNoUL = info?.upperLimit?.includes("None") || !info?.upperLimit;
-    const ulVal = ulMatch ? parseInt(ulMatch[0]) : (targetVal > 0 ? targetVal * 4 : 100);
+    const isSupplementalUL = info?.upperLimit?.toLowerCase().includes("supplemental");
+    const parsedUL = ulMatch ? parseInt(ulMatch[0]) : (targetVal > 0 ? targetVal * 4 : 100);
+
+    // For nutrients like Magnesium, the Supplemental UL (350mg) is lower than the RDA (400mg+).
+    // In these cases, we shouldn't show 'Toxicity' for total intake at the Target level.
+    const effectiveUL = (isSupplementalUL && parsedUL <= targetVal) ? targetVal * 1.5 : parsedUL;
+    const ulVal = parsedUL; // Keep raw for the marker label
 
     const [simValue, setSimValue] = useState(targetVal || 0);
 
@@ -88,7 +94,7 @@ export default function NutrientDetailsPage() {
     }, [targetVal]);
 
     const isDeficient = simValue < (targetVal * 0.8) && targetVal > 0;
-    const isToxic = !hasNoUL && simValue >= ulVal;
+    const isToxic = !hasNoUL && simValue >= effectiveUL;
     const isOptimal = !isDeficient && !isToxic;
     // --- End Simulation Logic ---
 
@@ -195,6 +201,8 @@ export default function NutrientDetailsPage() {
         );
     }
 
+    const dynamicMax = Math.max(targetVal, effectiveUL) * 1.5;
+
     return (
         <div className="max-w-4xl mx-auto space-y-12 pb-20 animate-in fade-in duration-700 pt-8 px-4">
             {/* Nav */}
@@ -278,8 +286,8 @@ export default function NutrientDetailsPage() {
                         <input
                             type="range"
                             min="0"
-                            max={ulVal * 1.5}
-                            step={(ulVal * 1.5) / 100}
+                            max={dynamicMax}
+                            step={dynamicMax / 100}
                             value={simValue}
                             onChange={(e) => setSimValue(parseFloat(e.target.value))}
                             className="w-full h-3 bg-slate-200 dark:bg-slate-800 rounded-full appearance-none cursor-pointer accent-emerald-500 hover:accent-emerald-600 transition-all [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-emerald-500 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:appearance-none"
@@ -289,19 +297,40 @@ export default function NutrientDetailsPage() {
                             <span>Zero</span>
                             <div
                                 className="absolute h-4 border-l-2 border-dashed border-emerald-500/50 flex flex-col items-center"
-                                style={{ left: `${(targetVal / (ulVal * 1.5)) * 100}%` }}
+                                style={{ left: `${(targetVal / dynamicMax) * 100}%` }}
                             >
                                 <span className="mt-4 text-emerald-600 font-black">Target</span>
                             </div>
                             {!hasNoUL && (
                                 <div
                                     className="absolute h-4 border-l-2 border-dashed border-rose-500/50 flex flex-col items-center"
-                                    style={{ left: `${(ulVal / (ulVal * 1.5)) * 100}%` }}
+                                    style={{ left: `${(ulVal / dynamicMax) * 100}%` }}
                                 >
                                     <span className="mt-4 text-rose-600 font-black">UL</span>
                                 </div>
                             )}
                             <span>High Hazard</span>
+                        </div>
+                    </div>
+
+                    {/* Whole Food Safety Advisory */}
+                    <div className="p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center gap-6 shadow-sm">
+                        <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 flex-shrink-0">
+                            <Sparkles size={32} />
+                        </div>
+                        <div className="space-y-1 text-center md:text-left">
+                            <h4 className="font-black text-[10px] uppercase tracking-[0.2em] text-emerald-600">Whole Food Safety Advisory</h4>
+                            <p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-relaxed">
+                                {(() => {
+                                    if (nutrientId === 'Magnesium') return "Safe from whole foods. The 350mg limit applies exclusively to supplemental pills. Leafy greens and seeds are zero-risk at any intake level.";
+                                    if (nutrientId === 'Vitamin A') return "Source matters. Toxicity (Retinol) is linked to animal liver and supplements. Beta-carotene from plants like carrots is naturally regulated and safe.";
+                                    if (nutrientId === 'Vitamin K') return "Zero known toxicity. This nutrient has no established hazard level from whole-food sources. You cannot consume too much from dietary kale or spinach.";
+                                    if (nutrientId === 'Potassium') return "Naturally balanced. In healthy individuals, dietary potassium is efficiently excreted by the kidneys. Hazard is primarily a concern for clinical kidney conditions.";
+                                    if (nutrientId === 'Vitamin D') return "Sunlight is self-regulating. Diet and sun exposure are almost never toxic; hazard is almost exclusively a result of extremely high-dose synthetic supplements.";
+                                    if (hasNoUL) return "Uncapped potential. This nutrient has no documented toxicity from natural food consumption. Your body safely manages and absorbs what it needs.";
+                                    return `Whole Food Safe. Clinical hazards are typically observed with isolated synthetic doses, not complex whole-food matrixes.`;
+                                })()}
+                            </p>
                         </div>
                     </div>
 
@@ -351,18 +380,22 @@ export default function NutrientDetailsPage() {
                             )}>
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between">
-                                        <h4 className={cn("font-black text-[11px] uppercase tracking-[0.2em]", isToxic ? "text-white" : "text-rose-700 dark:text-rose-400")}>Safety & Toxicity</h4>
+                                        <h4 className={cn("font-black text-[11px] uppercase tracking-[0.2em]", isToxic ? "text-white" : "text-rose-700 dark:text-rose-400")}>
+                                            {isSupplementalUL ? "Supplemental Hazard" : hasNoUL ? "Whole Food Safety" : "Safety & Toxicity"}
+                                        </h4>
                                         <div className={cn(
                                             "px-3 py-1 rounded-lg border text-[9px] font-black uppercase",
                                             isToxic ? "bg-rose-500 border-rose-400 text-white" : "bg-white/50 dark:bg-rose-950/50 border-rose-200 dark:border-rose-800 text-rose-600"
                                         )}>
-                                            UL: {info.upperLimit || 'N/A'}
+                                            {hasNoUL ? "Dietary: Safe" : `UL: ${info.upperLimit}`}
                                         </div>
                                     </div>
                                     <div className="space-y-3">
-                                        <p className={cn("text-[10px] font-black uppercase tracking-widest leading-none", isToxic ? "text-rose-100" : "text-rose-600/50")}>Known Toxic Symptoms</p>
+                                        <p className={cn("text-[10px] font-black uppercase tracking-widest leading-none", isToxic ? "text-rose-100" : "text-rose-600/50")}>
+                                            {isToxic ? "Symptom Onset" : "Potential Over-Dose Symptoms"}
+                                        </p>
                                         <div className="flex flex-wrap gap-2">
-                                            {(info.toxicitySymptoms || ['No common toxicity signs reported.']).map((s, i) => (
+                                            {(info.toxicitySymptoms || ['No whole-food toxicity recorded.']).map((s, i) => (
                                                 <span key={i} className={cn(
                                                     "text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border",
                                                     isToxic ? "bg-rose-500/50 border-rose-400 text-white" : "bg-white dark:bg-rose-900/20 text-rose-700 dark:text-rose-300 border-rose-100 dark:border-rose-800"
