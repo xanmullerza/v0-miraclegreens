@@ -24,6 +24,7 @@ import {
     ShoppingCart,
     ShoppingBasket,
     LayoutGrid,
+    Trophy,
     X,
     Filter,
     ChevronDown
@@ -155,14 +156,13 @@ export default function NutrientDetailsPage() {
 
     const isFav = favorites.includes(nutrientId);
 
-    const ingredientTabs = [
-        { id: 'allfoods', label: 'All Foods', icon: UtensilsCrossed, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-        { id: 'groceries', label: 'Groceries', icon: ShoppingCart, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-        { id: 'pantry', label: 'Pantry', icon: ShoppingBasket, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-        { id: 'nutrients', label: 'Nutrients', icon: Activity, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+    const libraryTabs = [
+        { id: 'nutrients', label: 'All Nutrients', icon: Activity, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+        { id: 'top10', label: 'Top 10', icon: Trophy, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+        { id: 'compare', label: 'Compare', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
     ];
 
-    const renderTabGroup = (tabsList: typeof ingredientTabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
+    const renderTabGroup = (tabsList: typeof libraryTabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
         <div className="space-y-3 w-full">
             {sectionLabel && <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>}
             <div className={cn(
@@ -186,11 +186,11 @@ export default function NutrientDetailsPage() {
                     <div className="flex items-center gap-4 overflow-hidden py-1">
                         {tabsList.map((tab) => {
                             const Icon = tab.icon;
-                            const isActive = tab.id === 'nutrients';
+                            const isActive = false; // Buttons not selected as you are not in any of the 3 main nutrient pages
                             return (
                                 <button
                                     key={tab.id}
-                                    onClick={() => router.push(`/dashboard/ingredients?tab=${tab.id}`)}
+                                    onClick={() => router.push(`/dashboard/library?tab=${tab.id}`)}
                                     className={cn(
                                         "flex items-center gap-3 py-3.5 rounded-[1.5rem] text-[9px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
                                         isActive
@@ -402,7 +402,7 @@ export default function NutrientDetailsPage() {
 
             {/* Hub Navigation Area */}
             <div className="flex flex-col gap-6 items-start w-full">
-                {renderTabGroup(ingredientTabs, "", "text-slate-500", true)}
+                {renderTabGroup(libraryTabs, "", "text-slate-500", true)}
 
                 {/* Perspective Selection (Triple Dropdown Filter) */}
                 <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
