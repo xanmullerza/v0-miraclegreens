@@ -823,7 +823,7 @@ export function MealPlannerContent({
 
                             <div className="flex items-center justify-between px-2">
                                 <button
-                                    onClick={() => router.push('/dashboard/profile?from=/dashboard/kitchen/mealplanner')}
+                                    onClick={() => router.push('/dashboard/profile?from=/dashboard/kitchen/meal-o-matic')}
                                     className="text-xs font-bold text-slate-500 hover:text-emerald-500 transition-colors flex items-center gap-1"
                                 >
                                     Edit these settings

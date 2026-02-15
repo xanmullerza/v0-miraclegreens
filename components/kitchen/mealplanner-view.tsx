@@ -1,10 +1,10 @@
 'use client';
 
 // This component re-exports the meal planner content for use in the Kitchen tabs.
-// The actual meal planner logic is maintained in app/dashboard/kitchen/mealplanner/page.tsx
+// The actual meal planner logic is maintained in app/dashboard/kitchen/meal-o-matic/page.tsx
 // to avoid code duplication.
 
-import { MealPlannerContent } from '@/app/dashboard/kitchen/mealplanner/page';
+import { MealPlannerContent } from '@/app/dashboard/kitchen/meal-o-matic/page';
 
 interface MealPlannerViewProps {
     showFavoritesOnly?: boolean;

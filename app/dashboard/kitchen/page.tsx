@@ -46,7 +46,7 @@ export default function KitchenPage() {
             id: 'mealomatic',
             title: 'Mealomatic',
             desc: 'Plan your weekly meals',
-            href: '/dashboard/kitchen/mealplanner',
+            href: '/dashboard/kitchen/meal-o-matic',
             icon: Calendar,
             color: 'text-amber-400',
             bg: 'bg-amber-500/10',
