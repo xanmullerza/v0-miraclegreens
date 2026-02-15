@@ -79,7 +79,7 @@ export default function KitchenPage() {
             id: 'groceries',
             title: 'Groceries',
             desc: 'Shopping list & needs',
-            href: '/dashboard/shopping-list',
+            href: '/kitchen/shopping-list',
             icon: ShoppingCart,
             color: 'text-blue-400',
             bg: 'bg-blue-500/10',
