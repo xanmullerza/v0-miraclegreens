@@ -67,7 +67,7 @@ export default function DashboardOverview() {
             id: 'kitchen',
             title: 'Kitchen',
             desc: 'Manage your pantry & meals',
-            href: '/kitchen',
+            href: '/dashboard/kitchen',
             icon: ChefHat,
             color: 'text-emerald-400',
             bg: 'bg-emerald-500/10',
