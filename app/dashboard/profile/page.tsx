@@ -362,7 +362,7 @@ function ProfilePageContent() {
                         </section>
 
                         {/* FAMILY PROTOCOLS */}
-                        <section className="space-y-6">
+                        <section className="space-y-6 hidden">
                             <div className="flex items-center gap-2 text-emerald-500 mb-2">
                                 <Users size={20} />
                                 <h2 className="text-sm font-black uppercase tracking-[0.2em]">Family Protocols</h2>
