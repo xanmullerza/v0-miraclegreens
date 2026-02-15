@@ -10,7 +10,9 @@ import {
     ArrowRight,
     Leaf,
     Activity,
-    Settings
+    Settings,
+    X,
+    Eye
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -22,6 +24,7 @@ export default function DashboardOverview() {
         nutrients: 0
     });
     const [isAdmin, setIsAdmin] = useState(false);
+    const [heroVisible, setHeroVisible] = useState(true);
 
     useEffect(() => {
         const checkUser = async () => {
@@ -49,6 +52,12 @@ export default function DashboardOverview() {
             }
         };
         fetchStats();
+
+        // Load hero visibility state from localStorage
+        const heroVisibilityState = localStorage.getItem('heroVisible');
+        if (heroVisibilityState !== null) {
+            setHeroVisible(heroVisibilityState === 'true');
+        }
     }, []);
 
     const heroCards = [
@@ -98,10 +107,26 @@ export default function DashboardOverview() {
         },
     ];
 
+    const handleCloseHero = () => {
+        setHeroVisible(false);
+        localStorage.setItem('heroVisible', 'false');
+    };
+
+    const handleDoNotShowAgain = () => {
+        setHeroVisible(false);
+        localStorage.setItem('heroVisible', 'false');
+    };
+
+    const handleShowHeroAgain = () => {
+        setHeroVisible(true);
+        localStorage.setItem('heroVisible', 'true');
+    };
+
     return (
         <div className="w-full space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-end min-h-[calc(100vh-100px)] px-4">
 
             {/* ── Hero Section — Split Layout ── */}
+            {heroVisible && (
             <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-8 lg:p-12 xl:p-16 max-w-7xl w-full">
                 {/* Decorative elements */}
                 <div className="absolute top-0 right-0 w-96 h-96 opacity-[0.06] pointer-events-none">
@@ -254,7 +279,38 @@ export default function DashboardOverview() {
                         })}
                     </div>
                 </div>
+
+                {/* Close and Do Not Show Again Buttons — Bottom Right */}
+                <div className="absolute bottom-6 right-6 flex items-center gap-2 z-20">
+                    <button
+                        onClick={handleCloseHero}
+                        className="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors border border-slate-600/50 hover:border-slate-600 inline-flex items-center justify-center"
+                        title="Close hero"
+                    >
+                        <X size={16} />
+                    </button>
+                    <button
+                        onClick={handleDoNotShowAgain}
+                        className="px-3 py-1.5 rounded-lg bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white text-[10px] font-bold uppercase tracking-widest transition-colors border border-slate-600/50 hover:border-slate-600 whitespace-nowrap"
+                    >
+                        Hide Hero
+                    </button>
+                </div>
             </div>
+            )}
+
+            {/* Show Hero Again Button — When Hero is Hidden */}
+            {!heroVisible && (
+                <div className="w-full max-w-7xl flex justify-end px-4">
+                    <button
+                        onClick={handleShowHeroAgain}
+                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 hover:border-slate-700 text-slate-300 hover:text-white text-[11px] font-bold uppercase tracking-widest transition-all duration-300"
+                    >
+                        <Eye size={14} />
+                        Show Hero
+                    </button>
+                </div>
+            )}
 
         </div>
     );
