@@ -473,7 +473,7 @@ export default function RecipeBuilderPage() {
             if (instructionsError) throw instructionsError;
 
             alert('Recipe created successfully!');
-            router.push('/dashboard/meals');
+            router.push('/dashboard/library/recipes');
         } catch (error: any) {
             console.error('Error creating recipe:', error);
             alert(`Failed: ${error.message}`);

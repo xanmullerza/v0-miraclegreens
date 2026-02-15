@@ -146,7 +146,7 @@ export default function EditRecipePage() {
         } catch (error: any) {
             console.error('Error fetching recipe:', error);
             toast.error(`Failed to load recipe: ${error.message}`);
-            router.push('/dashboard/meals');
+            router.push('/dashboard/library/recipes');
         } finally {
             setLoading(false);
         }
@@ -551,7 +551,7 @@ export default function EditRecipePage() {
             if (instructionsError) throw instructionsError;
 
             toast.success('Recipe updated successfully!');
-            router.push(`/dashboard/meals/${recipeId}`);
+            router.push(`/dashboard/library/recipes/${recipeId}`);
         } catch (error: any) {
             console.error('Error updating recipe:', error);
             toast.error(`Failed: ${error.message}`);
@@ -589,34 +589,6 @@ export default function EditRecipePage() {
                     </Button>
                 </div>
             </div>
-
-            {/* Hero Section Hidden as per user request */}
-            {/* <div className="relative h-48 rounded-[2.5rem] bg-violet-600 overflow-hidden flex items-center px-12 group">
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1505935428862-770b6f24f629?ixlib=rb-1.2.1&auto=format&fit=crop&w=1500&q=80')] bg-cover bg-center mix-blend-overlay opacity-30" />
-                <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-purple-600/50 mix-blend-multiply opacity-40" />
-
-                <div className="relative z-10 space-y-2">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20">
-                            <Pencil className="text-white" size={24} />
-                        </div>
-                        <h1 className="text-4xl font-black tracking-tight text-white uppercase italic">Edit Recipe</h1>
-                    </div>
-                    <p className="text-violet-50 font-medium max-w-md text-sm pl-1">
-                        Modify your laboratory recipe and recalibrate its nutrition profile.
-                    </p>
-                </div>
-
-                <div className="absolute right-12 top-1/2 -translate-y-1/2 hidden md:block">
-                    <Button
-                        onClick={() => setShowAutoImport(true)}
-                        className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-6 h-12 rounded-xl font-bold uppercase tracking-widest"
-                    >
-                        <Zap size={16} className="text-yellow-300 fill-current" />
-                        Quick Import
-                    </Button>
-                </div>
-            </div> */}
 
             <div className="space-y-8">
                 {/* Step 1: Core Ingredients */}
