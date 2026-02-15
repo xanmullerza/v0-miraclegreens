@@ -54,10 +54,10 @@ export default function KitchenPage() {
             gradient: 'from-amber-500 to-orange-600',
         },
         {
-            id: 'milab',
-            title: 'Mi Lab',
+            id: 'mixlab',
+            title: 'Mix Lab',
             desc: 'Create custom recipes',
-            href: '/library/recipes',
+            href: '/kitchen/mix-lab',
             icon: FlaskConical,
             color: 'text-violet-400',
             bg: 'bg-violet-500/10',
