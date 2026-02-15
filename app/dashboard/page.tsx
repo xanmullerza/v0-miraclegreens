@@ -101,7 +101,7 @@ export default function DashboardOverview() {
             bg: 'bg-amber-500/10'
         },
         {
-            name: 'Nutrients',
+            name: 'Library',
             desc: 'Compare nutrients, rank foods, and explore facts.',
             href: '/library',
             icon: Library,
