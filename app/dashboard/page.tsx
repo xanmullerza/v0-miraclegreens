@@ -99,7 +99,7 @@ export default function DashboardOverview() {
     ];
 
     return (
-        <div className="max-w-7xl mx-auto space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
+        <div className="max-w-7xl mx-auto space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-end min-h-[calc(100vh-100px)]">
 
             {/* ── Hero Section — Split Layout ── */}
             <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-8 lg:p-12 xl:p-16">
