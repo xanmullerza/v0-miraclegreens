@@ -8,14 +8,9 @@ import {
     ChefHat,
     Scale,
     Trophy,
-    Sparkles,
     ArrowRight,
-    BookOpen,
     Search,
     Zap,
-    Star,
-    Layers,
-    TrendingUp,
     Lightbulb,
     Compass,
 } from 'lucide-react';
@@ -45,56 +40,6 @@ export default function LibraryPage() {
         fetchStats();
     }, []);
 
-    const mainFeatures = [
-        {
-            id: 'nutrients',
-            title: 'Explore Nutrients',
-            description: 'Discover vitamins, minerals, and essential nutrients. Learn what they do, where to find them, and how much you need every day.',
-            href: '/dashboard/nutrients',
-            icon: Activity,
-            gradient: 'from-blue-500 to-indigo-600',
-            shadowColor: 'shadow-blue-500/20',
-            bgAccent: 'bg-blue-500/5',
-            borderAccent: 'border-blue-500/20',
-            hoverBorder: 'hover:border-blue-500/40',
-            iconBg: 'bg-blue-500/10',
-            iconColor: 'text-blue-500',
-            stat: `${stats.nutrients}+ tracked`,
-            statIcon: TrendingUp,
-        },
-        {
-            id: 'foods',
-            title: 'Explore Foods',
-            description: 'Browse our collection of whole foods with full nutrient breakdowns. Find the healthiest ingredients for your meals.',
-            href: '/dashboard/ingredients',
-            icon: Leaf,
-            gradient: 'from-emerald-500 to-teal-600',
-            shadowColor: 'shadow-emerald-500/20',
-            bgAccent: 'bg-emerald-500/5',
-            borderAccent: 'border-emerald-500/20',
-            hoverBorder: 'hover:border-emerald-500/40',
-            iconBg: 'bg-emerald-500/10',
-            iconColor: 'text-emerald-500',
-            stat: `${stats.foods} foods`,
-            statIcon: Layers,
-        },
-        {
-            id: 'recipes',
-            title: 'Explore Recipes',
-            description: 'Discover nutrient-packed recipes for every meal. See complete nutritional profiles and plan your meals with confidence.',
-            href: '/dashboard/recipes',
-            icon: ChefHat,
-            gradient: 'from-amber-500 to-orange-600',
-            shadowColor: 'shadow-amber-500/20',
-            bgAccent: 'bg-amber-500/5',
-            borderAccent: 'border-amber-500/20',
-            hoverBorder: 'hover:border-amber-500/40',
-            iconBg: 'bg-amber-500/10',
-            iconColor: 'text-amber-500',
-            stat: `${stats.recipes} recipes`,
-            statIcon: BookOpen,
-        },
-    ];
 
     const toolFeatures = [
         {
@@ -157,11 +102,58 @@ export default function LibraryPage() {
         return () => clearInterval(timer);
     }, [tips.length]);
 
+    const heroCards = [
+        {
+            id: 'nutrients',
+            title: 'Nutrients',
+            desc: 'Vitamins, minerals & more',
+            href: '/dashboard/nutrients',
+            icon: Activity,
+            color: 'text-blue-400',
+            bg: 'bg-blue-500/10',
+            borderHover: 'hover:border-blue-500/40',
+            gradient: 'from-blue-500 to-indigo-600',
+        },
+        {
+            id: 'foods',
+            title: 'Foods',
+            desc: 'Browse whole food profiles',
+            href: '/dashboard/ingredients',
+            icon: Leaf,
+            color: 'text-emerald-400',
+            bg: 'bg-emerald-500/10',
+            borderHover: 'hover:border-emerald-500/40',
+            gradient: 'from-emerald-500 to-teal-600',
+        },
+        {
+            id: 'recipes',
+            title: 'Recipes',
+            desc: 'Meals with full nutrition',
+            href: '/dashboard/recipes',
+            icon: ChefHat,
+            color: 'text-amber-400',
+            bg: 'bg-amber-500/10',
+            borderHover: 'hover:border-amber-500/40',
+            gradient: 'from-amber-500 to-orange-600',
+        },
+        {
+            id: 'compare',
+            title: 'Compare',
+            desc: 'Side-by-side food analysis',
+            href: '/dashboard/ingredients?tab=compare',
+            icon: Scale,
+            color: 'text-violet-400',
+            bg: 'bg-violet-500/10',
+            borderHover: 'hover:border-violet-500/40',
+            gradient: 'from-violet-500 to-purple-600',
+        },
+    ];
+
     return (
         <div className="max-w-7xl mx-auto space-y-16 animate-in fade-in duration-700 pb-32">
 
-            {/* ── Hero Section ── */}
-            <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-10 lg:p-16 min-h-[340px]">
+            {/* ── Hero Section — Split Layout ── */}
+            <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-8 lg:p-12 xl:p-16">
                 {/* Decorative elements */}
                 <div className="absolute top-0 right-0 w-96 h-96 opacity-[0.06] pointer-events-none">
                     <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-500 rounded-full blur-3xl" />
@@ -170,155 +162,116 @@ export default function LibraryPage() {
                     <div className="absolute inset-0 bg-gradient-to-tr from-amber-400 to-rose-500 rounded-full blur-3xl" />
                 </div>
 
-                {/* Floating icons — decorative */}
-                <div className="absolute top-8 right-12 opacity-10 animate-pulse">
-                    <Sparkles size={60} className="text-emerald-400" />
-                </div>
-                <div className="absolute bottom-12 right-24 opacity-[0.07]">
-                    <BookOpen size={80} className="text-blue-400" />
-                </div>
-
-                <div className="relative z-10 max-w-2xl">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest mb-8">
-                        <Compass size={12} className="fill-current" />
-                        Your Nutrition Library
-                    </div>
-
-                    <h1 className="text-3xl lg:text-5xl font-black text-white tracking-tighter leading-[0.95] mb-6">
-                        Welcome to the{' '}
-                        <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
-                            Library.
-                        </span>
-                    </h1>
-
-                    <p className="text-base lg:text-lg text-slate-400 leading-relaxed max-w-xl">
-                        Your personal guide to nutrition. Explore <span className="text-white font-semibold">nutrients</span>,
-                        browse <span className="text-white font-semibold">foods</span>,
-                        discover <span className="text-white font-semibold">recipes</span>, and
-                        compare ingredients — all in one place.
-                    </p>
-
-                    {/* Quick stats row */}
-                    <div className="flex items-center gap-6 mt-10 flex-wrap">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                                <Leaf size={14} className="text-emerald-400" />
-                            </div>
-                            <div>
-                                <p className="text-lg font-black text-white leading-none">{stats.foods}</p>
-                                <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Foods</p>
-                            </div>
-                        </div>
-                        <div className="w-px h-8 bg-slate-700/60" />
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                                <ChefHat size={14} className="text-amber-400" />
-                            </div>
-                            <div>
-                                <p className="text-lg font-black text-white leading-none">{stats.recipes}</p>
-                                <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Recipes</p>
-                            </div>
-                        </div>
-                        <div className="w-px h-8 bg-slate-700/60" />
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                                <Activity size={14} className="text-blue-400" />
-                            </div>
-                            <div>
-                                <p className="text-lg font-black text-white leading-none">{stats.nutrients}+</p>
-                                <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Nutrients</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* ── Main Features ── */}
-            <div>
-                <div className="flex items-center gap-3 mb-8">
-                    <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
-                        <Compass size={18} className="text-emerald-500" />
-                    </div>
+                <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+                    {/* Left — Welcome Text */}
                     <div>
-                        <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
-                            Start Exploring
-                        </h2>
-                        <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">
-                            Dive into nutrients, foods, and recipes
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest mb-8">
+                            <Compass size={12} className="fill-current" />
+                            Your Nutrition Library
+                        </div>
+
+                        <h1 className="text-3xl lg:text-5xl font-black text-white tracking-tighter leading-[0.95] mb-6">
+                            Welcome to the{' '}
+                            <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
+                                Library.
+                            </span>
+                        </h1>
+
+                        <p className="text-base lg:text-lg text-slate-400 leading-relaxed max-w-md">
+                            Your personal guide to nutrition. Explore <span className="text-white font-semibold">nutrients</span>,
+                            browse <span className="text-white font-semibold">foods</span>,
+                            discover <span className="text-white font-semibold">recipes</span>, and
+                            compare ingredients — all in one place.
                         </p>
+
+                        {/* Quick stats row */}
+                        <div className="flex items-center gap-5 mt-10 flex-wrap">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                                    <Leaf size={14} className="text-emerald-400" />
+                                </div>
+                                <div>
+                                    <p className="text-lg font-black text-white leading-none">{stats.foods}</p>
+                                    <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Foods</p>
+                                </div>
+                            </div>
+                            <div className="w-px h-8 bg-slate-700/60" />
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                                    <ChefHat size={14} className="text-amber-400" />
+                                </div>
+                                <div>
+                                    <p className="text-lg font-black text-white leading-none">{stats.recipes}</p>
+                                    <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Recipes</p>
+                                </div>
+                            </div>
+                            <div className="w-px h-8 bg-slate-700/60" />
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                                    <Activity size={14} className="text-blue-400" />
+                                </div>
+                                <div>
+                                    <p className="text-lg font-black text-white leading-none">{stats.nutrients}+</p>
+                                    <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Nutrients</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {mainFeatures.map((feature) => {
-                        const Icon = feature.icon;
-                        const StatIcon = feature.statIcon;
-                        const isHovered = hoveredCard === feature.id;
-                        return (
-                            <Link
-                                key={feature.id}
-                                href={feature.href}
-                                onMouseEnter={() => setHoveredCard(feature.id)}
-                                onMouseLeave={() => setHoveredCard(null)}
-                                className={cn(
-                                    "group relative overflow-hidden rounded-[2rem] border p-8 transition-all duration-500",
-                                    "bg-white dark:bg-slate-900",
-                                    feature.borderAccent,
-                                    feature.hoverBorder,
-                                    "hover:shadow-2xl hover:-translate-y-1",
-                                    feature.shadowColor,
-                                )}
-                            >
-                                {/* Gradient accent at top */}
-                                <div className={cn(
-                                    "absolute top-0 left-0 right-0 h-1 bg-gradient-to-r transition-all duration-500",
-                                    feature.gradient,
-                                    isHovered ? "opacity-100" : "opacity-0",
-                                )} />
-
-                                {/* Background glow */}
-                                <div className={cn(
-                                    "absolute -top-20 -right-20 w-40 h-40 rounded-full transition-all duration-700 blur-3xl",
-                                    feature.bgAccent,
-                                    isHovered ? "opacity-100 scale-150" : "opacity-0 scale-100",
-                                )} />
-
-                                <div className="relative z-10">
+                    {/* Right — 2×2 Action Grid */}
+                    <div className="grid grid-cols-2 gap-3 lg:gap-4">
+                        {heroCards.map((card) => {
+                            const Icon = card.icon;
+                            return (
+                                <Link
+                                    key={card.id}
+                                    href={card.href}
+                                    className={cn(
+                                        "group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 lg:p-6 transition-all duration-500",
+                                        card.borderHover,
+                                        "hover:bg-slate-800/70 hover:shadow-2xl hover:-translate-y-0.5",
+                                    )}
+                                >
+                                    {/* Gradient accent at top */}
                                     <div className={cn(
-                                        "w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3",
-                                        feature.iconBg,
-                                    )}>
-                                        <Icon size={24} className={feature.iconColor} />
-                                    </div>
+                                        "absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-all duration-500",
+                                        card.gradient,
+                                    )} />
 
-                                    <h3 className="text-lg font-black tracking-tight text-slate-900 dark:text-white mb-2 group-hover:text-slate-800 dark:group-hover:text-white transition-colors">
-                                        {feature.title}
-                                    </h3>
+                                    {/* Glow */}
+                                    <div className={cn(
+                                        "absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl transition-all duration-700 opacity-0 group-hover:opacity-100",
+                                        card.bg,
+                                    )} />
 
-                                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6">
-                                        {feature.description}
-                                    </p>
-
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-1.5">
-                                            <StatIcon size={12} className={feature.iconColor} />
-                                            <span className={cn("text-[10px] font-black uppercase tracking-widest", feature.iconColor)}>
-                                                {feature.stat}
-                                            </span>
-                                        </div>
+                                    <div className="relative z-10">
                                         <div className={cn(
-                                            "flex items-center gap-1 text-[10px] font-black uppercase tracking-widest transition-all duration-300",
-                                            feature.iconColor,
-                                            "opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0",
+                                            "w-10 h-10 lg:w-11 lg:h-11 rounded-xl flex items-center justify-center mb-4 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3",
+                                            card.bg,
+                                        )}>
+                                            <Icon size={18} className={card.color} />
+                                        </div>
+
+                                        <h3 className="text-sm font-black text-white mb-1 tracking-tight group-hover:text-white transition-colors">
+                                            {card.title}
+                                        </h3>
+                                        <p className="text-[11px] text-slate-500 leading-snug mb-4">
+                                            {card.desc}
+                                        </p>
+
+                                        <div className={cn(
+                                            "flex items-center gap-1 text-[9px] font-black uppercase tracking-widest transition-all duration-300",
+                                            card.color,
+                                            "opacity-60 group-hover:opacity-100",
                                         )}>
                                             Explore
-                                            <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                                            <ArrowRight size={10} className="group-hover:translate-x-1 transition-transform" />
                                         </div>
                                     </div>
-                                </div>
-                            </Link>
-                        );
-                    })}
+                                </Link>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
 
