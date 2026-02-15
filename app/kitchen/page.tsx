@@ -3,19 +3,19 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
-    Zap,
     ChefHat,
-    Library,
-    User,
     ArrowRight,
     Leaf,
     Activity,
-    Settings
+    Calendar,
+    FlaskConical,
+    Package,
+    ShoppingCart,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 
-export default function DashboardOverview() {
+export default function KitchenPage() {
     const [stats, setStats] = useState({
         foods: 0,
         recipes: 0,
@@ -35,7 +35,7 @@ export default function DashboardOverview() {
                     nutrients: 30, // Static count matching library for consistency
                 });
             } catch (e) {
-                console.error('Error fetching dashboard stats:', e);
+                console.error('Error fetching kitchen stats:', e);
             }
         };
         fetchStats();
@@ -43,48 +43,48 @@ export default function DashboardOverview() {
 
     const heroCards = [
         {
-            id: 'library',
-            title: 'Library',
-            desc: 'Nutrient database & tools',
-            href: '/library',
-            icon: Library,
-            color: 'text-blue-400',
-            bg: 'bg-blue-500/10',
-            borderHover: 'hover:border-blue-500/40',
-            gradient: 'from-blue-500 to-indigo-600',
+            id: 'mealomatic',
+            title: 'Mealomatic',
+            desc: 'Plan your weekly meals',
+            href: '/dashboard/mealplanner',
+            icon: Calendar,
+            color: 'text-amber-400',
+            bg: 'bg-amber-500/10',
+            borderHover: 'hover:border-amber-500/40',
+            gradient: 'from-amber-500 to-orange-600',
         },
         {
-            id: 'kitchen',
-            title: 'Kitchen',
-            desc: 'Manage your pantry & meals',
-            href: '/kitchen',
-            icon: ChefHat,
-            color: 'text-emerald-400',
-            bg: 'bg-emerald-500/10',
-            borderHover: 'hover:border-emerald-500/40',
-            gradient: 'from-emerald-500 to-teal-600',
-        },
-        {
-            id: 'profile',
-            title: 'Profile',
-            desc: 'Account & preferences',
-            href: '/dashboard/profile',
-            icon: User,
+            id: 'milab',
+            title: 'Mi Lab',
+            desc: 'Create custom recipes',
+            href: '/library/recipes',
+            icon: FlaskConical,
             color: 'text-violet-400',
             bg: 'bg-violet-500/10',
             borderHover: 'hover:border-violet-500/40',
             gradient: 'from-violet-500 to-purple-600',
         },
         {
-            id: 'settings',
-            title: 'Settings',
-            desc: 'App preferences & config',
-            href: '/dashboard/settings',
-            icon: Settings,
-            color: 'text-amber-400',
-            bg: 'bg-amber-500/10',
-            borderHover: 'hover:border-amber-500/40',
-            gradient: 'from-amber-500 to-orange-600',
+            id: 'pantry',
+            title: 'Pantry',
+            desc: 'Manage what you have',
+            href: '/dashboard/pantry',
+            icon: Package,
+            color: 'text-emerald-400',
+            bg: 'bg-emerald-500/10',
+            borderHover: 'hover:border-emerald-500/40',
+            gradient: 'from-emerald-500 to-teal-600',
+        },
+        {
+            id: 'groceries',
+            title: 'Groceries',
+            desc: 'Shopping list & needs',
+            href: '/dashboard/shopping-list',
+            icon: ShoppingCart,
+            color: 'text-blue-400',
+            bg: 'bg-blue-500/10',
+            borderHover: 'hover:border-blue-500/40',
+            gradient: 'from-blue-500 to-indigo-600',
         },
     ];
 
@@ -95,29 +95,29 @@ export default function DashboardOverview() {
             <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-8 lg:p-12 xl:p-16">
                 {/* Decorative elements */}
                 <div className="absolute top-0 right-0 w-96 h-96 opacity-[0.06] pointer-events-none">
-                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-500 rounded-full blur-3xl" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-400 via-rose-500 to-purple-500 rounded-full blur-3xl" />
                 </div>
                 <div className="absolute bottom-0 left-0 w-64 h-64 opacity-[0.04] pointer-events-none">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-amber-400 to-rose-500 rounded-full blur-3xl" />
+                    <div className="absolute inset-0 bg-gradient-to-tr from-emerald-400 to-blue-500 rounded-full blur-3xl" />
                 </div>
 
                 <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
                     {/* Left — Welcome Text */}
                     <div>
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest mb-8">
-                            <Zap size={12} className="fill-current" />
-                            Your Health Companion
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-black uppercase tracking-widest mb-8">
+                            <ChefHat size={12} className="fill-current" />
+                            Your Culinary Workspace
                         </div>
 
                         <h1 className="text-3xl lg:text-5xl font-black text-white tracking-tighter leading-[0.95] mb-6">
-                            Welcome to{' '}
-                            <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
-                                Vitala.
+                            Welcome to the{' '}
+                            <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 bg-clip-text text-transparent">
+                                Kitchen.
                             </span>
                         </h1>
 
                         <p className="text-base lg:text-lg text-slate-400 leading-relaxed max-w-md">
-                            Everything you need to find healthy food, great recipes, and plan your week. Discover how to eat well and feel your best.
+                            Your central hub for meal planning, recipe creation, pantry management, and shopping lists.
                         </p>
 
                         {/* Quick stats row */}
@@ -200,7 +200,7 @@ export default function DashboardOverview() {
                                             card.color,
                                             "opacity-60 group-hover:opacity-100",
                                         )}>
-                                            Explore
+                                            Open
                                             <ArrowRight size={10} className="group-hover:translate-x-1 transition-transform" />
                                         </div>
                                     </div>
