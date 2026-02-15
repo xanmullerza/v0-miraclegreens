@@ -281,17 +281,17 @@ export default function DashboardOverview() {
                 </div>
 
                 {/* Close and Do Not Show Again Buttons — Bottom Right */}
-                <div className="absolute bottom-6 right-6 flex items-center gap-2 z-20">
+                <div className="absolute bottom-8 right-8 flex items-center gap-3 z-50">
                     <button
                         onClick={handleCloseHero}
-                        className="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition-colors border border-slate-600/50 hover:border-slate-600 inline-flex items-center justify-center"
+                        className="p-2.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white transition-all duration-200 border border-slate-600 hover:border-slate-500 inline-flex items-center justify-center shadow-lg hover:shadow-xl"
                         title="Close hero"
                     >
-                        <X size={16} />
+                        <X size={18} />
                     </button>
                     <button
                         onClick={handleDoNotShowAgain}
-                        className="px-3 py-1.5 rounded-lg bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white text-[10px] font-bold uppercase tracking-widest transition-colors border border-slate-600/50 hover:border-slate-600 whitespace-nowrap"
+                        className="px-4 py-2.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-100 hover:text-white text-[10px] font-bold uppercase tracking-widest transition-all duration-200 border border-slate-600 hover:border-slate-500 whitespace-nowrap shadow-lg hover:shadow-xl"
                     >
                         Hide Hero
                     </button>
