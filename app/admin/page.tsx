@@ -29,7 +29,7 @@ export default function AdminOverview() {
         {
             name: 'Bulk Manager',
             desc: 'Category and tag management.',
-            href: '/dashboard/admin/manage-foods',
+            href: '/admin/manage-foods',
             icon: Table,
             color: 'text-emerald-500',
             bg: 'bg-emerald-500/10'
@@ -37,7 +37,7 @@ export default function AdminOverview() {
         {
             name: 'Add New Food',
             desc: 'Manually enter clinical data.',
-            href: '/dashboard/admin/add-food',
+            href: '/admin/add-food',
             icon: Plus,
             color: 'text-sky-500',
             bg: 'bg-sky-500/10'
@@ -45,7 +45,7 @@ export default function AdminOverview() {
         {
             name: 'Edit Food Item',
             desc: 'Refine individual food details.',
-            href: '/dashboard/admin/manage-foods',
+            href: '/admin/manage-foods',
             icon: Edit3,
             color: 'text-orange-500',
             bg: 'bg-orange-500/10'
@@ -53,7 +53,7 @@ export default function AdminOverview() {
         {
             name: 'Recipe Architect',
             desc: 'Build smart meal data.',
-            href: '/dashboard/admin/recipebuilder',
+            href: '/admin/recipebuilder',
             icon: ChefHat,
             color: 'text-violet-500',
             bg: 'bg-violet-500/10'
@@ -61,7 +61,7 @@ export default function AdminOverview() {
         {
             name: 'Edit Recipe',
             desc: 'Protocol and step refinement.',
-            href: '/dashboard/admin/manage-recipes',
+            href: '/admin/manage-recipes',
             icon: FileText,
             color: 'text-rose-500',
             bg: 'bg-rose-500/10'

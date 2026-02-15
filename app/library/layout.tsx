@@ -223,7 +223,7 @@ function LibraryLayoutContent({
                                 </Link>
                                 {(user?.email || user?.user_metadata?.email || '').toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase() && (
                                     <Link
-                                        href="/dashboard/admin"
+                                        href="/admin"
                                         className="p-2 text-slate-400 hover:text-emerald-500 transition-colors ml-1 outline-none"
                                         title="Admin Dashboard"
                                     >

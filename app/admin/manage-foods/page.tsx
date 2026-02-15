@@ -309,7 +309,7 @@ export default function ManageFoodsPage() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <button
-                        onClick={() => router.push('/dashboard/admin')}
+                        onClick={() => router.push('/admin')}
                         className="flex items-center gap-2 text-emerald-500 font-bold text-xs uppercase tracking-widest mb-2 hover:translate-x-[-4px] transition-transform"
                     >
                         <ArrowLeft size={14} /> Back to Admin

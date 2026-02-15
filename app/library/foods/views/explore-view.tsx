@@ -421,7 +421,7 @@ export function ExploreView({
                                                         size="icon"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            router.push(`/dashboard/admin/foods/${food.id}`);
+                                                            router.push(`/admin/foods/${food.id}`);
                                                         }}
                                                         className="h-9 w-9 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                                         title="Admin Edit"

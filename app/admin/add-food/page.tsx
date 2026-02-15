@@ -294,7 +294,7 @@ Fat: ${item.fat_g || 0}g
         <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
             {/* Back Button */}
             <button
-                onClick={() => router.push('/dashboard/admin')}
+                onClick={() => router.push('/admin')}
                 className="flex items-center gap-2 text-sky-500 font-bold text-xs uppercase tracking-widest mb-2 hover:translate-x-[-4px] transition-transform"
             >
                 <ArrowLeft size={14} /> Back to Admin

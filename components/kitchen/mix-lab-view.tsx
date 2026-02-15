@@ -111,7 +111,7 @@ export function MixLabView() {
                     </span>
                 </div>
                 <Button
-                    onClick={() => router.push('/dashboard/admin/recipebuilder?type=mix')}
+                    onClick={() => router.push('/admin/recipebuilder?type=mix')}
                     className="bg-purple-500 hover:bg-purple-600 text-white rounded-full px-6"
                 >
                     <Plus size={16} className="mr-2" />
@@ -185,7 +185,7 @@ export function MixLabView() {
                     <h3 className="text-lg font-bold text-slate-600 dark:text-slate-300 mb-2">No mixes yet</h3>
                     <p className="text-sm text-slate-400 mb-6">Start creating your homemade concoctions!</p>
                     <Button
-                        onClick={() => router.push('/dashboard/admin/recipebuilder?type=mix')}
+                        onClick={() => router.push('/admin/recipebuilder?type=mix')}
                         className="bg-purple-500 hover:bg-purple-600 text-white rounded-full px-8"
                     >
                         <Sparkles size={16} className="mr-2" />

@@ -823,7 +823,7 @@ export function MealPlannerContent({
 
                             <div className="flex items-center justify-between px-2">
                                 <button
-                                    onClick={() => router.push('/dashboard/profile?from=/dashboard/mealplanner')}
+                                    onClick={() => router.push('/dashboard/profile?from=/kitchen/mealplanner')}
                                     className="text-xs font-bold text-slate-500 hover:text-emerald-500 transition-colors flex items-center gap-1"
                                 >
                                     Edit these settings
@@ -871,7 +871,7 @@ export function MealPlannerContent({
                             </Button>
                             <Button
                                 size="lg"
-                                onClick={() => router.push('/dashboard/profile?from=/dashboard/mealplanner')}
+                                onClick={() => router.push('/dashboard/profile?from=/kitchen/mealplanner')}
                                 className="h-16 text-lg font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-500/20 group"
                             >
                                 Complete Profile <ChevronRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />

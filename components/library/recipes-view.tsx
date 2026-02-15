@@ -290,7 +290,7 @@ export function RecipesView({
                     </div>
 
                     <Button
-                        onClick={() => router.push('/dashboard/admin/recipebuilder')}
+                        onClick={() => router.push('/admin/recipebuilder')}
                         className="h-14 px-8 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest gap-2 shadow-xl shadow-blue-500/10"
                     >
                         <Plus size={18} />

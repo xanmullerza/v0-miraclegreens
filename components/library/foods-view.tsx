@@ -315,7 +315,7 @@ export function FoodsView({
                     </div>
 
                     <Button
-                        onClick={() => router.push('/dashboard/admin/add-food')}
+                        onClick={() => router.push('/admin/add-food')}
                         className="h-14 px-8 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest gap-2 shadow-xl shadow-emerald-500/10"
                     >
                         <Plus size={18} />
