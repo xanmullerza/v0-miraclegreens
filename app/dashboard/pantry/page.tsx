@@ -8,7 +8,7 @@ export default function PantryRedirect() {
     const router = useRouter();
 
     useEffect(() => {
-        router.replace('/dashboard/ingredients?tab=staples');
+        router.replace('/dashboard/library/ingredients?tab=staples');
     }, [router]);
 
     return (

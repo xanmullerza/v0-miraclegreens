@@ -42,7 +42,7 @@ export default function NutrientsPage() {
     const handleNutrientSelect = (id: string) => {
         setSelectedNutrientId(id);
         const encodedId = encodeURIComponent(id);
-        router.push(`/dashboard/nutrients/${encodedId}`);
+        router.push(`/dashboard/library/nutrients/${encodedId}`);
     };
 
     return (

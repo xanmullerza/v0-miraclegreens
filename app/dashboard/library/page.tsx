@@ -46,7 +46,7 @@ export default function LibraryPage() {
             id: 'compare',
             title: 'Compare Foods',
             description: 'Put foods side by side and compare their nutrient content. Find out which option gives you more of what you need.',
-            href: '/dashboard/ingredients?tab=compare',
+            href: '/dashboard/library/ingredients?tab=compare',
             icon: Scale,
             gradient: 'from-violet-500 to-purple-600',
             shadowColor: 'shadow-violet-500/20',
@@ -107,7 +107,7 @@ export default function LibraryPage() {
             id: 'nutrients',
             title: 'Nutrients',
             desc: 'Vitamins, minerals & more',
-            href: '/dashboard/nutrients',
+            href: '/dashboard/library/nutrients',
             icon: Activity,
             color: 'text-blue-400',
             bg: 'bg-blue-500/10',
@@ -118,7 +118,7 @@ export default function LibraryPage() {
             id: 'foods',
             title: 'Foods',
             desc: 'Browse whole food profiles',
-            href: '/dashboard/ingredients',
+            href: '/dashboard/library/ingredients',
             icon: Leaf,
             color: 'text-emerald-400',
             bg: 'bg-emerald-500/10',
@@ -129,7 +129,7 @@ export default function LibraryPage() {
             id: 'recipes',
             title: 'Recipes',
             desc: 'Meals with full nutrition',
-            href: '/dashboard/recipes',
+            href: '/dashboard/library/recipes',
             icon: ChefHat,
             color: 'text-amber-400',
             bg: 'bg-amber-500/10',
@@ -140,7 +140,7 @@ export default function LibraryPage() {
             id: 'compare',
             title: 'Compare',
             desc: 'Side-by-side food analysis',
-            href: '/dashboard/ingredients?tab=compare',
+            href: '/dashboard/library/ingredients?tab=compare',
             icon: Scale,
             color: 'text-violet-400',
             bg: 'bg-violet-500/10',
@@ -402,11 +402,11 @@ export default function LibraryPage() {
                 </p>
                 <div className="flex items-center justify-center gap-4 flex-wrap">
                     {[
-                        { label: 'Ingredients', href: '/dashboard/ingredients', icon: Leaf },
-                        { label: 'Recipes', href: '/dashboard/recipes', icon: ChefHat },
-                        { label: 'Compare', href: '/dashboard/ingredients?tab=compare', icon: Scale },
+                        { label: 'Ingredients', href: '/dashboard/library/ingredients', icon: Leaf },
+                        { label: 'Recipes', href: '/dashboard/library/recipes', icon: ChefHat },
+                        { label: 'Compare', href: '/dashboard/library/ingredients?tab=compare', icon: Scale },
                         { label: 'Top 10', href: '/dashboard/library?tab=top10', icon: Trophy },
-                        { label: 'Nutrients', href: '/dashboard/nutrients', icon: Activity },
+                        { label: 'Nutrients', href: '/dashboard/library/nutrients', icon: Activity },
                     ].map((link) => (
                         <Link
                             key={link.label}

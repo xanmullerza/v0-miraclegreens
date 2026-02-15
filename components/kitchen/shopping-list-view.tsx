@@ -720,7 +720,7 @@ export function ShoppingListView() {
                         Add items manually above, or generate a meal plan to automatically create a shopping list.
                     </p>
                     <Button
-                        onClick={() => router.push('/dashboard/recipes?tab=mealplanner')}
+                        onClick={() => router.push('/dashboard/library/recipes?tab=mealplanner')}
                         className="rounded-xl px-10 h-14 font-black uppercase tracking-widest text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20"
                     >
                         <ChefHat size={18} className="mr-2" />

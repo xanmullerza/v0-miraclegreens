@@ -7,7 +7,7 @@ export default function MealsRedirectPage() {
     const router = useRouter();
 
     useEffect(() => {
-        router.replace('/dashboard/recipes?tab=browse');
+        router.replace('/dashboard/library/recipes?tab=browse');
     }, [router]);
 
     return (
