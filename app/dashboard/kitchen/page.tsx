@@ -90,9 +90,9 @@ export default function KitchenPage() {
     ];
 
     return (
-        <div className="max-w-7xl mx-auto space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-end min-h-[calc(100vh-100px)]">
+        <div className="w-full space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-end min-h-[calc(100vh-100px)] px-4">
             {/* ── Hero Section — Split Layout ── */}
-            <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-8 lg:p-12 xl:p-16 w-full">
+            <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-8 lg:p-12 xl:p-16 max-w-7xl w-full">
                 {/* Decorative elements */}
                 <div className="absolute top-0 right-0 w-96 h-96 opacity-[0.06] pointer-events-none">
                     <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-500 rounded-full blur-3xl" />
