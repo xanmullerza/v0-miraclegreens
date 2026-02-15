@@ -123,7 +123,7 @@ export default function DashboardOverview() {
     };
 
     return (
-        <div className="w-full space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-end min-h-[calc(100vh-100px)] px-4">
+        <div className="w-full space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)] px-4">
 
             {/* ── Hero Section — Split Layout ── */}
             {heroVisible && (
@@ -303,7 +303,7 @@ export default function DashboardOverview() {
 
             {/* Show Hero Again Button — When Hero is Hidden */}
             {!heroVisible && (
-                <div className="w-full max-w-7xl flex justify-end px-4">
+                <div className="w-full max-w-7xl space-y-4">
                     <button
                         onClick={handleShowHeroAgain}
                         className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 hover:border-slate-700 text-slate-300 hover:text-white text-[11px] font-bold uppercase tracking-widest transition-all duration-300"
@@ -311,6 +311,96 @@ export default function DashboardOverview() {
                         <Eye size={14} />
                         Show Hero
                     </button>
+
+                    {/* Grid Display When Hero is Hidden */}
+                    <div className="grid grid-cols-2 gap-3 lg:gap-4">
+                        {heroCards.map((card) => {
+                            const Icon = card.icon;
+                            const isKitchen = card.id === 'kitchen';
+                            const isDisabled = isKitchen && !isAdmin;
+
+                            if (isDisabled) {
+                                return (
+                                    <div
+                                        key={card.id}
+                                        className="relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/30 bg-slate-800/20 p-5 lg:p-6 opacity-60 cursor-not-allowed select-none group"
+                                    >
+                                        <div className="absolute top-3 right-3 z-20">
+                                            <span className="px-1.5 py-0.5 rounded-md bg-slate-800/80 border border-slate-700 text-[8px] font-black uppercase tracking-widest text-slate-500">
+                                                Locked
+                                            </span>
+                                        </div>
+
+                                        <div className="relative z-10 grayscale opacity-50 transition-all duration-300 group-hover:opacity-70 group-hover:grayscale-0">
+                                            <div className="w-10 h-10 lg:w-11 lg:h-11 rounded-xl flex items-center justify-center mb-4 bg-slate-800/50">
+                                                <Icon size={18} className="text-slate-500" />
+                                            </div>
+
+                                            <h3 className="text-sm font-black text-slate-400 mb-1 tracking-tight">
+                                                {card.title}
+                                            </h3>
+                                            <p className="text-[11px] text-slate-600 leading-snug mb-4">
+                                                {card.desc}
+                                            </p>
+
+                                            <div className="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-slate-700">
+                                                Coming Soon
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            }
+
+                            return (
+                                <Link
+                                    key={card.id}
+                                    href={card.href}
+                                    className={cn(
+                                        "group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 lg:p-6 transition-all duration-500",
+                                        card.borderHover,
+                                        "hover:bg-slate-800/70 hover:shadow-2xl",
+                                    )}
+                                >
+                                    {/* Gradient accent at top */}
+                                    <div className={cn(
+                                        "absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-all duration-500",
+                                        card.gradient,
+                                    )} />
+
+                                    {/* Glow */}
+                                    <div className={cn(
+                                        "absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl transition-all duration-700 opacity-0 group-hover:opacity-100",
+                                        card.bg,
+                                    )} />
+
+                                    <div className="relative z-10">
+                                        <div className={cn(
+                                            "w-10 h-10 lg:w-11 lg:h-11 rounded-xl flex items-center justify-center mb-4 transition-all duration-500",
+                                            card.bg,
+                                        )}>
+                                            <Icon size={18} className={card.color} />
+                                        </div>
+
+                                        <h3 className="text-sm font-black text-white mb-1 tracking-tight group-hover:text-white transition-colors">
+                                            {card.title}
+                                        </h3>
+                                        <p className="text-[11px] text-slate-500 leading-snug mb-4">
+                                            {card.desc}
+                                        </p>
+
+                                        <div className={cn(
+                                            "flex items-center gap-1 text-[9px] font-black uppercase tracking-widest transition-all duration-300",
+                                            card.color,
+                                            "opacity-60 group-hover:opacity-100",
+                                        )}>
+                                            Explore
+                                            <ArrowRight size={10} className="transition-transform" />
+                                        </div>
+                                    </div>
+                                </Link>
+                            );
+                        })}
+                    </div>
                 </div>
             )}
 
