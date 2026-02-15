@@ -9,13 +9,13 @@ import {
     Scale,
     ArrowRight,
     Compass,
+    Zap,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 
 export default function LibraryPage() {
     const [stats, setStats] = useState({ foods: 0, recipes: 0, nutrients: 0 });
-
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -35,7 +35,6 @@ export default function LibraryPage() {
         };
         fetchStats();
     }, []);
-
 
     const heroCards = [
         {
@@ -85,54 +84,125 @@ export default function LibraryPage() {
     ];
 
     return (
-        <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-700 pb-20">
-            <div className="flex items-start justify-between gap-6">
-                <div>
-                    <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Library</h2>
-                    <p className="text-sm text-slate-500 mt-1">Your personal guide to nutrition: foods, recipes and nutrients.</p>
+        <div className="max-w-7xl mx-auto space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-end min-h-[calc(100vh-100px)]">
+            {/* ── Hero Section — Split Layout ── */}
+            <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-8 lg:p-12 xl:p-16 w-full">
+                {/* Decorative elements */}
+                <div className="absolute top-0 right-0 w-96 h-96 opacity-[0.06] pointer-events-none">
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-500 rounded-full blur-3xl" />
+                </div>
+                <div className="absolute bottom-0 left-0 w-64 h-64 opacity-[0.04] pointer-events-none">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-amber-400 to-rose-500 rounded-full blur-3xl" />
                 </div>
 
-                <div className="flex items-center gap-6 text-sm text-slate-600">
-                    <div className="text-center">
-                        <div className="font-black text-lg">{stats.foods}</div>
-                        <div className="text-xs uppercase">Foods</div>
-                    </div>
-                    <div className="text-center">
-                        <div className="font-black text-lg">{stats.recipes}</div>
-                        <div className="text-xs uppercase">Recipes</div>
-                    </div>
-                    <div className="text-center">
-                        <div className="font-black text-lg">{stats.nutrients}+</div>
-                        <div className="text-xs uppercase">Nutrients</div>
-                    </div>
-                </div>
-            </div>
+                <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+                    {/* Left — Welcome Text */}
+                    <div>
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest mb-8">
+                            <Zap size={12} className="fill-current" />
+                            Your Personal Database
+                        </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {heroCards.map((card) => {
-                    const Icon = card.icon;
-                    return (
-                        <Link
-                            key={card.id}
-                            href={card.href}
-                            className={cn(
-                                'group relative overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/5 p-4 flex flex-col',
-                                card.borderHover,
-                            )}
-                        >
-                            <div className="flex items-center gap-3">
-                                <div className={cn('w-11 h-11 rounded-lg flex items-center justify-center', card.bg)}>
-                                    <Icon size={18} className={card.color} />
+                        <h1 className="text-3xl lg:text-5xl font-black text-white tracking-tighter leading-[0.95] mb-6">
+                            Explore the{' '}
+                            <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
+                                Library.
+                            </span>
+                        </h1>
+
+                        <p className="text-base lg:text-lg text-slate-400 leading-relaxed max-w-md">
+                            Your personal guide to nutrition: browse foods, discover nutrients, explore recipes, and compare nutritional profiles side-by-side.
+                        </p>
+
+                        {/* Quick stats row */}
+                        <div className="flex items-center gap-5 mt-10 flex-wrap">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                                    <Leaf size={14} className="text-emerald-400" />
                                 </div>
                                 <div>
-                                    <h3 className="font-black text-sm text-white">{card.title}</h3>
-                                    <p className="text-xs text-slate-400">{card.desc}</p>
+                                    <p className="text-lg font-black text-white leading-none">{stats.foods}</p>
+                                    <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Foods</p>
                                 </div>
                             </div>
-                            <div className="mt-4 text-[10px] font-black uppercase tracking-widest text-slate-400">Explore →</div>
-                        </Link>
-                    );
-                })}
+                            <div className="w-px h-8 bg-slate-700/60" />
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                                    <ChefHat size={14} className="text-amber-400" />
+                                </div>
+                                <div>
+                                    <p className="text-lg font-black text-white leading-none">{stats.recipes}</p>
+                                    <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Recipes</p>
+                                </div>
+                            </div>
+                            <div className="w-px h-8 bg-slate-700/60" />
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                                    <Activity size={14} className="text-blue-400" />
+                                </div>
+                                <div>
+                                    <p className="text-lg font-black text-white leading-none">{stats.nutrients}+</p>
+                                    <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Nutrients</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Right — 2×2 Action Grid */}
+                    <div className="grid grid-cols-2 gap-3 lg:gap-4">
+                        {heroCards.map((card) => {
+                            const Icon = card.icon;
+                            return (
+                                <Link
+                                    key={card.id}
+                                    href={card.href}
+                                    className={cn(
+                                        "group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 lg:p-6 transition-all duration-500",
+                                        card.borderHover,
+                                        "hover:bg-slate-800/70 hover:shadow-2xl",
+                                    )}
+                                >
+                                    {/* Gradient accent at top */}
+                                    <div className={cn(
+                                        "absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-all duration-500",
+                                        card.gradient,
+                                    )} />
+
+                                    {/* Glow */}
+                                    <div className={cn(
+                                        "absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl transition-all duration-700 opacity-0 group-hover:opacity-100",
+                                        card.bg,
+                                    )} />
+
+                                    <div className="relative z-10">
+                                        <div className={cn(
+                                            "w-10 h-10 lg:w-11 lg:h-11 rounded-xl flex items-center justify-center mb-4 transition-all duration-500",
+                                            card.bg,
+                                        )}>
+                                            <Icon size={18} className={card.color} />
+                                        </div>
+
+                                        <h3 className="text-sm font-black text-white mb-1 tracking-tight group-hover:text-white transition-colors">
+                                            {card.title}
+                                        </h3>
+                                        <p className="text-[11px] text-slate-500 leading-snug mb-4">
+                                            {card.desc}
+                                        </p>
+
+                                        <div className={cn(
+                                            "flex items-center gap-1 text-[9px] font-black uppercase tracking-widest transition-all duration-300",
+                                            card.color,
+                                            "opacity-60 group-hover:opacity-100",
+                                        )}>
+                                            Explore
+                                            <ArrowRight size={10} className="transition-transform" />
+                                        </div>
+                                    </div>
+                                </Link>
+                            );
+                        })}
+                    </div>
+                </div>
             </div>
         </div>
     );
