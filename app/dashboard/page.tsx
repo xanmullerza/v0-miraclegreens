@@ -156,35 +156,54 @@ export default function DashboardOverview() {
                         </p>
 
                         {/* Quick stats row */}
-                        <div className="flex items-center gap-5 mt-10 flex-wrap">
-                            <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                                    <Leaf size={14} className="text-emerald-400" />
+                        <div className="flex items-center gap-5 mt-10 flex-wrap justify-between">
+                            <div className="flex items-center gap-5 flex-wrap">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                                        <Leaf size={14} className="text-emerald-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-lg font-black text-white leading-none">{stats.foods}</p>
+                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Foods</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <p className="text-lg font-black text-white leading-none">{stats.foods}</p>
-                                    <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Foods</p>
+                                <div className="w-px h-8 bg-slate-700/60" />
+                                <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                                        <ChefHat size={14} className="text-amber-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-lg font-black text-white leading-none">{stats.recipes}</p>
+                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Recipes</p>
+                                    </div>
+                                </div>
+                                <div className="w-px h-8 bg-slate-700/60" />
+                                <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                                        <Activity size={14} className="text-blue-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-lg font-black text-white leading-none">{stats.nutrients}+</p>
+                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Nutrients</p>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="w-px h-8 bg-slate-700/60" />
+
+                            {/* Close and Hide Hero Buttons */}
                             <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                                    <ChefHat size={14} className="text-amber-400" />
-                                </div>
-                                <div>
-                                    <p className="text-lg font-black text-white leading-none">{stats.recipes}</p>
-                                    <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Recipes</p>
-                                </div>
-                            </div>
-                            <div className="w-px h-8 bg-slate-700/60" />
-                            <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                                    <Activity size={14} className="text-blue-400" />
-                                </div>
-                                <div>
-                                    <p className="text-lg font-black text-white leading-none">{stats.nutrients}+</p>
-                                    <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Nutrients</p>
-                                </div>
+                                <button
+                                    onClick={handleCloseHero}
+                                    className="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white transition-all duration-200 border border-slate-600 hover:border-slate-500 inline-flex items-center justify-center"
+                                    title="Close hero"
+                                >
+                                    <X size={16} />
+                                </button>
+                                <button
+                                    onClick={handleDoNotShowAgain}
+                                    className="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-100 hover:text-white text-[9px] font-bold uppercase tracking-widest transition-all duration-200 border border-slate-600 hover:border-slate-500 whitespace-nowrap"
+                                >
+                                    Hide Hero
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -278,23 +297,6 @@ export default function DashboardOverview() {
                             );
                         })}
                     </div>
-                </div>
-
-                {/* Close and Do Not Show Again Buttons — Bottom Right */}
-                <div className="absolute bottom-8 right-8 flex items-center gap-3 z-50">
-                    <button
-                        onClick={handleCloseHero}
-                        className="p-2.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white transition-all duration-200 border border-slate-600 hover:border-slate-500 inline-flex items-center justify-center shadow-lg hover:shadow-xl"
-                        title="Close hero"
-                    >
-                        <X size={18} />
-                    </button>
-                    <button
-                        onClick={handleDoNotShowAgain}
-                        className="px-4 py-2.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-100 hover:text-white text-[10px] font-bold uppercase tracking-widest transition-all duration-200 border border-slate-600 hover:border-slate-500 whitespace-nowrap shadow-lg hover:shadow-xl"
-                    >
-                        Hide Hero
-                    </button>
                 </div>
             </div>
             )}
