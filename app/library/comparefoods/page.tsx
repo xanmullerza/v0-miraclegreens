@@ -8,7 +8,7 @@ export default function CompareRedirect() {
     const router = useRouter();
 
     useEffect(() => {
-        router.replace('/library/ingredients?tab=compare');
+        router.replace('/library/foods?tab=compare');
     }, [router]);
 
     return (
@@ -18,3 +18,4 @@ export default function CompareRedirect() {
         </div>
     );
 }
+

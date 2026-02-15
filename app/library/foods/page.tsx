@@ -38,12 +38,12 @@ export default function IngredientsHub() {
     );
 }
 
-type FoodTab = 'allfoods' | 'groceries' | 'pantry' | 'compare' | 'nutrients';
+type FoodTab = 'foods' | 'groceries' | 'pantry' | 'compare' | 'nutrients';
 
 function IngredientsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [activeTab, setActiveTab] = useState<FoodTab>('allfoods');
+    const [activeTab, setActiveTab] = useState<FoodTab>('foods');
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
     const { searchQuery, setSearchQuery, setIsFocused, activeSearchId, setActiveSearchId } = useSearch();
 
@@ -53,7 +53,7 @@ function IngredientsContent() {
     // Sync tab from URL
     useEffect(() => {
         const tab = searchParams.get('tab') as FoodTab;
-        if (tab && ['allfoods', 'groceries', 'pantry', 'compare', 'nutrients'].includes(tab)) {
+        if (tab && ['foods', 'groceries', 'pantry', 'compare', 'nutrients'].includes(tab)) {
             setActiveTab(tab);
         }
     }, [searchParams]);
@@ -66,7 +66,7 @@ function IngredientsContent() {
     };
 
     const tabs = [
-        { id: 'allfoods', label: 'All Foods', icon: UtensilsCrossed, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+        { id: 'foods', label: 'Foods', icon: UtensilsCrossed, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
         { id: 'groceries', label: 'Groceries', icon: ShoppingCart, color: 'text-rose-500', bg: 'bg-rose-500/10' },
         { id: 'pantry', label: 'Pantry', icon: ShoppingBasket, color: 'text-amber-500', bg: 'bg-amber-500/10' },
         { id: 'compare', label: 'Compare Foods', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
@@ -74,8 +74,8 @@ function IngredientsContent() {
     ];
 
     const tabConfig: Record<FoodTab, { heading: string; description: string; color: string }> = {
-        allfoods: {
-            heading: 'Ingredients',
+        foods: {
+            heading: 'Foods',
             description: 'Explore our complete database of nutritional building blocks',
             color: 'text-emerald-500'
         },
@@ -107,13 +107,13 @@ function IngredientsContent() {
             <div className="flex flex-col gap-8">
                 <div className="flex items-center gap-4">
                     <div className={cn("p-3.5 rounded-[1.5rem] shadow-xl shadow-slate-200 dark:shadow-slate-900/20 text-white transition-colors duration-500",
-                        activeTab === 'allfoods' ? "bg-emerald-600 shadow-emerald-500/20" :
+                        activeTab === 'foods' ? "bg-emerald-600 shadow-emerald-500/20" :
                             activeTab === 'groceries' ? "bg-rose-600 shadow-rose-500/20" :
                                 activeTab === 'pantry' ? "bg-amber-500 shadow-amber-500/20" :
                                     activeTab === 'compare' ? "bg-blue-600 shadow-blue-500/20" :
                                         "bg-indigo-600 shadow-indigo-500/20"
                     )}>
-                        {activeTab === 'allfoods' && <UtensilsCrossed size={28} />}
+                        {activeTab === 'foods' && <UtensilsCrossed size={28} />}
                         {activeTab === 'groceries' && <ShoppingCart size={28} />}
                         {activeTab === 'pantry' && <ShoppingBasket size={28} />}
                         {activeTab === 'compare' && <Scale size={28} />}
@@ -225,7 +225,7 @@ function IngredientsContent() {
 
             {/* Dynamic Content Area */}
             <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
-                {activeTab === 'allfoods' && <ExploreView hideControls={false} />}
+                {activeTab === 'foods' && <ExploreView hideControls={false} />}
                 {activeTab === 'groceries' && <ShoppingView />}
                 {activeTab === 'pantry' && <StaplesView />}
                 {activeTab === 'compare' && <CompareView />}

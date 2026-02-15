@@ -8,7 +8,7 @@ export default function SpiceRedirect() {
     const router = useRouter();
 
     useEffect(() => {
-        router.replace('/library/ingredients?tab=lab');
+        router.replace('/library/foods?tab=lab');
     }, [router]);
 
     return (
@@ -18,3 +18,4 @@ export default function SpiceRedirect() {
         </div>
     );
 }
+

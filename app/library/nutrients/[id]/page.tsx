@@ -233,7 +233,7 @@ export default function NutrientDetailsPage() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
-                                    router.push(`/library/ingredients?tab=nutrients`);
+                                    router.push(`/library/foods?tab=nutrients`);
                                 }
                             }}
                             onFocus={() => {
@@ -661,7 +661,7 @@ export default function NutrientDetailsPage() {
                                 topFoods.slice(0, 6).map((food: any) => (
                                     <button
                                         key={food.id}
-                                        onClick={() => router.push(`/library/ingredients/${food.id}`)}
+                                        onClick={() => router.push(`/library/foods/${food.id}`)}
                                         className="relative flex items-center gap-6 p-5 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/5 transition-all group overflow-hidden text-left"
                                     >
                                         <div className="w-20 h-20 rounded-2xl bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500">

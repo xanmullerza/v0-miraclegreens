@@ -120,13 +120,13 @@ export default function FoodDetailsPage() {
     const { searchQuery, setSearchQuery, setIsFocused, activeSearchId, setActiveSearchId } = useSearch();
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
     // Visual state for tabs - clicking them navigates back to main page
-    const currentTab = 'allfoods';
+    const currentTab = 'foods';
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     const ingredientTabs = [
-        { id: 'allfoods', label: 'All Foods', icon: UtensilsCrossed, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+        { id: 'foods', label: 'Foods', icon: UtensilsCrossed, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
         { id: 'groceries', label: 'Groceries', icon: ShoppingCart, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
         { id: 'pantry', label: 'Pantry', icon: ShoppingBasket, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
     ];
@@ -161,7 +161,7 @@ export default function FoodDetailsPage() {
                             return (
                                 <button
                                     key={tab.id}
-                                    onClick={() => router.push(`/library/ingredients?tab=${tab.id}`)}
+                                    onClick={() => router.push(`/library/foods?tab=${tab.id}`)}
                                     className={cn(
                                         "flex items-center gap-3 py-3.5 rounded-[1.5rem] text-[9px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
                                         isActive
@@ -203,7 +203,7 @@ export default function FoodDetailsPage() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
-                                    router.push(`/library/ingredients?tab=allfoods`);
+                                    router.push(`/library/foods?tab=foods`);
                                 }
                             }}
                             onFocus={() => {
@@ -768,7 +768,7 @@ export default function FoodDetailsPage() {
                         {['Greens', 'Vegetables', 'Animal', 'Dairy', 'Grains', 'Fats'].map(category => (
                             <button
                                 key={category}
-                                onClick={() => router.push(`/library/ingredients?tab=allfoods&category=${category}`)}
+                                onClick={() => router.push(`/library/foods?tab=foods&category=${category}`)}
                                 className="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-emerald-200 hover:text-emerald-600 transition-all shadow-sm whitespace-nowrap"
                             >
                                 {category}
@@ -779,7 +779,7 @@ export default function FoodDetailsPage() {
                     <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-1 hidden md:block" />
 
                     <button
-                        onClick={() => router.push('/library/ingredients?tab=allfoods')}
+                        onClick={() => router.push('/library/foods?tab=foods')}
                         className="flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/50 dark:bg-emerald-900/10 text-emerald-600 dark:text-emerald-400 transition-all group shrink-0"
                     >
                         <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />

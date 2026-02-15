@@ -334,7 +334,7 @@ Fat: ${item.fat_g || 0}g
                             Compare
                         </Button>
                         <Button
-                            onClick={() => router.push('/library/ingredients')}
+                            onClick={() => router.push('/library/foods')}
                             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
                             <Library size={14} className="group-hover/btn:scale-110 transition-transform" />
@@ -533,3 +533,4 @@ Fat: ${item.fat_g || 0}g
         </div>
     );
 }
+

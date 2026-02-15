@@ -352,7 +352,7 @@ export function ExploreView({
                                 {items.map((food) => (
                                     <div
                                         key={food.id}
-                                        onClick={() => router.push(`/library/ingredients/${food.id}`)}
+                                        onClick={() => router.push(`/library/foods/${food.id}`)}
                                         className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden cursor-pointer"
                                     >
                                         <div className="flex items-center justify-between p-4 lg:p-0 lg:grid lg:grid-cols-[60px_1fr_180px] gap-4 lg:items-center lg:px-10 py-0">
@@ -434,7 +434,7 @@ export function ExploreView({
                                                     variant="ghost"
                                                     size="icon"
                                                     className="h-9 w-9 rounded-xl text-slate-400 hover:text-emerald-500 transition-all"
-                                                    onClick={(e) => router.push(`/library/ingredients/${food.id}`)}
+                                                    onClick={(e) => router.push(`/library/foods/${food.id}`)}
                                                     title="View Details"
                                                 >
                                                     <ArrowRight size={16} />
@@ -555,3 +555,4 @@ export function ExploreView({
         </div>
     );
 }
+

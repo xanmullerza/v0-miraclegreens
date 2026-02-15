@@ -335,7 +335,7 @@ export function AllFoodsView() {
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                onClick={() => router.push(`/library/ingredients/${food.id}`)}
+                                                onClick={() => router.push(`/library/foods/${food.id}`)}
                                                 className="h-9 w-9 rounded-xl text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors"
                                             >
                                                 <ArrowRight size={16} />
@@ -402,3 +402,4 @@ export function AllFoodsView() {
         </div>
     );
 }
+

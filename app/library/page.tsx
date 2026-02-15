@@ -53,7 +53,7 @@ export default function LibraryPage() {
             id: 'foods',
             title: 'Foods',
             desc: 'Browse whole food profiles',
-            href: '/library/ingredients',
+            href: '/library/foods',
             icon: Leaf,
             color: 'text-emerald-400',
             bg: 'bg-emerald-500/10',
@@ -75,7 +75,7 @@ export default function LibraryPage() {
             id: 'compare',
             title: 'Compare',
             desc: 'Side-by-side food analysis',
-            href: '/library/ingredients?tab=compare',
+            href: '/library/foods?tab=compare',
             icon: Scale,
             color: 'text-violet-400',
             bg: 'bg-violet-500/10',
@@ -214,3 +214,4 @@ export default function LibraryPage() {
         </div>
     );
 }
+

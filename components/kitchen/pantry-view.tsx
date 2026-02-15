@@ -434,7 +434,7 @@ export function PantryView({
                         Add your favorite healthy foods to your pantry to make meal planning a breeze.
                     </p>
                     <Button
-                        onClick={() => router.push('/library/ingredients')}
+                        onClick={() => router.push('/library/foods')}
                         className="rounded-xl px-10 h-14 font-black uppercase tracking-widest text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20"
                     >
                         Stock Up Now
@@ -514,3 +514,4 @@ export function PantryView({
         </div>
     );
 }
+
