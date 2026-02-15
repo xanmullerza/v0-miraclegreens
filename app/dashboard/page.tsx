@@ -21,8 +21,18 @@ export default function DashboardOverview() {
         recipes: 0,
         nutrients: 0
     });
+    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
+        const checkUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
+            if (user?.email && adminEmail && user.email.toLowerCase() === adminEmail.toLowerCase()) {
+                setIsAdmin(true);
+            }
+        };
+        checkUser();
+
         const fetchStats = async () => {
             try {
                 const [foodsCount, recipesCount] = await Promise.all([
@@ -158,6 +168,41 @@ export default function DashboardOverview() {
                     <div className="grid grid-cols-2 gap-3 lg:gap-4">
                         {heroCards.map((card) => {
                             const Icon = card.icon;
+                            const isKitchen = card.id === 'kitchen';
+                            const isDisabled = isKitchen && !isAdmin;
+
+                            if (isDisabled) {
+                                return (
+                                    <div
+                                        key={card.id}
+                                        className="relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/30 bg-slate-800/20 p-5 lg:p-6 opacity-60 cursor-not-allowed select-none group"
+                                    >
+                                        <div className="absolute top-3 right-3 z-20">
+                                            <span className="px-1.5 py-0.5 rounded-md bg-slate-800/80 border border-slate-700 text-[8px] font-black uppercase tracking-widest text-slate-500">
+                                                Locked
+                                            </span>
+                                        </div>
+
+                                        <div className="relative z-10 grayscale opacity-50 transition-all duration-300 group-hover:opacity-70 group-hover:grayscale-0">
+                                            <div className="w-10 h-10 lg:w-11 lg:h-11 rounded-xl flex items-center justify-center mb-4 bg-slate-800/50">
+                                                <Icon size={18} className="text-slate-500" />
+                                            </div>
+
+                                            <h3 className="text-sm font-black text-slate-400 mb-1 tracking-tight">
+                                                {card.title}
+                                            </h3>
+                                            <p className="text-[11px] text-slate-600 leading-snug mb-4">
+                                                {card.desc}
+                                            </p>
+
+                                            <div className="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-slate-700">
+                                                Coming Soon
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            }
+
                             return (
                                 <Link
                                     key={card.id}
