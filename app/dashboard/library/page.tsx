@@ -1,223 +1,470 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
     Activity,
+    Leaf,
+    ChefHat,
+    Scale,
+    Trophy,
+    Sparkles,
+    ArrowRight,
+    BookOpen,
     Search,
-    Loader2,
-    X,
-    LayoutGrid,
-    Trophy
+    Zap,
+    Star,
+    Layers,
+    TrendingUp,
+    Lightbulb,
+    Compass,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useSearch } from '@/lib/context/search-context';
-
-import { NutrientsView } from '@/components/library/nutrients-view';
-import { TopTenView } from './views/top-ten-view';
+import { supabase } from '@/lib/supabase';
 
 export default function LibraryPage() {
-    return (
-        <Suspense fallback={
-            <div className="h-96 flex flex-col items-center justify-center gap-4">
-                <Loader2 className="animate-spin text-blue-500" size={48} />
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Loading Library...</p>
-            </div>
-        }>
-            <LibraryContent />
-        </Suspense>
-    );
-}
+    const [stats, setStats] = useState({ foods: 0, recipes: 0, nutrients: 0 });
+    const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
-function LibraryContent() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
-    const [activeTab, setActiveTab] = useState<'nutrients' | 'top10'>('nutrients');
-    const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-    const { searchQuery, setSearchQuery, setIsFocused, setActiveSearchId } = useSearch();
-
-    // Local state for views
-    const [showNutrientFavorites, setShowNutrientFavorites] = useState(false);
-    const [selectedNutrientCategories, setSelectedNutrientCategories] = useState<string[]>([]);
-
-    const [showTop10Favorites, setShowTop10Favorites] = useState(false);
-    const [selectedTop10Categories, setSelectedTop10Categories] = useState<string[]>([]);
-    const [selectedNutrientId, setSelectedNutrientId] = useState<string | undefined>(undefined);
-
-    // Sync from URL
     useEffect(() => {
-        const tab = searchParams.get('tab');
-        if (tab && ['nutrients', 'top10'].includes(tab)) {
-            setActiveTab(tab as 'nutrients' | 'top10');
-        }
+        const fetchStats = async () => {
+            try {
+                const [foodsCount, recipesCount] = await Promise.all([
+                    supabase.from('food_items').select('id', { count: 'exact', head: true }),
+                    supabase.from('recipes').select('id', { count: 'exact', head: true }),
+                ]);
+                setStats({
+                    foods: foodsCount.count || 0,
+                    recipes: recipesCount.count || 0,
+                    nutrients: 30,
+                });
+            } catch (e) {
+                console.error('Error fetching stats:', e);
+            }
+        };
+        fetchStats();
+    }, []);
 
-        const nutrientId = searchParams.get('nutrientId');
-        if (nutrientId) {
-            setSelectedNutrientId(nutrientId);
-        }
-    }, [searchParams]);
-
-    const handleTabChange = (tab: 'nutrients' | 'top10') => {
-        setActiveTab(tab);
-        const params = new URLSearchParams(searchParams.toString());
-        params.set('tab', tab);
-        window.history.pushState(null, '', `?${params.toString()}`);
-    };
-
-    const tabs = [
-        { id: 'nutrients', label: 'All Nutrients', icon: Activity, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-        { id: 'top10', label: 'Top 10', icon: Trophy, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+    const mainFeatures = [
+        {
+            id: 'nutrients',
+            title: 'Explore Nutrients',
+            description: 'Discover vitamins, minerals, and essential nutrients. Learn what they do, where to find them, and how much you need every day.',
+            href: '/dashboard/nutrients',
+            icon: Activity,
+            gradient: 'from-blue-500 to-indigo-600',
+            shadowColor: 'shadow-blue-500/20',
+            bgAccent: 'bg-blue-500/5',
+            borderAccent: 'border-blue-500/20',
+            hoverBorder: 'hover:border-blue-500/40',
+            iconBg: 'bg-blue-500/10',
+            iconColor: 'text-blue-500',
+            stat: `${stats.nutrients}+ tracked`,
+            statIcon: TrendingUp,
+        },
+        {
+            id: 'foods',
+            title: 'Explore Foods',
+            description: 'Browse our collection of whole foods with full nutrient breakdowns. Find the healthiest ingredients for your meals.',
+            href: '/dashboard/ingredients',
+            icon: Leaf,
+            gradient: 'from-emerald-500 to-teal-600',
+            shadowColor: 'shadow-emerald-500/20',
+            bgAccent: 'bg-emerald-500/5',
+            borderAccent: 'border-emerald-500/20',
+            hoverBorder: 'hover:border-emerald-500/40',
+            iconBg: 'bg-emerald-500/10',
+            iconColor: 'text-emerald-500',
+            stat: `${stats.foods} foods`,
+            statIcon: Layers,
+        },
+        {
+            id: 'recipes',
+            title: 'Explore Recipes',
+            description: 'Discover nutrient-packed recipes for every meal. See complete nutritional profiles and plan your meals with confidence.',
+            href: '/dashboard/recipes',
+            icon: ChefHat,
+            gradient: 'from-amber-500 to-orange-600',
+            shadowColor: 'shadow-amber-500/20',
+            bgAccent: 'bg-amber-500/5',
+            borderAccent: 'border-amber-500/20',
+            hoverBorder: 'hover:border-amber-500/40',
+            iconBg: 'bg-amber-500/10',
+            iconColor: 'text-amber-500',
+            stat: `${stats.recipes} recipes`,
+            statIcon: BookOpen,
+        },
     ];
 
-    const tabConfig: Record<'nutrients' | 'top10', { heading: string; description: string; color: string }> = {
-        nutrients: {
-            heading: 'All Nutrients',
-            description: 'Browse & explore our essential nutrient database',
-            color: 'text-blue-500'
+    const toolFeatures = [
+        {
+            id: 'compare',
+            title: 'Compare Foods',
+            description: 'Put foods side by side and compare their nutrient content. Find out which option gives you more of what you need.',
+            href: '/dashboard/ingredients?tab=compare',
+            icon: Scale,
+            gradient: 'from-violet-500 to-purple-600',
+            shadowColor: 'shadow-violet-500/20',
+            bgAccent: 'bg-violet-500/5',
+            borderAccent: 'border-violet-500/20',
+            hoverBorder: 'hover:border-violet-500/40',
+            iconBg: 'bg-violet-500/10',
+            iconColor: 'text-violet-500',
         },
-        top10: {
-            heading: 'Top 10 Richest',
-            description: 'Discover the richest food sources per nutrient',
-            color: 'text-amber-500'
+        {
+            id: 'top10',
+            title: 'Top 10 Rankings',
+            description: 'See which foods rank highest for each nutrient. The ultimate cheat sheet for nutrient-dense eating.',
+            href: '/dashboard/library?tab=top10',
+            icon: Trophy,
+            gradient: 'from-amber-500 to-yellow-500',
+            shadowColor: 'shadow-amber-500/20',
+            bgAccent: 'bg-amber-500/5',
+            borderAccent: 'border-amber-500/20',
+            hoverBorder: 'hover:border-amber-500/40',
+            iconBg: 'bg-amber-500/10',
+            iconColor: 'text-amber-500',
         },
-    };
+        {
+            id: 'allnutrients',
+            title: 'Nutrient Database',
+            description: 'Browse through our complete nutrient database. Filter by category and find detailed information on every tracked nutrient.',
+            href: '/dashboard/library?tab=nutrients',
+            icon: Search,
+            gradient: 'from-cyan-500 to-blue-500',
+            shadowColor: 'shadow-cyan-500/20',
+            bgAccent: 'bg-cyan-500/5',
+            borderAccent: 'border-cyan-500/20',
+            hoverBorder: 'hover:border-cyan-500/40',
+            iconBg: 'bg-cyan-500/10',
+            iconColor: 'text-cyan-500',
+        },
+    ];
+
+    const tips = [
+        { text: 'Eating a rainbow of colours helps cover a wider spectrum of nutrients.', icon: '🌈' },
+        { text: 'Cooking tomatoes increases their lycopene content — a powerful antioxidant.', icon: '🍅' },
+        { text: 'Pairing iron-rich foods with vitamin C boosts absorption.', icon: '🍊' },
+        { text: 'Dark leafy greens are packed with calcium, iron, and folate.', icon: '🥬' },
+    ];
+
+    const [currentTip, setCurrentTip] = useState(0);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTip((prev) => (prev + 1) % tips.length);
+        }, 6000);
+        return () => clearInterval(timer);
+    }, [tips.length]);
 
     return (
-        <div className="max-w-7xl mx-auto space-y-12 animate-in fade-in duration-700 pb-32">
-            {/* Unified Header */}
-            <div className="flex flex-col gap-8">
-                <div className="flex items-center gap-4">
-                    <div className={cn("p-3.5 rounded-[1.5rem] shadow-xl shadow-slate-200 dark:shadow-slate-900/20 text-white transition-colors duration-500",
-                        activeTab === 'nutrients' ? "bg-blue-600 shadow-blue-500/20" :
-                            "bg-amber-500 shadow-amber-500/20"
-                    )}>
-                        {activeTab === 'nutrients' && <Activity size={28} />}
-                        {activeTab === 'top10' && <Trophy size={28} />}
-                    </div>
-                    <div>
-                        <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85]">
-                            <span className={tabConfig[activeTab].color}>{tabConfig[activeTab].heading}.</span>
-                        </h1>
-                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">{tabConfig[activeTab].description}</p>
-                    </div>
+        <div className="max-w-7xl mx-auto space-y-16 animate-in fade-in duration-700 pb-32">
+
+            {/* ── Hero Section ── */}
+            <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-900 border border-slate-800 p-10 lg:p-16 min-h-[340px]">
+                {/* Decorative elements */}
+                <div className="absolute top-0 right-0 w-96 h-96 opacity-[0.06] pointer-events-none">
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-500 rounded-full blur-3xl" />
+                </div>
+                <div className="absolute bottom-0 left-0 w-64 h-64 opacity-[0.04] pointer-events-none">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-amber-400 to-rose-500 rounded-full blur-3xl" />
                 </div>
 
-                {/* Tab Pillbox */}
-                <div className="flex flex-col gap-6 items-start w-full">
-                    <div className="space-y-3 w-full">
-                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-400">Navigation</p>
-                        <div className={cn(
-                            "flex items-center p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden w-full md:max-w-[800px] mx-auto xl:mx-0"
-                        )}>
-                            {/* Left side - Home/Dashboard Button */}
-                            <div className={cn("flex-shrink-0 flex items-center justify-start transition-all duration-500", isSearchExpanded ? "w-0" : "w-12")}>
-                                {!isSearchExpanded && (
-                                    <button
-                                        onClick={() => router.push('/dashboard')}
-                                        className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all flex-shrink-0"
-                                        title="Back to Dashboard"
-                                    >
-                                        <LayoutGrid size={18} />
-                                    </button>
-                                )}
-                            </div>
+                {/* Floating icons — decorative */}
+                <div className="absolute top-8 right-12 opacity-10 animate-pulse">
+                    <Sparkles size={60} className="text-emerald-400" />
+                </div>
+                <div className="absolute bottom-12 right-24 opacity-[0.07]">
+                    <BookOpen size={80} className="text-blue-400" />
+                </div>
 
-                            {/* Center - Tabs area */}
-                            <div className={cn(
-                                "flex items-center justify-center overflow-x-auto no-scrollbar transition-all duration-500",
-                                isSearchExpanded ? "w-0 flex-none opacity-0" : "flex-1 opacity-100"
-                            )}>
-                                <div className="flex items-center gap-2 md:gap-4 py-1 px-1">
-                                    {tabs.map((tab) => {
-                                        const Icon = tab.icon;
-                                        const isActive = activeTab === tab.id;
-                                        return (
-                                            <button
-                                                key={tab.id}
-                                                onClick={() => handleTabChange(tab.id as 'nutrients' | 'top10')}
-                                                className={cn(
-                                                    "flex items-center gap-3 py-3.5 rounded-[1.5rem] text-[9px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
-                                                    isActive
-                                                        ? "bg-slate-900 dark:bg-slate-800 text-white shadow-xl translate-y-[-2px]"
-                                                        : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50",
-                                                    "px-4 md:px-5"
-                                                )}
-                                            >
-                                                <Icon size={15} className={cn(
-                                                    "transition-transform duration-500 group-hover:scale-110",
-                                                    isActive ? tab.color : "text-slate-400"
-                                                )} />
-                                                <span className={cn(
-                                                    "transition-all duration-300 overflow-hidden hidden md:inline",
-                                                )}>
-                                                    {tab.label}
-                                                </span>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            </div>
+                <div className="relative z-10 max-w-2xl">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest mb-8">
+                        <Compass size={12} className="fill-current" />
+                        Your Nutrition Library
+                    </div>
 
-                            {/* Right side - Global Search */}
-                            <div className={cn(
-                                "flex items-center justify-end transition-all duration-500",
-                                isSearchExpanded ? "flex-1 pl-2" : "w-12"
-                            )}>
-                                <div className={cn(
-                                    "flex items-center transition-all duration-500 overflow-hidden",
-                                    isSearchExpanded ? "flex-1 opacity-100" : "w-0 opacity-0"
-                                )}>
-                                    <input
-                                        type="text"
-                                        autoFocus
-                                        placeholder={`Search ${tabConfig[activeTab].heading}...`}
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        onFocus={() => {
-                                            setIsFocused(true);
-                                            setActiveSearchId('pill-bar');
-                                        }}
-                                        className="w-full bg-slate-50 dark:bg-slate-800/50 border-none focus:ring-0 text-[10px] font-black uppercase tracking-widest h-12 rounded-[1.5rem] px-6 text-slate-900 dark:text-white"
-                                    />
-                                </div>
-                                <button
-                                    onClick={() => setIsSearchExpanded(!isSearchExpanded)}
-                                    className={cn(
-                                        "flex items-center justify-center w-12 h-12 rounded-[1.5rem] transition-all flex-shrink-0",
-                                        isSearchExpanded
-                                            ? "bg-rose-50 text-rose-500 hover:bg-rose-100"
-                                            : "text-slate-400 hover:text-emerald-500 hover:bg-emerald-50"
-                                    )}
-                                    title="Search"
-                                >
-                                    {isSearchExpanded ? <X size={18} /> : <Search size={18} />}
-                                </button>
+                    <h1 className="text-3xl lg:text-5xl font-black text-white tracking-tighter leading-[0.95] mb-6">
+                        Welcome to the{' '}
+                        <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
+                            Library.
+                        </span>
+                    </h1>
+
+                    <p className="text-base lg:text-lg text-slate-400 leading-relaxed max-w-xl">
+                        Your personal guide to nutrition. Explore <span className="text-white font-semibold">nutrients</span>,
+                        browse <span className="text-white font-semibold">foods</span>,
+                        discover <span className="text-white font-semibold">recipes</span>, and
+                        compare ingredients — all in one place.
+                    </p>
+
+                    {/* Quick stats row */}
+                    <div className="flex items-center gap-6 mt-10 flex-wrap">
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                                <Leaf size={14} className="text-emerald-400" />
+                            </div>
+                            <div>
+                                <p className="text-lg font-black text-white leading-none">{stats.foods}</p>
+                                <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Foods</p>
+                            </div>
+                        </div>
+                        <div className="w-px h-8 bg-slate-700/60" />
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                                <ChefHat size={14} className="text-amber-400" />
+                            </div>
+                            <div>
+                                <p className="text-lg font-black text-white leading-none">{stats.recipes}</p>
+                                <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Recipes</p>
+                            </div>
+                        </div>
+                        <div className="w-px h-8 bg-slate-700/60" />
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                                <Activity size={14} className="text-blue-400" />
+                            </div>
+                            <div>
+                                <p className="text-lg font-black text-white leading-none">{stats.nutrients}+</p>
+                                <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Nutrients</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Dynamic Content Area */}
-            <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
-                {activeTab === 'nutrients' && (
-                    <NutrientsView
-                        showFavoritesOnly={showNutrientFavorites}
-                        setShowFavoritesOnly={setShowNutrientFavorites}
-                        selectedCategories={selectedNutrientCategories}
-                        setSelectedCategories={setSelectedNutrientCategories}
-                    />
-                )}
-                {activeTab === 'top10' && (
-                    <TopTenView
-                        showFavoritesOnly={showTop10Favorites}
-                        setShowFavoritesOnly={setShowTop10Favorites}
-                        selectedCategories={selectedTop10Categories}
-                        setSelectedCategories={setSelectedTop10Categories}
-                        selectedNutrientId={selectedNutrientId}
-                        onNutrientChange={setSelectedNutrientId}
-                    />
-                )}
+            {/* ── Main Features ── */}
+            <div>
+                <div className="flex items-center gap-3 mb-8">
+                    <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
+                        <Compass size={18} className="text-emerald-500" />
+                    </div>
+                    <div>
+                        <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
+                            Start Exploring
+                        </h2>
+                        <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">
+                            Dive into nutrients, foods, and recipes
+                        </p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {mainFeatures.map((feature) => {
+                        const Icon = feature.icon;
+                        const StatIcon = feature.statIcon;
+                        const isHovered = hoveredCard === feature.id;
+                        return (
+                            <Link
+                                key={feature.id}
+                                href={feature.href}
+                                onMouseEnter={() => setHoveredCard(feature.id)}
+                                onMouseLeave={() => setHoveredCard(null)}
+                                className={cn(
+                                    "group relative overflow-hidden rounded-[2rem] border p-8 transition-all duration-500",
+                                    "bg-white dark:bg-slate-900",
+                                    feature.borderAccent,
+                                    feature.hoverBorder,
+                                    "hover:shadow-2xl hover:-translate-y-1",
+                                    feature.shadowColor,
+                                )}
+                            >
+                                {/* Gradient accent at top */}
+                                <div className={cn(
+                                    "absolute top-0 left-0 right-0 h-1 bg-gradient-to-r transition-all duration-500",
+                                    feature.gradient,
+                                    isHovered ? "opacity-100" : "opacity-0",
+                                )} />
+
+                                {/* Background glow */}
+                                <div className={cn(
+                                    "absolute -top-20 -right-20 w-40 h-40 rounded-full transition-all duration-700 blur-3xl",
+                                    feature.bgAccent,
+                                    isHovered ? "opacity-100 scale-150" : "opacity-0 scale-100",
+                                )} />
+
+                                <div className="relative z-10">
+                                    <div className={cn(
+                                        "w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3",
+                                        feature.iconBg,
+                                    )}>
+                                        <Icon size={24} className={feature.iconColor} />
+                                    </div>
+
+                                    <h3 className="text-lg font-black tracking-tight text-slate-900 dark:text-white mb-2 group-hover:text-slate-800 dark:group-hover:text-white transition-colors">
+                                        {feature.title}
+                                    </h3>
+
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6">
+                                        {feature.description}
+                                    </p>
+
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-1.5">
+                                            <StatIcon size={12} className={feature.iconColor} />
+                                            <span className={cn("text-[10px] font-black uppercase tracking-widest", feature.iconColor)}>
+                                                {feature.stat}
+                                            </span>
+                                        </div>
+                                        <div className={cn(
+                                            "flex items-center gap-1 text-[10px] font-black uppercase tracking-widest transition-all duration-300",
+                                            feature.iconColor,
+                                            "opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0",
+                                        )}>
+                                            Explore
+                                            <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </Link>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* ── Tools Section ── */}
+            <div>
+                <div className="flex items-center gap-3 mb-8">
+                    <div className="w-10 h-10 rounded-2xl bg-violet-500/10 flex items-center justify-center">
+                        <Zap size={18} className="text-violet-500" />
+                    </div>
+                    <div>
+                        <h2 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
+                            Powerful Tools
+                        </h2>
+                        <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">
+                            Compare, rank, and discover
+                        </p>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {toolFeatures.map((feature) => {
+                        const Icon = feature.icon;
+                        const isHovered = hoveredCard === feature.id;
+                        return (
+                            <Link
+                                key={feature.id}
+                                href={feature.href}
+                                onMouseEnter={() => setHoveredCard(feature.id)}
+                                onMouseLeave={() => setHoveredCard(null)}
+                                className={cn(
+                                    "group relative overflow-hidden rounded-[2rem] border p-6 transition-all duration-500",
+                                    "bg-white dark:bg-slate-900",
+                                    feature.borderAccent,
+                                    feature.hoverBorder,
+                                    "hover:shadow-xl hover:-translate-y-0.5",
+                                    feature.shadowColor,
+                                )}
+                            >
+                                {/* Background glow */}
+                                <div className={cn(
+                                    "absolute -top-16 -right-16 w-32 h-32 rounded-full transition-all duration-700 blur-3xl",
+                                    feature.bgAccent,
+                                    isHovered ? "opacity-100 scale-150" : "opacity-0 scale-100",
+                                )} />
+
+                                <div className="relative z-10 flex items-start gap-4">
+                                    <div className={cn(
+                                        "w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3",
+                                        feature.iconBg,
+                                    )}>
+                                        <Icon size={20} className={feature.iconColor} />
+                                    </div>
+
+                                    <div className="flex-1 min-w-0">
+                                        <h3 className="text-sm font-black tracking-tight text-slate-900 dark:text-white mb-1">
+                                            {feature.title}
+                                        </h3>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                            {feature.description}
+                                        </p>
+                                    </div>
+
+                                    <ArrowRight size={16} className={cn(
+                                        "flex-shrink-0 mt-1 transition-all duration-300",
+                                        feature.iconColor,
+                                        "opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0",
+                                    )} />
+                                </div>
+                            </Link>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* ── Nutrition Tip ── */}
+            <div className="relative overflow-hidden rounded-[2rem] border border-slate-200 dark:border-slate-800 bg-gradient-to-br from-slate-50 to-white dark:from-slate-900 dark:to-slate-900/80 p-8 lg:p-10">
+                <div className="absolute top-0 right-0 w-48 h-48 opacity-[0.04] pointer-events-none">
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full blur-3xl" />
+                </div>
+
+                <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center flex-shrink-0">
+                        <Lightbulb size={20} className="text-amber-500" />
+                    </div>
+                    <div className="flex-1">
+                        <p className="text-[10px] uppercase tracking-widest text-amber-500 font-black mb-2">
+                            Did You Know?
+                        </p>
+                        <div className="relative h-14 overflow-hidden">
+                            {tips.map((tip, i) => (
+                                <p
+                                    key={i}
+                                    className={cn(
+                                        "absolute top-0 left-0 text-sm lg:text-base text-slate-600 dark:text-slate-300 leading-relaxed transition-all duration-700",
+                                        currentTip === i
+                                            ? "opacity-100 translate-y-0"
+                                            : "opacity-0 translate-y-4",
+                                    )}
+                                >
+                                    <span className="mr-2">{tip.icon}</span>
+                                    {tip.text}
+                                </p>
+                            ))}
+                        </div>
+                        {/* Progress dots */}
+                        <div className="flex items-center gap-2 mt-4">
+                            {tips.map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setCurrentTip(i)}
+                                    className={cn(
+                                        "transition-all duration-500 rounded-full",
+                                        currentTip === i
+                                            ? "w-6 h-1.5 bg-amber-500"
+                                            : "w-1.5 h-1.5 bg-slate-300 dark:bg-slate-700 hover:bg-amber-400",
+                                    )}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* ── Quick Links Footer ── */}
+            <div className="text-center space-y-4">
+                <p className="text-[10px] uppercase tracking-widest text-slate-400 font-black">
+                    Quick Links
+                </p>
+                <div className="flex items-center justify-center gap-4 flex-wrap">
+                    {[
+                        { label: 'Ingredients', href: '/dashboard/ingredients', icon: Leaf },
+                        { label: 'Recipes', href: '/dashboard/recipes', icon: ChefHat },
+                        { label: 'Compare', href: '/dashboard/ingredients?tab=compare', icon: Scale },
+                        { label: 'Top 10', href: '/dashboard/library?tab=top10', icon: Trophy },
+                        { label: 'Nutrients', href: '/dashboard/nutrients', icon: Activity },
+                    ].map((link) => (
+                        <Link
+                            key={link.label}
+                            href={link.href}
+                            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-500 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-300"
+                        >
+                            <link.icon size={12} />
+                            {link.label}
+                        </Link>
+                    ))}
+                </div>
             </div>
         </div>
     );
