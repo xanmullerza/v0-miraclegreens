@@ -76,33 +76,7 @@ function DashboardLayoutContent({
                 {/* Main Content */}
                 <main className="dashboard-main flex-1 overflow-y-auto relative bg-slate-50 dark:bg-[#020617] custom-scrollbar flex flex-col">
                     {/* Top Bar for Content */}
-                    <div className="sticky top-0 z-20 w-full h-16 border-b border-slate-200/50 dark:border-slate-800/50 bg-white/10 dark:bg-slate-900/10 backdrop-blur-md px-8 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            {pathname.split('/').filter(Boolean).map((segment, index, array) => {
-                                const path = '/' + array.slice(0, index + 1).join('/');
-                                const isLast = index === array.length - 1;
-                                const isFirst = index === 0; // dashboard
-
-                                return (
-                                    <React.Fragment key={path}>
-                                        {!isFirst && <ChevronRight size={10} className="text-slate-400" />}
-                                        {isLast ? (
-                                            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest">
-                                                {decodeURIComponent(segment).replace(/-/g, ' ')}
-                                            </span>
-                                        ) : (
-                                            <Link
-                                                href={path}
-                                                className="text-[10px] font-black text-slate-400 hover:text-emerald-500 uppercase tracking-widest transition-colors"
-                                            >
-                                                {decodeURIComponent(segment).replace(/-/g, ' ')}
-                                            </Link>
-                                        )}
-                                    </React.Fragment>
-                                );
-                            })}
-                        </div>
-
+                    <div className="sticky top-0 z-20 w-full h-16 border-b border-slate-200/50 dark:border-slate-800/50 bg-white/10 dark:bg-slate-900/10 backdrop-blur-md px-8 flex items-center justify-end">
                         <div className="flex items-center gap-6">
                             <div className="relative hidden md:block z-50">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />

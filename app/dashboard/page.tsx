@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
     Zap,
     ChefHat,
@@ -10,13 +11,15 @@ import {
     ArrowRight,
     Leaf,
     Activity,
-    Settings
+    Settings,
+    ChevronRight
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 export default function DashboardOverview() {
+    const pathname = usePathname();
     const { showHeroes, setShowHeroes } = useUserPreferences();
     const [stats, setStats] = useState({
         foods: 0,
@@ -101,7 +104,33 @@ export default function DashboardOverview() {
     ];
 
     return (
-        <div className="w-full space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)] px-4">
+        <div className="w-full space-y-6 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)] px-4">
+            {/* Breadcrumbs */}
+            <div className="w-full max-w-7xl flex items-center gap-2">
+                {pathname.split('/').filter(Boolean).map((segment, index, array) => {
+                    const path = '/' + array.slice(0, index + 1).join('/');
+                    const isLast = index === array.length - 1;
+                    const isFirst = index === 0;
+
+                    return (
+                        <React.Fragment key={path}>
+                            {!isFirst && <ChevronRight size={14} className="text-slate-400" />}
+                            {isLast ? (
+                                <span className="text-xs font-black text-emerald-500 uppercase tracking-widest">
+                                    {decodeURIComponent(segment).replace(/-/g, ' ')}
+                                </span>
+                            ) : (
+                                <Link
+                                    href={path}
+                                    className="text-xs font-black text-slate-400 hover:text-emerald-500 uppercase tracking-widest transition-colors"
+                                >
+                                    {decodeURIComponent(segment).replace(/-/g, ' ')}
+                                </Link>
+                            )}
+                        </React.Fragment>
+                    );
+                })}
+            </div>
 
             {/* ── Hero Section — Split Layout ── */}
             {showHeroes && (
