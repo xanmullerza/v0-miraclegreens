@@ -191,7 +191,7 @@ export default function NutrientDetailsPage() {
                             return (
                                 <button
                                     key={tab.id}
-                                    onClick={() => router.push(`/dashboard/library?tab=${tab.id}`)}
+                                    onClick={() => router.push(`/library?tab=${tab.id}`)}
                                     className={cn(
                                         "flex items-center gap-3 py-3.5 rounded-[1.5rem] text-[9px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
                                         isActive
@@ -233,7 +233,7 @@ export default function NutrientDetailsPage() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
-                                    router.push(`/dashboard/library/ingredients?tab=nutrients`);
+                                    router.push(`/library/ingredients?tab=nutrients`);
                                 }
                             }}
                             onFocus={() => {
@@ -343,7 +343,7 @@ export default function NutrientDetailsPage() {
                     <h2 className="text-2xl font-black uppercase tracking-tighter">Nutrient Not Found</h2>
                     <p className="text-slate-500 max-w-xs mx-auto text-sm">The requested nutrient does not exist in our health guide.</p>
                 </div>
-                <Button onClick={() => router.push('/dashboard/library/nutrients')} className="rounded-full px-8 bg-emerald-600">
+                <Button onClick={() => router.push('/library/nutrients')} className="rounded-full px-8 bg-emerald-600">
                     Back to Library
                 </Button>
             </div>
@@ -409,7 +409,7 @@ export default function NutrientDetailsPage() {
                 <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
                     {/* Welcome Button */}
                     <button
-                        onClick={() => router.push('/dashboard/library/nutrients/welcome')}
+                        onClick={() => router.push('/library/nutrients/welcome')}
                         className={cn(
                             "px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
                             nutrientId === 'welcome'
@@ -442,7 +442,7 @@ export default function NutrientDetailsPage() {
                                 <DropdownMenuCheckboxItem
                                     key={id}
                                     checked={nutrientId === id}
-                                    onCheckedChange={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}`)}
+                                    onCheckedChange={() => router.push(`/library/nutrients/${encodeURIComponent(id)}`)}
                                     className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
                                 >
                                     {id}
@@ -472,7 +472,7 @@ export default function NutrientDetailsPage() {
                                 <DropdownMenuCheckboxItem
                                     key={id}
                                     checked={nutrientId === id}
-                                    onCheckedChange={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}`)}
+                                    onCheckedChange={() => router.push(`/library/nutrients/${encodeURIComponent(id)}`)}
                                     className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
                                 >
                                     {id}
@@ -502,7 +502,7 @@ export default function NutrientDetailsPage() {
                                 <DropdownMenuCheckboxItem
                                     key={id}
                                     checked={nutrientId === id}
-                                    onCheckedChange={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}`)}
+                                    onCheckedChange={() => router.push(`/library/nutrients/${encodeURIComponent(id)}`)}
                                     className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
                                 >
                                     {id}
@@ -645,7 +645,7 @@ export default function NutrientDetailsPage() {
                             <button
                                 onClick={() => {
                                     // Map nutrient names to column names for Top 10 view if possible, or just pass the ID
-                                    router.push(`/dashboard/library?tab=top10&nutrientId=${nutrientId}`);
+                                    router.push(`/library?tab=top10&nutrientId=${nutrientId}`);
                                 }}
                                 className="text-[10px] font-black text-emerald-500 uppercase tracking-widest transition-all hover:text-emerald-600 hover:underline flex items-center gap-2 group"
                             >
@@ -661,7 +661,7 @@ export default function NutrientDetailsPage() {
                                 topFoods.slice(0, 6).map((food: any) => (
                                     <button
                                         key={food.id}
-                                        onClick={() => router.push(`/dashboard/library/ingredients/${food.id}`)}
+                                        onClick={() => router.push(`/library/ingredients/${food.id}`)}
                                         className="relative flex items-center gap-6 p-5 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/5 transition-all group overflow-hidden text-left"
                                     >
                                         <div className="w-20 h-20 rounded-2xl bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500">

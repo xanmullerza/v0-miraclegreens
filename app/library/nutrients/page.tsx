@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { NutrientsView } from '@/components/library/nutrients-view';
-import { NUTRIENTS } from '@/app/dashboard/library/views/top-ten-view';
+import { NUTRIENTS } from '@/app/library/views/top-ten-view';
 
 export default function NutrientsPage() {
     const router = useRouter();
@@ -42,7 +42,7 @@ export default function NutrientsPage() {
     const handleNutrientSelect = (id: string) => {
         setSelectedNutrientId(id);
         const encodedId = encodeURIComponent(id);
-        router.push(`/dashboard/library/nutrients/${encodedId}`);
+        router.push(`/library/nutrients/${encodedId}`);
     };
 
     return (

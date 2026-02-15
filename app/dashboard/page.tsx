@@ -79,7 +79,7 @@ export default function DashboardOverview() {
         {
             name: 'Ingredients',
             desc: 'Browse and explore nutritious food items.',
-            href: '/dashboard/library/ingredients',
+            href: '/library/ingredients',
             icon: Leaf,
             color: 'text-emerald-500',
             bg: 'bg-emerald-500/10'
@@ -95,7 +95,7 @@ export default function DashboardOverview() {
         {
             name: 'Recipes',
             desc: 'Plan meals, manage your pantry, and create shopping lists.',
-            href: '/dashboard/library/recipes',
+            href: '/library/recipes',
             icon: ChefHat,
             color: 'text-amber-500',
             bg: 'bg-amber-500/10'
@@ -103,7 +103,7 @@ export default function DashboardOverview() {
         {
             name: 'Nutrients',
             desc: 'Compare nutrients, rank foods, and explore facts.',
-            href: '/dashboard/library',
+            href: '/library',
             icon: Library,
             color: 'text-emerald-500',
             bg: 'bg-emerald-500/10'

@@ -161,7 +161,7 @@ export default function FoodDetailsPage() {
                             return (
                                 <button
                                     key={tab.id}
-                                    onClick={() => router.push(`/dashboard/library/ingredients?tab=${tab.id}`)}
+                                    onClick={() => router.push(`/library/ingredients?tab=${tab.id}`)}
                                     className={cn(
                                         "flex items-center gap-3 py-3.5 rounded-[1.5rem] text-[9px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
                                         isActive
@@ -203,7 +203,7 @@ export default function FoodDetailsPage() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
-                                    router.push(`/dashboard/library/ingredients?tab=allfoods`);
+                                    router.push(`/library/ingredients?tab=allfoods`);
                                 }
                             }}
                             onFocus={() => {
@@ -643,7 +643,7 @@ export default function FoodDetailsPage() {
                         const hasBreakdown = breakdownLabels.includes(label);
 
                         return (
-                            <div key={label} onClick={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct > 0 ? `${styles.borderLight} ${styles.fade}` : "")}>
+                            <div key={label} onClick={() => router.push(`/library/nutrients/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct > 0 ? `${styles.borderLight} ${styles.fade}` : "")}>
                                 <p className={cn(
                                     "text-[9px] font-black truncate mb-1 whitespace-nowrap overflow-hidden transition-colors",
                                     title === 'Biological Ratios' ? 'text-slate-400 dark:text-slate-500' : 'uppercase text-foreground/60'
@@ -768,7 +768,7 @@ export default function FoodDetailsPage() {
                         {['Greens', 'Vegetables', 'Animal', 'Dairy', 'Grains', 'Fats'].map(category => (
                             <button
                                 key={category}
-                                onClick={() => router.push(`/dashboard/library/ingredients?tab=allfoods&category=${category}`)}
+                                onClick={() => router.push(`/library/ingredients?tab=allfoods&category=${category}`)}
                                 className="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-emerald-200 hover:text-emerald-600 transition-all shadow-sm whitespace-nowrap"
                             >
                                 {category}
@@ -779,7 +779,7 @@ export default function FoodDetailsPage() {
                     <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-1 hidden md:block" />
 
                     <button
-                        onClick={() => router.push('/dashboard/library/ingredients?tab=allfoods')}
+                        onClick={() => router.push('/library/ingredients?tab=allfoods')}
                         className="flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/50 dark:bg-emerald-900/10 text-emerald-600 dark:text-emerald-400 transition-all group shrink-0"
                     >
                         <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />

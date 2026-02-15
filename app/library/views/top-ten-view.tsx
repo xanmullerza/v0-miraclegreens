@@ -23,13 +23,13 @@ import {
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '../../../../components/ui/progress';
+import { Progress } from '@/components/ui/progress';
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from "../../../../components/ui/tooltip";
+} from "@/components/ui/tooltip";
 import { CATEGORIES } from '@/components/library/foods-view';
 
 interface TopFood {
