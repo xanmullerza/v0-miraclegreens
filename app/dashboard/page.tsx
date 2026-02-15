@@ -210,7 +210,7 @@ export default function DashboardOverview() {
                                     className={cn(
                                         "group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 lg:p-6 transition-all duration-500",
                                         card.borderHover,
-                                        "hover:bg-slate-800/70 hover:shadow-2xl hover:-translate-y-0.5",
+                                        "hover:bg-slate-800/70 hover:shadow-2xl",
                                     )}
                                 >
                                     {/* Gradient accent at top */}
@@ -227,7 +227,7 @@ export default function DashboardOverview() {
 
                                     <div className="relative z-10">
                                         <div className={cn(
-                                            "w-10 h-10 lg:w-11 lg:h-11 rounded-xl flex items-center justify-center mb-4 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3",
+                                            "w-10 h-10 lg:w-11 lg:h-11 rounded-xl flex items-center justify-center mb-4 transition-all duration-500",
                                             card.bg,
                                         )}>
                                             <Icon size={18} className={card.color} />
@@ -246,7 +246,7 @@ export default function DashboardOverview() {
                                             "opacity-60 group-hover:opacity-100",
                                         )}>
                                             Explore
-                                            <ArrowRight size={10} className="group-hover:translate-x-1 transition-transform" />
+                                            <ArrowRight size={10} className="transition-transform" />
                                         </div>
                                     </div>
                                 </Link>
