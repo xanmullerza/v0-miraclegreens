@@ -93,7 +93,7 @@ export default function AdminOverview() {
         {
             name: 'Spice Lab',
             desc: 'Convert whole vs ground spices.',
-            href: '/dashboard/spice-converter',
+            href: '/admin/spice-converter',
             icon: Beaker,
             color: 'text-indigo-500',
             bg: 'bg-indigo-500/10'

@@ -21,7 +21,7 @@ import { useSearch } from '@/lib/context/search-context';
 // Views
 import { ExploreView } from './views/explore-view';
 import { ShoppingView } from './views/shopping-view';
-import { StaplesView } from './views/staples-view';
+import { StaplesView } from '@/components/library/staples-view';
 import { CompareView } from './views/compare-view';
 import { NutrientsView } from './views/nutrients-view';
 

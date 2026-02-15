@@ -1400,7 +1400,7 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
                                                                     onClick={() => {
                                                                         sessionStorage.setItem('moringa_spice_lab_pending', JSON.stringify(ingredients));
                                                                         const returnUrl = encodeURIComponent(pathname);
-                                                                        router.push(`/dashboard/spice-converter?foodId=${ing.food_item_id}&returnTo=${returnUrl}&swapIndex=${index}`);
+                                                                        router.push(`/admin/spice-converter?foodId=${ing.food_item_id}&returnTo=${returnUrl}&swapIndex=${index}`);
                                                                     }}
                                                                     className="ml-2 flex items-center gap-1.5 px-2 py-1 bg-amber-50 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-lg border border-amber-200 dark:border-amber-900/50 hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-all shadow-sm group/lab"
                                                                     title="Calibrate in Spice Lab"
