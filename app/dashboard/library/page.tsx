@@ -75,7 +75,7 @@ export default function LibraryPage() {
             id: 'compare',
             title: 'Compare',
             desc: 'Side-by-side food analysis',
-            href: '/dashboard/library/foods?tab=compare',
+            href: '/dashboard/library/comparefoods',
             icon: Scale,
             color: 'text-violet-400',
             bg: 'bg-violet-500/10',
