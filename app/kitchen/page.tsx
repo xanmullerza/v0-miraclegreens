@@ -68,7 +68,7 @@ export default function KitchenPage() {
             id: 'pantry',
             title: 'Pantry',
             desc: 'Manage what you have',
-            href: '/dashboard/pantry',
+            href: '/library/ingredients?tab=pantry',
             icon: Package,
             color: 'text-emerald-400',
             bg: 'bg-emerald-500/10',
