@@ -140,4 +140,19 @@
   .dark .custom-scrollbar::-webkit-scrollbar-thumb {
     background-color: #334155;
   }
+
+  /* When rendering inside the dashboard chrome, neutralize large decorative
+     hero containers from child pages to avoid the "page inside a page" effect.
+     This is a temporary, scoped visual fix while production rebuilds deploy. */
+  .dashboard-main .rounded-\[2\.5rem\] {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  .dashboard-main .relative.absolute,
+  .dashboard-main .absolute {
+    display: none !important;
+  }
 }
