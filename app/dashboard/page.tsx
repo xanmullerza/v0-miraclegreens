@@ -16,15 +16,16 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 export default function DashboardOverview() {
+    const { showHeroes, setShowHeroes } = useUserPreferences();
     const [stats, setStats] = useState({
         foods: 0,
         recipes: 0,
         nutrients: 0
     });
     const [isAdmin, setIsAdmin] = useState(false);
-    const [heroVisible, setHeroVisible] = useState(true);
 
     useEffect(() => {
         const checkUser = async () => {
@@ -52,12 +53,6 @@ export default function DashboardOverview() {
             }
         };
         fetchStats();
-
-        // Load hero visibility state from localStorage
-        const heroVisibilityState = localStorage.getItem('heroVisible');
-        if (heroVisibilityState !== null) {
-            setHeroVisible(heroVisibilityState === 'true');
-        }
     }, []);
 
     const heroCards = [
@@ -108,25 +103,22 @@ export default function DashboardOverview() {
     ];
 
     const handleCloseHero = () => {
-        setHeroVisible(false);
-        localStorage.setItem('heroVisible', 'false');
+        setShowHeroes(false);
     };
 
     const handleDoNotShowAgain = () => {
-        setHeroVisible(false);
-        localStorage.setItem('heroVisible', 'false');
+        setShowHeroes(false);
     };
 
     const handleShowHeroAgain = () => {
-        setHeroVisible(true);
-        localStorage.setItem('heroVisible', 'true');
+        setShowHeroes(true);
     };
 
     return (
         <div className="w-full space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)] px-4">
 
             {/* ── Hero Section — Split Layout ── */}
-            {heroVisible && (
+            {showHeroes && (
             <div className="relative rounded-[2.5rem] bg-slate-900 border border-slate-800 p-8 lg:p-12 xl:p-16 max-w-7xl w-full">
                 {/* Decorative elements */}
                 <div className="absolute top-0 right-0 w-96 h-96 opacity-[0.06] pointer-events-none">
@@ -302,7 +294,7 @@ export default function DashboardOverview() {
             )}
 
             {/* Show Hero Again Button — When Hero is Hidden */}
-            {!heroVisible && (
+            {!showHeroes && (
                 <div className="w-full max-w-7xl space-y-4">
                     <button
                         onClick={handleShowHeroAgain}

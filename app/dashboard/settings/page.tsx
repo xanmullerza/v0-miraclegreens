@@ -15,6 +15,7 @@ import {
     Sun,
     Monitor,
     Save,
+    Eye,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -30,6 +31,8 @@ export default function SettingsPage() {
         setMeasurementUnit,
         nutrientDisplayMode,
         setNutrientDisplayMode,
+        showHeroes,
+        setShowHeroes,
     } = useUserPreferences();
 
     const handleSave = async () => {
@@ -134,6 +137,34 @@ export default function SettingsPage() {
                             </button>
                         </div>
                         <p className="text-[9px] text-slate-400 italic px-1">This setting affects how nutrition is displayed across all foods and recipes.</p>
+                    </div>
+
+                    {/* Show Heroes */}
+                    <div className="space-y-3">
+                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Dashboard Hero Sections</Label>
+                        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+                            <button
+                                onClick={() => setShowHeroes(true)}
+                                className={cn(
+                                    "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
+                                    showHeroes ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
+                                )}
+                                title="Show hero sections with welcome and overview"
+                            >
+                                <Eye size={12} /> Show
+                            </button>
+                            <button
+                                onClick={() => setShowHeroes(false)}
+                                className={cn(
+                                    "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
+                                    !showHeroes ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
+                                )}
+                                title="Hide hero sections for experienced users"
+                            >
+                                <Eye size={12} className="line-through" /> Hide
+                            </button>
+                        </div>
+                        <p className="text-[9px] text-slate-400 italic px-1">For experienced users who prefer to go straight to the action grid.</p>
                     </div>
 
                     {/* Theme */}

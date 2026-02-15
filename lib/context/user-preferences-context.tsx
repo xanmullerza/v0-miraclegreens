@@ -46,6 +46,8 @@ interface UserPreferencesContextType {
     updateProfile: (updates: Partial<UserProfile>) => void;
     skipPlannerQuiz: boolean;
     setSkipPlannerQuiz: (skip: boolean) => void;
+    showHeroes: boolean;
+    setShowHeroes: (show: boolean) => void;
     dailyTargets: {
         energy: number;
         protein: number;
@@ -64,6 +66,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     const [energyUnit, setEnergyUnitState] = useState<EnergyUnit>("kJ");
     const [measurementUnit, setMeasurementUnitState] = useState<MeasurementUnit>("metric");
     const [nutrientDisplayMode, setNutrientDisplayModeState] = useState<NutrientDisplayMode>("both");
+    const [showHeroes, setShowHeroesState] = useState(true);
     const [profile, setProfileState] = useState<UserProfile>({
         name: "",
         nickname: "",
@@ -101,6 +104,11 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         const savedSkip = localStorage.getItem("skipPlannerQuiz");
         if (savedSkip !== null) {
             setSkipPlannerQuizState(savedSkip === "true");
+        }
+
+        const savedShowHeroes = localStorage.getItem("showHeroes");
+        if (savedShowHeroes !== null) {
+            setShowHeroesState(savedShowHeroes === "true");
         }
 
         const savedPlan = localStorage.getItem("dailyPlan");
@@ -180,6 +188,11 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         localStorage.setItem("nutrientDisplayMode", mode);
     };
 
+    const setShowHeroes = (show: boolean) => {
+        setShowHeroesState(show);
+        localStorage.setItem("showHeroes", show ? "true" : "false");
+    };
+
     const updateProfile = async (updates: Partial<UserProfile>) => {
         // Construct new profile
         const newProfile = { ...profile, ...updates };
@@ -256,6 +269,8 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
             updateProfile,
             skipPlannerQuiz,
             setSkipPlannerQuiz,
+            showHeroes,
+            setShowHeroes,
             dailyTargets,
             dailyPlan,
             updateDailyPlan
