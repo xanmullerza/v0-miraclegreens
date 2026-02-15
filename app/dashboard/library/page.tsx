@@ -10,8 +10,6 @@ import {
     ArrowRight,
     Compass,
     Zap,
-    X,
-    Eye,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -120,54 +118,35 @@ export default function LibraryPage() {
                         </p>
 
                         {/* Quick stats row */}
-                        <div className="flex items-center gap-5 mt-10 flex-wrap justify-between">
-                            <div className="flex items-center gap-5 flex-wrap">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                                        <Leaf size={14} className="text-emerald-400" />
-                                    </div>
-                                    <div>
-                                        <p className="text-lg font-black text-white leading-none">{stats.foods}</p>
-                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Foods</p>
-                                    </div>
+                        <div className="flex items-center gap-5 mt-10 flex-wrap">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                                    <Leaf size={14} className="text-emerald-400" />
                                 </div>
-                                <div className="w-px h-8 bg-slate-700/60" />
-                                <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                                        <ChefHat size={14} className="text-amber-400" />
-                                    </div>
-                                    <div>
-                                        <p className="text-lg font-black text-white leading-none">{stats.recipes}</p>
-                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Recipes</p>
-                                    </div>
-                                </div>
-                                <div className="w-px h-8 bg-slate-700/60" />
-                                <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                                        <Activity size={14} className="text-blue-400" />
-                                    </div>
-                                    <div>
-                                        <p className="text-lg font-black text-white leading-none">{stats.nutrients}+</p>
-                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Nutrients</p>
-                                    </div>
+                                <div>
+                                    <p className="text-lg font-black text-white leading-none">{stats.foods}</p>
+                                    <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Foods</p>
                                 </div>
                             </div>
-
-                            {/* Close and Hide Hero Buttons */}
+                            <div className="w-px h-8 bg-slate-700/60" />
                             <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => setShowHeroes(false)}
-                                    className="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 hover:text-white transition-all duration-200 border border-slate-600 hover:border-slate-500 inline-flex items-center justify-center"
-                                    title="Close hero"
-                                >
-                                    <X size={16} />
-                                </button>
-                                <button
-                                    onClick={() => setShowHeroes(false)}
-                                    className="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-100 hover:text-white text-[9px] font-bold uppercase tracking-widest transition-all duration-200 border border-slate-600 hover:border-slate-500 whitespace-nowrap"
-                                >
-                                    Hide Hero
-                                </button>
+                                <div className="w-8 h-8 rounded-xl bg-amber-500/10 flex items-center justify-center">
+                                    <ChefHat size={14} className="text-amber-400" />
+                                </div>
+                                <div>
+                                    <p className="text-lg font-black text-white leading-none">{stats.recipes}</p>
+                                    <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Recipes</p>
+                                </div>
+                            </div>
+                            <div className="w-px h-8 bg-slate-700/60" />
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center">
+                                    <Activity size={14} className="text-blue-400" />
+                                </div>
+                                <div>
+                                    <p className="text-lg font-black text-white leading-none">{stats.nutrients}+</p>
+                                    <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Nutrients</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -230,18 +209,9 @@ export default function LibraryPage() {
             </div>
             )}
 
-            {/* Show Hero Again Button — When Hero is Hidden */}
+            {/* Grid Display When Hero is Hidden */}
             {!showHeroes && (
-                <div className="w-full max-w-7xl space-y-4">
-                    <button
-                        onClick={() => setShowHeroes(true)}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-800 border border-slate-700/50 hover:border-slate-700 text-slate-300 hover:text-white text-[11px] font-bold uppercase tracking-widest transition-all duration-300"
-                    >
-                        <Eye size={14} />
-                        Show Hero
-                    </button>
-
-                    {/* Grid Display When Hero is Hidden */}
+                <div className="w-full max-w-7xl">
                     <div className="grid grid-cols-2 gap-3 lg:gap-4">
                         {heroCards.map((card) => {
                             const Icon = card.icon;
