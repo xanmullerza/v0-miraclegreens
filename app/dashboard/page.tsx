@@ -56,7 +56,7 @@ export default function DashboardOverview() {
             id: 'library',
             title: 'Library',
             desc: 'Nutrient database & tools',
-            href: '/library',
+            href: '/dashboard/library',
             icon: Library,
             color: 'text-blue-400',
             bg: 'bg-blue-500/10',

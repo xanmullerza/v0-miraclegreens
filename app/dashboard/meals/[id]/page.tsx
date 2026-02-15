@@ -910,9 +910,9 @@ export default function RecipeDetailsPage() {
     const { searchQuery, setSearchQuery, setIsFocused, activeSearchId, setActiveSearchId } = useSearch();
 
     const mealTabs = [
-        { id: 'browse', label: 'All Meals', icon: BookOpen, color: 'text-yellow-500', bg: 'bg-yellow-500/10', path: '/library/recipes?tab=browse' },
-        { id: 'mealplanner', label: 'Meal-O-Matic', icon: Bot, color: 'text-yellow-500', bg: 'bg-yellow-500/10', path: '/library/recipes?tab=mealplanner' },
-        { id: 'mixlab', label: 'Mix Lab', icon: FlaskConical, color: 'text-purple-500', bg: 'bg-purple-500/10', path: '/library/recipes?tab=mixlab' },
+        { id: 'browse', label: 'All Meals', icon: BookOpen, color: 'text-yellow-500', bg: 'bg-yellow-500/10', path: '/dashboard/library/recipes?tab=browse' },
+        { id: 'mealplanner', label: 'Meal-O-Matic', icon: Bot, color: 'text-yellow-500', bg: 'bg-yellow-500/10', path: '/dashboard/library/recipes?tab=mealplanner' },
+        { id: 'mixlab', label: 'Mix Lab', icon: FlaskConical, color: 'text-purple-500', bg: 'bg-purple-500/10', path: '/dashboard/library/recipes?tab=mixlab' },
     ];
 
     const renderTabGroup = (tabsList: typeof mealTabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
@@ -1278,7 +1278,7 @@ export default function RecipeDetailsPage() {
                                 onDragStart={(e) => isReordering && onDragStart(e, i)}
                                 onDragOver={(e) => isReordering && onDragOver(e, i)}
                                 onDrop={(e) => isReordering && onDrop(e, i)}
-                                onClick={() => !isReordering && !isEditingIngredients && !isEditingMeasures && !isToggling && !hiddenIngredientIds.includes(ing.id) && ing.food_item_id && router.push(`/library/foods/${ing.food_item_id}`)}
+                                onClick={() => !isReordering && !isEditingIngredients && !isEditingMeasures && !isToggling && !hiddenIngredientIds.includes(ing.id) && ing.food_item_id && router.push(`/dashboard/library/foods/${ing.food_item_id}`)}
                                 className={cn(
                                     "flex flex-col items-center text-center p-4 rounded-2xl border transition-all group relative overflow-hidden",
                                     hiddenIngredientIds.includes(ing.id)
@@ -1642,7 +1642,7 @@ export default function RecipeDetailsPage() {
                                                 const hasBreakdown = breakdownLabels.includes(label);
 
                                                 return (
-                                                    <div key={label} onClick={() => router.push(`/library/nutrients/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>
+                                                    <div key={label} onClick={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, pct !== null ? `${styles.borderLight} ${styles.fade}` : "")}>>
                                                         <p className={cn(
                                                             "text-[9px] font-black truncate mb-1 whitespace-nowrap overflow-hidden transition-colors",
                                                             title === 'Biological Ratios' ? 'text-slate-400 dark:text-slate-500' : 'uppercase text-foreground/60'

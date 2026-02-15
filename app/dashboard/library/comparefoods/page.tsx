@@ -8,7 +8,7 @@ export default function CompareRedirect() {
     const router = useRouter();
 
     useEffect(() => {
-        router.replace('/library/foods?tab=compare');
+        router.replace('/dashboard/library/foods?tab=compare');
     }, [router]);
 
     return (

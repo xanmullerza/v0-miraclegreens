@@ -77,7 +77,7 @@ export default function AdminOverview() {
         {
             name: 'View Nutrients',
             desc: 'Deep-dive into biological markers.',
-            href: '/library/nutrients',
+            href: '/dashboard/library/nutrients',
             icon: Zap,
             color: 'text-amber-500',
             bg: 'bg-amber-500/10'
@@ -85,7 +85,7 @@ export default function AdminOverview() {
         {
             name: 'Compare Foods',
             desc: 'Analyze and compare profiles.',
-            href: '/library/comparefoods',
+            href: '/dashboard/library/comparefoods',
             icon: Scale,
             color: 'text-orange-500',
             bg: 'bg-orange-500/10'
