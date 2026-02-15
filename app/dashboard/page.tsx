@@ -9,7 +9,8 @@ import {
     User,
     ArrowRight,
     Leaf,
-    Activity
+    Activity,
+    Settings
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -42,22 +43,22 @@ export default function DashboardOverview() {
 
     const heroCards = [
         {
-            id: 'ingredients',
-            title: 'Ingredients',
-            desc: 'Browse nutritious foods',
-            href: '/library/ingredients',
-            icon: Leaf,
+            id: 'kitchen',
+            title: 'Kitchen',
+            desc: 'Manage your pantry & meals',
+            href: '/dashboard/pantry',
+            icon: ChefHat,
             color: 'text-emerald-400',
             bg: 'bg-emerald-500/10',
             borderHover: 'hover:border-emerald-500/40',
             gradient: 'from-emerald-500 to-teal-600',
         },
         {
-            id: 'recipes',
-            title: 'Recipes',
-            desc: 'Plan meals & manage pantry',
-            href: '/library/recipes',
-            icon: ChefHat,
+            id: 'settings',
+            title: 'Settings',
+            desc: 'App preferences & config',
+            href: '/dashboard/settings',
+            icon: Settings,
             color: 'text-amber-400',
             bg: 'bg-amber-500/10',
             borderHover: 'hover:border-amber-500/40',
