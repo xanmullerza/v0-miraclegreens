@@ -488,7 +488,13 @@ export function CompareView() {
                         {searchResults[index].length > 0 && (
                             <div className="mt-2 p-2 bg-slate-800/60 dark:bg-slate-800 rounded-lg text-[12px] text-slate-100">
                                 {searchResults[index].slice(0,5).map(f => (
-                                    <div key={f.id} className="py-1 border-b last:border-b-0 border-slate-700">{f.common_name || f.name}</div>
+                                    <button
+                                        key={f.id}
+                                        onMouseDown={(e) => { e.preventDefault(); handleSelectFood(f, index); }}
+                                        className="w-full text-left py-1 border-b last:border-b-0 border-slate-700 hover:bg-slate-700 rounded"
+                                    >
+                                        {f.common_name || f.name}
+                                    </button>
                                 ))}
                             </div>
                         )}
