@@ -104,7 +104,7 @@ export default function KitchenPage() {
                     <div className="absolute inset-0 bg-gradient-to-tr from-amber-400 to-rose-500 rounded-full blur-3xl" />
                 </div>
 
-                <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
+                <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 items-center">
                     {/* Left — Welcome Text */}
                     <div>
                         
@@ -155,7 +155,7 @@ export default function KitchenPage() {
                     </div>
 
                     {/* Right — 2×2 Action Grid */}
-                    <div className="grid grid-cols-2 gap-3 lg:gap-4 justify-items-center">
+                    <div className="grid grid-cols-2 gap-1 lg:gap-2 justify-items-center">
                         {heroCards.map((card) => {
                             const Icon = card.icon;
                             return (
@@ -215,7 +215,7 @@ export default function KitchenPage() {
             {/* Grid Display When Hero is Hidden */}
             {!showHeroes && (
                 <div className="w-full max-w-7xl flex justify-center mt-6 lg:mt-8">
-                    <div className="grid grid-cols-2 gap-3 lg:gap-4 justify-items-center">
+                    <div className="grid grid-cols-2 gap-1 lg:gap-2 justify-items-center">
                         {heroCards.map((card) => {
                             const Icon = card.icon;
                             return (
