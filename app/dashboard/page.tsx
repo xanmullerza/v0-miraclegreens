@@ -114,7 +114,7 @@ export default function DashboardOverview() {
                     <div className="absolute inset-0 bg-gradient-to-tr from-amber-400 to-rose-500 rounded-full blur-3xl" />
                 </div>
 
-                <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+                <div className="relative z-10">
                     {/* Left — Welcome Text */}
                     <div>
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest mb-8">
@@ -166,193 +166,106 @@ export default function DashboardOverview() {
                             </div>
                         </div>
                     </div>
-
-                    {/* Right — 2×2 Action Grid */}
-                    <div className="grid grid-cols-2 gap-3 lg:gap-4 justify-items-center">
-                        {heroCards.map((card) => {
-                            const Icon = card.icon;
-                            const isKitchen = card.id === 'kitchen';
-                            const isDisabled = isKitchen && !isAdmin;
-
-                            if (isDisabled) {
-                                return (
-                                    <div
-                                        key={card.id}
-                                        className="relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/30 bg-slate-800/20 p-5 lg:p-6 opacity-60 cursor-not-allowed select-none group w-44 sm:w-48 lg:w-56 aspect-square"
-                                    >
-                                        <div className="absolute top-3 right-3 z-20">
-                                            <span className="px-1.5 py-0.5 rounded-md bg-slate-800/80 border border-slate-700 text-[8px] font-black uppercase tracking-widest text-slate-500">
-                                                Locked
-                                            </span>
-                                        </div>
-
-                                        <div className="relative z-10 grayscale opacity-50 transition-all duration-300 group-hover:opacity-70 group-hover:grayscale-0">
-                                            <div className="w-10 h-10 lg:w-11 lg:h-11 rounded-xl flex items-center justify-center mb-4 bg-slate-800/50">
-                                                <Icon size={18} className="text-slate-500" />
-                                            </div>
-
-                                            <h3 className="text-sm font-black text-slate-400 mb-1 tracking-tight">
-                                                {card.title}
-                                            </h3>
-                                            <p className="text-[11px] text-slate-600 leading-snug mb-4">
-                                                {card.desc}
-                                            </p>
-
-                                            <div className="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-slate-700">
-                                                Coming Soon
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            }
-
-                            return (
-                                <Link
-                                    key={card.id}
-                                    href={card.href}
-                                    className={cn(
-                                        "group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 lg:p-6 transition-all duration-500 w-44 sm:w-48 lg:w-56 aspect-square",
-                                        card.borderHover,
-                                        "hover:bg-slate-800/70 hover:shadow-2xl",
-                                    )}
-                                >
-                                    {/* Gradient accent at top */}
-                                    <div className={cn(
-                                        "absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-all duration-500",
-                                        card.gradient,
-                                    )} />
-
-                                    {/* Glow */}
-                                    <div className={cn(
-                                        "absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl transition-all duration-700 opacity-0 group-hover:opacity-100",
-                                        card.bg,
-                                    )} />
-
-                                    <div className="relative z-10">
-                                        <div className={cn(
-                                            "w-10 h-10 lg:w-11 lg:h-11 rounded-xl flex items-center justify-center mb-4 transition-all duration-500",
-                                            card.bg,
-                                        )}>
-                                            <Icon size={18} className={card.color} />
-                                        </div>
-
-                                        <h3 className="text-sm font-black text-white mb-1 tracking-tight group-hover:text-white transition-colors">
-                                            {card.title}
-                                        </h3>
-                                        <p className="text-[11px] text-slate-500 leading-snug mb-4">
-                                            {card.desc}
-                                        </p>
-
-                                        <div className={cn(
-                                            "flex items-center gap-1 text-[9px] font-black uppercase tracking-widest transition-all duration-300",
-                                            card.color,
-                                            "opacity-60 group-hover:opacity-100",
-                                        )}>
-                                            Explore
-                                            <ArrowRight size={10} className="transition-transform" />
-                                        </div>
-                                    </div>
-                                </Link>
-                            );
-                        })}
-                    </div>
                 </div>
             </div>
             )}
 
-            {/* Grid Display When Hero is Hidden */}
-            {!showHeroes && (
-                <div className="w-full max-w-7xl flex justify-center mt-6 lg:mt-8">
-                    <div className="grid grid-cols-2 gap-3 lg:gap-4">
-                        {heroCards.map((card) => {
-                            const Icon = card.icon;
-                            const isKitchen = card.id === 'kitchen';
-                            const isDisabled = isKitchen && !isAdmin;
+            {/* Tiles container (separate from hero) - always rendered so placement is stable */}
+            <div className={cn(
+                "w-full max-w-7xl",
+                showHeroes ? "flex justify-end -mt-40 lg:-mt-44" : "flex justify-center mt-6 lg:mt-8"
+            )}>
+                <div className="grid grid-cols-2 gap-3 lg:gap-4 justify-items-center">
+                    {heroCards.map((card) => {
+                        const Icon = card.icon;
+                        const isKitchen = card.id === 'kitchen';
+                        const isDisabled = isKitchen && !isAdmin;
 
-                            if (isDisabled) {
-                                return (
-                                    <div
-                                        key={card.id}
-                                        className="relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/30 bg-slate-800/20 p-5 lg:p-6 opacity-60 cursor-not-allowed select-none group aspect-square"
-                                    >
-                                        <div className="absolute top-3 right-3 z-20">
-                                            <span className="px-1.5 py-0.5 rounded-md bg-slate-800/80 border border-slate-700 text-[8px] font-black uppercase tracking-widest text-slate-500">
-                                                Locked
-                                            </span>
-                                        </div>
-
-                                        <div className="relative z-10 grayscale opacity-50 transition-all duration-300 group-hover:opacity-70 group-hover:grayscale-0">
-                                            <div className="w-10 h-10 lg:w-11 lg:h-11 rounded-xl flex items-center justify-center mb-4 bg-slate-800/50">
-                                                <Icon size={18} className="text-slate-500" />
-                                            </div>
-
-                                            <h3 className="text-sm font-black text-slate-400 mb-1 tracking-tight">
-                                                {card.title}
-                                            </h3>
-                                            <p className="text-[11px] text-slate-600 leading-snug mb-4">
-                                                {card.desc}
-                                            </p>
-
-                                            <div className="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-slate-700">
-                                                Coming Soon
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            }
-
+                        if (isDisabled) {
                             return (
-                                <Link
+                                <div
                                     key={card.id}
-                                    href={card.href}
-                                    className={cn(
-                                        "group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 lg:p-6 transition-all duration-500 aspect-square",
-                                        card.borderHover,
-                                        "hover:bg-slate-800/70 hover:shadow-2xl",
-                                    )}
+                                    className="relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/30 bg-slate-800/20 p-5 lg:p-6 opacity-60 cursor-not-allowed select-none group w-44 sm:w-48 lg:w-56 aspect-square"
                                 >
-                                    {/* Gradient accent at top */}
-                                    <div className={cn(
-                                        "absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-all duration-500",
-                                        card.gradient,
-                                    )} />
+                                    <div className="absolute top-3 right-3 z-20">
+                                        <span className="px-1.5 py-0.5 rounded-md bg-slate-800/80 border border-slate-700 text-[8px] font-black uppercase tracking-widest text-slate-500">
+                                            Locked
+                                        </span>
+                                    </div>
 
-                                    {/* Glow */}
-                                    <div className={cn(
-                                        "absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl transition-all duration-700 opacity-0 group-hover:opacity-100",
-                                        card.bg,
-                                    )} />
-
-                                    <div className="relative z-10">
-                                        <div className={cn(
-                                            "w-10 h-10 lg:w-11 lg:h-11 rounded-xl flex items-center justify-center mb-4 transition-all duration-500",
-                                            card.bg,
-                                        )}>
-                                            <Icon size={18} className={card.color} />
+                                    <div className="relative z-10 grayscale opacity-50 transition-all duration-300 group-hover:opacity-70 group-hover:grayscale-0">
+                                        <div className="w-10 h-10 lg:w-11 lg:h-11 rounded-xl flex items-center justify-center mb-4 bg-slate-800/50">
+                                            <Icon size={18} className="text-slate-500" />
                                         </div>
 
-                                        <h3 className="text-sm font-black text-white mb-1 tracking-tight group-hover:text-white transition-colors">
+                                        <h3 className="text-sm font-black text-slate-400 mb-1 tracking-tight">
                                             {card.title}
                                         </h3>
-                                        <p className="text-[11px] text-slate-500 leading-snug mb-4">
+                                        <p className="text-[11px] text-slate-600 leading-snug mb-4">
                                             {card.desc}
                                         </p>
 
-                                        <div className={cn(
-                                            "flex items-center gap-1 text-[9px] font-black uppercase tracking-widest transition-all duration-300",
-                                            card.color,
-                                            "opacity-60 group-hover:opacity-100",
-                                        )}>
-                                            Explore
-                                            <ArrowRight size={10} className="transition-transform" />
+                                        <div className="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-slate-700">
+                                            Coming Soon
                                         </div>
                                     </div>
-                                </Link>
+                                </div>
                             );
-                        })}
-                    </div>
+                        }
+
+                        return (
+                            <Link
+                                key={card.id}
+                                href={card.href}
+                                className={cn(
+                                    "group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 lg:p-6 transition-all duration-500 w-44 sm:w-48 lg:w-56 aspect-square",
+                                    card.borderHover,
+                                    "hover:bg-slate-800/70 hover:shadow-2xl",
+                                )}
+                            >
+                                {/* Gradient accent at top */}
+                                <div className={cn(
+                                    "absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-all duration-500",
+                                    card.gradient,
+                                )} />
+
+                                {/* Glow */}
+                                <div className={cn(
+                                    "absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl transition-all duration-700 opacity-0 group-hover:opacity-100",
+                                    card.bg,
+                                )} />
+
+                                <div className="relative z-10">
+                                    <div className={cn(
+                                        "w-10 h-10 lg:w-11 lg:h-11 rounded-xl flex items-center justify-center mb-4 transition-all duration-500",
+                                        card.bg,
+                                    )}>
+                                        <Icon size={18} className={card.color} />
+                                    </div>
+
+                                    <h3 className="text-sm font-black text-white mb-1 tracking-tight group-hover:text-white transition-colors">
+                                        {card.title}
+                                    </h3>
+                                    <p className="text-[11px] text-slate-500 leading-snug mb-4">
+                                        {card.desc}
+                                    </p>
+
+                                    <div className={cn(
+                                        "flex items-center gap-1 text-[9px] font-black uppercase tracking-widest transition-all duration-300",
+                                        card.color,
+                                        "opacity-60 group-hover:opacity-100",
+                                    )}>
+                                        Explore
+                                        <ArrowRight size={10} className="transition-transform" />
+                                    </div>
+                                </div>
+                            </Link>
+                        );
+                    })}
                 </div>
-            )}
+            </div>
+
+            
 
         </div>
     );
