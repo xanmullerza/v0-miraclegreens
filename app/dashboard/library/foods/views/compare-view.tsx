@@ -116,6 +116,33 @@ export function CompareView() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Test Supabase connectivity on mount
+    useEffect(() => {
+        const testSupabaseConnection = async () => {
+            try {
+                console.log('[CompareView] Testing Supabase connectivity...');
+                const { data, error } = await supabase
+                    .from('food_items')
+                    .select('id, name, common_name')
+                    .limit(1);
+                
+                if (error) {
+                    console.error('[CompareView] Supabase error:', error);
+                    toast.error(`Database connection error: ${error.message}`);
+                } else {
+                    console.log('[CompareView] Supabase connection successful. Sample data:', data);
+                    if (!data || data.length === 0) {
+                        console.warn('[CompareView] Warning: food_items table appears to be empty');
+                    }
+                }
+            } catch (err) {
+                console.error('[CompareView] Error testing Supabase connection:', err);
+            }
+        };
+        
+        testSupabaseConnection();
+    }, []);
+
     const performSearch = async (query: string, index: number) => {
         if (!query || query.length < 2) {
             setSearchResults(prev => {
@@ -133,22 +160,68 @@ export function CompareView() {
         });
 
         try {
-            const { data, error } = await supabase
+            console.log(`[CompareView] Searching for: "${query}" in index ${index}`);
+            
+            // Primary search using .or() syntax
+            let { data, error } = await supabase
                 .from('food_items')
                 .select('*')
                 .or(`name.ilike.%${query}%,common_name.ilike.%${query}%`)
                 .limit(5);
 
-            if (error) throw error;
+            console.log(`[CompareView] Primary search result count: ${data?.length || 0}, error: ${error?.message || 'none'}`);
+
+            // Fallback: If primary search fails or returns no results, try alternative approach
+            if (error || !data || data.length === 0) {
+                console.log('[CompareView] Trying fallback search method...');
+                
+                // Try searching name field only first
+                const { data: nameData, error: nameError } = await supabase
+                    .from('food_items')
+                    .select('*')
+                    .ilike('name', `%${query}%`)
+                    .limit(5);
+                
+                if (nameError) {
+                    console.error('[CompareView] Fallback name search error:', nameError);
+                } else if (nameData && nameData.length > 0) {
+                    console.log('[CompareView] Fallback name search successful, found', nameData.length, 'results');
+                    data = nameData;
+                    error = null;
+                } else {
+                    // Try searching common_name field
+                    const { data: commonData, error: commonError } = await supabase
+                        .from('food_items')
+                        .select('*')
+                        .ilike('common_name', `%${query}%`)
+                        .limit(5);
+                    
+                    if (commonError) {
+                        console.error('[CompareView] Fallback common_name search error:', commonError);
+                    } else if (commonData && commonData.length > 0) {
+                        console.log('[CompareView] Fallback common_name search successful, found', commonData.length, 'results');
+                        data = commonData;
+                        error = null;
+                    }
+                }
+            }
+
+            if (error) {
+                console.error('Search error details:', error);
+                throw error;
+            }
 
             setSearchResults(prev => {
                 const next = [...prev];
                 next[index] = data || [];
                 return next;
             });
+            
+            console.log(`[CompareView] Updated search results for index ${index}:`, data?.length || 0, 'items');
         } catch (error) {
             console.error('Search error:', error);
-            toast.error("Search failed");
+            const errorMsg = error instanceof Error ? error.message : 'Search failed';
+            toast.error(`Search failed: ${errorMsg}`);
         } finally {
             setIsLoading(prev => {
                 const next = [...prev];
