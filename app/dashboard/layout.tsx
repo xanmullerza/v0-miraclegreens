@@ -256,8 +256,8 @@ function DashboardLayoutContent({
                         </div>
                     </div>
 
-                    {/* Breadcrumb Subheader - Hidden on nutrient detail pages */}
-                    {!pathname.match(/\/library\/nutrients\/[^/]+$/) && (
+                    {/* Breadcrumb Subheader - Hidden on nutrient pages */}
+                    {!pathname.match(/\/library\/nutrients(\/[^/]+)?$/) && (
                     <div className="sticky top-16 z-10 w-full border-b border-slate-200/30 dark:border-slate-800/30 bg-white/5 dark:bg-slate-900/5 backdrop-blur-sm px-8 py-1 flex items-center justify-center gap-4">
                         {/* Back Button */}
                         <button
