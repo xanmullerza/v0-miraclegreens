@@ -760,8 +760,6 @@ export default function FoodDetailsPage() {
 
             {/* Unified Hub Navigation (Replaces Old Nav) */}
             <div className="flex flex-col gap-6 items-start w-full">
-                {renderTabGroup(ingredientTabs, "", "text-slate-500", true)}
-
                 <div className="flex items-center gap-4 animate-in fade-in slide-in-from-right-8 duration-700 w-full">
                     {/* Category Pills (Limited Selection for Row) */}
                     <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2">

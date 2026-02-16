@@ -228,7 +228,6 @@ function KitchenContent() {
 
                 {/* Tab Section & Filters */}
                 <div className="flex flex-col gap-6 items-start w-full">
-                    {renderTabGroup(mealsTabs, "🍽️ Meals & Recipes", "text-slate-500", true)}
                 </div>
 
                 {['browse', 'mealplanner'].includes(activeTab) && (

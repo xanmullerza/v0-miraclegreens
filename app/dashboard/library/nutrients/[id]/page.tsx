@@ -414,8 +414,6 @@ export default function NutrientDetailsPage() {
 
             {/* Hub Navigation Area */}
             <div className="flex flex-col gap-6 items-start w-full">
-                {renderTabGroup(libraryTabs, "", "text-slate-500", true)}
-
                 {/* Perspective Selection (Triple Dropdown Filter) */}
                 <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
                     {/* Welcome Button */}

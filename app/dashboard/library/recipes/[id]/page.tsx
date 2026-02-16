@@ -1106,7 +1106,6 @@ export default function RecipeDetailsPage() {
 
                 {/* Tab Navigation Hub */}
                 <div className="flex flex-col gap-6 items-start w-full">
-                    {renderTabGroup(mealTabs, "🍽️ Meals & Recipes", "text-slate-500", true)}
                 </div>
 
                 {/* Controls Row - Like Food Page's Amount/Measure Row */}
