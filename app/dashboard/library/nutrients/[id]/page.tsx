@@ -442,7 +442,7 @@ export default function NutrientDetailsPage() {
                                 <DropdownMenuCheckboxItem
                                     key={id}
                                     checked={nutrientId === id}
-                                    onCheckedChange={() => router.push(`/library/nutrients/${encodeURIComponent(id)}`)}
+                                    onCheckedChange={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}`)}
                                     className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
                                 >
                                     {id}
@@ -472,7 +472,7 @@ export default function NutrientDetailsPage() {
                                 <DropdownMenuCheckboxItem
                                     key={id}
                                     checked={nutrientId === id}
-                                    onCheckedChange={() => router.push(`/library/nutrients/${encodeURIComponent(id)}`)}
+                                    onCheckedChange={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}`)}
                                     className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
                                 >
                                     {id}
@@ -502,7 +502,7 @@ export default function NutrientDetailsPage() {
                                 <DropdownMenuCheckboxItem
                                     key={id}
                                     checked={nutrientId === id}
-                                    onCheckedChange={() => router.push(`/library/nutrients/${encodeURIComponent(id)}`)}
+                                    onCheckedChange={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}`)}
                                     className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
                                 >
                                     {id}
