@@ -90,6 +90,33 @@ export default function NutrientsPage() {
             {/* Sticky Filter Header */}
             <div className="sticky top-0 z-50 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 shadow-sm">
                 <div className="px-8 py-3 flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
+                    {/* Breadcrumbs on the Left */}
+                    <div className="flex items-center gap-2 whitespace-nowrap flex-shrink-0">
+                        {pathname.split('/').filter(Boolean).map((segment, index, array) => {
+                            const path = '/' + array.slice(0, index + 1).join('/');
+                            const isLast = index === array.length - 1;
+                            const isFirst = index === 0;
+
+                            return (
+                                <React.Fragment key={path}>
+                                    {!isFirst && <ChevronRight size={12} className="text-slate-300 dark:text-slate-600" />}
+                                    {isLast ? (
+                                        <span className="text-xs font-black text-emerald-500 uppercase tracking-widest">
+                                            {decodeURIComponent(segment).replace(/-/g, ' ')}
+                                        </span>
+                                    ) : (
+                                        <Link
+                                            href={path}
+                                            className="text-xs font-black text-slate-400 hover:text-emerald-500 uppercase tracking-widest transition-colors"
+                                        >
+                                            {decodeURIComponent(segment).replace(/-/g, ' ')}
+                                        </Link>
+                                    )}
+                                </React.Fragment>
+                            );
+                        })}
+                    </div>
+
                     {/* Filters on the Right */}
                     <div className="flex items-center gap-2 flex-wrap md:ml-auto">
                         {/* Welcome Button */}
