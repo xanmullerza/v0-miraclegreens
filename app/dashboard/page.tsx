@@ -173,9 +173,12 @@ export default function DashboardOverview() {
             {/* Tiles container (separate from hero) - always rendered so placement is stable */}
             <div className={cn(
                 "w-full max-w-7xl",
-                showHeroes ? "flex justify-end -mt-40 lg:-mt-44" : "flex justify-center mt-6 lg:mt-8"
+                // Bound the tiles area to fit between subheader and footer, vertically center when hero shown.
+                showHeroes
+                    ? "flex justify-end items-center h-[calc(100vh-8rem)]"
+                    : "flex justify-center items-start h-[calc(100vh-8rem)] pt-6"
             )}>
-                <div className="grid grid-cols-2 gap-3 lg:gap-4 justify-items-center">
+                <div className="grid grid-cols-2 gap-3 lg:gap-4 justify-items-center max-h-full overflow-visible">
                     {heroCards.map((card) => {
                         const Icon = card.icon;
                         const isKitchen = card.id === 'kitchen';
