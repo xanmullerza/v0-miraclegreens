@@ -782,6 +782,11 @@ export default function NutrientDetailsPage() {
                                                         style={{ width: `${Math.min((nutrientValue * (measureGrams / 100) / maxNutrientValue) * 100, 100)}%` }}
                                                     />
                                                 </div>
+                                                {/* RDA percentage row - shows how much of user's RDA this portion provides */}
+                                                <div className="mt-2 flex items-center justify-between">
+                                                    <span className="text-[11px] font-black text-slate-500 uppercase tracking-wider">Portion</span>
+                                                    <span className="text-[11px] font-black text-emerald-500 uppercase tracking-wider">{rdaPercentage > 0 ? `${rdaPercentage}% RDA` : '—'}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </button>
