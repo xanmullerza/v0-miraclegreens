@@ -57,7 +57,7 @@ export default function DashboardOverview() {
 
             {showHeroes ? (
                 <div className="w-full max-w-7xl relative">
-                    <div className="relative rounded-[2.5rem] bg-slate-900 border border-slate-800 pt-12 pb-8 px-8 lg:pt-16 lg:pb-12 lg:px-12 xl:pt-20 xl:pb-16 xl:px-16 w-full flex items-start gap-8">
+                    <div className="relative rounded-[2.5rem] bg-slate-900 border border-slate-800 mt-6 pt-12 pb-8 px-8 lg:mt-8 lg:pt-16 lg:pb-12 lg:px-12 xl:mt-10 xl:pt-20 xl:pb-16 xl:px-16 w-full flex items-center gap-6">
                         <div className="absolute top-0 right-0 w-96 h-96 opacity-[0.06] pointer-events-none">
                             <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-500 rounded-full blur-3xl" />
                         </div>
@@ -66,11 +66,6 @@ export default function DashboardOverview() {
                         </div>
 
                         <div className="flex-1 relative z-10">
-                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest mb-8">
-                                <Zap size={12} className="fill-current" />
-                                Your Health Companion
-                            </div>
-
                             <h1 className="text-3xl lg:text-5xl font-black text-white tracking-tighter leading-[0.95] mb-6">
                                 Welcome to <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">Vitala.</span>
                             </h1>
