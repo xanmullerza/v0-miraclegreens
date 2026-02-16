@@ -318,7 +318,7 @@ export default function NutrientDetailsPage() {
                 .not(col, 'is', null)
                 .not('category', 'in', '(Flavour,Supplements)')
                 .order(col, { ascending: false })
-                .limit(6);
+                .limit(20);
 
             if (error) {
                 // FALLBACK: If column doesn't exist, search the micronutrients JSONB column
@@ -333,7 +333,7 @@ export default function NutrientDetailsPage() {
                     const sorted = jsonMatch
                         .filter(f => f.micronutrients && f.micronutrients[nutrientInfoKey] !== undefined)
                         .sort((a, b) => (b.micronutrients[nutrientInfoKey] || 0) - (a.micronutrients[nutrientInfoKey] || 0))
-                        .slice(0, 6);
+                        .slice(0, 20);
                     setTopFoods(sorted);
                 }
             } else {
