@@ -263,10 +263,10 @@ export default function NutrientsPage() {
                             Understanding Essential Nutrients
                         </h3>
                         <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                            Essential nutrients are substances your body cannot produce on its own, so you must obtain them through food and supplements. These vital compounds are the building blocks of life, enabling your body to function optimally, maintain energy, support growth, and fight off disease. Without adequate nutrition, your body cannot perform basic functions like breathing, thinking, digesting food, or maintaining a healthy immune system.
+                            Essential nutrients are substances your body needs but cannot make on its own. Think of them like ingredients your body needs daily to work properly. Without them, your body can't do basic things like get energy, build muscle, fight infections, or think clearly.
                         </p>
                         <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                            There are six main categories of essential nutrients: carbohydrates, proteins, fats, vitamins, minerals, and water. Each plays a unique and critical role in maintaining health, preventing disease, and allowing your body to perform at its best.
+                            There are six main groups of nutrients: carbohydrates (energy), proteins (building material), fats (hormone and energy support), vitamins (help with body functions), minerals (strengthen bones and regulate body processes), and water. We need all of them to stay healthy.
                         </p>
                     </div>
 
@@ -275,10 +275,10 @@ export default function NutrientsPage() {
                             Why Minerals Matter
                         </h3>
                         <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                            Minerals are inorganic substances essential for countless bodily functions. These elemental compounds regulate nerve signals, support muscle contraction, maintain fluid balance, and strengthen bones and teeth. Calcium, magnesium, potassium, sodium, iron, zinc, and selenium are just a few of the critical minerals your body needs daily.
+                            Minerals are natural substances found in foods that your body needs to function. Common minerals like calcium, magnesium, iron, and potassium do important jobs: calcium makes bones strong, iron carries oxygen in your blood, potassium keeps your heart beating properly, and magnesium helps your muscles relax.
                         </p>
                         <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                            Minerals work synergistically with other nutrients to support your cardiovascular system, metabolic processes, and immune defense. For example, iron carries oxygen throughout your blood, magnesium helps muscles relax and nerves communicate, and potassium regulates blood pressure and heart function. A deficiency in even one mineral can cascade into multiple health problems, which is why consuming a varied diet rich in mineral-dense foods is crucial for optimal health.
+                            Without enough minerals, your body struggles. For example, if you don't get enough iron, you feel tired and weak. If you don't get enough calcium, your bones become weak and fragile. The good news is that eating a variety of foods—vegetables, whole grains, nuts, and beans—gives you the minerals you need to feel your best and stay healthy.
                         </p>
                     </div>
 
@@ -287,10 +287,10 @@ export default function NutrientsPage() {
                             The Vital Role of Vitamins
                         </h3>
                         <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                            Vitamins are organic compounds that your body needs to function properly. Unlike minerals, vitamins can be broken down by heat or acid, so they're more delicate and require careful handling during food preparation. There are 13 essential vitamins that fall into two categories: water-soluble (B vitamins and vitamin C) and fat-soluble (vitamins A, D, E, and K).
+                            Vitamins are organic compounds that keep your body running smoothly. They help turn food into energy, boost your immune system, heal wounds, and protect your cells from damage. There are 13 essential vitamins your body can't do without.
                         </p>
                         <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                            Vitamins serve as cofactors for hundreds of metabolic reactions in your body. They boost immunity, support energy production, promote wound healing, protect against cellular damage, and help convert food into usable energy. B vitamins, for instance, are critical for energy metabolism and nervous system function. Vitamin C strengthens your immune system and supports collagen production. Vitamin D regulates calcium absorption and influences gene expression. Vitamin deficiencies can lead to serious conditions like scurvy, beriberi, pellagra, and anemia—conditions that were once common but can easily be prevented through proper nutrition.
+                            Think of vitamins like the spark plugs in a car—they make things happen. Vitamin C helps you fight colds and makes your skin glow. B vitamins give you energy and keep your brain working well. Vitamin D helps your body absorb calcium and keeps you feeling happy. Without the right vitamins, you get tired, get sick more often, and don't feel like yourself. Eating fruits, vegetables, and whole foods makes sure you get all the vitamins you need.
                         </p>
                     </div>
 
@@ -299,10 +299,10 @@ export default function NutrientsPage() {
                             Macronutrients: Your Body's Fuel and Structure
                         </h3>
                         <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                            Macronutrients—carbohydrates, proteins, and fats—are needed in larger quantities because they provide energy and serve as structural components of cells. Carbohydrates are your brain and muscles' preferred fuel source. Proteins are building blocks for tissues, enzymes, and hormones. Fats support hormone production, insulate organs, and enable the absorption of fat-soluble vitamins. Fiber, though technically a carbohydrate, deserves special mention for its role in digestive health, blood sugar regulation, and maintaining healthy cholesterol levels.
+                            Macronutrients are the big three: carbs, proteins, and fats. You need them in larger amounts because they provide energy and build your body. Carbs are your brain's favorite fuel—they give you energy to think and move. Proteins build your muscles, skin, and hair. Fats help your brain work, protect your organs, and help your body absorb vitamins.
                         </p>
                         <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                            The key to good nutrition is balance. Consuming the right proportion of macronutrients alongside adequate micronutrients (vitamins and minerals) creates the foundation for vibrant health. This is where exploring individual nutrients becomes valuable—understanding each nutrient's role helps you make informed food choices that nourish your body completely.
+                            Fiber is also important—it helps your digestion work smoothly, keeps your blood sugar stable, and makes you feel full longer. The secret to good health is eating the right balance of all these nutrients. That's where this tool comes in handy. By exploring individual nutrients, you'll learn which foods give you what you need, so you can eat smart and feel great.
                         </p>
                     </div>
                 </div>
