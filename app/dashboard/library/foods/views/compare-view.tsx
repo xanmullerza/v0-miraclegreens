@@ -119,6 +119,26 @@ export function CompareView() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Diagnostic: log element under pointer when user clicks while a search is active
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (activeSearchIndex === null) return;
+            try {
+                const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+                const tag = el?.tagName || 'none';
+                const cls = el?.className || '';
+                const msg = `[CompareView] click at (${e.clientX},${e.clientY}) -> ${tag} ${cls}`;
+                console.log(msg);
+                setLastSearchLog(msg);
+            } catch (err) {
+                console.error('ElementFromPoint error', err);
+            }
+        };
+
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
+    }, [activeSearchIndex]);
+
     // Test Supabase connectivity on mount
     useEffect(() => {
         const testSupabaseConnection = async () => {
