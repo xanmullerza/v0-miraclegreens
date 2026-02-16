@@ -698,9 +698,9 @@ export default function NutrientDetailsPage() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {loadingFoods ? (
-                                [1, 2, 3, 4, 5, 6].map(i => <div key={i} className="h-32 w-full animate-pulse bg-slate-50 dark:bg-slate-900/50 rounded-[2rem]" />)
+                                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map(i => <div key={i} className="h-32 w-full animate-pulse bg-slate-50 dark:bg-slate-900/50 rounded-[2rem]" />)
                             ) : topFoods.length > 0 ? (
-                                topFoods.slice(0, 6).map((food: any) => (
+                                topFoods.slice(0, 20).map((food: any) => (
                                     <button
                                         key={food.id}
                                         onClick={() => router.push(`/dashboard/library/foods/${food.id}`)}
