@@ -258,6 +258,8 @@ export function CompareView() {
     };
 
     const handleSelectFood = (food: FoodItem, index: number) => {
+        console.log(`[CompareView] handleSelectFood called for index ${index} ->`, food?.name || food?.common_name || food?.id);
+        setLastSearchLog && setLastSearchLog(`[CompareView] Selected ${food?.common_name || food?.name}`);
         setSelectedFoods(prev => {
             const next = [...prev];
             next[index] = food;
