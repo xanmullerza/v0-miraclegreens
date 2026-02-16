@@ -257,7 +257,7 @@ function DashboardLayoutContent({
                     </div>
 
                     {/* Breadcrumb Subheader */}
-                    <div className="sticky top-16 z-10 w-full border-b border-slate-200/30 dark:border-slate-800/30 bg-white/5 dark:bg-slate-900/5 backdrop-blur-sm px-8 py-3 flex items-center justify-center gap-4">
+                    <div className="sticky top-16 z-10 w-full border-b border-slate-200/30 dark:border-slate-800/30 bg-white/5 dark:bg-slate-900/5 backdrop-blur-sm px-8 py-2 flex items-center justify-center gap-4">
                         {/* Back Button */}
                         <button
                             onClick={() => router.back()}
