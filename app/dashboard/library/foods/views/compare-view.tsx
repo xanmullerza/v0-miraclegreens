@@ -372,7 +372,7 @@ export function CompareView() {
             {/* Search Header */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6" ref={searchRef}>
                 {[0, 1, 2].map((index) => (
-                    <div key={index} className="relative group">
+                    <div key={index} className="relative group overflow-visible">
                         <div className={cn(
                             "bg-white dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500",
                             activeSearchIndex === index ? "ring-2 ring-emerald-500/50" : ""
@@ -429,7 +429,7 @@ export function CompareView() {
 
                         {/* Search Results Dropdown */}
                         {activeSearchIndex === index && searchResults[index].length > 0 && (
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl z-50 overflow-hidden animate-in slide-in-from-top-4 duration-300">
+                            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl z-[9999] overflow-visible animate-in slide-in-from-top-4 duration-300">
                                 {searchResults[index].map((food) => (
                                     <button
                                         key={food.id}
@@ -458,6 +458,15 @@ export function CompareView() {
                                         </div>
                                         <Plus size={14} className="text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                                     </button>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Inline debug list (always visible for dev) */}
+                        {searchResults[index].length > 0 && (
+                            <div className="mt-2 p-2 bg-slate-800/60 dark:bg-slate-800 rounded-lg text-[12px] text-slate-100">
+                                {searchResults[index].slice(0,5).map(f => (
+                                    <div key={f.id} className="py-1 border-b last:border-b-0 border-slate-700">{f.common_name || f.name}</div>
                                 ))}
                             </div>
                         )}
