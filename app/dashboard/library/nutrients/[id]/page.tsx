@@ -365,6 +365,34 @@ export default function NutrientDetailsPage() {
 
     const dynamicMax = Math.max(targetVal, effectiveUL) * 1.5;
 
+    // Helper function to get nutrient value from food
+    const columnMap: Record<string, string> = {
+        'Potassium': 'potassium_mg',
+        'Magnesium': 'magnesium_mg',
+        'Calcium': 'calcium_mg',
+        'Sodium': 'sodium_mg',
+        'Iron': 'iron_mg',
+        'Zinc': 'zinc_mg',
+        'Vitamin A': 'vitamin_a_ug',
+        'Vitamin C': 'vitamin_c_mg',
+        'Vitamin D': 'vitamin_d_ug',
+        'Vitamin E': 'vitamin_e_mg',
+        'Vitamin K': 'vitamin_k_ug',
+        'Protein': 'protein_g',
+        'Fiber': 'fiber_g',
+        'Carbs': 'carbs_g',
+        'Fat': 'fat_g'
+    };
+
+    const col = columnMap[nutrientInfoKey] || nutrientInfoKey.toLowerCase().replace(/ /g, '_').replace(/[()]/g, '');
+
+    const getNutrientValue = (food: any): number => {
+        const value = food[col] || (food.micronutrients ? food.micronutrients[nutrientInfoKey] : 0);
+        return parseFloat(value) || 0;
+    };
+
+    const maxNutrientValue = topFoods.length > 0 ? Math.max(...topFoods.map(getNutrientValue)) : 1;
+
     return (
         <div className="flex flex-col w-full min-h-screen">
             {/* Sticky Filter Header */}
@@ -696,17 +724,20 @@ export default function NutrientDetailsPage() {
                             </button>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                             {loadingFoods ? (
                                 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map(i => <div key={i} className="h-32 w-full animate-pulse bg-slate-50 dark:bg-slate-900/50 rounded-[2rem]" />)
                             ) : topFoods.length > 0 ? (
-                                topFoods.slice(0, 20).map((food: any) => (
+                                topFoods.slice(0, 20).map((food: any) => {
+                                    const nutrientValue = getNutrientValue(food);
+                                    const percentage = maxNutrientValue > 0 ? (nutrientValue / maxNutrientValue) * 100 : 0;
+                                    return (
                                     <button
                                         key={food.id}
                                         onClick={() => router.push(`/dashboard/library/foods/${food.id}`)}
-                                        className="relative flex items-center gap-6 p-5 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/5 transition-all group overflow-hidden text-left"
+                                        className="relative flex flex-col gap-3 p-4 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/5 transition-all group overflow-hidden text-left"
                                     >
-                                        <div className="w-20 h-20 rounded-2xl bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500">
+                                        <div className="w-full h-24 rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500">
                                             {food.image ? (
                                                 <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
                                             ) : (
@@ -716,17 +747,31 @@ export default function NutrientDetailsPage() {
                                             )}
                                         </div>
 
-                                        <div className="space-y-1 z-10 min-w-0">
-                                            <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none mb-1 opacity-0 group-hover:opacity-100 transition-opacity -translate-y-2 group-hover:translate-y-0 duration-300">
+                                        <div className="space-y-2 z-10 min-w-0">
+                                            <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                                 View Source
                                             </p>
-                                            <p className="text-sm font-black uppercase tracking-tight text-slate-900 dark:text-white leading-tight italic truncate pr-2">
+                                            <p className="text-xs font-black uppercase tracking-tight text-slate-900 dark:text-white leading-tight italic line-clamp-2">
                                                 {food.common_name || food.name}
                                             </p>
-                                            <div className="h-0.5 w-8 bg-slate-100 dark:bg-slate-800 group-hover:w-full group-hover:bg-emerald-500 transition-all duration-500" />
+                                            
+                                            <div className="pt-1">
+                                                <div className="flex items-center justify-between mb-1.5">
+                                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider">
+                                                        {nutrientValue.toFixed(1)} {unit}
+                                                    </span>
+                                                </div>
+                                                <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                                    <div 
+                                                        className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-300"
+                                                        style={{ width: `${Math.min(percentage, 100)}%` }}
+                                                    />
+                                                </div>
+                                            </div>
                                         </div>
                                     </button>
-                                ))
+                                    );
+                                })
                             ) : (
                                 <div className="col-span-full py-16 text-center bg-slate-50/50 dark:bg-slate-900/30 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
                                     <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest italic">No whole food scans recorded for this profile.</p>
