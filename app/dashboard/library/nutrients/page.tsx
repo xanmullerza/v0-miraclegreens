@@ -72,7 +72,7 @@ export default function NutrientsPage() {
     // Here, we'll use them as quick navigation or high-level filtering.
     // Since the dropdowns pick a SPECIFIC nutrient, navigation is the best UX.
 
-    const MACROS = ['energy_kcal', 'protein_g', 'carbs_g', 'fat_g', 'Fiber', 'Sugar', 'Omega-3', 'Cholesterol'];
+    const MACROS = ['energy_kcal', 'protein_g', 'carbs_g', 'fat_g', 'Fiber'];
     const MINERALS = ['Sodium', 'Potassium', 'Magnesium', 'Calcium', 'Phosphorus', 'Iron', 'Zinc', 'Copper', 'Manganese', 'Selenium', 'Oxalate'];
     const VITAMINS = ['Vitamin A', 'Vitamin C', 'Vitamin D', 'Vitamin E', 'Vitamin K', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Choline'];
 
