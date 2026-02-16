@@ -747,9 +747,9 @@ export default function NutrientDetailsPage() {
                                     <button
                                         key={food.id}
                                         onClick={() => router.push(`/dashboard/library/foods/${food.id}`)}
-                                        className="relative flex flex-col gap-3 p-4 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/5 transition-all group overflow-hidden text-left"
+                                        className="relative flex flex-col gap-3 p-4 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/5 transition-all group text-left"
                                     >
-                                        <div className="relative w-full h-24 rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500">
+                                        <div className="w-full h-24 rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500">
                                             {food.image ? (
                                                 <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
                                             ) : (
@@ -757,9 +757,9 @@ export default function NutrientDetailsPage() {
                                                     <Beef size={28} />
                                                 </div>
                                             )}
-                                            <div className="absolute top-2 right-2 bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-lg">
-                                                {rdaPercentage}%
-                                            </div>
+                                        </div>
+                                        <div className="absolute top-6 right-5 bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-lg">
+                                            {rdaPercentage}%
                                         </div>
 
                                         <div className="space-y-2 z-10 min-w-0">
