@@ -758,8 +758,8 @@ export default function NutrientDetailsPage() {
                                                 </div>
                                             )}
                                         </div>
-                                        <div className="absolute top-6 right-5 bg-emerald-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-lg">
-                                            {rdaPercentage}%
+                                        <div className="absolute top-3 right-3 bg-emerald-500 text-white px-2 py-0.5 rounded-md text-[11px] font-black uppercase tracking-wider shadow-lg z-30">
+                                            {rdaPercentage > 0 ? `${rdaPercentage}%` : '—'}
                                         </div>
 
                                         <div className="space-y-2 z-10 min-w-0">
