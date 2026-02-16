@@ -226,7 +226,7 @@ export default function KitchenPage() {
                                     key={card.id}
                                     href={card.href}
                                     className={cn(
-                                        "group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 lg:p-6 transition-all duration-500",
+                                        "group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 lg:p-6 transition-all duration-500 h-32 lg:h-40",
                                         card.borderHover,
                                         "hover:bg-slate-800/70 hover:shadow-2xl",
                                     )}
