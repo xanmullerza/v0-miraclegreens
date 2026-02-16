@@ -91,6 +91,7 @@ export default function NutrientDetailsPage() {
     const [favorites, setFavorites] = useState<string[]>([]);
     const [topFoods, setTopFoods] = useState<any[]>([]);
     const [loadingFoods, setLoadingFoods] = useState(true);
+    const [measureGrams, setMeasureGrams] = useState(100);
 
     // --- Simulation Logic ---
     let targetVal = 0;
@@ -712,16 +713,26 @@ export default function NutrientDetailsPage() {
                                 <h4 className="font-black text-xs uppercase tracking-[0.2em] text-emerald-500">{nutrientInfoKey} Rich Foods</h4>
                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Top bioavailable sources per 100g clinical sample</p>
                             </div>
-                            <button
-                                onClick={() => {
-                                    // Map nutrient names to column names for Top 10 view if possible, or just pass the ID
-                                    router.push(`/dashboard/library?tab=top10&nutrientId=${nutrientId}`);
-                                }}
-                                className="text-[10px] font-black text-emerald-500 uppercase tracking-widest transition-all hover:text-emerald-600 hover:underline flex items-center gap-2 group"
-                            >
-                                View Top 10
-                                <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                            </button>
+                            <div className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-900/10 px-5 py-3 rounded-2xl border border-emerald-200 dark:border-emerald-800/30">
+                                <button
+                                    onClick={() => setMeasureGrams(Math.max(10, measureGrams - 10))}
+                                    className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                                    title="Decrease grams"
+                                >
+                                    <ChevronDown size={16} />
+                                </button>
+                                <div className="flex flex-col items-center gap-0.5 min-w-[65px] text-center">
+                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Measure</span>
+                                    <span className="text-lg font-black text-emerald-600 dark:text-emerald-400">{measureGrams}g</span>
+                                </div>
+                                <button
+                                    onClick={() => setMeasureGrams(measureGrams + 10)}
+                                    className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                                    title="Increase grams"
+                                >
+                                    <ChevronDown size={16} className="rotate-180" />
+                                </button>
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
@@ -758,13 +769,13 @@ export default function NutrientDetailsPage() {
                                             <div className="pt-1">
                                                 <div className="flex items-center justify-between mb-1.5">
                                                     <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider">
-                                                        {nutrientValue.toFixed(1)} {unit}
+                                                        {(nutrientValue * (measureGrams / 100)).toFixed(1)} {unit}
                                                     </span>
                                                 </div>
                                                 <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                                     <div 
                                                         className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-300"
-                                                        style={{ width: `${Math.min(percentage, 100)}%` }}
+                                                        style={{ width: `${Math.min((nutrientValue * (measureGrams / 100) / maxNutrientValue) * 100, 100)}%` }}
                                                     />
                                                 </div>
                                             </div>
