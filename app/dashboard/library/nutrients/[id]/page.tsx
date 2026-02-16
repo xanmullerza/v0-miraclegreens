@@ -364,9 +364,122 @@ export default function NutrientDetailsPage() {
     const dynamicMax = Math.max(targetVal, effectiveUL) * 1.5;
 
     return (
-        <div className="max-w-7xl mx-auto space-y-8 pb-32 animate-in fade-in duration-700">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center gap-8 animate-in slide-in-from-top-4 duration-700 pb-1">
+        <div className="flex flex-col w-full min-h-screen">
+            {/* Sticky Filter Header */}
+            <div className="sticky top-0 z-50 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+                <div className="max-w-7xl mx-auto px-4 py-4">
+                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear">
+                        {/* Welcome Button */}
+                        <button
+                            onClick={() => router.push('/dashboard/library/nutrients/welcome')}
+                            className={cn(
+                                "px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
+                                nutrientId === 'welcome'
+                                    ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20 px-5"
+                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-emerald-500"
+                            )}
+                        >
+                            <Sparkles size={14} />
+                            <span>Welcome</span>
+                        </button>
+
+                        {/* Macro Dropdown */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className={cn(
+                                    "px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
+                                    MACROS_LIST.includes(nutrientInfoKey)
+                                        ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20 px-5"
+                                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
+                                )}>
+                                    <Scale size={14} />
+                                    <span>{MACROS_LIST.includes(nutrientInfoKey) ? nutrientInfoKey : "Macros"}</span>
+                                    <ChevronDown size={12} className="opacity-50" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
+                                <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Macro</DropdownMenuLabel>
+                                <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
+                                {MACROS_LIST.map(id => (
+                                    <DropdownMenuCheckboxItem
+                                        key={id}
+                                        checked={nutrientInfoKey === id}
+                                        onCheckedChange={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}`)}
+                                        className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
+                                    >
+                                        {id}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        {/* Mineral Dropdown */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className={cn(
+                                    "px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
+                                    MINERALS_LIST.includes(nutrientInfoKey)
+                                        ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20 px-5"
+                                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
+                                )}>
+                                    <Gem size={14} />
+                                    <span>{MINERALS_LIST.includes(nutrientInfoKey) ? nutrientInfoKey : "Minerals"}</span>
+                                    <ChevronDown size={12} className="opacity-50" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 max-h-[400px] overflow-y-auto no-scrollbar">
+                                <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Mineral</DropdownMenuLabel>
+                                <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
+                                {MINERALS_LIST.map(id => (
+                                    <DropdownMenuCheckboxItem
+                                        key={id}
+                                        checked={nutrientInfoKey === id}
+                                        onCheckedChange={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}`)}
+                                        className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
+                                    >
+                                        {id}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        {/* Vitamin Dropdown */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className={cn(
+                                    "px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
+                                    VITAMINS_LIST.includes(nutrientInfoKey)
+                                        ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20 px-5"
+                                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
+                                )}>
+                                    <Battery size={14} />
+                                    <span>{VITAMINS_LIST.includes(nutrientInfoKey) ? nutrientInfoKey : "Vitamins"}</span>
+                                    <ChevronDown size={12} className="opacity-50" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 max-h-[400px] overflow-y-auto no-scrollbar">
+                                <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Vitamin</DropdownMenuLabel>
+                                <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
+                                {VITAMINS_LIST.map(id => (
+                                    <DropdownMenuCheckboxItem
+                                        key={id}
+                                        checked={nutrientInfoKey === id}
+                                        onCheckedChange={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}`)}
+                                        className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
+                                    >
+                                        {id}
+                                    </DropdownMenuCheckboxItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="max-w-7xl mx-auto space-y-8 pb-32 animate-in fade-in duration-700 flex-1 w-full">
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row md:items-center gap-8 animate-in slide-in-from-top-4 duration-700 pb-1">
                 {/* Status Readout (Now on the left) */}
                 <div className={cn(
                     "w-24 h-24 rounded-[1.5rem] border-2 transition-all duration-700 flex flex-col items-center justify-center shadow-lg flex-shrink-0",
@@ -409,116 +522,6 @@ export default function NutrientDetailsPage() {
                     <p className="text-slate-400 font-bold uppercase tracking-widest text-[11px] leading-relaxed max-w-2xl italic">
                         "{info.description}"
                     </p>
-                </div>
-            </div>
-
-            {/* Hub Navigation Area */}
-            <div className="flex flex-col gap-6 items-start w-full">
-                {/* Perspective Selection (Triple Dropdown Filter) */}
-                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
-                    {/* Welcome Button */}
-                    <button
-                        onClick={() => router.push('/dashboard/library/nutrients/welcome')}
-                        className={cn(
-                            "px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
-                            nutrientId === 'welcome'
-                                ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20 px-5"
-                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-emerald-500"
-                        )}
-                    >
-                        <Sparkles size={14} />
-                        <span>Welcome</span>
-                    </button>
-
-                    {/* Macro Dropdown */}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <button className={cn(
-                                "px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
-                                MACROS_LIST.includes(nutrientInfoKey)
-                                    ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20 px-5"
-                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
-                            )}>
-                                <Scale size={14} />
-                                <span>{MACROS_LIST.includes(nutrientInfoKey) ? nutrientInfoKey : "Macros"}</span>
-                                <ChevronDown size={12} className="opacity-50" />
-                            </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
-                            <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Macro</DropdownMenuLabel>
-                            <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
-                            {MACROS_LIST.map(id => (
-                                <DropdownMenuCheckboxItem
-                                    key={id}
-                                    checked={nutrientInfoKey === id}
-                                    onCheckedChange={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}`)}
-                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
-                                >
-                                    {id}
-                                </DropdownMenuCheckboxItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    {/* Mineral Dropdown */}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <button className={cn(
-                                "px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
-                                MINERALS_LIST.includes(nutrientInfoKey)
-                                    ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20 px-5"
-                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
-                            )}>
-                                <Gem size={14} />
-                                <span>{MINERALS_LIST.includes(nutrientInfoKey) ? nutrientInfoKey : "Minerals"}</span>
-                                <ChevronDown size={12} className="opacity-50" />
-                            </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 max-h-[400px] overflow-y-auto no-scrollbar">
-                            <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Mineral</DropdownMenuLabel>
-                            <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
-                            {MINERALS_LIST.map(id => (
-                                <DropdownMenuCheckboxItem
-                                    key={id}
-                                    checked={nutrientInfoKey === id}
-                                    onCheckedChange={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}`)}
-                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
-                                >
-                                    {id}
-                                </DropdownMenuCheckboxItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-
-                    {/* Vitamin Dropdown */}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <button className={cn(
-                                "px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
-                                VITAMINS_LIST.includes(nutrientInfoKey)
-                                    ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20 px-5"
-                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
-                            )}>
-                                <Battery size={14} />
-                                <span>{VITAMINS_LIST.includes(nutrientInfoKey) ? nutrientInfoKey : "Vitamins"}</span>
-                                <ChevronDown size={12} className="opacity-50" />
-                            </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 max-h-[400px] overflow-y-auto no-scrollbar">
-                            <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Vitamin</DropdownMenuLabel>
-                            <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
-                            {VITAMINS_LIST.map(id => (
-                                <DropdownMenuCheckboxItem
-                                    key={id}
-                                    checked={nutrientInfoKey === id}
-                                    onCheckedChange={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}`)}
-                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
-                                >
-                                    {id}
-                                </DropdownMenuCheckboxItem>
-                            ))}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
                 </div>
             </div>
 
@@ -702,6 +705,7 @@ export default function NutrientDetailsPage() {
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
         </div>
     );
