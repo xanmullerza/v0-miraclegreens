@@ -706,98 +706,106 @@ export default function NutrientDetailsPage() {
                         </div>
                     </div>
 
-                    {/* Nutrient Rich Foods Section */}
-                    <div className="space-y-8 pt-8 border-t border-slate-100 dark:border-slate-800/50">
-                        <div className="flex items-center justify-between px-2">
-                            <div className="space-y-1">
-                                <h4 className="font-black text-xs uppercase tracking-[0.2em] text-emerald-500">{nutrientInfoKey} Rich Foods</h4>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Top bioavailable sources per 100g clinical sample</p>
-                            </div>
-                            <div className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-900/10 px-5 py-3 rounded-2xl border border-emerald-200 dark:border-emerald-800/30">
-                                <button
-                                    onClick={() => setMeasureGrams(Math.max(10, measureGrams - 10))}
-                                    className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
-                                    title="Decrease grams"
-                                >
-                                    <ChevronDown size={16} />
-                                </button>
-                                <div className="flex flex-col items-center gap-0.5 min-w-[65px] text-center">
-                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Measure</span>
-                                    <span className="text-lg font-black text-emerald-600 dark:text-emerald-400">{measureGrams}g</span>
+                    {/* Nutrient Rich Foods Section (carded) */}
+                    <div className="pt-12 border-t border-slate-100 dark:border-slate-800/50">
+                        <div className="bg-slate-50 dark:bg-slate-900/40 rounded-[3rem] p-10 border border-slate-100 dark:border-slate-800/50 flex flex-col gap-10">
+                            <div className="flex items-start gap-8">
+                                <div className="w-16 h-16 rounded-[2rem] bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                                    <UtensilsCrossed size={32} />
                                 </div>
-                                <button
-                                    onClick={() => setMeasureGrams(measureGrams + 10)}
-                                    className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
-                                    title="Increase grams"
-                                >
-                                    <ChevronDown size={16} className="rotate-180" />
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                            {loadingFoods ? (
-                                [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map(i => <div key={i} className="h-32 w-full animate-pulse bg-slate-50 dark:bg-slate-900/50 rounded-[2rem]" />)
-                            ) : topFoods.length > 0 ? (
-                                topFoods.slice(0, 20).map((food: any) => {
-                                    const nutrientValue = getNutrientValue(food);
-                                    const percentage = maxNutrientValue > 0 ? (nutrientValue / maxNutrientValue) * 100 : 0;
-                                    const rdaPercent = targetVal > 0 ? (nutrientValue * (measureGrams / 100) / targetVal) * 100 : 0;
-                                    const rdaPercentage = Math.round(rdaPercent);
-                                    return (
-                                    <button
-                                        key={food.id}
-                                        onClick={() => router.push(`/dashboard/library/foods/${food.id}`)}
-                                        className="relative flex flex-col gap-3 p-4 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/5 transition-all group text-left"
-                                    >
-                                        <div className="w-full h-24 rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500">
-                                            {food.image ? (
-                                                <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-slate-200 dark:text-slate-800">
-                                                    <Beef size={28} />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="absolute top-3 right-3 bg-emerald-500 text-white px-2 py-0.5 rounded-md text-[11px] font-black uppercase tracking-wider shadow-lg z-30">
-                                            {rdaPercentage > 0 ? `${rdaPercentage}%` : '—'}
-                                        </div>
-
-                                        <div className="space-y-2 z-10 min-w-0">
-                                            <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                                View Source
-                                            </p>
-                                            <p className="text-xs font-black uppercase tracking-tight text-slate-900 dark:text-white leading-tight italic line-clamp-2">
-                                                {food.common_name || food.name}
-                                            </p>
-                                            
-                                            <div className="pt-1">
-                                                <div className="flex items-center justify-between mb-1.5">
-                                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider">
-                                                        {(nutrientValue * (measureGrams / 100)).toFixed(1)} {unit}
-                                                    </span>
-                                                </div>
-                                                <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                                    <div 
-                                                        className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-300"
-                                                        style={{ width: `${Math.min(rdaPercent, 100)}%` }}
-                                                    />
-                                                </div>
-                                                {/* RDA percentage row - shows how much of user's RDA this portion provides */}
-                                                <div className="mt-2 flex items-center justify-between">
-                                                    <span className="text-[11px] font-black text-slate-500 uppercase tracking-wider">Portion</span>
-                                                    <span className="text-[11px] font-black text-emerald-500 uppercase tracking-wider">{rdaPercentage > 0 ? `${rdaPercentage}% RDA` : '—'}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </button>
-                                    );
-                                })
-                            ) : (
-                                <div className="col-span-full py-16 text-center bg-slate-50/50 dark:bg-slate-900/30 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
-                                    <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest italic">No whole food scans recorded for this profile.</p>
+                                <div className="flex-1 space-y-1">
+                                    <h4 className="font-black text-xs uppercase tracking-[0.2em] text-emerald-500">{nutrientInfoKey} Rich Foods</h4>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Top bioavailable sources per 100g clinical sample</p>
                                 </div>
-                            )}
+                            </div>
+
+                            <div className="w-full">
+                                <div className="flex items-center justify-end">
+                                    <div className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-900/10 px-5 py-3 rounded-2xl border border-emerald-200 dark:border-emerald-800/30">
+                                        <button
+                                            onClick={() => setMeasureGrams(Math.max(10, measureGrams - 10))}
+                                            className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                                            title="Decrease grams"
+                                        >
+                                            <ChevronDown size={16} />
+                                        </button>
+                                        <div className="flex flex-col items-center gap-0.5 min-w-[65px] text-center">
+                                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Measure</span>
+                                            <span className="text-lg font-black text-emerald-600 dark:text-emerald-400">{measureGrams}g</span>
+                                        </div>
+                                        <button
+                                            onClick={() => setMeasureGrams(measureGrams + 10)}
+                                            className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                                            title="Increase grams"
+                                        >
+                                            <ChevronDown size={16} className="rotate-180" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                                    {loadingFoods ? (
+                                        [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20].map(i => <div key={i} className="h-32 w-full animate-pulse bg-slate-50 dark:bg-slate-900/50 rounded-[2rem]" />)
+                                    ) : topFoods.length > 0 ? (
+                                        topFoods.slice(0,20).map((food:any) => {
+                                            const nutrientValue = getNutrientValue(food);
+                                            const rdaPercent = targetVal > 0 ? (nutrientValue * (measureGrams/100) / targetVal) * 100 : 0;
+                                            const rdaPercentage = Math.round(rdaPercent);
+                                            return (
+                                                <button
+                                                    key={food.id}
+                                                    onClick={() => router.push(`/dashboard/library/foods/${food.id}`)}
+                                                    className="relative flex flex-col gap-3 p-4 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/5 transition-all group text-left"
+                                                >
+                                                    <div className="w-full h-24 rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500">
+                                                        {food.image ? (
+                                                            <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-slate-200 dark:text-slate-800">
+                                                                <Beef size={28} />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="absolute top-3 right-3 bg-emerald-500 text-white px-2 py-0.5 rounded-md text-[11px] font-black uppercase tracking-wider shadow-lg z-30">
+                                                        {rdaPercentage > 0 ? `${rdaPercentage}%` : '—'}
+                                                    </div>
+
+                                                    <div className="space-y-2 z-10 min-w-0">
+                                                        <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                                            View Source
+                                                        </p>
+                                                        <p className="text-xs font-black uppercase tracking-tight text-slate-900 dark:text-white leading-tight italic line-clamp-2">
+                                                            {food.common_name || food.name}
+                                                        </p>
+                                                        
+                                                        <div className="pt-1">
+                                                            <div className="flex items-center justify-between mb-1.5">
+                                                                <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider">
+                                                                    {(nutrientValue * (measureGrams / 100)).toFixed(1)} {unit}
+                                                                </span>
+                                                            </div>
+                                                            <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                                                <div 
+                                                                    className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-300"
+                                                                    style={{ width: `${Math.min(rdaPercent,100)}%` }}
+                                                                />
+                                                            </div>
+                                                            <div className="mt-2 flex items-center justify-between">
+                                                                <span className="text-[11px] font-black text-slate-500 uppercase tracking-wider">Portion</span>
+                                                                <span className="text-[11px] font-black text-emerald-500 uppercase tracking-wider">{rdaPercentage > 0 ? `${rdaPercentage}% RDA` : '—'}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </button>
+                                            )
+                                        })
+                                    ) : (
+                                        <div className="col-span-full py-16 text-center bg-slate-50/50 dark:bg-slate-900/30 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                                            <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest italic">No whole food scans recorded for this profile.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
