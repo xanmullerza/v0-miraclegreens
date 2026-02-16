@@ -52,6 +52,14 @@ const MACROS_LIST = ['Energy', 'Protein', 'Carbs', 'Fat', 'Fiber', 'Sugar', 'Ome
 const MINERALS_LIST = ['Sodium', 'Potassium', 'Magnesium', 'Calcium', 'Phosphorus', 'Iron', 'Zinc', 'Copper', 'Manganese', 'Selenium', 'Oxalate'];
 const VITAMINS_LIST = ['Vitamin A', 'Vitamin C', 'Vitamin D', 'Vitamin E', 'Vitamin K', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Choline'];
 
+// Mapping from URL IDs (database column names) to nutrient info keys
+const URL_ID_TO_NUTRIENT_INFO: Record<string, string> = {
+    'energy_kcal': 'Energy',
+    'protein_g': 'Protein',
+    'carbs_g': 'Carbs',
+    'fat_g': 'Fat',
+};
+
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl overflow-hidden shadow-sm", className)}>
         {children}
@@ -62,7 +70,10 @@ export default function NutrientDetailsPage() {
     const router = useRouter();
     const { id } = useParams();
     const nutrientId = decodeURIComponent(id as string);
-    const info = nutrientInfo[nutrientId];
+    
+    // Map URL ID to nutrient info key
+    const nutrientInfoKey = URL_ID_TO_NUTRIENT_INFO[nutrientId] || nutrientId;
+    const info = nutrientInfo[nutrientInfoKey];
     const { profile, dailyTargets, energyUnit } = useUserPreferences();
 
     // Context-aware RDAs
@@ -84,22 +95,22 @@ export default function NutrientDetailsPage() {
     let unit = 'mg';
 
     if (info) {
-        if (nutrientId === 'Energy') {
+        if (nutrientInfoKey === 'Energy') {
             targetVal = energyUnit === 'kJ' ? dailyTargets.energy * 4.184 : dailyTargets.energy;
             unit = energyUnit;
-        } else if (nutrientId === 'Protein') {
+        } else if (nutrientInfoKey === 'Protein') {
             targetVal = dailyTargets.protein;
             unit = 'g';
-        } else if (nutrientId === 'Carbs') {
+        } else if (nutrientInfoKey === 'Carbs') {
             targetVal = dailyTargets.carbs;
             unit = 'g';
-        } else if (nutrientId === 'Fat') {
+        } else if (nutrientInfoKey === 'Fat') {
             targetVal = dailyTargets.fat;
             unit = 'g';
-        } else if (userRDAs?.[nutrientId]) {
-            targetVal = userRDAs[nutrientId];
-            if (nutrientId === 'Vitamin D') unit = 'IU';
-            else if (nutrientId.includes('Folate') || nutrientId.includes('B12') || nutrientId.includes('Biotin') || nutrientId.includes('Selenium') || nutrientId === 'Vitamin A' || nutrientId === 'Vitamin K' || nutrientId.includes('µg')) unit = 'µg';
+        } else if (userRDAs?.[nutrientInfoKey]) {
+            targetVal = userRDAs[nutrientInfoKey];
+            if (nutrientInfoKey === 'Vitamin D') unit = 'IU';
+            else if (nutrientInfoKey.includes('Folate') || nutrientInfoKey.includes('B12') || nutrientInfoKey.includes('Biotin') || nutrientInfoKey.includes('Selenium') || nutrientInfoKey === 'Vitamin A' || nutrientInfoKey === 'Vitamin K' || nutrientInfoKey.includes('µg')) unit = 'µg';
         }
     }
 
@@ -113,9 +124,9 @@ export default function NutrientDetailsPage() {
     // Handle Percentage-based ULs (Protein, Carbs, Fat)
     if (isPercentUL && dailyTargets.energy) {
         const percent = rawUL / 100;
-        if (nutrientId === 'Protein') rawUL = (dailyTargets.energy * percent) / 4;
-        else if (nutrientId === 'Carbs') rawUL = (dailyTargets.energy * percent) / 4;
-        else if (nutrientId === 'Fat') rawUL = (dailyTargets.energy * percent) / 9;
+        if (nutrientInfoKey === 'Protein') rawUL = (dailyTargets.energy * percent) / 4;
+        else if (nutrientInfoKey === 'Carbs') rawUL = (dailyTargets.energy * percent) / 4;
+        else if (nutrientInfoKey === 'Fat') rawUL = (dailyTargets.energy * percent) / 9;
     }
 
     const parsedUL = rawUL;
@@ -296,7 +307,7 @@ export default function NutrientDetailsPage() {
                 'Fat': 'fat_g'
             };
 
-            const col = columnMap[nutrientId] || nutrientId.toLowerCase().replace(/ /g, '_').replace(/[()]/g, '');
+            const col = columnMap[nutrientInfoKey] || nutrientInfoKey.toLowerCase().replace(/ /g, '_').replace(/[()]/g, '');
 
             // Try to find foods high in this nutrient, but exclude herbs/spices/supplements for "practical" diet additions
             const { data, error } = await supabase
@@ -318,8 +329,8 @@ export default function NutrientDetailsPage() {
 
                 if (!jsonError && jsonMatch) {
                     const sorted = jsonMatch
-                        .filter(f => f.micronutrients && f.micronutrients[nutrientId] !== undefined)
-                        .sort((a, b) => (b.micronutrients[nutrientId] || 0) - (a.micronutrients[nutrientId] || 0))
+                        .filter(f => f.micronutrients && f.micronutrients[nutrientInfoKey] !== undefined)
+                        .sort((a, b) => (b.micronutrients[nutrientInfoKey] || 0) - (a.micronutrients[nutrientInfoKey] || 0))
                         .slice(0, 6);
                     setTopFoods(sorted);
                 }
@@ -382,7 +393,7 @@ export default function NutrientDetailsPage() {
 
                 <div className="flex-1 flex flex-col">
                     <h1 className="text-4xl lg:text-7xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.8] mb-2 flex items-center gap-4">
-                        <span className="text-emerald-500">{nutrientId}</span>
+                        <span className="text-emerald-500">{nutrientInfoKey}</span>
                         <button
                             onClick={toggleFavorite}
                             className={cn(
@@ -426,12 +437,12 @@ export default function NutrientDetailsPage() {
                         <DropdownMenuTrigger asChild>
                             <button className={cn(
                                 "px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
-                                MACROS_LIST.includes(nutrientId)
+                                MACROS_LIST.includes(nutrientInfoKey)
                                     ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20 px-5"
                                     : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
                             )}>
                                 <Scale size={14} />
-                                <span>{MACROS_LIST.includes(nutrientId) ? nutrientId : "Macros"}</span>
+                                <span>{MACROS_LIST.includes(nutrientInfoKey) ? nutrientInfoKey : "Macros"}</span>
                                 <ChevronDown size={12} className="opacity-50" />
                             </button>
                         </DropdownMenuTrigger>
@@ -441,7 +452,7 @@ export default function NutrientDetailsPage() {
                             {MACROS_LIST.map(id => (
                                 <DropdownMenuCheckboxItem
                                     key={id}
-                                    checked={nutrientId === id}
+                                    checked={nutrientInfoKey === id}
                                     onCheckedChange={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}`)}
                                     className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
                                 >
@@ -456,12 +467,12 @@ export default function NutrientDetailsPage() {
                         <DropdownMenuTrigger asChild>
                             <button className={cn(
                                 "px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
-                                MINERALS_LIST.includes(nutrientId)
+                                MINERALS_LIST.includes(nutrientInfoKey)
                                     ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20 px-5"
                                     : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
                             )}>
                                 <Gem size={14} />
-                                <span>{MINERALS_LIST.includes(nutrientId) ? nutrientId : "Minerals"}</span>
+                                <span>{MINERALS_LIST.includes(nutrientInfoKey) ? nutrientInfoKey : "Minerals"}</span>
                                 <ChevronDown size={12} className="opacity-50" />
                             </button>
                         </DropdownMenuTrigger>
@@ -471,7 +482,7 @@ export default function NutrientDetailsPage() {
                             {MINERALS_LIST.map(id => (
                                 <DropdownMenuCheckboxItem
                                     key={id}
-                                    checked={nutrientId === id}
+                                    checked={nutrientInfoKey === id}
                                     onCheckedChange={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}`)}
                                     className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
                                 >
@@ -486,12 +497,12 @@ export default function NutrientDetailsPage() {
                         <DropdownMenuTrigger asChild>
                             <button className={cn(
                                 "px-4 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
-                                VITAMINS_LIST.includes(nutrientId)
+                                VITAMINS_LIST.includes(nutrientInfoKey)
                                     ? "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20 px-5"
                                     : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
                             )}>
                                 <Battery size={14} />
-                                <span>{VITAMINS_LIST.includes(nutrientId) ? nutrientId : "Vitamins"}</span>
+                                <span>{VITAMINS_LIST.includes(nutrientInfoKey) ? nutrientInfoKey : "Vitamins"}</span>
                                 <ChevronDown size={12} className="opacity-50" />
                             </button>
                         </DropdownMenuTrigger>
@@ -501,7 +512,7 @@ export default function NutrientDetailsPage() {
                             {VITAMINS_LIST.map(id => (
                                 <DropdownMenuCheckboxItem
                                     key={id}
-                                    checked={nutrientId === id}
+                                    checked={nutrientInfoKey === id}
                                     onCheckedChange={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}`)}
                                     className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
                                 >
@@ -639,7 +650,7 @@ export default function NutrientDetailsPage() {
                     <div className="space-y-8 pt-8 border-t border-slate-100 dark:border-slate-800/50">
                         <div className="flex items-center justify-between px-2">
                             <div className="space-y-1">
-                                <h4 className="font-black text-xs uppercase tracking-[0.2em] text-emerald-500">{nutrientId} Rich Foods</h4>
+                                <h4 className="font-black text-xs uppercase tracking-[0.2em] text-emerald-500">{nutrientInfoKey} Rich Foods</h4>
                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Top bioavailable sources per 100g clinical sample</p>
                             </div>
                             <button
