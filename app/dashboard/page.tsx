@@ -13,101 +13,11 @@ import {
     Settings
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { cn } from '@/lib/utils';
-import { useUserPreferences } from '@/lib/context/user-preferences-context';
+            )}
 
-export default function DashboardOverview() {
-    const { showHeroes, setShowHeroes } = useUserPreferences();
-    const [stats, setStats] = useState({
-        foods: 0,
-        recipes: 0,
-        nutrients: 0
-    });
-    const [isAdmin, setIsAdmin] = useState(false);
-
-    useEffect(() => {
-        const checkUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
-            if (user?.email && adminEmail && user.email.toLowerCase() === adminEmail.toLowerCase()) {
-                setIsAdmin(true);
-            }
-        };
-        checkUser();
-
-        const fetchStats = async () => {
-            try {
-                const [foodsCount, recipesCount] = await Promise.all([
-                    supabase.from('food_items').select('id', { count: 'exact', head: true }),
-                    supabase.from('recipes').select('id', { count: 'exact', head: true }),
-                ]);
-                setStats({
-                    foods: foodsCount.count || 0,
-                    recipes: recipesCount.count || 0,
-                    nutrients: 30, // Static count matching library for consistency
-                });
-            } catch (e) {
-                console.error('Error fetching dashboard stats:', e);
-            }
-        };
-        fetchStats();
-    }, []);
-
-    const heroCards = [
-        {
-            id: 'library',
-            title: 'Library',
-            desc: 'Nutrient database & tools',
-            href: '/dashboard/library',
-            icon: Library,
-            color: 'text-blue-400',
-            bg: 'bg-blue-500/10',
-            borderHover: 'hover:border-blue-500/40',
-            gradient: 'from-blue-500 to-indigo-600',
-        },
-        {
-            id: 'kitchen',
-            title: 'Kitchen',
-            desc: 'Manage your pantry & meals',
-            href: '/dashboard/kitchen',
-            icon: ChefHat,
-            color: 'text-emerald-400',
-            bg: 'bg-emerald-500/10',
-            borderHover: 'hover:border-emerald-500/40',
-            gradient: 'from-emerald-500 to-teal-600',
-        },
-        {
-            id: 'profile',
-            title: 'Profile',
-            desc: 'Account & preferences',
-            href: '/dashboard/profile',
-            icon: User,
-            color: 'text-violet-400',
-            bg: 'bg-violet-500/10',
-            borderHover: 'hover:border-violet-500/40',
-            gradient: 'from-violet-500 to-purple-600',
-        },
-        {
-            id: 'settings',
-            title: 'Settings',
-            desc: 'App preferences & config',
-            href: '/dashboard/settings',
-            icon: Settings,
-            color: 'text-amber-400',
-            bg: 'bg-amber-500/10',
-            borderHover: 'hover:border-amber-500/40',
-            gradient: 'from-amber-500 to-orange-600',
-        },
-    ];
-
-    return (
-        <div className="w-full space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)] px-4">
-
-            {/* Main card that can contain hero + tiles so they align consistently */}
-            {showHeroes ? (
-                <div className="w-full max-w-7xl relative">
-                    <div className="relative rounded-[2.5rem] bg-slate-900 border border-slate-800 pt-12 pb-8 px-8 lg:pt-16 lg:pb-12 lg:px-12 xl:pt-20 xl:pb-16 xl:px-16 w-full flex items-start gap-8">
-                        {/* Decorative elements */}
+        </div>
+    );
+}
                         <div className="absolute top-0 right-0 w-96 h-96 opacity-[0.06] pointer-events-none">
                             <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-500 rounded-full blur-3xl" />
                         </div>
