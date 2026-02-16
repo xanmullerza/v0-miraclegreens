@@ -708,13 +708,13 @@ export default function NutrientDetailsPage() {
 
                     {/* Nutrient Rich Foods Section (carded) */}
                     <div className="pt-12 border-t border-slate-100 dark:border-slate-800/50">
-                        <div className="bg-slate-50 dark:bg-slate-900/40 rounded-[3rem] p-10 border border-slate-100 dark:border-slate-800/50 flex flex-col gap-10">
-                            <div className="flex items-start gap-8">
+                        <div className="bg-slate-50 dark:bg-slate-900/40 rounded-[3rem] p-8 border border-slate-100 dark:border-slate-800/50 flex flex-col gap-6">
+                            <div className="flex items-start gap-6">
                                 <div className="w-16 h-16 rounded-[2rem] bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
                                     <UtensilsCrossed size={32} />
                                 </div>
                                 <div className="flex-1 space-y-1">
-                                    <h4 className="font-black text-xs uppercase tracking-[0.2em] text-emerald-500">{nutrientInfoKey} Rich Foods</h4>
+                                    <h4 className="font-black text-xs uppercase tracking-[0.3em] text-emerald-500">{nutrientInfoKey} Rich Foods</h4>
                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Top bioavailable sources per 100g clinical sample</p>
                                 </div>
                             </div>
