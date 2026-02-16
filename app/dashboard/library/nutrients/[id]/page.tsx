@@ -742,7 +742,8 @@ export default function NutrientDetailsPage() {
                                 topFoods.slice(0, 20).map((food: any) => {
                                     const nutrientValue = getNutrientValue(food);
                                     const percentage = maxNutrientValue > 0 ? (nutrientValue / maxNutrientValue) * 100 : 0;
-                                    const rdaPercentage = targetVal > 0 ? Math.round((nutrientValue * (measureGrams / 100) / targetVal) * 100) : 0;
+                                    const rdaPercent = targetVal > 0 ? (nutrientValue * (measureGrams / 100) / targetVal) * 100 : 0;
+                                    const rdaPercentage = Math.round(rdaPercent);
                                     return (
                                     <button
                                         key={food.id}
@@ -779,7 +780,7 @@ export default function NutrientDetailsPage() {
                                                 <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                                                     <div 
                                                         className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-300"
-                                                        style={{ width: `${Math.min((nutrientValue * (measureGrams / 100) / maxNutrientValue) * 100, 100)}%` }}
+                                                        style={{ width: `${Math.min(rdaPercent, 100)}%` }}
                                                     />
                                                 </div>
                                                 {/* RDA percentage row - shows how much of user's RDA this portion provides */}
