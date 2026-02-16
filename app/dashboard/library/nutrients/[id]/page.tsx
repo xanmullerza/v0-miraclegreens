@@ -724,7 +724,7 @@ export default function NutrientDetailsPage() {
                             </button>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                             {loadingFoods ? (
                                 [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map(i => <div key={i} className="h-32 w-full animate-pulse bg-slate-50 dark:bg-slate-900/50 rounded-[2rem]" />)
                             ) : topFoods.length > 0 ? (
