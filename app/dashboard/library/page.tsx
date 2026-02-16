@@ -89,7 +89,7 @@ export default function LibraryPage() {
         <div className="w-full space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)] px-4">
             {/* ── Hero Section — Split Layout ── */}
             {showHeroes && (
-            <div className="relative rounded-[2.5rem] bg-slate-900 border border-slate-800 p-8 lg:p-12 xl:p-16 max-w-7xl w-full">
+            <div className="relative rounded-[2.5rem] bg-slate-900 border border-slate-800 mt-6 p-8 lg:mt-8 lg:p-12 xl:mt-10 xl:p-16 max-w-7xl w-full">
                 {/* Decorative elements */}
                 <div className="absolute top-0 right-0 w-96 h-96 opacity-[0.06] pointer-events-none">
                     <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-500 rounded-full blur-3xl" />
@@ -98,14 +98,11 @@ export default function LibraryPage() {
                     <div className="absolute inset-0 bg-gradient-to-tr from-amber-400 to-rose-500 rounded-full blur-3xl" />
                 </div>
 
-                <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+                <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
                     {/* Left — Welcome Text */}
                     <div>
-                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest mb-8">
-                            <Zap size={12} className="fill-current" />
-                            Your Personal Database
-                        </div>
-
+                        
+                        
                         <h1 className="text-3xl lg:text-5xl font-black text-white tracking-tighter leading-[0.95] mb-6">
                             Explore the{' '}
                             <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
@@ -152,7 +149,7 @@ export default function LibraryPage() {
                     </div>
 
                     {/* Right — 2×2 Action Grid */}
-                    <div className="grid grid-cols-2 gap-3 lg:gap-4">
+                    <div className="grid grid-cols-2 gap-3 lg:gap-4 justify-items-center">
                         {heroCards.map((card) => {
                             const Icon = card.icon;
                             return (
@@ -160,7 +157,7 @@ export default function LibraryPage() {
                                     key={card.id}
                                     href={card.href}
                                     className={cn(
-                                        "group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 lg:p-6 transition-all duration-500",
+                                        "group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 lg:p-6 transition-all duration-500 w-40 sm:w-44 lg:w-48 aspect-square",
                                         card.borderHover,
                                         "hover:bg-slate-800/70 hover:shadow-2xl",
                                     )}
@@ -211,8 +208,8 @@ export default function LibraryPage() {
 
             {/* Grid Display When Hero is Hidden */}
             {!showHeroes && (
-                <div className="w-full max-w-7xl">
-                    <div className="grid grid-cols-2 gap-3 lg:gap-4">
+                <div className="w-full max-w-7xl flex justify-center mt-6 lg:mt-8">
+                    <div className="grid grid-cols-2 gap-3 lg:gap-4 justify-items-center">
                         {heroCards.map((card) => {
                             const Icon = card.icon;
                             return (
@@ -220,7 +217,7 @@ export default function LibraryPage() {
                                     key={card.id}
                                     href={card.href}
                                     className={cn(
-                                        "group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 lg:p-6 transition-all duration-500 h-32 lg:h-40",
+                                        "group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 lg:p-6 transition-all duration-500 w-40 sm:w-44 lg:w-48 aspect-square",
                                         card.borderHover,
                                         "hover:bg-slate-800/70 hover:shadow-2xl",
                                     )}
