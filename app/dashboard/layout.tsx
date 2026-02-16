@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
     Search,
     ChevronRight,
+    ChevronLeft,
     Bell,
     User,
     ArrowLeft,
@@ -39,6 +40,7 @@ function DashboardLayoutContent({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
+    const router = useRouter();
     const { profile } = useUserPreferences();
     const {
         searchQuery,
@@ -255,7 +257,17 @@ function DashboardLayoutContent({
                     </div>
 
                     {/* Breadcrumb Subheader */}
-                    <div className="sticky top-16 z-10 w-full border-b border-slate-200/30 dark:border-slate-800/30 bg-white/5 dark:bg-slate-900/5 backdrop-blur-sm px-8 py-3 flex items-center justify-center">
+                    <div className="sticky top-16 z-10 w-full border-b border-slate-200/30 dark:border-slate-800/30 bg-white/5 dark:bg-slate-900/5 backdrop-blur-sm px-8 py-3 flex items-center justify-center gap-4">
+                        {/* Back Button */}
+                        <button
+                            onClick={() => router.back()}
+                            className="p-1.5 text-slate-400 hover:text-emerald-500 transition-colors flex-shrink-0"
+                            title="Go Back"
+                        >
+                            <ChevronLeft size={16} />
+                        </button>
+
+                        {/* Breadcrumbs */}
                         <div className="flex items-center gap-2">
                             {pathname.split('/').filter(Boolean).map((segment, index, array) => {
                                 const path = '/' + array.slice(0, index + 1).join('/');
@@ -281,6 +293,15 @@ function DashboardLayoutContent({
                                 );
                             })}
                         </div>
+
+                        {/* Forward Button */}
+                        <button
+                            onClick={() => router.forward()}
+                            className="p-1.5 text-slate-400 hover:text-emerald-500 transition-colors flex-shrink-0"
+                            title="Go Forward"
+                        >
+                            <ChevronRight size={16} />
+                        </button>
                     </div>
 
                     <div className="p-8 pb-20 flex-1">
