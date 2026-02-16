@@ -178,7 +178,7 @@ export default function DashboardOverview() {
                                 return (
                                     <div
                                         key={card.id}
-                                        className="relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/30 bg-slate-800/20 p-5 lg:p-6 opacity-60 cursor-not-allowed select-none group"
+                                        className="relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/30 bg-slate-800/20 p-5 lg:p-6 opacity-60 cursor-not-allowed select-none group aspect-square"
                                     >
                                         <div className="absolute top-3 right-3 z-20">
                                             <span className="px-1.5 py-0.5 rounded-md bg-slate-800/80 border border-slate-700 text-[8px] font-black uppercase tracking-widest text-slate-500">
@@ -211,7 +211,7 @@ export default function DashboardOverview() {
                                     key={card.id}
                                     href={card.href}
                                     className={cn(
-                                        "group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 lg:p-6 transition-all duration-500",
+                                        "group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 lg:p-6 transition-all duration-500 aspect-square",
                                         card.borderHover,
                                         "hover:bg-slate-800/70 hover:shadow-2xl",
                                     )}
@@ -262,7 +262,7 @@ export default function DashboardOverview() {
 
             {/* Grid Display When Hero is Hidden */}
             {!showHeroes && (
-                <div className="w-full max-w-7xl">
+                <div className="w-full max-w-7xl flex justify-center">
                     <div className="grid grid-cols-2 gap-3 lg:gap-4">
                         {heroCards.map((card) => {
                             const Icon = card.icon;
@@ -273,7 +273,7 @@ export default function DashboardOverview() {
                                 return (
                                     <div
                                         key={card.id}
-                                        className="relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/30 bg-slate-800/20 p-5 lg:p-6 opacity-60 cursor-not-allowed select-none group h-32 lg:h-40"
+                                        className="relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/30 bg-slate-800/20 p-5 lg:p-6 opacity-60 cursor-not-allowed select-none group aspect-square"
                                     >
                                         <div className="absolute top-3 right-3 z-20">
                                             <span className="px-1.5 py-0.5 rounded-md bg-slate-800/80 border border-slate-700 text-[8px] font-black uppercase tracking-widest text-slate-500">
@@ -306,7 +306,7 @@ export default function DashboardOverview() {
                                     key={card.id}
                                     href={card.href}
                                     className={cn(
-                                        "group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 lg:p-6 transition-all duration-500 h-32 lg:h-40",
+                                        "group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 lg:p-6 transition-all duration-500 aspect-square",
                                         card.borderHover,
                                         "hover:bg-slate-800/70 hover:shadow-2xl",
                                     )}
