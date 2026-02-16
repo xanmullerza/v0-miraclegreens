@@ -433,7 +433,7 @@ export function CompareView() {
                                 {searchResults[index].map((food) => (
                                     <button
                                         key={food.id}
-                                        onClick={() => handleSelectFood(food, index)}
+                                        onMouseDown={(e) => { e.preventDefault(); handleSelectFood(food, index); }}
                                         className="w-full p-4 flex items-center gap-4 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border-b last:border-none border-slate-100 dark:border-slate-800 text-left group"
                                     >
                                         <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex-shrink-0 overflow-hidden border border-slate-200 dark:border-slate-700 group-hover:scale-105 transition-transform">
