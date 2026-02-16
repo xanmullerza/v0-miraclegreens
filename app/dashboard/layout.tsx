@@ -254,6 +254,35 @@ function DashboardLayoutContent({
                         </div>
                     </div>
 
+                    {/* Breadcrumb Subheader */}
+                    <div className="sticky top-16 z-10 w-full border-b border-slate-200/30 dark:border-slate-800/30 bg-white/5 dark:bg-slate-900/5 backdrop-blur-sm px-8 py-3 flex items-center justify-center">
+                        <div className="flex items-center gap-2">
+                            {pathname.split('/').filter(Boolean).map((segment, index, array) => {
+                                const path = '/' + array.slice(0, index + 1).join('/');
+                                const isLast = index === array.length - 1;
+                                const isFirst = index === 0;
+
+                                return (
+                                    <React.Fragment key={path}>
+                                        {!isFirst && <ChevronRight size={12} className="text-slate-400" />}
+                                        {isLast ? (
+                                            <span className="text-xs font-black text-emerald-500 uppercase tracking-widest">
+                                                {decodeURIComponent(segment).replace(/-/g, ' ')}
+                                            </span>
+                                        ) : (
+                                            <Link
+                                                href={path}
+                                                className="text-xs font-black text-slate-400 hover:text-emerald-500 uppercase tracking-widest transition-colors"
+                                            >
+                                                {decodeURIComponent(segment).replace(/-/g, ' ')}
+                                            </Link>
+                                        )}
+                                    </React.Fragment>
+                                );
+                            })}
+                        </div>
+                    </div>
+
                     <div className="p-8 pb-20 flex-1">
                         {children}
                     </div>

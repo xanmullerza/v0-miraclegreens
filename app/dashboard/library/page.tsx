@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import {
     Activity,
     Leaf,
@@ -11,14 +10,12 @@ import {
     ArrowRight,
     Compass,
     Zap,
-    ChevronRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 export default function LibraryPage() {
-    const pathname = usePathname();
     const { showHeroes, setShowHeroes } = useUserPreferences();
     const [stats, setStats] = useState({ foods: 0, recipes: 0, nutrients: 0 });
 
@@ -89,34 +86,7 @@ export default function LibraryPage() {
     ];
 
     return (
-        <div className="w-full space-y-6 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)] px-4">
-            {/* Breadcrumbs */}
-            <div className="w-full max-w-7xl flex items-center gap-2">
-                {pathname.split('/').filter(Boolean).map((segment, index, array) => {
-                    const path = '/' + array.slice(0, index + 1).join('/');
-                    const isLast = index === array.length - 1;
-                    const isFirst = index === 0;
-
-                    return (
-                        <React.Fragment key={path}>
-                            {!isFirst && <ChevronRight size={14} className="text-slate-400" />}
-                            {isLast ? (
-                                <span className="text-xs font-black text-emerald-500 uppercase tracking-widest">
-                                    {decodeURIComponent(segment).replace(/-/g, ' ')}
-                                </span>
-                            ) : (
-                                <Link
-                                    href={path}
-                                    className="text-xs font-black text-slate-400 hover:text-emerald-500 uppercase tracking-widest transition-colors"
-                                >
-                                    {decodeURIComponent(segment).replace(/-/g, ' ')}
-                                </Link>
-                            )}
-                        </React.Fragment>
-                    );
-                })}
-            </div>
-
+        <div className="w-full space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)] px-4">
             {/* ── Hero Section — Split Layout ── */}
             {showHeroes && (
             <div className="relative rounded-[2.5rem] bg-slate-900 border border-slate-800 p-8 lg:p-12 xl:p-16 max-w-7xl w-full">
