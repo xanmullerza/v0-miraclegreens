@@ -36,7 +36,7 @@ const NUTRIENTS = [
     { id: 'carbs_g', label: 'Carbs', unit: 'g', color: 'bg-orange-500', icon: Zap },
     { id: 'Choline', label: 'Choline', unit: 'mg', color: 'bg-indigo-500', icon: Droplet },
     { id: 'Copper', label: 'Copper', unit: 'mg', color: 'bg-rose-500', icon: Gem },
-    { id: 'energy_kcal', label: 'Energy (Calories)', unit: 'kcal', color: 'bg-amber-500', icon: Zap },
+    { id: 'energy_kcal', label: 'Energy', unit: 'kcal', color: 'bg-amber-500', icon: Zap },
     { id: 'fat_g', label: 'Fat', unit: 'g', color: 'bg-amber-500', icon: Zap },
     { id: 'Fiber', label: 'Fiber', unit: 'g', color: 'bg-emerald-500', icon: Activity },
     { id: 'Iron', label: 'Iron', unit: 'mg', color: 'bg-red-500', icon: Gem },
