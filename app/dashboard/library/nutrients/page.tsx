@@ -23,7 +23,6 @@ import {
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { NutrientsView } from '@/components/library/nutrients-view';
 
 const NUTRIENTS = [
     { id: 'B1 (Thiamine)', label: 'B1 (Thiamine)', unit: 'mg', color: 'bg-blue-500', icon: Droplet },
@@ -239,13 +238,117 @@ export default function NutrientsPage() {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 space-y-8 p-4 md:p-8 pb-24">
-                <NutrientsView
-                    selectedCategories={["Macros", "Minerals", "Vitamins"]}
-                    showFavoritesOnly={false}
-                    setShowFavoritesOnly={() => { }}
-                    setSelectedCategories={() => { }}
-                />
+            <div className="flex-1 space-y-12 p-4 md:p-8 pb-24 max-w-5xl mx-auto w-full">
+                {/* Advisory Card */}
+                <div className="bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-emerald-950/20 dark:to-blue-950/20 border-2 border-emerald-200 dark:border-emerald-800/50 rounded-2xl p-8 md:p-10 shadow-sm">
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                        <div className="flex-shrink-0 w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center">
+                            <Sparkles size={32} className="text-white" />
+                        </div>
+                        <div className="flex-1">
+                            <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-slate-900 dark:text-white mb-2">
+                                Explore Essential Nutrients
+                            </h2>
+                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                                Click on the <span className="font-bold">Macros</span>, <span className="font-bold">Minerals</span>, or <span className="font-bold">Vitamins</span> filters above to discover detailed information about each nutrient, including recommended daily intake, food sources, health benefits, and more.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Essential Nutrients Guide */}
+                <div className="space-y-8">
+                    <div>
+                        <h3 className="text-xl font-black uppercase tracking-wide text-slate-900 dark:text-white mb-6 flex items-center gap-3">
+                            <Scale size={24} className="text-blue-500" />
+                            Macronutrients
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                                <h4 className="font-black text-sm uppercase tracking-wide text-blue-600 dark:text-blue-400 mb-2">Protein</h4>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Essential for building and repairing tissues, muscles, and organs. Supports immune function and hormone production.</p>
+                            </div>
+                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                                <h4 className="font-black text-sm uppercase tracking-wide text-orange-600 dark:text-orange-400 mb-2">Carbohydrates</h4>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Primary source of energy for your body and brain. Choose whole grains and fiber-rich options for sustained energy.</p>
+                            </div>
+                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                                <h4 className="font-black text-sm uppercase tracking-wide text-amber-600 dark:text-amber-400 mb-2">Fats</h4>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Crucial for nutrient absorption, hormone balance, and brain function. Focus on healthy unsaturated fats.</p>
+                            </div>
+                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                                <h4 className="font-black text-sm uppercase tracking-wide text-emerald-600 dark:text-emerald-400 mb-2">Fiber</h4>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Supports digestive health, maintains stable blood sugar levels, and promotes healthy weight management.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 className="text-xl font-black uppercase tracking-wide text-slate-900 dark:text-white mb-6 flex items-center gap-3">
+                            <Gem size={24} className="text-slate-500" />
+                            Minerals
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                                <h4 className="font-black text-sm uppercase tracking-wide text-slate-700 dark:text-slate-300 mb-2">Calcium & Phosphorus</h4>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Build and maintain strong bones and teeth. Essential for muscle function and nerve transmission.</p>
+                            </div>
+                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                                <h4 className="font-black text-sm uppercase tracking-wide text-sky-600 dark:text-sky-400 mb-2">Potassium & Sodium</h4>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Regulate fluid balance, blood pressure, and heart rhythm. Critical for proper nerve and muscle function.</p>
+                            </div>
+                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                                <h4 className="font-black text-sm uppercase tracking-wide text-purple-600 dark:text-purple-400 mb-2">Iron & Zinc</h4>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Support oxygen transport, immune function, and wound healing. Crucial for energy production.</p>
+                            </div>
+                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                                <h4 className="font-black text-sm uppercase tracking-wide text-cyan-600 dark:text-cyan-400 mb-2">Magnesium</h4>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Supports muscle relaxation, nerve function, and energy production. Important for heart health.</p>
+                            </div>
+                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                                <h4 className="font-black text-sm uppercase tracking-wide text-rose-600 dark:text-rose-400 mb-2">Copper & Manganese</h4>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Aid in bone formation, metabolism, and antioxidant defense. Support collagen synthesis.</p>
+                            </div>
+                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                                <h4 className="font-black text-sm uppercase tracking-wide text-pink-600 dark:text-pink-400 mb-2">Selenium</h4>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Powerful antioxidant that protects cells from damage. Supports thyroid function and immunity.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 className="text-xl font-black uppercase tracking-wide text-slate-900 dark:text-white mb-6 flex items-center gap-3">
+                            <Battery size={24} className="text-yellow-500" />
+                            Vitamins
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                                <h4 className="font-black text-sm uppercase tracking-wide text-blue-600 dark:text-blue-400 mb-2">B Vitamins</h4>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Essential for energy metabolism, nervous system function, and red blood cell formation. Support brain health and stress management.</p>
+                            </div>
+                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                                <h4 className="font-black text-sm uppercase tracking-wide text-orange-600 dark:text-orange-400 mb-2">Vitamin A</h4>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Critical for vision, immune function, and skin health. Supports cellular growth and development.</p>
+                            </div>
+                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                                <h4 className="font-black text-sm uppercase tracking-wide text-yellow-600 dark:text-yellow-400 mb-2">Vitamin C</h4>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Powerful antioxidant that boosts immunity and collagen production. Enhances iron absorption and supports wound healing.</p>
+                            </div>
+                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                                <h4 className="font-black text-sm uppercase tracking-wide text-yellow-500 dark:text-yellow-300 mb-2">Vitamin D</h4>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Regulates calcium absorption for bone health. Supports immune function and mood regulation.</p>
+                            </div>
+                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                                <h4 className="font-black text-sm uppercase tracking-wide text-emerald-600 dark:text-emerald-400 mb-2">Vitamin E</h4>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Antioxidant that protects cells from oxidative stress. Supports immune function and skin health.</p>
+                            </div>
+                            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
+                                <h4 className="font-black text-sm uppercase tracking-wide text-green-700 dark:text-green-400 mb-2">Vitamin K</h4>
+                                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">Essential for blood clotting and bone metabolism. Supports cardiovascular health and calcium regulation.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );
