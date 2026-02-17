@@ -16,11 +16,14 @@ import {
     Monitor,
     Save,
     Eye,
+    ShieldCheck,
+    ExternalLink
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase';
 
 export default function SettingsPage() {
     const { theme, setTheme } = useTheme();
@@ -35,6 +38,18 @@ export default function SettingsPage() {
         setShowHeroes,
     } = useUserPreferences();
 
+    const [user, setUser] = React.useState<any>(null);
+
+    React.useEffect(() => {
+        const getUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+        };
+        getUser();
+    }, []);
+
+    const isAdmin = (user?.email || user?.user_metadata?.email || '').toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase();
+
     const handleSave = async () => {
         toast.success('Preferences updated successfully!');
     };
@@ -42,6 +57,32 @@ export default function SettingsPage() {
     return (
         <div className="max-w-2xl mx-auto animate-in fade-in duration-500 px-4 py-8">
             <div className="space-y-8 pb-32">
+                {/* Admin Trigger */}
+                {isAdmin && (
+                    <div className="animate-in fade-in slide-in-from-top-4 duration-700">
+                        <Button
+                            asChild
+                            variant="outline"
+                            className="w-full bg-slate-900 border-slate-700 hover:bg-slate-800 text-slate-100 font-black h-16 rounded-[2rem] flex items-center justify-between px-8 group transition-all shadow-xl shadow-emerald-500/10"
+                        >
+                            <a href="https://www.yourtestsite.xyz/admin" target="_blank" rel="noopener noreferrer">
+                                <div className="flex items-center gap-4">
+                                    <div className="bg-emerald-500/20 p-2.5 rounded-2xl text-emerald-500 group-hover:bg-emerald-500/30 transition-colors">
+                                        <ShieldCheck size={24} />
+                                    </div>
+                                    <div className="text-left">
+                                        <h3 className="text-sm font-black uppercase tracking-wider italic leading-none">Admin Terminal</h3>
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">Authorized Access Only</p>
+                                    </div>
+                                </div>
+                                <div className="bg-slate-800 p-2 rounded-xl group-hover:bg-emerald-500/20 group-hover:text-emerald-500 transition-all">
+                                    <ExternalLink size={16} />
+                                </div>
+                            </a>
+                        </Button>
+                    </div>
+                )}
+
                 {/* Measures Card */}
                 <section className="space-y-6">
                     <div className="flex items-center gap-4">
