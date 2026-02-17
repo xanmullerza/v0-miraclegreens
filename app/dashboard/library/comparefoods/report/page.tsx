@@ -115,7 +115,7 @@ function ComparisonReportContent() {
                 </Button>
                 <div className="flex gap-2">
                     <Button variant="outline" className="gap-2" onClick={() => window.print()}>
-                        <Printer className="w-4 h-4" /> Print Report
+                        <Printer className="w-4 h-4" /> Print Results
                     </Button>
                     <Button
                         className={cn("gap-2 transition-all", copied ? "bg-slate-900" : "bg-emerald-600 hover:bg-emerald-700")}
@@ -129,7 +129,7 @@ function ComparisonReportContent() {
             {/* MAIN HEADER: THE VERDICT */}
             <div className="text-center space-y-6">
                 <Badge variant="outline" className="text-emerald-600 bg-emerald-50 border-emerald-200 uppercase tracking-widest px-4 py-1">
-                    Head-to-Head Analysis Report
+                    Food Comparison Results
                 </Badge>
                 <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white leading-tight">
                     The Superior Choice is <br />
@@ -138,7 +138,7 @@ function ComparisonReportContent() {
                     </span>
                 </h1>
                 <p className="text-xl text-slate-500 max-w-2xl mx-auto">
-                    Based on nutrient density scoring measured against the recommended daily intake for an average adult.
+                    Comparing how many nutrients are packed into every 100g, based on daily health needs.
                 </p>
             </div>
 
@@ -151,7 +151,7 @@ function ComparisonReportContent() {
                     <div className="space-y-4">
                         <h2 className="text-3xl font-bold">{winner.common_name || winner.name}</h2>
                         <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-lg">
-                            Dominating in <span className="font-bold text-slate-900 dark:text-white">{topTraits}</span> content, {winner.common_name || winner.name} provides a superior micronutrient profile per calorie, making it the more efficient metabolic choice.
+                            With more <span className="font-bold text-slate-900 dark:text-white">{topTraits}</span>, {winner.common_name || winner.name} gives you more nutrients in every bite, making it a great choice for your health.
                         </p>
 
                         <div className="flex flex-wrap gap-3 pt-2">
@@ -165,7 +165,7 @@ function ComparisonReportContent() {
                 </div>
                 {/* Stat Highlight Visual */}
                 <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-xl border border-slate-100 dark:border-slate-800 space-y-6">
-                    <h3 className="font-bold text-center uppercase tracking-widest text-slate-400 text-xs">Performance Highlights</h3>
+                    <h3 className="font-bold text-center uppercase tracking-widest text-slate-400 text-xs">Nutrient Highlights</h3>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="text-center p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl">
                             <div className="text-2xl font-black text-emerald-500">{(winner.protein_g).toFixed(1)}g</div>
@@ -178,7 +178,7 @@ function ComparisonReportContent() {
                     </div>
                     {runnerUp && (
                         <div className="py-2 px-4 bg-slate-50 dark:bg-slate-800 rounded-xl text-center text-xs text-slate-500">
-                            <span className="font-bold text-emerald-600">{(winner.score / runnerUp.score * 100 - 100).toFixed(0)}% more nutrient dense</span> than {runnerUp.common_name || runnerUp.name}
+                            <span className="font-bold text-emerald-600">{(winner.score / runnerUp.score * 100 - 100).toFixed(0)}% more nutrient dense</span>
                         </div>
                     )}
                 </div>
@@ -218,7 +218,7 @@ function ComparisonReportContent() {
                                         {itemEnergy < (energyUnit === 'kJ' ? 200 : 50) && <Badge variant="outline" className="text-[8px] h-4 px-1 border-green-200 text-green-600 bg-green-50">Low Energy</Badge>}
                                     </div>
                                     <p className="text-xs text-slate-500 mb-4 h-10">
-                                        While it didn't win the overall density score, it is still a superior choice for specific goals:
+                                        While it didn't take the top spot overall, it's still a great choice for these specific goals:
                                     </p>
                                     <div className="space-y-2">
                                         {advantages.slice(0, 3).map((adv, i) => (
@@ -238,7 +238,7 @@ function ComparisonReportContent() {
             {/* BEST FOR... BADGES */}
             <div className="bg-slate-900 text-white rounded-[32px] p-8 md:p-12 space-y-8">
                 <div className="text-center">
-                    <h3 className="text-2xl font-black mb-2">Scenario Analysis</h3>
+                    <h3 className="text-2xl font-black mb-2">Best for your goals</h3>
                     <p className="text-slate-400">Which ingredient suits your specific goals?</p>
                 </div>
 

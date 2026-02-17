@@ -289,7 +289,7 @@ export function CompareView() {
                             </div>
                             <input
                                 autoFocus
-                                placeholder={`Search for Sample ${activeSlot + 1}...`}
+                                placeholder={`Search for Food ${activeSlot + 1}...`}
                                 className="flex-1 bg-transparent border-none focus:ring-0 text-xl font-black uppercase tracking-widest text-slate-900 dark:text-white placeholder:text-slate-300"
                                 value={searchQuery}
                                 onKeyDown={(e) => {
@@ -312,7 +312,7 @@ export function CompareView() {
                                         <Activity className="animate-spin text-emerald-500" size={32} />
                                         <div className="absolute inset-0 animate-ping bg-emerald-500/20 rounded-full" />
                                     </div>
-                                    <p className="text-[10px] font-black uppercase tracking-widest">Querying Library...</p>
+                                    <p className="text-[10px] font-black uppercase tracking-widest">Searching Library...</p>
                                 </div>
                             ) : searchResults.length > 0 ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -358,16 +358,16 @@ export function CompareView() {
                             <Info size={32} className="text-emerald-500" />
                             <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
                         </div>
-                        <h3 className="text-xl md:text-3xl font-black text-slate-900 dark:text-white uppercase italic mb-3 tracking-tight">Engine Ready</h3>
+                        <h3 className="text-xl md:text-3xl font-black text-slate-900 dark:text-white uppercase italic mb-3 tracking-tight">Ready to Compare</h3>
                         <p className="text-slate-500 font-medium text-xs md:text-base max-w-[280px] md:max-w-md leading-relaxed mb-8">
-                            Nutritional comparison engine is online. <br />
-                            Use the <span className="text-emerald-500 font-bold italic">Add Buttons</span> in the table below to begin analysis.
+                            Pick your foods to see how they stack up side-by-side. <br />
+                            Use the <span className="text-emerald-500 font-bold italic">Add Buttons</span> below to start your comparison.
                         </p>
                         <button
                             onClick={() => setActiveSlot(0)}
                             className="px-8 py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all"
                         >
-                            Start Investigation
+                            Let's Compare
                         </button>
                     </div>
                 ) : (
@@ -378,13 +378,13 @@ export function CompareView() {
                                 <Activity size={24} />
                             </div>
                             <div>
-                                <h3 className="font-black text-lg uppercase italic text-slate-900 dark:text-white leading-none mb-1">Comparison Lab</h3>
+                                <h3 className="font-black text-lg uppercase italic text-slate-900 dark:text-white leading-none mb-1">Side-by-Side View</h3>
                                 <div className="flex gap-2">
                                     <Badge className="bg-emerald-500 text-white border-none font-black text-[8px] uppercase tracking-widest">
-                                        {selectedFoods.filter(f => f !== null).length} / 3 SAMPLES
+                                        {selectedFoods.filter(f => f !== null).length} / 3 FOODS
                                     </Badge>
                                     <Badge variant="outline" className="border-slate-200 dark:border-slate-800 font-black text-[8px] uppercase tracking-widest text-slate-400">
-                                        ACTIVE ANALYSIS
+                                        LIVE COMPARISON
                                     </Badge>
                                 </div>
                             </div>
@@ -396,14 +396,14 @@ export function CompareView() {
                                     onClick={() => setActiveSlot(selectedFoods.findIndex(f => f === null))}
                                     className="px-5 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-black text-[10px] uppercase tracking-widest text-emerald-500 hover:border-emerald-500/50 transition-all flex items-center gap-2"
                                 >
-                                    <Plus size={14} /> Add Sample
+                                    <Plus size={14} /> Add Food
                                 </button>
                             )}
                             <button
                                 onClick={clearAll}
                                 className="px-5 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-black text-[10px] uppercase tracking-widest text-rose-500 hover:border-rose-500/50 transition-all flex items-center gap-2"
                             >
-                                <Trash2 size={14} /> Reset Engine
+                                <Trash2 size={14} /> Clear All
                             </button>
                         </div>
                     </div>
@@ -446,7 +446,7 @@ export function CompareView() {
                                                     </h4>
                                                     <div className="flex flex-col md:flex-row items-center gap-0.5 md:gap-2">
                                                         <Badge className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-none font-black text-[6px] md:text-[8px] uppercase tracking-widest px-1 md:px-2">
-                                                            {scores[i]} PTS
+                                                            {scores[i]} Score
                                                         </Badge>
                                                         {getMedal(i) && (
                                                             <span className={cn("text-[7px] md:text-[10px] font-black uppercase italic tracking-tighter leading-none whitespace-nowrap", getMedal(i)!.color.split(' ')[0])}>
