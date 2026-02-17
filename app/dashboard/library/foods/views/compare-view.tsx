@@ -269,55 +269,7 @@ export function CompareView() {
     };
 
     return (
-        <div className="space-y-6 md:space-y-12 animate-in fade-in duration-500 pb-20">
-            {/* 3 Interaction Slots */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[0, 1, 2].map((i) => (
-                    <div key={i} className="relative">
-                        {selectedFoods[i] ? (
-                            <div className="bg-white dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl p-4 flex items-center justify-between group h-[84px]">
-                                <div className="flex items-center gap-4 min-w-0">
-                                    <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 shrink-0 overflow-hidden border border-slate-100 dark:border-slate-800">
-                                        {selectedFoods[i]!.image ? (
-                                            <img src={selectedFoods[i]!.image!} className="w-full h-full object-cover" />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                <Beef size={18} className="opacity-10" />
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="min-w-0">
-                                        <div className="flex items-center gap-2 mb-0.5">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Sample {i + 1}</p>
-                                            <div className="w-1 h-1 rounded-full bg-slate-300" />
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{scores[i]} PTS</p>
-                                        </div>
-                                        <h3 className="font-black text-sm uppercase italic text-slate-900 dark:text-white truncate">
-                                            {selectedFoods[i]?.common_name || selectedFoods[i]?.name}
-                                        </h3>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => removeFood(i)}
-                                    className="p-2 text-slate-300 hover:text-rose-500 transition-colors shrink-0"
-                                >
-                                    <Trash2 size={16} />
-                                </button>
-                            </div>
-                        ) : (
-                            <button
-                                onClick={() => setActiveSlot(i)}
-                                className="w-full h-[84px] rounded-[1.5rem] md:rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center gap-3 text-slate-400 hover:border-emerald-500/50 hover:text-emerald-500 transition-all group bg-white/50 dark:bg-slate-900/50 overflow-visible"
-                            >
-                                <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <Plus size={18} />
-                                </div>
-                                <span className="text-[11px] font-black uppercase tracking-widest">Add Sample {i + 1}</span>
-                            </button>
-                        )}
-                    </div>
-                ))}
-            </div>
+        <div className="space-y-6 md:space-y-12 animate-in fade-in duration-700 pb-20 pt-4">
 
             {/* Centralized Search Overlay */}
             {activeSlot !== null && (
@@ -416,7 +368,7 @@ export function CompareView() {
                                     <th key={i} className="p-4 md:p-8 text-center border-l border-slate-100 dark:border-slate-800 w-[100px] md:w-1/4 min-w-[100px] md:min-w-0">
                                         <div className="flex flex-col items-center gap-1 md:gap-2">
                                             {selectedFoods[i] ? (
-                                                <>
+                                                <div className="relative group/card">
                                                     <div className={cn("p-1.5 md:p-2 rounded-lg md:rounded-xl mb-0.5 md:mb-1 animate-in zoom-in duration-500", getMedal(i)?.bg)}>
                                                         {getMedal(i) ? React.createElement(getMedal(i)!.icon, {
                                                             size: 16,
@@ -425,7 +377,7 @@ export function CompareView() {
                                                             <div className="w-4 h-4 md:w-6 md:h-6" /> // Placeholder to maintain height
                                                         )}
                                                     </div>
-                                                    <h4 className="font-black text-[9px] md:text-sm uppercase italic text-slate-900 dark:text-white line-clamp-1">
+                                                    <h4 className="font-black text-[9px] md:text-sm uppercase italic text-slate-900 dark:text-white line-clamp-1 mb-1">
                                                         {selectedFoods[i]?.common_name || selectedFoods[i]?.name}
                                                     </h4>
                                                     <div className="flex flex-col md:flex-row items-center gap-0.5 md:gap-2">
@@ -433,12 +385,19 @@ export function CompareView() {
                                                             {scores[i]} PTS
                                                         </Badge>
                                                         {getMedal(i) && (
-                                                            <span className={cn("text-[7px] md:text-[10px] font-black uppercase italic tracking-tighter leading-none", getMedal(i)!.color.split(' ')[0])}>
+                                                            <span className={cn("text-[7px] md:text-[10px] font-black uppercase italic tracking-tighter leading-none whitespace-nowrap", getMedal(i)!.color.split(' ')[0])}>
                                                                 {getMedal(i)!.label}
                                                             </span>
                                                         )}
                                                     </div>
-                                                </>
+                                                    {/* Floating Remove Button */}
+                                                    <button
+                                                        onClick={() => removeFood(i)}
+                                                        className="absolute -top-1 -right-1 md:-top-2 md:-right-2 p-1.5 md:p-2 bg-white dark:bg-slate-800 text-slate-400 hover:text-rose-500 rounded-full shadow-lg border border-slate-100 dark:border-slate-700 opacity-0 group-hover/card:opacity-100 transition-all scale-75 group-hover/card:scale-100"
+                                                    >
+                                                        <X size={10} className="md:w-3 md:h-3" />
+                                                    </button>
+                                                </div>
                                             ) : (
                                                 <button
                                                     onClick={() => setActiveSlot(i)}
