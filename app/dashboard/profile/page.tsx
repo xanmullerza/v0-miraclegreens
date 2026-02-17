@@ -289,10 +289,10 @@ function ProfilePageContent() {
             <Sheet open={showRDASheet} onOpenChange={setShowRDASheet}>
                 <div className="flex flex-col lg:flex-row gap-6 items-start">
                 {/* Main Content (Compact Settings) */}
-                <div className="w-full lg:w-1/2 space-y-8 pb-32">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="w-full space-y-8 pb-32">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
                         {/* Identification Card */}
-                        <section className="space-y-6">
+                        <section className="space-y-6 w-full">
                             <div className="flex items-center gap-2 text-emerald-500 mb-2">
                                 <User size={20} />
                                 <h2 className="text-sm font-black uppercase tracking-[0.2em]">Identification</h2>
@@ -360,7 +360,7 @@ function ProfilePageContent() {
                         </section>
 
                         {/* Goals Card */}
-                        <section className="space-y-6">
+                        <section className="space-y-6 w-full">
                             <div className="flex items-center gap-2 text-emerald-500 mb-2">
                                 <Activity size={20} />
                                 <h2 className="text-sm font-black uppercase tracking-[0.2em]">Goals</h2>
