@@ -19,6 +19,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { HeaderActionsProvider, useHeaderActions } from '@/lib/context/header-actions-context';
 import { SearchProvider, useSearch } from '@/lib/context/search-context';
 import { supabase } from '@/lib/supabase';
 import {
@@ -55,6 +56,7 @@ function DashboardLayoutContent({
         searchInputRef,
         keepFocusAfterSelect
     } = useSearch();
+    const { actions } = useHeaderActions();
     const [user, setUser] = useState<any>(null);
 
     useEffect(() => {
@@ -258,52 +260,61 @@ function DashboardLayoutContent({
 
                     {/* Breadcrumb Subheader - Hidden on nutrient pages */}
                     {!pathname.match(/\/library\/nutrients(\/[^/]+)?$/) && (
-                    <div className="sticky top-16 z-10 w-full border-b border-slate-200/30 dark:border-slate-800/30 bg-white/5 dark:bg-slate-900/5 backdrop-blur-sm px-8 py-1 flex items-center justify-center gap-4">
-                        {/* Back Button */}
-                        <button
-                            onClick={() => router.back()}
-                            className="p-1.5 text-slate-400 hover:text-emerald-500 transition-colors flex-shrink-0"
-                            title="Go Back"
-                        >
-                            <ChevronLeft size={16} />
-                        </button>
+                        <div className="sticky top-16 z-10 w-full border-b border-slate-200/30 dark:border-slate-800/30 bg-white/5 dark:bg-slate-900/5 backdrop-blur-sm px-8 py-1 flex items-center gap-4">
+                            {/* Back Button */}
+                            <div className="flex items-center gap-1 flex-shrink-0">
+                                <button
+                                    onClick={() => router.back()}
+                                    className="p-1.5 text-slate-400 hover:text-emerald-500 transition-colors"
+                                    title="Go Back"
+                                >
+                                    <ChevronLeft size={16} />
+                                </button>
+                            </div>
 
-                        {/* Breadcrumbs */}
-                        <div className="flex items-center gap-2">
-                            {pathname.split('/').filter(Boolean).map((segment, index, array) => {
-                                const path = '/' + array.slice(0, index + 1).join('/');
-                                const isLast = index === array.length - 1;
-                                const isFirst = index === 0;
+                            {/* Breadcrumbs - Centered */}
+                            <div className="flex-1 flex items-center justify-center gap-2 overflow-hidden">
+                                {pathname.split('/').filter(Boolean).map((segment, index, array) => {
+                                    const path = '/' + array.slice(0, index + 1).join('/');
+                                    const isLast = index === array.length - 1;
+                                    const isFirst = index === 0;
 
-                                return (
-                                    <React.Fragment key={path}>
-                                        {!isFirst && <ChevronRight size={12} className="text-slate-400" />}
-                                        {isLast ? (
-                                            <span className="text-xs font-black text-emerald-500 uppercase tracking-widest">
-                                                {decodeURIComponent(segment).replace(/-/g, ' ')}
-                                            </span>
-                                        ) : (
-                                            <Link
-                                                href={path}
-                                                className="text-xs font-black text-slate-400 hover:text-emerald-500 uppercase tracking-widest transition-colors"
-                                            >
-                                                {decodeURIComponent(segment).replace(/-/g, ' ')}
-                                            </Link>
-                                        )}
-                                    </React.Fragment>
-                                );
-                            })}
+                                    return (
+                                        <React.Fragment key={path}>
+                                            {!isFirst && <ChevronRight size={12} className="text-slate-400 shrink-0" />}
+                                            {isLast ? (
+                                                <span className="text-[10px] font-black text-emerald-500 uppercase tracking-widest truncate">
+                                                    {decodeURIComponent(segment).replace(/-/g, ' ')}
+                                                </span>
+                                            ) : (
+                                                <Link
+                                                    href={path}
+                                                    className="text-[10px] font-black text-slate-400 hover:text-emerald-500 uppercase tracking-widest transition-colors shrink-0"
+                                                >
+                                                    {decodeURIComponent(segment).replace(/-/g, ' ')}
+                                                </Link>
+                                            )}
+                                        </React.Fragment>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Actions & Forward Button */}
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                                {actions && (
+                                    <div className="flex items-center gap-2 mr-2 animate-in fade-in slide-in-from-right-2 duration-300">
+                                        {actions}
+                                    </div>
+                                )}
+                                <button
+                                    onClick={() => router.forward()}
+                                    className="p-1.5 text-slate-400 hover:text-emerald-500 transition-colors"
+                                    title="Go Forward"
+                                >
+                                    <ChevronRight size={16} />
+                                </button>
+                            </div>
                         </div>
-
-                        {/* Forward Button */}
-                        <button
-                            onClick={() => router.forward()}
-                            className="p-1.5 text-slate-400 hover:text-emerald-500 transition-colors flex-shrink-0"
-                            title="Go Forward"
-                        >
-                            <ChevronRight size={16} />
-                        </button>
-                    </div>
                     )}
 
                     <div className="px-8 pt-4 pb-20 flex-1">
@@ -327,7 +338,9 @@ export default function DashboardLayout({
 }) {
     return (
         <SearchProvider>
-            <DashboardLayoutContent>{children}</DashboardLayoutContent>
+            <HeaderActionsProvider>
+                <DashboardLayoutContent>{children}</DashboardLayoutContent>
+            </HeaderActionsProvider>
         </SearchProvider>
     );
 }

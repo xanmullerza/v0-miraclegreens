@@ -30,6 +30,7 @@ import { cn } from '@/lib/utils';
 import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { supabase } from '@/lib/supabase';
+import { HeaderActions } from '@/lib/context/header-actions-context';
 
 import { MealPlannerView } from '@/components/kitchen/mealplanner-view';
 import { MixLabView } from '@/components/kitchen/mix-lab-view';
@@ -209,46 +210,28 @@ function KitchenContent() {
     );
 
     return (
-        <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700 pb-32">
-            {/* Unified Header */}
-            <div className="flex flex-col gap-8">
-                <div className="flex items-center gap-4">
-                    <div className="p-3.5 rounded-[1.5rem] bg-yellow-500 shadow-xl shadow-yellow-500/20 text-white">
-                        <Sparkles size={28} />
-                    </div>
-                    <div>
-                        <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2">
-                            <span className="text-yellow-500">{tabConfig[activeTab].heading}.</span>
-                        </h1>
-                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">
-                            {tabConfig[activeTab].description}
-                        </p>
-                    </div>
-                </div>
-
-                {/* Tab Section & Filters */}
-                <div className="flex flex-col gap-6 items-start w-full">
-                </div>
-
-                {['browse', 'mealplanner'].includes(activeTab) && (
-                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2 w-full mask-linear animate-in fade-in slide-in-from-right-8 duration-700">
+        <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700 pb-32 pt-8">
+            {/* Header Actions (Teleported to Subheader) */}
+            {['browse', 'mealplanner'].includes(activeTab) && (
+                <HeaderActions>
+                    <div className="flex items-center gap-2">
                         {/* Scope/Favorites Dropdown */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <button className={cn(
-                                    "flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all duration-300 shrink-0 shadow-sm group outline-none",
+                                    "flex items-center gap-2 px-2.5 py-1.5 rounded-xl border transition-all duration-300 shrink-0 shadow-sm group outline-none",
                                     showFavoritesOnly
                                         ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
-                                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-200 hover:text-rose-500"
+                                        : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-200 hover:text-rose-500"
                                 )}>
-                                    <Heart size={14} className={cn("transition-transform group-hover:scale-110", showFavoritesOnly && "fill-current")} />
-                                    <span className="text-[9px] font-black uppercase tracking-widest">
-                                        {showFavoritesOnly ? "Favorites Only" : "All Results"}
+                                    <Heart size={12} className={cn("transition-transform group-hover:scale-110", showFavoritesOnly && "fill-current")} />
+                                    <span className="text-[8px] font-black uppercase tracking-widest hidden sm:inline">
+                                        {showFavoritesOnly ? "Favorites" : "All Results"}
                                     </span>
-                                    <ChevronDown size={12} className="opacity-50" />
+                                    <ChevronDown size={10} className="opacity-50" />
                                 </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="w-48 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
+                            <DropdownMenuContent align="end" className="w-48 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
                                 <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Filter Scope</DropdownMenuLabel>
                                 <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
                                 <DropdownMenuCheckboxItem
@@ -268,27 +251,25 @@ function KitchenContent() {
                             </DropdownMenuContent>
                         </DropdownMenu>
 
-                        <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-2" />
-
                         {/* Meal Type Dropdown Filter */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <button className={cn(
-                                    "px-5 py-2.5 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-3 shrink-0 border shadow-sm outline-none",
+                                    "px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
                                     selectedTypes.length < MEAL_TYPES.length
                                         ? "bg-yellow-600 text-white border-yellow-600 shadow-lg shadow-yellow-500/20"
-                                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-yellow-200 hover:text-yellow-600"
+                                        : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-yellow-200 hover:text-yellow-600"
                                 )}>
-                                    <Filter size={14} />
-                                    <span>
+                                    <Filter size={12} />
+                                    <span className="hidden sm:inline">
                                         {selectedTypes.length === 0 ? "No Types" :
                                             selectedTypes.length === MEAL_TYPES.length ? "Meal Types" :
                                                 `${selectedTypes.length} Types`}
                                     </span>
-                                    <ChevronDown size={12} className={cn("transition-transform duration-300")} />
+                                    <ChevronDown size={10} className={cn("opacity-50")} />
                                 </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
+                            <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
                                 <div className="flex items-center justify-between pr-2">
                                     <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Types</DropdownMenuLabel>
                                     <div className="flex items-center gap-1">
@@ -341,8 +322,8 @@ function KitchenContent() {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-                )}
-            </div>
+                </HeaderActions>
+            )}
 
             {/* Dynamic Content Area */}
             <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
