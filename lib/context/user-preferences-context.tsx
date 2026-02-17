@@ -32,6 +32,7 @@ interface UserProfile {
     activityLevel: ActivityLevel;
     nutrientStrategy: NutrientStrategy;
     exclusions: string[];
+    healthConditions: string[];
     familyMembers: FamilyMember[];
 }
 
@@ -79,6 +80,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         activityLevel: "sedentary",
         nutrientStrategy: "balanced",
         exclusions: [],
+        healthConditions: [],
         familyMembers: []
     });
     const [skipPlannerQuiz, setSkipPlannerQuizState] = useState(false);
@@ -154,6 +156,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
                                 activityLevel: data.activity_level || "sedentary",
                                 nutrientStrategy: data.nutrient_strategy || "balanced",
                                 exclusions: data.dietary_preferences?.exclusions || [],
+                                healthConditions: data.health_conditions || [],
                                 familyMembers: data.family_members || []
                             };
                             setProfileState(cloudProfile);

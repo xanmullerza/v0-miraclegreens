@@ -174,6 +174,7 @@ function ProfilePageContent() {
     const [formData, setFormData] = useState({
         ...profile,
         exclusions: profile.exclusions || [],
+        healthConditions: profile.healthConditions || [],
         familyMembers: profile.familyMembers || []
     });
 
@@ -398,6 +399,21 @@ function ProfilePageContent() {
                                     </div>
                                     <p className="text-[10px] text-slate-400 italic">Adjusts your macro ratio targets (Energy/Protein/Carbs/Fat) across the entire app.</p>
                                 </div>
+                            </div>
+                        </section>
+
+                        {/* Health Considerations Card */}
+                        <section className="space-y-6">
+                            <div className="flex items-center gap-4">
+                                <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
+                                    <Zap size={24} className="stroke-[2.5]" />
+                                </div>
+                                <div>
+                                    <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Health Considerations</h2>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Wellness & Conditions</p>
+                                </div>
+                            </div>
+                            <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
                                 {/* Exclusions */}
                                 <div className="space-y-4">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Specific Exclusions</Label>
@@ -414,10 +430,10 @@ function ProfilePageContent() {
                                                         setFormData({ ...formData, exclusions: newExclusions });
                                                     }}
                                                     className={cn(
-                                                        "px-4 py-2 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all",
+                                                        "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
                                                         isSelected
-                                                            ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
-                                                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                                            ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20"
+                                                            : "bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
                                                     )}
                                                 >
                                                     {exclusion}
@@ -426,6 +442,36 @@ function ProfilePageContent() {
                                         })}
                                     </div>
                                     <p className="text-[10px] text-slate-400 italic">These items will be marked as "Excluded" even if the meal otherwise fits your diet.</p>
+                                </div>
+
+                                {/* Health Conditions */}
+                                <div className="space-y-4 border-t border-slate-100 dark:border-slate-800 pt-4">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Health Conditions</Label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {['Diabetes', 'Hypertension', 'Heart Disease', 'High Cholesterol', 'Celiac', 'IBS', 'Kidney Disease', 'Thyroid Issues', 'PCOS', 'Gout'].map(condition => {
+                                            const isSelected = (formData.healthConditions || [])?.includes(condition);
+                                            return (
+                                                <button
+                                                    key={condition}
+                                                    onClick={() => {
+                                                        const newConditions = isSelected
+                                                            ? (formData.healthConditions || []).filter(c => c !== condition)
+                                                            : [...(formData.healthConditions || []), condition];
+                                                        setFormData({ ...formData, healthConditions: newConditions });
+                                                    }}
+                                                    className={cn(
+                                                        "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                                        isSelected
+                                                            ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20"
+                                                            : "bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                                    )}
+                                                >
+                                                    {condition}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                    <p className="text-[10px] text-slate-400 italic">Select conditions to optimize meal plans with appropriate nutritional considerations.</p>
                                 </div>
                             </div>
                         </section>
