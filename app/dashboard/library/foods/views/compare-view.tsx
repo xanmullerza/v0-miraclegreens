@@ -99,149 +99,52 @@ const NUTRIENT_GROUPS = [
 
 export function CompareView() {
     const [selectedFoods, setSelectedFoods] = useState<(FoodItem | null)[]>([null, null, null]);
-    const [searchQueries, setSearchQueries] = useState<string[]>(['', '', '']);
-    const [searchResults, setSearchResults] = useState<FoodItem[][]>([[], [], []]);
-    const [isLoading, setIsLoading] = useState<boolean[]>([false, false, false]);
-    const [activeSearchIndex, setActiveSearchIndex] = useState<number | null>(null);
-    const searchRef = useRef<HTMLDivElement>(null);
-    const searchTimeoutRef = useRef<{ [key: number]: NodeJS.Timeout }>({});
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [activeSlot, setActiveSlot] = useState<number | null>(null); // Which box are we picking for?
     const { energyUnit } = useUserPreferences();
+    const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-                setActiveSearchIndex(null);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-            // Cleanup timeouts
-            Object.values(searchTimeoutRef.current).forEach(clearTimeout);
-        };
-    }, []);
-
-    const performSearch = async (query: string, index: number) => {
+    // Perform Search
+    const performSearch = async (query: string) => {
         if (!query || query.length < 2) {
-            setSearchResults(prev => {
-                const next = [...prev];
-                next[index] = [];
-                return next;
-            });
+            setSearchResults([]);
             return;
         }
-
-        setIsLoading(prev => {
-            const next = [...prev];
-            next[index] = true;
-            return next;
-        });
-
+        setIsSearching(true);
         try {
-            console.log(`[CompareView] Searching for: "${query}" in index ${index}`);
-
-            // Primary search using .or() syntax
-            let { data, error } = await supabase
+            const { data, error } = await supabase
                 .from('food_items')
                 .select('*')
                 .or(`name.ilike.%${query}%,common_name.ilike.%${query}%`)
-                .limit(5);
+                .limit(8);
 
-            console.log(`[CompareView] Primary search result count: ${data?.length || 0}, error: ${error?.message || 'none'}`);
-
-            // Fallback: If primary search fails or returns no results, try alternative approach
-            if (error || !data || data.length === 0) {
-                console.log('[CompareView] Trying fallback search method...');
-
-                // Try searching name field only first
-                const { data: nameData, error: nameError } = await supabase
-                    .from('food_items')
-                    .select('*')
-                    .ilike('name', `%${query}%`)
-                    .limit(5);
-
-                if (nameError) {
-                    console.error('[CompareView] Fallback name search error:', nameError);
-                } else if (nameData && nameData.length > 0) {
-                    console.log(`[CompareView] Fallback name search successful, found ${nameData.length} results`);
-                    data = nameData;
-                    error = null;
-                } else {
-                    // Try searching common_name field
-                    const { data: commonData, error: commonError } = await supabase
-                        .from('food_items')
-                        .select('*')
-                        .ilike('common_name', `%${query}%`)
-                        .limit(5);
-
-                    if (commonError) {
-                        console.error('[CompareView] Fallback common_name search error:', commonError);
-                    } else if (commonData && commonData.length > 0) {
-                        console.log(`[CompareView] Fallback common_name search successful, found ${commonData.length} results`);
-                        data = commonData;
-                        error = null;
-                    }
-                }
-            }
-
-            if (error) {
-                console.error('Search error details:', error);
-                throw error;
-            }
-
-            setSearchResults(prev => {
-                const next = [...prev];
-                next[index] = data || [];
-                return next;
-            });
-
-            console.log(`[CompareView] Updated search results for index ${index}: ${(data || []).length} items`);
+            if (error) throw error;
+            setSearchResults(data || []);
         } catch (error) {
             console.error('Search error:', error);
-            const errorMsg = error instanceof Error ? error.message : 'Search failed';
-            toast.error(`Search failed: ${errorMsg}`);
+            // toast.error("Database search failed");
         } finally {
-            setIsLoading(prev => {
-                const next = [...prev];
-                next[index] = false;
-                return next;
-            });
+            setIsSearching(false);
         }
     };
 
-    const handleSearchChange = (val: string, index: number) => {
-        const nextQueries = [...searchQueries];
-        nextQueries[index] = val;
-        setSearchQueries(nextQueries);
-
-        // Debounce search
-        if (searchTimeoutRef.current[index]) {
-            clearTimeout(searchTimeoutRef.current[index]);
-        }
-
-        searchTimeoutRef.current[index] = setTimeout(() => {
-            performSearch(val, index);
-        }, 300);
+    // Debounce handler
+    const handleSearchInput = (val: string) => {
+        setSearchQuery(val);
+        if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+        searchTimeoutRef.current = setTimeout(() => performSearch(val), 300);
     };
 
-    const handleSelectFood = (food: FoodItem, index: number) => {
-        console.log(`[CompareView] Selected ${food?.common_name || food?.name}`);
-        setSelectedFoods(prev => {
-            const next = [...prev];
-            next[index] = food;
-            return next;
-        });
-        setSearchQueries(prev => {
-            const next = [...prev];
-            next[index] = '';
-            return next;
-        });
-        setSearchResults(prev => {
-            const next = [...prev];
-            next[index] = [];
-            return next;
-        });
-        setActiveSearchIndex(null);
+    const selectFood = (food: FoodItem) => {
+        if (activeSlot === null) return;
+        const next = [...selectedFoods];
+        next[activeSlot] = food;
+        setSelectedFoods(next);
+        setActiveSlot(null);
+        setSearchQuery('');
+        setSearchResults([]);
     };
 
     const removeFood = (index: number) => {
@@ -337,102 +240,129 @@ export function CompareView() {
 
     return (
         <div className="space-y-6 md:space-y-12 animate-in fade-in duration-500 pb-20">
-            {/* Search Header */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6" ref={searchRef}>
-                {[0, 1, 2].map((index) => (
-                    <div key={index} className="relative group overflow-visible">
-                        <div className={cn(
-                            "bg-white dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl transition-all duration-500",
-                            activeSearchIndex === index ? "ring-2 ring-emerald-500/50" : ""
-                        )}>
-                            <div className="p-3 md:p-4 flex flex-col items-center gap-4">
-                                {selectedFoods[index] ? (
-                                    <div className="w-full flex items-center justify-between gap-3 md:gap-4">
-                                        <div className="flex items-center gap-3 md:gap-4 flex-1">
-                                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex-shrink-0 overflow-hidden border border-slate-200 dark:border-slate-700">
-                                                {selectedFoods[index]?.image ? (
-                                                    <img src={selectedFoods[index]?.image!} alt={selectedFoods[index]?.name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                        <Beef size={18} className="opacity-10" />
-                                                    </div>
-                                                )}
+            {/* 3 Interaction Slots */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {[0, 1, 2].map((i) => (
+                    <div key={i} className="relative">
+                        {selectedFoods[i] ? (
+                            <div className="bg-white dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl p-4 flex items-center justify-between group h-[84px]">
+                                <div className="flex items-center gap-4 min-w-0">
+                                    <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 shrink-0 overflow-hidden border border-slate-100 dark:border-slate-800">
+                                        {selectedFoods[i]!.image ? (
+                                            <img src={selectedFoods[i]!.image!} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                <Beef size={18} className="opacity-10" />
                                             </div>
-                                            <div className="min-w-0">
-                                                <div className="flex items-center gap-2 mb-0.5">
-                                                    <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">Box {index + 1}</p>
-                                                    <div className="w-1 h-1 rounded-full bg-slate-300" />
-                                                    <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-emerald-500">{scores[index]} PTS</p>
-                                                </div>
-                                                <h3 className="font-black text-xs md:text-sm uppercase italic text-slate-900 dark:text-white truncate">
-                                                    {selectedFoods[index]?.common_name || selectedFoods[index]?.name}
-                                                </h3>
-                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="min-w-0">
+                                        <div className="flex items-center gap-2 mb-0.5">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Sample {i + 1}</p>
+                                            <div className="w-1 h-1 rounded-full bg-slate-300" />
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{scores[i]} PTS</p>
                                         </div>
-                                        <button
-                                            onClick={() => removeFood(index)}
-                                            className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 flex items-center justify-center transition-all"
-                                        >
-                                            <Trash2 size={14} />
-                                        </button>
+                                        <h3 className="font-black text-sm uppercase italic text-slate-900 dark:text-white truncate">
+                                            {selectedFoods[i]?.common_name || selectedFoods[i]?.name}
+                                        </h3>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => removeFood(i)}
+                                    className="p-2 text-slate-300 hover:text-rose-500 transition-colors shrink-0"
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => setActiveSlot(i)}
+                                className="w-full h-[84px] rounded-[1.5rem] md:rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center gap-3 text-slate-400 hover:border-emerald-500/50 hover:text-emerald-500 transition-all group bg-white/50 dark:bg-slate-900/50 overflow-visible"
+                            >
+                                <div className="w-8 h-8 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Plus size={18} />
+                                </div>
+                                <span className="text-[11px] font-black uppercase tracking-widest">Add Sample {i + 1}</span>
+                            </button>
+                        )}
+                    </div>
+                ))}
+            </div>
+
+            {/* Centralized Search Overlay */}
+            {activeSlot !== null && (
+                <div className="fixed inset-0 z-[9999] bg-slate-950/80 backdrop-blur-md flex items-start justify-center pt-20 px-4">
+                    <div className="w-full max-w-2xl animate-in zoom-in-95 duration-300 overflow-visible">
+                        <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl border border-emerald-500/20 overflow-visible">
+                            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-4">
+                                <Search className="text-emerald-500" size={24} />
+                                <input
+                                    autoFocus
+                                    placeholder="Search recipes or ingredients..."
+                                    className="flex-1 bg-transparent border-none focus:ring-0 text-lg font-black uppercase tracking-widest text-slate-900 dark:text-white placeholder:text-slate-300"
+                                    value={searchQuery}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Escape') setActiveSlot(null);
+                                    }}
+                                    onChange={(e) => handleSearchInput(e.target.value)}
+                                />
+                                <button onClick={() => setActiveSlot(null)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-400 transition-colors">
+                                    <X size={24} />
+                                </button>
+                            </div>
+
+                            <div className="max-h-[400px] overflow-y-auto p-4 md:p-6 no-scrollbar">
+                                {isSearching ? (
+                                    <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-4">
+                                        <div className="relative">
+                                            <Activity className="animate-spin text-emerald-500" size={32} />
+                                            <div className="absolute inset-0 animate-ping bg-emerald-500/20 rounded-full" />
+                                        </div>
+                                        <p className="text-[10px] font-black uppercase tracking-widest">Querying Library...</p>
+                                    </div>
+                                ) : searchResults.length > 0 ? (
+                                    <div className="grid grid-cols-1 gap-2">
+                                        {searchResults.map(food => (
+                                            <button
+                                                key={food.id}
+                                                onClick={() => selectFood(food)}
+                                                className="w-full p-4 rounded-2xl hover:bg-emerald-50 dark:hover:bg-emerald-900/10 flex items-center justify-between group transition-all border border-transparent hover:border-emerald-500/20"
+                                            >
+                                                <div className="flex items-center gap-4 text-left min-w-0">
+                                                    <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
+                                                        {food.image ? <img src={food.image} className="w-full h-full object-cover" /> : <Beef className="m-auto opacity-10 h-full w-5" />}
+                                                    </div>
+                                                    <div className="min-w-0">
+                                                        <h4 className="font-bold text-sm uppercase text-slate-900 dark:text-white truncate">{food.common_name || food.name}</h4>
+                                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                                                            {energyUnit === 'kJ' ? (food.energy_kcal * 4.184).toFixed(0) : food.energy_kcal.toFixed(0)} {energyUnit} / 100g
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={18} />
+                                            </button>
+                                        ))}
+                                    </div>
+                                ) : searchQuery.length > 1 ? (
+                                    <div className="py-20 text-center text-slate-400">
+                                        <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <X size={20} />
+                                        </div>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">No matching items found</p>
                                     </div>
                                 ) : (
-                                    <div className="w-full">
-                                        <div className="flex items-center gap-2 md:gap-3 px-3 md:px-4 h-12 md:h-14 bg-slate-50 dark:bg-slate-800/50 rounded-xl md:rounded-2xl border border-slate-100 dark:border-slate-700">
-                                            <Search className="text-slate-400" size={16} />
-                                            <input
-                                                type="text"
-                                                placeholder="Search food..."
-                                                value={searchQueries[index]}
-                                                onChange={(e) => handleSearchChange(e.target.value, index)}
-                                                onFocus={() => setActiveSearchIndex(index)}
-                                                className="bg-transparent border-none focus:ring-0 text-[10px] md:text-[11px] font-black uppercase tracking-widest w-full text-slate-900 dark:text-white placeholder:text-slate-300"
-                                            />
-                                            {isLoading[index] && <Activity className="animate-spin text-emerald-500" size={14} />}
+                                    <div className="py-20 text-center text-slate-400">
+                                        <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Search size={20} className="text-emerald-500/50" />
                                         </div>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">Enter item name to compare</p>
                                     </div>
                                 )}
                             </div>
                         </div>
-
-                        {/* Search Results Dropdown */}
-                        {searchResults[index].length > 0 && !selectedFoods[index] && (
-                            <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl z-[9999] overflow-visible animate-in slide-in-from-top-4 duration-300">
-                                {searchResults[index].map((food) => (
-                                    <button
-                                        key={food.id}
-                                        onMouseDown={(e) => { e.preventDefault(); handleSelectFood(food, index); }}
-                                        className="w-full p-4 flex items-center gap-4 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors border-b last:border-none border-slate-100 dark:border-slate-800 text-left group"
-                                    >
-                                        <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex-shrink-0 overflow-hidden border border-slate-200 dark:border-slate-700 group-hover:scale-105 transition-transform">
-                                            {food.image ? (
-                                                <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                    <Beef size={16} className="opacity-10" />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h4 className="font-bold text-xs uppercase text-slate-900 dark:text-white truncate">
-                                                {food.common_name || food.name}
-                                            </h4>
-                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">
-                                                {energyUnit === 'kJ'
-                                                    ? `${(food.energy_kcal * 4.184).toFixed(0)} kJ`
-                                                    : `${food.energy_kcal.toFixed(0)} kcal`
-                                                } / 100g
-                                            </p>
-                                        </div>
-                                        <Plus size={14} className="text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-
                     </div>
-                ))}
-            </div>
+                </div>
+            )}
 
 
             {/* Comparison Table */}
