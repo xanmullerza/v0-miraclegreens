@@ -401,12 +401,19 @@ export function CompareView() {
                                             ) : (
                                                 <button
                                                     onClick={() => setActiveSlot(i)}
-                                                    className="flex flex-col items-center gap-1 opacity-20 hover:opacity-100 hover:text-emerald-500 transition-all group/add"
+                                                    className="flex flex-col items-center gap-2 group/add transition-all active:scale-95"
                                                 >
-                                                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-full border border-dashed border-slate-400 group-hover/add:border-emerald-500/50 flex items-center justify-center transition-colors">
-                                                        <Plus size={10} className="text-slate-400 group-hover/add:text-emerald-500" />
+                                                    <div className="relative">
+                                                        {/* Attractor Pulse Glow */}
+                                                        <div className="absolute inset-[-4px] rounded-full bg-emerald-500/20 animate-pulse" />
+
+                                                        <div className="relative w-7 h-7 md:w-10 md:h-10 rounded-full border-2 border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/40 flex items-center justify-center shadow-[0_0_20px_rgba(16,185,129,0.15)] group-hover/add:bg-emerald-500 transition-all duration-300">
+                                                            <Plus size={16} className="text-emerald-500 group-hover/add:text-white transition-colors" />
+                                                        </div>
                                                     </div>
-                                                    <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover/add:text-emerald-500 transition-colors">Add</p>
+                                                    <p className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400 group-hover/add:tracking-[0.3em] transition-all duration-500">
+                                                        Add
+                                                    </p>
                                                 </button>
                                             )}
                                         </div>
