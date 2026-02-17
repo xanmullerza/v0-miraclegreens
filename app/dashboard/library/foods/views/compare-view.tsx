@@ -271,6 +271,21 @@ export function CompareView() {
     return (
         <div className="space-y-6 md:space-y-12 animate-in fade-in duration-700 pb-20 pt-4">
 
+            {/* Empty State / Onboarding */}
+            {!selectedFoods.some(f => f !== null) && (
+                <div className="bg-white/5 dark:bg-slate-900/50 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800 p-10 md:p-20 flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-top-4 duration-1000">
+                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mb-6 relative">
+                        <Info size={32} className="text-emerald-500" />
+                        <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
+                    </div>
+                    <h3 className="text-xl md:text-3xl font-black text-slate-900 dark:text-white uppercase italic mb-3 tracking-tight">Engine Ready</h3>
+                    <p className="text-slate-500 font-medium text-xs md:text-base max-w-[280px] md:max-w-md leading-relaxed">
+                        Nutritional comparison engine is online. <br />
+                        Use the <span className="text-emerald-500 font-bold italic">Add Buttons</span> in the table below to begin analysis.
+                    </p>
+                </div>
+            )}
+
             {/* Centralized Search Overlay */}
             {activeSlot !== null && (
                 <div className="fixed inset-0 z-[9999] bg-slate-950/80 backdrop-blur-md flex items-start justify-center pt-20 px-4">
@@ -486,18 +501,6 @@ export function CompareView() {
                     </table>
                 </div>
 
-                {/* Empty State */}
-                {!selectedFoods.some(f => f !== null) && (
-                    <div className="p-10 md:p-20 flex flex-col items-center justify-center text-center">
-                        <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center mb-4 md:mb-6">
-                            <Info size={24} className={cn("text-slate-300", "md:w-8 md:h-8")} />
-                        </div>
-                        <h3 className="text-sm md:text-xl font-black text-slate-900 dark:text-white uppercase italic mb-2">Engine Ready</h3>
-                        <p className="text-slate-500 font-medium text-[10px] md:text-sm max-w-[240px] md:max-w-sm">
-                            Search and select up to 3 samples above for side-by-side analysis.
-                        </p>
-                    </div>
-                )}
             </div>
         </div>
     );
