@@ -65,11 +65,11 @@ function FamilyMemberForm({ initialData, onSave, onCancel }: { initialData?: Par
             className={cn(
                 "cursor-pointer flex flex-col items-center justify-center gap-0.5 rounded-xl border p-2.5 transition-all hover:scale-[1.02] text-center flex-1 min-w-[80px]",
                 selected
-                    ? "bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-sm"
+                    ? "bg-amber-500/10 border-amber-500 text-amber-600 dark:text-amber-400 shadow-sm"
                     : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50"
             )}
         >
-            <Icon className={cn("h-4 w-4 mb-0.5", selected ? "text-emerald-500" : "text-slate-400")} />
+            <Icon className={cn("h-4 w-4 mb-0.5", selected ? "text-amber-500" : "text-slate-400")} />
             <span className="text-[9px] font-bold uppercase tracking-tight leading-tight">{label || type.replace('-', ' ')}</span>
         </div>
     );
@@ -79,7 +79,7 @@ function FamilyMemberForm({ initialData, onSave, onCancel }: { initialData?: Par
             <div className="bg-white dark:bg-slate-950 w-full max-w-2xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
                 <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50 rounded-t-[2rem]">
                     <div className="flex items-center gap-3">
-                        <div className="bg-emerald-100 dark:bg-emerald-900/30 p-2 rounded-xl text-emerald-600 dark:text-emerald-400">
+                        <div className="bg-amber-100 dark:bg-amber-900/30 p-2 rounded-xl text-amber-600 dark:text-amber-400">
                             <Users size={20} />
                         </div>
                         <div>
@@ -107,8 +107,8 @@ function FamilyMemberForm({ initialData, onSave, onCancel }: { initialData?: Par
                         <div className="space-y-2">
                             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Gender</Label>
                             <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800 h-10">
-                                <button onClick={() => setData({ ...data, gender: 'male' })} className={cn("flex-1 text-xs font-black uppercase tracking-wider rounded-lg transition-all", data.gender === 'male' ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-400")}>Male</button>
-                                <button onClick={() => setData({ ...data, gender: 'female' })} className={cn("flex-1 text-xs font-black uppercase tracking-wider rounded-lg transition-all", data.gender === 'female' ? "bg-white dark:bg-slate-800 text-emerald-600 shadow-sm" : "text-slate-400")}>Female</button>
+                                <button onClick={() => setData({ ...data, gender: 'male' })} className={cn("flex-1 text-xs font-black uppercase tracking-wider rounded-lg transition-all", data.gender === 'male' ? "bg-white dark:bg-slate-800 text-amber-600 shadow-sm" : "text-slate-400")}>Male</button>
+                                <button onClick={() => setData({ ...data, gender: 'female' })} className={cn("flex-1 text-xs font-black uppercase tracking-wider rounded-lg transition-all", data.gender === 'female' ? "bg-white dark:bg-slate-800 text-amber-600 shadow-sm" : "text-slate-400")}>Female</button>
                             </div>
                         </div>
                     </div>
@@ -150,7 +150,7 @@ function FamilyMemberForm({ initialData, onSave, onCancel }: { initialData?: Par
 
                 <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 rounded-b-[2rem] flex justify-end gap-3">
                     <Button variant="ghost" onClick={onCancel} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">Cancel</Button>
-                    <Button onClick={() => onSave(data)} className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl px-8">Save Profile</Button>
+                    <Button onClick={() => onSave(data)} className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-xl px-8">Save Profile</Button>
                 </div>
             </div>
         </div>
@@ -273,11 +273,11 @@ function ProfilePageContent() {
             className={cn(
                 "cursor-pointer flex flex-col items-center justify-center gap-0.5 rounded-xl border p-2.5 transition-all hover:scale-[1.02] text-center",
                 selected
-                    ? "bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-sm"
+                    ? "bg-amber-500/10 border-amber-500 text-amber-600 dark:text-amber-400 shadow-sm"
                     : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800/50"
             )}
         >
-            <Icon className={cn("h-4 w-4 mb-0.5", selected ? "text-emerald-500" : "text-slate-400")} />
+            <Icon className={cn("h-4 w-4 mb-0.5", selected ? "text-amber-500" : "text-slate-400")} />
             <span className="text-[10px] font-bold uppercase tracking-tight leading-tight">{label || type.replace('-', ' ')}</span>
         </div>
     );
@@ -293,11 +293,16 @@ function ProfilePageContent() {
                     <div className="grid grid-cols-1 gap-8 w-full">
                         {/* Identification Card */}
                         <section className="space-y-6 w-full">
-                            <div className="flex items-center gap-2 text-emerald-500 mb-2">
-                                <User size={20} />
-                                <h2 className="text-sm font-black uppercase tracking-[0.2em]">Identification</h2>
+                            <div className="flex items-center gap-4">
+                                <div className="flex-shrink-0 bg-amber-500/20 p-3 rounded-2xl text-amber-500">
+                                    <User size={24} className="stroke-[2.5]" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Know Your Profile</p>
+                                    <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Identification</h2>
+                                </div>
                             </div>
-                            <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 space-y-6 shadow-sm">
+                            <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-amber-500 before:to-amber-500/50">
                                 <div className="space-y-2">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Name</Label>
                                     <Input
@@ -361,11 +366,16 @@ function ProfilePageContent() {
 
                         {/* Dietary Profile Card */}
                         <section className="space-y-6 w-full">
-                            <div className="flex items-center gap-2 text-emerald-500 mb-2">
-                                <Utensils size={20} />
-                                <h2 className="text-sm font-black uppercase tracking-[0.2em]">Dietary Profile</h2>
+                            <div className="flex items-center gap-4">
+                                <div className="flex-shrink-0 bg-amber-500/20 p-3 rounded-2xl text-amber-500">
+                                    <Utensils size={24} className="stroke-[2.5]" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Nutritional Approach</p>
+                                    <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Dietary Profile</h2>
+                                </div>
                             </div>
-                            <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-6 shadow-sm">
+                            <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-amber-500 before:to-amber-500/50">
                                 {/* Dietary Protocol */}
                                 <div className="space-y-4">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Dietary Protocol</Label>
@@ -422,11 +432,16 @@ function ProfilePageContent() {
 
                         {/* Goals Card */}
                         <section className="space-y-6 w-full">
-                            <div className="flex items-center gap-2 text-emerald-500 mb-2">
-                                <Activity size={20} />
-                                <h2 className="text-sm font-black uppercase tracking-[0.2em]">Goals</h2>
+                            <div className="flex items-center gap-4">
+                                <div className="flex-shrink-0 bg-amber-500/20 p-3 rounded-2xl text-amber-500">
+                                    <Activity size={24} className="stroke-[2.5]" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Fitness Direction</p>
+                                    <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Goals</h2>
+                                </div>
                             </div>
-                            <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 space-y-8 shadow-sm">
+                            <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-amber-500 before:to-amber-500/50">
                                 {/* Biological Goal */}
                                 <div className="space-y-4">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Goal</Label>
@@ -450,11 +465,16 @@ function ProfilePageContent() {
                         {/* End grid */}
 
                         {/* FAMILY PROTOCOLS */}
-                            <div className="flex items-center gap-2 text-emerald-500 mb-2">
-                                <Users size={20} />
-                                <h2 className="text-sm font-black uppercase tracking-[0.2em]">Family Protocols</h2>
+                            <div className="flex items-center gap-4">
+                                <div className="flex-shrink-0 bg-amber-500/20 p-3 rounded-2xl text-amber-500">
+                                    <Users size={24} className="stroke-[2.5]" />
+                                </div>
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Household Management</p>
+                                    <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Family Protocols</h2>
+                                </div>
                             </div>
-                            <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-6 shadow-sm">
+                            <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-amber-500 before:to-amber-500/50">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {/* Existing Members */}
                                     {formData.familyMembers.map((member) => (
@@ -504,14 +524,14 @@ function ProfilePageContent() {
                     <div className="flex flex-col gap-4 justify-center pt-8 border-t border-slate-100 dark:border-slate-800">
                         <Button
                             onClick={handleSave}
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-8 h-12 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-2 text-xs uppercase tracking-widest"
+                            className="bg-amber-500 hover:bg-amber-600 text-slate-900 font-black px-8 h-12 rounded-xl shadow-lg shadow-amber-500/30 flex items-center gap-2 text-xs uppercase tracking-widest"
                         >
                             <Save size={16} />
                             Save
                         </Button>
                         <Button
                             variant="outline"
-                            className="w-full mt-4 font-black text-xs uppercase tracking-widest border-emerald-500 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/10"
+                            className="w-full mt-4 font-black text-xs uppercase tracking-widest border-amber-500 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/10"
                             onClick={() => setShowRDASheet(true)}
                         >
                             Recommended Intake
@@ -522,7 +542,7 @@ function ProfilePageContent() {
                 {/* RDA Sheet Slider */}
                 <SheetContent side="left" className="max-w-md w-full bg-slate-950 border-l-0 border-r border-slate-800 p-0">
                     <SheetHeader className="bg-slate-900/80 p-6 border-b border-slate-800 rounded-t-3xl">
-                        <SheetTitle className="text-lg font-black text-emerald-400 uppercase tracking-widest">Recommended Intake</SheetTitle>
+                        <SheetTitle className="text-lg font-black text-amber-400 uppercase tracking-widest">Recommended Intake</SheetTitle>
                     </SheetHeader>
                     <div className="p-6 overflow-y-auto custom-scrollbar h-full">
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
