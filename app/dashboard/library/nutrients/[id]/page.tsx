@@ -438,8 +438,6 @@ export default function NutrientDetailsPage() {
                 <BreadcrumbPillbox
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
-                    sectionLabel="Nutrient Information"
-                    sectionColor="text-indigo-500"
                     customLastSegment={nutrientInfoKey}
                     isFilterExpanded={isFilterExpanded}
                     onFilterToggle={toggleFilter}
@@ -549,29 +547,6 @@ export default function NutrientDetailsPage() {
             </div>
 
             <div className="max-w-7xl mx-auto space-y-8 pb-32 animate-in fade-in duration-700 flex-1 w-full px-4">
-                {/* Header Section */}
-                <div className="flex flex-col md:flex-row md:items-center gap-8 animate-in slide-in-from-top-4 duration-700 pb-1">
-                    <div className="flex-1 flex flex-col">
-                        <h1 className="text-4xl lg:text-7xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.8] mb-2 flex items-center gap-4">
-                            <span className="text-emerald-500">{nutrientInfoKey}</span>
-                            <button
-                                onClick={toggleFavorite}
-                                className={cn(
-                                    "w-10 h-10 rounded-full flex items-center justify-center transition-all border shrink-0",
-                                    isFav
-                                        ? "bg-rose-500 text-white border-rose-600 shadow-xl shadow-rose-500/20"
-                                        : "bg-white dark:bg-slate-900 text-slate-300 border-slate-200 dark:border-slate-800 hover:text-rose-500 hover:border-rose-200"
-                                )}
-                            >
-                                <Heart size={20} fill={isFav ? "currentColor" : "none"} />
-                            </button>
-                        </h1>
-                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[11px] leading-relaxed max-w-2xl italic">
-                            "{info.description}"
-                        </p>
-                    </div>
-                </div>
-
                 {/* Tabbed Content Section */}
                 <div className="pt-4 space-y-6">
                     {/* Tab Bar */}
