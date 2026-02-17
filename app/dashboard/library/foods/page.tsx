@@ -19,6 +19,8 @@ import { cn } from '@/lib/utils';
 import { useSearch } from '@/lib/context/search-context';
 import { HeaderActions } from '@/lib/context/header-actions-context';
 
+import { NavigationPillbox, NavigationTab } from '@/components/ui/navigation-pillbox';
+
 // Views
 import { ExploreView } from './views/explore-view';
 import { ShoppingView } from './views/shopping-view';
@@ -45,11 +47,7 @@ function IngredientsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState<FoodTab>('foods');
-    const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-    const { searchQuery, setSearchQuery, setIsFocused, activeSearchId, setActiveSearchId } = useSearch();
-
-    // Check for admin/user context if needed (omitted for brevity unless required by logic)
-    // The previous implementation snippet hinted at admin checks but views handle them mostly.
+    const { searchQuery, setSearchQuery } = useSearch();
 
     // Sync tab from URL
     useEffect(() => {
@@ -66,7 +64,7 @@ function IngredientsContent() {
         window.history.pushState(null, '', `?${params.toString()}`);
     };
 
-    const tabs = [
+    const tabs: NavigationTab<FoodTab>[] = [
         { id: 'foods', label: 'Foods', icon: UtensilsCrossed, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
         { id: 'groceries', label: 'Groceries', icon: ShoppingCart, color: 'text-rose-500', bg: 'bg-rose-500/10' },
         { id: 'pantry', label: 'Pantry', icon: ShoppingBasket, color: 'text-amber-500', bg: 'bg-amber-500/10' },
@@ -104,8 +102,16 @@ function IngredientsContent() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700 pb-32 pt-8">
-            {/* Unified Header Removed */}
-            {/* Navigation Pillbox Removed */}
+            {/* Navigation Pillbox */}
+            <NavigationPillbox
+                tabs={tabs}
+                activeTab={activeTab}
+                onTabChange={handleTabChange}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                sectionLabel="Ingredient Library"
+                sectionColor={tabConfig[activeTab].color}
+            />
 
             {/* Dynamic Content Area */}
             <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
