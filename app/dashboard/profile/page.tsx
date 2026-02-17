@@ -290,7 +290,7 @@ function ProfilePageContent() {
                 <div className="flex flex-col lg:flex-row gap-6 items-start">
                 {/* Main Content (Compact Settings) */}
                 <div className="w-full space-y-8 pb-32">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+                    <div className="grid grid-cols-1 gap-8 w-full">
                         {/* Identification Card */}
                         <section className="space-y-6 w-full">
                             <div className="flex items-center gap-2 text-emerald-500 mb-2">
