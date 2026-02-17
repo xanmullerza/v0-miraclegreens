@@ -38,6 +38,7 @@ import {
     Filter
 } from 'lucide-react';
 import { useSearch } from '@/lib/context/search-context';
+import { BreadcrumbPillbox } from '@/components/ui/breadcrumb-pillbox';
 import { CATEGORIES } from '@/components/library/foods-view';
 import { FOOD_DETAILS } from '@/lib/data/food-details';
 import { Badge } from '@/components/ui/badge';
@@ -758,85 +759,62 @@ export default function FoodDetailsPage() {
                 </div>
             </div>
 
-            {/* Unified Hub Navigation (Replaces Old Nav) */}
-            <div className="flex flex-col gap-6 items-start w-full">
-                <div className="flex items-center gap-4 animate-in fade-in slide-in-from-right-8 duration-700 w-full">
-                    {/* Category Pills (Limited Selection for Row) */}
-                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-2">
-                        {['Greens', 'Vegetables', 'Animal', 'Dairy', 'Grains', 'Fats'].map(category => (
-                            <button
-                                key={category}
-                                onClick={() => router.push(`/dashboard/library/foods?tab=foods&category=${category}`)}
-                                className="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-emerald-200 hover:text-emerald-600 transition-all shadow-sm whitespace-nowrap"
-                            >
-                                {category}
-                            </button>
-                        ))}
-                    </div>
+            {/* Unified Breadcrumb Navigation */}
+            <BreadcrumbPillbox
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                sectionLabel="Ingredient Library"
+                sectionColor="text-emerald-500"
+                customLastSegment={food.name}
+            />
 
-                    <div className="w-px h-8 bg-slate-200 dark:bg-slate-800 shrink-0 mx-1 hidden md:block" />
+            <div className="flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                <div className="flex items-center bg-white dark:bg-slate-900 px-2 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm group/amount transition-all hover:border-emerald-500/50 shrink-0">
+                    <div className="flex items-center">
+                        <input
+                            type="number"
+                            value={amount}
+                            onChange={(e) => setAmount(Number(e.target.value))}
+                            className="w-16 bg-transparent text-lg font-black italic text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-center border-r border-slate-100 dark:border-slate-800"
+                        />
 
-                    <button
-                        onClick={() => router.push('/library/foods?tab=foods')}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/50 dark:bg-emerald-900/10 text-emerald-600 dark:text-emerald-400 transition-all group shrink-0"
-                    >
-                        <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Back to Library</span>
-                    </button>
-                </div>
-
-                <div className="flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-700">
-                    <div className="flex items-center bg-white dark:bg-slate-900 px-2 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm group/amount transition-all hover:border-emerald-500/50 shrink-0">
-                        <div className="flex items-center">
-                            <input
-                                type="number"
-                                value={amount}
-                                onChange={(e) => setAmount(Number(e.target.value))}
-                                className="w-16 bg-transparent text-lg font-black italic text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-center border-r border-slate-100 dark:border-slate-800"
-                            />
-
-                            <div className="relative group/select pl-3 pr-2">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger className="flex items-center gap-1.5 pr-2 text-[10px] font-black uppercase tracking-tighter text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
-                                        {selectedPortion?.label || 'Gram (g)'}
-                                        <ChevronDown className="w-3 h-3 text-slate-400 group-hover/select:text-emerald-500" />
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent
-                                        align="end"
-                                        className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-[1.5rem] p-2 min-w-[140px] shadow-2xl animate-in zoom-in-95 duration-200"
+                        <div className="relative group/select pl-3 pr-2">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger className="flex items-center gap-1.5 pr-2 text-[10px] font-black uppercase tracking-tighter text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
+                                    {selectedPortion?.label || 'Gram (g)'}
+                                    <ChevronDown className="w-3 h-3 text-slate-400 group-hover/select:text-emerald-500" />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                    align="end"
+                                    className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-[1.5rem] p-2 min-w-[140px] shadow-2xl animate-in zoom-in-95 duration-200"
+                                >
+                                    <DropdownMenuItem
+                                        className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
+                                        onClick={() => {
+                                            setSelectedPortion(null);
+                                            if (amount === 1) setAmount(100);
+                                        }}
                                     >
+                                        Gram (g)
+                                    </DropdownMenuItem>
+                                    {food?.portions?.map(p => (
                                         <DropdownMenuItem
+                                            key={p.label}
                                             className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
                                             onClick={() => {
-                                                setSelectedPortion(null);
-                                                if (amount === 1) setAmount(100);
+                                                setSelectedPortion(p);
+                                                if (amount >= 10) setAmount(1);
                                             }}
                                         >
-                                            Gram (g)
+                                            {p.label}
                                         </DropdownMenuItem>
-                                        {food?.portions?.map(p => (
-                                            <DropdownMenuItem
-                                                key={p.label}
-                                                className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
-                                                onClick={() => {
-                                                    setSelectedPortion(p);
-                                                    if (amount >= 10) setAmount(1);
-                                                }}
-                                            >
-                                                {p.label}
-                                            </DropdownMenuItem>
-                                        ))}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
+                                    ))}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     </div>
                 </div>
             </div>
-
-
-
-
 
             {/* Nutrient Grids - Removed Hero Wrapper */}
             <div className="space-y-6">
@@ -925,71 +903,72 @@ export default function FoodDetailsPage() {
             </div>
 
             {/* Know Your Food Section */}
-            {(food.details || FOOD_DETAILS[food.id]) && (() => {
-                const details = food.details || FOOD_DETAILS[food.id];
-                return (
-                    <div className="space-y-6 pt-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-                        <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-8 font-display">
-                            <h3 className="text-sm font-black uppercase tracking-[0.3em] text-purple-500 italic flex items-center gap-2">
-                                <Search size={18} />
-                                Know Your Food
-                            </h3>
+            {
+                (food.details || FOOD_DETAILS[food.id]) && (() => {
+                    const details = food.details || FOOD_DETAILS[food.id];
+                    return (
+                        <div className="space-y-6 pt-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+                            <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-8 font-display">
+                                <h3 className="text-sm font-black uppercase tracking-[0.3em] text-purple-500 italic flex items-center gap-2">
+                                    <Search size={18} />
+                                    Know Your Food
+                                </h3>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Producers */}
+                                <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
+                                    <div className="flex items-center gap-2 text-slate-400 font-black uppercase tracking-widest text-[10px]">
+                                        <ShoppingBasket size={14} /> Top Producers
+                                    </div>
+                                    <p className="text-lg font-bold text-slate-900 dark:text-white leading-snug">
+                                        {details.producers}
+                                    </p>
+                                </Card>
+
+                                {/* Facts */}
+                                <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
+                                    <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-black uppercase tracking-widest text-[10px]">
+                                        <Lightbulb size={14} /> Culinary Facts & Uses
+                                    </div>
+                                    <ul className="space-y-3">
+                                        {details.facts.map((fact: string, i: number) => (
+                                            <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
+                                                <span className="text-purple-500 font-bold mt-1">✨</span>
+                                                <span className="leading-snug font-medium italic">{fact}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </Card>
+
+                                {/* History */}
+                                <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
+                                    <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-black uppercase tracking-widest text-[10px]">
+                                        <Globe size={14} /> Origin & History
+                                    </div>
+                                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                                        {details.history}
+                                    </p>
+                                </Card>
+
+                                {/* Benefits */}
+                                <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
+                                    <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-black uppercase tracking-widest text-[10px]">
+                                        <ShieldCheck size={14} /> Key Benefits
+                                    </div>
+                                    <ul className="space-y-3">
+                                        {details.benefits.map((benefit: string, i: number) => (
+                                            <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
+                                                <span className="text-blue-500 font-bold mt-1">•</span>
+                                                <span className="leading-snug font-medium">{benefit}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </Card>
+                            </div>
                         </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Producers */}
-                            <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
-                                <div className="flex items-center gap-2 text-slate-400 font-black uppercase tracking-widest text-[10px]">
-                                    <ShoppingBasket size={14} /> Top Producers
-                                </div>
-                                <p className="text-lg font-bold text-slate-900 dark:text-white leading-snug">
-                                    {details.producers}
-                                </p>
-                            </Card>
-
-                            {/* Facts */}
-                            <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
-                                <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-black uppercase tracking-widest text-[10px]">
-                                    <Lightbulb size={14} /> Culinary Facts & Uses
-                                </div>
-                                <ul className="space-y-3">
-                                    {details.facts.map((fact: string, i: number) => (
-                                        <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
-                                            <span className="text-purple-500 font-bold mt-1">✨</span>
-                                            <span className="leading-snug font-medium italic">{fact}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </Card>
-
-                            {/* History */}
-                            <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
-                                <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-black uppercase tracking-widest text-[10px]">
-                                    <Globe size={14} /> Origin & History
-                                </div>
-                                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                                    {details.history}
-                                </p>
-                            </Card>
-
-                            {/* Benefits */}
-                            <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
-                                <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-black uppercase tracking-widest text-[10px]">
-                                    <ShieldCheck size={14} /> Key Benefits
-                                </div>
-                                <ul className="space-y-3">
-                                    {details.benefits.map((benefit: string, i: number) => (
-                                        <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
-                                            <span className="text-blue-500 font-bold mt-1">•</span>
-                                            <span className="leading-snug font-medium">{benefit}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </Card>
-                        </div>
-                    </div>
-                );
-            })()
+                    );
+                })()
             }
 
             {/* NUTRIENT BREAKDOWN MODAL */}
