@@ -104,6 +104,7 @@ export function CompareView() {
     const [isLoading, setIsLoading] = useState<boolean[]>([false, false, false]);
     const [activeSearchIndex, setActiveSearchIndex] = useState<number | null>(null);
     const searchRef = useRef<HTMLDivElement>(null);
+    const searchTimeoutRef = useRef<{ [key: number]: NodeJS.Timeout }>({});
     const { energyUnit } = useUserPreferences();
 
     useEffect(() => {
@@ -113,7 +114,11 @@ export function CompareView() {
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            // Cleanup timeouts
+            Object.values(searchTimeoutRef.current).forEach(clearTimeout);
+        };
     }, []);
 
     const performSearch = async (query: string, index: number) => {
@@ -208,7 +213,15 @@ export function CompareView() {
         const nextQueries = [...searchQueries];
         nextQueries[index] = val;
         setSearchQueries(nextQueries);
-        performSearch(val, index);
+
+        // Debounce search
+        if (searchTimeoutRef.current[index]) {
+            clearTimeout(searchTimeoutRef.current[index]);
+        }
+
+        searchTimeoutRef.current[index] = setTimeout(() => {
+            performSearch(val, index);
+        }, 300);
     };
 
     const handleSelectFood = (food: FoodItem, index: number) => {
@@ -329,7 +342,7 @@ export function CompareView() {
                 {[0, 1, 2].map((index) => (
                     <div key={index} className="relative group overflow-visible">
                         <div className={cn(
-                            "bg-white dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden transition-all duration-500",
+                            "bg-white dark:bg-slate-900 rounded-[1.5rem] md:rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl transition-all duration-500",
                             activeSearchIndex === index ? "ring-2 ring-emerald-500/50" : ""
                         )}>
                             <div className="p-3 md:p-4 flex flex-col items-center gap-4">
@@ -383,7 +396,7 @@ export function CompareView() {
                         </div>
 
                         {/* Search Results Dropdown */}
-                        {activeSearchIndex === index && searchResults[index].length > 0 && (
+                        {searchResults[index].length > 0 && !selectedFoods[index] && (
                             <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl z-[9999] overflow-visible animate-in slide-in-from-top-4 duration-300">
                                 {searchResults[index].map((food) => (
                                     <button
