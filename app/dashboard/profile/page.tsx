@@ -496,65 +496,6 @@ function ProfilePageContent() {
                             />
                         )}
 
-                        {/* Diet Profile */}
-                        <section className="space-y-6">
-                            <div className="flex items-center gap-2 text-emerald-500 mb-2">
-                                <Utensils size={20} />
-                                <h2 className="text-sm font-black uppercase tracking-[0.2em]">Dietary Profile</h2>
-                            </div>
-                            <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-6 shadow-sm">
-
-                                <div className="space-y-4">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Dietary Protocol</Label>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                        <GoalCard type="anything" label="Balanced" selected={formData.dietType === 'anything'} onClick={() => setFormData({ ...formData, dietType: 'anything' })} icon={Apple} />
-                                        <GoalCard type="pescatarian" label="Pescatarian" selected={formData.dietType === 'pescatarian'} onClick={() => setFormData({ ...formData, dietType: 'pescatarian' })} icon={Fish} />
-                                        <GoalCard type="vegetarian" label="Vegetarian" selected={formData.dietType === 'vegetarian'} onClick={() => setFormData({ ...formData, dietType: 'vegetarian' })} icon={Egg} />
-                                        <GoalCard type="vegan" label="Vegan" selected={formData.dietType === 'vegan'} onClick={() => setFormData({ ...formData, dietType: 'vegan' })} icon={Leaf} />
-                                    </div>
-                                </div>
-                                <div className="space-y-4">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nutrient Strategy</Label>
-                                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                                        <GoalCard type="balanced" label="Balanced" selected={formData.nutrientStrategy === 'balanced'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'balanced' })} icon={Activity} />
-                                        <GoalCard type="low-carb" label="Low Carb" selected={formData.nutrientStrategy === 'low-carb'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'low-carb' })} icon={TrendingDown} />
-                                        <GoalCard type="high-protein" label="High Protein" selected={formData.nutrientStrategy === 'high-protein'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'high-protein' })} icon={Dumbbell} />
-                                        <GoalCard type="keto" label="Keto Diet" selected={formData.nutrientStrategy === 'keto'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'keto' })} icon={Zap} />
-                                        <GoalCard type="high-carb" label="High Carb" selected={formData.nutrientStrategy === 'high-carb'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'high-carb' })} icon={Apple} />
-                                    </div>
-                                    <p className="text-[10px] text-slate-400 italic">Adjusts your macro ratio targets (Energy/Protein/Carbs/Fat) across the entire app.</p>
-                                </div>
-
-                                <div className="space-y-4">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Specific Exclusions</Label>
-                                    <div className="flex flex-wrap gap-2">
-                                        {['Eggs', 'Dairy', 'Honey', 'Nuts', 'Peanuts', 'Soy', 'Gluten', 'Shellfish', 'Fish', 'Corn', 'Nightshades'].map(exclusion => {
-                                            const isSelected = formData.exclusions?.includes(exclusion);
-                                            return (
-                                                <button
-                                                    key={exclusion}
-                                                    onClick={() => {
-                                                        const newExclusions = isSelected
-                                                            ? formData.exclusions.filter(e => e !== exclusion)
-                                                            : [...(formData.exclusions || []), exclusion];
-                                                        setFormData({ ...formData, exclusions: newExclusions });
-                                                    }}
-                                                    className={cn(
-                                                        "px-4 py-2 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all",
-                                                        isSelected
-                                                            ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
-                                                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
-                                                    )}
-                                                >
-                                                    {exclusion}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                    <p className="text-[10px] text-slate-400 italic">These items will be marked as "Excluded" even if the meal otherwise fits your diet.</p>
-                                </div>
-                            </div>
-                        </section>
 
 
                     </div>
