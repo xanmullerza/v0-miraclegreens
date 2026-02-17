@@ -418,6 +418,7 @@ export function ExploreView({
                                                     <Heart size={16} fill={food.is_favorite ? "currentColor" : "none"} />
                                                 </Button>
 
+                                                {/* Hiding Quick Add button for now per user request
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
@@ -427,6 +428,7 @@ export function ExploreView({
                                                 >
                                                     <Plus size={16} />
                                                 </Button>
+                                                */}
 
 
 
