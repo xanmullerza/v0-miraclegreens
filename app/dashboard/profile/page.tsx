@@ -287,12 +287,12 @@ function ProfilePageContent() {
     return (
         <div className="max-w-7xl mx-auto animate-in fade-in duration-500 px-4 py-8">
             <Sheet open={showRDASheet} onOpenChange={setShowRDASheet}>
-                <div className="flex flex-col lg:flex-row gap-6 items-start">
+                <div className="flex flex-col lg:flex-row gap-6 items-start justify-center">
                 {/* Main Content (Compact Settings) */}
-                <div className="w-full space-y-8 pb-32">
-                    <div className="grid grid-cols-1 gap-8 w-full">
+                <div className="max-w-2xl space-y-8 pb-32">
+                    <div className="grid grid-cols-1 gap-8">
                         {/* Identification Card */}
-                        <section className="space-y-6 w-full">
+                        <section className="space-y-6">
                             <div className="flex items-center gap-4">
                                 <div className="flex-shrink-0 bg-amber-500/20 p-3 rounded-2xl text-amber-500">
                                     <User size={24} className="stroke-[2.5]" />
@@ -365,7 +365,7 @@ function ProfilePageContent() {
                         </section>
 
                         {/* Dietary Profile Card */}
-                        <section className="space-y-6 w-full">
+                        <section className="space-y-6">
                             <div className="flex items-center gap-4">
                                 <div className="flex-shrink-0 bg-amber-500/20 p-3 rounded-2xl text-amber-500">
                                     <Utensils size={24} className="stroke-[2.5]" />
@@ -431,7 +431,7 @@ function ProfilePageContent() {
                         </section>
 
                         {/* Goals Card */}
-                        <section className="space-y-6 w-full">
+                        <section className="space-y-6">
                             <div className="flex items-center gap-4">
                                 <div className="flex-shrink-0 bg-amber-500/20 p-3 rounded-2xl text-amber-500">
                                     <Activity size={24} className="stroke-[2.5]" />
