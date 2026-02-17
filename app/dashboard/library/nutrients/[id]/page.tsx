@@ -547,30 +547,6 @@ export default function NutrientDetailsPage() {
             <div className="max-w-7xl mx-auto space-y-8 pb-32 animate-in fade-in duration-700 flex-1 w-full">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center gap-8 animate-in slide-in-from-top-4 duration-700 pb-1">
-                    {/* Status Readout (Now on the left) */}
-                    <div className={cn(
-                        "w-24 h-24 rounded-[1.5rem] border-2 transition-all duration-700 flex flex-col items-center justify-center shadow-lg flex-shrink-0",
-                        isDeficient ? "bg-amber-50 border-amber-300 text-amber-800 shadow-amber-200/50" :
-                            isToxic ? "bg-rose-50 border-rose-300 text-rose-800 shadow-rose-200/50" :
-                                "bg-emerald-50 border-emerald-300 text-emerald-800 shadow-emerald-500/10"
-                    )}>
-                        <p className="text-[7px] font-black uppercase tracking-widest opacity-60">Intake</p>
-                        <div className="flex items-baseline gap-0.5">
-                            <span className="text-2xl font-black italic tracking-tighter leading-none">
-                                {simValue >= 100 ? Math.round(simValue) : simValue.toFixed(1)}
-                            </span>
-                            <span className="text-[8px] font-black uppercase">{unit}</span>
-                        </div>
-                        <div className={cn(
-                            "mt-1 px-2.5 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest flex items-center gap-1",
-                            isDeficient ? "bg-amber-500 text-white" :
-                                isToxic ? "bg-rose-600 text-white" :
-                                    "bg-emerald-600 text-white"
-                        )}>
-                            {isDeficient ? "Deficit" : isToxic ? "Toxicity" : "Optimal"}
-                        </div>
-                    </div>
-
                     <div className="flex-1 flex flex-col">
                         <h1 className="text-4xl lg:text-7xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.8] mb-2 flex items-center gap-4">
                             <span className="text-emerald-500">{nutrientInfoKey}</span>
@@ -802,10 +778,33 @@ export default function NutrientDetailsPage() {
                     {/* ===== TAB 3: Dosage Simulator ===== */}
                     {activeContentTab === 'dosage' && isAdmin && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                            {/* Intake Box */}
-                            <div className="flex items-center justify-between px-2">
+                            {/* Intake Box and Title */}
+                            <div className="flex flex-col md:flex-row items-center gap-6 px-2">
+                                <div className={cn(
+                                    "w-24 h-24 rounded-[1.5rem] border-2 transition-all duration-700 flex flex-col items-center justify-center shadow-lg flex-shrink-0",
+                                    isDeficient ? "bg-amber-50 border-amber-300 text-amber-800 shadow-amber-200/50" :
+                                        isToxic ? "bg-rose-50 border-rose-300 text-rose-800 shadow-rose-200/50" :
+                                            "bg-emerald-50 border-emerald-300 text-emerald-800 shadow-emerald-500/10"
+                                )}>
+                                    <p className="text-[7px] font-black uppercase tracking-widest opacity-60">Intake</p>
+                                    <div className="flex items-baseline gap-0.5">
+                                        <span className="text-2xl font-black italic tracking-tighter leading-none">
+                                            {simValue >= 100 ? Math.round(simValue) : simValue.toFixed(1)}
+                                        </span>
+                                        <span className="text-[8px] font-black uppercase">{unit}</span>
+                                    </div>
+                                    <div className={cn(
+                                        "mt-1 px-2.5 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest flex items-center gap-1",
+                                        isDeficient ? "bg-amber-500 text-white" :
+                                            isToxic ? "bg-rose-600 text-white" :
+                                                "bg-emerald-600 text-white"
+                                    )}>
+                                        {isDeficient ? "Deficit" : isToxic ? "Toxicity" : "Optimal"}
+                                    </div>
+                                </div>
+
                                 <div className="space-y-1">
-                                    <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">Dosage Simulator</h4>
+                                    <h4 className="font-black text-xs uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">Intake Box</h4>
                                     <p className="text-[10px] font-bold text-slate-400 uppercase">Slide to simulate intake levels and see biological thresholds</p>
                                 </div>
                             </div>
