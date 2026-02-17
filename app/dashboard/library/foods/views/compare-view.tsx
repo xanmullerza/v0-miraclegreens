@@ -148,6 +148,13 @@ export function CompareView() {
         setSearchResults([]);
     };
 
+    const clearAll = () => {
+        setSelectedFoods([null, null, null]);
+        setActiveSlot(null);
+        setSearchQuery('');
+        setSearchResults([]);
+    };
+
     const removeFood = (index: number) => {
         setSelectedFoods(prev => {
             const next = [...prev];
@@ -271,95 +278,137 @@ export function CompareView() {
     return (
         <div className="space-y-6 md:space-y-12 animate-in fade-in duration-700 pb-20 pt-4">
 
-            {/* Empty State / Onboarding */}
-            {!selectedFoods.some(f => f !== null) && (
-                <div className="bg-white/5 dark:bg-slate-900/50 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800 p-10 md:p-20 flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-top-4 duration-1000">
-                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mb-6 relative">
-                        <Info size={32} className="text-emerald-500" />
-                        <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
-                    </div>
-                    <h3 className="text-xl md:text-3xl font-black text-slate-900 dark:text-white uppercase italic mb-3 tracking-tight">Engine Ready</h3>
-                    <p className="text-slate-500 font-medium text-xs md:text-base max-w-[280px] md:max-w-md leading-relaxed">
-                        Nutritional comparison engine is online. <br />
-                        Use the <span className="text-emerald-500 font-bold italic">Add Buttons</span> in the table below to begin analysis.
-                    </p>
-                </div>
-            )}
-
-            {/* Centralized Search Overlay */}
-            {activeSlot !== null && (
-                <div className="fixed inset-0 z-[9999] bg-slate-950/80 backdrop-blur-md flex items-start justify-center pt-20 px-4">
-                    <div className="w-full max-w-2xl animate-in zoom-in-95 duration-300 overflow-visible">
-                        <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl border border-emerald-500/20 overflow-visible">
-                            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-4">
-                                <Search className="text-emerald-500" size={24} />
-                                <input
-                                    autoFocus
-                                    placeholder="Search recipes or ingredients..."
-                                    className="flex-1 bg-transparent border-none focus:ring-0 text-lg font-black uppercase tracking-widest text-slate-900 dark:text-white placeholder:text-slate-300"
-                                    value={searchQuery}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Escape') setActiveSlot(null);
-                                    }}
-                                    onChange={(e) => handleSearchInput(e.target.value)}
-                                />
-                                <button onClick={() => setActiveSlot(null)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full text-slate-400 transition-colors">
-                                    <X size={24} />
-                                </button>
+            {/* Dynamic Workspace: Onboarding OR Search OR Summary */}
+            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500">
+                {activeSlot !== null ? (
+                    /* Search Active State */
+                    <div className="animate-in slide-in-from-top-4 duration-500">
+                        <div className="p-6 md:p-8 border-b border-slate-100 dark:border-slate-800 flex items-center gap-4 bg-slate-50/50 dark:bg-slate-800/30">
+                            <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 animate-pulse">
+                                <Search size={20} />
                             </div>
+                            <input
+                                autoFocus
+                                placeholder={`Search for Sample ${activeSlot + 1}...`}
+                                className="flex-1 bg-transparent border-none focus:ring-0 text-xl font-black uppercase tracking-widest text-slate-900 dark:text-white placeholder:text-slate-300"
+                                value={searchQuery}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Escape') setActiveSlot(null);
+                                }}
+                                onChange={(e) => handleSearchInput(e.target.value)}
+                            />
+                            <button
+                                onClick={() => setActiveSlot(null)}
+                                className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all border border-slate-200 dark:border-slate-800"
+                            >
+                                Cancel
+                            </button>
+                        </div>
 
-                            <div className="max-h-[400px] overflow-y-auto p-4 md:p-6 no-scrollbar">
-                                {isSearching ? (
-                                    <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-4">
-                                        <div className="relative">
-                                            <Activity className="animate-spin text-emerald-500" size={32} />
-                                            <div className="absolute inset-0 animate-ping bg-emerald-500/20 rounded-full" />
-                                        </div>
-                                        <p className="text-[10px] font-black uppercase tracking-widest">Querying Library...</p>
+                        <div className="max-h-[400px] overflow-y-auto p-4 md:p-8 no-scrollbar bg-white dark:bg-slate-900">
+                            {isSearching ? (
+                                <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-4">
+                                    <div className="relative">
+                                        <Activity className="animate-spin text-emerald-500" size={32} />
+                                        <div className="absolute inset-0 animate-ping bg-emerald-500/20 rounded-full" />
                                     </div>
-                                ) : searchResults.length > 0 ? (
-                                    <div className="grid grid-cols-1 gap-2">
-                                        {searchResults.map(food => (
-                                            <button
-                                                key={food.id}
-                                                onClick={() => selectFood(food)}
-                                                className="w-full p-4 rounded-2xl hover:bg-emerald-50 dark:hover:bg-emerald-900/10 flex items-center justify-between group transition-all border border-transparent hover:border-emerald-500/20"
-                                            >
-                                                <div className="flex items-center gap-4 text-left min-w-0">
-                                                    <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
-                                                        {food.image ? <img src={food.image} className="w-full h-full object-cover" /> : <Beef className="m-auto opacity-10 h-full w-5" />}
-                                                    </div>
-                                                    <div className="min-w-0">
-                                                        <h4 className="font-bold text-sm uppercase text-slate-900 dark:text-white truncate">{food.common_name || food.name}</h4>
-                                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                                                            {energyUnit === 'kJ' ? (food.energy_kcal * 4.184).toFixed(0) : food.energy_kcal.toFixed(0)} {energyUnit} / 100g
-                                                        </p>
-                                                    </div>
+                                    <p className="text-[10px] font-black uppercase tracking-widest">Querying Library...</p>
+                                </div>
+                            ) : searchResults.length > 0 ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    {searchResults.map(food => (
+                                        <button
+                                            key={food.id}
+                                            onClick={() => selectFood(food)}
+                                            className="w-full p-4 rounded-2xl hover:bg-emerald-50 dark:hover:bg-emerald-900/10 flex items-center justify-between group transition-all border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 text-left"
+                                        >
+                                            <div className="flex items-center gap-4 min-w-0">
+                                                <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
+                                                    {food.image ? <img src={food.image} className="w-full h-full object-cover" /> : <Beef className="m-auto opacity-10 h-full w-5" />}
                                                 </div>
-                                                <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={18} />
-                                            </button>
-                                        ))}
+                                                <div className="min-w-0">
+                                                    <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{food.common_name || food.name}</h4>
+                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                                                        {energyUnit === 'kJ' ? (food.energy_kcal * 4.184).toFixed(0) : food.energy_kcal.toFixed(0)} {energyUnit} <span className="text-slate-200 dark:text-slate-700">|</span> 100g
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={20} />
+                                        </button>
+                                    ))}
+                                </div>
+                            ) : searchQuery.length > 1 ? (
+                                <div className="py-20 text-center text-slate-400">
+                                    <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-dashed border-slate-200 dark:border-slate-700">
+                                        <Search size={24} className="opacity-20" />
                                     </div>
-                                ) : searchQuery.length > 1 ? (
-                                    <div className="py-20 text-center text-slate-400">
-                                        <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <X size={20} />
-                                        </div>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">No matching items found</p>
-                                    </div>
-                                ) : (
-                                    <div className="py-20 text-center text-slate-400">
-                                        <div className="w-12 h-12 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <Search size={20} className="text-emerald-500/50" />
-                                        </div>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">Enter item name to compare</p>
-                                    </div>
-                                )}
-                            </div>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">No matching items found</p>
+                                </div>
+                            ) : (
+                                <div className="py-12 text-center text-slate-400">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">Enter item name to compare</p>
+                                </div>
+                            )}
                         </div>
                     </div>
-                </div>
-            )}
+                ) : !selectedFoods.some(f => f !== null) ? (
+                    /* Initial Engine Ready State */
+                    <div className="p-10 md:p-20 flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-top-4 duration-1000">
+                        <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mb-6 relative">
+                            <Info size={32} className="text-emerald-500" />
+                            <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
+                        </div>
+                        <h3 className="text-xl md:text-3xl font-black text-slate-900 dark:text-white uppercase italic mb-3 tracking-tight">Engine Ready</h3>
+                        <p className="text-slate-500 font-medium text-xs md:text-base max-w-[280px] md:max-w-md leading-relaxed mb-8">
+                            Nutritional comparison engine is online. <br />
+                            Use the <span className="text-emerald-500 font-bold italic">Add Buttons</span> in the table below to begin analysis.
+                        </p>
+                        <button
+                            onClick={() => setActiveSlot(0)}
+                            className="px-8 py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all"
+                        >
+                            Start Investigation
+                        </button>
+                    </div>
+                ) : (
+                    /* Summary / Lab Header State (Mini Dashboard) */
+                    <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-slate-50/50 dark:bg-slate-800/20 animate-in fade-in duration-500">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                                <Activity size={24} />
+                            </div>
+                            <div>
+                                <h3 className="font-black text-lg uppercase italic text-slate-900 dark:text-white leading-none mb-1">Comparison Lab</h3>
+                                <div className="flex gap-2">
+                                    <Badge className="bg-emerald-500 text-white border-none font-black text-[8px] uppercase tracking-widest">
+                                        {selectedFoods.filter(f => f !== null).length} / 3 SAMPLES
+                                    </Badge>
+                                    <Badge variant="outline" className="border-slate-200 dark:border-slate-800 font-black text-[8px] uppercase tracking-widest text-slate-400">
+                                        ACTIVE ANALYSIS
+                                    </Badge>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                            {selectedFoods.filter(f => f !== null).length < 3 && (
+                                <button
+                                    onClick={() => setActiveSlot(selectedFoods.findIndex(f => f === null))}
+                                    className="px-5 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-black text-[10px] uppercase tracking-widest text-emerald-500 hover:border-emerald-500/50 transition-all flex items-center gap-2"
+                                >
+                                    <Plus size={14} /> Add Sample
+                                </button>
+                            )}
+                            <button
+                                onClick={clearAll}
+                                className="px-5 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-black text-[10px] uppercase tracking-widest text-rose-500 hover:border-rose-500/50 transition-all flex items-center gap-2"
+                            >
+                                <Trash2 size={14} /> Reset Engine
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
 
 
             {/* Comparison Table */}
