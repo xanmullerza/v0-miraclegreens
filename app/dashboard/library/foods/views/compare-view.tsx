@@ -16,7 +16,8 @@ import {
     Beef,
     Trophy,
     Medal,
-    ChevronRight
+    ChevronRight,
+    RefreshCw
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -460,6 +461,13 @@ export function CompareView() {
                                                         className="absolute -top-1 -right-1 md:-top-2 md:-right-2 p-1.5 md:p-2 bg-white dark:bg-slate-800 text-slate-400 hover:text-rose-500 rounded-full shadow-lg border border-slate-100 dark:border-slate-700 opacity-0 group-hover/card:opacity-100 transition-all scale-75 group-hover/card:scale-100"
                                                     >
                                                         <X size={10} className="md:w-3 md:h-3" />
+                                                    </button>
+                                                    {/* Floating Swap Button */}
+                                                    <button
+                                                        onClick={() => setActiveSlot(i)}
+                                                        className="absolute -top-1 -left-1 md:-top-2 md:-left-2 p-1.5 md:p-2 bg-white dark:bg-slate-800 text-slate-400 hover:text-emerald-500 rounded-full shadow-lg border border-slate-100 dark:border-slate-700 opacity-0 group-hover/card:opacity-100 transition-all scale-75 group-hover/card:scale-100"
+                                                    >
+                                                        <RefreshCw size={10} className="md:w-3 md:h-3" />
                                                     </button>
                                                 </div>
                                             ) : (
