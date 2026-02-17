@@ -94,6 +94,7 @@ export default function NutrientDetailsPage() {
     const [measureGrams, setMeasureGrams] = useState(100);
     const [activeContentTab, setActiveContentTab] = useState('foods');
     const [visibleFoodsCount, setVisibleFoodsCount] = useState(5);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     // --- Simulation Logic ---
     let targetVal = 0;
@@ -290,6 +291,24 @@ export default function NutrientDetailsPage() {
             setVisibleFoodsCount(5);
         }
     }, [nutrientId]);
+
+    useEffect(() => {
+        const checkAdmin = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
+                const userEmail = (user.email || user.user_metadata?.email || '').toLowerCase();
+                setIsAdmin(userEmail === adminEmail.toLowerCase() && adminEmail !== '');
+            }
+        };
+        checkAdmin();
+    }, []);
+
+    const tabs = [
+        { id: 'foods', label: `${nutrientInfoKey} Rich Foods`, icon: UtensilsCrossed },
+        { id: 'learn', label: 'Learn', icon: Lightbulb },
+        ...(isAdmin ? [{ id: 'dosage', label: 'Dosage Simulator', icon: Activity }] : []),
+    ];
 
     const fetchTopFoods = async () => {
         setLoadingFoods(true);
@@ -577,11 +596,7 @@ export default function NutrientDetailsPage() {
                 <div className="pt-4 space-y-6">
                     {/* Tab Bar */}
                     <div className="flex items-center gap-2 p-1.5 bg-slate-100 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 w-fit">
-                        {[
-                            { id: 'foods', label: `${nutrientInfoKey} Rich Foods`, icon: UtensilsCrossed },
-                            { id: 'learn', label: 'Learn', icon: Lightbulb },
-                            { id: 'dosage', label: 'Dosage Simulator', icon: Activity },
-                        ].map(tab => {
+                        {tabs.map(tab => {
                             const Icon = tab.icon;
                             const isActive = activeContentTab === tab.id;
                             return (
@@ -597,7 +612,9 @@ export default function NutrientDetailsPage() {
                                 >
                                     <Icon size={14} className={cn(isActive ? "text-emerald-500" : "text-slate-400")} />
                                     <span className="hidden md:inline">{tab.label}</span>
-                                    <span className="md:hidden">{tab.id === 'foods' ? 'Foods' : tab.id === 'learn' ? 'Learn' : 'Dosage'}</span>
+                                    <span className="md:hidden">
+                                        {tab.id === 'foods' ? 'Foods' : tab.id === 'learn' ? 'Learn' : tab.id === 'dosage' ? 'Dosage' : ''}
+                                    </span>
                                 </button>
                             );
                         })}
@@ -783,7 +800,7 @@ export default function NutrientDetailsPage() {
                     )}
 
                     {/* ===== TAB 3: Dosage Simulator ===== */}
-                    {activeContentTab === 'dosage' && (
+                    {activeContentTab === 'dosage' && isAdmin && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
                             {/* Intake Box */}
                             <div className="flex items-center justify-between px-2">
