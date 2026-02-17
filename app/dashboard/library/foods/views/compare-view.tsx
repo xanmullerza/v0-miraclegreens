@@ -148,7 +148,7 @@ export function CompareView() {
                     .from('food_items')
                     .select('id, name, common_name')
                     .limit(1);
-                
+
                 if (error) {
                     console.error('[CompareView] Supabase error:', error);
                     toast.error(`Database connection error: ${error.message}`);
@@ -166,7 +166,7 @@ export function CompareView() {
                 console.error('[CompareView] Error testing Supabase connection:', err);
             }
         };
-        
+
         testSupabaseConnection();
     }, []);
 
@@ -190,7 +190,7 @@ export function CompareView() {
             const searchingMsg = `[CompareView] Searching for: "${query}" in index ${index}`;
             console.log(searchingMsg);
             setLastSearchLog(searchingMsg);
-            
+
             // Primary search using .or() syntax
             let { data, error } = await supabase
                 .from('food_items')
@@ -207,14 +207,14 @@ export function CompareView() {
                 const fallbackMsg = '[CompareView] Trying fallback search method...';
                 console.log(fallbackMsg);
                 setLastSearchLog(fallbackMsg);
-                
+
                 // Try searching name field only first
                 const { data: nameData, error: nameError } = await supabase
                     .from('food_items')
                     .select('*')
                     .ilike('name', `%${query}%`)
                     .limit(5);
-                
+
                 if (nameError) {
                     console.error('[CompareView] Fallback name search error:', nameError);
                 } else if (nameData && nameData.length > 0) {
@@ -230,7 +230,7 @@ export function CompareView() {
                         .select('*')
                         .ilike('common_name', `%${query}%`)
                         .limit(5);
-                    
+
                     if (commonError) {
                         console.error('[CompareView] Fallback common_name search error:', commonError);
                     } else if (commonData && commonData.length > 0) {
@@ -253,7 +253,7 @@ export function CompareView() {
                 next[index] = data || [];
                 return next;
             });
-            
+
             const updatedMsg = `[CompareView] Updated search results for index ${index}: ${(data || []).length} items`;
             console.log(updatedMsg);
             setLastSearchLog(updatedMsg);
@@ -484,7 +484,7 @@ export function CompareView() {
                             </div>
                         )}
 
-                        {/* Inline debug list (always visible for dev) */}
+                        {/* Inline debug list (always visible for dev) - Hiding per user request
                         {searchResults[index].length > 0 && (
                             <div className="mt-2 p-2 bg-slate-800/60 dark:bg-slate-800 rounded-lg text-[12px] text-slate-100">
                                 {searchResults[index].slice(0,5).map(f => (
@@ -498,11 +498,12 @@ export function CompareView() {
                                 ))}
                             </div>
                         )}
+                        */}
                     </div>
                 ))}
             </div>
 
-            {/* Debug Panel */}
+            {/* Debug Panel - Hiding per user request
             <div className="px-4">
                 <div className="text-xs bg-slate-50 dark:bg-slate-800 rounded-xl p-3 border border-slate-100 dark:border-slate-800">
                     <div className="flex items-center justify-between mb-2">
@@ -524,6 +525,7 @@ export function CompareView() {
                     </div>
                 </div>
             </div>
+            */}
 
             {/* Comparison Table */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl md:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden mx-[-1rem] md:mx-0">
