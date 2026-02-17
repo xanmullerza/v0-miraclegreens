@@ -624,41 +624,41 @@ export default function NutrientDetailsPage() {
                     {activeContentTab === 'foods' && (
                         <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
                             <div className="bg-slate-50 dark:bg-slate-900/40 rounded-[3rem] p-8 border border-slate-100 dark:border-slate-800/50 flex flex-col gap-6">
-                                <div className="flex items-start gap-6">
-                                    <div className="w-16 h-16 rounded-[2rem] bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
-                                        <UtensilsCrossed size={32} />
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                                    <div className="flex items-center gap-6">
+                                        <div className="w-16 h-16 rounded-[2rem] bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                                            <UtensilsCrossed size={32} />
+                                        </div>
+                                        <div className="flex-1 space-y-1">
+                                            <h4 className="font-black text-sm uppercase tracking-[0.3em] text-emerald-500">{nutrientInfoKey} Rich Foods</h4>
+                                            <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest leading-none">Top bioavailable sources per {measureGrams}g clinical sample</p>
+                                        </div>
                                     </div>
-                                    <div className="flex-1 space-y-1">
-                                        <h4 className="font-black text-xs uppercase tracking-[0.3em] text-emerald-500">{nutrientInfoKey} Rich Foods</h4>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Top bioavailable sources per 100g clinical sample</p>
+
+                                    <div className="flex items-center gap-2 bg-emerald-50/50 dark:bg-emerald-900/5 px-4 py-2 rounded-2xl border border-emerald-200/50 dark:border-emerald-800/20">
+                                        <button
+                                            onClick={() => setMeasureGrams(Math.max(10, measureGrams - 10))}
+                                            className="flex items-center justify-center w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                                            title="Decrease grams"
+                                        >
+                                            <ChevronDown size={14} />
+                                        </button>
+                                        <div className="flex flex-col items-center min-w-[50px] text-center">
+                                            <span className="text-[8px] font-black text-slate-400 uppercase tracking-tighter leading-none">Measure</span>
+                                            <span className="text-sm font-black text-emerald-600 dark:text-emerald-400 leading-none">{measureGrams}g</span>
+                                        </div>
+                                        <button
+                                            onClick={() => setMeasureGrams(measureGrams + 10)}
+                                            className="flex items-center justify-center w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                                            title="Increase grams"
+                                        >
+                                            <ChevronDown size={14} className="rotate-180" />
+                                        </button>
                                     </div>
                                 </div>
 
                                 <div className="w-full">
-                                    <div className="flex items-center justify-end">
-                                        <div className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-900/10 px-5 py-3 rounded-2xl border border-emerald-200 dark:border-emerald-800/30">
-                                            <button
-                                                onClick={() => setMeasureGrams(Math.max(10, measureGrams - 10))}
-                                                className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
-                                                title="Decrease grams"
-                                            >
-                                                <ChevronDown size={16} />
-                                            </button>
-                                            <div className="flex flex-col items-center gap-0.5 min-w-[65px] text-center">
-                                                <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Measure</span>
-                                                <span className="text-lg font-black text-emerald-600 dark:text-emerald-400">{measureGrams}g</span>
-                                            </div>
-                                            <button
-                                                onClick={() => setMeasureGrams(measureGrams + 10)}
-                                                className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
-                                                title="Increase grams"
-                                            >
-                                                <ChevronDown size={16} className="rotate-180" />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                                    <div className="mt-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                                         {loadingFoods ? (
                                             [1, 2, 3, 4, 5].map(i => <div key={i} className="h-32 w-full animate-pulse bg-slate-50 dark:bg-slate-900/50 rounded-[2rem]" />)
                                         ) : topFoods.length > 0 ? (
