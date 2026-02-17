@@ -434,7 +434,7 @@ export default function NutrientDetailsPage() {
     return (
         <div className="flex flex-col w-full min-h-screen">
             {/* Sticky Subheader Navigation */}
-            <div className="sticky top-0 z-40 w-full bg-slate-50/80 dark:bg-[#0f1336]/80 backdrop-blur-xl border-b border-slate-200/50 dark:border-slate-800/50 py-4 px-4 transition-all duration-300">
+            <div className="sticky top-0 z-40 w-full bg-transparent py-4 px-4 transition-all duration-300">
                 <div className="max-w-xl mx-auto w-full animate-in slide-in-from-top-4 duration-700">
                     <BreadcrumbPillbox
                         searchQuery={searchQuery}
