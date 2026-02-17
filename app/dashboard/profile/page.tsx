@@ -585,6 +585,17 @@ function ProfilePageContent() {
                             >
                                 Recommended Intake
                             </Button>
+                            <Button
+                                variant="ghost"
+                                className="w-full mt-4 font-black text-xs uppercase tracking-widest text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 h-12 rounded-xl"
+                                onClick={async () => {
+                                    await supabase.auth.signOut();
+                                    router.push('/');
+                                }}
+                            >
+                                <LogOut size={16} className="mr-2" />
+                                Sign Out
+                            </Button>
                         </div>
                     </div>
 
@@ -648,8 +659,8 @@ function ProfilePageContent() {
                         </div>
                     </SheetContent>
                 </div> {/* <-- Close flex container */}
-            </Sheet>
-        </div>
+            </Sheet >
+        </div >
     );
 }
 
