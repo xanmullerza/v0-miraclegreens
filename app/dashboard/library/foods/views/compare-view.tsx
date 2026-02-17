@@ -156,6 +156,65 @@ export function CompareView() {
         });
     };
 
+    const calculateScores = (foods: (FoodItem | null)[]) => {
+        const scores = [0, 0, 0];
+        const totalSelected = foods.filter(f => f !== null).length;
+        if (totalSelected === 0) return scores;
+
+        NUTRIENT_GROUPS.forEach(group => {
+            group.keys.forEach(nutrient => {
+                const values = foods.map(food => {
+                    if (!food) return null;
+                    if (nutrient.key in food && typeof (food as any)[nutrient.key] === 'number') {
+                        return (food as any)[nutrient.key];
+                    }
+                    if (food.micronutrients && food.micronutrients[nutrient.key]) {
+                        const v = food.micronutrients[nutrient.key];
+                        return typeof v === 'number' ? v : 0;
+                    }
+                    return 0;
+                });
+                const sortedUniqueValues = Array.from(new Set(values.filter((v): v is number => v !== null)))
+                    .sort((a, b) => b - a);
+                values.forEach((val, i) => {
+                    if (val !== null) {
+                        const rank = sortedUniqueValues.indexOf(val);
+                        if (rank === 0) scores[i] += 3;
+                        else if (rank === 1) scores[i] += 2;
+                        else if (rank === 2) scores[i] += 1;
+                    }
+                });
+            });
+        });
+        return scores;
+    };
+
+    // Auto-shuffle effect
+    useEffect(() => {
+        if (selectedFoods.every(f => f === null)) return;
+
+        const currentScores = calculateScores(selectedFoods);
+
+        // Create indexed items to detect changes
+        const items = selectedFoods.map((food, i) => ({ food, score: currentScores[i], originalIndex: i }));
+
+        // Sort: 1. Presence of food (nulls last) 2. Score descending 3. Orignal index (tie-breaker for stability)
+        const sorted = [...items].sort((a, b) => {
+            if (a.food && !b.food) return -1;
+            if (!a.food && b.food) return 1;
+            if (b.score !== a.score) return b.score - a.score;
+            return a.originalIndex - b.originalIndex;
+        });
+
+        // Check if order actually changed
+        const hasChanged = sorted.some((item, i) => item.originalIndex !== i);
+
+        if (hasChanged) {
+            // Apply new order
+            setSelectedFoods(sorted.map(s => s.food));
+        }
+    }, [selectedFoods]);
+
     const getNutrientValue = (food: FoodItem | null, key: string, unit: string) => {
         if (!food) return '-';
 
@@ -190,39 +249,9 @@ export function CompareView() {
         emerald: "text-emerald-500 bg-emerald-500/10 border-emerald-500/20"
     };
 
-    // Calculate Scores
-    const scores = [0, 0, 0];
+    // Calculate Scores for Display
+    const scores = calculateScores(selectedFoods);
     const totalSelected = selectedFoods.filter(f => f !== null).length;
-
-    if (totalSelected > 0) {
-        NUTRIENT_GROUPS.forEach(group => {
-            group.keys.forEach(nutrient => {
-                const values = selectedFoods.map(food => {
-                    if (!food) return null;
-                    if (nutrient.key in food && typeof (food as any)[nutrient.key] === 'number') {
-                        return (food as any)[nutrient.key];
-                    }
-                    if (food.micronutrients && food.micronutrients[nutrient.key]) {
-                        const v = food.micronutrients[nutrient.key];
-                        return typeof v === 'number' ? v : 0;
-                    }
-                    return 0;
-                });
-
-                const sortedUniqueValues = Array.from(new Set(values.filter((v): v is number => v !== null)))
-                    .sort((a, b) => b - a);
-
-                values.forEach((val, i) => {
-                    if (val !== null) {
-                        const rank = sortedUniqueValues.indexOf(val);
-                        if (rank === 0) scores[i] += 3;
-                        else if (rank === 1) scores[i] += 2;
-                        else if (rank === 2) scores[i] += 1;
-                    }
-                });
-            });
-        });
-    }
 
     // Determine Ranks
     const sortedScores = Array.from(new Set(scores.filter((s, i) => selectedFoods[i] !== null)))
