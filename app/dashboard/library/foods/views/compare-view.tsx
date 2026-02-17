@@ -15,7 +15,8 @@ import {
     Info,
     Beef,
     Trophy,
-    Medal
+    Medal,
+    ChevronRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
