@@ -455,19 +455,20 @@ export function CompareView() {
                                                             </span>
                                                         )}
                                                     </div>
+                                                    {/* Swap Button - Always Visible */}
+                                                    <button
+                                                        onClick={() => setActiveSlot(i)}
+                                                        className="mt-1.5 md:mt-2 flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/30 transition-all active:scale-95"
+                                                    >
+                                                        <RefreshCw size={10} className="md:w-3 md:h-3" />
+                                                        <span className="text-[7px] md:text-[9px] font-black uppercase tracking-widest">Swap</span>
+                                                    </button>
                                                     {/* Floating Remove Button */}
                                                     <button
                                                         onClick={() => removeFood(i)}
                                                         className="absolute -top-1 -right-1 md:-top-2 md:-right-2 p-1.5 md:p-2 bg-white dark:bg-slate-800 text-slate-400 hover:text-rose-500 rounded-full shadow-lg border border-slate-100 dark:border-slate-700 opacity-0 group-hover/card:opacity-100 transition-all scale-75 group-hover/card:scale-100"
                                                     >
                                                         <X size={10} className="md:w-3 md:h-3" />
-                                                    </button>
-                                                    {/* Floating Swap Button */}
-                                                    <button
-                                                        onClick={() => setActiveSlot(i)}
-                                                        className="absolute -top-1 -left-1 md:-top-2 md:-left-2 p-1.5 md:p-2 bg-white dark:bg-slate-800 text-slate-400 hover:text-emerald-500 rounded-full shadow-lg border border-slate-100 dark:border-slate-700 opacity-0 group-hover/card:opacity-100 transition-all scale-75 group-hover/card:scale-100"
-                                                    >
-                                                        <RefreshCw size={10} className="md:w-3 md:h-3" />
                                                     </button>
                                                 </div>
                                             ) : (
