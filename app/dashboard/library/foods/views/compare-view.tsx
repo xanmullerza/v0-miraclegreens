@@ -105,9 +105,6 @@ export function CompareView() {
     const [activeSearchIndex, setActiveSearchIndex] = useState<number | null>(null);
     const searchRef = useRef<HTMLDivElement>(null);
     const { energyUnit } = useUserPreferences();
-    const [supabaseOK, setSupabaseOK] = useState<boolean | null>(null);
-    const [sampleCount, setSampleCount] = useState<number | null>(null);
-    const [lastSearchLog, setLastSearchLog] = useState<string | null>(null);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -117,57 +114,6 @@ export function CompareView() {
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-
-    // Diagnostic: log element under pointer when user clicks while a search is active
-    useEffect(() => {
-        const handler = (e: MouseEvent) => {
-            if (activeSearchIndex === null) return;
-            try {
-                const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
-                const tag = el?.tagName || 'none';
-                const cls = el?.className || '';
-                const msg = `[CompareView] click at (${e.clientX},${e.clientY}) -> ${tag} ${cls}`;
-                console.log(msg);
-                setLastSearchLog(msg);
-            } catch (err) {
-                console.error('ElementFromPoint error', err);
-            }
-        };
-
-        document.addEventListener('mousedown', handler);
-        return () => document.removeEventListener('mousedown', handler);
-    }, [activeSearchIndex]);
-
-    // Test Supabase connectivity on mount
-    useEffect(() => {
-        const testSupabaseConnection = async () => {
-            try {
-                console.log('[CompareView] Testing Supabase connectivity...');
-                const { data, error } = await supabase
-                    .from('food_items')
-                    .select('id, name, common_name')
-                    .limit(1);
-
-                if (error) {
-                    console.error('[CompareView] Supabase error:', error);
-                    toast.error(`Database connection error: ${error.message}`);
-                    setSupabaseOK(false);
-                    setSampleCount(0);
-                } else {
-                    console.log('[CompareView] Supabase connection successful. Sample data:', data);
-                    setSupabaseOK(true);
-                    setSampleCount(data?.length || 0);
-                    if (!data || data.length === 0) {
-                        console.warn('[CompareView] Warning: food_items table appears to be empty');
-                    }
-                }
-            } catch (err) {
-                console.error('[CompareView] Error testing Supabase connection:', err);
-            }
-        };
-
-        testSupabaseConnection();
     }, []);
 
     const performSearch = async (query: string, index: number) => {
@@ -187,9 +133,7 @@ export function CompareView() {
         });
 
         try {
-            const searchingMsg = `[CompareView] Searching for: "${query}" in index ${index}`;
-            console.log(searchingMsg);
-            setLastSearchLog(searchingMsg);
+            console.log(`[CompareView] Searching for: "${query}" in index ${index}`);
 
             // Primary search using .or() syntax
             let { data, error } = await supabase
@@ -198,15 +142,11 @@ export function CompareView() {
                 .or(`name.ilike.%${query}%,common_name.ilike.%${query}%`)
                 .limit(5);
 
-            const primaryMsg = `[CompareView] Primary search result count: ${data?.length || 0}, error: ${error?.message || 'none'}`;
-            console.log(primaryMsg);
-            setLastSearchLog(primaryMsg);
+            console.log(`[CompareView] Primary search result count: ${data?.length || 0}, error: ${error?.message || 'none'}`);
 
             // Fallback: If primary search fails or returns no results, try alternative approach
             if (error || !data || data.length === 0) {
-                const fallbackMsg = '[CompareView] Trying fallback search method...';
-                console.log(fallbackMsg);
-                setLastSearchLog(fallbackMsg);
+                console.log('[CompareView] Trying fallback search method...');
 
                 // Try searching name field only first
                 const { data: nameData, error: nameError } = await supabase
@@ -218,9 +158,7 @@ export function CompareView() {
                 if (nameError) {
                     console.error('[CompareView] Fallback name search error:', nameError);
                 } else if (nameData && nameData.length > 0) {
-                    const nameFoundMsg = `[CompareView] Fallback name search successful, found ${nameData.length} results`;
-                    console.log(nameFoundMsg);
-                    setLastSearchLog(nameFoundMsg);
+                    console.log(`[CompareView] Fallback name search successful, found ${nameData.length} results`);
                     data = nameData;
                     error = null;
                 } else {
@@ -234,9 +172,7 @@ export function CompareView() {
                     if (commonError) {
                         console.error('[CompareView] Fallback common_name search error:', commonError);
                     } else if (commonData && commonData.length > 0) {
-                        const commonFoundMsg = `[CompareView] Fallback common_name search successful, found ${commonData.length} results`;
-                        console.log(commonFoundMsg);
-                        setLastSearchLog(commonFoundMsg);
+                        console.log(`[CompareView] Fallback common_name search successful, found ${commonData.length} results`);
                         data = commonData;
                         error = null;
                     }
@@ -254,9 +190,7 @@ export function CompareView() {
                 return next;
             });
 
-            const updatedMsg = `[CompareView] Updated search results for index ${index}: ${(data || []).length} items`;
-            console.log(updatedMsg);
-            setLastSearchLog(updatedMsg);
+            console.log(`[CompareView] Updated search results for index ${index}: ${(data || []).length} items`);
         } catch (error) {
             console.error('Search error:', error);
             const errorMsg = error instanceof Error ? error.message : 'Search failed';
@@ -278,8 +212,7 @@ export function CompareView() {
     };
 
     const handleSelectFood = (food: FoodItem, index: number) => {
-        console.log(`[CompareView] handleSelectFood called for index ${index} ->`, food?.name || food?.common_name || food?.id);
-        setLastSearchLog && setLastSearchLog(`[CompareView] Selected ${food?.common_name || food?.name}`);
+        console.log(`[CompareView] Selected ${food?.common_name || food?.name}`);
         setSelectedFoods(prev => {
             const next = [...prev];
             next[index] = food;
@@ -484,48 +417,10 @@ export function CompareView() {
                             </div>
                         )}
 
-                        {/* Inline debug list (always visible for dev) - Hiding per user request
-                        {searchResults[index].length > 0 && (
-                            <div className="mt-2 p-2 bg-slate-800/60 dark:bg-slate-800 rounded-lg text-[12px] text-slate-100">
-                                {searchResults[index].slice(0,5).map(f => (
-                                    <button
-                                        key={f.id}
-                                        onMouseDown={(e) => { e.preventDefault(); handleSelectFood(f, index); }}
-                                        className="w-full text-left py-1 border-b last:border-b-0 border-slate-700 hover:bg-slate-700 rounded"
-                                    >
-                                        {f.common_name || f.name}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                        */}
                     </div>
                 ))}
             </div>
 
-            {/* Debug Panel - Hiding per user request
-            <div className="px-4">
-                <div className="text-xs bg-slate-50 dark:bg-slate-800 rounded-xl p-3 border border-slate-100 dark:border-slate-800">
-                    <div className="flex items-center justify-between mb-2">
-                        <div className="font-black">Search Debug</div>
-                        <div className="text-[11px]">
-                            Supabase: {supabaseOK === null ? 'testing...' : supabaseOK ? `OK (${sampleCount || 0})` : 'ERROR'}
-                        </div>
-                    </div>
-                    <div className="text-[11px] text-slate-600 dark:text-slate-300 mb-2">Last log: {lastSearchLog || '—'}</div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                        {[0,1,2].map((i) => (
-                            <div key={i} className="text-[11px] bg-white dark:bg-slate-900 p-2 rounded-lg border border-slate-100 dark:border-slate-800">
-                                <div className="font-black">Box {i+1}</div>
-                                <div>Query: {searchQueries[i] || '—'}</div>
-                                <div>Results: {searchResults[i]?.length || 0}</div>
-                                <div>Loading: {isLoading[i] ? 'yes' : 'no'}</div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-            */}
 
             {/* Comparison Table */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl md:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden mx-[-1rem] md:mx-0">
