@@ -508,62 +508,62 @@ function ProfilePageContent() {
                                         </div>
                                     </div>
                                 </div>
-                                {/* End grid */}
+                            </section>
 
-                                {/* FAMILY PROTOCOLS - Hidden for now */}
-                                {false && (
-                                    <section className="space-y-6">
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                                <Users size={24} className="stroke-[2.5]" />
-                                            </div>
-                                            <div>
-                                                <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Family Protocols</h2>
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Household Management</p>
-                                            </div>
+                            {/* FAMILY PROTOCOLS - Hidden for now */}
+                            {false && (
+                                <section className="space-y-6">
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
+                                            <Users size={24} className="stroke-[2.5]" />
                                         </div>
-                                        <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                {/* Existing Members */}
-                                                {formData.familyMembers.map((member) => (
-                                                    <div key={member.id} onClick={() => setEditingMember(member)} className="group cursor-pointer p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-900 transition-all relative">
-                                                        <div className="flex justify-between items-start mb-2">
-                                                            <div className="flex items-center gap-2">
-                                                                <div className={cn("w-2 h-2 rounded-full", member.gender === 'male' ? "bg-blue-400" : "bg-rose-400")} />
-                                                                <h3 className="font-bold text-sm text-slate-700 dark:text-slate-200">{member.name || 'Unnamed'}</h3>
-                                                            </div>
-                                                            <button onClick={(e) => { e.stopPropagation(); handleDeleteMember(member.id); }} className="text-slate-300 hover:text-rose-500 transition-colors p-1"><X size={14} /></button>
-                                                        </div>
-                                                        <div className="flex flex-wrap gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-tight">
-                                                            <span className="bg-white dark:bg-slate-950 px-2 py-1 rounded-md">{member.age} yrs</span>
-                                                            <span className="bg-white dark:bg-slate-950 px-2 py-1 rounded-md">{member.goal}</span>
-                                                        </div>
-                                                    </div>
-                                                ))}
-
-                                                {/* Add Button */}
-                                                <button
-                                                    onClick={() => setIsAddingMember(true)}
-                                                    className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/5 transition-all text-slate-400 hover:text-emerald-500 h-[100px]"
-                                                >
-                                                    <div className="p-2 rounded-full bg-slate-50 dark:bg-slate-900 group-hover:bg-white transition-colors">
-                                                        <Plus size={20} />
-                                                    </div>
-                                                    <span className="text-[10px] font-black uppercase tracking-widest">Add Member</span>
-                                                </button>
-                                            </div>
-                                            <p className="text-[10px] text-slate-400 italic">Add family members to automatically calculate scale-appropriate portion sizes in recipes.</p>
+                                        <div>
+                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Family Protocols</h2>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Household Management</p>
                                         </div>
-                                    </section>
-                                )}
+                                    </div>
+                                    <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {/* Existing Members */}
+                                            {formData.familyMembers.map((member) => (
+                                                <div key={member.id} onClick={() => setEditingMember(member)} className="group cursor-pointer p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-900 transition-all relative">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className={cn("w-2 h-2 rounded-full", member.gender === 'male' ? "bg-blue-400" : "bg-rose-400")} />
+                                                            <h3 className="font-bold text-sm text-slate-700 dark:text-slate-200">{member.name || 'Unnamed'}</h3>
+                                                        </div>
+                                                        <button onClick={(e) => { e.stopPropagation(); handleDeleteMember(member.id); }} className="text-slate-300 hover:text-rose-500 transition-colors p-1"><X size={14} /></button>
+                                                    </div>
+                                                    <div className="flex flex-wrap gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+                                                        <span className="bg-white dark:bg-slate-950 px-2 py-1 rounded-md">{member.age} yrs</span>
+                                                        <span className="bg-white dark:bg-slate-950 px-2 py-1 rounded-md">{member.goal}</span>
+                                                    </div>
+                                                </div>
+                                            ))}
 
-                                {(isAddingMember || editingMember) && (
-                                    <FamilyMemberForm
-                                        initialData={editingMember || {}}
-                                        onSave={handleSaveMember}
-                                        onCancel={() => { setIsAddingMember(false); setEditingMember(null); }}
-                                    />
-                                )}
+                                            {/* Add Button */}
+                                            <button
+                                                onClick={() => setIsAddingMember(true)}
+                                                className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/5 transition-all text-slate-400 hover:text-emerald-500 h-[100px]"
+                                            >
+                                                <div className="p-2 rounded-full bg-slate-50 dark:bg-slate-900 group-hover:bg-white transition-colors">
+                                                    <Plus size={20} />
+                                                </div>
+                                                <span className="text-[10px] font-black uppercase tracking-widest">Add Member</span>
+                                            </button>
+                                        </div>
+                                        <p className="text-[10px] text-slate-400 italic">Add family members to automatically calculate scale-appropriate portion sizes in recipes.</p>
+                                    </div>
+                                </section>
+                            )}
+
+                            {(isAddingMember || editingMember) && (
+                                <FamilyMemberForm
+                                    initialData={editingMember || {}}
+                                    onSave={handleSaveMember}
+                                    onCancel={() => { setIsAddingMember(false); setEditingMember(null); }}
+                                />
+                            )}
 
 
 
