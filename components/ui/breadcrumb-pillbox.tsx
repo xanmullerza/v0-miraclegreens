@@ -15,6 +15,8 @@ interface BreadcrumbPillboxProps {
     customLastSegment?: string;
     filterContent?: React.ReactNode;
     isFilterActive?: boolean;
+    isFilterExpanded?: boolean;
+    onFilterToggle?: (expanded: boolean) => void;
 }
 
 export function BreadcrumbPillbox({
@@ -25,12 +27,23 @@ export function BreadcrumbPillbox({
     showHomeButton = true,
     customLastSegment,
     filterContent,
-    isFilterActive = false
+    isFilterActive = false,
+    isFilterExpanded: controlledIsFilterExpanded,
+    onFilterToggle
 }: BreadcrumbPillboxProps) {
     const router = useRouter();
     const pathname = usePathname();
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-    const [isFilterExpanded, setIsFilterExpanded] = useState(false);
+    const [internalIsFilterExpanded, setInternalIsFilterExpanded] = useState(false);
+
+    const isFilterExpanded = controlledIsFilterExpanded !== undefined ? controlledIsFilterExpanded : internalIsFilterExpanded;
+    const setIsFilterExpanded = (val: boolean) => {
+        if (onFilterToggle) {
+            onFilterToggle(val);
+        } else {
+            setInternalIsFilterExpanded(val);
+        }
+    };
 
     // Close search on escape key
     useEffect(() => {

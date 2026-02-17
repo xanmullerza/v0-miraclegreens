@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter, useParams, usePathname } from 'next/navigation';
+import { useRouter, useParams, usePathname, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
     Zap,
@@ -71,8 +71,22 @@ const Card = ({ children, className }: { children: React.ReactNode, className?: 
 export default function NutrientDetailsPage() {
     const router = useRouter();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const { id } = useParams();
     const nutrientId = decodeURIComponent(id as string);
+
+    // Filter expansion state from URL
+    const isFilterExpanded = searchParams.get('filter') === 'open';
+
+    const toggleFilter = (expanded: boolean) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (expanded) {
+            params.set('filter', 'open');
+        } else {
+            params.delete('filter');
+        }
+        router.push(`${pathname}?${params.toString()}`);
+    };
 
     // Map URL ID to nutrient info key
     const nutrientInfoKey = URL_ID_TO_NUTRIENT_INFO[nutrientId] || nutrientId;
@@ -424,9 +438,11 @@ export default function NutrientDetailsPage() {
                 <BreadcrumbPillbox
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
-                    sectionLabel="Nutrient Guide"
+                    sectionLabel="Nutrient Information"
                     sectionColor="text-indigo-500"
                     customLastSegment={nutrientInfoKey}
+                    isFilterExpanded={isFilterExpanded}
+                    onFilterToggle={toggleFilter}
                     filterContent={
                         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
                             {/* Macro Dropdown */}
@@ -450,7 +466,10 @@ export default function NutrientDetailsPage() {
                                         <DropdownMenuCheckboxItem
                                             key={id}
                                             checked={nutrientInfoKey === id}
-                                            onCheckedChange={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}`)}
+                                            onCheckedChange={() => {
+                                                const params = new URLSearchParams(searchParams.toString());
+                                                router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}?${params.toString()}`);
+                                            }}
                                             className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
                                         >
                                             {id}
@@ -480,7 +499,10 @@ export default function NutrientDetailsPage() {
                                         <DropdownMenuCheckboxItem
                                             key={id}
                                             checked={nutrientInfoKey === id}
-                                            onCheckedChange={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}`)}
+                                            onCheckedChange={() => {
+                                                const params = new URLSearchParams(searchParams.toString());
+                                                router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}?${params.toString()}`);
+                                            }}
                                             className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
                                         >
                                             {id}
@@ -510,7 +532,10 @@ export default function NutrientDetailsPage() {
                                         <DropdownMenuCheckboxItem
                                             key={id}
                                             checked={nutrientInfoKey === id}
-                                            onCheckedChange={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}`)}
+                                            onCheckedChange={() => {
+                                                const params = new URLSearchParams(searchParams.toString());
+                                                router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}?${params.toString()}`);
+                                            }}
                                             className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
                                         >
                                             {id}
