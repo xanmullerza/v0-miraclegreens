@@ -76,7 +76,7 @@ function FamilyMemberForm({ initialData, onSave, onCancel }: { initialData?: Par
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={onCancel}>
-            <div className="bg-white dark:bg-slate-950 w-full max-w-2xl rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
+            <div className="bg-white dark:bg-slate-950 w-full max-w-2xl rounded-[2rem] shadow-2xl flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
                 <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50 rounded-t-[2rem]">
                     <div className="flex items-center gap-3">
                         <div className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-xl text-purple-600 dark:text-purple-400">
@@ -106,7 +106,7 @@ function FamilyMemberForm({ initialData, onSave, onCancel }: { initialData?: Par
                         </div>
                         <div className="space-y-2">
                             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Gender</Label>
-                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800 h-10">
+                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl h-10">
                                 <button onClick={() => setData({ ...data, gender: 'male' })} className={cn("flex-1 text-xs font-black uppercase tracking-wider rounded-lg transition-all", data.gender === 'male' ? "bg-white dark:bg-slate-800 text-purple-600 shadow-sm" : "text-slate-400")}>Male</button>
                                 <button onClick={() => setData({ ...data, gender: 'female' })} className={cn("flex-1 text-xs font-black uppercase tracking-wider rounded-lg transition-all", data.gender === 'female' ? "bg-white dark:bg-slate-800 text-purple-600 shadow-sm" : "text-slate-400")}>Female</button>
                             </div>
@@ -302,7 +302,7 @@ function ProfilePageContent() {
                                     <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Identification</h2>
                                 </div>
                             </div>
-                            <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                            <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
                                 <div className="space-y-2">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Name</Label>
                                     <Input
@@ -315,7 +315,7 @@ function ProfilePageContent() {
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
                                     <div className="space-y-2">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Gender</Label>
-                                        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800 h-8 mt-1">
+                                        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl h-8 mt-1">
                                             <button
                                                 onClick={() => setFormData({ ...formData, gender: 'male' })}
                                                 className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'male' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
@@ -375,7 +375,7 @@ function ProfilePageContent() {
                                     <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Dietary Profile</h2>
                                 </div>
                             </div>
-                            <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                            <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
                                 {/* Dietary Protocol */}
                                 <div className="space-y-4">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Dietary Protocol</Label>
@@ -441,7 +441,7 @@ function ProfilePageContent() {
                                     <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Goals</h2>
                                 </div>
                             </div>
-                            <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                            <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
                                 {/* Biological Goal */}
                                 <div className="space-y-4">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Goal</Label>
@@ -474,11 +474,11 @@ function ProfilePageContent() {
                                     <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Family Protocols</h2>
                                 </div>
                             </div>
-                            <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                            <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {/* Existing Members */}
                                     {formData.familyMembers.map((member) => (
-                                        <div key={member.id} onClick={() => setEditingMember(member)} className="group cursor-pointer p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 hover:border-emerald-500 hover:bg-white dark:hover:bg-slate-900 transition-all relative">
+                                        <div key={member.id} onClick={() => setEditingMember(member)} className="group cursor-pointer p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-900 transition-all relative">
                                             <div className="flex justify-between items-start mb-2">
                                                 <div className="flex items-center gap-2">
                                                     <div className={cn("w-2 h-2 rounded-full", member.gender === 'male' ? "bg-blue-400" : "bg-rose-400")} />
@@ -487,8 +487,8 @@ function ProfilePageContent() {
                                                 <button onClick={(e) => { e.stopPropagation(); handleDeleteMember(member.id); }} className="text-slate-300 hover:text-rose-500 transition-colors p-1"><X size={14} /></button>
                                             </div>
                                             <div className="flex flex-wrap gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-tight">
-                                                <span className="bg-white dark:bg-slate-950 px-2 py-1 rounded-md border border-slate-100 dark:border-slate-800">{member.age} yrs</span>
-                                                <span className="bg-white dark:bg-slate-950 px-2 py-1 rounded-md border border-slate-100 dark:border-slate-800">{member.goal}</span>
+                                                <span className="bg-white dark:bg-slate-950 px-2 py-1 rounded-md">{member.age} yrs</span>
+                                                <span className="bg-white dark:bg-slate-950 px-2 py-1 rounded-md">{member.goal}</span>
                                             </div>
                                         </div>
                                     ))}
@@ -550,7 +550,7 @@ function ProfilePageContent() {
                                 const unit = (nutrient === 'Energy') ? energyUnit : (nutrient === 'Protein' || nutrient === 'Carbs' || nutrient === 'Fat' || nutrient === 'Fiber' || nutrient === 'ALA' || nutrient.includes('_g')) ? 'g' : (nutrient === 'Vitamin D') ? 'IU' : (nutrient.includes('Folate') || nutrient.includes('B12') || nutrient.includes('Biotin') || nutrient.includes('Selenium') || nutrient === 'Vitamin A' || nutrient === 'Vitamin K' || nutrient.includes('EPA')) ? 'µg' : 'mg';
                                 const displayVal = value < 1 ? value.toFixed(2) : value < 10 ? value.toFixed(1) : Math.round(value);
                                 return (
-                                    <div key={nutrient} className="bg-slate-900/50 border border-slate-800/50 px-4 py-3 rounded-2xl flex items-center justify-between hover:border-blue-500/30 transition-all hover:bg-slate-900 group/item">
+                                    <div key={nutrient} className="bg-slate-900/50 px-4 py-3 rounded-2xl flex items-center justify-between hover:bg-slate-900 group/item">
                                         <div className="flex flex-col min-w-0 pr-2">
                                             <p className="text-[11px] uppercase font-black text-slate-400 group-hover/item:text-slate-300 transition-colors leading-none truncate">{nutrient}</p>
                                             {['ALA', 'EPA', 'Histidine', 'Leucine'].includes(nutrient) && (
