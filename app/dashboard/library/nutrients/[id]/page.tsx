@@ -72,7 +72,7 @@ export default function NutrientDetailsPage() {
     const pathname = usePathname();
     const { id } = useParams();
     const nutrientId = decodeURIComponent(id as string);
-    
+
     // Map URL ID to nutrient info key
     const nutrientInfoKey = URL_ID_TO_NUTRIENT_INFO[nutrientId] || nutrientId;
     const info = nutrientInfo[nutrientInfoKey];
@@ -92,6 +92,7 @@ export default function NutrientDetailsPage() {
     const [topFoods, setTopFoods] = useState<any[]>([]);
     const [loadingFoods, setLoadingFoods] = useState(true);
     const [measureGrams, setMeasureGrams] = useState(100);
+    const [activeContentTab, setActiveContentTab] = useState('foods');
 
     // --- Simulation Logic ---
     let targetVal = 0;
@@ -525,277 +526,316 @@ export default function NutrientDetailsPage() {
             <div className="max-w-7xl mx-auto space-y-8 pb-32 animate-in fade-in duration-700 flex-1 w-full">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center gap-8 animate-in slide-in-from-top-4 duration-700 pb-1">
-                {/* Status Readout (Now on the left) */}
-                <div className={cn(
-                    "w-24 h-24 rounded-[1.5rem] border-2 transition-all duration-700 flex flex-col items-center justify-center shadow-lg flex-shrink-0",
-                    isDeficient ? "bg-amber-50 border-amber-300 text-amber-800 shadow-amber-200/50" :
-                        isToxic ? "bg-rose-50 border-rose-300 text-rose-800 shadow-rose-200/50" :
-                            "bg-emerald-50 border-emerald-300 text-emerald-800 shadow-emerald-500/10"
-                )}>
-                    <p className="text-[7px] font-black uppercase tracking-widest opacity-60">Intake</p>
-                    <div className="flex items-baseline gap-0.5">
-                        <span className="text-2xl font-black italic tracking-tighter leading-none">
-                            {simValue >= 100 ? Math.round(simValue) : simValue.toFixed(1)}
-                        </span>
-                        <span className="text-[8px] font-black uppercase">{unit}</span>
-                    </div>
+                    {/* Status Readout (Now on the left) */}
                     <div className={cn(
-                        "mt-1 px-2.5 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest flex items-center gap-1",
-                        isDeficient ? "bg-amber-500 text-white" :
-                            isToxic ? "bg-rose-600 text-white" :
-                                "bg-emerald-600 text-white"
+                        "w-24 h-24 rounded-[1.5rem] border-2 transition-all duration-700 flex flex-col items-center justify-center shadow-lg flex-shrink-0",
+                        isDeficient ? "bg-amber-50 border-amber-300 text-amber-800 shadow-amber-200/50" :
+                            isToxic ? "bg-rose-50 border-rose-300 text-rose-800 shadow-rose-200/50" :
+                                "bg-emerald-50 border-emerald-300 text-emerald-800 shadow-emerald-500/10"
                     )}>
-                        {isDeficient ? "Deficit" : isToxic ? "Toxicity" : "Optimal"}
-                    </div>
-                </div>
-
-                <div className="flex-1 flex flex-col">
-                    <h1 className="text-4xl lg:text-7xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.8] mb-2 flex items-center gap-4">
-                        <span className="text-emerald-500">{nutrientInfoKey}</span>
-                        <button
-                            onClick={toggleFavorite}
-                            className={cn(
-                                "w-10 h-10 rounded-full flex items-center justify-center transition-all border shrink-0",
-                                isFav
-                                    ? "bg-rose-500 text-white border-rose-600 shadow-xl shadow-rose-500/20"
-                                    : "bg-white dark:bg-slate-900 text-slate-300 border-slate-200 dark:border-slate-800 hover:text-rose-500 hover:border-rose-200"
-                            )}
-                        >
-                            <Heart size={20} fill={isFav ? "currentColor" : "none"} />
-                        </button>
-                    </h1>
-                    <p className="text-slate-400 font-bold uppercase tracking-widest text-[11px] leading-relaxed max-w-2xl italic">
-                        "{info.description}"
-                    </p>
-                </div>
-            </div>
-
-            {/* Dose Simulator Section - Just Slider */}
-            <div className="space-y-6 pt-4">
-                <div className="flex items-center justify-between px-2">
-                    <div className="space-y-1">
-                        <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">Clinical Dose Simulator</h4>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase">Slide to simulate intake levels and see biological thresholds</p>
-                    </div>
-                </div>
-
-                <div className="space-y-12">
-                    {/* Simulator Interface */}
-                    <div className="relative pt-6 pb-2">
-                        <input
-                            type="range"
-                            min="0"
-                            max={dynamicMax}
-                            step={dynamicMax / 100}
-                            value={simValue}
-                            onChange={(e) => setSimValue(parseFloat(e.target.value))}
-                            className="w-full h-3 bg-slate-200 dark:bg-slate-800 rounded-full appearance-none cursor-pointer accent-emerald-500 hover:accent-emerald-600 transition-all [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-emerald-500 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:appearance-none"
-                        />
-
-                        <div className="absolute top-0 left-0 w-full flex justify-between px-1 text-[8px] font-black uppercase text-slate-400 tracking-widest pointer-events-none">
-                            <span>Zero</span>
-                            <div
-                                className="absolute h-4 border-l-2 border-dashed border-emerald-500/50 flex flex-col items-center"
-                                style={{ left: `${(targetVal / dynamicMax) * 100}%` }}
-                            >
-                                <span className="mt-4 text-emerald-600 font-black">Target</span>
-                            </div>
-                            {!hasNoUL && (
-                                <div
-                                    className="absolute h-4 border-l-2 border-dashed border-rose-500/50 flex flex-col items-center"
-                                    style={{ left: `${(ulVal / dynamicMax) * 100}%` }}
-                                >
-                                    <span className="mt-4 text-rose-600 font-black">UL</span>
-                                </div>
-                            )}
-                            <span>High Hazard</span>
+                        <p className="text-[7px] font-black uppercase tracking-widest opacity-60">Intake</p>
+                        <div className="flex items-baseline gap-0.5">
+                            <span className="text-2xl font-black italic tracking-tighter leading-none">
+                                {simValue >= 100 ? Math.round(simValue) : simValue.toFixed(1)}
+                            </span>
+                            <span className="text-[8px] font-black uppercase">{unit}</span>
+                        </div>
+                        <div className={cn(
+                            "mt-1 px-2.5 py-0.5 rounded-full text-[7px] font-black uppercase tracking-widest flex items-center gap-1",
+                            isDeficient ? "bg-amber-500 text-white" :
+                                isToxic ? "bg-rose-600 text-white" :
+                                    "bg-emerald-600 text-white"
+                        )}>
+                            {isDeficient ? "Deficit" : isToxic ? "Toxicity" : "Optimal"}
                         </div>
                     </div>
 
-                    {/* Simplified Status Tags Section */}
-                    <div className="pt-6 pb-2 min-h-[80px]">
-                        <div className="flex flex-wrap gap-2.5 animate-in fade-in slide-in-from-bottom-2 duration-500">
-                            {isDeficient && info.deficiencySigns.map((s, i) => (
-                                <span key={i} className="text-[10px] font-black uppercase tracking-widest px-5 py-3 rounded-2xl bg-amber-50 dark:bg-amber-400/5 border border-amber-200 dark:border-amber-400/20 text-amber-700 dark:text-amber-400 shadow-sm">
-                                    {s}
-                                </span>
-                            ))}
-                            {isOptimal && info.benefits.map((b, i) => (
-                                <span key={i} className="text-[10px] font-black uppercase tracking-widest px-5 py-3 rounded-2xl bg-emerald-50 dark:bg-emerald-400/5 border border-emerald-200 dark:border-emerald-400/20 text-emerald-700 dark:text-emerald-400 shadow-sm">
-                                    {b}
-                                </span>
-                            ))}
-                            {isToxic && (info.toxicitySymptoms || ['No whole-food risks recorded.']).map((s, i) => (
-                                <span key={i} className="text-[10px] font-black uppercase tracking-widest px-5 py-3 rounded-2xl bg-rose-50 dark:bg-rose-400/5 border border-rose-200 dark:border-rose-400/20 text-rose-700 dark:text-rose-400 shadow-sm">
-                                    {s}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Whole Food Safety Advisory */}
-                    <div className="p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center gap-6 shadow-sm">
-                        <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 flex-shrink-0">
-                            <Sparkles size={32} />
-                        </div>
-                        <div className="space-y-1 text-center md:text-left">
-                            <h4 className="font-black text-[10px] uppercase tracking-[0.2em] text-emerald-600">Whole Food Safety Advisory</h4>
-                            <p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-relaxed">
-                                {(() => {
-                                    if (nutrientId === 'Protein') return "Real protein for real people. Your body is incredibly good at handling high protein from steak, eggs, or beans. The official 'limits' are just guidelines for extreme diets, not real-world safety risks.";
-                                    if (nutrientId === 'Magnesium') return "Nature’s Magnesium is 100% safe. You can’t consume too many seeds or greens—your body handles them perfectly. Only concentrated pills carry a risk of over-doing it.";
-                                    if (nutrientId === 'Sodium') return "The salt naturally found inside foods like celery or meat is totally safe. The real danger is almost always from added table salt and factory-made snacks, not the food itself.";
-                                    if (nutrientId === 'Vitamin A') return "Carrots and leafy greens are always safe. Your body only has trouble with 'pre-made' Vitamin A from things like animal liver or high-dose supplements.";
-                                    if (nutrientId === 'Vitamin K') return "Eat as much as you like! There is no known way to eat too much Vitamin K from natural foods like kale or spinach. Your body handles it all beautifully.";
-                                    if (nutrientId === 'Potassium') return "Healthy bodies are experts at balancing potassium. Unless you have specific kidney issues, your body safely flushes out what it doesn't need from your diet.";
-                                    if (nutrientId === 'Vitamin D') return "Sunlight and real food are safe. It’s almost impossible to get too much Vitamin D naturally. Hazards only happen with extremely high doses of synthetic pills.";
-                                    if (hasNoUL) return "This nutrient is naturally safe. When you eat whole foods, your body knows exactly how to absorb what it needs and simply ignores the rest.";
-                                    return `Whole foods are naturally balanced. Your body handles real food much better than it handles concentrated chemical supplements.`;
-                                })()}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Know Your Nutrients - Educational Section */}
-                    <div className="pt-12 border-t border-slate-100 dark:border-slate-800">
-                        <div className="bg-slate-50 dark:bg-slate-900/40 rounded-[3rem] p-10 border border-slate-100 dark:border-slate-800/50 flex flex-col md:flex-row gap-10 items-start">
-                            <div className="w-16 h-16 rounded-[2rem] bg-amber-500/10 flex items-center justify-center text-amber-500 shrink-0">
-                                <Lightbulb size={32} />
-                            </div>
-                            <div className="space-y-6 flex-1">
-                                <div className="space-y-1">
-                                    <h4 className="font-black text-xs uppercase tracking-[0.3em] text-amber-500">Know Your Nutrients</h4>
-                                    <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white">Biological Heritage & Significance</h3>
-                                </div>
-                                <p className="text-xl font-medium text-slate-700 dark:text-slate-300 leading-relaxed italic border-l-4 border-amber-500/20 pl-6 py-1">
-                                    "{info.history} {info.importance}"
-                                </p>
-
-                                {info.relatedFacts && info.relatedFacts.length > 0 && (
-                                    <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800/50">
-                                        <h5 className="font-black text-[10px] uppercase tracking-[0.2em] text-slate-400 mb-4">5 Fast Facts</h5>
-                                        <div className="grid grid-cols-1 gap-4">
-                                            {info.relatedFacts.map((fact, i) => (
-                                                <div key={i} className="flex gap-4 items-start group">
-                                                    <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform">
-                                                        <span className="text-xs font-black">{i + 1}</span>
-                                                    </div>
-                                                    <p className="text-sm font-bold text-slate-600 dark:text-slate-400 leading-relaxed group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">
-                                                        {fact}
-                                                    </p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
+                    <div className="flex-1 flex flex-col">
+                        <h1 className="text-4xl lg:text-7xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.8] mb-2 flex items-center gap-4">
+                            <span className="text-emerald-500">{nutrientInfoKey}</span>
+                            <button
+                                onClick={toggleFavorite}
+                                className={cn(
+                                    "w-10 h-10 rounded-full flex items-center justify-center transition-all border shrink-0",
+                                    isFav
+                                        ? "bg-rose-500 text-white border-rose-600 shadow-xl shadow-rose-500/20"
+                                        : "bg-white dark:bg-slate-900 text-slate-300 border-slate-200 dark:border-slate-800 hover:text-rose-500 hover:border-rose-200"
                                 )}
-                            </div>
-                        </div>
+                            >
+                                <Heart size={20} fill={isFav ? "currentColor" : "none"} />
+                            </button>
+                        </h1>
+                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[11px] leading-relaxed max-w-2xl italic">
+                            "{info.description}"
+                        </p>
+                    </div>
+                </div>
+
+                {/* Tabbed Content Section */}
+                <div className="pt-4 space-y-6">
+                    {/* Tab Bar */}
+                    <div className="flex items-center gap-2 p-1.5 bg-slate-100 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 w-fit">
+                        {[
+                            { id: 'foods', label: `${nutrientInfoKey} Rich Foods`, icon: UtensilsCrossed },
+                            { id: 'learn', label: 'Learn', icon: Lightbulb },
+                            { id: 'dosage', label: 'Dosage Simulator', icon: Activity },
+                        ].map(tab => {
+                            const Icon = tab.icon;
+                            const isActive = activeContentTab === tab.id;
+                            return (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveContentTab(tab.id)}
+                                    className={cn(
+                                        "flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-[0.12em] transition-all duration-300 whitespace-nowrap",
+                                        isActive
+                                            ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-lg"
+                                            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                    )}
+                                >
+                                    <Icon size={14} className={cn(isActive ? "text-emerald-500" : "text-slate-400")} />
+                                    <span className="hidden md:inline">{tab.label}</span>
+                                    <span className="md:hidden">{tab.id === 'foods' ? 'Foods' : tab.id === 'learn' ? 'Learn' : 'Dosage'}</span>
+                                </button>
+                            );
+                        })}
                     </div>
 
-                    {/* Nutrient Rich Foods Section (carded) */}
-                    <div className="pt-12 border-t border-slate-100 dark:border-slate-800/50">
-                        <div className="bg-slate-50 dark:bg-slate-900/40 rounded-[3rem] p-8 border border-slate-100 dark:border-slate-800/50 flex flex-col gap-6">
-                            <div className="flex items-start gap-6">
-                                <div className="w-16 h-16 rounded-[2rem] bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
-                                    <UtensilsCrossed size={32} />
-                                </div>
-                                <div className="flex-1 space-y-1">
-                                    <h4 className="font-black text-xs uppercase tracking-[0.3em] text-emerald-500">{nutrientInfoKey} Rich Foods</h4>
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Top bioavailable sources per 100g clinical sample</p>
-                                </div>
-                            </div>
-
-                            <div className="w-full">
-                                <div className="flex items-center justify-end">
-                                    <div className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-900/10 px-5 py-3 rounded-2xl border border-emerald-200 dark:border-emerald-800/30">
-                                        <button
-                                            onClick={() => setMeasureGrams(Math.max(10, measureGrams - 10))}
-                                            className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
-                                            title="Decrease grams"
-                                        >
-                                            <ChevronDown size={16} />
-                                        </button>
-                                        <div className="flex flex-col items-center gap-0.5 min-w-[65px] text-center">
-                                            <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Measure</span>
-                                            <span className="text-lg font-black text-emerald-600 dark:text-emerald-400">{measureGrams}g</span>
-                                        </div>
-                                        <button
-                                            onClick={() => setMeasureGrams(measureGrams + 10)}
-                                            className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
-                                            title="Increase grams"
-                                        >
-                                            <ChevronDown size={16} className="rotate-180" />
-                                        </button>
+                    {/* ===== TAB 1: Rich Foods ===== */}
+                    {activeContentTab === 'foods' && (
+                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            <div className="bg-slate-50 dark:bg-slate-900/40 rounded-[3rem] p-8 border border-slate-100 dark:border-slate-800/50 flex flex-col gap-6">
+                                <div className="flex items-start gap-6">
+                                    <div className="w-16 h-16 rounded-[2rem] bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                                        <UtensilsCrossed size={32} />
+                                    </div>
+                                    <div className="flex-1 space-y-1">
+                                        <h4 className="font-black text-xs uppercase tracking-[0.3em] text-emerald-500">{nutrientInfoKey} Rich Foods</h4>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Top bioavailable sources per 100g clinical sample</p>
                                     </div>
                                 </div>
 
-                                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                                    {loadingFoods ? (
-                                        [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20].map(i => <div key={i} className="h-32 w-full animate-pulse bg-slate-50 dark:bg-slate-900/50 rounded-[2rem]" />)
-                                    ) : topFoods.length > 0 ? (
-                                        topFoods.slice(0,20).map((food:any) => {
-                                            const nutrientValue = getNutrientValue(food);
-                                            const rdaPercent = targetVal > 0 ? (nutrientValue * (measureGrams/100) / targetVal) * 100 : 0;
-                                            const rdaPercentage = Math.round(rdaPercent);
-                                            return (
-                                                <button
-                                                    key={food.id}
-                                                    onClick={() => router.push(`/dashboard/library/foods/${food.id}`)}
-                                                    className="relative flex flex-col gap-3 p-4 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/5 transition-all group text-left"
-                                                >
-                                                    <div className="w-full h-24 rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500">
-                                                        {food.image ? (
-                                                            <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
-                                                        ) : (
-                                                            <div className="w-full h-full flex items-center justify-center text-slate-200 dark:text-slate-800">
-                                                                <Beef size={28} />
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div className="absolute top-3 right-3 bg-emerald-500 text-white px-2 py-0.5 rounded-md text-[11px] font-black uppercase tracking-wider shadow-lg z-30">
-                                                        {rdaPercentage > 0 ? `${rdaPercentage}%` : '—'}
-                                                    </div>
+                                <div className="w-full">
+                                    <div className="flex items-center justify-end">
+                                        <div className="flex items-center gap-3 bg-emerald-50 dark:bg-emerald-900/10 px-5 py-3 rounded-2xl border border-emerald-200 dark:border-emerald-800/30">
+                                            <button
+                                                onClick={() => setMeasureGrams(Math.max(10, measureGrams - 10))}
+                                                className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                                                title="Decrease grams"
+                                            >
+                                                <ChevronDown size={16} />
+                                            </button>
+                                            <div className="flex flex-col items-center gap-0.5 min-w-[65px] text-center">
+                                                <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Measure</span>
+                                                <span className="text-lg font-black text-emerald-600 dark:text-emerald-400">{measureGrams}g</span>
+                                            </div>
+                                            <button
+                                                onClick={() => setMeasureGrams(measureGrams + 10)}
+                                                className="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                                                title="Increase grams"
+                                            >
+                                                <ChevronDown size={16} className="rotate-180" />
+                                            </button>
+                                        </div>
+                                    </div>
 
-                                                    <div className="space-y-2 z-10 min-w-0">
-                                                        <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                                            View Source
-                                                        </p>
-                                                        <p className="text-xs font-black uppercase tracking-tight text-slate-900 dark:text-white leading-tight italic line-clamp-2">
-                                                            {food.common_name || food.name}
-                                                        </p>
-                                                        
-                                                        <div className="pt-1">
-                                                            <div className="flex items-center justify-between mb-1.5">
-                                                                <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider">
-                                                                    {(nutrientValue * (measureGrams / 100)).toFixed(1)} {unit}
-                                                                </span>
-                                                            </div>
-                                                            <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                                                                <div 
-                                                                    className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-300"
-                                                                    style={{ width: `${Math.min(rdaPercent,100)}%` }}
-                                                                />
-                                                            </div>
-                                                            <div className="mt-2 flex items-center justify-between">
-                                                                <span className="text-[11px] font-black text-slate-500 uppercase tracking-wider">Portion</span>
-                                                                <span className="text-[11px] font-black text-emerald-500 uppercase tracking-wider">{rdaPercentage > 0 ? `${rdaPercentage}% RDA` : '—'}</span>
+                                    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                                        {loadingFoods ? (
+                                            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map(i => <div key={i} className="h-32 w-full animate-pulse bg-slate-50 dark:bg-slate-900/50 rounded-[2rem]" />)
+                                        ) : topFoods.length > 0 ? (
+                                            topFoods.slice(0, 20).map((food: any) => {
+                                                const nutrientValue = getNutrientValue(food);
+                                                const rdaPercent = targetVal > 0 ? (nutrientValue * (measureGrams / 100) / targetVal) * 100 : 0;
+                                                const rdaPercentage = Math.round(rdaPercent);
+                                                return (
+                                                    <button
+                                                        key={food.id}
+                                                        onClick={() => router.push(`/dashboard/library/foods/${food.id}`)}
+                                                        className="relative flex flex-col gap-3 p-4 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/5 transition-all group text-left"
+                                                    >
+                                                        <div className="w-full h-24 rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500">
+                                                            {food.image ? (
+                                                                <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <div className="w-full h-full flex items-center justify-center text-slate-200 dark:text-slate-800">
+                                                                    <Beef size={28} />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="absolute top-3 right-3 bg-emerald-500 text-white px-2 py-0.5 rounded-md text-[11px] font-black uppercase tracking-wider shadow-lg z-30">
+                                                            {rdaPercentage > 0 ? `${rdaPercentage}%` : '—'}
+                                                        </div>
+
+                                                        <div className="space-y-2 z-10 min-w-0">
+                                                            <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                                                View Source
+                                                            </p>
+                                                            <p className="text-xs font-black uppercase tracking-tight text-slate-900 dark:text-white leading-tight italic line-clamp-2">
+                                                                {food.common_name || food.name}
+                                                            </p>
+
+                                                            <div className="pt-1">
+                                                                <div className="flex items-center justify-between mb-1.5">
+                                                                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-wider">
+                                                                        {(nutrientValue * (measureGrams / 100)).toFixed(1)} {unit}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                                                    <div
+                                                                        className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-300"
+                                                                        style={{ width: `${Math.min(rdaPercent, 100)}%` }}
+                                                                    />
+                                                                </div>
+                                                                <div className="mt-2 flex items-center justify-between">
+                                                                    <span className="text-[11px] font-black text-slate-500 uppercase tracking-wider">Portion</span>
+                                                                    <span className="text-[11px] font-black text-emerald-500 uppercase tracking-wider">{rdaPercentage > 0 ? `${rdaPercentage}% RDA` : '—'}</span>
+                                                                </div>
                                                             </div>
                                                         </div>
+                                                    </button>
+                                                )
+                                            })
+                                        ) : (
+                                            <div className="col-span-full py-16 text-center bg-slate-50/50 dark:bg-slate-900/30 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
+                                                <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest italic">No whole food scans recorded for this profile.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ===== TAB 2: Learn ===== */}
+                    {activeContentTab === 'learn' && (
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            {/* Know Your Nutrients */}
+                            <div className="bg-slate-50 dark:bg-slate-900/40 rounded-[3rem] p-10 border border-slate-100 dark:border-slate-800/50 flex flex-col md:flex-row gap-10 items-start">
+                                <div className="w-16 h-16 rounded-[2rem] bg-amber-500/10 flex items-center justify-center text-amber-500 shrink-0">
+                                    <Lightbulb size={32} />
+                                </div>
+                                <div className="space-y-6 flex-1">
+                                    <div className="space-y-1">
+                                        <h4 className="font-black text-xs uppercase tracking-[0.3em] text-amber-500">Know Your Nutrients</h4>
+                                        <h3 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white">Biological Heritage & Significance</h3>
+                                    </div>
+                                    <p className="text-xl font-medium text-slate-700 dark:text-slate-300 leading-relaxed italic border-l-4 border-amber-500/20 pl-6 py-1">
+                                        "{info.history} {info.importance}"
+                                    </p>
+
+                                    {info.relatedFacts && info.relatedFacts.length > 0 && (
+                                        <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800/50">
+                                            <h5 className="font-black text-[10px] uppercase tracking-[0.2em] text-slate-400 mb-4">5 Fast Facts</h5>
+                                            <div className="grid grid-cols-1 gap-4">
+                                                {info.relatedFacts.map((fact, i) => (
+                                                    <div key={i} className="flex gap-4 items-start group">
+                                                        <div className="w-6 h-6 rounded-full bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0 mt-0.5 group-hover:scale-110 transition-transform">
+                                                            <span className="text-xs font-black">{i + 1}</span>
+                                                        </div>
+                                                        <p className="text-sm font-bold text-slate-600 dark:text-slate-400 leading-relaxed group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">
+                                                            {fact}
+                                                        </p>
                                                     </div>
-                                                </button>
-                                            )
-                                        })
-                                    ) : (
-                                        <div className="col-span-full py-16 text-center bg-slate-50/50 dark:bg-slate-900/30 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
-                                            <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest italic">No whole food scans recorded for this profile.</p>
+                                                ))}
+                                            </div>
                                         </div>
                                     )}
                                 </div>
                             </div>
+
+                            {/* Whole Food Safety Advisory */}
+                            <div className="p-6 rounded-[2rem] bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center gap-6 shadow-sm">
+                                <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 flex-shrink-0">
+                                    <Sparkles size={32} />
+                                </div>
+                                <div className="space-y-1 text-center md:text-left">
+                                    <h4 className="font-black text-[10px] uppercase tracking-[0.2em] text-emerald-600">Whole Food Safety Advisory</h4>
+                                    <p className="text-sm font-bold text-slate-700 dark:text-slate-300 leading-relaxed">
+                                        {(() => {
+                                            if (nutrientId === 'Protein') return "Real protein for real people. Your body is incredibly good at handling high protein from steak, eggs, or beans. The official 'limits' are just guidelines for extreme diets, not real-world safety risks.";
+                                            if (nutrientId === 'Magnesium') return "Nature's Magnesium is 100% safe. You can't consume too many seeds or greens—your body handles them perfectly. Only concentrated pills carry a risk of over-doing it.";
+                                            if (nutrientId === 'Sodium') return "The salt naturally found inside foods like celery or meat is totally safe. The real danger is almost always from added table salt and factory-made snacks, not the food itself.";
+                                            if (nutrientId === 'Vitamin A') return "Carrots and leafy greens are always safe. Your body only has trouble with 'pre-made' Vitamin A from things like animal liver or high-dose supplements.";
+                                            if (nutrientId === 'Vitamin K') return "Eat as much as you like! There is no known way to eat too much Vitamin K from natural foods like kale or spinach. Your body handles it all beautifully.";
+                                            if (nutrientId === 'Potassium') return "Healthy bodies are experts at balancing potassium. Unless you have specific kidney issues, your body safely flushes out what it doesn't need from your diet.";
+                                            if (nutrientId === 'Vitamin D') return "Sunlight and real food are safe. It's almost impossible to get too much Vitamin D naturally. Hazards only happen with extremely high doses of synthetic pills.";
+                                            if (hasNoUL) return "This nutrient is naturally safe. When you eat whole foods, your body knows exactly how to absorb what it needs and simply ignores the rest.";
+                                            return `Whole foods are naturally balanced. Your body handles real food much better than it handles concentrated chemical supplements.`;
+                                        })()}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    )}
+
+                    {/* ===== TAB 3: Dosage Simulator ===== */}
+                    {activeContentTab === 'dosage' && (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                            {/* Intake Box */}
+                            <div className="flex items-center justify-between px-2">
+                                <div className="space-y-1">
+                                    <h4 className="font-black text-[11px] uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-400">Dosage Simulator</h4>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase">Slide to simulate intake levels and see biological thresholds</p>
+                                </div>
+                            </div>
+
+                            {/* Simulator Slider */}
+                            <div className="space-y-12">
+                                <div className="relative pt-6 pb-2">
+                                    <input
+                                        type="range"
+                                        min="0"
+                                        max={dynamicMax}
+                                        step={dynamicMax / 100}
+                                        value={simValue}
+                                        onChange={(e) => setSimValue(parseFloat(e.target.value))}
+                                        className="w-full h-3 bg-slate-200 dark:bg-slate-800 rounded-full appearance-none cursor-pointer accent-emerald-500 hover:accent-emerald-600 transition-all [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-emerald-500 [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:appearance-none"
+                                    />
+
+                                    <div className="absolute top-0 left-0 w-full flex justify-between px-1 text-[8px] font-black uppercase text-slate-400 tracking-widest pointer-events-none">
+                                        <span>Zero</span>
+                                        <div
+                                            className="absolute h-4 border-l-2 border-dashed border-emerald-500/50 flex flex-col items-center"
+                                            style={{ left: `${(targetVal / dynamicMax) * 100}%` }}
+                                        >
+                                            <span className="mt-4 text-emerald-600 font-black">Target</span>
+                                        </div>
+                                        {!hasNoUL && (
+                                            <div
+                                                className="absolute h-4 border-l-2 border-dashed border-rose-500/50 flex flex-col items-center"
+                                                style={{ left: `${(ulVal / dynamicMax) * 100}%` }}
+                                            >
+                                                <span className="mt-4 text-rose-600 font-black">UL</span>
+                                            </div>
+                                        )}
+                                        <span>High Hazard</span>
+                                    </div>
+                                </div>
+
+                                {/* Status Tags */}
+                                <div className="pt-6 pb-2 min-h-[80px]">
+                                    <div className="flex flex-wrap gap-2.5 animate-in fade-in slide-in-from-bottom-2 duration-500">
+                                        {isDeficient && info.deficiencySigns.map((s, i) => (
+                                            <span key={i} className="text-[10px] font-black uppercase tracking-widest px-5 py-3 rounded-2xl bg-amber-50 dark:bg-amber-400/5 border border-amber-200 dark:border-amber-400/20 text-amber-700 dark:text-amber-400 shadow-sm">
+                                                {s}
+                                            </span>
+                                        ))}
+                                        {isOptimal && info.benefits.map((b, i) => (
+                                            <span key={i} className="text-[10px] font-black uppercase tracking-widest px-5 py-3 rounded-2xl bg-emerald-50 dark:bg-emerald-400/5 border border-emerald-200 dark:border-emerald-400/20 text-emerald-700 dark:text-emerald-400 shadow-sm">
+                                                {b}
+                                            </span>
+                                        ))}
+                                        {isToxic && (info.toxicitySymptoms || ['No whole-food risks recorded.']).map((s, i) => (
+                                            <span key={i} className="text-[10px] font-black uppercase tracking-widest px-5 py-3 rounded-2xl bg-rose-50 dark:bg-rose-400/5 border border-rose-200 dark:border-rose-400/20 text-rose-700 dark:text-rose-400 shadow-sm">
+                                                {s}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
-            </div>
             </div>
         </div>
     );
