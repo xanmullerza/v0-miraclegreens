@@ -157,6 +157,8 @@ function FamilyMemberForm({ initialData, onSave, onCancel }: { initialData?: Par
     );
 }
 
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetClose } from '@/components/ui/sheet';
+
 function ProfilePageContent() {
     const {
         profile,
@@ -280,11 +282,14 @@ function ProfilePageContent() {
         </div>
     );
 
+    const [showRDASheet, setShowRDASheet] = useState(false);
+
     return (
         <div className="max-w-7xl mx-auto animate-in fade-in duration-500 px-4 py-8">
-            <div className="flex flex-col lg:flex-row gap-6 items-start">
+            <Sheet open={showRDASheet} onOpenChange={setShowRDASheet}>
+                <div className="flex flex-col lg:flex-row gap-6 items-start">
                 {/* Main Content (Compact Settings) */}
-                <div className="w-full lg:w-1/2 space-y-8 pb-24">
+                <div className="w-full lg:w-1/2 space-y-8 pb-32">
                     <div className="grid grid-cols-1 gap-8">
                         {/* Basic Info */}
                         <section className="space-y-6">
@@ -491,7 +496,7 @@ function ProfilePageContent() {
                     </div>
 
                     {/* Save Button */}
-                    <div className="flex justify-center pt-8 border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex flex-col gap-4 justify-center pt-8 border-t border-slate-100 dark:border-slate-800">
                         <Button
                             onClick={handleSave}
                             className="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-8 h-12 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-2 text-xs uppercase tracking-widest"
@@ -499,26 +504,30 @@ function ProfilePageContent() {
                             <Save size={16} />
                             Save
                         </Button>
+                        <Button
+                            variant="outline"
+                            className="w-full mt-4 font-black text-xs uppercase tracking-widest border-emerald-500 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/10"
+                            onClick={() => setShowRDASheet(true)}
+                        >
+                            Recommended Intake
+                        </Button>
                     </div>
                 </div>
 
-                {/* Sticky Sidebar (Full-heightish Split) */}
-                <aside className="w-full lg:w-1/2 lg:sticky lg:top-8 space-y-6">
-                    <div className="bg-slate-950 border border-slate-800 rounded-[2.5rem] p-6 pt-7 shadow-2xl relative overflow-hidden group">
-                        {/* Background Decoration */}
-                        <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors duration-700" />
-
-                        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 pr-1">
+                {/* RDA Sheet Slider */}
+                <SheetContent side="left" className="max-w-md w-full bg-slate-950 border-l-0 border-r border-slate-800 p-0">
+                    <SheetHeader className="bg-slate-900/80 p-6 border-b border-slate-800 rounded-t-3xl">
+                        <SheetTitle className="text-lg font-black text-emerald-400 uppercase tracking-widest">Recommended Intake</SheetTitle>
+                    </SheetHeader>
+                    <div className="p-6 overflow-y-auto custom-scrollbar h-full">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                             {Object.entries(combinedRDAs).map(([nutrient, value]) => {
                                 const unit = (nutrient === 'Energy') ? energyUnit : (nutrient === 'Protein' || nutrient === 'Carbs' || nutrient === 'Fat' || nutrient === 'Fiber' || nutrient === 'ALA' || nutrient.includes('_g')) ? 'g' : (nutrient === 'Vitamin D') ? 'IU' : (nutrient.includes('Folate') || nutrient.includes('B12') || nutrient.includes('Biotin') || nutrient.includes('Selenium') || nutrient === 'Vitamin A' || nutrient === 'Vitamin K' || nutrient.includes('EPA')) ? 'µg' : 'mg';
-
                                 const displayVal = value < 1 ? value.toFixed(2) : value < 10 ? value.toFixed(1) : Math.round(value);
-
                                 return (
                                     <div key={nutrient} className="bg-slate-900/50 border border-slate-800/50 px-4 py-3 rounded-2xl flex items-center justify-between hover:border-blue-500/30 transition-all hover:bg-slate-900 group/item">
                                         <div className="flex flex-col min-w-0 pr-2">
                                             <p className="text-[11px] uppercase font-black text-slate-400 group-hover/item:text-slate-300 transition-colors leading-none truncate">{nutrient}</p>
-                                            {/* Optional constituent label */}
                                             {['ALA', 'EPA', 'Histidine', 'Leucine'].includes(nutrient) && (
                                                 <span className="text-[7px] text-blue-500 font-bold uppercase mt-1">Constituent</span>
                                             )}
@@ -531,10 +540,10 @@ function ProfilePageContent() {
                                 );
                             })}
                         </div>
-
                     </div>
-                </aside>
-            </div>
+                </SheetContent>
+                </div> {/* <-- Close flex container */}
+            </Sheet>
         </div>
     );
 }
