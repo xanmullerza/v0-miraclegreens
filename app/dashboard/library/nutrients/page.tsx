@@ -224,73 +224,110 @@ export default function NutrientsPage() {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 space-y-12 p-4 md:p-8 pb-24 max-w-5xl mx-auto w-full">
+            <div className="flex-1 space-y-12 p-4 md:p-8 pb-24 max-w-3xl mx-auto w-full">
                 {/* Advisory Card */}
-                <div className="bg-gradient-to-br from-emerald-50 to-blue-50 dark:from-emerald-950/20 dark:to-blue-950/20 border-2 border-emerald-200 dark:border-emerald-800/50 rounded-2xl p-8 md:p-10 shadow-sm">
-                    <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                        <div className="flex-shrink-0 w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center">
-                            <Sparkles size={32} className="text-white" />
+                <section className="space-y-6">
+                    <div className="flex items-center gap-4">
+                        <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500">
+                            <Sparkles size={24} className="stroke-[2.5]" />
                         </div>
-                        <div className="flex-1">
-                            <h2 className="text-2xl md:text-3xl font-black uppercase tracking-tight text-slate-900 dark:text-white mb-2">
-                                Explore Essential Nutrients
-                            </h2>
-                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                                Click on the <span className="font-bold">Macros</span>, <span className="font-bold">Minerals</span>, or <span className="font-bold">Vitamins</span> filters above to discover detailed information about each nutrient, including recommended daily intake, food sources, health benefits, and more.
-                            </p>
+                        <div>
+                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Explore Essential Nutrients</h2>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Learn About Your Health</p>
                         </div>
                     </div>
-                </div>
+                    <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50">
+                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                            Click on the <span className="font-bold">Macros</span>, <span className="font-bold">Minerals</span>, or <span className="font-bold">Vitamins</span> filters above to discover detailed information about each nutrient, including recommended daily intake, food sources, health benefits, and more.
+                        </p>
+                    </div>
+                </section>
 
                 {/* Essential Nutrients Guide */}
                 <div className="space-y-8 prose prose-invert max-w-none">
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 md:p-10 space-y-6">
-                        <h3 className="text-2xl font-black uppercase tracking-wide text-slate-900 dark:text-white">
-                            Understanding Essential Nutrients
-                        </h3>
-                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                            Essential nutrients are substances your body needs but cannot make on its own. Think of them like ingredients your body needs daily to work properly. Without them, your body can't do basic things like get energy, build muscle, fight infections, or think clearly.
-                        </p>
-                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                            There are six main groups of nutrients: carbohydrates (energy), proteins (building material), fats (hormone and energy support), vitamins (help with body functions), minerals (strengthen bones and regulate body processes), and water. We need all of them to stay healthy.
-                        </p>
-                    </div>
+                    {/* Understanding Essential Nutrients */}
+                    <section className="space-y-6">
+                        <div className="flex items-center gap-4">
+                            <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500">
+                                <Activity size={24} className="stroke-[2.5]" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Understanding Essential Nutrients</h3>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">The Basics</p>
+                            </div>
+                        </div>
+                        <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-4 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50">
+                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
+                                Essential nutrients are substances your body needs but cannot make on its own. Think of them like ingredients your body needs daily to work properly. Without them, your body can't do basic things like get energy, build muscle, fight infections, or think clearly.
+                            </p>
+                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
+                                There are six main groups of nutrients: carbohydrates (energy), proteins (building material), fats (hormone and energy support), vitamins (help with body functions), minerals (strengthen bones and regulate body processes), and water. We need all of them to stay healthy.
+                            </p>
+                        </div>
+                    </section>
 
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 md:p-10 space-y-6">
-                        <h3 className="text-2xl font-black uppercase tracking-wide text-slate-900 dark:text-white">
-                            Why Minerals Matter
-                        </h3>
-                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                            Minerals are natural substances found in foods that your body needs to function. Common minerals like calcium, magnesium, iron, and potassium do important jobs: calcium makes bones strong, iron carries oxygen in your blood, potassium keeps your heart beating properly, and magnesium helps your muscles relax.
-                        </p>
-                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                            Without enough minerals, your body struggles. For example, if you don't get enough iron, you feel tired and weak. If you don't get enough calcium, your bones become weak and fragile. The good news is that eating a variety of foods—vegetables, whole grains, nuts, and beans—gives you the minerals you need to feel your best and stay healthy.
-                        </p>
-                    </div>
+                    {/* Why Minerals Matter */}
+                    <section className="space-y-6">
+                        <div className="flex items-center gap-4">
+                            <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500">
+                                <Gem size={24} className="stroke-[2.5]" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Why Minerals Matter</h3>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Building Blocks of Health</p>
+                            </div>
+                        </div>
+                        <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-4 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50">
+                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
+                                Minerals are natural substances found in foods that your body needs to function. Common minerals like calcium, magnesium, iron, and potassium do important jobs: calcium makes bones strong, iron carries oxygen in your blood, potassium keeps your heart beating properly, and magnesium helps your muscles relax.
+                            </p>
+                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
+                                Without enough minerals, your body struggles. For example, if you don't get enough iron, you feel tired and weak. If you don't get enough calcium, your bones become weak and fragile. The good news is that eating a variety of foods—vegetables, whole grains, nuts, and beans—gives you the minerals you need to feel your best and stay healthy.
+                            </p>
+                        </div>
+                    </section>
 
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 md:p-10 space-y-6">
-                        <h3 className="text-2xl font-black uppercase tracking-wide text-slate-900 dark:text-white">
-                            The Vital Role of Vitamins
-                        </h3>
-                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                            Vitamins are organic compounds that keep your body running smoothly. They help turn food into energy, boost your immune system, heal wounds, and protect your cells from damage. There are 13 essential vitamins your body can't do without.
-                        </p>
-                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                            Think of vitamins like the spark plugs in a car—they make things happen. Vitamin C helps you fight colds and makes your skin glow. B vitamins give you energy and keep your brain working well. Vitamin D helps your body absorb calcium and keeps you feeling happy. Without the right vitamins, you get tired, get sick more often, and don't feel like yourself. Eating fruits, vegetables, and whole foods makes sure you get all the vitamins you need.
-                        </p>
-                    </div>
+                    {/* The Vital Role of Vitamins */}
+                    <section className="space-y-6">
+                        <div className="flex items-center gap-4">
+                            <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500">
+                                <Battery size={24} className="stroke-[2.5]" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">The Vital Role of Vitamins</h3>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Essential Compounds</p>
+                            </div>
+                        </div>
+                        <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-4 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50">
+                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
+                                Vitamins are organic compounds that keep your body running smoothly. They help turn food into energy, boost your immune system, heal wounds, and protect your cells from damage. There are 13 essential vitamins your body can't do without.
+                            </p>
+                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
+                                Think of vitamins like the spark plugs in a car—they make things happen. Vitamin C helps you fight colds and makes your skin glow. B vitamins give you energy and keep your brain working well. Vitamin D helps your body absorb calcium and keeps you feeling happy. Without the right vitamins, you get tired, get sick more often, and don't feel like yourself. Eating fruits, vegetables, and whole foods makes sure you get all the vitamins you need.
+                            </p>
+                        </div>
+                    </section>
 
-                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 md:p-10 space-y-6">
-                        <h3 className="text-2xl font-black uppercase tracking-wide text-slate-900 dark:text-white">
-                            Macronutrients: Your Body's Fuel and Structure
-                        </h3>
-                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                            Macronutrients are the big three: carbs, proteins, and fats. You need them in larger amounts because they provide energy and build your body. Carbs are your brain's favorite fuel—they give you energy to think and move. Proteins build your muscles, skin, and hair. Fats help your brain work, protect your organs, and help your body absorb vitamins.
-                        </p>
-                        <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                            Fiber is also important—it helps your digestion work smoothly, keeps your blood sugar stable, and makes you feel full longer. The secret to good health is eating the right balance of all these nutrients. That's where this tool comes in handy. By exploring individual nutrients, you'll learn which foods give you what you need, so you can eat smart and feel great.
-                        </p>
-                    </div>
+                    {/* Macronutrients */}
+                    <section className="space-y-6">
+                        <div className="flex items-center gap-4">
+                            <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500">
+                                <Zap size={24} className="stroke-[2.5]" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Macronutrients: Your Body's Fuel</h3>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Energy & Structure</p>
+                            </div>
+                        </div>
+                        <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-4 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50">
+                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
+                                Macronutrients are the big three: carbs, proteins, and fats. You need them in larger amounts because they provide energy and build your body. Carbs are your brain's favorite fuel—they give you energy to think and move. Proteins build your muscles, skin, and hair. Fats help your brain work, protect your organs, and help your body absorb vitamins.
+                            </p>
+                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
+                                Fiber is also important—it helps your digestion work smoothly, keeps your blood sugar stable, and makes you feel full longer. The secret to good health is eating the right balance of all these nutrients. That's where this tool comes in handy. By exploring individual nutrients, you'll learn which foods give you what you need, so you can eat smart and feel great.
+                            </p>
+                        </div>
+                    </section>
                 </div>
             </div>
         </div>
