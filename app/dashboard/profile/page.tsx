@@ -290,8 +290,8 @@ function ProfilePageContent() {
                 <div className="flex flex-col lg:flex-row gap-6 items-start">
                 {/* Main Content (Compact Settings) */}
                 <div className="w-full lg:w-1/2 space-y-8 pb-32">
-                    <div className="grid grid-cols-1 gap-8">
-                        {/* Basic Info */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Identification Card */}
                         <section className="space-y-6">
                             <div className="flex items-center gap-2 text-emerald-500 mb-2">
                                 <User size={20} />
@@ -307,7 +307,6 @@ function ProfilePageContent() {
                                         className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl"
                                     />
                                 </div>
-
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
                                     <div className="space-y-2">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Gender</Label>
@@ -360,8 +359,36 @@ function ProfilePageContent() {
                             </div>
                         </section>
 
+                        {/* Goals Card */}
+                        <section className="space-y-6">
+                            <div className="flex items-center gap-2 text-emerald-500 mb-2">
+                                <Activity size={20} />
+                                <h2 className="text-sm font-black uppercase tracking-[0.2em]">Goals</h2>
+                            </div>
+                            <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 space-y-8 shadow-sm">
+                                {/* Biological Goal */}
+                                <div className="space-y-4">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Goal</Label>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <GoalCard type="lose-fat" label="Lose Fat" selected={formData.goal === 'lose-fat'} onClick={() => setFormData({ ...formData, goal: 'lose-fat' })} icon={TrendingDown} />
+                                        <GoalCard type="maintain" label="Maintain" selected={formData.goal === 'maintain'} onClick={() => setFormData({ ...formData, goal: 'maintain' })} icon={Activity} />
+                                        <GoalCard type="build-muscle" label="Build Muscle" selected={formData.goal === 'build-muscle'} onClick={() => setFormData({ ...formData, goal: 'build-muscle' })} icon={Dumbbell} />
+                                    </div>
+                                </div>
+                                {/* Activity Level */}
+                                <div className="space-y-4">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Activity Level</Label>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        <GoalCard type="sedentary" label="Sedentary" selected={formData.activityLevel === 'sedentary'} onClick={() => setFormData({ ...formData, activityLevel: 'sedentary' })} icon={User} />
+                                        <GoalCard type="light" label="Lightly Active" selected={formData.activityLevel === 'light'} onClick={() => setFormData({ ...formData, activityLevel: 'light' })} icon={ChevronRight} />
+                                        <GoalCard type="moderate" label="Moderate" selected={formData.activityLevel === 'moderate'} onClick={() => setFormData({ ...formData, activityLevel: 'moderate' })} icon={Zap} />
+                                        <GoalCard type="active" label="Very Active" selected={formData.activityLevel === 'active'} onClick={() => setFormData({ ...formData, activityLevel: 'active' })} icon={Flame} />
+                                    </div>
+                                </div>
+                            </div>
+                        {/* End grid */}
+
                         {/* FAMILY PROTOCOLS */}
-                        <section className="space-y-6 hidden">
                             <div className="flex items-center gap-2 text-emerald-500 mb-2">
                                 <Users size={20} />
                                 <h2 className="text-sm font-black uppercase tracking-[0.2em]">Family Protocols</h2>
@@ -536,7 +563,7 @@ function ProfilePageContent() {
                         </div>
                     </div>
                 </SheetContent>
-                </div> {/* <-- Close flex container */}
+            </div> {/* <-- Close flex container */}
             </Sheet>
         </div>
     );
