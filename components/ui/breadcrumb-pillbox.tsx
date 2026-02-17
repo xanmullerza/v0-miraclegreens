@@ -70,9 +70,13 @@ export function BreadcrumbPillbox({
                                         ? "text-indigo-500 bg-indigo-50/50"
                                         : "text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/10"
                             )}
-                            title={isFilterExpanded ? "Close Filters" : "Open Filters"}
+                            title={isFilterExpanded ? "Back to Breadcrumbs" : "Open Filters"}
                         >
-                            <Filter size={18} className={cn(isFilterExpanded && "scale-110 transition-transform")} />
+                            {isFilterExpanded ? (
+                                <LayoutGrid size={18} className="animate-in zoom-in spin-in-90 duration-300" />
+                            ) : (
+                                <Filter size={18} className="animate-in zoom-in duration-300" />
+                            )}
                         </button>
                     ) : showHomeButton && (
                         <button
