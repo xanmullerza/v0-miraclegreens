@@ -299,20 +299,11 @@ function ProfilePageContent() {
                             </div>
                             <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 space-y-6 shadow-sm">
                                 <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Full Name</Label>
-                                    <Input
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        placeholder="Enter your full name"
-                                        className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nickname</Label>
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Name</Label>
                                     <Input
                                         value={formData.nickname}
                                         onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
-                                        placeholder="Codenames or nicknames"
+                                        placeholder="Enter your name"
                                         className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl"
                                     />
                                 </div>
@@ -341,7 +332,8 @@ function ProfilePageContent() {
                                             type="number"
                                             value={formData.age}
                                             onChange={(e) => setFormData({ ...formData, age: e.target.value ? Number(e.target.value) : '' })}
-                                            className="bg-transparent border-none text-xl font-bold h-10 mt-1 focus-visible:ring-0 px-0"
+                                            placeholder="Enter your age"
+                                            className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -350,7 +342,8 @@ function ProfilePageContent() {
                                             type="number"
                                             value={formData.weight}
                                             onChange={(e) => setFormData({ ...formData, weight: e.target.value ? Number(e.target.value) : '' })}
-                                            className="bg-transparent border-none text-xl font-bold h-10 mt-1 focus-visible:ring-0 px-0"
+                                            placeholder="Enter your weight"
+                                            className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -359,7 +352,8 @@ function ProfilePageContent() {
                                             type="number"
                                             value={formData.height}
                                             onChange={(e) => setFormData({ ...formData, height: e.target.value ? Number(e.target.value) : '' })}
-                                            className="bg-transparent border-none text-xl font-bold h-10 mt-1 focus-visible:ring-0 px-0"
+                                            placeholder="Enter your height"
+                                            className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl"
                                         />
                                     </div>
                                 </div>
