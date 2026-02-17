@@ -149,8 +149,10 @@ export const useRDA = (age: number | undefined, gender: 'male' | 'female' | unde
 
                 if (error || !data || data.length === 0) {
                     if (isMounted) {
-                        // If DB call fails or returns empty, use fallback
-                        console.warn('Falling back to hardcoded RDAs due to:', error?.message || 'No data found');
+                        // If DB call fails or returns empty, use fallback silently unless there's an actual error
+                        if (error) {
+                            console.warn('Falling back to hardcoded RDAs due to:', error.message);
+                        }
                         setRdas(getFallbackRDAs(age, gender, calories, weight));
                     }
                     return;
