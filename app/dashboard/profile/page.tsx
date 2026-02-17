@@ -289,331 +289,334 @@ function ProfilePageContent() {
         <div className="max-w-7xl mx-auto animate-in fade-in duration-500 px-4 py-8">
             <Sheet open={showRDASheet} onOpenChange={setShowRDASheet}>
                 <div className="flex flex-col lg:flex-row gap-6 items-start justify-center">
-                {/* Main Content (Compact Settings) */}
-                <div className="max-w-2xl space-y-8 pb-32">
-                    <div className="grid grid-cols-1 gap-8">
-                        {/* Identification Card */}
-                        <section className="space-y-6">
-                            <div className="flex items-center gap-4">
-                                <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                    <User size={24} className="stroke-[2.5]" />
+                    {/* Main Content (Compact Settings) */}
+                    <div className="max-w-2xl space-y-8 pb-32">
+                        <div className="grid grid-cols-1 gap-8">
+                            {/* Identification Card */}
+                            <section className="space-y-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
+                                        <User size={24} className="stroke-[2.5]" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Identification</h2>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Know Your Profile</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Identification</h2>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Know Your Profile</p>
+                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Name</Label>
+                                        <Input
+                                            value={formData.nickname}
+                                            onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
+                                            placeholder="Enter your name"
+                                            className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Gender</Label>
+                                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl h-8 mt-1">
+                                                <button
+                                                    onClick={() => setFormData({ ...formData, gender: 'male' })}
+                                                    className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'male' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
+                                                >
+                                                    M
+                                                </button>
+                                                <button
+                                                    onClick={() => setFormData({ ...formData, gender: 'female' })}
+                                                    className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'female' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
+                                                >
+                                                    F
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Age</Label>
+                                            <Input
+                                                type="number"
+                                                value={formData.age}
+                                                onChange={(e) => setFormData({ ...formData, age: e.target.value ? Number(e.target.value) : '' })}
+                                                placeholder="Enter your age"
+                                                className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Weight ({measurementUnit === 'metric' ? 'kg' : 'lb'})</Label>
+                                            <Input
+                                                type="number"
+                                                value={formData.weight}
+                                                onChange={(e) => setFormData({ ...formData, weight: e.target.value ? Number(e.target.value) : '' })}
+                                                placeholder="Enter your weight"
+                                                className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Height ({measurementUnit === 'metric' ? 'cm' : 'ft/in'})</Label>
+                                            <Input
+                                                type="number"
+                                                value={formData.height}
+                                                onChange={(e) => setFormData({ ...formData, height: e.target.value ? Number(e.target.value) : '' })}
+                                                placeholder="Enter your height"
+                                                className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Name</Label>
-                                    <Input
-                                        value={formData.nickname}
-                                        onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
-                                        placeholder="Enter your name"
-                                        className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl"
+                            </section>
+
+                            {/* Dietary Profile Card */}
+                            <section className="space-y-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
+                                        <Utensils size={24} className="stroke-[2.5]" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Dietary Profile</h2>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Nutritional Approach</p>
+                                    </div>
+                                </div>
+                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                    {/* Dietary Protocol */}
+                                    <div className="space-y-4">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Dietary Protocol</Label>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                            <GoalCard type="anything" label="Balanced" selected={formData.dietType === 'anything'} onClick={() => setFormData({ ...formData, dietType: 'anything' })} icon={Apple} />
+                                            <GoalCard type="pescatarian" label="Pescatarian" selected={formData.dietType === 'pescatarian'} onClick={() => setFormData({ ...formData, dietType: 'pescatarian' })} icon={Fish} />
+                                            <GoalCard type="vegetarian" label="Vegetarian" selected={formData.dietType === 'vegetarian'} onClick={() => setFormData({ ...formData, dietType: 'vegetarian' })} icon={Egg} />
+                                            <GoalCard type="vegan" label="Vegan" selected={formData.dietType === 'vegan'} onClick={() => setFormData({ ...formData, dietType: 'vegan' })} icon={Leaf} />
+                                        </div>
+                                    </div>
+                                    {/* Nutrient Strategy */}
+                                    <div className="space-y-4">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nutrient Strategy</Label>
+                                        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                                            <GoalCard type="balanced" label="Balanced" selected={formData.nutrientStrategy === 'balanced'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'balanced' })} icon={Activity} />
+                                            <GoalCard type="low-carb" label="Low Carb" selected={formData.nutrientStrategy === 'low-carb'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'low-carb' })} icon={TrendingDown} />
+                                            <GoalCard type="high-protein" label="High Protein" selected={formData.nutrientStrategy === 'high-protein'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'high-protein' })} icon={Dumbbell} />
+                                            <GoalCard type="keto" label="Keto Diet" selected={formData.nutrientStrategy === 'keto'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'keto' })} icon={Zap} />
+                                            <GoalCard type="high-carb" label="High Carb" selected={formData.nutrientStrategy === 'high-carb'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'high-carb' })} icon={Apple} />
+                                        </div>
+                                        <p className="text-[10px] text-slate-400 italic">Adjusts your macro ratio targets (Energy/Protein/Carbs/Fat) across the entire app.</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* Health Considerations Card */}
+                            <section className="space-y-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
+                                        <Zap size={24} className="stroke-[2.5]" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Health Considerations</h2>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Wellness & Conditions</p>
+                                    </div>
+                                </div>
+                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                    {/* Exclusions */}
+                                    <div className="space-y-4">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Specific Exclusions</Label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {['Eggs', 'Dairy', 'Honey', 'Nuts', 'Peanuts', 'Soy', 'Gluten', 'Shellfish', 'Fish', 'Corn', 'Nightshades'].map(exclusion => {
+                                                const isSelected = formData.exclusions?.includes(exclusion);
+                                                return (
+                                                    <button
+                                                        key={exclusion}
+                                                        onClick={() => {
+                                                            const newExclusions = isSelected
+                                                                ? formData.exclusions.filter(e => e !== exclusion)
+                                                                : [...(formData.exclusions || []), exclusion];
+                                                            setFormData({ ...formData, exclusions: newExclusions });
+                                                        }}
+                                                        className={cn(
+                                                            "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                                            isSelected
+                                                                ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20"
+                                                                : "bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                                        )}
+                                                    >
+                                                        {exclusion}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                        <p className="text-[10px] text-slate-400 italic">These items will be marked as "Excluded" even if the meal otherwise fits your diet.</p>
+                                    </div>
+
+                                    {/* Health Conditions */}
+                                    <div className="space-y-4 border-t border-slate-100 dark:border-slate-800 pt-4">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Health Conditions</Label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {['Diabetes', 'Hypertension', 'Heart Disease', 'High Cholesterol', 'Celiac', 'IBS', 'Kidney Disease', 'Thyroid Issues', 'PCOS', 'Gout'].map(condition => {
+                                                const isSelected = (formData.healthConditions || [])?.includes(condition);
+                                                return (
+                                                    <button
+                                                        key={condition}
+                                                        onClick={() => {
+                                                            const newConditions = isSelected
+                                                                ? (formData.healthConditions || []).filter(c => c !== condition)
+                                                                : [...(formData.healthConditions || []), condition];
+                                                            setFormData({ ...formData, healthConditions: newConditions });
+                                                        }}
+                                                        className={cn(
+                                                            "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                                            isSelected
+                                                                ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20"
+                                                                : "bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                                        )}
+                                                    >
+                                                        {condition}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                        <p className="text-[10px] text-slate-400 italic">Select conditions to optimize meal plans with appropriate nutritional considerations.</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* Goals Card */}
+                            <section className="space-y-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
+                                        <Activity size={24} className="stroke-[2.5]" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Goals</h2>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Fitness Direction</p>
+                                    </div>
+                                </div>
+                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                    {/* Biological Goal */}
+                                    <div className="space-y-4">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Goal</Label>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <GoalCard type="lose-fat" label="Lose Fat" selected={formData.goal === 'lose-fat'} onClick={() => setFormData({ ...formData, goal: 'lose-fat' })} icon={TrendingDown} />
+                                            <GoalCard type="maintain" label="Maintain" selected={formData.goal === 'maintain'} onClick={() => setFormData({ ...formData, goal: 'maintain' })} icon={Activity} />
+                                            <GoalCard type="build-muscle" label="Build Muscle" selected={formData.goal === 'build-muscle'} onClick={() => setFormData({ ...formData, goal: 'build-muscle' })} icon={Dumbbell} />
+                                        </div>
+                                    </div>
+                                    {/* Activity Level */}
+                                    <div className="space-y-4">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Activity Level</Label>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                            <GoalCard type="sedentary" label="Sedentary" selected={formData.activityLevel === 'sedentary'} onClick={() => setFormData({ ...formData, activityLevel: 'sedentary' })} icon={User} />
+                                            <GoalCard type="light" label="Lightly Active" selected={formData.activityLevel === 'light'} onClick={() => setFormData({ ...formData, activityLevel: 'light' })} icon={ChevronRight} />
+                                            <GoalCard type="moderate" label="Moderate" selected={formData.activityLevel === 'moderate'} onClick={() => setFormData({ ...formData, activityLevel: 'moderate' })} icon={Zap} />
+                                            <GoalCard type="active" label="Very Active" selected={formData.activityLevel === 'active'} onClick={() => setFormData({ ...formData, activityLevel: 'active' })} icon={Flame} />
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* End grid */}
+
+                                {/* FAMILY PROTOCOLS - Hidden for now */}
+                                {false && (
+                                    <section className="space-y-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
+                                                <Users size={24} className="stroke-[2.5]" />
+                                            </div>
+                                            <div>
+                                                <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Family Protocols</h2>
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Household Management</p>
+                                            </div>
+                                        </div>
+                                        <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                {/* Existing Members */}
+                                                {formData.familyMembers.map((member) => (
+                                                    <div key={member.id} onClick={() => setEditingMember(member)} className="group cursor-pointer p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-900 transition-all relative">
+                                                        <div className="flex justify-between items-start mb-2">
+                                                            <div className="flex items-center gap-2">
+                                                                <div className={cn("w-2 h-2 rounded-full", member.gender === 'male' ? "bg-blue-400" : "bg-rose-400")} />
+                                                                <h3 className="font-bold text-sm text-slate-700 dark:text-slate-200">{member.name || 'Unnamed'}</h3>
+                                                            </div>
+                                                            <button onClick={(e) => { e.stopPropagation(); handleDeleteMember(member.id); }} className="text-slate-300 hover:text-rose-500 transition-colors p-1"><X size={14} /></button>
+                                                        </div>
+                                                        <div className="flex flex-wrap gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+                                                            <span className="bg-white dark:bg-slate-950 px-2 py-1 rounded-md">{member.age} yrs</span>
+                                                            <span className="bg-white dark:bg-slate-950 px-2 py-1 rounded-md">{member.goal}</span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+
+                                                {/* Add Button */}
+                                                <button
+                                                    onClick={() => setIsAddingMember(true)}
+                                                    className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/5 transition-all text-slate-400 hover:text-emerald-500 h-[100px]"
+                                                >
+                                                    <div className="p-2 rounded-full bg-slate-50 dark:bg-slate-900 group-hover:bg-white transition-colors">
+                                                        <Plus size={20} />
+                                                    </div>
+                                                    <span className="text-[10px] font-black uppercase tracking-widest">Add Member</span>
+                                                </button>
+                                            </div>
+                                            <p className="text-[10px] text-slate-400 italic">Add family members to automatically calculate scale-appropriate portion sizes in recipes.</p>
+                                        </div>
+                                    </section>
+                                )}
+
+                                {(isAddingMember || editingMember) && (
+                                    <FamilyMemberForm
+                                        initialData={editingMember || {}}
+                                        onSave={handleSaveMember}
+                                        onCancel={() => { setIsAddingMember(false); setEditingMember(null); }}
                                     />
-                                </div>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
-                                    <div className="space-y-2">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Gender</Label>
-                                        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl h-8 mt-1">
-                                            <button
-                                                onClick={() => setFormData({ ...formData, gender: 'male' })}
-                                                className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'male' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
-                                            >
-                                                M
-                                            </button>
-                                            <button
-                                                onClick={() => setFormData({ ...formData, gender: 'female' })}
-                                                className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'female' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
-                                            >
-                                                F
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Age</Label>
-                                        <Input
-                                            type="number"
-                                            value={formData.age}
-                                            onChange={(e) => setFormData({ ...formData, age: e.target.value ? Number(e.target.value) : '' })}
-                                            placeholder="Enter your age"
-                                            className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Weight ({measurementUnit === 'metric' ? 'kg' : 'lb'})</Label>
-                                        <Input
-                                            type="number"
-                                            value={formData.weight}
-                                            onChange={(e) => setFormData({ ...formData, weight: e.target.value ? Number(e.target.value) : '' })}
-                                            placeholder="Enter your weight"
-                                            className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl"
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Height ({measurementUnit === 'metric' ? 'cm' : 'ft/in'})</Label>
-                                        <Input
-                                            type="number"
-                                            value={formData.height}
-                                            onChange={(e) => setFormData({ ...formData, height: e.target.value ? Number(e.target.value) : '' })}
-                                            placeholder="Enter your height"
-                                            className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
-
-                        {/* Dietary Profile Card */}
-                        <section className="space-y-6">
-                            <div className="flex items-center gap-4">
-                                <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                    <Utensils size={24} className="stroke-[2.5]" />
-                                </div>
-                                <div>
-                                    <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Dietary Profile</h2>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Nutritional Approach</p>
-                                </div>
-                            </div>
-                            <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
-                                {/* Dietary Protocol */}
-                                <div className="space-y-4">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Dietary Protocol</Label>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                        <GoalCard type="anything" label="Balanced" selected={formData.dietType === 'anything'} onClick={() => setFormData({ ...formData, dietType: 'anything' })} icon={Apple} />
-                                        <GoalCard type="pescatarian" label="Pescatarian" selected={formData.dietType === 'pescatarian'} onClick={() => setFormData({ ...formData, dietType: 'pescatarian' })} icon={Fish} />
-                                        <GoalCard type="vegetarian" label="Vegetarian" selected={formData.dietType === 'vegetarian'} onClick={() => setFormData({ ...formData, dietType: 'vegetarian' })} icon={Egg} />
-                                        <GoalCard type="vegan" label="Vegan" selected={formData.dietType === 'vegan'} onClick={() => setFormData({ ...formData, dietType: 'vegan' })} icon={Leaf} />
-                                    </div>
-                                </div>
-                                {/* Nutrient Strategy */}
-                                <div className="space-y-4">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nutrient Strategy</Label>
-                                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                                        <GoalCard type="balanced" label="Balanced" selected={formData.nutrientStrategy === 'balanced'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'balanced' })} icon={Activity} />
-                                        <GoalCard type="low-carb" label="Low Carb" selected={formData.nutrientStrategy === 'low-carb'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'low-carb' })} icon={TrendingDown} />
-                                        <GoalCard type="high-protein" label="High Protein" selected={formData.nutrientStrategy === 'high-protein'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'high-protein' })} icon={Dumbbell} />
-                                        <GoalCard type="keto" label="Keto Diet" selected={formData.nutrientStrategy === 'keto'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'keto' })} icon={Zap} />
-                                        <GoalCard type="high-carb" label="High Carb" selected={formData.nutrientStrategy === 'high-carb'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'high-carb' })} icon={Apple} />
-                                    </div>
-                                    <p className="text-[10px] text-slate-400 italic">Adjusts your macro ratio targets (Energy/Protein/Carbs/Fat) across the entire app.</p>
-                                </div>
-                            </div>
-                        </section>
-
-                        {/* Health Considerations Card */}
-                        <section className="space-y-6">
-                            <div className="flex items-center gap-4">
-                                <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                    <Zap size={24} className="stroke-[2.5]" />
-                                </div>
-                                <div>
-                                    <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Health Considerations</h2>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Wellness & Conditions</p>
-                                </div>
-                            </div>
-                            <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
-                                {/* Exclusions */}
-                                <div className="space-y-4">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Specific Exclusions</Label>
-                                    <div className="flex flex-wrap gap-2">
-                                        {['Eggs', 'Dairy', 'Honey', 'Nuts', 'Peanuts', 'Soy', 'Gluten', 'Shellfish', 'Fish', 'Corn', 'Nightshades'].map(exclusion => {
-                                            const isSelected = formData.exclusions?.includes(exclusion);
-                                            return (
-                                                <button
-                                                    key={exclusion}
-                                                    onClick={() => {
-                                                        const newExclusions = isSelected
-                                                            ? formData.exclusions.filter(e => e !== exclusion)
-                                                            : [...(formData.exclusions || []), exclusion];
-                                                        setFormData({ ...formData, exclusions: newExclusions });
-                                                    }}
-                                                    className={cn(
-                                                        "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-                                                        isSelected
-                                                            ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20"
-                                                            : "bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
-                                                    )}
-                                                >
-                                                    {exclusion}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                    <p className="text-[10px] text-slate-400 italic">These items will be marked as "Excluded" even if the meal otherwise fits your diet.</p>
-                                </div>
-
-                                {/* Health Conditions */}
-                                <div className="space-y-4 border-t border-slate-100 dark:border-slate-800 pt-4">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Health Conditions</Label>
-                                    <div className="flex flex-wrap gap-2">
-                                        {['Diabetes', 'Hypertension', 'Heart Disease', 'High Cholesterol', 'Celiac', 'IBS', 'Kidney Disease', 'Thyroid Issues', 'PCOS', 'Gout'].map(condition => {
-                                            const isSelected = (formData.healthConditions || [])?.includes(condition);
-                                            return (
-                                                <button
-                                                    key={condition}
-                                                    onClick={() => {
-                                                        const newConditions = isSelected
-                                                            ? (formData.healthConditions || []).filter(c => c !== condition)
-                                                            : [...(formData.healthConditions || []), condition];
-                                                        setFormData({ ...formData, healthConditions: newConditions });
-                                                    }}
-                                                    className={cn(
-                                                        "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-                                                        isSelected
-                                                            ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20"
-                                                            : "bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
-                                                    )}
-                                                >
-                                                    {condition}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                    <p className="text-[10px] text-slate-400 italic">Select conditions to optimize meal plans with appropriate nutritional considerations.</p>
-                                </div>
-                            </div>
-                        </section>
-
-                        {/* Goals Card */}
-                        <section className="space-y-6">
-                            <div className="flex items-center gap-4">
-                                <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                    <Activity size={24} className="stroke-[2.5]" />
-                                </div>
-                                <div>
-                                    <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Goals</h2>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Fitness Direction</p>
-                                </div>
-                            </div>
-                            <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
-                                {/* Biological Goal */}
-                                <div className="space-y-4">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Goal</Label>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                        <GoalCard type="lose-fat" label="Lose Fat" selected={formData.goal === 'lose-fat'} onClick={() => setFormData({ ...formData, goal: 'lose-fat' })} icon={TrendingDown} />
-                                        <GoalCard type="maintain" label="Maintain" selected={formData.goal === 'maintain'} onClick={() => setFormData({ ...formData, goal: 'maintain' })} icon={Activity} />
-                                        <GoalCard type="build-muscle" label="Build Muscle" selected={formData.goal === 'build-muscle'} onClick={() => setFormData({ ...formData, goal: 'build-muscle' })} icon={Dumbbell} />
-                                    </div>
-                                </div>
-                                {/* Activity Level */}
-                                <div className="space-y-4">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Activity Level</Label>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                        <GoalCard type="sedentary" label="Sedentary" selected={formData.activityLevel === 'sedentary'} onClick={() => setFormData({ ...formData, activityLevel: 'sedentary' })} icon={User} />
-                                        <GoalCard type="light" label="Lightly Active" selected={formData.activityLevel === 'light'} onClick={() => setFormData({ ...formData, activityLevel: 'light' })} icon={ChevronRight} />
-                                        <GoalCard type="moderate" label="Moderate" selected={formData.activityLevel === 'moderate'} onClick={() => setFormData({ ...formData, activityLevel: 'moderate' })} icon={Zap} />
-                                        <GoalCard type="active" label="Very Active" selected={formData.activityLevel === 'active'} onClick={() => setFormData({ ...formData, activityLevel: 'active' })} icon={Flame} />
-                                    </div>
-                                </div>
-                            </div>
-                        {/* End grid */}
-
-                        {/* FAMILY PROTOCOLS */}
-                            <div className="flex items-center gap-4">
-                                <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                    <Users size={24} className="stroke-[2.5]" />
-                                </div>
-                                <div>
-                                    <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Family Protocols</h2>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Household Management</p>
-                                </div>
-                            </div>
-                            <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {/* Existing Members */}
-                                    {formData.familyMembers.map((member) => (
-                                        <div key={member.id} onClick={() => setEditingMember(member)} className="group cursor-pointer p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-900 transition-all relative">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <div className="flex items-center gap-2">
-                                                    <div className={cn("w-2 h-2 rounded-full", member.gender === 'male' ? "bg-blue-400" : "bg-rose-400")} />
-                                                    <h3 className="font-bold text-sm text-slate-700 dark:text-slate-200">{member.name || 'Unnamed'}</h3>
-                                                </div>
-                                                <button onClick={(e) => { e.stopPropagation(); handleDeleteMember(member.id); }} className="text-slate-300 hover:text-rose-500 transition-colors p-1"><X size={14} /></button>
-                                            </div>
-                                            <div className="flex flex-wrap gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-tight">
-                                                <span className="bg-white dark:bg-slate-950 px-2 py-1 rounded-md">{member.age} yrs</span>
-                                                <span className="bg-white dark:bg-slate-950 px-2 py-1 rounded-md">{member.goal}</span>
-                                            </div>
-                                        </div>
-                                    ))}
-
-                                    {/* Add Button */}
-                                    <button
-                                        onClick={() => setIsAddingMember(true)}
-                                        className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/5 transition-all text-slate-400 hover:text-emerald-500 h-[100px]"
-                                    >
-                                        <div className="p-2 rounded-full bg-slate-50 dark:bg-slate-900 group-hover:bg-white transition-colors">
-                                            <Plus size={20} />
-                                        </div>
-                                        <span className="text-[10px] font-black uppercase tracking-widest">Add Member</span>
-                                    </button>
-                                </div>
-                                <p className="text-[10px] text-slate-400 italic">Add family members to automatically calculate scale-appropriate portion sizes in recipes.</p>
-                            </div>
-                        </section>
-
-                        {(isAddingMember || editingMember) && (
-                            <FamilyMemberForm
-                                initialData={editingMember || {}}
-                                onSave={handleSaveMember}
-                                onCancel={() => { setIsAddingMember(false); setEditingMember(null); }}
-                            />
-                        )}
+                                )}
 
 
 
-                    </div>
+                        </div>
 
-                    {/* Save Button */}
-                    <div className="flex flex-col gap-4 justify-center pt-8 border-t border-slate-100 dark:border-slate-800">
-                        <Button
-                            onClick={handleSave}
-                            className="bg-purple-600 hover:bg-purple-700 text-white font-black px-8 h-12 rounded-xl shadow-lg shadow-purple-500/30 flex items-center gap-2 text-xs uppercase tracking-widest"
-                        >
-                            <Save size={16} />
-                            Save
-                        </Button>
-                        <Button
-                            variant="outline"
-                            className="w-full mt-4 font-black text-xs uppercase tracking-widest border-purple-500 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/10"
-                            onClick={() => setShowRDASheet(true)}
-                        >
-                            Recommended Intake
-                        </Button>
-                    </div>
-                </div>
-
-                {/* RDA Sheet Slider */}
-                <SheetContent side="left" className="max-w-md w-full bg-slate-950 border-l-0 border-r border-slate-800 p-0">
-                    <SheetHeader className="bg-slate-900/80 p-6 border-b border-slate-800 rounded-t-3xl">
-                        <SheetTitle className="text-lg font-black text-purple-400 uppercase tracking-widest">Recommended Intake</SheetTitle>
-                    </SheetHeader>
-                    <div className="p-6 overflow-y-auto custom-scrollbar h-full">
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                            {Object.entries(combinedRDAs).map(([nutrient, value]) => {
-                                const unit = (nutrient === 'Energy') ? energyUnit : (nutrient === 'Protein' || nutrient === 'Carbs' || nutrient === 'Fat' || nutrient === 'Fiber' || nutrient === 'ALA' || nutrient.includes('_g')) ? 'g' : (nutrient === 'Vitamin D') ? 'IU' : (nutrient.includes('Folate') || nutrient.includes('B12') || nutrient.includes('Biotin') || nutrient.includes('Selenium') || nutrient === 'Vitamin A' || nutrient === 'Vitamin K' || nutrient.includes('EPA')) ? 'µg' : 'mg';
-                                const displayVal = value < 1 ? value.toFixed(2) : value < 10 ? value.toFixed(1) : Math.round(value);
-                                return (
-                                    <div key={nutrient} className="bg-slate-900/50 px-4 py-3 rounded-2xl flex items-center justify-between hover:bg-slate-900 group/item">
-                                        <div className="flex flex-col min-w-0 pr-2">
-                                            <p className="text-[11px] uppercase font-black text-slate-400 group-hover/item:text-slate-300 transition-colors leading-none truncate">{nutrient}</p>
-                                            {['ALA', 'EPA', 'Histidine', 'Leucine'].includes(nutrient) && (
-                                                <span className="text-[7px] text-blue-500 font-bold uppercase mt-1">Constituent</span>
-                                            )}
-                                        </div>
-                                        <div className="flex-shrink-0">
-                                            <span className="text-xs font-black text-white tracking-tighter italic leading-none">{displayVal}</span>
-                                            <span className="text-[8px] ml-1 text-slate-500 font-bold uppercase">{unit}</span>
-                                        </div>
-                                    </div>
-                                );
-                            })}
+                        {/* Save Button */}
+                        <div className="flex flex-col gap-4 justify-center pt-8 border-t border-slate-100 dark:border-slate-800">
+                            <Button
+                                onClick={handleSave}
+                                className="bg-purple-600 hover:bg-purple-700 text-white font-black px-8 h-12 rounded-xl shadow-lg shadow-purple-500/30 flex items-center gap-2 text-xs uppercase tracking-widest"
+                            >
+                                <Save size={16} />
+                                Save
+                            </Button>
+                            <Button
+                                variant="outline"
+                                className="w-full mt-4 font-black text-xs uppercase tracking-widest border-purple-500 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/10"
+                                onClick={() => setShowRDASheet(true)}
+                            >
+                                Recommended Intake
+                            </Button>
                         </div>
                     </div>
-                </SheetContent>
-            </div> {/* <-- Close flex container */}
+
+                    {/* RDA Sheet Slider */}
+                    <SheetContent side="left" className="max-w-md w-full bg-slate-950 border-l-0 border-r border-slate-800 p-0">
+                        <SheetHeader className="bg-slate-900/80 p-6 border-b border-slate-800 rounded-t-3xl">
+                            <SheetTitle className="text-lg font-black text-purple-400 uppercase tracking-widest">Recommended Intake</SheetTitle>
+                        </SheetHeader>
+                        <div className="p-6 overflow-y-auto custom-scrollbar h-full">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                {Object.entries(combinedRDAs).map(([nutrient, value]) => {
+                                    const unit = (nutrient === 'Energy') ? energyUnit : (nutrient === 'Protein' || nutrient === 'Carbs' || nutrient === 'Fat' || nutrient === 'Fiber' || nutrient === 'ALA' || nutrient.includes('_g')) ? 'g' : (nutrient === 'Vitamin D') ? 'IU' : (nutrient.includes('Folate') || nutrient.includes('B12') || nutrient.includes('Biotin') || nutrient.includes('Selenium') || nutrient === 'Vitamin A' || nutrient === 'Vitamin K' || nutrient.includes('EPA')) ? 'µg' : 'mg';
+                                    const displayVal = value < 1 ? value.toFixed(2) : value < 10 ? value.toFixed(1) : Math.round(value);
+                                    return (
+                                        <div key={nutrient} className="bg-slate-900/50 px-4 py-3 rounded-2xl flex items-center justify-between hover:bg-slate-900 group/item">
+                                            <div className="flex flex-col min-w-0 pr-2">
+                                                <p className="text-[11px] uppercase font-black text-slate-400 group-hover/item:text-slate-300 transition-colors leading-none truncate">{nutrient}</p>
+                                                {['ALA', 'EPA', 'Histidine', 'Leucine'].includes(nutrient) && (
+                                                    <span className="text-[7px] text-blue-500 font-bold uppercase mt-1">Constituent</span>
+                                                )}
+                                            </div>
+                                            <div className="flex-shrink-0">
+                                                <span className="text-xs font-black text-white tracking-tighter italic leading-none">{displayVal}</span>
+                                                <span className="text-[8px] ml-1 text-slate-500 font-bold uppercase">{unit}</span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </SheetContent>
+                </div> {/* <-- Close flex container */}
             </Sheet>
         </div>
     );
