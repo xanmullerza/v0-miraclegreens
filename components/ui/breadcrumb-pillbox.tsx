@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Search, X, LayoutGrid, ChevronRight } from 'lucide-react';
+import { Search, X, LayoutGrid, ChevronRight, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BreadcrumbPillboxProps {
@@ -13,6 +13,8 @@ interface BreadcrumbPillboxProps {
     sectionColor?: string;
     showHomeButton?: boolean;
     customLastSegment?: string;
+    filterContent?: React.ReactNode;
+    isFilterActive?: boolean;
 }
 
 export function BreadcrumbPillbox({
@@ -21,16 +23,22 @@ export function BreadcrumbPillbox({
     sectionLabel,
     sectionColor = 'text-emerald-500',
     showHomeButton = true,
-    customLastSegment
+    customLastSegment,
+    filterContent,
+    isFilterActive = false
 }: BreadcrumbPillboxProps) {
     const router = useRouter();
     const pathname = usePathname();
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+    const [isFilterExpanded, setIsFilterExpanded] = useState(false);
 
     // Close search on escape key
     useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') setIsSearchExpanded(false);
+            if (e.key === 'Escape') {
+                setIsSearchExpanded(false);
+                setIsFilterExpanded(false);
+            }
         };
         window.addEventListener('keydown', handleEsc);
         return () => window.removeEventListener('keydown', handleEsc);
@@ -49,9 +57,24 @@ export function BreadcrumbPillbox({
                 "flex items-center p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden w-full md:max-w-[800px] mx-auto xl:mx-0 transition-all duration-500",
                 isSearchExpanded ? "ring-2 ring-emerald-500/20" : ""
             )}>
-                {/* Left side - Home Button area */}
+                {/* Left side - Filter/Home Button area */}
                 <div className={cn("flex-shrink-0 flex items-center justify-start transition-all duration-500", isSearchExpanded ? "w-0 opacity-0" : "w-12 opacity-100")}>
-                    {showHomeButton && (
+                    {filterContent ? (
+                        <button
+                            onClick={() => setIsFilterExpanded(!isFilterExpanded)}
+                            className={cn(
+                                "flex items-center justify-center w-12 h-12 rounded-[1.5rem] transition-all flex-shrink-0",
+                                isFilterExpanded
+                                    ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 shadow-inner"
+                                    : isFilterActive
+                                        ? "text-indigo-500 bg-indigo-50/50"
+                                        : "text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/10"
+                            )}
+                            title={isFilterExpanded ? "Close Filters" : "Open Filters"}
+                        >
+                            <Filter size={18} className={cn(isFilterExpanded && "scale-110 transition-transform")} />
+                        </button>
+                    ) : showHomeButton && (
                         <button
                             onClick={() => router.push('/dashboard')}
                             className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all flex-shrink-0"
@@ -62,37 +85,43 @@ export function BreadcrumbPillbox({
                     )}
                 </div>
 
-                {/* Center - Breadcrumb area */}
+                {/* Center - Breadcrumb/Filter area */}
                 <div className={cn("flex items-center justify-center overflow-hidden transition-all duration-500", isSearchExpanded ? "w-0 flex-none opacity-0" : "flex-1 opacity-100")}>
-                    <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-4">
-                        {segments.map((segment, index) => {
-                            const path = '/' + segments.slice(0, index + 1).join('/');
-                            const isLast = index === segments.length - 1;
-                            const label = isLast && customLastSegment
-                                ? customLastSegment
-                                : decodeURIComponent(segment).replace(/-/g, ' ');
+                    {isFilterExpanded && filterContent ? (
+                        <div className="flex items-center gap-4 animate-in slide-in-from-left-4 duration-500 w-full justify-center px-4">
+                            {filterContent}
+                        </div>
+                    ) : (
+                        <div className={cn("flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-4", isFilterExpanded ? "hidden" : "flex")}>
+                            {segments.map((segment, index) => {
+                                const path = '/' + segments.slice(0, index + 1).join('/');
+                                const isLast = index === segments.length - 1;
+                                const label = isLast && customLastSegment
+                                    ? customLastSegment
+                                    : decodeURIComponent(segment).replace(/-/g, ' ');
 
-                            return (
-                                <React.Fragment key={path}>
-                                    {index > 0 && (
-                                        <ChevronRight size={12} className="text-slate-300 dark:text-slate-700 flex-shrink-0" />
-                                    )}
-                                    {isLast ? (
-                                        <span className={cn("text-[9px] font-black uppercase tracking-[0.12em] whitespace-nowrap", sectionColor)}>
-                                            {label}
-                                        </span>
-                                    ) : (
-                                        <Link
-                                            href={path}
-                                            className="text-[9px] font-black uppercase tracking-[0.12em] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors whitespace-nowrap"
-                                        >
-                                            {label}
-                                        </Link>
-                                    )}
-                                </React.Fragment>
-                            );
-                        })}
-                    </div>
+                                return (
+                                    <React.Fragment key={path}>
+                                        {index > 0 && (
+                                            <ChevronRight size={12} className="text-slate-300 dark:text-slate-700 flex-shrink-0" />
+                                        )}
+                                        {isLast ? (
+                                            <span className={cn("text-[9px] font-black uppercase tracking-[0.12em] whitespace-nowrap", sectionColor)}>
+                                                {label}
+                                            </span>
+                                        ) : (
+                                            <Link
+                                                href={path}
+                                                className="text-[9px] font-black uppercase tracking-[0.12em] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors whitespace-nowrap"
+                                            >
+                                                {label}
+                                            </Link>
+                                        )}
+                                    </React.Fragment>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
 
                 {/* Right side - Search area */}
