@@ -17,6 +17,8 @@ interface BreadcrumbPillboxProps {
     isFilterActive?: boolean;
     isFilterExpanded?: boolean;
     onFilterToggle?: (expanded: boolean) => void;
+    actions?: React.ReactNode;
+    userProfile?: React.ReactNode;
 }
 
 export function BreadcrumbPillbox({
@@ -29,7 +31,9 @@ export function BreadcrumbPillbox({
     filterContent,
     isFilterActive = false,
     isFilterExpanded: controlledIsFilterExpanded,
-    onFilterToggle
+    onFilterToggle,
+    actions,
+    userProfile
 }: BreadcrumbPillboxProps) {
     const router = useRouter();
     const pathname = usePathname();
@@ -141,11 +145,12 @@ export function BreadcrumbPillbox({
                     )}
                 </div>
 
-                {/* Right side - Search area */}
+                {/* Right side - Actions, Search & Profile */}
                 <div className={cn(
-                    "flex items-center justify-end transition-all duration-500",
-                    isSearchExpanded ? "flex-1 pl-2" : "w-12"
+                    "flex items-center justify-end gap-2 transition-all duration-500",
+                    isSearchExpanded ? "flex-1 pl-2" : "flex-shrink-0"
                 )}>
+                    {/* Search Input - Expands to fill available space */}
                     <div className={cn(
                         "flex items-center transition-all duration-500 overflow-hidden",
                         isSearchExpanded ? "flex-1 opacity-100" : "w-0 opacity-0"
@@ -159,6 +164,15 @@ export function BreadcrumbPillbox({
                             className="w-full bg-slate-50 dark:bg-slate-800/50 border-none focus:ring-0 text-[10px] font-black uppercase tracking-widest h-12 rounded-[1.5rem] px-6 text-slate-900 dark:text-white"
                         />
                     </div>
+
+                    {/* Actions (Hidden if search expanded on mobile maybe? For now keep visible) */}
+                    {!isSearchExpanded && actions && (
+                        <div className="flex items-center gap-2">
+                            {actions}
+                        </div>
+                    )}
+
+                    {/* Search Toggle */}
                     <button
                         onClick={() => {
                             if (isSearchExpanded) setSearchQuery('');
@@ -174,6 +188,13 @@ export function BreadcrumbPillbox({
                     >
                         {isSearchExpanded ? <X size={18} /> : <Search size={18} />}
                     </button>
+
+                    {/* User Profile - Always visible if provided */}
+                    {userProfile && (
+                        <div className="pl-1 border-l border-slate-100 dark:border-slate-800 flex-shrink-0">
+                            {userProfile}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
