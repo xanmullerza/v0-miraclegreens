@@ -440,12 +440,15 @@ export function CompareView() {
                                                     </div>
                                                 </>
                                             ) : (
-                                                <div className="flex flex-col items-center gap-1 opacity-20">
-                                                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-full border border-dashed border-slate-400 flex items-center justify-center">
-                                                        <Plus size={10} className="text-slate-400" />
+                                                <button
+                                                    onClick={() => setActiveSlot(i)}
+                                                    className="flex flex-col items-center gap-1 opacity-20 hover:opacity-100 hover:text-emerald-500 transition-all group/add"
+                                                >
+                                                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-full border border-dashed border-slate-400 group-hover/add:border-emerald-500/50 flex items-center justify-center transition-colors">
+                                                        <Plus size={10} className="text-slate-400 group-hover/add:text-emerald-500" />
                                                     </div>
-                                                    <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-slate-400">Add</p>
-                                                </div>
+                                                    <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-slate-400 group-hover/add:text-emerald-500 transition-colors">Add</p>
+                                                </button>
                                             )}
                                         </div>
                                     </th>
