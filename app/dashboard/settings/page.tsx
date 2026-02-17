@@ -40,21 +40,29 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
-            <div className="max-w-4xl mx-auto px-4 py-8">
-                <div className="flex flex-col md:flex-row gap-8">
-                    {/* Measures Card */}
-                    <div className="flex-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 space-y-8 shadow-sm">
-                        <h2 className="text-lg font-bold mb-4">Measures</h2>
+        <div className="max-w-2xl mx-auto animate-in fade-in duration-500 px-4 py-8">
+            <div className="space-y-8 pb-32">
+                {/* Measures Card */}
+                <section className="space-y-6">
+                    <div className="flex items-center gap-4">
+                        <div className="flex-shrink-0 bg-yellow-500/20 p-3 rounded-2xl text-yellow-500">
+                            <Scale size={24} className="stroke-[2.5]" />
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Measures</h2>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Units & Standards</p>
+                        </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-yellow-500 before:to-yellow-500/50">
                         {/* Energy Unit */}
                         <div className="space-y-3">
                             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Energy Measurement</Label>
-                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
                                 <button
                                     onClick={() => setEnergyUnit("kJ")}
                                     className={cn(
                                         "flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold rounded-lg transition-all",
-                                        energyUnit === "kJ" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
+                                        energyUnit === "kJ" ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
                                     )}
                                 >
                                     <Zap size={14} /> Kilojoules (kJ)
@@ -63,7 +71,7 @@ export default function SettingsPage() {
                                     onClick={() => setEnergyUnit("kcal")}
                                     className={cn(
                                         "flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold rounded-lg transition-all",
-                                        energyUnit === "kcal" ? "bg-white dark:bg-slate-800 text-orange-600 dark:text-orange-400 shadow-sm" : "text-slate-500"
+                                        energyUnit === "kcal" ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
                                     )}
                                 >
                                     <Flame size={14} /> Calories (kcal)
@@ -74,12 +82,12 @@ export default function SettingsPage() {
                         {/* Measurement System */}
                         <div className="space-y-3">
                             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Measurement System</Label>
-                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
                                 <button
                                     onClick={() => setMeasurementUnit("metric")}
                                     className={cn(
                                         "flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold rounded-lg transition-all",
-                                        measurementUnit === "metric" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
+                                        measurementUnit === "metric" ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
                                     )}
                                 >
                                     <Scale size={14} /> Metric (kg/cm)
@@ -88,7 +96,7 @@ export default function SettingsPage() {
                                     onClick={() => setMeasurementUnit("imperial")}
                                     className={cn(
                                         "flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold rounded-lg transition-all",
-                                        measurementUnit === "imperial" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
+                                        measurementUnit === "imperial" ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
                                     )}
                                 >
                                     <Scale size={14} /> Imperial (lb/ft)
@@ -99,12 +107,12 @@ export default function SettingsPage() {
                         {/* Nutrient Display Mode */}
                         <div className="space-y-3">
                             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Nutrient Display (App-wide)</Label>
-                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
                                 <button
                                     onClick={() => setNutrientDisplayMode("value")}
                                     className={cn(
                                         "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
-                                        nutrientDisplayMode === "value" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
+                                        nutrientDisplayMode === "value" ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
                                     )}
                                     title="Show raw nutrient values (e.g., 500mg)"
                                 >
@@ -114,7 +122,7 @@ export default function SettingsPage() {
                                     onClick={() => setNutrientDisplayMode("percentage")}
                                     className={cn(
                                         "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
-                                        nutrientDisplayMode === "percentage" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
+                                        nutrientDisplayMode === "percentage" ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
                                     )}
                                     title="Show % of your personal RDA"
                                 >
@@ -124,7 +132,7 @@ export default function SettingsPage() {
                                     onClick={() => setNutrientDisplayMode("both")}
                                     className={cn(
                                         "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
-                                        nutrientDisplayMode === "both" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
+                                        nutrientDisplayMode === "both" ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
                                     )}
                                     title="Show both values and percentages"
                                 >
@@ -134,19 +142,29 @@ export default function SettingsPage() {
                             <p className="text-[9px] text-slate-400 italic px-1">This setting affects how nutrition is displayed across all foods and recipes.</p>
                         </div>
                     </div>
+                </section>
 
-                    {/* Appearance Card */}
-                    <div className="flex-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 space-y-8 shadow-sm">
-                        <h2 className="text-lg font-bold mb-4">Appearance</h2>
+                {/* Appearance Card */}
+                <section className="space-y-6">
+                    <div className="flex items-center gap-4">
+                        <div className="flex-shrink-0 bg-yellow-500/20 p-3 rounded-2xl text-yellow-500">
+                            <Monitor size={24} className="stroke-[2.5]" />
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Appearance</h2>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Interface & Theme</p>
+                        </div>
+                    </div>
+                    <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-yellow-500 before:to-yellow-500/50">
                         {/* Show Heroes */}
                         <div className="space-y-3">
                             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Dashboard Hero Sections</Label>
-                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
                                 <button
                                     onClick={() => setShowHeroes(true)}
                                     className={cn(
                                         "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
-                                        showHeroes ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
+                                        showHeroes ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
                                     )}
                                     title="Show hero sections with welcome and overview"
                                 >
@@ -156,7 +174,7 @@ export default function SettingsPage() {
                                     onClick={() => setShowHeroes(false)}
                                     className={cn(
                                         "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
-                                        !showHeroes ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
+                                        !showHeroes ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
                                     )}
                                     title="Hide hero sections for experienced users"
                                 >
@@ -169,12 +187,12 @@ export default function SettingsPage() {
                         {/* Theme */}
                         <div className="space-y-3">
                             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Interface Theme</Label>
-                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
                                 <button
                                     onClick={() => setTheme("light")}
                                     className={cn(
                                         "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
-                                        theme === "light" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
+                                        theme === "light" ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
                                     )}
                                 >
                                     <Sun size={12} /> Light
@@ -183,7 +201,7 @@ export default function SettingsPage() {
                                     onClick={() => setTheme("dark")}
                                     className={cn(
                                         "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
-                                        theme === "dark" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
+                                        theme === "dark" ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
                                     )}
                                 >
                                     <Moon size={12} /> Dark
@@ -192,7 +210,7 @@ export default function SettingsPage() {
                                     onClick={() => setTheme("system")}
                                     className={cn(
                                         "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
-                                        theme === "system" ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-500"
+                                        theme === "system" ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
                                     )}
                                 >
                                     <Monitor size={12} /> System
@@ -200,13 +218,13 @@ export default function SettingsPage() {
                             </div>
                         </div>
                     </div>
-                </div>
+                </section>
 
                 {/* Save Button */}
-                <div className="flex justify-center pt-8">
+                <div className="flex flex-col gap-4 justify-center pt-8 border-t border-slate-100 dark:border-slate-800">
                     <Button
                         onClick={handleSave}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-8 h-12 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-2 text-xs uppercase tracking-widest"
+                        className="bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-black px-8 h-12 rounded-xl shadow-lg shadow-yellow-500/30 flex items-center gap-2 text-xs uppercase tracking-widest"
                     >
                         <Save size={16} />
                         Save
