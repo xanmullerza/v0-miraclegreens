@@ -93,6 +93,7 @@ export default function NutrientDetailsPage() {
     const [loadingFoods, setLoadingFoods] = useState(true);
     const [measureGrams, setMeasureGrams] = useState(100);
     const [activeContentTab, setActiveContentTab] = useState('foods');
+    const [visibleFoodsCount, setVisibleFoodsCount] = useState(5);
 
     // --- Simulation Logic ---
     let targetVal = 0;
@@ -286,6 +287,7 @@ export default function NutrientDetailsPage() {
     useEffect(() => {
         if (info) {
             fetchTopFoods();
+            setVisibleFoodsCount(5);
         }
     }, [nutrientId]);
 
@@ -641,9 +643,9 @@ export default function NutrientDetailsPage() {
 
                                     <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                                         {loadingFoods ? (
-                                            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map(i => <div key={i} className="h-32 w-full animate-pulse bg-slate-50 dark:bg-slate-900/50 rounded-[2rem]" />)
+                                            [1, 2, 3, 4, 5].map(i => <div key={i} className="h-32 w-full animate-pulse bg-slate-50 dark:bg-slate-900/50 rounded-[2rem]" />)
                                         ) : topFoods.length > 0 ? (
-                                            topFoods.slice(0, 20).map((food: any) => {
+                                            topFoods.slice(0, visibleFoodsCount).map((food: any) => {
                                                 const nutrientValue = getNutrientValue(food);
                                                 const rdaPercent = targetVal > 0 ? (nutrientValue * (measureGrams / 100) / targetVal) * 100 : 0;
                                                 const rdaPercentage = Math.round(rdaPercent);
@@ -701,6 +703,18 @@ export default function NutrientDetailsPage() {
                                             </div>
                                         )}
                                     </div>
+                                    {/* Load More Button */}
+                                    {!loadingFoods && topFoods.length > visibleFoodsCount && visibleFoodsCount < 30 && (
+                                        <div className="flex justify-center pt-4">
+                                            <button
+                                                onClick={() => setVisibleFoodsCount(prev => Math.min(prev + 5, 30))}
+                                                className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 transition-all text-[10px] font-black uppercase tracking-widest active:scale-95"
+                                            >
+                                                <ChevronDown size={14} />
+                                                Load More ({Math.min(visibleFoodsCount + 5, 30, topFoods.length)} of {Math.min(topFoods.length, 30)})
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
