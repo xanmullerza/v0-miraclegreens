@@ -34,6 +34,9 @@ import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { HeaderActions } from '@/lib/context/header-actions-context';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
+import { ChevronDown as ChevronDownIcon, CheckSquare, Square } from 'lucide-react';
 
 interface FoodItem {
     id: string;
@@ -239,102 +242,115 @@ export function ExploreView({
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            {/* Search and Filters */}
+            {/* Header Actions (Teleported to Subheader) */}
             {!hideControls && (
-                <div className="flex flex-col gap-6">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div className="relative flex-1 max-w-xl">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-                            <Input
-                                placeholder="Search ingredient library..."
-                                value={searchQuery}
-                                onChange={handleSearchChange}
-                                className="pl-12 h-14 rounded-2xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl"
-                            />
-                        </div>
-
-                        <div className="flex items-center gap-3">
-                        </div>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-4">
-                        {/* Favorites Switch Toggle */}
-                        <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm shrink-0 transition-all">
-                            <Globe
-                                size={18}
-                                className={cn(
-                                    "transition-all cursor-pointer",
-                                    !showFavoritesOnly ? "text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" : "text-slate-300 hover:text-slate-400"
-                                )}
-                                onClick={() => setShowFavoritesOnly(false)}
-                            />
-                            <Switch
-                                id="favorites-mode"
-                                checked={showFavoritesOnly}
-                                onCheckedChange={setShowFavoritesOnly}
-                                className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-blue-600 dark:data-[state=unchecked]:bg-blue-600"
-                            />
-                            <Heart
-                                size={18}
-                                className={cn(
-                                    "transition-all cursor-pointer",
-                                    showFavoritesOnly ? "text-rose-500 fill-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : "text-slate-300 hover:text-slate-400"
-                                )}
-                                onClick={() => setShowFavoritesOnly(true)}
-                            />
-                        </div>
+                <HeaderActions>
+                    <div className="flex items-center gap-2">
+                        {/* Scope/Favorites Dropdown */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className={cn(
+                                    "flex items-center gap-2 px-2.5 py-1.5 rounded-xl border transition-all duration-300 shrink-0 shadow-sm group outline-none",
+                                    showFavoritesOnly
+                                        ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
+                                        : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-emerald-200 hover:text-emerald-500"
+                                )}>
+                                    <Heart size={12} className={cn("transition-transform group-hover:scale-110", showFavoritesOnly && "fill-current")} />
+                                    <span className="text-[8px] font-black uppercase tracking-widest hidden sm:inline">
+                                        {showFavoritesOnly ? "Favorites" : "All Samples"}
+                                    </span>
+                                    <ChevronDown size={10} className="opacity-50" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-48 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
+                                <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Filter Scope</DropdownMenuLabel>
+                                <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
+                                <DropdownMenuCheckboxItem
+                                    checked={!showFavoritesOnly}
+                                    onCheckedChange={(checked) => checked && setShowFavoritesOnly(false)}
+                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-slate-50 py-2.5 cursor-pointer"
+                                >
+                                    Show All Samples
+                                </DropdownMenuCheckboxItem>
+                                <DropdownMenuCheckboxItem
+                                    checked={showFavoritesOnly}
+                                    onCheckedChange={(checked) => checked && setShowFavoritesOnly(true)}
+                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-rose-50 dark:focus:bg-rose-900/10 focus:text-rose-600 py-2.5 cursor-pointer"
+                                >
+                                    Favorites Only
+                                </DropdownMenuCheckboxItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
 
                         {/* Category Filter */}
-                        <div className="relative">
-                            <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar items-center h-14 shadow-sm w-fit transition-all duration-500">
-                                <button
-                                    onClick={() => setIsFilterOpen(!isFilterOpen)}
-                                    className={cn(
-                                        "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300 shrink-0",
-                                        isFilterOpen ? "bg-emerald-600 text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                    )}
-                                >
-                                    <Filter size={18} />
-                                    <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter Groups</span>
-                                    <ChevronDown size={14} className={cn("transition-transform duration-300", isFilterOpen && "rotate-180")} />
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className={cn(
+                                    "px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
+                                    selectedCategories.length > 0 && selectedCategories.length < CATEGORIES.length
+                                        ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20"
+                                        : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-emerald-200 hover:text-emerald-600"
+                                )}>
+                                    <Filter size={12} />
+                                    <span className="hidden sm:inline">
+                                        {selectedCategories.length === 0 || selectedCategories.length === CATEGORIES.length ? "All Groups" :
+                                            `${selectedCategories.length} Groups`}
+                                    </span>
+                                    <ChevronDown size={10} className="opacity-50" />
                                 </button>
-
-                                <div className="w-px h-6 bg-slate-100 dark:bg-slate-800 mx-1 shrink-0" />
-
-                                <div className={cn("flex items-center gap-1 transition-all duration-500 ease-in-out overflow-hidden", isFilterOpen ? "max-w-[1000px] opacity-100 px-1" : "max-w-0 opacity-0 px-0")}>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
+                                <div className="flex items-center justify-between pr-2">
+                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Groups</DropdownMenuLabel>
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault(); e.stopPropagation();
+                                                setSelectedCategories(CATEGORIES);
+                                            }}
+                                            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-emerald-500 transition-colors"
+                                            title="Select All"
+                                        >
+                                            <CheckSquare size={14} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault(); e.stopPropagation();
+                                                setSelectedCategories([]);
+                                            }}
+                                            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
+                                            title="Select None"
+                                        >
+                                            <Square size={14} />
+                                        </button>
+                                    </div>
+                                </div>
+                                <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
+                                <div className="py-1 max-h-[300px] overflow-y-auto no-scrollbar">
                                     {CATEGORIES.map(category => {
                                         const isActive = selectedCategories.includes(category);
                                         return (
-                                            <button
+                                            <DropdownMenuCheckboxItem
                                                 key={category}
-                                                onClick={() => isActive
-                                                    ? setSelectedCategories(prev => prev.filter(c => c !== category))
-                                                    : setSelectedCategories(prev => [...prev, category])
-                                                }
-                                                className={cn(
-                                                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
-                                                    isActive
-                                                        ? "bg-emerald-600/10 text-emerald-600 border border-emerald-600/20"
-                                                        : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
-                                                )}
+                                                checked={isActive}
+                                                onCheckedChange={(checked) => {
+                                                    if (checked) {
+                                                        setSelectedCategories(prev => [...prev, category]);
+                                                    } else {
+                                                        setSelectedCategories(prev => prev.filter(c => c !== category));
+                                                    }
+                                                }}
+                                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-emerald-50 dark:focus:bg-emerald-900/10 focus:text-emerald-600 py-2.5 cursor-pointer"
                                             >
                                                 {category}
-                                            </button>
+                                            </DropdownMenuCheckboxItem>
                                         );
                                     })}
                                 </div>
-
-                                {!isFilterOpen && (
-                                    <div className="px-4 whitespace-nowrap">
-                                        <span className="text-[10px] font-bold text-slate-400 italic">
-                                            {selectedCategories.length === 0 || selectedCategories.length === CATEGORIES.length ? "All Samples" : `${selectedCategories.length} Categories Selected`}
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
                     </div>
-                </div>
+                </HeaderActions>
             )}
 
 
@@ -430,15 +446,6 @@ export function ExploreView({
                                                     </Button>
                                                 )}
 
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-9 w-9 rounded-xl text-slate-400 hover:text-emerald-500 transition-all"
-                                                    onClick={(e) => router.push(`/dashboard/library/foods/${food.id}`)}
-                                                    title="View Details"
-                                                >
-                                                    <ArrowRight size={16} />
-                                                </Button>
                                             </div>
                                         </div>
 
