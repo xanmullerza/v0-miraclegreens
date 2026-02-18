@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
-    Search, X, LayoutGrid, ChevronRight, Filter, Home,
+    Search, X, LayoutGrid, ChevronRight, Filter, Home, Zap, Activity,
     LayoutDashboard, Library, Apple, FlaskConical, ChefHat, BookOpen, Utensils, User, Settings, FileText
 } from 'lucide-react';
 import { useHeaderActions } from '@/lib/context/header-actions-context';
@@ -12,7 +12,7 @@ import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { cn } from '@/lib/utils';
 
 const segmentIconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
-    dashboard: LayoutDashboard,
+    dashboard: Home,
     library: Library,
     foods: Apple,
     nutrients: FlaskConical,
@@ -111,39 +111,20 @@ export function BreadcrumbPillbox({
                 "flex items-center p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden w-full md:max-w-[800px] mx-auto xl:mx-0 transition-all duration-500",
                 isSearchExpanded ? "ring-2 ring-emerald-500/20" : ""
             )}>
-                {/* Left side - Filter/Home Button area */}
+                {/* Left side - Placeholder Actions / Filters */}
                 <div className={cn(
-                    "flex-shrink-0 flex items-center justify-start transition-all duration-500",
-                    (isSearchExpanded || pathname === '/dashboard') ? "w-0 opacity-0" : "w-12 opacity-100"
+                    "flex transition-all duration-500",
+                    (isSearchExpanded || pathname === '/dashboard') ? "w-0 opacity-0 overflow-hidden" : "flex-shrink-0"
                 )}>
-                    {filterContent ? (
-                        <button
-                            onClick={() => setIsFilterExpanded(!isFilterExpanded)}
-                            className={cn(
-                                "flex items-center justify-center w-12 h-12 rounded-[1.5rem] transition-all flex-shrink-0",
-                                isFilterExpanded
-                                    ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 shadow-inner"
-                                    : isFilterActive
-                                        ? "text-indigo-500 bg-indigo-50/50"
-                                        : "text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/10"
-                            )}
-                            title={isFilterExpanded ? "Back to Breadcrumbs" : "Open Filters"}
-                        >
-                            {isFilterExpanded ? (
-                                <LayoutGrid size={18} className="animate-in zoom-in spin-in-90 duration-300" />
-                            ) : (
-                                <Filter size={18} className="animate-in zoom-in duration-300" />
-                            )}
-                        </button>
-                    ) : showHomeButton && (
-                        <button
-                            onClick={() => router.push('/dashboard')}
-                            className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all flex-shrink-0"
-                            title="Back to Dashboard"
-                        >
-                            <Home size={18} />
-                        </button>
-                    )}
+                    {/* Left Split Button (Placeholder) */}
+                    <div className="flex flex-col h-12 w-12 border-r border-slate-200 dark:border-slate-800 mr-2 divide-y divide-slate-100 dark:divide-slate-800">
+                        <div className="h-6 w-12 flex items-center justify-center">
+                            <Zap size={14} className="text-slate-300 dark:text-slate-700" />
+                        </div>
+                        <div className="h-6 w-12 flex items-center justify-center">
+                            <Activity size={14} className="text-slate-300 dark:text-slate-700" />
+                        </div>
+                    </div>
                 </div>
 
                 {/* Center - Breadcrumb/Filter area or Logo */}
