@@ -35,7 +35,16 @@ import { supabase } from '@/lib/supabase';
 import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
-import { ChevronDown as ChevronDownIcon, CheckSquare, Square } from 'lucide-react';
+import { ChevronDown as ChevronDownIcon, CheckSquare, Square, ChefHat } from 'lucide-react';
+
+const CAL_TO_KJ = 4.184;
+
+function formatEnergy(calories: number, unit: 'kcal' | 'kj') {
+    if (unit === 'kj') {
+        return `${Math.round(calories * CAL_TO_KJ).toLocaleString()} kJ`;
+    }
+    return `${Math.round(calories).toLocaleString()} kcal`;
+}
 
 interface FoodItem {
     id: string;
@@ -90,7 +99,7 @@ export function ExploreView({
     const [quickAddWeight, setQuickAddWeight] = useState('');
     const [quickAddUnit, setQuickAddUnit] = useState('g');
     const [quickAddMode, setQuickAddMode] = useState<'pantry' | 'shopping'>('pantry');
-    const { measurementUnit } = useUserPreferences();
+    const { measurementUnit, energyUnit } = useUserPreferences();
 
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
@@ -367,9 +376,9 @@ export function ExploreView({
                                         onClick={() => router.push(`/dashboard/library/foods/${food.id}`)}
                                         className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden cursor-pointer"
                                     >
-                                        <div className="flex items-center justify-between p-4 lg:p-0 lg:grid lg:grid-cols-[60px_1fr_180px] gap-4 lg:items-center lg:px-10 py-0">
+                                        <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px_150px] gap-3 lg:gap-4 lg:items-center lg:px-10 py-1">
                                             {/* Thumbnail */}
-                                            <div className="hidden lg:block aspect-square w-12 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-500 mx-auto">
+                                            <div className="aspect-square w-16 lg:w-12 shrink-0 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-500">
                                                 {food.image ? (
                                                     <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
                                                 ) : (
@@ -385,48 +394,60 @@ export function ExploreView({
                                             </div>
 
                                             {/* Name */}
-                                            <div className="flex-1 lg:flex-none lg:p-0">
-                                                <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
+                                            <div className="flex-1 min-w-0 lg:p-0">
+                                                <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize truncate">
                                                     {hasMultiple ? food.name : (food.common_name || food.name)}
                                                 </h3>
-                                                <div className="flex flex-wrap gap-2 mt-2">
+                                                <div className="flex flex-wrap gap-2 mt-1">
                                                     {/* Quantity badge - always visible if present */}
                                                     {food.quantity && (
                                                         <Badge className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[9px] border-none uppercase font-black tracking-tight">
                                                             {food.quantity}
                                                         </Badge>
                                                     )}
+                                                </div>
 
+                                                {/* Mobile-only stats row */}
+                                                <div className="flex lg:hidden items-center gap-2 mt-1.5 text-[9px] font-black">
+                                                    <span className="text-blue-500">{formatEnergy(food.energy_kcal, energyUnit)}</span>
+                                                    <span className="text-slate-300 text-[8px]">•</span>
+                                                    <span className="text-emerald-500">{food.protein_g.toFixed(0)}g P</span>
+                                                    <span className="text-slate-300 text-[8px]">•</span>
+                                                    <span className="text-amber-500">{food.carbs_g.toFixed(0)}g C</span>
+                                                    <span className="text-slate-300 text-[8px]">•</span>
+                                                    <span className="text-rose-500">{food.fat_g.toFixed(0)}g F</span>
                                                 </div>
                                             </div>
 
-
+                                            {/* Stats (Desktop View) */}
+                                            <div className="hidden lg:flex flex-col items-end">
+                                                <span className="text-[8px] uppercase font-black text-slate-400">Energy</span>
+                                                <span className="font-black text-[11px] text-slate-900 dark:text-white">{formatEnergy(food.energy_kcal, energyUnit)}</span>
+                                            </div>
+                                            <div className="hidden lg:flex flex-col items-end">
+                                                <span className="text-[8px] uppercase font-black text-slate-400">Carbs</span>
+                                                <span className="font-black text-[11px] text-slate-900 dark:text-white">{food.carbs_g.toFixed(1)}g</span>
+                                            </div>
+                                            <div className="hidden lg:flex flex-col items-end">
+                                                <span className="text-[8px] uppercase font-black text-slate-400">Fat</span>
+                                                <span className="font-black text-[11px] text-slate-900 dark:text-white">{food.fat_g.toFixed(1)}g</span>
+                                            </div>
+                                            <div className="hidden lg:flex flex-col items-end">
+                                                <span className="text-[8px] uppercase font-black text-slate-400">Protein</span>
+                                                <span className="font-black text-[11px] text-slate-900 dark:text-white">{food.protein_g.toFixed(1)}g</span>
+                                            </div>
 
                                             {/* Actions */}
-                                            <div className="p-3 lg:p-0 flex justify-center items-center gap-1">
+                                            <div className="shrink-0 flex items-center lg:justify-end gap-1 px-2 lg:px-0">
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className={cn("h-9 w-9 rounded-xl transition-all bg-transparent", food.is_favorite ? "text-rose-500" : "text-slate-400 hover:text-rose-500")}
+                                                    className={cn("h-8 w-8 rounded-xl transition-all bg-transparent", food.is_favorite ? "text-rose-500" : "text-slate-400 hover:text-rose-500")}
                                                     onClick={(e) => toggleFavorite(food, e)}
                                                     title="Favorite"
                                                 >
-                                                    <Heart size={16} fill={food.is_favorite ? "currentColor" : "none"} />
+                                                    <Heart size={14} fill={food.is_favorite ? "currentColor" : "none"} />
                                                 </Button>
-
-                                                {/* Hiding Quick Add button for now per user request
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-9 w-9 rounded-xl text-slate-400 hover:text-emerald-500 transition-all"
-                                                    onClick={(e) => { e.stopPropagation(); setQuickAddItem(quickAddItem?.id === food.id ? null : food); }}
-                                                    title="Quick Add"
-                                                >
-                                                    <Plus size={16} />
-                                                </Button>
-                                                */}
-
-
 
                                                 {/* Admin Edit */}
                                                 {currentUserEmail?.toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase() && (
@@ -437,13 +458,12 @@ export function ExploreView({
                                                             e.stopPropagation();
                                                             router.push(`/admin/foods/${food.id}`);
                                                         }}
-                                                        className="h-9 w-9 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                                        className="h-8 w-8 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                                         title="Admin Edit"
                                                     >
-                                                        <Edit2 size={16} />
+                                                        <Edit2 size={14} />
                                                     </Button>
                                                 )}
-
                                             </div>
                                         </div>
 
