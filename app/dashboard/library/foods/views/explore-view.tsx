@@ -43,7 +43,7 @@ function formatEnergy(calories: number, unit: 'kcal' | 'kJ') {
     if (unit === 'kJ') {
         return `${Math.round(calories * CAL_TO_KJ).toLocaleString()} kJ`;
     }
-    return `${Math.round(calories).toLocaleString()} kcal`;
+    return `${Math.round(calories).toLocaleString()} kC`;
 }
 
 interface FoodItem {
@@ -421,8 +421,8 @@ export function ExploreView({
 
                                             {/* Stats (Desktop View) */}
                                             <div className="hidden lg:flex flex-col items-end">
-                                                <span className="text-[8px] uppercase font-black text-slate-400">Energy</span>
                                                 <span className="font-black text-[11px] text-slate-900 dark:text-white">{formatEnergy(food.energy_kcal, energyUnit)}</span>
+                                                <span className="text-[8px] uppercase font-black text-slate-400">E</span>
                                             </div>
                                             <div className="hidden lg:flex flex-col items-end">
                                                 <span className="text-[8px] uppercase font-black text-slate-400">Carbs</span>
