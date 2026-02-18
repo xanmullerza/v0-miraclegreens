@@ -39,8 +39,8 @@ import { ChevronDown as ChevronDownIcon, CheckSquare, Square, ChefHat } from 'lu
 
 const CAL_TO_KJ = 4.184;
 
-function formatEnergy(calories: number, unit: 'kcal' | 'kj') {
-    if (unit === 'kj') {
+function formatEnergy(calories: number, unit: 'kcal' | 'kJ') {
+    if (unit === 'kJ') {
         return `${Math.round(calories * CAL_TO_KJ).toLocaleString()} kJ`;
     }
     return `${Math.round(calories).toLocaleString()} kcal`;
