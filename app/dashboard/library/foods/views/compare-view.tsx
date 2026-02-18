@@ -427,7 +427,7 @@ export function CompareView() {
                                     <th key={i} className="p-2 md:p-8 text-center border-l border-slate-100 dark:border-slate-800 w-[85px] md:w-1/4 min-w-[85px] md:min-w-0">
                                         <div className="flex flex-col items-center gap-1 md:gap-2">
                                             {selectedFoods[i] ? (
-                                                <div className="relative group/card">
+                                                <div className="relative group/card flex flex-col items-center">
                                                     <div className="flex justify-center mb-1 animate-in zoom-in duration-500">
                                                         {getMedal(i) ? React.createElement(getMedal(i)!.icon, {
                                                             size: 16,
@@ -436,10 +436,10 @@ export function CompareView() {
                                                             <div className="w-4 h-4 md:w-6 md:h-6" /> // Placeholder to maintain height
                                                         )}
                                                     </div>
-                                                    <h4 className="font-black text-[9px] md:text-sm uppercase italic text-slate-900 dark:text-white line-clamp-1 mb-1">
+                                                    <h4 className="font-black text-[9px] md:text-sm uppercase italic text-slate-900 dark:text-white line-clamp-1 mb-1 text-center">
                                                         {selectedFoods[i]?.common_name || selectedFoods[i]?.name}
                                                     </h4>
-                                                    <div className="flex flex-col md:flex-row items-center gap-0.5 md:gap-2">
+                                                    <div className="flex flex-col md:flex-row items-center gap-0.5 md:gap-2 justify-center">
                                                         <Badge className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-none font-black text-[6px] md:text-[8px] uppercase tracking-widest px-1 md:px-2">
                                                             {scores[i]} Score
                                                         </Badge>
@@ -452,7 +452,7 @@ export function CompareView() {
                                                     {/* Swap Button - Always Visible */}
                                                     <button
                                                         onClick={() => setActiveSlot(i)}
-                                                        className="mt-1.5 md:mt-2 flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border border-slate-200 dark:border-slate-700 hover:border-emerald-500/30 transition-all active:scale-95"
+                                                        className="mt-1.5 md:mt-2 flex items-center gap-1 md:gap-1.5 px-2 md:px-3 py-1 md:py-1.5 rounded-lg md:rounded-xl bg-orange-500 text-white hover:bg-orange-600 border border-orange-600/20 shadow-lg shadow-orange-500/20 transition-all active:scale-95"
                                                     >
                                                         <RefreshCw size={10} className="md:w-3 md:h-3" />
                                                         <span className="text-[7px] md:text-[9px] font-black uppercase tracking-widest">Swap</span>
