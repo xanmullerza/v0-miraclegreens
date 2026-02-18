@@ -717,23 +717,25 @@ export function MealPlannerContent({
             {!hideControls && (
                 <HeaderActions>
                     <div className="flex items-center gap-2">
-                        {/* Scope/Favorites Dropdown */}
+                        {/* Unified Filter Dropdown */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <button className={cn(
-                                    "flex items-center gap-2 px-2.5 py-1.5 rounded-xl border transition-all duration-300 shrink-0 shadow-sm group outline-none",
-                                    showFavoritesOnly
-                                        ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
-                                        : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-200 hover:text-rose-500"
+                                    "px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
+                                    (selectedTypes.length < MEAL_TYPES.length || showFavoritesOnly)
+                                        ? "bg-yellow-600 text-white border-yellow-600 shadow-lg shadow-yellow-500/20"
+                                        : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-yellow-200 hover:text-yellow-600"
                                 )}>
-                                    <Heart size={12} className={cn("transition-transform group-hover:scale-110", showFavoritesOnly && "fill-current")} />
-                                    <span className="text-[8px] font-black uppercase tracking-widest hidden sm:inline">
-                                        {showFavoritesOnly ? "Favorites" : "All Results"}
+                                    <Filter size={12} />
+                                    <span className="hidden sm:inline">
+                                        {(selectedTypes.length === MEAL_TYPES.length && !showFavoritesOnly) ? "Filter" :
+                                            "Filters Active"}
                                     </span>
-                                    <ChevronDown size={10} className="opacity-50" />
+                                    <ChevronDown size={10} className={cn("opacity-50")} />
                                 </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-48 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
+                            <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
+                                {/* Favorites Section */}
                                 <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Filter Scope</DropdownMenuLabel>
                                 <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
                                 <DropdownMenuCheckboxItem
@@ -750,30 +752,12 @@ export function MealPlannerContent({
                                 >
                                     Favorites Only
                                 </DropdownMenuCheckboxItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
 
-                        {/* Meal Type Dropdown Filter */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button className={cn(
-                                    "px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
-                                    selectedTypes.length < MEAL_TYPES.length
-                                        ? "bg-yellow-600 text-white border-yellow-600 shadow-lg shadow-yellow-500/20"
-                                        : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-yellow-200 hover:text-yellow-600"
-                                )}>
-                                    <Filter size={12} />
-                                    <span className="hidden sm:inline">
-                                        {selectedTypes.length === 0 ? "No Types" :
-                                            selectedTypes.length === MEAL_TYPES.length ? "Meal Types" :
-                                                `${selectedTypes.length} Types`}
-                                    </span>
-                                    <ChevronDown size={10} className={cn("opacity-50")} />
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
+                                <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2 my-1" />
+
+                                {/* Meal Types Section */}
                                 <div className="flex items-center justify-between pr-2">
-                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Types</DropdownMenuLabel>
+                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Meal Types</DropdownMenuLabel>
                                     <div className="flex items-center gap-1">
                                         <button
                                             onClick={(e) => {
