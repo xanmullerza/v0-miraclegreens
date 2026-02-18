@@ -245,9 +245,9 @@ export function BreadcrumbPillbox({
                         {isSearchExpanded ? <X size={18} /> : <Search size={18} />}
                     </button>
 
-                    {/* User Profile - Always visible if provided */}
+                    {/* User Profile - Hidden on mobile */}
                     {userProfile && (
-                        <div className="pl-1 border-l border-slate-100 dark:border-slate-800 flex-shrink-0">
+                        <div className="hidden md:flex pl-1 border-l border-slate-100 dark:border-slate-800 flex-shrink-0">
                             {userProfile}
                         </div>
                     )}
