@@ -92,7 +92,7 @@ function KitchenContent() {
 
     return (
         <PageContainer maxWidth="max-w-7xl">
-            <div className="space-y-10 animate-in fade-in duration-700 pb-32 pt-8">
+            <div className="space-y-10 animate-in fade-in duration-700 pb-32 pt-16">
 
                 {/* Header Toggle (Teleported to Subheader) */}
                 {['browse', 'mealplanner'].includes(activeTab) && (
@@ -121,12 +121,12 @@ function KitchenContent() {
 
                 {/* Filter Slider Section */}
                 <div className={cn(
-                    "relative z-[-1] overflow-hidden transition-all duration-700 ease-in-out -mt-12",
-                    isFilterOpen ? "max-h-60 opacity-100 mb-8 pt-12" : "max-h-0 opacity-0 mb-0 pt-0"
+                    "overflow-hidden transition-all duration-700 ease-in-out -mt-8",
+                    isFilterOpen ? "max-h-64 opacity-100 mb-8 pt-4" : "max-h-0 opacity-0 mb-0 pt-0"
                 )}>
-                    <div className="bg-white/80 dark:bg-slate-900/60 border-x border-b border-slate-200/50 dark:border-slate-800/50 rounded-b-[2rem] p-6 pb-5 flex flex-wrap items-center gap-4 backdrop-blur-md shadow-lg group">
+                    <div className="bg-white/95 dark:bg-slate-900/95 border border-slate-200/60 dark:border-slate-800/60 rounded-3xl p-6 flex flex-wrap items-center gap-4 shadow-xl backdrop-blur-xl group mx-1">
                         <div className="flex items-center gap-3 w-full sm:w-auto">
-                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 pl-2">Configure:</span>
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 pl-2">Filter Options:</span>
 
                             {/* Scope/Favorites Dropdown */}
                             <DropdownMenu>
