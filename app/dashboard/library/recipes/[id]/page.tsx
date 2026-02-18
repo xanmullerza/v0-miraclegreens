@@ -965,297 +965,298 @@ export default function RecipeDetailsPage() {
         <PageContainer maxWidth="max-w-7xl">
             <div className="w-full space-y-10 animate-in fade-in duration-700 pb-32 px-4">
                 <div className="max-w-7xl mx-auto space-y-8">
-                {/* Main Header Section (Image + Name) - Matching Food Page */}
-                <div className="flex flex-row items-end gap-6 animate-in slide-in-from-top-4 duration-700 pb-1">
-                    {/* Left Side: Image (Small, Inline) */}
-                    <div className="w-24 h-24 lg:w-24 lg:h-24 shrink-0">
-                        <Card className="w-full h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden rounded-2xl">
-                            <div className="w-full h-full rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
-                                {recipe.image ? (
-                                    <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-slate-200">
-                                        <ChefHat size={24} className="opacity-10" />
+                    {/* Main Header Section (Image + Name) - Matching Food Page */}
+                    <div className="flex flex-row items-end gap-6 animate-in slide-in-from-top-4 duration-700 pb-1">
+                        {/* Left Side: Image (Small, Inline) */}
+                        <div className="w-24 h-24 lg:w-24 lg:h-24 shrink-0">
+                            <Card className="w-full h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden rounded-2xl">
+                                <div className="w-full h-full rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
+                                    {recipe.image ? (
+                                        <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-slate-200">
+                                            <ChefHat size={24} className="opacity-10" />
+                                        </div>
+                                    )}
+                                    <div className="absolute top-1 left-1">
+                                        <Badge className="bg-emerald-600/90 text-white border-none text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 backdrop-blur-md shadow-xl w-fit">
+                                            {recipe.type}
+                                        </Badge>
                                     </div>
-                                )}
-                                <div className="absolute top-1 left-1">
-                                    <Badge className="bg-emerald-600/90 text-white border-none text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 backdrop-blur-md shadow-xl w-fit">
-                                        {recipe.type}
-                                    </Badge>
-                                </div>
-                            </div>
-                        </Card>
-                    </div>
-
-                    {/* Right Side: Text Content */}
-                    <div className="flex-1 flex flex-col">
-                        <h1 className="text-4xl lg:text-6xl font-black tracking-tighter uppercase italic leading-[0.85] mb-2">
-                            <span className="text-emerald-500">{recipe.title}</span>
-                        </h1>
-                        <div className="flex items-center gap-3 flex-wrap">
-                            {recipe.source && (
-                                <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Source: {recipe.source}</span>
-                            )}
-                            <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px] flex items-center gap-1">
-                                <Clock size={10} /> {recipe.prep_time}m
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-
-                {/* Controls Row - Like Food Page's Amount/Measure Row */}
-                <div className="flex flex-col gap-4 items-start w-full">
-                    <div className="flex items-center gap-3 flex-wrap animate-in fade-in slide-in-from-right-8 duration-700">
-                        {/* Servings Input (Mirrors Food Page's Amount Input) */}
-                        <div className="flex items-center bg-white dark:bg-slate-900 px-2 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm group/amount transition-all hover:border-emerald-500/50 shrink-0">
-                            <div className="flex items-center">
-                                <input
-                                    type="number"
-                                    value={calculations.totalServings.toFixed(1)}
-                                    readOnly
-                                    className="w-16 bg-transparent text-lg font-black italic text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-center border-r border-slate-100 dark:border-slate-800"
-                                />
-                                <div className="relative group/select pl-3 pr-2">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger className="flex items-center gap-1.5 pr-2 text-[10px] font-black uppercase tracking-tighter text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
-                                            Servings
-                                            <ChevronDown className="w-3 h-3 text-slate-400 group-hover/select:text-emerald-500" />
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent
-                                            align="end"
-                                            className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-[1.5rem] p-2 min-w-[160px] shadow-2xl animate-in zoom-in-95 duration-200"
-                                        >
-                                            <DropdownMenuItem
-                                                className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
-                                                onClick={() => setSelectedMemberIds(allPeople.map(p => p.id))}
-                                            >
-                                                Full Family ({allPeople.length})
-                                            </DropdownMenuItem>
-                                            {allPeople.map(person => (
-                                                <DropdownMenuItem
-                                                    key={person.id}
-                                                    className={cn(
-                                                        "text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all",
-                                                        selectedMemberIds.includes(person.id) ? "text-emerald-500" : "text-slate-500 dark:text-slate-400"
-                                                    )}
-                                                    onClick={() => {
-                                                        if (selectedMemberIds.includes(person.id)) {
-                                                            setSelectedMemberIds(prev => prev.filter(pid => pid !== person.id));
-                                                        } else {
-                                                            setSelectedMemberIds(prev => [...prev, person.id]);
-                                                        }
-                                                    }}
-                                                >
-                                                    {selectedMemberIds.includes(person.id) ? '✓ ' : ''}{person.name || (person as any).nickname || 'User'}
-                                                </DropdownMenuItem>
-                                            ))}
-                                            <DropdownMenuItem
-                                                className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-rose-500 focus:text-white transition-all text-slate-400"
-                                                onClick={() => setSelectedMemberIds([])}
-                                            >
-                                                Clear All
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Scaling Factor Indicator */}
-                    {currentScalingFactor !== 1 && (
-                        <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-emerald-500">
-                            <Scale size={12} />
-                            Scaled to {(currentScalingFactor * 100).toFixed(0)}% · Based on {calculations.maxTDEE.toFixed(0)} {energyUnit}
-                        </div>
-                    )}
-                </div>
-
-                {/* Main Content Grid - Ingredients + Nutrition */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Left Column - Ingredients & Instructions */}
-                    <div className="lg:col-span-2 space-y-6">
-                        {/* ═══ INGREDIENTS SECTION ═══ */}
-                        <Card className="p-6 lg:p-8 space-y-6">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <Layers className="text-emerald-500" size={20} />
-                                    <h2 className="text-lg font-black uppercase tracking-wider">Ingredients</h2>
-                                </div>
-                                <button
-                                    onClick={resetOrder}
-                                    className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-500 transition-colors flex items-center gap-1"
-                                    title="Reset to original recipe"
-                                >
-                                    <RotateCcw size={12} /> Reset
-                                </button>
-                            </div>
-
-                            {ingredients.length === 0 ? (
-                                <div className="text-center py-8 text-slate-400">
-                                    <p className="text-sm font-bold">No ingredients in this recipe</p>
-                                </div>
-                            ) : (
-                                <div className="space-y-2 max-h-[600px] overflow-y-auto custom-scrollbar">
-                                    {ingredients.map((ing, index) => (
-                                        <div
-                                            key={ing.id || index}
-                                            draggable
-                                            onDragStart={(e) => onDragStart(e, index)}
-                                            onDragOver={(e) => onDragOver(e, index)}
-                                            onDrop={(e) => onDrop(e, index)}
-                                            className={cn(
-                                                "group flex items-center gap-3 p-3 rounded-2xl border transition-all",
-                                                hiddenIngredientIds.includes(ing.id)
-                                                    ? "bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 opacity-50"
-                                                    : "bg-emerald-50/30 dark:bg-emerald-500/5 border-emerald-200 dark:border-emerald-800/30 hover:border-emerald-400"
-                                            )}
-                                        >
-                                            {/* Drag Handle */}
-                                            <button
-                                                className="text-slate-300 hover:text-slate-500 dark:hover:text-slate-400 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
-                                                title="Drag to reorder"
-                                            >
-                                                <GripVertical size={14} />
-                                            </button>
-
-                                            {/* Toggle Visibility */}
-                                            <button
-                                                onClick={(e) => toggleIngredient(ing.id, e)}
-                                                className={cn(
-                                                    "flex-shrink-0 transition-colors",
-                                                    hiddenIngredientIds.includes(ing.id)
-                                                        ? "text-slate-400 hover:text-slate-600"
-                                                        : "text-emerald-500 hover:text-emerald-600"
-                                                )}
-                                                title={hiddenIngredientIds.includes(ing.id) ? "Show" : "Hide"}
-                                            >
-                                                {hiddenIngredientIds.includes(ing.id) ? (
-                                                    <EyeOff size={16} />
-                                                ) : (
-                                                    <Eye size={16} />
-                                                )}
-                                            </button>
-
-                                            {/* Content */}
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-bold text-slate-900 dark:text-white truncate">
-                                                    {ing.item}
-                                                </p>
-                                                <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                                                    {ing.food_item?.energy_kcal ? `${(ing.weight_g / 100 * ing.food_item.energy_kcal).toFixed(0)} kcal` : 'No data'}
-                                                </p>
-                                            </div>
-
-                                            {/* Amount Display */}
-                                            <div className="text-right flex-shrink-0">
-                                                <p className="text-xs font-black text-slate-900 dark:text-white">
-                                                    {ing.quantity?.toFixed(2) || ing.weight_g}
-                                                </p>
-                                                <p className="text-[9px] text-slate-500 dark:text-slate-400">
-                                                    {ing.measure_label || 'g'}
-                                                </p>
-                                            </div>
-
-                                            {/* Actions */}
-                                            <button
-                                                onClick={(e) => removeIngredient(index, e)}
-                                                className="text-slate-300 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100"
-                                                title="Remove"
-                                            >
-                                                <Trash2 size={14} />
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* Add Ingredient Button */}
-                            <button
-                                onClick={() => setShowPicker(true)}
-                                className="w-full py-3 rounded-2xl border-2 border-dashed border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 text-emerald-600 dark:text-emerald-400 font-bold text-sm transition-all"
-                            >
-                                <Plus size={16} className="inline mr-2" />
-                                Add Ingredient
-                            </button>
-                        </Card>
-
-                        {/* ═══ INSTRUCTIONS SECTION ═══ */}
-                        {instructions.length > 0 && (
-                            <Card className="p-6 lg:p-8 space-y-6">
-                                <div className="flex items-center gap-3">
-                                    <BookOpen className="text-emerald-500" size={20} />
-                                    <h2 className="text-lg font-black uppercase tracking-wider">Instructions</h2>
-                                </div>
-                                <div className="space-y-4">
-                                    {instructions.map((inst, i) => (
-                                        <div key={i} className="flex gap-4">
-                                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-500 font-black flex items-center justify-center text-sm">
-                                                {i + 1}
-                                            </div>
-                                            <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed flex-1">
-                                                {inst.step_text}
-                                            </p>
-                                        </div>
-                                    ))}
                                 </div>
                             </Card>
+                        </div>
+
+                        {/* Right Side: Text Content */}
+                        <div className="flex-1 flex flex-col">
+                            <h1 className="text-4xl lg:text-6xl font-black tracking-tighter uppercase italic leading-[0.85] mb-2">
+                                <span className="text-emerald-500">{recipe.title}</span>
+                            </h1>
+                            <div className="flex items-center gap-3 flex-wrap">
+                                {recipe.source && (
+                                    <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Source: {recipe.source}</span>
+                                )}
+                                <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px] flex items-center gap-1">
+                                    <Clock size={10} /> {recipe.prep_time}m
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    {/* Controls Row - Like Food Page's Amount/Measure Row */}
+                    <div className="flex flex-col gap-4 items-start w-full">
+                        <div className="flex items-center gap-3 flex-wrap animate-in fade-in slide-in-from-right-8 duration-700">
+                            {/* Servings Input (Mirrors Food Page's Amount Input) */}
+                            <div className="flex items-center bg-white dark:bg-slate-900 px-2 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm group/amount transition-all hover:border-emerald-500/50 shrink-0">
+                                <div className="flex items-center">
+                                    <input
+                                        type="number"
+                                        value={calculations.totalServings.toFixed(1)}
+                                        readOnly
+                                        className="w-16 bg-transparent text-lg font-black italic text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-center border-r border-slate-100 dark:border-slate-800"
+                                    />
+                                    <div className="relative group/select pl-3 pr-2">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger className="flex items-center gap-1.5 pr-2 text-[10px] font-black uppercase tracking-tighter text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
+                                                Servings
+                                                <ChevronDown className="w-3 h-3 text-slate-400 group-hover/select:text-emerald-500" />
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent
+                                                align="end"
+                                                className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-[1.5rem] p-2 min-w-[160px] shadow-2xl animate-in zoom-in-95 duration-200"
+                                            >
+                                                <DropdownMenuItem
+                                                    className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
+                                                    onClick={() => setSelectedMemberIds(allPeople.map(p => p.id))}
+                                                >
+                                                    Full Family ({allPeople.length})
+                                                </DropdownMenuItem>
+                                                {allPeople.map(person => (
+                                                    <DropdownMenuItem
+                                                        key={person.id}
+                                                        className={cn(
+                                                            "text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all",
+                                                            selectedMemberIds.includes(person.id) ? "text-emerald-500" : "text-slate-500 dark:text-slate-400"
+                                                        )}
+                                                        onClick={() => {
+                                                            if (selectedMemberIds.includes(person.id)) {
+                                                                setSelectedMemberIds(prev => prev.filter(pid => pid !== person.id));
+                                                            } else {
+                                                                setSelectedMemberIds(prev => [...prev, person.id]);
+                                                            }
+                                                        }}
+                                                    >
+                                                        {selectedMemberIds.includes(person.id) ? '✓ ' : ''}{person.name || (person as any).nickname || 'User'}
+                                                    </DropdownMenuItem>
+                                                ))}
+                                                <DropdownMenuItem
+                                                    className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-rose-500 focus:text-white transition-all text-slate-400"
+                                                    onClick={() => setSelectedMemberIds([])}
+                                                >
+                                                    Clear All
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Scaling Factor Indicator */}
+                        {currentScalingFactor !== 1 && (
+                            <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-emerald-500">
+                                <Scale size={12} />
+                                Scaled to {(currentScalingFactor * 100).toFixed(0)}% · Based on {calculations.maxTDEE.toFixed(0)} {energyUnit}
+                            </div>
                         )}
                     </div>
 
-                    {/* Right Column - Nutrition Summary */}
-                    <div className="space-y-6">
-                        <Card className="p-6 space-y-6">
-                            <h3 className="text-lg font-black uppercase tracking-wider flex items-center gap-2">
-                                <Zap size={20} className="text-emerald-500" />
-                                Macros
-                            </h3>
-                            <div className="space-y-4">
-                                <div className="flex items-baseline justify-between">
-                                    <span className="text-sm font-bold text-slate-600 dark:text-slate-400">Calories</span>
-                                    <span className="text-2xl font-black text-emerald-500">{calculatedTotals?.calories.toFixed(0) || '0'}</span>
+                    {/* Main Content Grid - Ingredients + Nutrition */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Left Column - Ingredients & Instructions */}
+                        <div className="lg:col-span-2 space-y-6">
+                            {/* ═══ INGREDIENTS SECTION ═══ */}
+                            <Card className="p-6 lg:p-8 space-y-6">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <Layers className="text-emerald-500" size={20} />
+                                        <h2 className="text-lg font-black uppercase tracking-wider">Ingredients</h2>
+                                    </div>
+                                    <button
+                                        onClick={resetOrder}
+                                        className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-500 transition-colors flex items-center gap-1"
+                                        title="Reset to original recipe"
+                                    >
+                                        <RotateCcw size={12} /> Reset
+                                    </button>
                                 </div>
-                                <div className="grid grid-cols-3 gap-3">
-                                    <div className="text-center p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">P</p>
-                                        <p className="text-lg font-black text-slate-900 dark:text-white">{calculatedTotals?.protein.toFixed(1) || '0'}g</p>
-                                    </div>
-                                    <div className="text-center p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">C</p>
-                                        <p className="text-lg font-black text-slate-900 dark:text-white">{calculatedTotals?.carbs.toFixed(1) || '0'}g</p>
-                                    </div>
-                                    <div className="text-center p-3 rounded-xl bg-orange-50 dark:bg-orange-900/20">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">F</p>
-                                        <p className="text-lg font-black text-slate-900 dark:text-white">{calculatedTotals?.fat.toFixed(1) || '0'}g</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </Card>
 
-                        {/* Favorite Button */}
-                        <button
-                            onClick={toggleFavorite}
-                            className={cn(
-                                "w-full py-3 rounded-2xl font-black text-sm uppercase tracking-wider transition-all",
-                                recipe.is_favorite
-                                    ? "bg-rose-500/10 text-rose-500 border border-rose-300 dark:border-rose-900"
-                                    : "bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:border-rose-300"
+                                {ingredients.length === 0 ? (
+                                    <div className="text-center py-8 text-slate-400">
+                                        <p className="text-sm font-bold">No ingredients in this recipe</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2 max-h-[600px] overflow-y-auto custom-scrollbar">
+                                        {ingredients.map((ing, index) => (
+                                            <div
+                                                key={ing.id || index}
+                                                draggable
+                                                onDragStart={(e) => onDragStart(e, index)}
+                                                onDragOver={(e) => onDragOver(e, index)}
+                                                onDrop={(e) => onDrop(e, index)}
+                                                className={cn(
+                                                    "group flex items-center gap-3 p-3 rounded-2xl border transition-all",
+                                                    hiddenIngredientIds.includes(ing.id)
+                                                        ? "bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 opacity-50"
+                                                        : "bg-emerald-50/30 dark:bg-emerald-500/5 border-emerald-200 dark:border-emerald-800/30 hover:border-emerald-400"
+                                                )}
+                                            >
+                                                {/* Drag Handle */}
+                                                <button
+                                                    className="text-slate-300 hover:text-slate-500 dark:hover:text-slate-400 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
+                                                    title="Drag to reorder"
+                                                >
+                                                    <GripVertical size={14} />
+                                                </button>
+
+                                                {/* Toggle Visibility */}
+                                                <button
+                                                    onClick={(e) => toggleIngredient(ing.id, e)}
+                                                    className={cn(
+                                                        "flex-shrink-0 transition-colors",
+                                                        hiddenIngredientIds.includes(ing.id)
+                                                            ? "text-slate-400 hover:text-slate-600"
+                                                            : "text-emerald-500 hover:text-emerald-600"
+                                                    )}
+                                                    title={hiddenIngredientIds.includes(ing.id) ? "Show" : "Hide"}
+                                                >
+                                                    {hiddenIngredientIds.includes(ing.id) ? (
+                                                        <EyeOff size={16} />
+                                                    ) : (
+                                                        <Eye size={16} />
+                                                    )}
+                                                </button>
+
+                                                {/* Content */}
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                                                        {ing.item}
+                                                    </p>
+                                                    <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                                                        {ing.food_item?.energy_kcal ? `${(ing.weight_g / 100 * ing.food_item.energy_kcal).toFixed(0)} kcal` : 'No data'}
+                                                    </p>
+                                                </div>
+
+                                                {/* Amount Display */}
+                                                <div className="text-right flex-shrink-0">
+                                                    <p className="text-xs font-black text-slate-900 dark:text-white">
+                                                        {ing.quantity?.toFixed(2) || ing.weight_g}
+                                                    </p>
+                                                    <p className="text-[9px] text-slate-500 dark:text-slate-400">
+                                                        {ing.measure_label || 'g'}
+                                                    </p>
+                                                </div>
+
+                                                {/* Actions */}
+                                                <button
+                                                    onClick={(e) => removeIngredient(index, e)}
+                                                    className="text-slate-300 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100"
+                                                    title="Remove"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* Add Ingredient Button */}
+                                <button
+                                    onClick={() => setShowPicker(true)}
+                                    className="w-full py-3 rounded-2xl border-2 border-dashed border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 text-emerald-600 dark:text-emerald-400 font-bold text-sm transition-all"
+                                >
+                                    <Plus size={16} className="inline mr-2" />
+                                    Add Ingredient
+                                </button>
+                            </Card>
+
+                            {/* ═══ INSTRUCTIONS SECTION ═══ */}
+                            {instructions.length > 0 && (
+                                <Card className="p-6 lg:p-8 space-y-6">
+                                    <div className="flex items-center gap-3">
+                                        <BookOpen className="text-emerald-500" size={20} />
+                                        <h2 className="text-lg font-black uppercase tracking-wider">Instructions</h2>
+                                    </div>
+                                    <div className="space-y-4">
+                                        {instructions.map((inst, i) => (
+                                            <div key={i} className="flex gap-4">
+                                                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-500/10 text-emerald-500 font-black flex items-center justify-center text-sm">
+                                                    {i + 1}
+                                                </div>
+                                                <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed flex-1">
+                                                    {inst.step_text}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </Card>
                             )}
-                        >
-                            <Heart size={16} className={cn("inline mr-2", recipe.is_favorite && "fill-current")} />
-                            {recipe.is_favorite ? 'Favorited' : 'Add to Favorites'}
-                        </button>
+                        </div>
+
+                        {/* Right Column - Nutrition Summary */}
+                        <div className="space-y-6">
+                            <Card className="p-6 space-y-6">
+                                <h3 className="text-lg font-black uppercase tracking-wider flex items-center gap-2">
+                                    <Zap size={20} className="text-emerald-500" />
+                                    Macros
+                                </h3>
+                                <div className="space-y-4">
+                                    <div className="flex items-baseline justify-between">
+                                        <span className="text-sm font-bold text-slate-600 dark:text-slate-400">Calories</span>
+                                        <span className="text-2xl font-black text-emerald-500">{calculatedTotals?.calories.toFixed(0) || '0'}</span>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-3">
+                                        <div className="text-center p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">P</p>
+                                            <p className="text-lg font-black text-slate-900 dark:text-white">{calculatedTotals?.protein.toFixed(1) || '0'}g</p>
+                                        </div>
+                                        <div className="text-center p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">C</p>
+                                            <p className="text-lg font-black text-slate-900 dark:text-white">{calculatedTotals?.carbs.toFixed(1) || '0'}g</p>
+                                        </div>
+                                        <div className="text-center p-3 rounded-xl bg-orange-50 dark:bg-orange-900/20">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">F</p>
+                                            <p className="text-lg font-black text-slate-900 dark:text-white">{calculatedTotals?.fat.toFixed(1) || '0'}g</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </Card>
+
+                            {/* Favorite Button */}
+                            <button
+                                onClick={toggleFavorite}
+                                className={cn(
+                                    "w-full py-3 rounded-2xl font-black text-sm uppercase tracking-wider transition-all",
+                                    recipe.is_favorite
+                                        ? "bg-rose-500/10 text-rose-500 border border-rose-300 dark:border-rose-900"
+                                        : "bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:border-rose-300"
+                                )}
+                            >
+                                <Heart size={16} className={cn("inline mr-2", recipe.is_favorite && "fill-current")} />
+                                {recipe.is_favorite ? 'Favorited' : 'Add to Favorites'}
+                            </button>
+                        </div>
                     </div>
+
+                    {/* DidYouKnow Section */}
+                    <DidYouKnow />
                 </div>
 
-                {/* DidYouKnow Section */}
-                <DidYouKnow />
+                {/* Modals */}
+                {showPicker && <FoodItemPicker onSelect={handleAddIngredient} onClose={() => setShowPicker(false)} />}
+                {showExportModal && calculatedTotals && <NutrientExportModal isOpen={showExportModal} nutrition={calculatedTotals} recipeName={recipe?.title || 'Recipe'} totalWeight={totalWeight} onClose={() => setShowExportModal(false)} />}
             </div>
-
-            {/* Modals */}
-            {showPicker && <FoodItemPicker onSelect={handleAddIngredient} onClose={() => setShowPicker(false)} />}
-            {showExportModal && calculatedTotals && <NutrientExportModal isOpen={showExportModal} nutrition={calculatedTotals} recipeName={recipe?.title || 'Recipe'} totalWeight={totalWeight} onClose={() => setShowExportModal(false)} />}
-        </div>
+        </PageContainer>
     );
 }

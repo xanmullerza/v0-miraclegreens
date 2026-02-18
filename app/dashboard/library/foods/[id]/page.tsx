@@ -610,459 +610,458 @@ export default function FoodDetailsPage() {
     return (
         <PageContainer maxWidth="max-w-6xl">
             <div className="space-y-8 pb-20 animate-in fade-in duration-700">
-            {/* NEW Main Header Section (Image + Name + Description) */}
-            <div className="flex flex-row items-end gap-6 animate-in slide-in-from-top-4 duration-700 pb-1">
-                {/* Left Side: Image (Inline with Text) */}
-                <div className="w-24 h-24 lg:w-24 lg:h-24 shrink-0">
-                    <Card className="w-full h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden rounded-2xl">
-                        <div className="w-full h-full rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
-                            {food.image ? (
-                                <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-slate-200">
-                                    <Beef size={24} className="opacity-10" />
-                                </div>
-                            )}
-                            <div className="absolute top-1 left-1 flex flex-col gap-1">
-                                {food.protein_g > 15 && (
-                                    <Badge className="bg-red-600/90 text-white border-none text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 backdrop-blur-md shadow-xl w-fit">
-                                        HP
-                                    </Badge>
+                {/* NEW Main Header Section (Image + Name + Description) */}
+                <div className="flex flex-row items-end gap-6 animate-in slide-in-from-top-4 duration-700 pb-1">
+                    {/* Left Side: Image (Inline with Text) */}
+                    <div className="w-24 h-24 lg:w-24 lg:h-24 shrink-0">
+                        <Card className="w-full h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden rounded-2xl">
+                            <div className="w-full h-full rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
+                                {food.image ? (
+                                    <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-slate-200">
+                                        <Beef size={24} className="opacity-10" />
+                                    </div>
                                 )}
+                                <div className="absolute top-1 left-1 flex flex-col gap-1">
+                                    {food.protein_g > 15 && (
+                                        <Badge className="bg-red-600/90 text-white border-none text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 backdrop-blur-md shadow-xl w-fit">
+                                            HP
+                                        </Badge>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    </Card>
+                        </Card>
+                    </div>
+
+                    {/* Right Side: Text Content */}
+                    <div className="flex-1 flex flex-col">
+                        <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2">
+                            <span className="text-emerald-500">{food.common_name || food.name}</span>
+                        </h1>
+
+                        {/* Description - Styled as Subtext */}
+                        {(food.details || FOOD_DETAILS[food.id]) && (
+                            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] leading-relaxed max-w-2xl">
+                                {(food.details || FOOD_DETAILS[food.id]).description}
+                                {food.quantity && (
+                                    <span className="ml-3 text-emerald-500">
+                                        In Stock: {food.quantity}
+                                    </span>
+                                )}
+                            </p>
+                        )}
+                    </div>
                 </div>
 
-                {/* Right Side: Text Content */}
-                <div className="flex-1 flex flex-col">
-                    <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2">
-                        <span className="text-emerald-500">{food.common_name || food.name}</span>
-                    </h1>
 
-                    {/* Description - Styled as Subtext */}
-                    {(food.details || FOOD_DETAILS[food.id]) && (
-                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] leading-relaxed max-w-2xl">
-                            {(food.details || FOOD_DETAILS[food.id]).description}
-                            {food.quantity && (
-                                <span className="ml-3 text-emerald-500">
-                                    In Stock: {food.quantity}
-                                </span>
-                            )}
-                        </p>
-                    )}
-                </div>
-            </div>
+                <div className="flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                    <div className="flex items-center bg-white dark:bg-slate-900 px-2 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm group/amount transition-all hover:border-emerald-500/50 shrink-0">
+                        <div className="flex items-center">
+                            <input
+                                type="number"
+                                value={amount}
+                                onChange={(e) => setAmount(Number(e.target.value))}
+                                className="w-16 bg-transparent text-lg font-black italic text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-center border-r border-slate-100 dark:border-slate-800"
+                            />
 
-
-            <div className="flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-700">
-                <div className="flex items-center bg-white dark:bg-slate-900 px-2 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm group/amount transition-all hover:border-emerald-500/50 shrink-0">
-                    <div className="flex items-center">
-                        <input
-                            type="number"
-                            value={amount}
-                            onChange={(e) => setAmount(Number(e.target.value))}
-                            className="w-16 bg-transparent text-lg font-black italic text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-center border-r border-slate-100 dark:border-slate-800"
-                        />
-
-                        <div className="relative group/select pl-3 pr-2">
-                            <DropdownMenu>
-                                <DropdownMenuTrigger className="flex items-center gap-1.5 pr-2 text-[10px] font-black uppercase tracking-tighter text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
-                                    {selectedPortion?.label || 'Gram (g)'}
-                                    <ChevronDown className="w-3 h-3 text-slate-400 group-hover/select:text-emerald-500" />
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent
-                                    align="end"
-                                    className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-[1.5rem] p-2 min-w-[140px] shadow-2xl animate-in zoom-in-95 duration-200"
-                                >
-                                    <DropdownMenuItem
-                                        className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
-                                        onClick={() => {
-                                            setSelectedPortion(null);
-                                            if (amount === 1) setAmount(100);
-                                        }}
+                            <div className="relative group/select pl-3 pr-2">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger className="flex items-center gap-1.5 pr-2 text-[10px] font-black uppercase tracking-tighter text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
+                                        {selectedPortion?.label || 'Gram (g)'}
+                                        <ChevronDown className="w-3 h-3 text-slate-400 group-hover/select:text-emerald-500" />
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent
+                                        align="end"
+                                        className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-[1.5rem] p-2 min-w-[140px] shadow-2xl animate-in zoom-in-95 duration-200"
                                     >
-                                        Gram (g)
-                                    </DropdownMenuItem>
-                                    {food?.portions?.map(p => (
                                         <DropdownMenuItem
-                                            key={p.label}
                                             className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
                                             onClick={() => {
-                                                setSelectedPortion(p);
-                                                if (amount >= 10) setAmount(1);
+                                                setSelectedPortion(null);
+                                                if (amount === 1) setAmount(100);
                                             }}
                                         >
-                                            {p.label}
+                                            Gram (g)
                                         </DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                                        {food?.portions?.map(p => (
+                                            <DropdownMenuItem
+                                                key={p.label}
+                                                className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
+                                                onClick={() => {
+                                                    setSelectedPortion(p);
+                                                    if (amount >= 10) setAmount(1);
+                                                }}
+                                            >
+                                                {p.label}
+                                            </DropdownMenuItem>
+                                        ))}
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Nutrient Grids - Removed Hero Wrapper */}
-            <div className="space-y-6">
-                <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6">
-                    <h3 className="text-sm font-black uppercase tracking-[0.3em] text-emerald-500 italic flex items-center gap-2">
-                        <Activity size={18} />
-                        Essential Nutrients
-                    </h3>
-                </div>
-
-
-
-
-
-                <NutrientGrid title="Macronutrients" icon={Zap} theme="orange" subtitle="Detailed breakdown of energy and macro density" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
-                    'Energy': ['Energy', 'energy_kcal', 'Calories', 'calories'],
-                    'Protein': ['Protein', 'protein_g', 'protein'],
-                    'Carbs': ['Carbohydrates', 'carbs_g', 'carbs'],
-                    'Fat': ['Fat', 'fat_g', 'fat']
-                }} />
-
-                <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Essential minerals for cellular hydration and nerve signal transmission" items={{
-                    'Sodium': ['Sodium', 'sodium_mg'],
-                    'Potassium': ['Potassium', 'potassium_mg'],
-                    'Magnesium': ['Magnesium', 'magnesium_mg'],
-                    'Calcium': ['Calcium', 'calcium_mg'],
-                    'Phosphorus': ['Phosphorus', 'phosphorus_mg']
-                }} />
-
-                <NutrientGrid title="Trace Minerals" icon={Gem} theme="rose" subtitle="Essential minerals for energy and immune support" items={{
-                    'Iron': ['Iron', 'iron_mg'],
-                    'Zinc': ['Zinc', 'zinc_mg'],
-                    'Copper': ['Copper', 'copper_mg'],
-                    'Manganese': ['Manganese', 'manganese_mg'],
-                    'Selenium': ['Selenium', 'selenium_ug']
-                }} />
-
-                <NutrientGrid title="Water-Soluble Vitamins" icon={Droplet} theme="blue" subtitle="Daily vitamins for a healthy mind and body" items={{
-                    'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
-                    'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
-                    'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
-                    'B5 (Pantothenic Acid)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
-                    'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
-                    'B7 (Biotin)': ['Biotin', 'biotin_ug'],
-                    'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
-                    'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
-                    'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
-                    'Choline': ['Choline', 'choline_mg'],
-                }} />
-
-                <NutrientGrid title="Fat-Soluble Vitamins" icon={Battery} theme="emerald" subtitle="Stored vitamins for long-term vitality" breakdownLabels={['Vitamin A', 'Vitamin E']} items={{
-                    'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
-                    'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
-                    'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
-                    'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
-                }} />
-
-                <div className="pt-12 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6">
-                    <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
-                        <Dna size={18} />
-                        Advanced Nutrition
-                    </h3>
-                </div>
-
-                <NutrientGrid title="Extra Markers" icon={Activity} theme="amber" subtitle="Extra health markers worth tracking" forceRaw={true} items={{
-                    'Fiber': ['Fiber', 'fiber_g'],
-                    'Sugars': ['Sugars', 'sugars_g'],
-                    'Oxalate': ['Oxalate', 'oxalate_mg'],
-                    'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
-                }} />
-
-                <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Key nutrient balances for a healthy body" items={{
-                    'Sodium & Potassium': ['Sodium', 'Potassium'],
-                    'Zinc & Copper': ['Zinc', 'Copper'],
-                    'Omega 3 to 6 ratio': ['Omega-6', 'Omega-3'],
-                    'Calcium & Magnesium': ['Calcium', 'Magnesium'],
-                    'Calcium & Phosphorus': ['Calcium', 'Phosphorus'],
-                }} />
-
-                <DidYouKnow
-                    phytonutrients={food.phytonutrients}
-                    foodName={food.common_name || food.name}
-                    className="py-4"
-                />
-
-            </div>
-
-            {/* Know Your Food Section */}
-            {
-                (food.details || FOOD_DETAILS[food.id]) && (() => {
-                    const details = food.details || FOOD_DETAILS[food.id];
-                    return (
-                        <div className="space-y-6 pt-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-                            <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-8 font-display">
-                                <h3 className="text-sm font-black uppercase tracking-[0.3em] text-purple-500 italic flex items-center gap-2">
-                                    <Search size={18} />
-                                    Know Your Food
-                                </h3>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* Producers */}
-                                <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
-                                    <div className="flex items-center gap-2 text-slate-400 font-black uppercase tracking-widest text-[10px]">
-                                        <ShoppingBasket size={14} /> Top Producers
-                                    </div>
-                                    <p className="text-lg font-bold text-slate-900 dark:text-white leading-snug">
-                                        {details.producers}
-                                    </p>
-                                </Card>
-
-                                {/* Facts */}
-                                <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
-                                    <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-black uppercase tracking-widest text-[10px]">
-                                        <Lightbulb size={14} /> Culinary Facts & Uses
-                                    </div>
-                                    <ul className="space-y-3">
-                                        {details.facts.map((fact: string, i: number) => (
-                                            <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
-                                                <span className="text-purple-500 font-bold mt-1">✨</span>
-                                                <span className="leading-snug font-medium italic">{fact}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </Card>
-
-                                {/* History */}
-                                <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
-                                    <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-black uppercase tracking-widest text-[10px]">
-                                        <Globe size={14} /> Origin & History
-                                    </div>
-                                    <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                                        {details.history}
-                                    </p>
-                                </Card>
-
-                                {/* Benefits */}
-                                <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
-                                    <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-black uppercase tracking-widest text-[10px]">
-                                        <ShieldCheck size={14} /> Key Benefits
-                                    </div>
-                                    <ul className="space-y-3">
-                                        {details.benefits.map((benefit: string, i: number) => (
-                                            <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
-                                                <span className="text-blue-500 font-bold mt-1">•</span>
-                                                <span className="leading-snug font-medium">{benefit}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </Card>
-                            </div>
-                        </div>
-                    );
-                })()
-            }
-
-            {/* NUTRIENT BREAKDOWN MODAL */}
-            {
-                breakdownNutrient && (food.micronutrients) && (
-                    <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setBreakdownNutrient(null)}>
-                        <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] max-w-lg w-full p-8 shadow-2xl relative animate-in zoom-in-95 duration-200 border border-slate-200 dark:border-slate-800" onClick={e => e.stopPropagation()}>
-                            <button onClick={() => setBreakdownNutrient(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"><X size={24} /></button>
-
-                            <div className="flex items-center gap-4 mb-8">
-                                <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center shadow-xl shadow-current/10",
-                                    breakdownNutrient === 'Protein' ? "bg-red-100 text-red-600" :
-                                        breakdownNutrient === 'Carbs' ? "bg-amber-100 text-amber-600" :
-                                            breakdownNutrient === 'Fat' ? "bg-orange-100 text-orange-600" :
-                                                "bg-emerald-100 text-emerald-600"
-                                )}>
-                                    <Layers className="h-7 w-7" />
-                                </div>
-                                <div>
-                                    <h3 className="text-2xl font-black uppercase tracking-tighter italic">{breakdownNutrient}</h3>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Detailed Breakdown</p>
-                                </div>
-                            </div>
-
-                            <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
-                                {(() => {
-                                    const items = NUTRIENT_BREAKDOWNS[breakdownNutrient] || [];
-                                    return items.map((item, idx) => {
-                                        const val = getVal(item.keys);
-                                        return (
-                                            <div key={idx} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 group hover:border-emerald-500/30 transition-all">
-                                                <div className="flex justify-between items-center mb-3">
-                                                    <div className="flex flex-col">
-                                                        <span className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors uppercase tracking-tight">
-                                                            {item.label}
-                                                            {item.isEssential && <span className="ml-2 text-[8px] px-2 py-0.5 bg-emerald-500 text-white rounded-md uppercase font-black">Essential</span>}
-                                                        </span>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <span className="font-black text-sm text-slate-900 dark:text-white tabular-nums">{val.toFixed(2)}</span>
-                                                        <span className="ml-1 text-[10px] font-bold text-slate-400 uppercase">{item.unit === 'µg' ? 'µg' : item.unit}</span>
-                                                    </div>
-                                                </div>
-
-                                                {/* Progress Bar for constituent */}
-                                                {(() => {
-                                                    const rda = userRDAs?.[item.label];
-                                                    if (!rda || val === 0) return null;
-                                                    const pct = Math.min(100, Math.round((val / rda) * 100));
-                                                    return (
-                                                        <div className="space-y-1">
-                                                            <div className="h-1.5 w-full bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
-                                                                <div
-                                                                    className="h-full transition-all duration-1000 bg-emerald-500"
-                                                                    style={{ width: `${pct}%` }}
-                                                                />
-                                                            </div>
-                                                            <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-widest opacity-40">
-                                                                <span>Target Progress</span>
-                                                                <span>{pct}% of {rda.toFixed(1)}{item.unit === 'µg' ? 'µg' : item.unit}</span>
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                })()}
-                                            </div>
-                                        );
-                                    });
-                                })()}
-                            </div>
-
-                            <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
-                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Values represent a customized {amount}g sample volume</p>
-                            </div>
-                        </div>
+                {/* Nutrient Grids - Removed Hero Wrapper */}
+                <div className="space-y-6">
+                    <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6">
+                        <h3 className="text-sm font-black uppercase tracking-[0.3em] text-emerald-500 italic flex items-center gap-2">
+                            <Activity size={18} />
+                            Essential Nutrients
+                        </h3>
                     </div>
-                )
-            }
 
-            {/* EDIT MODAL */}
-            {
-                isEditing && (
-                    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-                        <div className="w-full max-w-md">
-                            <Card className="bg-white dark:bg-slate-900 p-8 space-y-6 shadow-2xl border-emerald-500/20">
-                                <div className="flex justify-between items-center">
-                                    <h3 className="text-2xl font-black uppercase tracking-tighter italic">Edit Ingredient Details</h3>
-                                    <button onClick={() => setIsEditing(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400">
-                                        <X size={24} />
-                                    </button>
+
+
+
+
+                    <NutrientGrid title="Macronutrients" icon={Zap} theme="orange" subtitle="Detailed breakdown of energy and macro density" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
+                        'Energy': ['Energy', 'energy_kcal', 'Calories', 'calories'],
+                        'Protein': ['Protein', 'protein_g', 'protein'],
+                        'Carbs': ['Carbohydrates', 'carbs_g', 'carbs'],
+                        'Fat': ['Fat', 'fat_g', 'fat']
+                    }} />
+
+                    <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Essential minerals for cellular hydration and nerve signal transmission" items={{
+                        'Sodium': ['Sodium', 'sodium_mg'],
+                        'Potassium': ['Potassium', 'potassium_mg'],
+                        'Magnesium': ['Magnesium', 'magnesium_mg'],
+                        'Calcium': ['Calcium', 'calcium_mg'],
+                        'Phosphorus': ['Phosphorus', 'phosphorus_mg']
+                    }} />
+
+                    <NutrientGrid title="Trace Minerals" icon={Gem} theme="rose" subtitle="Essential minerals for energy and immune support" items={{
+                        'Iron': ['Iron', 'iron_mg'],
+                        'Zinc': ['Zinc', 'zinc_mg'],
+                        'Copper': ['Copper', 'copper_mg'],
+                        'Manganese': ['Manganese', 'manganese_mg'],
+                        'Selenium': ['Selenium', 'selenium_ug']
+                    }} />
+
+                    <NutrientGrid title="Water-Soluble Vitamins" icon={Droplet} theme="blue" subtitle="Daily vitamins for a healthy mind and body" items={{
+                        'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
+                        'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
+                        'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
+                        'B5 (Pantothenic Acid)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
+                        'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
+                        'B7 (Biotin)': ['Biotin', 'biotin_ug'],
+                        'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
+                        'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
+                        'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
+                        'Choline': ['Choline', 'choline_mg'],
+                    }} />
+
+                    <NutrientGrid title="Fat-Soluble Vitamins" icon={Battery} theme="emerald" subtitle="Stored vitamins for long-term vitality" breakdownLabels={['Vitamin A', 'Vitamin E']} items={{
+                        'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
+                        'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
+                        'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
+                        'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
+                    }} />
+
+                    <div className="pt-12 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6">
+                        <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
+                            <Dna size={18} />
+                            Advanced Nutrition
+                        </h3>
+                    </div>
+
+                    <NutrientGrid title="Extra Markers" icon={Activity} theme="amber" subtitle="Extra health markers worth tracking" forceRaw={true} items={{
+                        'Fiber': ['Fiber', 'fiber_g'],
+                        'Sugars': ['Sugars', 'sugars_g'],
+                        'Oxalate': ['Oxalate', 'oxalate_mg'],
+                        'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
+                    }} />
+
+                    <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Key nutrient balances for a healthy body" items={{
+                        'Sodium & Potassium': ['Sodium', 'Potassium'],
+                        'Zinc & Copper': ['Zinc', 'Copper'],
+                        'Omega 3 to 6 ratio': ['Omega-6', 'Omega-3'],
+                        'Calcium & Magnesium': ['Calcium', 'Magnesium'],
+                        'Calcium & Phosphorus': ['Calcium', 'Phosphorus'],
+                    }} />
+
+                    <DidYouKnow
+                        phytonutrients={food.phytonutrients}
+                        foodName={food.common_name || food.name}
+                        className="py-4"
+                    />
+
+                </div>
+
+                {/* Know Your Food Section */}
+                {
+                    (food.details || FOOD_DETAILS[food.id]) && (() => {
+                        const details = food.details || FOOD_DETAILS[food.id];
+                        return (
+                            <div className="space-y-6 pt-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+                                <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-8 font-display">
+                                    <h3 className="text-sm font-black uppercase tracking-[0.3em] text-purple-500 italic flex items-center gap-2">
+                                        <Search size={18} />
+                                        Know Your Food
+                                    </h3>
                                 </div>
 
-                                <div className="space-y-5 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
-                                    <div className="space-y-2">
-                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Ingredient Name (Scientific)</Label>
-                                        <Input
-                                            value={editName}
-                                            onChange={(e) => setEditName(e.target.value)}
-                                            className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 font-bold h-12 rounded-xl"
-                                        />
-                                    </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Producers */}
+                                    <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
+                                        <div className="flex items-center gap-2 text-slate-400 font-black uppercase tracking-widest text-[10px]">
+                                            <ShoppingBasket size={14} /> Top Producers
+                                        </div>
+                                        <p className="text-lg font-bold text-slate-900 dark:text-white leading-snug">
+                                            {details.producers}
+                                        </p>
+                                    </Card>
 
-                                    <div className="space-y-2">
-                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Common Name</Label>
-                                        <Input
-                                            value={editCommonName}
-                                            onChange={(e) => setEditCommonName(e.target.value)}
-                                            className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 h-12 rounded-xl"
-                                            placeholder="e.g. Garden Pea"
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Biological Category</Label>
-                                        <div className="flex flex-wrap gap-2">
-                                            {CATEGORIES.map(category => (
-                                                <button
-                                                    key={category}
-                                                    onClick={() => setEditCategory(category)}
-                                                    className={cn(
-                                                        "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all",
-                                                        editCategory === category
-                                                            ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
-                                                            : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
-                                                    )}
-                                                >
-                                                    {category}
-                                                </button>
+                                    {/* Facts */}
+                                    <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
+                                        <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-black uppercase tracking-widest text-[10px]">
+                                            <Lightbulb size={14} /> Culinary Facts & Uses
+                                        </div>
+                                        <ul className="space-y-3">
+                                            {details.facts.map((fact: string, i: number) => (
+                                                <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
+                                                    <span className="text-purple-500 font-bold mt-1">✨</span>
+                                                    <span className="leading-snug font-medium italic">{fact}</span>
+                                                </li>
                                             ))}
-                                        </div>
-                                    </div>
+                                        </ul>
+                                    </Card>
 
-                                    <div className="space-y-2">
-                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Display Image</Label>
-                                        <div className="relative aspect-video rounded-2xl bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group/upload flex items-center justify-center">
-                                            {editImage ? (
-                                                <>
-                                                    <img src={editImage} alt="Preview" className="w-full h-full object-cover" />
-                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/upload:opacity-100 transition-opacity flex items-center justify-center">
-                                                        <Button variant="secondary" size="sm" className="gap-2" onClick={() => setEditImage('')}>
-                                                            <X size={14} /> Remove
-                                                        </Button>
+                                    {/* History */}
+                                    <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
+                                        <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-black uppercase tracking-widest text-[10px]">
+                                            <Globe size={14} /> Origin & History
+                                        </div>
+                                        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                                            {details.history}
+                                        </p>
+                                    </Card>
+
+                                    {/* Benefits */}
+                                    <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
+                                        <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-black uppercase tracking-widest text-[10px]">
+                                            <ShieldCheck size={14} /> Key Benefits
+                                        </div>
+                                        <ul className="space-y-3">
+                                            {details.benefits.map((benefit: string, i: number) => (
+                                                <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
+                                                    <span className="text-blue-500 font-bold mt-1">•</span>
+                                                    <span className="leading-snug font-medium">{benefit}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </Card>
+                                </div>
+                            </div>
+                        );
+                    })()
+                }
+
+                {/* NUTRIENT BREAKDOWN MODAL */}
+                {
+                    breakdownNutrient && (food.micronutrients) && (
+                        <div className="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={() => setBreakdownNutrient(null)}>
+                            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] max-w-lg w-full p-8 shadow-2xl relative animate-in zoom-in-95 duration-200 border border-slate-200 dark:border-slate-800" onClick={e => e.stopPropagation()}>
+                                <button onClick={() => setBreakdownNutrient(null)} className="absolute top-6 right-6 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"><X size={24} /></button>
+
+                                <div className="flex items-center gap-4 mb-8">
+                                    <div className={cn("h-14 w-14 rounded-2xl flex items-center justify-center shadow-xl shadow-current/10",
+                                        breakdownNutrient === 'Protein' ? "bg-red-100 text-red-600" :
+                                            breakdownNutrient === 'Carbs' ? "bg-amber-100 text-amber-600" :
+                                                breakdownNutrient === 'Fat' ? "bg-orange-100 text-orange-600" :
+                                                    "bg-emerald-100 text-emerald-600"
+                                    )}>
+                                        <Layers className="h-7 w-7" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-2xl font-black uppercase tracking-tighter italic">{breakdownNutrient}</h3>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Detailed Breakdown</p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+                                    {(() => {
+                                        const items = NUTRIENT_BREAKDOWNS[breakdownNutrient] || [];
+                                        return items.map((item, idx) => {
+                                            const val = getVal(item.keys);
+                                            return (
+                                                <div key={idx} className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 group hover:border-emerald-500/30 transition-all">
+                                                    <div className="flex justify-between items-center mb-3">
+                                                        <div className="flex flex-col">
+                                                            <span className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors uppercase tracking-tight">
+                                                                {item.label}
+                                                                {item.isEssential && <span className="ml-2 text-[8px] px-2 py-0.5 bg-emerald-500 text-white rounded-md uppercase font-black">Essential</span>}
+                                                            </span>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <span className="font-black text-sm text-slate-900 dark:text-white tabular-nums">{val.toFixed(2)}</span>
+                                                            <span className="ml-1 text-[10px] font-bold text-slate-400 uppercase">{item.unit === 'µg' ? 'µg' : item.unit}</span>
+                                                        </div>
                                                     </div>
-                                                </>
-                                            ) : (
-                                                <div className="text-center p-4">
-                                                    {uploading ? (
-                                                        <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mx-auto" />
-                                                    ) : (
-                                                        <>
-                                                            <Camera size={24} className="text-slate-400 mx-auto mb-2" />
-                                                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Upload Profile Image</p>
-                                                            <input
-                                                                type="file"
-                                                                accept="image/*"
-                                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                                                onChange={handleImageUpload}
-                                                            />
-                                                        </>
-                                                    )}
+
+                                                    {/* Progress Bar for constituent */}
+                                                    {(() => {
+                                                        const rda = userRDAs?.[item.label];
+                                                        if (!rda || val === 0) return null;
+                                                        const pct = Math.min(100, Math.round((val / rda) * 100));
+                                                        return (
+                                                            <div className="space-y-1">
+                                                                <div className="h-1.5 w-full bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
+                                                                    <div
+                                                                        className="h-full transition-all duration-1000 bg-emerald-500"
+                                                                        style={{ width: `${pct}%` }}
+                                                                    />
+                                                                </div>
+                                                                <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-widest opacity-40">
+                                                                    <span>Target Progress</span>
+                                                                    <span>{pct}% of {rda.toFixed(1)}{item.unit === 'µg' ? 'µg' : item.unit}</span>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })()}
                                                 </div>
-                                            )}
+                                            );
+                                        });
+                                    })()}
+                                </div>
+
+                                <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
+                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">Values represent a customized {amount}g sample volume</p>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
+
+                {/* EDIT MODAL */}
+                {
+                    isEditing && (
+                        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                            <div className="w-full max-w-md">
+                                <Card className="bg-white dark:bg-slate-900 p-8 space-y-6 shadow-2xl border-emerald-500/20">
+                                    <div className="flex justify-between items-center">
+                                        <h3 className="text-2xl font-black uppercase tracking-tighter italic">Edit Ingredient Details</h3>
+                                        <button onClick={() => setIsEditing(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400">
+                                            <X size={24} />
+                                        </button>
+                                    </div>
+
+                                    <div className="space-y-5 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Ingredient Name (Scientific)</Label>
+                                            <Input
+                                                value={editName}
+                                                onChange={(e) => setEditName(e.target.value)}
+                                                className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 font-bold h-12 rounded-xl"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Common Name</Label>
+                                            <Input
+                                                value={editCommonName}
+                                                onChange={(e) => setEditCommonName(e.target.value)}
+                                                className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 h-12 rounded-xl"
+                                                placeholder="e.g. Garden Pea"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Biological Category</Label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {CATEGORIES.map(category => (
+                                                    <button
+                                                        key={category}
+                                                        onClick={() => setEditCategory(category)}
+                                                        className={cn(
+                                                            "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all",
+                                                            editCategory === category
+                                                                ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20"
+                                                                : "bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+                                                        )}
+                                                    >
+                                                        {category}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Display Image</Label>
+                                            <div className="relative aspect-video rounded-2xl bg-slate-50 dark:bg-slate-950 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group/upload flex items-center justify-center">
+                                                {editImage ? (
+                                                    <>
+                                                        <img src={editImage} alt="Preview" className="w-full h-full object-cover" />
+                                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/upload:opacity-100 transition-opacity flex items-center justify-center">
+                                                            <Button variant="secondary" size="sm" className="gap-2" onClick={() => setEditImage('')}>
+                                                                <X size={14} /> Remove
+                                                            </Button>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <div className="text-center p-4">
+                                                        {uploading ? (
+                                                            <Loader2 className="h-8 w-8 animate-spin text-emerald-500 mx-auto" />
+                                                        ) : (
+                                                            <>
+                                                                <Camera size={24} className="text-slate-400 mx-auto mb-2" />
+                                                                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Upload Profile Image</p>
+                                                                <input
+                                                                    type="file"
+                                                                    accept="image/*"
+                                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                                    onChange={handleImageUpload}
+                                                                />
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Nutrients per 100g</Label>
+                                            <textarea
+                                                value={editNutrientText}
+                                                onChange={(e) => setEditNutrientText(e.target.value)}
+                                                className="w-full h-32 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs font-mono focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                                placeholder="Paste nutrition data here..."
+                                            />
+                                            <p className="text-[9px] text-slate-400">Format: "Protein: 10g" or paste from USDA</p>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Serving Sizes</Label>
+                                            <textarea
+                                                value={editServingText}
+                                                onChange={(e) => setEditServingText(e.target.value)}
+                                                className="w-full h-24 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs font-mono focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                                placeholder="1 cup = 240g&#10;1 large = 150g"
+                                            />
+                                            <p className="text-[9px] text-slate-400">Format: "1 cup = 240g"</p>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Nutrients per 100g</Label>
-                                        <textarea
-                                            value={editNutrientText}
-                                            onChange={(e) => setEditNutrientText(e.target.value)}
-                                            className="w-full h-32 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs font-mono focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
-                                            placeholder="Paste nutrition data here..."
-                                        />
-                                        <p className="text-[9px] text-slate-400">Format: "Protein: 10g" or paste from USDA</p>
+                                    <div className="flex gap-3 pt-6 border-t border-slate-100 dark:border-slate-800">
+                                        <Button variant="outline" className="flex-1 rounded-2xl h-12 font-black uppercase tracking-widest text-[10px]" onClick={() => setIsEditing(false)}>
+                                            Discard
+                                        </Button>
+                                        <Button
+                                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl h-12 font-black uppercase tracking-widest text-[10px] shadow-lg shadow-emerald-500/20 gap-2"
+                                            onClick={handleEditSave}
+                                            disabled={saveLoading}
+                                        >
+                                            {saveLoading ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
+                                            Save Profile
+                                        </Button>
                                     </div>
-
-                                    <div className="space-y-2">
-                                        <Label className="text-[10px] uppercase font-black tracking-widest text-slate-400">Serving Sizes</Label>
-                                        <textarea
-                                            value={editServingText}
-                                            onChange={(e) => setEditServingText(e.target.value)}
-                                            className="w-full h-24 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs font-mono focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
-                                            placeholder="1 cup = 240g&#10;1 large = 150g"
-                                        />
-                                        <p className="text-[9px] text-slate-400">Format: "1 cup = 240g"</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex gap-3 pt-6 border-t border-slate-100 dark:border-slate-800">
-                                    <Button variant="outline" className="flex-1 rounded-2xl h-12 font-black uppercase tracking-widest text-[10px]" onClick={() => setIsEditing(false)}>
-                                        Discard
-                                    </Button>
-                                    <Button
-                                        className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl h-12 font-black uppercase tracking-widest text-[10px] shadow-lg shadow-emerald-500/20 gap-2"
-                                        onClick={handleEditSave}
-                                        disabled={saveLoading}
-                                    >
-                                        {saveLoading ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
-                                        Save Profile
-                                    </Button>
-                                </div>
-                            </Card>
+                                </Card>
+                            </div>
                         </div>
-                    </div>
-                )
-            }
+                    )
+                }
             </div>
         </PageContainer>
     );
-}
 }
