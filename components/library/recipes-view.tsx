@@ -385,17 +385,6 @@ export function RecipesView({
 
                                     {/* Actions */}
                                     <div className="shrink-0 flex items-center lg:justify-end gap-1">
-                                        {isAdmin && (
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    router.push(`/dashboard/library/recipes/${recipe.id}/edit`);
-                                                }}
-                                                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-500 transition-all"
-                                            >
-                                                <Pencil size={14} />
-                                            </button>
-                                        )}
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
