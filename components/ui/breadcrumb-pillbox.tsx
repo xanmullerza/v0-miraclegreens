@@ -201,9 +201,9 @@ export function BreadcrumbPillbox({
                     )}
                 </div>
 
-                {/* Right side - Actions, Search & Profile */}
+                {/* Right side - Split Button for Search & Actions */}
                 <div className={cn(
-                    "flex items-center justify-end gap-2 transition-all duration-500",
+                    "flex transition-all duration-500",
                     isSearchExpanded ? "flex-1 pl-2" : "flex-shrink-0"
                 )}>
                     {/* Search Input - Expands to fill available space */}
@@ -221,33 +221,52 @@ export function BreadcrumbPillbox({
                         />
                     </div>
 
-                    {/* Actions (Hidden if search expanded on mobile maybe? For now keep visible) */}
-                    {!isSearchExpanded && actions && (
-                        <div className="flex items-center gap-2">
-                            {actions}
-                        </div>
-                    )}
+                    {/* Split Button Container */}
+                    <div className={cn(
+                        "flex items-center transition-all duration-500",
+                        isSearchExpanded ? "ml-2" : "ml-2 border-l border-slate-200 dark:border-slate-800"
+                    )}>
+                        <div className={cn(
+                            "flex flex-col h-12 w-12",
+                            isSearchExpanded ? "" : "divide-y divide-slate-100 dark:divide-slate-800"
+                        )}>
+                            {/* Top Half: Search Toggle */}
+                            <button
+                                onClick={() => {
+                                    if (isSearchExpanded) setSearchQuery('');
+                                    setIsSearchExpanded(!isSearchExpanded);
+                                }}
+                                className={cn(
+                                    "flex items-center justify-center w-12 transition-all flex-shrink-0",
+                                    isSearchExpanded
+                                        ? "h-12 rounded-[1.5rem] bg-rose-50 text-rose-500 hover:bg-rose-100"
+                                        : "h-6 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50"
+                                )}
+                                title="Search"
+                            >
+                                {isSearchExpanded ? <X size={18} /> : <Search size={14} />}
+                            </button>
 
-                    {/* Search Toggle */}
-                    <button
-                        onClick={() => {
-                            if (isSearchExpanded) setSearchQuery('');
-                            setIsSearchExpanded(!isSearchExpanded);
-                        }}
-                        className={cn(
-                            "flex items-center justify-center w-12 h-12 rounded-[1.5rem] transition-all flex-shrink-0",
-                            isSearchExpanded
-                                ? "bg-rose-50 text-rose-500 hover:bg-rose-100"
-                                : "text-slate-400 hover:text-emerald-500 hover:bg-emerald-50"
-                        )}
-                        title="Search"
-                    >
-                        {isSearchExpanded ? <X size={18} /> : <Search size={18} />}
-                    </button>
+                            {/* Bottom Half: Filter / Actions */}
+                            {!isSearchExpanded && (
+                                <div className="h-6 w-12 flex items-center justify-center overflow-hidden">
+                                    {actions ? (
+                                        <div className="flex items-center justify-center scale-75 transform origin-center">
+                                            {actions}
+                                        </div>
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-700">
+                                            <Filter size={12} className="opacity-20" />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
                     {/* User Profile - Hidden on mobile */}
-                    {userProfile && (
-                        <div className="hidden md:flex pl-1 border-l border-slate-100 dark:border-slate-800 flex-shrink-0">
+                    {userProfile && !isSearchExpanded && (
+                        <div className="hidden md:flex pl-3 border-l border-slate-100 dark:border-slate-800 flex-shrink-0 ml-2">
                             {userProfile}
                         </div>
                     )}
