@@ -411,19 +411,19 @@ export function CompareView() {
                     <table className="w-full border-collapse table-fixed md:table-auto">
                         <thead className="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-sm">
                             <tr>
-                                <th className="p-4 md:p-8 text-left bg-slate-50/50 dark:bg-slate-800/30 w-[140px] md:w-1/4 min-w-[140px] md:min-w-[200px] sticky left-0 z-40 bg-white dark:bg-slate-900 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-slate-100 dark:border-slate-800">
-                                    <div className="flex items-center gap-2 md:gap-3">
-                                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                                            <Scale size={16} className="md:w-5 md:h-5" />
+                                <th className="p-2 md:p-8 text-left bg-slate-50/50 dark:bg-slate-800/30 w-[100px] md:w-1/4 min-w-[100px] md:min-w-[200px] sticky left-0 z-40 bg-white dark:bg-slate-900 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-slate-100 dark:border-slate-800">
+                                    <div className="flex items-center gap-1 md:gap-3">
+                                        <div className="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                                            <Scale size={14} className="md:w-5 md:h-5" />
                                         </div>
                                         <div>
-                                            <h3 className="font-black text-[10px] md:text-sm uppercase italic text-slate-900 dark:text-white leading-none mb-1">Nutrition</h3>
+                                            <h3 className="font-black text-[9px] md:text-sm uppercase italic text-slate-900 dark:text-white leading-none mb-1">Nutrition</h3>
                                             <p className="text-[7px] md:text-[9px] font-black text-emerald-500 uppercase tracking-widest leading-none">per 100g</p>
                                         </div>
                                     </div>
                                 </th>
                                 {[0, 1, 2].map((i) => (
-                                    <th key={i} className="p-4 md:p-8 text-center border-l border-slate-100 dark:border-slate-800 w-[100px] md:w-1/4 min-w-[100px] md:min-w-0">
+                                    <th key={i} className="p-2 md:p-8 text-center border-l border-slate-100 dark:border-slate-800 w-[85px] md:w-1/4 min-w-[85px] md:min-w-0">
                                         <div className="flex flex-col items-center gap-1 md:gap-2">
                                             {selectedFoods[i] ? (
                                                 <div className="relative group/card">
@@ -491,9 +491,9 @@ export function CompareView() {
                             {NUTRIENT_GROUPS.map((group) => (
                                 <React.Fragment key={group.title}>
                                     <tr className="bg-slate-50/80 dark:bg-slate-800/50">
-                                        <td colSpan={4} className="px-4 md:px-8 py-2 md:py-3 sticky left-0 z-20 bg-slate-50/80 dark:bg-slate-800 shadow-[2px_0_5px_rgba(0,0,0,0.02)] border-r border-slate-100 dark:border-slate-800">
-                                            <div className="flex items-center gap-2">
-                                                <group.icon size={12} className={cn("md:w-[14px] md:h-[14px]", themes[group.theme as keyof typeof themes].split(' ')[0])} />
+                                        <td colSpan={4} className="px-2 md:px-8 py-2 md:py-3 sticky left-0 z-20 bg-slate-50/80 dark:bg-slate-800 shadow-[2px_0_5px_rgba(0,0,0,0.02)] border-r border-slate-100 dark:border-slate-800">
+                                            <div className="flex items-center gap-1.5">
+                                                <group.icon size={11} className={cn("md:w-[14px] md:h-[14px]", themes[group.theme as keyof typeof themes].split(' ')[0])} />
                                                 <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.15em] md:tracking-[0.2em] text-slate-400">{group.title}</span>
                                             </div>
                                         </td>
@@ -517,12 +517,12 @@ export function CompareView() {
 
                                         return (
                                             <tr key={nutrient.key} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors group">
-                                                <td className="p-3 md:p-6 px-4 md:px-12 sticky left-0 z-20 bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] focus-within:z-30">
+                                                <td className="p-2 md:p-6 px-2 md:px-12 sticky left-0 z-20 bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 shadow-[2px_0_5px_rgba(0,0,0,0.03)] focus-within:z-30">
                                                     <div className="flex flex-col">
-                                                        <span className="text-[9px] md:text-[11px] font-black uppercase tracking-wider md:tracking-widest text-slate-700 dark:text-slate-300 group-hover:text-emerald-500 transition-colors truncate">
+                                                        <span className="text-[8px] md:text-[11px] font-black uppercase tracking-wider md:tracking-widest text-slate-700 dark:text-slate-300 group-hover:text-emerald-500 transition-colors truncate">
                                                             {nutrient.label}
                                                         </span>
-                                                        <span className="text-[7px] md:text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+                                                        <span className="text-[6px] md:text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
                                                             {nutrient.key === 'energy_kcal' ? energyUnit : nutrient.unit}
                                                         </span>
                                                     </div>
@@ -533,7 +533,7 @@ export function CompareView() {
                                                     const colorClass = rank === 0 ? "text-emerald-500" : rank === 1 ? "text-blue-500" : rank === 2 ? "text-rose-500" : "text-slate-900 dark:text-white";
 
                                                     return (
-                                                        <td key={i} className="p-3 md:p-6 text-center border-l border-slate-100 dark:border-slate-800">
+                                                        <td key={i} className="p-2 md:p-6 text-center border-l border-slate-100 dark:border-slate-800">
                                                             <span className={cn(
                                                                 "text-[11px] md:text-xs font-black tracking-widest transition-colors duration-500",
                                                                 selectedFoods[i] ? colorClass : "text-slate-200 dark:text-slate-800"
