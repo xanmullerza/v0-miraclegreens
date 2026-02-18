@@ -16,6 +16,7 @@ import {
     Beef,
     Trophy,
     Medal,
+    Award,
     ChevronRight,
     RefreshCw
 } from 'lucide-react';
@@ -263,9 +264,9 @@ export function CompareView() {
         const score = scores[index];
         const rank = sortedScores.indexOf(score);
 
-        if (rank === 0) return { icon: Trophy, color: "text-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.3)]", label: "1st", bg: "bg-yellow-50 dark:bg-yellow-900/20" };
-        if (rank === 1) return { icon: Medal, color: "text-slate-400 shadow-[0_0_15px_rgba(148,163,184,0.3)]", label: "2nd", bg: "bg-slate-50 dark:bg-slate-800/50" };
-        if (rank === 2) return { icon: Medal, color: "text-amber-700 shadow-[0_0_15px_rgba(180,83,9,0.3)]", label: "3rd", bg: "bg-amber-50 dark:bg-amber-900/20" };
+        if (rank === 0) return { icon: Trophy, color: "text-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.3)]", label: "1st" };
+        if (rank === 1) return { icon: Medal, color: "text-slate-400 shadow-[0_0_15px_rgba(148,163,184,0.3)]", label: "2nd" };
+        if (rank === 2) return { icon: Award, color: "text-amber-700 shadow-[0_0_15px_rgba(180,83,9,0.3)]", label: "3rd" };
         return null;
     };
 
@@ -427,7 +428,7 @@ export function CompareView() {
                                         <div className="flex flex-col items-center gap-1 md:gap-2">
                                             {selectedFoods[i] ? (
                                                 <div className="relative group/card">
-                                                    <div className={cn("p-1.5 md:p-2 rounded-lg md:rounded-xl mb-0.5 md:mb-1 animate-in zoom-in duration-500", getMedal(i)?.bg)}>
+                                                    <div className="flex justify-center mb-1 animate-in zoom-in duration-500">
                                                         {getMedal(i) ? React.createElement(getMedal(i)!.icon, {
                                                             size: 16,
                                                             className: cn("md:w-6 md:h-6", getMedal(i)!.color)
