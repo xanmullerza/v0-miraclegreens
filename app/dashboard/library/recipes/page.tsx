@@ -5,9 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import {
     Loader2,
     Sparkles,
-    FlaskConical,
-    Bot,
-    BookOpen,
+
     Search,
     X,
     LayoutGrid,
@@ -27,12 +25,12 @@ import {
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { useSearch } from '@/lib/context/search-context';
+
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { supabase } from '@/lib/supabase';
 import { HeaderActions } from '@/lib/context/header-actions-context';
 
-import { NavigationPillbox, NavigationTab } from '@/components/ui/navigation-pillbox';
+
 import { MealPlannerView } from '@/components/kitchen/mealplanner-view';
 import { MixLabView } from '@/components/kitchen/mix-lab-view';
 import { RecipesView, MEAL_TYPES } from '@/components/library/recipes-view';
@@ -57,7 +55,7 @@ function KitchenContent() {
     const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState<TabId>('browse');
     const [isAdmin, setIsAdmin] = useState(false);
-    const { searchQuery, setSearchQuery } = useSearch();
+
     const { dailyPlan } = useUserPreferences();
 
     // Lifted Filter State
@@ -86,52 +84,13 @@ function KitchenContent() {
         }
     }, [searchParams]);
 
-    const handleTabChange = (tab: TabId) => {
-        setActiveTab(tab);
-        const params = new URLSearchParams(searchParams.toString());
-        params.set('tab', tab);
-        window.history.pushState(null, '', `?${params.toString()}`);
-    };
 
-    // Tab configuration with headings and descriptions
-    const tabConfig: Record<TabId, { heading: string; description: string; color: string }> = {
-        browse: {
-            heading: 'Browse All Meals',
-            description: 'Explore our complete recipe collection and find meals that match your nutritional goals',
-            color: 'text-yellow-500'
-        },
-        mealplanner: {
-            heading: 'Meal-O-Matic',
-            description: 'Let AI create personalized meal plans based on your preferences and nutritional needs',
-            color: 'text-yellow-500'
-        },
-        mixlab: {
-            heading: 'Homemade Mixes',
-            description: 'Create custom recipes by mixing and matching ingredients to your exact specifications',
-            color: 'text-purple-500'
-        }
-    };
 
-    // Meals & Recipes tabs
-    const mealsTabs: NavigationTab<TabId>[] = [
-        { id: 'browse', label: 'All Meals', icon: BookOpen, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
-        { id: 'mealplanner', label: 'Meal-O-Matic', icon: Bot, color: 'text-yellow-500', bg: 'bg-yellow-500/10' },
-        { id: 'mixlab', label: 'Mix Lab', icon: FlaskConical, color: 'text-purple-500', bg: 'bg-purple-500/10' },
-    ];
+
 
     return (
         <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700 pb-32 pt-8">
-            <NavigationPillbox
-                tabs={mealsTabs}
-                activeTab={activeTab}
-                onTabChange={handleTabChange}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                sectionLabel="Kitchen Tools"
-                sectionColor={tabConfig[activeTab].color}
-                isAdmin={isAdmin}
-                adminOnlyTabs={['mealplanner', 'mixlab']}
-            />
+
             {/* Header Actions (Teleported to Subheader) */}
             {['browse', 'mealplanner'].includes(activeTab) && (
                 <HeaderActions>
