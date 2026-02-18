@@ -105,8 +105,8 @@ export default function DashboardOverview() {
                             </div>
                         </div>
 
-                        <div className="flex-none w-full">
-                            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-4 justify-items-stretch w-full px-2 sm:px-0">
+                        <div className="flex-none w-full md:max-w-[800px]">
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-4 justify-items-stretch w-full px-2 md:px-0">
                                 {heroCards.map((card) => {
                                     const Icon = card.icon;
                                     const isKitchen = card.id === 'kitchen';
@@ -144,8 +144,8 @@ export default function DashboardOverview() {
                     </div>
                 </div>
             ) : (
-                <div className="w-full flex justify-center mt-6 lg:mt-8 px-2 sm:px-4 lg:px-0">
-                    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-4 justify-items-stretch w-full max-w-7xl">
+                <div className="w-full flex justify-center mt-6 lg:mt-8">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-4 justify-items-stretch w-full md:max-w-[800px] px-2 md:px-0">
                         {heroCards.map((card) => {
                             const Icon = card.icon;
                             const isKitchen = card.id === 'kitchen';
