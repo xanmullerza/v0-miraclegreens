@@ -324,25 +324,28 @@ export function CompareView() {
                             )}
                         </div>
 
-                        <div className="p-6 md:p-8 border-t border-slate-100 dark:border-slate-800 flex items-center gap-4 bg-slate-50/50 dark:bg-slate-800/30 order-2">
-                            <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 animate-pulse">
-                                <Search size={20} />
+                        <div className="p-4 md:p-6 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3 bg-white dark:bg-slate-900 order-2">
+                            <div className="flex-1 relative flex items-center">
+                                <div className="absolute left-5 text-slate-400">
+                                    <Search size={16} className="md:w-5 md:h-5" />
+                                </div>
+                                <input
+                                    autoFocus
+                                    placeholder={`Search for Food ${activeSlot + 1}...`}
+                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border-none focus:ring-2 focus:ring-emerald-500/20 text-[10px] md:text-sm font-black uppercase tracking-widest h-12 md:h-14 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300 transition-all"
+                                    value={searchQuery}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Escape') setActiveSlot(null);
+                                    }}
+                                    onChange={(e) => handleSearchInput(e.target.value)}
+                                />
                             </div>
-                            <input
-                                autoFocus
-                                placeholder={`Search for Food ${activeSlot + 1}...`}
-                                className="flex-1 bg-transparent border-none focus:ring-0 text-xl font-black uppercase tracking-widest text-slate-900 dark:text-white placeholder:text-slate-300"
-                                value={searchQuery}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Escape') setActiveSlot(null);
-                                }}
-                                onChange={(e) => handleSearchInput(e.target.value)}
-                            />
                             <button
                                 onClick={() => setActiveSlot(null)}
-                                className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all border border-slate-200 dark:border-slate-800"
+                                className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-full bg-rose-50 dark:bg-rose-950/30 text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/40 flex items-center justify-center transition-all active:scale-95 group/cancel"
+                                title="Cancel"
                             >
-                                Cancel
+                                <X size={18} className="md:w-6 md:h-6 group-hover/cancel:rotate-90 transition-transform duration-300" />
                             </button>
                         </div>
                     </div>
