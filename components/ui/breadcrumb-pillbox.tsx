@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Search, X, LayoutGrid, ChevronRight, Filter } from 'lucide-react';
+import { useHeaderActions } from '@/lib/context/header-actions-context';
 import { cn } from '@/lib/utils';
 
 interface BreadcrumbPillboxProps {
@@ -27,23 +28,31 @@ export function BreadcrumbPillbox({
     sectionLabel,
     sectionColor = 'text-emerald-500',
     showHomeButton = true,
-    customLastSegment,
-    filterContent,
-    isFilterActive = false,
-    isFilterExpanded: controlledIsFilterExpanded,
-    onFilterToggle,
     actions,
     userProfile
 }: BreadcrumbPillboxProps) {
     const router = useRouter();
     const pathname = usePathname();
+    const {
+        customSegmentLabel,
+        filterContent,
+        isFilterExpanded: contextIsFilterExpanded,
+        setIsFilterExpanded: setContextIsFilterExpanded,
+        isFilterActive: contextIsFilterActive
+    } = useHeaderActions();
+
+    // Local state for search
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+    // Local state for filter if not controlled by context (though we prefer context now)
     const [internalIsFilterExpanded, setInternalIsFilterExpanded] = useState(false);
 
-    const isFilterExpanded = controlledIsFilterExpanded !== undefined ? controlledIsFilterExpanded : internalIsFilterExpanded;
+    // If context provides filter content, use context state. Otherwise use internal state (legacy support)
+    const isFilterExpanded = filterContent ? contextIsFilterExpanded : internalIsFilterExpanded;
+    const isFilterActive = filterContent ? (contextIsFilterActive || false) : false;
+
     const setIsFilterExpanded = (val: boolean) => {
-        if (onFilterToggle) {
-            onFilterToggle(val);
+        if (filterContent) {
+            setContextIsFilterExpanded(val);
         } else {
             setInternalIsFilterExpanded(val);
         }
@@ -117,8 +126,9 @@ export function BreadcrumbPillbox({
                             {segments.map((segment, index) => {
                                 const path = '/' + segments.slice(0, index + 1).join('/');
                                 const isLast = index === segments.length - 1;
-                                const label = isLast && customLastSegment
-                                    ? customLastSegment
+
+                                const label = isLast && customSegmentLabel
+                                    ? customSegmentLabel
                                     : decodeURIComponent(segment).replace(/-/g, ' ');
 
                                 return (

@@ -38,7 +38,7 @@ import {
     Filter
 } from 'lucide-react';
 import { useSearch } from '@/lib/context/search-context';
-import { BreadcrumbPillbox } from '@/components/ui/breadcrumb-pillbox';
+import { useHeaderActions } from '@/lib/context/header-actions-context';
 import { CATEGORIES } from '@/components/library/foods-view';
 import { FOOD_DETAILS } from '@/lib/data/food-details';
 import { Badge } from '@/components/ui/badge';
@@ -120,125 +120,17 @@ export default function FoodDetailsPage() {
     // --- Navigation / Pillbox State ---
     const { searchQuery, setSearchQuery, setIsFocused, activeSearchId, setActiveSearchId } = useSearch();
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-    // Visual state for tabs - clicking them navigates back to main page
-    const currentTab = 'foods';
-    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-    const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-    const ingredientTabs = [
-        { id: 'foods', label: 'Foods', icon: UtensilsCrossed, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-        { id: 'groceries', label: 'Groceries', icon: ShoppingCart, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-        { id: 'pantry', label: 'Pantry', icon: ShoppingBasket, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-    ];
+    // Header Actions
+    const { setCustomSegmentLabel } = useHeaderActions();
 
-    const renderTabGroup = (tabsList: typeof ingredientTabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
-        <div className="space-y-3 w-full">
-            {sectionLabel && <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>}
-            <div className={cn(
-                "flex items-center p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden w-full md:max-w-[800px] mx-auto xl:mx-0"
-            )}>
-                {/* Left side - Home Button area */}
-                <div className={cn("flex-shrink-0 flex items-center justify-start transition-all duration-500", isSearchExpanded ? "w-0" : "w-12")}>
-                    {showHomeButton && !isSearchExpanded && (
-                        <button
-                            onClick={() => router.push('/dashboard')}
-                            className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all flex-shrink-0"
-                            title="Back to Dashboard"
-                        >
-                            <LayoutGrid size={18} />
-                        </button>
-                    )}
-                </div>
-
-                {/* Center - Tabs area */}
-                <div className={cn("flex items-center justify-center overflow-hidden transition-all duration-500", isSearchExpanded ? "w-0 flex-none opacity-0" : "flex-1 opacity-100")}>
-                    <div className="flex items-center gap-4 overflow-hidden py-1">
-                        {tabsList.map((tab) => {
-                            const Icon = tab.icon;
-                            // Checking if we are "on" this tab is tricky since we are in detail view. 
-                            // We'll just show them as navigable buttons.
-                            const isActive = false;
-                            return (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => router.push(`/dashboard/library/foods?tab=${tab.id}`)}
-                                    className={cn(
-                                        "flex items-center gap-3 py-3.5 rounded-[1.5rem] text-[9px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
-                                        isActive
-                                            ? "bg-slate-900 dark:bg-slate-800 text-white shadow-xl translate-y-[-2px]"
-                                            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50",
-                                        "px-4 md:px-5"
-                                    )}
-                                >
-                                    <Icon size={15} className={cn(
-                                        "transition-transform duration-500 group-hover:scale-110",
-                                        isActive ? tab.color : "text-slate-400"
-                                    )} />
-                                    <span className={cn(
-                                        "transition-all duration-300 overflow-hidden hidden md:block",
-                                        isSearchExpanded ? "w-0 opacity-0" : "w-auto opacity-100"
-                                    )}>
-                                        {tab.label}
-                                    </span>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
-
-                {/* Right side - Search area */}
-                <div className={cn(
-                    "flex items-center justify-end transition-all duration-500",
-                    isSearchExpanded ? "flex-1 pl-2" : "w-12"
-                )}>
-                    <div className={cn(
-                        "flex items-center transition-all duration-500 overflow-hidden",
-                        isSearchExpanded ? "flex-1 opacity-100" : "w-0 opacity-0"
-                    )}>
-                        <input
-                            type="text"
-                            autoFocus
-                            placeholder={`Search ingredients...`}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    router.push(`/dashboard/library/foods?tab=foods`);
-                                }
-                            }}
-                            onFocus={() => {
-                                setIsFocused(true);
-                                setActiveSearchId('ingredients-bar');
-                            }}
-                            onBlur={() => {
-                                // Small delay to allow selections
-                                setTimeout(() => {
-                                    if (activeSearchId === 'ingredients-bar') setActiveSearchId(null);
-                                }, 200);
-                            }}
-                            className="w-full bg-slate-50 dark:bg-slate-800/50 border-none focus:ring-0 text-[10px] font-black uppercase tracking-widest h-12 rounded-[1.5rem] px-6 text-slate-900 dark:text-white"
-                        />
-                    </div>
-                    <button
-                        onClick={() => {
-                            if (isSearchExpanded) setSearchQuery('');
-                            setIsSearchExpanded(!isSearchExpanded);
-                        }}
-                        className={cn(
-                            "flex items-center justify-center w-12 h-12 rounded-[1.5rem] transition-all flex-shrink-0",
-                            isSearchExpanded
-                                ? "bg-emerald-50 text-emerald-500 hover:bg-emerald-100"
-                                : "text-slate-400 hover:text-emerald-500 hover:bg-emerald-50"
-                        )}
-                        title="Search"
-                    >
-                        {isSearchExpanded ? <X size={18} /> : <Search size={18} />}
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
+    // Update header label when food loads
+    useEffect(() => {
+        if (food?.name) {
+            setCustomSegmentLabel(food.name);
+        }
+        return () => setCustomSegmentLabel(null);
+    }, [food?.name, setCustomSegmentLabel]);
 
     useEffect(() => {
         if (id) {
@@ -759,14 +651,6 @@ export default function FoodDetailsPage() {
                 </div>
             </div>
 
-            {/* Unified Breadcrumb Navigation */}
-            <BreadcrumbPillbox
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                sectionLabel="Ingredient Library"
-                sectionColor="text-emerald-500"
-                customLastSegment={food.name}
-            />
 
             <div className="flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-700">
                 <div className="flex items-center bg-white dark:bg-slate-900 px-2 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm group/amount transition-all hover:border-emerald-500/50 shrink-0">

@@ -48,7 +48,7 @@ import {
     Bot,
     FlaskConical
 } from 'lucide-react';
-import { BreadcrumbPillbox } from '@/components/ui/breadcrumb-pillbox';
+import { useHeaderActions } from '@/lib/context/header-actions-context';
 import { useSearch } from '@/lib/context/search-context';
 import FoodItemPicker from '@/components/recipe/food-item-picker';
 import NutrientExportModal from '@/components/recipe/nutrient-export-modal';
@@ -139,6 +139,15 @@ export default function RecipeDetailsPage() {
     const [loading, setLoading] = useState(true);
     const [showDetailedNutrients, setShowDetailedNutrients] = useState(true);
     const { searchQuery, setSearchQuery } = useSearch();
+    const { setCustomSegmentLabel } = useHeaderActions();
+
+    // Update header label when recipe loads
+    useEffect(() => {
+        if (recipe?.title) {
+            setCustomSegmentLabel(recipe.title);
+        }
+        return () => setCustomSegmentLabel(null);
+    }, [recipe?.title, setCustomSegmentLabel]);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
     const [expandedBreakdownSections, setExpandedBreakdownSections] = useState<Record<string, boolean>>({});
     const [calculatedTotals, setCalculatedTotals] = useState<CalculatedNutrition | null>(null);
@@ -993,14 +1002,6 @@ export default function RecipeDetailsPage() {
                     </div>
                 </div>
 
-                {/* Unified Breadcrumb Navigation */}
-                <BreadcrumbPillbox
-                    searchQuery={searchQuery}
-                    setSearchQuery={setSearchQuery}
-                    sectionLabel="Kitchen & Library"
-                    sectionColor="text-yellow-500"
-                    customLastSegment={recipe.title}
-                />
 
                 {/* Controls Row - Like Food Page's Amount/Measure Row */}
                 <div className="flex flex-col gap-4 items-start w-full">

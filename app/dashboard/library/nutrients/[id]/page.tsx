@@ -42,8 +42,8 @@ import {
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { BreadcrumbPillbox } from '@/components/ui/breadcrumb-pillbox';
 import { useSearch } from '@/lib/context/search-context';
+import { useHeaderActions } from '@/lib/context/header-actions-context';
 import { nutrientInfo, NutrientInfo } from '@/lib/data/nutrient-info';
 import { supabase } from '@/lib/supabase';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -76,17 +76,15 @@ export default function NutrientDetailsPage() {
     const nutrientId = decodeURIComponent(id as string);
 
     // Filter expansion state from URL
-    const isFilterExpanded = searchParams.get('filter') === 'open';
+    // Filter expansion state from URL
+    const isFilterExpandedParam = searchParams.get('filter') === 'open';
 
-    const toggleFilter = (expanded: boolean) => {
-        const params = new URLSearchParams(searchParams.toString());
-        if (expanded) {
-            params.set('filter', 'open');
-        } else {
-            params.delete('filter');
-        }
-        router.push(`${pathname}?${params.toString()}`);
-    };
+    const {
+        setCustomSegmentLabel,
+        setFilterContent,
+        setIsFilterExpanded,
+        isFilterExpanded: contextIsFilterExpanded
+    } = useHeaderActions();
 
     // Map URL ID to nutrient info key
     const nutrientInfoKey = URL_ID_TO_NUTRIENT_INFO[nutrientId] || nutrientId;
@@ -195,110 +193,135 @@ export default function NutrientDetailsPage() {
         { id: 'compare', label: 'Compare', icon: Scale, color: 'text-blue-500', bg: 'bg-blue-500/10' },
     ];
 
-    const renderTabGroup = (tabsList: typeof libraryTabs, sectionLabel: string, sectionColor: string, showHomeButton = false) => (
-        <div className="space-y-3 w-full">
-            {sectionLabel && <p className={cn("text-[9px] font-black uppercase tracking-widest", sectionColor)}>{sectionLabel}</p>}
-            <div className={cn(
-                "flex items-center p-2 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden w-full md:max-w-[800px] mx-auto xl:mx-0"
-            )}>
-                {/* Left side - Home Button area */}
-                <div className={cn("flex-shrink-0 flex items-center justify-start transition-all duration-500", isSearchExpanded ? "w-0" : "w-12")}>
-                    {showHomeButton && !isSearchExpanded && (
-                        <button
-                            onClick={() => router.push('/dashboard')}
-                            className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all flex-shrink-0"
-                            title="Back to Dashboard"
-                        >
-                            <LayoutGrid size={18} />
+    useEffect(() => {
+        const checkAdmin = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
+                const userEmail = (user.email || user.user_metadata?.email || '').toLowerCase();
+                setIsAdmin(userEmail === adminEmail.toLowerCase() && adminEmail !== '');
+            }
+        };
+        checkAdmin();
+    }, []);
+
+    // Inject Header Content
+    useEffect(() => {
+        setCustomSegmentLabel(nutrientInfoKey);
+
+        // Sync URL param to context state initially
+        if (isFilterExpandedParam) {
+            setIsFilterExpanded(true);
+        }
+
+        setFilterContent(
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+                {/* Macro Dropdown */}
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <button className={cn(
+                            "px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
+                            MACROS_LIST.includes(nutrientInfoKey)
+                                ? "bg-indigo-600 text-white border-indigo-600 shadow-md"
+                                : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
+                        )}>
+                            <Scale size={12} />
+                            <span>{MACROS_LIST.includes(nutrientInfoKey) ? nutrientInfoKey : "Macros"}</span>
+                            <ChevronDown size={10} className="opacity-50" />
                         </button>
-                    )}
-                </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
+                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Macro</DropdownMenuLabel>
+                        <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
+                        {MACROS_LIST.map(id => (
+                            <DropdownMenuCheckboxItem
+                                key={id}
+                                checked={nutrientInfoKey === id}
+                                onCheckedChange={() => {
+                                    const params = new URLSearchParams(searchParams.toString());
+                                    router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}?${params.toString()}`);
+                                }}
+                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
+                            >
+                                {id}
+                            </DropdownMenuCheckboxItem>
+                        ))}
+                    </DropdownMenuContent>
+                </DropdownMenu>
 
-                {/* Center - Tabs area */}
-                <div className={cn("flex items-center justify-center overflow-hidden transition-all duration-500", isSearchExpanded ? "w-0 flex-none opacity-0" : "flex-1 opacity-100")}>
-                    <div className="flex items-center gap-4 overflow-hidden py-1">
-                        {tabsList.map((tab) => {
-                            const Icon = tab.icon;
-                            const isActive = false; // Buttons not selected as you are not in any of the 3 main nutrient pages
-                            return (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => router.push(`/dashboard/library?tab=${tab.id}`)}
-                                    className={cn(
-                                        "flex items-center gap-3 py-3.5 rounded-[1.5rem] text-[9px] font-black uppercase tracking-[0.12em] transition-all duration-500 whitespace-nowrap group flex-shrink-0",
-                                        isActive
-                                            ? "bg-slate-900 dark:bg-slate-800 text-white shadow-xl translate-y-[-2px]"
-                                            : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50",
-                                        "px-4 md:px-5"
-                                    )}
-                                >
-                                    <Icon size={15} className={cn(
-                                        "transition-transform duration-500 group-hover:scale-110",
-                                        isActive ? tab.color : "text-slate-400"
-                                    )} />
-                                    <span className={cn(
-                                        "transition-all duration-300 overflow-hidden hidden md:block",
-                                        isSearchExpanded ? "w-0 opacity-0" : "w-auto opacity-100"
-                                    )}>
-                                        {tab.label}
-                                    </span>
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
+                {/* Mineral Dropdown */}
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <button className={cn(
+                            "px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
+                            MINERALS_LIST.includes(nutrientInfoKey)
+                                ? "bg-indigo-600 text-white border-indigo-600 shadow-md"
+                                : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
+                        )}>
+                            <Gem size={12} />
+                            <span>{MINERALS_LIST.includes(nutrientInfoKey) ? nutrientInfoKey : "Minerals"}</span>
+                            <ChevronDown size={10} className="opacity-50" />
+                        </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 max-h-[400px] overflow-y-auto no-scrollbar">
+                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Mineral</DropdownMenuLabel>
+                        <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
+                        {MINERALS_LIST.map(id => (
+                            <DropdownMenuCheckboxItem
+                                key={id}
+                                checked={nutrientInfoKey === id}
+                                onCheckedChange={() => {
+                                    const params = new URLSearchParams(searchParams.toString());
+                                    router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}?${params.toString()}`);
+                                }}
+                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
+                            >
+                                {id}
+                            </DropdownMenuCheckboxItem>
+                        ))}
+                    </DropdownMenuContent>
+                </DropdownMenu>
 
-                {/* Right side - Search area */}
-                <div className={cn(
-                    "flex items-center justify-end transition-all duration-500",
-                    isSearchExpanded ? "flex-1 pl-2" : "w-12"
-                )}>
-                    <div className={cn(
-                        "flex items-center transition-all duration-500 overflow-hidden",
-                        isSearchExpanded ? "flex-1 opacity-100" : "w-0 opacity-0"
-                    )}>
-                        <input
-                            type="text"
-                            autoFocus
-                            placeholder={`Search nutrients...`}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    router.push(`/dashboard/library/foods?tab=nutrients`);
-                                }
-                            }}
-                            onFocus={() => {
-                                setIsFocused(true);
-                                setActiveSearchId('nutrients-bar');
-                            }}
-                            onBlur={() => {
-                                setTimeout(() => {
-                                    if (activeSearchId === 'nutrients-bar') setActiveSearchId(null);
-                                }, 200);
-                            }}
-                            className="w-full bg-slate-50 dark:bg-slate-800/50 border-none focus:ring-0 text-[10px] font-black uppercase tracking-widest h-12 rounded-[1.5rem] px-6 text-slate-900 dark:text-white"
-                        />
-                    </div>
-                    <button
-                        onClick={() => {
-                            if (isSearchExpanded) setSearchQuery('');
-                            setIsSearchExpanded(!isSearchExpanded);
-                        }}
-                        className={cn(
-                            "flex items-center justify-center w-12 h-12 rounded-[1.5rem] transition-all flex-shrink-0",
-                            isSearchExpanded
-                                ? "bg-blue-50 text-blue-500 hover:bg-blue-100"
-                                : "text-slate-400 hover:text-blue-500 hover:bg-blue-50"
-                        )}
-                        title="Search"
-                    >
-                        {isSearchExpanded ? <X size={18} /> : <Search size={18} />}
-                    </button>
-                </div>
+                {/* Vitamin Dropdown */}
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <button className={cn(
+                            "px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
+                            VITAMINS_LIST.includes(nutrientInfoKey)
+                                ? "bg-indigo-600 text-white border-indigo-600 shadow-md"
+                                : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
+                        )}>
+                            <Battery size={12} />
+                            <span>{VITAMINS_LIST.includes(nutrientInfoKey) ? nutrientInfoKey : "Vitamins"}</span>
+                            <ChevronDown size={10} className="opacity-50" />
+                        </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 max-h-[400px] overflow-y-auto no-scrollbar">
+                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Vitamin</DropdownMenuLabel>
+                        <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
+                        {VITAMINS_LIST.map(id => (
+                            <DropdownMenuCheckboxItem
+                                key={id}
+                                checked={nutrientInfoKey === id}
+                                onCheckedChange={() => {
+                                    const params = new URLSearchParams(searchParams.toString());
+                                    router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}?${params.toString()}`);
+                                }}
+                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
+                            >
+                                {id}
+                            </DropdownMenuCheckboxItem>
+                        ))}
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
-        </div>
-    );
+        );
+
+        return () => {
+            setCustomSegmentLabel(null);
+            setFilterContent(null);
+        };
+    }, [nutrientInfoKey, isFilterExpandedParam, searchParams, router]);
 
     useEffect(() => {
         if (info) {
@@ -433,120 +456,6 @@ export default function NutrientDetailsPage() {
 
     return (
         <div className="flex flex-col w-full min-h-screen">
-            {/* Sticky Subheader Navigation */}
-            <div className="sticky top-0 z-40 w-full bg-transparent py-4 px-4 transition-all duration-300">
-                <div className="max-w-xl mx-auto w-full animate-in slide-in-from-top-4 duration-700">
-                    <BreadcrumbPillbox
-                        searchQuery={searchQuery}
-                        setSearchQuery={setSearchQuery}
-                        customLastSegment={nutrientInfoKey}
-                        isFilterExpanded={isFilterExpanded}
-                        onFilterToggle={toggleFilter}
-                        filterContent={
-                            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
-                                {/* Macro Dropdown */}
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <button className={cn(
-                                            "px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
-                                            MACROS_LIST.includes(nutrientInfoKey)
-                                                ? "bg-indigo-600 text-white border-indigo-600 shadow-md"
-                                                : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
-                                        )}>
-                                            <Scale size={12} />
-                                            <span>{MACROS_LIST.includes(nutrientInfoKey) ? nutrientInfoKey : "Macros"}</span>
-                                            <ChevronDown size={10} className="opacity-50" />
-                                        </button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
-                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Macro</DropdownMenuLabel>
-                                        <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
-                                        {MACROS_LIST.map(id => (
-                                            <DropdownMenuCheckboxItem
-                                                key={id}
-                                                checked={nutrientInfoKey === id}
-                                                onCheckedChange={() => {
-                                                    const params = new URLSearchParams(searchParams.toString());
-                                                    router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}?${params.toString()}`);
-                                                }}
-                                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
-                                            >
-                                                {id}
-                                            </DropdownMenuCheckboxItem>
-                                        ))}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-
-                                {/* Mineral Dropdown */}
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <button className={cn(
-                                            "px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
-                                            MINERALS_LIST.includes(nutrientInfoKey)
-                                                ? "bg-indigo-600 text-white border-indigo-600 shadow-md"
-                                                : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
-                                        )}>
-                                            <Gem size={12} />
-                                            <span>{MINERALS_LIST.includes(nutrientInfoKey) ? nutrientInfoKey : "Minerals"}</span>
-                                            <ChevronDown size={10} className="opacity-50" />
-                                        </button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 max-h-[400px] overflow-y-auto no-scrollbar">
-                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Mineral</DropdownMenuLabel>
-                                        <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
-                                        {MINERALS_LIST.map(id => (
-                                            <DropdownMenuCheckboxItem
-                                                key={id}
-                                                checked={nutrientInfoKey === id}
-                                                onCheckedChange={() => {
-                                                    const params = new URLSearchParams(searchParams.toString());
-                                                    router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}?${params.toString()}`);
-                                                }}
-                                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
-                                            >
-                                                {id}
-                                            </DropdownMenuCheckboxItem>
-                                        ))}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-
-                                {/* Vitamin Dropdown */}
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <button className={cn(
-                                            "px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
-                                            VITAMINS_LIST.includes(nutrientInfoKey)
-                                                ? "bg-indigo-600 text-white border-indigo-600 shadow-md"
-                                                : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
-                                        )}>
-                                            <Battery size={12} />
-                                            <span>{VITAMINS_LIST.includes(nutrientInfoKey) ? nutrientInfoKey : "Vitamins"}</span>
-                                            <ChevronDown size={10} className="opacity-50" />
-                                        </button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 max-h-[400px] overflow-y-auto no-scrollbar">
-                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Vitamin</DropdownMenuLabel>
-                                        <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
-                                        {VITAMINS_LIST.map(id => (
-                                            <DropdownMenuCheckboxItem
-                                                key={id}
-                                                checked={nutrientInfoKey === id}
-                                                onCheckedChange={() => {
-                                                    const params = new URLSearchParams(searchParams.toString());
-                                                    router.push(`/dashboard/library/nutrients/${encodeURIComponent(id)}?${params.toString()}`);
-                                                }}
-                                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
-                                            >
-                                                {id}
-                                            </DropdownMenuCheckboxItem>
-                                        ))}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
-                        }
-                    />
-                </div>
-            </div>
 
             <div className="max-w-7xl mx-auto space-y-8 pb-32 animate-in fade-in duration-700 flex-1 w-full px-4 pt-8">
                 {/* Tabbed Content Section */}
