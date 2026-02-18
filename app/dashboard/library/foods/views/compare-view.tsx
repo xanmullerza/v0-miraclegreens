@@ -42,7 +42,7 @@ interface FoodItem {
 
 const NUTRIENT_GROUPS = [
     {
-        title: "Macronutrients",
+        title: "Macros",
         icon: Zap,
         theme: "orange",
         keys: [
@@ -54,22 +54,15 @@ const NUTRIENT_GROUPS = [
         ]
     },
     {
-        title: "Electrolytes",
-        icon: Droplet,
-        theme: "indigo",
+        title: "Minerals",
+        icon: Gem,
+        theme: "rose",
         keys: [
             { label: 'Potassium', key: 'Potassium', unit: 'mg' },
             { label: 'Magnesium', key: 'Magnesium', unit: 'mg' },
             { label: 'Calcium', key: 'Calcium', unit: 'mg' },
             { label: 'Sodium', key: 'Sodium', unit: 'mg' },
-            { label: 'Phosphorus', key: 'Phosphorus', unit: 'mg' }
-        ]
-    },
-    {
-        title: "Trace Minerals",
-        icon: Gem,
-        theme: "rose",
-        keys: [
+            { label: 'Phosphorus', key: 'Phosphorus', unit: 'mg' },
             { label: 'Iron', key: 'Iron', unit: 'mg' },
             { label: 'Zinc', key: 'Zinc', unit: 'mg' },
             { label: 'Selenium', key: 'Selenium', unit: 'µg' },
