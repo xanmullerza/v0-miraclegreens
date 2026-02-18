@@ -212,7 +212,7 @@ export function BreadcrumbPillbox({
                     </div>
 
                     {/* Split Button Container */}
-                    {pathname !== '/dashboard' && (
+                    {pathname !== '/dashboard' && pathname !== '/dashboard/library/comparefoods' && (
                         <div className={cn(
                             "flex items-center transition-all duration-500",
                             isSearchExpanded ? "ml-2" : "ml-2 border-l border-slate-200 dark:border-slate-800"

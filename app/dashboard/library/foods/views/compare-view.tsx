@@ -277,30 +277,8 @@ export function CompareView() {
             <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500">
                 {activeSlot !== null ? (
                     /* Search Active State */
-                    <div className="animate-in slide-in-from-top-4 duration-500">
-                        <div className="p-6 md:p-8 border-b border-slate-100 dark:border-slate-800 flex items-center gap-4 bg-slate-50/50 dark:bg-slate-800/30">
-                            <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 animate-pulse">
-                                <Search size={20} />
-                            </div>
-                            <input
-                                autoFocus
-                                placeholder={`Search for Food ${activeSlot + 1}...`}
-                                className="flex-1 bg-transparent border-none focus:ring-0 text-xl font-black uppercase tracking-widest text-slate-900 dark:text-white placeholder:text-slate-300"
-                                value={searchQuery}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Escape') setActiveSlot(null);
-                                }}
-                                onChange={(e) => handleSearchInput(e.target.value)}
-                            />
-                            <button
-                                onClick={() => setActiveSlot(null)}
-                                className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all border border-slate-200 dark:border-slate-800"
-                            >
-                                Cancel
-                            </button>
-                        </div>
-
-                        <div className="max-h-[400px] overflow-y-auto p-4 md:p-8 no-scrollbar bg-white dark:bg-slate-900">
+                    <div className="animate-in slide-in-from-top-4 duration-500 flex flex-col">
+                        <div className="max-h-[400px] overflow-y-auto p-4 md:p-8 no-scrollbar bg-white dark:bg-slate-900 order-1">
                             {isSearching ? (
                                 <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-4">
                                     <div className="relative">
@@ -344,6 +322,28 @@ export function CompareView() {
                                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">Enter item name to compare</p>
                                 </div>
                             )}
+                        </div>
+
+                        <div className="p-6 md:p-8 border-t border-slate-100 dark:border-slate-800 flex items-center gap-4 bg-slate-50/50 dark:bg-slate-800/30 order-2">
+                            <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500 animate-pulse">
+                                <Search size={20} />
+                            </div>
+                            <input
+                                autoFocus
+                                placeholder={`Search for Food ${activeSlot + 1}...`}
+                                className="flex-1 bg-transparent border-none focus:ring-0 text-xl font-black uppercase tracking-widest text-slate-900 dark:text-white placeholder:text-slate-300"
+                                value={searchQuery}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Escape') setActiveSlot(null);
+                                }}
+                                onChange={(e) => handleSearchInput(e.target.value)}
+                            />
+                            <button
+                                onClick={() => setActiveSlot(null)}
+                                className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-all border border-slate-200 dark:border-slate-800"
+                            >
+                                Cancel
+                            </button>
                         </div>
                     </div>
                 ) : !selectedFoods.some(f => f !== null) ? (
