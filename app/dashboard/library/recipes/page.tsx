@@ -126,7 +126,7 @@ function KitchenContent() {
                 )}>
                     <div className="bg-white/95 dark:bg-slate-900/95 border border-slate-200/60 dark:border-slate-800/60 rounded-3xl p-6 flex flex-wrap items-center gap-4 shadow-xl backdrop-blur-xl group mx-1">
                         <div className="flex items-center gap-3 w-full sm:w-auto">
-                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 pl-2">Filter Options:</span>
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 pl-2 hidden sm:inline">Filter Options:</span>
 
                             {/* Scope/Favorites Dropdown */}
                             <DropdownMenu>
