@@ -112,7 +112,10 @@ export function BreadcrumbPillbox({
                 isSearchExpanded ? "ring-2 ring-emerald-500/20" : ""
             )}>
                 {/* Left side - Filter/Home Button area */}
-                <div className={cn("flex-shrink-0 flex items-center justify-start transition-all duration-500", isSearchExpanded ? "w-0 opacity-0" : "w-12 opacity-100")}>
+                <div className={cn(
+                    "flex-shrink-0 flex items-center justify-start transition-all duration-500",
+                    (isSearchExpanded || pathname === '/dashboard') ? "w-0 opacity-0" : "w-12 opacity-100"
+                )}>
                     {filterContent ? (
                         <button
                             onClick={() => setIsFilterExpanded(!isFilterExpanded)}
@@ -143,9 +146,15 @@ export function BreadcrumbPillbox({
                     )}
                 </div>
 
-                {/* Center - Breadcrumb/Filter area */}
+                {/* Center - Breadcrumb/Filter area or Logo */}
                 <div className={cn("flex items-center justify-center overflow-hidden transition-all duration-500", isSearchExpanded ? "w-0 flex-none opacity-0" : "flex-1 opacity-100")}>
-                    {isFilterExpanded && filterContent ? (
+                    {pathname === '/dashboard' ? (
+                        <div className="flex items-center justify-center py-1">
+                            <span className="text-2xl font-black bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent tracking-[-0.05em] animate-in fade-in zoom-in-95 duration-1000 drop-shadow-sm">
+                                VITALA.
+                            </span>
+                        </div>
+                    ) : isFilterExpanded && filterContent ? (
                         <div className="flex items-center gap-4 animate-in slide-in-from-left-4 duration-500 w-full justify-center px-4">
                             {filterContent}
                         </div>
@@ -222,50 +231,52 @@ export function BreadcrumbPillbox({
                     </div>
 
                     {/* Split Button Container */}
-                    <div className={cn(
-                        "flex items-center transition-all duration-500",
-                        isSearchExpanded ? "ml-2" : "ml-2 border-l border-slate-200 dark:border-slate-800"
-                    )}>
+                    {pathname !== '/dashboard' && (
                         <div className={cn(
-                            "flex flex-col h-12 w-12",
-                            isSearchExpanded ? "" : "divide-y divide-slate-100 dark:divide-slate-800"
+                            "flex items-center transition-all duration-500",
+                            isSearchExpanded ? "ml-2" : "ml-2 border-l border-slate-200 dark:border-slate-800"
                         )}>
-                            {/* Top Half: Search Toggle */}
-                            <button
-                                onClick={() => {
-                                    if (isSearchExpanded) setSearchQuery('');
-                                    setIsSearchExpanded(!isSearchExpanded);
-                                }}
-                                className={cn(
-                                    "flex items-center justify-center w-12 transition-all flex-shrink-0",
-                                    isSearchExpanded
-                                        ? "h-12 rounded-[1.5rem] bg-rose-50 text-rose-500 hover:bg-rose-100"
-                                        : "h-6 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50"
-                                )}
-                                title="Search"
-                            >
-                                {isSearchExpanded ? <X size={18} /> : <Search size={14} />}
-                            </button>
-
-                            {/* Bottom Half: Filter / Actions */}
-                            {!isSearchExpanded && (
-                                <div className="h-6 w-12 flex items-center justify-center overflow-hidden">
-                                    {actions ? (
-                                        <div className="flex items-center justify-center scale-75 transform origin-center">
-                                            {actions}
-                                        </div>
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-700">
-                                            <Filter size={12} className="opacity-20" />
-                                        </div>
+                            <div className={cn(
+                                "flex flex-col h-12 w-12",
+                                isSearchExpanded ? "" : "divide-y divide-slate-100 dark:divide-slate-800"
+                            )}>
+                                {/* Top Half: Search Toggle */}
+                                <button
+                                    onClick={() => {
+                                        if (isSearchExpanded) setSearchQuery('');
+                                        setIsSearchExpanded(!isSearchExpanded);
+                                    }}
+                                    className={cn(
+                                        "flex items-center justify-center w-12 transition-all flex-shrink-0",
+                                        isSearchExpanded
+                                            ? "h-12 rounded-[1.5rem] bg-rose-50 text-rose-500 hover:bg-rose-100"
+                                            : "h-6 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50"
                                     )}
-                                </div>
-                            )}
+                                    title="Search"
+                                >
+                                    {isSearchExpanded ? <X size={18} /> : <Search size={14} />}
+                                </button>
+
+                                {/* Bottom Half: Filter / Actions */}
+                                {!isSearchExpanded && (
+                                    <div className="h-6 w-12 flex items-center justify-center overflow-hidden">
+                                        {actions ? (
+                                            <div className="flex items-center justify-center scale-75 transform origin-center">
+                                                {actions}
+                                            </div>
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-700">
+                                                <Filter size={12} className="opacity-20" />
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* User Profile - Hidden on mobile */}
-                    {userProfile && !isSearchExpanded && (
+                    {userProfile && !isSearchExpanded && pathname !== '/dashboard' && (
                         <div className="hidden md:flex pl-3 border-l border-slate-100 dark:border-slate-800 flex-shrink-0 ml-2">
                             {userProfile}
                         </div>
