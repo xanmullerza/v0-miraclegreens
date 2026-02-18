@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
-    Search, X, LayoutGrid, ChevronRight, Filter,
+    Search, X, LayoutGrid, ChevronRight, Filter, Home,
     LayoutDashboard, Library, Apple, FlaskConical, ChefHat, BookOpen, Utensils, User, Settings, FileText
 } from 'lucide-react';
 import { useHeaderActions } from '@/lib/context/header-actions-context';
@@ -138,7 +138,7 @@ export function BreadcrumbPillbox({
                             className="flex items-center justify-center w-12 h-12 rounded-[1.5rem] text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all flex-shrink-0"
                             title="Back to Dashboard"
                         >
-                            <LayoutGrid size={18} />
+                            <Home size={18} />
                         </button>
                     )}
                 </div>
