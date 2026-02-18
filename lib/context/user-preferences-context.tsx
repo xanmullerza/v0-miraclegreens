@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 export type EnergyUnit = "kcal" | "kJ";
 export type MeasurementUnit = "metric" | "imperial";
 export type NutrientDisplayMode = 'value' | 'percentage' | 'both';
+export type HeaderStyle = 'labels' | 'icons';
 
 export interface FamilyMember {
     id: string;
@@ -49,6 +50,8 @@ interface UserPreferencesContextType {
     setSkipPlannerQuiz: (skip: boolean) => void;
     showHeroes: boolean;
     setShowHeroes: (show: boolean) => void;
+    headerStyle: HeaderStyle;
+    setHeaderStyle: (style: HeaderStyle) => void;
     dailyTargets: {
         energy: number;
         protein: number;
@@ -68,6 +71,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     const [measurementUnit, setMeasurementUnitState] = useState<MeasurementUnit>("metric");
     const [nutrientDisplayMode, setNutrientDisplayModeState] = useState<NutrientDisplayMode>("both");
     const [showHeroes, setShowHeroesState] = useState(true);
+    const [headerStyle, setHeaderStyleState] = useState<HeaderStyle>('labels');
     const [profile, setProfileState] = useState<UserProfile>({
         name: "",
         nickname: "",
@@ -111,6 +115,11 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         const savedShowHeroes = localStorage.getItem("showHeroes");
         if (savedShowHeroes !== null) {
             setShowHeroesState(savedShowHeroes === "true");
+        }
+
+        const savedHeaderStyle = localStorage.getItem("headerStyle") as HeaderStyle;
+        if (savedHeaderStyle === 'labels' || savedHeaderStyle === 'icons') {
+            setHeaderStyleState(savedHeaderStyle);
         }
 
         const savedPlan = localStorage.getItem("dailyPlan");
@@ -196,6 +205,11 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         localStorage.setItem("showHeroes", show ? "true" : "false");
     };
 
+    const setHeaderStyle = (style: HeaderStyle) => {
+        setHeaderStyleState(style);
+        localStorage.setItem("headerStyle", style);
+    };
+
     const updateProfile = async (updates: Partial<UserProfile>) => {
         // Construct new profile
         const newProfile = { ...profile, ...updates };
@@ -274,6 +288,8 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
             setSkipPlannerQuiz,
             showHeroes,
             setShowHeroes,
+            headerStyle,
+            setHeaderStyle,
             dailyTargets,
             dailyPlan,
             updateDailyPlan

@@ -17,7 +17,9 @@ import {
     Save,
     Eye,
     ShieldCheck,
-    ExternalLink
+    ExternalLink,
+    Tag,
+    Shapes
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -36,6 +38,8 @@ export default function SettingsPage() {
         setNutrientDisplayMode,
         showHeroes,
         setShowHeroes,
+        headerStyle,
+        setHeaderStyle,
     } = useUserPreferences();
 
     const [user, setUser] = React.useState<any>(null);
@@ -223,6 +227,34 @@ export default function SettingsPage() {
                                 </button>
                             </div>
                             <p className="text-[9px] text-slate-400 italic px-1">For experienced users who prefer to go straight to the action grid.</p>
+                        </div>
+
+                        {/* Header Navigation Style */}
+                        <div className="space-y-3">
+                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Header Navigation</Label>
+                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
+                                <button
+                                    onClick={() => setHeaderStyle('labels')}
+                                    className={cn(
+                                        "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
+                                        headerStyle === 'labels' ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
+                                    )}
+                                    title="Show text labels in the header breadcrumb bar"
+                                >
+                                    <Tag size={12} /> Labels
+                                </button>
+                                <button
+                                    onClick={() => setHeaderStyle('icons')}
+                                    className={cn(
+                                        "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
+                                        headerStyle === 'icons' ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
+                                    )}
+                                    title="Show icons in the header breadcrumb bar"
+                                >
+                                    <Shapes size={12} /> Icons
+                                </button>
+                            </div>
+                            <p className="text-[9px] text-slate-400 italic px-1">Switch between text labels and icons in the header breadcrumb bar.</p>
                         </div>
 
                         {/* Theme */}

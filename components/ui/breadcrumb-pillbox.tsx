@@ -3,9 +3,25 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Search, X, LayoutGrid, ChevronRight, Filter } from 'lucide-react';
+import {
+    Search, X, LayoutGrid, ChevronRight, Filter,
+    LayoutDashboard, Library, Apple, FlaskConical, ChefHat, BookOpen, Utensils, User, Settings, FileText
+} from 'lucide-react';
 import { useHeaderActions } from '@/lib/context/header-actions-context';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { cn } from '@/lib/utils';
+
+const segmentIconMap: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+    dashboard: LayoutDashboard,
+    library: Library,
+    foods: Apple,
+    nutrients: FlaskConical,
+    kitchen: ChefHat,
+    recipes: BookOpen,
+    meals: Utensils,
+    profile: User,
+    settings: Settings,
+};
 
 interface BreadcrumbPillboxProps {
     searchQuery: string;
@@ -45,6 +61,18 @@ export function BreadcrumbPillbox({
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
     // Local state for filter if not controlled by context (though we prefer context now)
     const [internalIsFilterExpanded, setInternalIsFilterExpanded] = useState(false);
+    // Track mobile for icon-only mode
+    const [isMobile, setIsMobile] = useState(false);
+    const { headerStyle } = useUserPreferences();
+
+    useEffect(() => {
+        const checkMobile = () => setIsMobile(window.innerWidth < 768);
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    const useIcons = isMobile || headerStyle === 'icons';
 
     // If context provides filter content, use context state. Otherwise use internal state (legacy support)
     const isFilterExpanded = filterContent ? contextIsFilterExpanded : internalIsFilterExpanded;
@@ -131,22 +159,40 @@ export function BreadcrumbPillbox({
                                     ? customSegmentLabel
                                     : decodeURIComponent(segment).replace(/-/g, ' ');
 
+                                const SegmentIcon = segmentIconMap[segment.toLowerCase()] || FileText;
+
                                 return (
                                     <React.Fragment key={path}>
                                         {index > 0 && (
                                             <ChevronRight size={12} className="text-slate-300 dark:text-slate-700 flex-shrink-0" />
                                         )}
                                         {isLast ? (
-                                            <span className={cn("text-[9px] font-black uppercase tracking-[0.12em] whitespace-nowrap", sectionColor)}>
-                                                {label}
-                                            </span>
+                                            useIcons ? (
+                                                <span className={cn("flex items-center justify-center", sectionColor)} title={label}>
+                                                    <SegmentIcon size={16} />
+                                                </span>
+                                            ) : (
+                                                <span className={cn("text-[9px] font-black uppercase tracking-[0.12em] whitespace-nowrap", sectionColor)}>
+                                                    {label}
+                                                </span>
+                                            )
                                         ) : (
-                                            <Link
-                                                href={path}
-                                                className="text-[9px] font-black uppercase tracking-[0.12em] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors whitespace-nowrap"
-                                            >
-                                                {label}
-                                            </Link>
+                                            useIcons ? (
+                                                <Link
+                                                    href={path}
+                                                    className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                                                    title={label}
+                                                >
+                                                    <SegmentIcon size={16} />
+                                                </Link>
+                                            ) : (
+                                                <Link
+                                                    href={path}
+                                                    className="text-[9px] font-black uppercase tracking-[0.12em] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors whitespace-nowrap"
+                                                >
+                                                    {label}
+                                                </Link>
+                                            )
                                         )}
                                     </React.Fragment>
                                 );
