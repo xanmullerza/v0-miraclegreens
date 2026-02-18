@@ -101,18 +101,16 @@ function KitchenContent() {
                             <button
                                 onClick={() => setIsFilterOpen(!isFilterOpen)}
                                 className={cn(
-                                    "flex items-center gap-2 px-3 py-1.5 rounded-xl border transition-all duration-300 shrink-0 shadow-sm group outline-none",
+                                    "flex items-center justify-center p-2 rounded-xl transition-all duration-300 shrink-0 group outline-none",
                                     isFilterOpen
-                                        ? "bg-slate-900 text-white border-slate-900 shadow-lg shadow-slate-900/20"
-                                        : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-slate-300 dark:hover:border-slate-700"
+                                        ? "text-emerald-500"
+                                        : "text-slate-400 hover:text-emerald-500"
                                 )}
+                                title={isFilterOpen ? "Hide Filters" : "Show Filters"}
                             >
-                                <Filter size={12} className={cn("transition-transform group-hover:scale-110", isFilterOpen && "fill-current")} />
-                                <span className="text-[8px] font-black uppercase tracking-widest hidden sm:inline">
-                                    {isFilterOpen ? "Hide Filters" : "Filters"}
-                                </span>
+                                <Filter size={16} className={cn("transition-transform group-hover:scale-110", isFilterOpen && "fill-current")} />
                                 {(showFavoritesOnly || selectedTypes.length < MEAL_TYPES.length) && (
-                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 ml-0.5 animate-pulse" />
+                                    <div className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                 )}
                             </button>
                         </div>
