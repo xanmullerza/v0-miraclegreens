@@ -53,10 +53,10 @@ export default function DashboardOverview() {
     ];
 
     return (
-        <div className="w-full space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)] px-2 sm:px-4">
+        <div className="w-full space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)]">
 
             {showHeroes ? (
-                <div className="w-full max-w-7xl relative">
+                <div className="w-full md:max-w-[800px] mx-auto relative px-0">
                     <div className="relative rounded-[2.5rem] bg-slate-900 border border-slate-800 mt-6 pt-12 pb-8 px-8 lg:mt-8 lg:pt-16 lg:pb-12 lg:px-12 xl:mt-10 xl:pt-20 xl:pb-16 xl:px-16 w-full flex items-center gap-6">
                         <div className="absolute top-0 right-0 w-96 h-96 opacity-[0.06] pointer-events-none">
                             <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-500 rounded-full blur-3xl" />
@@ -106,7 +106,7 @@ export default function DashboardOverview() {
                         </div>
 
                         <div className="flex-none w-full md:max-w-[800px]">
-                            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-4 justify-items-stretch w-full px-2 md:px-0">
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-4 justify-items-stretch w-full">
                                 {heroCards.map((card) => {
                                     const Icon = card.icon;
                                     const isKitchen = card.id === 'kitchen';
@@ -144,8 +144,8 @@ export default function DashboardOverview() {
                     </div>
                 </div>
             ) : (
-                <div className="w-full flex justify-center mt-6 lg:mt-8">
-                    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-4 justify-items-stretch w-full md:max-w-[800px] px-2 md:px-0">
+                <div className="w-full mx-auto mt-6 lg:mt-8 md:max-w-[800px]">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-4 justify-items-stretch w-full">
                         {heroCards.map((card) => {
                             const Icon = card.icon;
                             const isKitchen = card.id === 'kitchen';
