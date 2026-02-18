@@ -12,6 +12,7 @@ import {
     Activity,
     Settings
 } from 'lucide-react';
+import { PageContainer } from '@/components/ui/page-container';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -53,7 +54,8 @@ export default function DashboardOverview() {
     ];
 
     return (
-        <div className="w-full space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)]">
+        <PageContainer>
+            <div className="space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)]">
 
             {showHeroes ? (
                 <div className="w-full md:max-w-[800px] mx-auto relative px-0">
@@ -182,6 +184,7 @@ export default function DashboardOverview() {
                 </div>
             )}
 
-        </div>
+            </div>
+        </PageContainer>
     );
 }

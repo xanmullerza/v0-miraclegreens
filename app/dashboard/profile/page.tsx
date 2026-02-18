@@ -28,6 +28,7 @@ import {
     X,
     Users
 } from 'lucide-react';
+import { PageContainer } from '@/components/ui/page-container';
 import { useRDA } from '@/hooks/use-rda';
 import { supabase } from '@/lib/supabase';
 import { Input } from '@/components/ui/input';
@@ -311,7 +312,8 @@ function ProfilePageContent() {
     const isAdmin = (user?.email || user?.user_metadata?.email || '').toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase();
 
     return (
-        <div className="max-w-7xl mx-auto animate-in fade-in duration-500 px-4 py-8">
+        <PageContainer maxWidth="max-w-7xl">
+            <div className="animate-in fade-in duration-500 py-8">
             {/* Profile Header */}
             <div className="max-w-2xl mx-auto mb-12 flex flex-col items-center text-center space-y-4">
                 <div className="relative group">
@@ -722,6 +724,7 @@ function ProfilePageContent() {
                 </div>
             </Sheet>
         </div>
+        </PageContainer>
     );
 }
 

@@ -962,8 +962,9 @@ export default function RecipeDetailsPage() {
     if (!recipe) return null;
 
     return (
-        <div className="w-full space-y-10 animate-in fade-in duration-700 pb-32 px-4">
-            <div className="max-w-7xl mx-auto space-y-8">
+        <PageContainer maxWidth="max-w-7xl">
+            <div className="w-full space-y-10 animate-in fade-in duration-700 pb-32 px-4">
+                <div className="max-w-7xl mx-auto space-y-8">
                 {/* Main Header Section (Image + Name) - Matching Food Page */}
                 <div className="flex flex-row items-end gap-6 animate-in slide-in-from-top-4 duration-700 pb-1">
                     {/* Left Side: Image (Small, Inline) */}

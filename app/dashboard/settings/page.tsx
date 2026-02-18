@@ -26,6 +26,7 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
+import { PageContainer } from '@/components/ui/page-container';
 
 export default function SettingsPage() {
     const { theme, setTheme } = useTheme();
@@ -41,6 +42,7 @@ export default function SettingsPage() {
         headerStyle,
         setHeaderStyle,
     } = useUserPreferences();
+
 
     const [user, setUser] = React.useState<any>(null);
 
@@ -59,8 +61,9 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="max-w-2xl mx-auto animate-in fade-in duration-500 px-4 py-8">
-            <div className="space-y-8 pb-32">
+        <PageContainer maxWidth="max-w-2xl">
+            <div className="animate-in fade-in duration-500 py-8">
+                <div className="space-y-8 pb-32">
                 {/* Admin Trigger */}
                 {isAdmin && (
                     <div className="animate-in fade-in slide-in-from-top-4 duration-700">
@@ -304,6 +307,6 @@ export default function SettingsPage() {
                     </Button>
                 </div>
             </div>
-        </div>
+        </PageContainer>
     );
 }

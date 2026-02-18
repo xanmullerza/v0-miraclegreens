@@ -16,6 +16,7 @@ import {
     CheckSquare,
     Square
 } from 'lucide-react';
+import { PageContainer } from '@/components/ui/page-container';
 import {
     DropdownMenu,
     DropdownMenuTrigger,
@@ -89,7 +90,8 @@ function KitchenContent() {
 
 
     return (
-        <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700 pb-32 pt-8">
+        <PageContainer maxWidth="max-w-7xl">
+            <div className="space-y-10 animate-in fade-in duration-700 pb-32 pt-8">
 
             {/* Header Actions (Teleported to Subheader) */}
             {['browse', 'mealplanner'].includes(activeTab) && (
@@ -227,6 +229,7 @@ function KitchenContent() {
                     />
                 )}
             </div>
-        </div>
+            </div>
+        </PageContainer>
     );
 }

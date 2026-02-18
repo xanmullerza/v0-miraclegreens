@@ -51,7 +51,7 @@ function DashboardLayoutContent({
                 {/* Main Content */}
                 <main className="dashboard-main flex-1 overflow-y-auto relative bg-slate-50 dark:bg-[#020617] custom-scrollbar flex flex-col">
                     {/* Main Header (BreadcrumbPillbox) */}
-                    <div className="sticky top-4 z-40 px-4 w-full flex justify-center pointer-events-none">
+                    <div className="sticky top-4 z-40 px-2 sm:px-4 w-full flex justify-center pointer-events-none">
                         <div className="pointer-events-auto w-full max-w-[800px]">
                             <BreadcrumbPillbox
                                 searchQuery={searchQuery}
@@ -94,7 +94,7 @@ function DashboardLayoutContent({
                         </div>
                     </div>
 
-                    <div className="px-4 pt-4 pb-20 flex-1">
+                    <div className="px-2 sm:px-4 pt-4 pb-20 flex-1">
                         {children}
                     </div>
 

@@ -8,6 +8,7 @@ import { ShoppingView } from './views/shopping-view';
 import { StaplesView } from '@/components/library/staples-view';
 import { CompareView } from './views/compare-view';
 import { NutrientsView } from './views/nutrients-view';
+import { PageContainer } from '@/components/ui/page-container';
 
 export default function IngredientsHub() {
     return (
@@ -31,15 +32,17 @@ function IngredientsContent() {
 
 
     return (
-        <div className="max-w-7xl mx-auto space-y-10 animate-in fade-in duration-700 pb-32 pt-8">
-            {/* Dynamic Content Area */}
-            <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
-                {activeTab === 'foods' && <ExploreView hideControls={false} />}
-                {activeTab === 'groceries' && <ShoppingView />}
-                {activeTab === 'pantry' && <StaplesView />}
-                {activeTab === 'compare' && <CompareView />}
-                {activeTab === 'nutrients' && <NutrientsView />}
+        <PageContainer maxWidth="max-w-7xl">
+            <div className="space-y-10 animate-in fade-in duration-700 pb-32 pt-8">
+                {/* Dynamic Content Area */}
+                <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
+                    {activeTab === 'foods' && <ExploreView hideControls={false} />}
+                    {activeTab === 'groceries' && <ShoppingView />}
+                    {activeTab === 'pantry' && <StaplesView />}
+                    {activeTab === 'compare' && <CompareView />}
+                    {activeTab === 'nutrients' && <NutrientsView />}
+                </div>
             </div>
-        </div>
+        </PageContainer>
     );
 }

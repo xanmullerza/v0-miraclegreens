@@ -12,6 +12,7 @@ import {
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import { useUserPreferences } from "@/lib/context/user-preferences-context";
+import { PageContainer } from '@/components/ui/page-container';
 
 export default function LibraryPage() {
     const { showHeroes } = useUserPreferences();
@@ -40,7 +41,8 @@ export default function LibraryPage() {
     ];
 
     return (
-        <div className="w-full space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)] px-4">
+        <PageContainer maxWidth="max-w-7xl">
+            <div className="space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)]">
             {showHeroes ? (
                 <div className="w-full max-w-7xl relative">
                     <div className="relative rounded-[2.5rem] bg-slate-900 border border-slate-800 mt-6 pt-12 pb-8 px-8 lg:mt-8 lg:pt-16 lg:pb-12 lg:px-12 xl:mt-10 xl:pt-20 xl:pb-16 xl:px-16 w-full flex items-center gap-6">
@@ -138,7 +140,8 @@ export default function LibraryPage() {
                     </div>
                 </div>
             )}
-        </div>
+            </div>
+        </PageContainer>
     );
 }
 

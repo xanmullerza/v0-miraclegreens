@@ -59,6 +59,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PageContainer } from '@/components/ui/page-container';
+import { PageContainer } from '@/components/ui/page-container';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900 shadow-xl rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden", className)}>
@@ -606,7 +608,8 @@ export default function FoodDetailsPage() {
     if (!food) return null;
 
     return (
-        <div className="max-w-6xl mx-auto space-y-8 pb-20 animate-in fade-in duration-700">
+        <PageContainer maxWidth="max-w-6xl">
+            <div className="space-y-8 pb-20 animate-in fade-in duration-700">
             {/* NEW Main Header Section (Image + Name + Description) */}
             <div className="flex flex-row items-end gap-6 animate-in slide-in-from-top-4 duration-700 pb-1">
                 {/* Left Side: Image (Inline with Text) */}
@@ -1058,6 +1061,8 @@ export default function FoodDetailsPage() {
                     </div>
                 )
             }
-        </div >
+            </div>
+        </PageContainer>
     );
+}
 }
