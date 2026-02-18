@@ -53,7 +53,7 @@ export default function DashboardOverview() {
     ];
 
     return (
-        <div className="w-full space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)] px-4">
+        <div className="w-full space-y-16 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)] px-2 sm:px-4">
 
             {showHeroes ? (
                 <div className="w-full max-w-7xl relative">
@@ -105,8 +105,8 @@ export default function DashboardOverview() {
                             </div>
                         </div>
 
-                        <div className="flex-none">
-                            <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:gap-4 justify-items-stretch w-full max-w-none px-4 sm:px-0">
+                        <div className="flex-none w-full">
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-4 justify-items-stretch w-full px-2 sm:px-0">
                                 {heroCards.map((card) => {
                                     const Icon = card.icon;
                                     const isKitchen = card.id === 'kitchen';
@@ -114,7 +114,7 @@ export default function DashboardOverview() {
 
                                     if (isDisabled) {
                                         return (
-                                            <div key={card.id} className="relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/30 bg-slate-800/20 p-5 sm:p-6 lg:p-6 opacity-60 cursor-not-allowed select-none group min-h-[180px] sm:min-h-[200px] lg:aspect-square">
+                                            <div key={card.id} className="relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/30 bg-slate-800/20 p-4 sm:p-5 lg:p-6 opacity-60 cursor-not-allowed select-none group aspect-square">
                                                 <div className="absolute top-3 right-3 z-20"><span className="px-1.5 py-0.5 rounded-md bg-slate-800/80 border border-slate-700 text-[8px] font-black uppercase tracking-widest text-slate-500">Locked</span></div>
                                                 <div className="relative z-10 grayscale opacity-50 transition-all duration-300 group-hover:opacity-70 group-hover:grayscale-0">
                                                     <div className="w-11 h-11 sm:w-12 sm:h-12 lg:w-11 lg:h-11 rounded-xl flex items-center justify-center mb-3 bg-slate-800/50"><Icon size={20} className="text-slate-500" /></div>
@@ -127,7 +127,7 @@ export default function DashboardOverview() {
                                     }
 
                                     return (
-                                        <Link key={card.id} href={card.href} className={cn("group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 sm:p-6 lg:p-6 transition-all duration-500 min-h-[180px] sm:min-h-[200px] lg:aspect-square", card.borderHover, "hover:bg-slate-800/70 hover:shadow-2xl")}>
+                                        <Link key={card.id} href={card.href} className={cn("group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-4 sm:p-5 lg:p-6 transition-all duration-500 aspect-square", card.borderHover, "hover:bg-slate-800/70 hover:shadow-2xl")}>
                                             <div className={cn("absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-all duration-500", card.gradient)} />
                                             <div className={cn("absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl transition-all duration-700 opacity-0 group-hover:opacity-100", card.bg)} />
                                             <div className="relative z-10">
@@ -144,8 +144,8 @@ export default function DashboardOverview() {
                     </div>
                 </div>
             ) : (
-                <div className="w-full max-w-7xl flex justify-center mt-6 lg:mt-8 px-4 sm:px-0">
-                    <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:gap-4 justify-items-stretch w-full max-w-none">
+                <div className="w-full flex justify-center mt-6 lg:mt-8 px-2 sm:px-4 lg:px-0">
+                    <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:gap-4 justify-items-stretch w-full max-w-7xl">
                         {heroCards.map((card) => {
                             const Icon = card.icon;
                             const isKitchen = card.id === 'kitchen';
@@ -153,7 +153,7 @@ export default function DashboardOverview() {
 
                             if (isDisabled) {
                                 return (
-                                    <div key={card.id} className="relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/30 bg-slate-800/20 p-5 sm:p-6 lg:p-6 opacity-60 cursor-not-allowed select-none group min-h-[180px] sm:min-h-[200px] lg:aspect-square">
+                                    <div key={card.id} className="relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/30 bg-slate-800/20 p-4 sm:p-5 lg:p-6 opacity-60 cursor-not-allowed select-none group aspect-square">
                                         <div className="absolute top-3 right-3 z-20"><span className="px-1.5 py-0.5 rounded-md bg-slate-800/80 border border-slate-700 text-[8px] font-black uppercase tracking-widest text-slate-500">Locked</span></div>
                                         <div className="relative z-10 grayscale opacity-50 transition-all duration-300 group-hover:opacity-70 group-hover:grayscale-0">
                                             <div className="w-11 h-11 sm:w-12 sm:h-12 lg:w-11 lg:h-11 rounded-xl flex items-center justify-center mb-3 bg-slate-800/50"><Icon size={20} className="text-slate-500" /></div>
@@ -166,7 +166,7 @@ export default function DashboardOverview() {
                             }
 
                             return (
-                                <Link key={card.id} href={card.href} className={cn("group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-5 sm:p-6 lg:p-6 transition-all duration-500 min-h-[180px] sm:min-h-[200px] lg:aspect-square", card.borderHover, "hover:bg-slate-800/70 hover:shadow-2xl")}>
+                                <Link key={card.id} href={card.href} className={cn("group relative overflow-hidden rounded-2xl lg:rounded-[1.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-4 sm:p-5 lg:p-6 transition-all duration-500 aspect-square", card.borderHover, "hover:bg-slate-800/70 hover:shadow-2xl")}>
                                     <div className={cn("absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-all duration-500", card.gradient)} />
                                     <div className={cn("absolute -top-10 -right-10 w-24 h-24 rounded-full blur-2xl transition-all duration-700 opacity-0 group-hover:opacity-100", card.bg)} />
                                     <div className="relative z-10">
