@@ -87,13 +87,13 @@ const NUTRIENT_GROUPS = [
             { label: 'Vitamin D', key: 'Vitamin D', unit: 'µg' },
             { label: 'Vitamin E', key: 'Vitamin E', unit: 'mg' },
             { label: 'Vitamin K', key: 'Vitamin K', unit: 'µg' },
-            { label: 'B1 (Thiamine)', key: 'B1 (Thiamine)', unit: 'mg' },
-            { label: 'B2 (Riboflavin)', key: 'B2 (Riboflavin)', unit: 'mg' },
-            { label: 'B3 (Niacin)', key: 'B3 (Niacin)', unit: 'mg' },
-            { label: 'B5 (Pantothenic Acid)', key: 'B5 (Pantothenic Acid)', unit: 'mg' },
-            { label: 'B6 (Pyridoxine)', key: 'B6 (Pyridoxine)', unit: 'mg' },
-            { label: 'B9 (Folate)', key: 'B9 (Folate)', unit: 'µg' },
-            { label: 'B12 (Cobalamin)', key: 'B12 (Cobalamin)', unit: 'µg' },
+            { label: 'Vitamin B1', key: 'B1 (Thiamine)', unit: 'mg' },
+            { label: 'Vitamin B2', key: 'B2 (Riboflavin)', unit: 'mg' },
+            { label: 'Vitamin B3', key: 'B3 (Niacin)', unit: 'mg' },
+            { label: 'Vitamin B5', key: 'B5 (Pantothenic Acid)', unit: 'mg' },
+            { label: 'Vitamin B6', key: 'B6 (Pyridoxine)', unit: 'mg' },
+            { label: 'Vitamin B9', key: 'B9 (Folate)', unit: 'µg' },
+            { label: 'Vitamin B12', key: 'B12 (Cobalamin)', unit: 'µg' },
             { label: 'Choline', key: 'Choline', unit: 'mg' }
         ]
     }
