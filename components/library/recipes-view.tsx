@@ -324,9 +324,9 @@ export function RecipesView({
                                 onClick={() => router.push(`/dashboard/library/recipes/${recipe.id}`)}
                                 className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
                             >
-                                <div className="lg:grid lg:grid-cols-[120px_1fr_100px_80px_80px_80px_150px] gap-4 lg:items-center lg:px-8">
+                                <div className="flex flex-row lg:grid lg:grid-cols-[120px_1fr_100px_80px_80px_80px_150px] gap-3 lg:gap-4 items-center lg:px-8">
                                     {/* Thumbnail */}
-                                    <div className="aspect-[4/3] lg:aspect-square w-full lg:w-30 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
+                                    <div className="aspect-square w-24 lg:w-30 shrink-0 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
                                         {recipe.image ? (
                                             <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                                         ) : (
@@ -337,20 +337,27 @@ export function RecipesView({
                                     </div>
 
                                     {/* Info */}
-                                    <div className="p-3 lg:p-0">
-                                        <h3 className="font-bold text-lg tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
+                                    <div className="flex-1 min-w-0 lg:p-0">
+                                        <h3 className="font-bold text-base lg:text-lg tracking-tight text-slate-900 dark:text-white leading-tight capitalize truncate">
                                             {recipe.title}
                                         </h3>
-                                        <div className="flex items-center gap-3 mt-1">
-                                            <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
+                                        <div className="flex items-center gap-3 mt-1.5">
+                                            <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-tighter shrink-0">
                                                 <Clock size={10} /> {recipe.prep_time}m
                                             </div>
-                                            <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-tighter">
+                                            <div className="flex items-center gap-1 text-[10px] text-slate-400 font-bold uppercase tracking-tighter shrink-0">
                                                 <Users size={10} /> {recipe.servings}P
                                             </div>
-                                            <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase tracking-widest px-1.5 py-0">
+                                            <Badge className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] border-none uppercase tracking-widest px-1.5 py-0 shrink-0">
                                                 {recipe.type}
                                             </Badge>
+                                        </div>
+
+                                        {/* Mobile-only stats row */}
+                                        <div className="flex lg:hidden items-center gap-3 mt-2 text-[10px] font-black">
+                                            <span className="text-blue-500">{formatEnergy(recipe.calories, energyUnit)}</span>
+                                            <span className="text-slate-300 text-[8px]">•</span>
+                                            <span className="text-emerald-500">{recipe.protein.toFixed(0)}g P</span>
                                         </div>
                                     </div>
 
@@ -373,7 +380,7 @@ export function RecipesView({
                                     </div>
 
                                     {/* Actions */}
-                                    <div className="p-3 lg:p-0 flex justify-end gap-2">
+                                    <div className="shrink-0 flex items-center lg:justify-end gap-1">
                                         {isAdmin && (
                                             <button
                                                 onClick={(e) => {
