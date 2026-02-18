@@ -72,6 +72,7 @@ import { findSpiceFactor, SpiceState, isSpice, getSpiceMeasures, getSpiceStates 
 import { COOKING_STATES, CookingState, StateFactor } from '@/lib/utils/cooking-states';
 import { searchLocalFood } from '@/lib/services/nutrition';
 import { DidYouKnow } from '@/components/DidYouKnow';
+import { PageContainer } from '@/components/ui/page-container';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900 shadow-xl rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden", className)}>
