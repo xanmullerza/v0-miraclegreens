@@ -121,24 +121,24 @@ function KitchenContent() {
 
                 {/* Filter Slider Section */}
                 <div className={cn(
-                    "overflow-hidden transition-all duration-500 ease-in-out -mt-6",
-                    isFilterOpen ? "max-h-40 opacity-100 mb-8" : "max-h-0 opacity-0 mb-0"
+                    "relative z-[-1] overflow-hidden transition-all duration-700 ease-in-out -mt-12",
+                    isFilterOpen ? "max-h-60 opacity-100 mb-8 pt-12" : "max-h-0 opacity-0 mb-0 pt-0"
                 )}>
-                    <div className="bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200/50 dark:border-slate-800/50 rounded-3xl p-4 flex flex-wrap items-center gap-4 backdrop-blur-sm shadow-inner group">
+                    <div className="bg-white/80 dark:bg-slate-900/60 border-x border-b border-slate-200/50 dark:border-slate-800/50 rounded-b-[2rem] p-6 pb-5 flex flex-wrap items-center gap-4 backdrop-blur-md shadow-lg group">
                         <div className="flex items-center gap-3 w-full sm:w-auto">
-                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 pl-2">Filter By:</span>
+                            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 pl-2">Configure:</span>
 
                             {/* Scope/Favorites Dropdown */}
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <button className={cn(
-                                        "flex items-center gap-2 px-3.5 py-2 rounded-2xl border transition-all duration-300 shrink-0 shadow-sm group outline-none text-[9px] font-black uppercase tracking-widest",
+                                        "flex items-center gap-2 px-4 py-2.5 rounded-2xl border transition-all duration-300 shrink-0 shadow-sm group outline-none text-[9px] font-black uppercase tracking-widest",
                                         showFavoritesOnly
                                             ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
                                             : "bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-rose-200 hover:text-rose-500"
                                     )}>
                                         <Heart size={14} className={cn("transition-transform group-hover:scale-110", showFavoritesOnly && "fill-current")} />
-                                        {showFavoritesOnly ? "Favorites Only" : "All Results"}
+                                        {showFavoritesOnly ? "Favorites Only" : "Explore All"}
                                         <ChevronDown size={12} className="opacity-50" />
                                     </button>
                                 </DropdownMenuTrigger>
