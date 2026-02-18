@@ -150,7 +150,7 @@ export function BreadcrumbPillbox({
                 <div className={cn("flex items-center justify-center overflow-hidden transition-all duration-500", isSearchExpanded ? "w-0 flex-none opacity-0" : "flex-1 opacity-100")}>
                     {pathname === '/dashboard' ? (
                         <div className="flex items-center justify-center py-1">
-                            <span className="text-2xl font-black bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent tracking-[-0.05em] animate-in fade-in zoom-in-95 duration-1000 drop-shadow-sm">
+                            <span className="text-3xl font-black italic uppercase bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent tracking-tighter animate-in fade-in zoom-in-95 duration-1000 drop-shadow-md leading-none">
                                 VITALA.
                             </span>
                         </div>
