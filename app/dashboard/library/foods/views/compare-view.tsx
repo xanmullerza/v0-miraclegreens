@@ -277,8 +277,8 @@ export function CompareView() {
             <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500">
                 {activeSlot !== null ? (
                     /* Search Active State */
-                    <div className="animate-in slide-in-from-top-4 duration-500 flex flex-col">
-                        <div className="max-h-[400px] overflow-y-auto p-4 md:p-8 no-scrollbar bg-white dark:bg-slate-900 order-1">
+                    <div className="animate-in slide-in-from-top-4 duration-500 flex flex-col rounded-[2.5rem] overflow-hidden">
+                        <div className="max-h-[400px] overflow-y-auto p-4 md:p-8 no-scrollbar bg-white dark:bg-slate-900 order-1 rounded-t-[2.5rem]">
                             {isSearching ? (
                                 <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-4">
                                     <div className="relative">
@@ -324,15 +324,15 @@ export function CompareView() {
                             )}
                         </div>
 
-                        <div className="p-4 md:p-6 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3 bg-white dark:bg-slate-900 order-2">
+                        <div className="p-4 md:p-6 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3 bg-white dark:bg-slate-900 order-2 rounded-b-[2.5rem]">
                             <div className="flex-1 relative flex items-center">
                                 <div className="absolute left-5 text-blue-500/50">
                                     <Search size={16} className="md:w-5 md:h-5" />
                                 </div>
                                 <input
                                     autoFocus
-                                    placeholder={`Search for Food ${activeSlot + 1}...`}
-                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-blue-500/30 focus:border-blue-500/60 focus:ring-4 focus:ring-blue-500/10 text-[10px] md:text-sm font-black uppercase tracking-widest h-12 md:h-14 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300 transition-all shadow-sm"
+                                    placeholder="SEARCH FOOD LIBRARY..."
+                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-blue-500/30 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-[10px] md:text-sm font-black uppercase tracking-widest h-12 md:h-14 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300 transition-all shadow-sm"
                                     value={searchQuery}
                                     onKeyDown={(e) => {
                                         if (e.key === 'Escape') setActiveSlot(null);
