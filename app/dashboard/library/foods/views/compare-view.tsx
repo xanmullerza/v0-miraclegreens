@@ -333,7 +333,7 @@ export function CompareView() {
                                 <Info size={24} className="text-emerald-500" />
                                 <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
                             </div>
-                            <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase italic tracking-tight mb-1">Ready to Compare</h3>
+                            <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase italic tracking-tight mb-1">Ready to Compare?</h3>
                             <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest max-w-xs">
                                 Search below to add your first food item
                             </p>
@@ -359,7 +359,7 @@ export function CompareView() {
                         </div>
                         <input
                             autoFocus={activeSlot !== null}
-                            placeholder={activeSlot !== null ? "SEARCH FOOD LIBRARY..." : "CLICK ADD BELOW OR TYPE TO SEARCH..."}
+                            placeholder={activeSlot !== null ? "SEARCH FOOD LIBRARY..." : ""}
                             className={cn(
                                 "w-full bg-slate-50 dark:bg-slate-800/50 border-2 transition-all shadow-sm text-[10px] md:text-sm font-black uppercase tracking-widest h-12 md:h-14 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300",
                                 activeSlot !== null
