@@ -340,24 +340,7 @@ export function CompareView() {
                         </div>
                     ) : (
                         /* Summary State (Integrated) */
-                        <div className="flex flex-col md:flex-row items-center justify-between h-full gap-6 animate-in fade-in duration-500">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                                    <Activity size={24} />
-                                </div>
-                                <div className="text-left">
-                                    <h3 className="font-black text-lg uppercase italic text-slate-900 dark:text-white leading-none mb-1">Side-by-Side View</h3>
-                                    <div className="flex gap-2">
-                                        <Badge className="bg-emerald-500 text-white border-none font-black text-[8px] uppercase tracking-widest">
-                                            {selectedFoods.filter(f => f !== null).length} / 3 FOODS
-                                        </Badge>
-                                        <Badge variant="outline" className="border-slate-200 dark:border-slate-800 font-black text-[8px] uppercase tracking-widest text-slate-400">
-                                            LIVE COMPARISON
-                                        </Badge>
-                                    </div>
-                                </div>
-                            </div>
-
+                        <div className="flex flex-col items-center justify-center h-full animate-in fade-in duration-500">
                             <button
                                 onClick={clearAll}
                                 className="px-5 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-black text-[10px] uppercase tracking-widest text-rose-500 hover:border-rose-500/50 transition-all flex items-center gap-2 shadow-sm active:scale-95"
