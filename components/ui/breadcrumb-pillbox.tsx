@@ -108,7 +108,7 @@ export function BreadcrumbPillbox({
                 </p>
             )}
             <div className={cn(
-                "sticky top-0 z-50 flex items-center p-2 bg-white dark:bg-slate-900 rounded-b-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden w-full md:max-w-[800px] mx-auto xl:mx-0 transition-all duration-500",
+                "sticky top-0 z-50 flex items-center p-2 pt-0 bg-white dark:bg-slate-900 rounded-b-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden w-full md:max-w-[800px] mx-auto xl:mx-0 transition-all duration-500",
                 isSearchExpanded ? "ring-2 ring-emerald-500/20" : ""
             )}>
                 {/* Left side - Placeholder Actions / Filters */}
