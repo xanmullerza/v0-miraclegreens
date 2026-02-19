@@ -101,7 +101,7 @@ function DashboardLayoutContent({
                         {children}
                     </div>
 
-                    {pathname !== '/dashboard/library/comparefoods' && <Footer />}
+                    <Footer />
                 </main>
             </div>
 
