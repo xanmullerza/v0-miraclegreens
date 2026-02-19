@@ -30,7 +30,7 @@ export function Footer() {
 
   // Search footer for all other pages
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-40 px-2 sm:px-4 py-4 flex justify-center pointer-events-none">
+    <footer className="fixed bottom-0 left-0 right-0 z-40 px-2 sm:px-4 flex justify-center pointer-events-none">
       <div className="pointer-events-auto w-full max-w-[800px]">
         <div className="p-4 md:p-6 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3 bg-white dark:bg-slate-900 rounded-t-[2.5rem] shadow-xl">
           <div className="flex-1 relative flex items-center">
