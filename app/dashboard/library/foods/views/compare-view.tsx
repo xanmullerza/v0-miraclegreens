@@ -274,13 +274,16 @@ export function CompareView() {
         <div className="space-y-6 md:space-y-12 animate-in fade-in duration-700 pb-20 pt-4">
 
             {/* Dynamic Workspace: Onboarding OR Search OR Summary */}
-            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500">
-                {activeSlot !== null ? (
-                    /* Search Active State */
-                    <div className="animate-in slide-in-from-top-4 duration-500 flex flex-col rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900 shadow-2xl">
-                        <div className="h-[180px] overflow-y-auto p-4 md:p-8 no-scrollbar order-1">
+            {/* Unified Workspace: Stable Header + Persistent Search */}
+            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col">
+
+                {/* 1. Dynamic Content Area (Fixed Height to prevent shifts) */}
+                <div className="h-[180px] overflow-y-auto p-4 md:p-8 no-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1">
+                    {activeSlot !== null ? (
+                        /* Search Active / Results State */
+                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                             {isSearching ? (
-                                <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-4">
+                                <div className="py-12 flex flex-col items-center justify-center text-slate-400 gap-4">
                                     <div className="relative">
                                         <Activity className="animate-spin text-emerald-500" size={32} />
                                         <div className="absolute inset-0 animate-ping bg-emerald-500/20 rounded-full" />
@@ -323,89 +326,99 @@ export function CompareView() {
                                 </div>
                             )}
                         </div>
-
-                        <div className="p-4 md:p-6 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3 bg-white dark:bg-slate-900 order-2 rounded-b-[2.5rem]">
-                            <div className="flex-1 relative flex items-center">
-                                <div className="absolute left-5 text-blue-500/50">
-                                    <Search size={16} className="md:w-5 md:h-5" />
+                    ) : !selectedFoods.some(f => f !== null) ? (
+                        /* Initial Onboarding State (Compact) */
+                        <div className="flex flex-col items-center justify-center text-center h-full animate-in fade-in duration-700">
+                            <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4 relative">
+                                <Info size={24} className="text-emerald-500" />
+                                <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
+                            </div>
+                            <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase italic tracking-tight mb-1">Ready to Compare</h3>
+                            <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest max-w-xs">
+                                Search below to add your first food item
+                            </p>
+                        </div>
+                    ) : (
+                        /* Summary State (Integrated) */
+                        <div className="flex flex-col md:flex-row items-center justify-between h-full gap-6 animate-in fade-in duration-500">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                                    <Activity size={24} />
                                 </div>
-                                <input
-                                    autoFocus
-                                    placeholder="SEARCH FOOD LIBRARY..."
-                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-blue-500/30 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:bg-white dark:focus:bg-slate-800/80 text-[10px] md:text-sm font-black uppercase tracking-widest h-12 md:h-14 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300 transition-all shadow-sm"
-                                    value={searchQuery}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Escape') setActiveSlot(null);
-                                    }}
-                                    onChange={(e) => handleSearchInput(e.target.value)}
-                                />
-                            </div>
-                            <button
-                                onClick={() => setActiveSlot(null)}
-                                className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-full bg-blue-50 dark:bg-blue-950/30 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/40 flex items-center justify-center transition-all active:scale-95 group/cancel shadow-sm"
-                                title="Cancel Search"
-                            >
-                                <Search size={18} className="md:w-6 md:h-6 group-hover/cancel:scale-110 transition-transform duration-300" />
-                            </button>
-                        </div>
-                    </div>
-                ) : !selectedFoods.some(f => f !== null) ? (
-                    /* Initial Engine Ready State */
-                    <div className="p-10 md:p-20 flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-top-4 duration-1000">
-                        <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mb-6 relative">
-                            <Info size={32} className="text-emerald-500" />
-                            <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
-                        </div>
-                        <h3 className="text-xl md:text-3xl font-black text-slate-900 dark:text-white uppercase italic mb-3 tracking-tight">Ready to Compare</h3>
-                        <p className="text-slate-500 font-medium text-xs md:text-base max-w-[280px] md:max-w-md leading-relaxed mb-8">
-                            Pick your foods to see how they stack up side-by-side. <br />
-                            Use the <span className="text-emerald-500 font-bold italic">Add Buttons</span> below to start your comparison.
-                        </p>
-                        <button
-                            onClick={() => setActiveSlot(0)}
-                            className="px-8 py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-xl shadow-emerald-500/20 hover:scale-105 active:scale-95 transition-all"
-                        >
-                            Let's Compare
-                        </button>
-                    </div>
-                ) : (
-                    /* Summary / Lab Header State (Mini Dashboard) */
-                    <div className="p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 bg-slate-50/50 dark:bg-slate-800/20 animate-in fade-in duration-500">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                                <Activity size={24} />
-                            </div>
-                            <div>
-                                <h3 className="font-black text-lg uppercase italic text-slate-900 dark:text-white leading-none mb-1">Side-by-Side View</h3>
-                                <div className="flex gap-2">
-                                    <Badge className="bg-emerald-500 text-white border-none font-black text-[8px] uppercase tracking-widest">
-                                        {selectedFoods.filter(f => f !== null).length} / 3 FOODS
-                                    </Badge>
-                                    <Badge variant="outline" className="border-slate-200 dark:border-slate-800 font-black text-[8px] uppercase tracking-widest text-slate-400">
-                                        LIVE COMPARISON
-                                    </Badge>
+                                <div className="text-left">
+                                    <h3 className="font-black text-lg uppercase italic text-slate-900 dark:text-white leading-none mb-1">Side-by-Side View</h3>
+                                    <div className="flex gap-2">
+                                        <Badge className="bg-emerald-500 text-white border-none font-black text-[8px] uppercase tracking-widest">
+                                            {selectedFoods.filter(f => f !== null).length} / 3 FOODS
+                                        </Badge>
+                                        <Badge variant="outline" className="border-slate-200 dark:border-slate-800 font-black text-[8px] uppercase tracking-widest text-slate-400">
+                                            LIVE COMPARISON
+                                        </Badge>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="flex items-center gap-3">
-                            {selectedFoods.filter(f => f !== null).length < 3 && (
-                                <button
-                                    onClick={() => setActiveSlot(selectedFoods.findIndex(f => f === null))}
-                                    className="px-5 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-black text-[10px] uppercase tracking-widest text-emerald-500 hover:border-emerald-500/50 transition-all flex items-center gap-2"
-                                >
-                                    <Plus size={14} /> Add Food
-                                </button>
-                            )}
                             <button
                                 onClick={clearAll}
-                                className="px-5 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-black text-[10px] uppercase tracking-widest text-rose-500 hover:border-rose-500/50 transition-all flex items-center gap-2"
+                                className="px-5 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-black text-[10px] uppercase tracking-widest text-rose-500 hover:border-rose-500/50 transition-all flex items-center gap-2 shadow-sm active:scale-95"
                             >
                                 <Trash2 size={14} /> Clear All
                             </button>
                         </div>
+                    )}
+                </div>
+
+                {/* 2. Permanent Search Footer */}
+                <div className="p-4 md:p-6 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3 bg-white dark:bg-slate-900 order-2 rounded-b-[2.5rem]">
+                    <div className="flex-1 relative flex items-center">
+                        <div className={cn("absolute left-5 transition-colors", activeSlot !== null ? "text-blue-500/50" : "text-slate-300")}>
+                            <Search size={16} className="md:w-5 md:h-5" />
+                        </div>
+                        <input
+                            autoFocus={activeSlot !== null}
+                            placeholder={activeSlot !== null ? "SEARCH FOOD LIBRARY..." : "CLICK ADD BELOW OR TYPE TO SEARCH..."}
+                            className={cn(
+                                "w-full bg-slate-50 dark:bg-slate-800/50 border-2 transition-all shadow-sm text-[10px] md:text-sm font-black uppercase tracking-widest h-12 md:h-14 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300",
+                                activeSlot !== null
+                                    ? "border-blue-500/30 focus:border-blue-500/80 focus:ring-4 focus:ring-blue-500/10 focus:bg-white dark:focus:bg-slate-800/80"
+                                    : "border-slate-100 dark:border-slate-800 cursor-pointer hover:border-blue-500/20"
+                            )}
+                            value={searchQuery}
+                            onFocus={() => {
+                                if (activeSlot === null) {
+                                    const firstEmpty = selectedFoods.findIndex(f => f === null);
+                                    setActiveSlot(firstEmpty !== -1 ? firstEmpty : 0);
+                                }
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Escape') setActiveSlot(null);
+                            }}
+                            onChange={(e) => {
+                                if (activeSlot === null) {
+                                    const firstEmpty = selectedFoods.findIndex(f => f === null);
+                                    setActiveSlot(firstEmpty !== -1 ? firstEmpty : 0);
+                                }
+                                handleSearchInput(e.target.value);
+                            }}
+                        />
                     </div>
-                )}
+                    {activeSlot !== null ? (
+                        <button
+                            onClick={() => {
+                                setActiveSlot(null);
+                                setSearchQuery("");
+                            }}
+                            className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-full bg-blue-50 dark:bg-blue-950/30 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/40 flex items-center justify-center transition-all active:scale-95 group/cancel shadow-sm"
+                            title="Close Search"
+                        >
+                            <X size={18} className="md:w-6 md:h-6 group-hover/cancel:rotate-90 transition-transform duration-300" />
+                        </button>
+                    ) : (
+                        <div className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-full bg-slate-50 dark:bg-slate-800/50 text-slate-300 flex items-center justify-center">
+                            <Search size={18} className="md:w-6 md:h-6" />
+                        </div>
+                    )}
+                </div>
             </div>
 
 
@@ -557,6 +570,6 @@ export function CompareView() {
                 </div>
 
             </div>
-        </div>
+        </div >
     );
 }
