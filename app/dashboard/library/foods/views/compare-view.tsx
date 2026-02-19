@@ -326,13 +326,13 @@ export function CompareView() {
 
                         <div className="p-4 md:p-6 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3 bg-white dark:bg-slate-900 order-2">
                             <div className="flex-1 relative flex items-center">
-                                <div className="absolute left-5 text-slate-400">
+                                <div className="absolute left-5 text-blue-500/50">
                                     <Search size={16} className="md:w-5 md:h-5" />
                                 </div>
                                 <input
                                     autoFocus
                                     placeholder={`Search for Food ${activeSlot + 1}...`}
-                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border-none focus:ring-2 focus:ring-emerald-500/20 text-[10px] md:text-sm font-black uppercase tracking-widest h-12 md:h-14 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300 transition-all"
+                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-blue-500/30 focus:border-blue-500/60 focus:ring-4 focus:ring-blue-500/10 text-[10px] md:text-sm font-black uppercase tracking-widest h-12 md:h-14 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300 transition-all shadow-sm"
                                     value={searchQuery}
                                     onKeyDown={(e) => {
                                         if (e.key === 'Escape') setActiveSlot(null);
@@ -342,10 +342,10 @@ export function CompareView() {
                             </div>
                             <button
                                 onClick={() => setActiveSlot(null)}
-                                className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-full bg-rose-50 dark:bg-rose-950/30 text-rose-500 hover:bg-rose-100 dark:hover:bg-rose-900/40 flex items-center justify-center transition-all active:scale-95 group/cancel"
-                                title="Cancel"
+                                className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-full bg-blue-50 dark:bg-blue-950/30 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/40 flex items-center justify-center transition-all active:scale-95 group/cancel shadow-sm"
+                                title="Cancel Search"
                             >
-                                <X size={18} className="md:w-6 md:h-6 group-hover/cancel:rotate-90 transition-transform duration-300" />
+                                <Search size={18} className="md:w-6 md:h-6 group-hover/cancel:scale-110 transition-transform duration-300" />
                             </button>
                         </div>
                     </div>
