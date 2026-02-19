@@ -278,7 +278,7 @@ export function CompareView() {
                 {activeSlot !== null ? (
                     /* Search Active State */
                     <div className="animate-in slide-in-from-top-4 duration-500 flex flex-col rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900 shadow-2xl">
-                        <div className="h-[320px] overflow-y-auto p-4 md:p-8 no-scrollbar order-1">
+                        <div className="h-[180px] overflow-y-auto p-4 md:p-8 no-scrollbar order-1">
                             {isSearching ? (
                                 <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-4">
                                     <div className="relative">
