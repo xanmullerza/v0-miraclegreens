@@ -271,7 +271,7 @@ export function CompareView() {
     };
 
     return (
-        <div className="space-y-6 md:space-y-12 animate-in fade-in duration-700 pb-20 pt-4">
+        <div className="space-y-6 md:space-y-12 animate-in fade-in duration-700 pb-20 pt-0">
 
             {/* Dynamic Workspace: Onboarding OR Search OR Summary */}
             {/* Unified Workspace: Stable Header + Persistent Search */}
