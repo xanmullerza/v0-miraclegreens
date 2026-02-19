@@ -277,8 +277,8 @@ export function CompareView() {
             <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500">
                 {activeSlot !== null ? (
                     /* Search Active State */
-                    <div className="animate-in slide-in-from-top-4 duration-500 flex flex-col rounded-[2.5rem] overflow-hidden">
-                        <div className="max-h-[400px] overflow-y-auto p-4 md:p-8 no-scrollbar bg-white dark:bg-slate-900 order-1 rounded-t-[2.5rem]">
+                    <div className="animate-in slide-in-from-top-4 duration-500 flex flex-col rounded-[2.5rem] overflow-hidden bg-white dark:bg-slate-900 shadow-2xl">
+                        <div className="h-[320px] overflow-y-auto p-4 md:p-8 no-scrollbar order-1">
                             {isSearching ? (
                                 <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-4">
                                     <div className="relative">
@@ -332,7 +332,7 @@ export function CompareView() {
                                 <input
                                     autoFocus
                                     placeholder="SEARCH FOOD LIBRARY..."
-                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-blue-500/30 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-[10px] md:text-sm font-black uppercase tracking-widest h-12 md:h-14 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300 transition-all shadow-sm"
+                                    className="w-full bg-slate-50 dark:bg-slate-800/50 border-2 border-blue-500/30 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:bg-white dark:focus:bg-slate-800/80 text-[10px] md:text-sm font-black uppercase tracking-widest h-12 md:h-14 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300 transition-all shadow-sm"
                                     value={searchQuery}
                                     onKeyDown={(e) => {
                                         if (e.key === 'Escape') setActiveSlot(null);
