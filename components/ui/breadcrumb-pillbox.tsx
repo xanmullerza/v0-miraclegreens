@@ -101,9 +101,9 @@ export function BreadcrumbPillbox({
     const segments = pathname.split('/').filter(Boolean);
 
     return (
-        <div className="space-y-3 w-full">
+        <div className="w-full">
             {sectionLabel && (
-                <p className={cn("text-[9px] font-black uppercase tracking-widest px-2 md:px-0", sectionColor)}>
+                <p className={cn("text-[9px] font-black uppercase tracking-widest px-2 md:px-0 mb-0", sectionColor)}>
                     {sectionLabel}
                 </p>
             )}

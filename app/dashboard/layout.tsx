@@ -53,7 +53,7 @@ function DashboardLayoutContent({
                     {/* Main Header (BreadcrumbPillbox) */}
                     <div className={cn(
                         "z-40 px-2 sm:px-4 w-full flex justify-center pointer-events-none transition-all duration-500",
-                        pathname === '/dashboard/library/comparefoods' ? "relative pt-4" : "sticky top-4"
+                        pathname === '/dashboard/library/comparefoods' ? "relative pt-0" : "sticky top-0"
                     )}>
                         <div className="pointer-events-auto w-full max-w-[800px]">
                             <BreadcrumbPillbox
