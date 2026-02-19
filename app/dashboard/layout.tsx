@@ -51,7 +51,10 @@ function DashboardLayoutContent({
                 {/* Main Content */}
                 <main className="dashboard-main flex-1 overflow-y-auto relative bg-slate-50 dark:bg-[#020617] custom-scrollbar flex flex-col">
                     {/* Main Header (BreadcrumbPillbox) */}
-                    <div className="sticky top-4 z-40 px-2 sm:px-4 w-full flex justify-center pointer-events-none">
+                    <div className={cn(
+                        "z-40 px-2 sm:px-4 w-full flex justify-center pointer-events-none transition-all duration-500",
+                        pathname === '/dashboard/library/comparefoods' ? "relative pt-4" : "sticky top-4"
+                    )}>
                         <div className="pointer-events-auto w-full max-w-[800px]">
                             <BreadcrumbPillbox
                                 searchQuery={searchQuery}
