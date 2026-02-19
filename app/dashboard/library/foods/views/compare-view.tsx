@@ -328,7 +328,7 @@ export function CompareView() {
                         </div>
                     ) : !selectedFoods.some(f => f !== null) ? (
                         /* Initial Onboarding State (Compact) */
-                        <div className="flex flex-col items-center justify-center text-center h-full animate-in fade-in duration-700">
+                        <div className="flex flex-col items-center justify-start pt-8 md:pt-10 text-center h-full animate-in fade-in duration-700">
                             <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4 relative">
                                 <Info size={24} className="text-emerald-500" />
                                 <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
