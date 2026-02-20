@@ -36,6 +36,8 @@ interface BreadcrumbPillboxProps {
     onFilterToggle?: (expanded: boolean) => void;
     actions?: React.ReactNode;
     userProfile?: React.ReactNode;
+    userStatus?: 'cloud' | 'local' | 'anonymous';
+    userAvatarUrl?: string;
 }
 
 export function BreadcrumbPillbox({
@@ -45,7 +47,9 @@ export function BreadcrumbPillbox({
     sectionColor = 'text-emerald-500',
     showHomeButton = true,
     actions,
-    userProfile
+    userProfile,
+    userStatus = 'anonymous',
+    userAvatarUrl
 }: BreadcrumbPillboxProps) {
     const router = useRouter();
     const pathname = usePathname();
@@ -234,10 +238,15 @@ export function BreadcrumbPillbox({
                             className="h-6 w-12 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                             title="Profile"
                         >
-                            <div className="h-4 w-4 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-500 overflow-hidden grayscale">
-                                {userProfile && (userProfile as any).props?.children?.[0]?.props?.children?.[1]?.props?.children?.[0]?.props?.src ? (
+                            <div className={cn(
+                                "h-4 w-4 rounded-full flex items-center justify-center text-white overflow-hidden transition-colors",
+                                userStatus === 'cloud' ? "bg-emerald-500" :
+                                    userStatus === 'local' ? "bg-blue-500" :
+                                        "bg-orange-500"
+                            )}>
+                                {userAvatarUrl ? (
                                     <img
-                                        src={(userProfile as any).props.children[0].props.children[1].props.children[0].props.src}
+                                        src={userAvatarUrl}
                                         alt="P"
                                         className="w-full h-full object-cover"
                                     />

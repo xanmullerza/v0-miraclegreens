@@ -65,20 +65,12 @@ function DashboardLayoutContent({
                                         <Settings size={18} />
                                     </Link>
                                 }
-                                userProfile={
-                                    <div className="flex items-center gap-2">
-                                        <div className="text-right hidden sm:block">
-                                            <p className="text-xs font-bold leading-none">{user?.user_metadata?.full_name || profile.nickname || profile.name || 'Anonymous'}</p>
-                                        </div>
-                                        <div className="h-4 w-4 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500 overflow-hidden">
-                                            {user?.user_metadata?.avatar_url ? (
-                                                <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <User size={10} />
-                                            )}
-                                        </div>
-                                    </div>
+                                userStatus={
+                                    user ? 'cloud' :
+                                        (profile.name || profile.nickname) ? 'local' :
+                                            'anonymous'
                                 }
+                                userAvatarUrl={user?.user_metadata?.avatar_url}
                             />
                         </div>
                     </div>
