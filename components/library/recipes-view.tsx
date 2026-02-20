@@ -374,7 +374,7 @@ export function RecipesView({
 
                                     {/* Actions */}
                                     <div className="shrink-0 flex items-center lg:justify-end gap-1">
-                                        {(String(recipe.id).startsWith('local-') || recipe.is_curated === false) && (
+                                        {(String(recipe.id).startsWith('local-') || recipe.is_curated === false || isAdmin) && (
                                             <>
                                                 <button
                                                     onClick={(e) => handleEdit(e, recipe.id)}

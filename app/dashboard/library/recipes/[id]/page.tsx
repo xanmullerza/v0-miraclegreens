@@ -1381,7 +1381,7 @@ export default function RecipeDetailsPage() {
                                 {recipe.is_favorite ? 'Favorited' : 'Add to Favorites'}
                             </button>
 
-                            {recipe && (String(recipe.id).startsWith('local-') || recipe.is_curated === false) && (
+                            {recipe && (String(recipe.id).startsWith('local-') || recipe.is_curated === false || isAdmin) && (
                                 <div className="grid grid-cols-2 gap-3 pt-2">
                                     <Button
                                         variant="outline"
