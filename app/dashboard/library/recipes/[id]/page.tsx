@@ -271,7 +271,13 @@ export default function RecipeDetailsPage() {
 
                 if (ingError) throw ingError;
 
-                const recipeIds = Array.from(new Set(ingData.map(i => i.recipe_id)));
+                // Count overlaps for each recipe
+                const overlapCounts: Record<string, number> = {};
+                ingData.forEach(i => {
+                    overlapCounts[i.recipe_id] = (overlapCounts[i.recipe_id] || 0) + 1;
+                });
+
+                const recipeIds = Object.keys(overlapCounts);
 
                 if (recipeIds.length === 0) {
                     setRelatedRecipes([]);
@@ -281,11 +287,17 @@ export default function RecipeDetailsPage() {
                 const { data: recipeData, error: recipeError } = await supabase
                     .from('recipes')
                     .select('id, title, image, type, diet, prep_time, calories')
-                    .in('id', recipeIds)
-                    .limit(6);
+                    .in('id', recipeIds);
 
                 if (recipeError) throw recipeError;
-                setRelatedRecipes((recipeData || []) as Recipe[]);
+
+                // Sort by overlap count (descending)
+                const sortedRecipes = (recipeData || [])
+                    .map(r => ({ ...r, overlapMatch: overlapCounts[r.id] }))
+                    .sort((a, b) => b.overlapMatch - a.overlapMatch)
+                    .slice(0, 6);
+
+                setRelatedRecipes(sortedRecipes as any);
             } catch (error) {
                 console.error("Error fetching related recipes:", error);
             } finally {
@@ -1405,7 +1417,7 @@ export default function RecipeDetailsPage() {
                                             href={`/dashboard/library/recipes/${meal.id}`}
                                             className="group relative flex flex-col items-center text-center gap-3 p-4 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-indigo-500/30 transition-all duration-500 shadow-xl shadow-slate-200/50 dark:shadow-none hover:-translate-y-1"
                                         >
-                                            <div className="w-full aspect-square rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 group-hover:scale-105 transition-transform duration-700">
+                                            <div className="w-full aspect-square rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 group-hover:scale-105 transition-transform duration-700 relative">
                                                 {meal.image ? (
                                                     <img src={meal.image} className="w-full h-full object-cover" alt={meal.title} />
                                                 ) : (
@@ -1415,7 +1427,7 @@ export default function RecipeDetailsPage() {
                                                 )}
                                                 {/* Overlay with Type */}
                                                 <div className="absolute top-2 left-2 px-2 py-1 rounded-lg bg-white/90 dark:bg-slate-900/90 backdrop-blur shadow-sm border border-slate-100 dark:border-slate-800">
-                                                    <p className="text-[7px] font-black uppercase tracking-widest text-indigo-500">{meal.type}</p>
+                                                    <p className="text-[7px] font-black uppercase tracking-widest text-indigo-500">{(meal as any).overlapMatch} Shared</p>
                                                 </div>
                                             </div>
 
