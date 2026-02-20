@@ -161,17 +161,23 @@ export function useDataPersistence() {
                         await supabase.from('ingredients').delete().eq('recipe_id', recipe.id);
                     }
 
-                    const ingredientsData = ingredients.map(ing => ({
-                        recipe_id: recipeId,
-                        food_item_id: ing.food_item_id,
-                        item: ing.item,
-                        amount: ing.amount,
-                        weight_g: ing.weight_g,
-                        quantity: ing.quantity,
-                        measure_label: ing.measure_label,
-                        base_ingredient: ing.base_ingredient,
-                        modifier: ing.modifier,
-                    }));
+                    const ingredientsData = ingredients.map(ing => {
+                        // Ensure we have a descriptive item name and amount for legacy support/fallback
+                        const itemName = ing.food_item_name || 'Ingredient';
+                        const amountStr = `${ing.quantity || 0} ${ing.measure_label || 'unit'}`;
+
+                        return {
+                            recipe_id: recipeId,
+                            food_item_id: ing.food_item_id,
+                            item: itemName,
+                            amount: amountStr,
+                            weight_g: ing.weight_g,
+                            quantity: ing.quantity,
+                            measure_label: ing.measure_label,
+                            base_ingredient: ing.base_ingredient || null,
+                            modifier: ing.modifier || null,
+                        };
+                    });
 
                     const { error: ingError } = await supabase.from('ingredients').insert(ingredientsData);
                     if (ingError) throw ingError;
