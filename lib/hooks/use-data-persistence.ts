@@ -210,6 +210,7 @@ export function useDataPersistence() {
                 // Standardize ingredients for local storage to match cloud structure (include nesting)
                 const mappedIngredients = ingredients?.map(ing => ({
                     ...ing,
+                    item: ing.food_item_name || (ing as any).item || 'Ingredient', // Map to expected 'item' field
                     food_item: ing.food_item || {
                         id: ing.food_item_id,
                         name: ing.food_item_name,
@@ -222,11 +223,17 @@ export function useDataPersistence() {
                     }
                 }));
 
+                // Standardize instructions to match DB structure
+                const mappedInstructions = instructions?.map((ins: any, idx) => ({
+                    step_text: typeof ins === 'string' ? ins : ins.step_text,
+                    step_order: ins.step_order || idx + 1
+                }));
+
                 const newRecipe = {
                     ...recipe,
                     id: recipeId,
                     ingredients: mappedIngredients,
-                    instructions,
+                    instructions: mappedInstructions,
                     is_favorite: recipe.is_favorite ?? false
                 } as Recipe;
 

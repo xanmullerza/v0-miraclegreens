@@ -405,9 +405,20 @@ export default function RecipeDetailsPage() {
                 if (!localRecipe) throw new Error('Local recipe not found');
 
                 setRecipe(localRecipe);
-                setIngredients(localRecipe.ingredients || []);
-                setOriginalIngredients(localRecipe.ingredients || []);
-                setInstructions(localRecipe.instructions || []);
+                const fetchedIngredients = (localRecipe.ingredients || []).map((ing: any) => ({
+                    ...ing,
+                    item: ing.item || ing.food_item_name || ing.base_ingredient || 'Ingredient'
+                }));
+                setIngredients(fetchedIngredients);
+                setOriginalIngredients(fetchedIngredients);
+
+                const fetchedInstructions = (localRecipe.instructions || []).map((inst: any, idx: number) => {
+                    if (typeof inst === 'string') {
+                        return { step_text: inst, step_order: idx + 1 };
+                    }
+                    return inst;
+                });
+                setInstructions(fetchedInstructions);
 
                 // Calculate live micronutrients
                 if (localRecipe.ingredients?.length > 0) {
@@ -422,7 +433,8 @@ export default function RecipeDetailsPage() {
                                 protein_g: ing.base_nutrition?.protein || 0,
                                 fat_g: ing.base_nutrition?.fat || 0,
                                 carbs_g: ing.base_nutrition?.carbs || 0,
-                                micronutrients: ing.base_nutrition?.micronutrients || {}
+                                micronutrients: ing.base_nutrition?.micronutrients || {},
+                                phytonutrients: ing.base_nutrition?.phytonutrients || {}
                             };
 
                             return {

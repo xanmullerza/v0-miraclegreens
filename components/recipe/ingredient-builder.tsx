@@ -333,7 +333,8 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
             protein: finalFoodItem.protein_g,
             fat: finalFoodItem.fat_g,
             carbs: finalFoodItem.carbs_g,
-            micronutrients: finalFoodItem.micronutrients || {}
+            micronutrients: finalFoodItem.micronutrients || {},
+            phytonutrients: finalFoodItem.phytonutrients || {}
         };
 
         const newIngredient: RecipeIngredient = {
