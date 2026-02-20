@@ -14,6 +14,10 @@ const tabs = [
 import { HeaderActionsProvider } from '@/lib/context/header-actions-context';
 import { SearchProvider } from '@/lib/context/search-context';
 
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
+import { useEffect, useState } from 'react';
+
 export default function BrowsePage() {
     return (
         <SearchProvider>
@@ -27,6 +31,26 @@ export default function BrowsePage() {
 function BrowsePageContent() {
     const [activeTab, setActiveTab] = useState('about');
     const [searchQuery, setSearchQuery] = useState('');
+    const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+    const router = useRouter();
+
+    useEffect(() => {
+        const checkAdmin = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
+            const isUserAdmin = (user?.email || user?.user_metadata?.email || '').toLowerCase() === adminEmail.toLowerCase();
+
+            setIsAdmin(isUserAdmin);
+
+            if (!isUserAdmin) {
+                router.push('/dashboard');
+            }
+        };
+        checkAdmin();
+    }, [router]);
+
+    if (isAdmin === null) return null; // Or a loading spinner
+    if (!isAdmin) return null;
 
     const renderContent = () => {
         switch (activeTab) {

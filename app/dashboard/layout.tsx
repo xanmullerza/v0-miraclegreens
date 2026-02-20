@@ -71,6 +71,7 @@ function DashboardLayoutContent({
                                             'anonymous'
                                 }
                                 userAvatarUrl={user?.user_metadata?.avatar_url}
+                                isAdmin={(user?.email || user?.user_metadata?.email || '').toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase()}
                             />
                         </div>
                     </div>

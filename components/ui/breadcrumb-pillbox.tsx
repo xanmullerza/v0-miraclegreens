@@ -39,6 +39,7 @@ interface BreadcrumbPillboxProps {
     userProfile?: React.ReactNode;
     userStatus?: 'cloud' | 'local' | 'anonymous';
     userAvatarUrl?: string;
+    isAdmin?: boolean;
 }
 
 export function BreadcrumbPillbox({
@@ -50,7 +51,8 @@ export function BreadcrumbPillbox({
     actions,
     userProfile,
     userStatus = 'anonymous',
-    userAvatarUrl
+    userAvatarUrl,
+    isAdmin = false
 }: BreadcrumbPillboxProps) {
     const router = useRouter();
     const pathname = usePathname();
@@ -130,9 +132,15 @@ export function BreadcrumbPillbox({
                             <Search size={14} />
                         </button>
                         <Link
-                            href="/browse"
-                            className="h-6 w-12 flex items-center justify-center text-slate-300 dark:text-slate-700 hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-                            title="Browse"
+                            href={isAdmin ? "/browse" : "#"}
+                            className={cn(
+                                "h-6 w-12 flex items-center justify-center text-slate-300 dark:text-slate-700 transition-colors",
+                                isAdmin
+                                    ? "hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                    : "opacity-20 cursor-not-allowed pointer-events-none"
+                            )}
+                            title={isAdmin ? "Browse" : "Admin Only"}
+                            onClick={(e: React.MouseEvent) => !isAdmin && e.preventDefault()}
                         >
                             <Globe size={14} className="opacity-40" />
                         </Link>
