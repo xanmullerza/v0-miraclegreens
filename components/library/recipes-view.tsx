@@ -36,6 +36,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { useDataPersistence, Recipe } from '@/lib/hooks/use-data-persistence';
 
 const CAL_TO_KJ = 4.184;
 const formatEnergy = (calories: number, unit: 'kcal' | 'kJ') => {
@@ -44,21 +45,6 @@ const formatEnergy = (calories: number, unit: 'kcal' | 'kJ') => {
     }
     return `${Math.round(calories).toLocaleString()} kC`;
 };
-
-interface Recipe {
-    id: string;
-    title: string;
-    type: string;
-    calories: number;
-    protein: number;
-    fat: number;
-    carbs: number;
-    prep_time: number;
-    servings: number;
-    image: string | null;
-    is_favorite: boolean;
-    diet: string[];
-}
 
 export const MEAL_TYPES = ["breakfast", "lunch", "dinner", "snack"];
 
@@ -91,6 +77,8 @@ export function RecipesView({
     const [hasMore, setHasMore] = useState(true);
     const { searchQuery } = useSearch();
     const { energyUnit } = useUserPreferences();
+    const { user, fetchRecipes: fetchRecipesBridge, saveRecipe, loading: authLoading } = useDataPersistence();
+
     const [localSelectedTypes, setLocalSelectedTypes] = useState<string[]>(MEAL_TYPES);
     const [localShowFavoritesOnly, setLocalShowFavoritesOnly] = useState(false);
 
@@ -108,52 +96,37 @@ export function RecipesView({
     const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
-        const checkAdmin = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
-                setIsAdmin(user.email?.toLowerCase() === adminEmail.toLowerCase());
-            }
-        };
-        checkAdmin();
-    }, []);
+        if (user) {
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
+            setIsAdmin(user.email?.toLowerCase() === adminEmail.toLowerCase());
+        } else {
+            setIsAdmin(false);
+        }
+    }, [user]);
 
     useEffect(() => {
-        fetchRecipes(0, true);
-    }, [searchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection]);
+        if (!authLoading) {
+            fetchRecipes(0, true);
+        }
+    }, [searchQuery, selectedTypes, showFavoritesOnly, sortField, sortDirection, authLoading]);
 
     const fetchRecipes = async (pageNum: number, isNewSearch = false) => {
         if (pageNum === 0) setLoading(true);
         else setLoadingMore(true);
 
         try {
-            let query = supabase
-                .from('recipes')
-                .select('*', { count: 'exact' })
-                .order(sortField, { ascending: sortDirection === 'asc' });
-
-            if (searchQuery.trim()) {
-                query = query.ilike('title', `%${searchQuery}%`);
-            }
-
-            if (selectedTypes.length < MEAL_TYPES.length) {
-                query = query.in('type', selectedTypes);
-            }
-
-            if (showFavoritesOnly) {
-                query = query.eq('is_favorite', true);
-            }
-
-            const from = pageNum * PAGE_SIZE;
-            const to = from + PAGE_SIZE - 1;
-            query = query.range(from, to);
-
-            const { data, error, count } = await query;
-            if (error) throw error;
+            const { recipes: newItems, count } = await fetchRecipesBridge({
+                searchQuery,
+                selectedTypes,
+                showFavoritesOnly,
+                page: pageNum,
+                pageSize: PAGE_SIZE,
+                sortField,
+                sortDirection
+            });
 
             if (count !== null) setTotalCount(count);
 
-            const newItems = data || [];
             if (isNewSearch) {
                 setRecipes(newItems);
                 setPage(0);
@@ -190,12 +163,10 @@ export function RecipesView({
     const toggleFavorite = async (recipe: Recipe) => {
         const newStatus = !recipe.is_favorite;
         try {
-            const { error } = await supabase
-                .from('recipes')
-                .update({ is_favorite: newStatus } as any)
-                .eq('id', recipe.id);
-
-            if (error) throw error;
+            await saveRecipe({
+                ...recipe,
+                is_favorite: newStatus
+            });
 
             setRecipes(prev => prev.map(r =>
                 r.id === recipe.id ? { ...r, is_favorite: newStatus } : r
@@ -290,7 +261,7 @@ export function RecipesView({
                     </div>
 
                     <Button
-                        onClick={() => router.push('/admin/recipebuilder')}
+                        onClick={() => router.push('/dashboard/library/recipes/new')}
                         className="h-14 px-8 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest gap-2 shadow-xl shadow-blue-500/10"
                     >
                         <Plus size={18} />

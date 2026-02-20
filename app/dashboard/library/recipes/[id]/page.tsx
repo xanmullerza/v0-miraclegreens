@@ -392,81 +392,87 @@ export default function RecipeDetailsPage() {
     const fetchRecipeDetails = async () => {
         setLoading(true);
         try {
-            // Fetch Recipe
-            const { data: recipeData, error: recipeError } = await supabase
-                .from('recipes')
-                .select('*')
-                .eq('id', id)
-                .single();
+            const recipeIdStr = String(id);
 
-            if (recipeError) throw recipeError;
+            if (recipeIdStr.startsWith('local-')) {
+                // LOAD FROM LOCAL STORAGE
+                const localData = localStorage.getItem('local_recipes');
+                if (!localData) throw new Error('Local recipe not found');
 
-            // Fetch Ingredients with food item data
-            const { data: ingData, error: ingError } = await supabase
-                .from('ingredients')
-                .select('*, food_item:food_items(*)')
-                .eq('recipe_id', id);
+                const localRecipes: any[] = JSON.parse(localData);
+                const localRecipe = localRecipes.find(r => r.id === recipeIdStr);
 
-            if (ingError) throw ingError;
+                if (!localRecipe) throw new Error('Local recipe not found');
 
-            const fetchedIngredients = ingData || [];
-            setIngredients(fetchedIngredients);
-            setOriginalIngredients(fetchedIngredients); // Save original order
+                setRecipe(localRecipe);
+                setIngredients(localRecipe.ingredients || []);
+                setOriginalIngredients(localRecipe.ingredients || []);
+                setInstructions(localRecipe.instructions || []);
 
-            // Calculate live micronutrients for the report
-            if (fetchedIngredients.length > 0) {
-                const calculated = calculateRecipeNutrition(
-                    fetchedIngredients.map(ing => ({
-                        food_item: ing.food_item,
-                        weight_g: ing.weight_g || 0,
-                        cooking_state: ing.cooking_state
-                    }))
-                );
-
-                setCalculatedTotals(calculated);
-
-                // Build phytonutrient source map: which ingredient contributes which phytonutrient
-                const sourcesMap: Record<string, { description: string; sources: string[] }> = {};
-                for (const ing of fetchedIngredients) {
-                    const fi = ing.food_item;
-                    if (fi?.phytonutrients && typeof fi.phytonutrients === 'object') {
-                        const foodName = fi.common_name || fi.name || 'Unknown';
-                        Object.entries(fi.phytonutrients).forEach(([phytoName, desc]) => {
-                            if (!sourcesMap[phytoName]) {
-                                sourcesMap[phytoName] = { description: desc as string, sources: [] };
-                            }
-                            if (!sourcesMap[phytoName].sources.includes(foodName)) {
-                                sourcesMap[phytoName].sources.push(foodName);
-                            }
-                        });
-                    }
+                // Calculate live micronutrients
+                if (localRecipe.ingredients?.length > 0) {
+                    const calculated = calculateRecipeNutrition(
+                        localRecipe.ingredients.map((ing: any) => ({
+                            food_item: ing.food_item,
+                            weight_g: ing.weight_g || 0,
+                            cooking_state: ing.cooking_state
+                        }))
+                    );
+                    setCalculatedTotals(calculated);
                 }
-                setPhytoSources(sourcesMap);
-
-                // Use the fresh calculation for the entire display
-                setRecipe({
-                    ...recipeData,
-                    calories: calculated.calories,
-                    protein: calculated.protein,
-                    carbs: calculated.carbs,
-                    fat: calculated.fat,
-                    micronutrients: calculated.micronutrients,
-                    phytonutrients: calculated.phytonutrients
-                });
             } else {
-                setRecipe(recipeData);
+                // LOAD FROM SUPABASE
+                const { data: recipeData, error: recipeError } = await supabase
+                    .from('recipes')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (recipeError) throw recipeError;
+
+                const { data: ingData, error: ingError } = await supabase
+                    .from('ingredients')
+                    .select('*, food_item:food_items(*)')
+                    .eq('recipe_id', id);
+
+                if (ingError) throw ingError;
+
+                const fetchedIngredients = ingData || [];
+                setIngredients(fetchedIngredients);
+                setOriginalIngredients(fetchedIngredients);
+
+                if (fetchedIngredients.length > 0) {
+                    const calculated = calculateRecipeNutrition(
+                        fetchedIngredients.map(ing => ({
+                            food_item: ing.food_item,
+                            weight_g: ing.weight_g || 0,
+                            cooking_state: ing.cooking_state
+                        }))
+                    );
+
+                    setCalculatedTotals(calculated);
+                    setRecipe({
+                        ...recipeData,
+                        calories: calculated.calories,
+                        protein: calculated.protein,
+                        carbs: calculated.carbs,
+                        fat: calculated.fat,
+                        micronutrients: calculated.micronutrients,
+                        phytonutrients: calculated.phytonutrients
+                    });
+                } else {
+                    setRecipe(recipeData);
+                }
+
+                const { data: insData, error: insError } = await supabase
+                    .from('instructions')
+                    .select('*')
+                    .eq('recipe_id', id)
+                    .order('step_order', { ascending: true });
+
+                if (insError) throw insError;
+                setInstructions(insData || []);
             }
-
-            // Fetch Instructions
-            const { data: insData, error: insError } = await supabase
-                .from('instructions')
-                .select('*')
-                .eq('recipe_id', id)
-                .order('step_order', { ascending: true });
-
-            if (insError) throw insError;
-            setInstructions(insData || []);
-
         } catch (error) {
             console.error('Error fetching recipe:', error);
             toast.error('Failed to load meal details');
@@ -475,6 +481,7 @@ export default function RecipeDetailsPage() {
             setLoading(false);
         }
     };
+
 
     // Effect to recalculate nutrition when ingredients or hidden status changes
     useEffect(() => {
