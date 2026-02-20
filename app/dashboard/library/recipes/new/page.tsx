@@ -53,6 +53,7 @@ function UserRecipeBuilder() {
     const [isFavorite, setIsFavorite] = useState(true);
     const [startMode, setStartMode] = useState<'none' | 'smart' | 'magic' | 'manual'>('none');
     const [instructionsMode, setInstructionsMode] = useState<'none' | 'magic' | 'manual'>('none');
+    const [loadingRecipe, setLoadingRecipe] = useState(false);
 
     const instructionsRef = useRef<HTMLDivElement>(null);
     const detailsRef = useRef<HTMLDivElement>(null);
@@ -61,6 +62,7 @@ function UserRecipeBuilder() {
     useEffect(() => {
         if (recipeIdToEdit) {
             const loadRecipe = async () => {
+                setLoadingRecipe(true);
                 try {
                     const recipe = await getRecipe(recipeIdToEdit);
                     if (recipe) {
@@ -113,6 +115,8 @@ function UserRecipeBuilder() {
                 } catch (error) {
                     console.error("Failed to load recipe for editing", error);
                     toast.error("Failed to load recipe for editing");
+                } finally {
+                    setLoadingRecipe(false);
                 }
             };
             loadRecipe();
@@ -224,6 +228,17 @@ function UserRecipeBuilder() {
             setSaving(false);
         }
     };
+
+    if (loadingRecipe || authLoading) {
+        return (
+            <div className="max-w-7xl mx-auto min-h-[60vh] flex flex-col items-center justify-center gap-4">
+                <Loader2 className="w-10 h-10 animate-spin text-emerald-500" />
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 italic animate-pulse">
+                    Initializing Protocol Workspace...
+                </p>
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100 pb-20">
