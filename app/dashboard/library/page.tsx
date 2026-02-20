@@ -45,7 +45,6 @@ export default function LibraryPage() {
         { id: "foods", title: "Foods", desc: "Browse whole food profiles", href: "/dashboard/library/foods", icon: Leaf, color: "text-emerald-400", bg: "bg-emerald-500/10", borderHover: "hover:border-emerald-500/40", gradient: "from-emerald-500 to-teal-600" },
         { id: "recipes", title: "Recipes", desc: "Meals with full nutrition", href: "/dashboard/library/recipes", icon: ChefHat, color: "text-amber-400", bg: "bg-amber-500/10", borderHover: "hover:border-amber-500/40", gradient: "from-amber-500 to-orange-600" },
         { id: "mixes", title: "Mixes", desc: "Ingredient blends & bases", href: "/dashboard/library/mixes", icon: Beaker, color: "text-indigo-400", bg: "bg-indigo-500/10", borderHover: "hover:border-indigo-500/40", gradient: "from-indigo-500 to-blue-600" },
-        { id: "compare", title: "Compare", desc: "Side-by-side food analysis", href: "/dashboard/library/comparefoods", icon: Scale, color: "text-violet-400", bg: "bg-violet-500/10", borderHover: "hover:border-violet-500/40", gradient: "from-violet-500 to-purple-600" },
     ];
 
     return (
@@ -66,7 +65,7 @@ export default function LibraryPage() {
                                     Explore the <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">Library.</span>
                                 </h1>
                                 <p className="text-base lg:text-lg text-slate-400 leading-relaxed max-w-md">
-                                    Your personal guide to nutrition: browse foods, discover nutrients, explore recipes, and compare nutritional profiles side-by-side.
+                                    Your personal guide to nutrition: browse foods, discover nutrients, and explore recipes.
                                 </p>
 
                                 <div className="flex items-center gap-5 mt-10 flex-wrap">

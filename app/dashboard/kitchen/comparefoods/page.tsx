@@ -1,7 +1,7 @@
 'use client';
 
 import { Scale } from 'lucide-react';
-import { CompareView } from '../foods/views/compare-view';
+import { CompareView } from '../../library/foods/views/compare-view';
 import { PageContainer } from '@/components/ui/page-container';
 
 export default function CompareFoodsPage() {
