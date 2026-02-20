@@ -18,7 +18,10 @@ import {
     Medal,
     Award,
     ChevronRight,
-    RefreshCw
+    RefreshCw,
+    ChefHat,
+    History,
+    ArrowRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -39,6 +42,14 @@ interface FoodItem {
     carbs_g: number;
     fat_g: number;
     fiber_g: number;
+}
+
+interface RelatedMeal {
+    id: string;
+    title: string;
+    image: string | null;
+    diet: string[];
+    type: string;
 }
 
 const NUTRIENT_GROUPS = [
@@ -99,6 +110,8 @@ export function CompareView() {
     const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [activeSlot, setActiveSlot] = useState<number | null>(null); // Which box are we picking for?
+    const [relatedMeals, setRelatedMeals] = useState<RelatedMeal[]>([]);
+    const [isLoadingMeals, setIsLoadingMeals] = useState(false);
     const { energyUnit } = useUserPreferences();
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -149,6 +162,51 @@ export function CompareView() {
         setSearchQuery('');
         setSearchResults([]);
     };
+
+    // Fetch meals containing selected ingredients
+    useEffect(() => {
+        const fetchRelatedMeals = async () => {
+            const foodIds = selectedFoods.filter(f => f !== null).map(f => f!.id);
+            if (foodIds.length === 0) {
+                setRelatedMeals([]);
+                return;
+            }
+
+            setIsLoadingMeals(true);
+            try {
+                // Find recipes that contain these food items
+                const { data: ingredientData, error: ingredientError } = await supabase
+                    .from('ingredients')
+                    .select('recipe_id')
+                    .in('food_item_id', foodIds);
+
+                if (ingredientError) throw ingredientError;
+
+                const recipeIds = Array.from(new Set(ingredientData?.map(i => i.recipe_id) || []));
+
+                if (recipeIds.length === 0) {
+                    setRelatedMeals([]);
+                    return;
+                }
+
+                // Fetch recipe details
+                const { data: recipeData, error: recipeError } = await supabase
+                    .from('recipes')
+                    .select('id, title, image, diet, type')
+                    .in('id', recipeIds)
+                    .limit(6);
+
+                if (recipeError) throw recipeError;
+                setRelatedMeals(recipeData || []);
+            } catch (error) {
+                console.error('Error fetching related meals:', error);
+            } finally {
+                setIsLoadingMeals(false);
+            }
+        };
+
+        fetchRelatedMeals();
+    }, [selectedFoods]);
 
     const removeFood = (index: number) => {
         setSelectedFoods(prev => {
@@ -553,6 +611,77 @@ export function CompareView() {
                 </div>
 
             </div>
+
+            {/* Related Meals Section */}
+            {(relatedMeals.length > 0 || isLoadingMeals) && (
+                <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-700">
+                    <div className="flex items-center justify-between px-2 md:px-0">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-indigo-500 text-white flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                                <ChefHat size={20} />
+                            </div>
+                            <div>
+                                <h3 className="font-black text-sm md:text-lg uppercase italic text-slate-900 dark:text-white leading-none mb-1">Related Meals</h3>
+                                <p className="text-[9px] md:text-[11px] font-black text-indigo-500 uppercase tracking-widest leading-none">Meals containing these ingredients</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
+                            <History size={14} className="opacity-50" />
+                            Suggested
+                        </div>
+                    </div>
+
+                    {isLoadingMeals ? (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                            {[0, 1, 2, 3, 4, 5].map((i) => (
+                                <div key={i} className="aspect-[4/5] rounded-[2rem] bg-slate-100 dark:bg-slate-800 animate-pulse" />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                            {relatedMeals.map((meal) => (
+                                <a
+                                    key={meal.id}
+                                    href={`/dashboard/library/recipes/${meal.id}`}
+                                    className="group relative flex flex-col items-center text-center gap-3 p-4 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-indigo-500/30 transition-all duration-500 shadow-xl shadow-slate-200/50 dark:shadow-none hover:-translate-y-1"
+                                >
+                                    <div className="w-full aspect-square rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 group-hover:scale-105 transition-transform duration-700">
+                                        {meal.image ? (
+                                            <img src={meal.image} className="w-full h-full object-cover" alt={meal.title} />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <ChefHat className="text-slate-200" size={32} />
+                                            </div>
+                                        )}
+                                        {/* Overlay with Type */}
+                                        <div className="absolute top-2 left-2 px-2 py-1 rounded-lg bg-white/90 dark:bg-slate-900/90 backdrop-blur shadow-sm border border-slate-100 dark:border-slate-800">
+                                            <p className="text-[7px] font-black uppercase tracking-widest text-indigo-500">{meal.type}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1 px-1">
+                                        <h4 className="font-black text-[10px] md:text-xs uppercase italic text-slate-900 dark:text-white line-clamp-2 min-h-[2.5em]">
+                                            {meal.title}
+                                        </h4>
+                                        <div className="flex flex-wrap gap-1 justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                            {meal.diet.slice(0, 2).map((d) => (
+                                                <span key={d} className="text-[6px] font-black uppercase tracking-widest text-slate-400">
+                                                    #{d}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="absolute inset-0 border-2 border-indigo-500/0 group-hover:border-indigo-500/20 rounded-[2.5rem] transition-all duration-500 pointer-events-none" />
+                                    <div className="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500 shadow-lg shadow-indigo-500/40">
+                                        <ArrowRight size={14} />
+                                    </div>
+                                </a>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
         </div >
     );
 }
