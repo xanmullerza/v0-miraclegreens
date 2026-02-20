@@ -185,15 +185,6 @@ export default function UserRecipeBuilderPage() {
 
             <div className="space-y-8">
                 <Card className="p-8 space-y-6">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-bold flex items-center gap-3">
-                            <Plus className="w-5 h-5 text-violet-500" />
-                            Ingredients
-                        </h3>
-                        <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-widest opacity-60">
-                            {ingredients.length} items added
-                        </Badge>
-                    </div>
                     <IngredientBuilder
                         ingredients={ingredients}
                         onChange={setIngredients}
