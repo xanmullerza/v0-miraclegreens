@@ -67,35 +67,16 @@ function DashboardLayoutContent({
                                 }
                                 userProfile={
                                     <div className="flex items-center gap-2">
-                                        <Link
-                                            href="/dashboard/profile"
-                                            className="flex items-center gap-3 px-2 py-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
-                                        >
-                                            <div className="text-right hidden sm:block">
-                                                <p className="text-xs font-bold leading-none">{user?.user_metadata?.full_name || profile.nickname || profile.name || 'Anonymous'}</p>
-                                                <p className="text-[10px] text-slate-400 font-medium">
-                                                    {(user?.email || user?.user_metadata?.email || '').toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase()
-                                                        ? 'Administrator'
-                                                        : (user || profile.name || profile.nickname) ? 'Member' : 'Guest'}
-                                                </p>
-                                            </div>
-                                            <div className="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500 group-hover:text-emerald-500 transition-colors overflow-hidden">
-                                                {user?.user_metadata?.avatar_url ? (
-                                                    <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <User size={18} />
-                                                )}
-                                            </div>
-                                        </Link>
-                                        {!user && (
-                                            <Link
-                                                href="/auth/login"
-                                                className="p-2 text-slate-400 hover:text-emerald-500 transition-colors ml-1 outline-none flex items-center gap-2"
-                                                title="Sign In"
-                                            >
-                                                <LogIn size={18} />
-                                            </Link>
-                                        )}
+                                        <div className="text-right hidden sm:block">
+                                            <p className="text-xs font-bold leading-none">{user?.user_metadata?.full_name || profile.nickname || profile.name || 'Anonymous'}</p>
+                                        </div>
+                                        <div className="h-4 w-4 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500 overflow-hidden">
+                                            {user?.user_metadata?.avatar_url ? (
+                                                <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <User size={10} />
+                                            )}
+                                        </div>
                                     </div>
                                 }
                             />
