@@ -412,11 +412,25 @@ export default function RecipeDetailsPage() {
                 // Calculate live micronutrients
                 if (localRecipe.ingredients?.length > 0) {
                     const calculated = calculateRecipeNutrition(
-                        localRecipe.ingredients.map((ing: any) => ({
-                            food_item: ing.food_item,
-                            weight_g: ing.weight_g || 0,
-                            cooking_state: ing.cooking_state
-                        }))
+                        localRecipe.ingredients.map((ing: any) => {
+                            // If food_item missing, reconstruct it from base_nutrition or flattened fields
+                            const foodItem = ing.food_item || {
+                                id: ing.food_item_id,
+                                name: ing.food_item_name,
+                                energy_kcal: ing.base_nutrition?.calories || 0,
+                                energy_kj: ing.base_nutrition?.energy_kj,
+                                protein_g: ing.base_nutrition?.protein || 0,
+                                fat_g: ing.base_nutrition?.fat || 0,
+                                carbs_g: ing.base_nutrition?.carbs || 0,
+                                micronutrients: ing.base_nutrition?.micronutrients || {}
+                            };
+
+                            return {
+                                food_item: foodItem,
+                                weight_g: ing.weight_g || 0,
+                                cooking_state: ing.cooking_state
+                            };
+                        })
                     );
                     setCalculatedTotals(calculated);
                 }

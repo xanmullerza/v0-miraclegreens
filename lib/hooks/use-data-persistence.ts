@@ -206,10 +206,26 @@ export function useDataPersistence() {
                 let localRecipes: Recipe[] = localData ? JSON.parse(localData) : [];
 
                 const recipeId = recipe.id || `local-${Date.now()}`;
+
+                // Standardize ingredients for local storage to match cloud structure (include nesting)
+                const mappedIngredients = ingredients?.map(ing => ({
+                    ...ing,
+                    food_item: ing.food_item || {
+                        id: ing.food_item_id,
+                        name: ing.food_item_name,
+                        energy_kcal: ing.base_nutrition?.calories || 0,
+                        energy_kj: ing.base_nutrition?.energy_kj,
+                        protein_g: ing.base_nutrition?.protein || 0,
+                        fat_g: ing.base_nutrition?.fat || 0,
+                        carbs_g: ing.base_nutrition?.carbs || 0,
+                        micronutrients: ing.base_nutrition?.micronutrients || {}
+                    }
+                }));
+
                 const newRecipe = {
                     ...recipe,
                     id: recipeId,
-                    ingredients,
+                    ingredients: mappedIngredients,
                     instructions,
                     is_favorite: recipe.is_favorite ?? false
                 } as Recipe;
