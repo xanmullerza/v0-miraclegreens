@@ -49,8 +49,6 @@ export default function DashboardOverview() {
     const heroCards = [
         { id: 'library', title: 'Library', desc: 'Nutrient database & tools', href: '/dashboard/library', icon: Library, color: 'text-blue-400', bg: 'bg-blue-500/10', borderHover: 'hover:border-blue-500/40', gradient: 'from-blue-500 to-indigo-600' },
         { id: 'kitchen', title: 'Kitchen', desc: 'Manage your pantry & meals', href: '/dashboard/kitchen', icon: ChefHat, color: 'text-emerald-400', bg: 'bg-emerald-500/10', borderHover: 'hover:border-emerald-500/40', gradient: 'from-emerald-500 to-teal-600' },
-        { id: 'profile', title: 'Profile', desc: 'Account & preferences', href: '/dashboard/profile', icon: User, color: 'text-violet-400', bg: 'bg-violet-500/10', borderHover: 'hover:border-violet-500/40', gradient: 'from-violet-500 to-purple-600' },
-        { id: 'settings', title: 'Settings', desc: 'App preferences & config', href: '/dashboard/settings', icon: Settings, color: 'text-amber-400', bg: 'bg-amber-500/10', borderHover: 'hover:border-amber-500/40', gradient: 'from-amber-500 to-orange-600' },
     ];
 
     return (

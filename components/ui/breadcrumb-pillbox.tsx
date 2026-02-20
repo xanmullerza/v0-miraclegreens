@@ -114,7 +114,7 @@ export function BreadcrumbPillbox({
                 {/* Left side - Placeholder Actions / Filters */}
                 <div className={cn(
                     "flex transition-all duration-500",
-                    (isSearchExpanded || pathname === '/dashboard') ? "w-0 opacity-0 overflow-hidden" : "flex-shrink-0"
+                    isSearchExpanded ? "w-0 opacity-0 overflow-hidden" : "flex-shrink-0"
                 )}>
                     {/* Left Split Button (Placeholder) */}
                     <div className="flex flex-col h-12 w-12 border-r border-slate-200 dark:border-slate-800 mr-2 divide-y divide-slate-100 dark:divide-slate-800">
