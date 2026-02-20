@@ -264,17 +264,33 @@ export default function RecipeDetailsPage() {
                 // Query ingredients table for other recipes using these food items
                 const { data: ingData, error: ingError } = await supabase
                     .from('ingredients')
-                    .select('recipe_id')
+                    .select('recipe_id, food_item_id')
                     .in('food_item_id', foodIds)
                     .neq('recipe_id', id as string)
                     .limit(50);
 
                 if (ingError) throw ingError;
 
-                // Count overlaps for each recipe
+                // Create a mapping of food_item_id to its names for the current recipe
+                const sharedFoodNames: Record<string, string> = {};
+                ingredients.forEach(ing => {
+                    if (ing.food_item_id) {
+                        sharedFoodNames[ing.food_item_id] = ing.food_item?.common_name || ing.food_item?.name || ing.base_ingredient || 'Unknown';
+                    }
+                });
+
+                // Count overlaps and track which ingredients are shared
                 const overlapCounts: Record<string, number> = {};
+                const sharedItemsMap: Record<string, string[]> = {};
+
                 ingData.forEach(i => {
                     overlapCounts[i.recipe_id] = (overlapCounts[i.recipe_id] || 0) + 1;
+                    if (i.food_item_id && sharedFoodNames[i.food_item_id]) {
+                        if (!sharedItemsMap[i.recipe_id]) sharedItemsMap[i.recipe_id] = [];
+                        if (!sharedItemsMap[i.recipe_id].includes(sharedFoodNames[i.food_item_id])) {
+                            sharedItemsMap[i.recipe_id].push(sharedFoodNames[i.food_item_id]);
+                        }
+                    }
                 });
 
                 const recipeIds = Object.keys(overlapCounts);
@@ -293,7 +309,11 @@ export default function RecipeDetailsPage() {
 
                 // Sort by overlap count (descending)
                 const sortedRecipes = (recipeData || [])
-                    .map(r => ({ ...r, overlapMatch: overlapCounts[r.id] }))
+                    .map(r => ({
+                        ...r,
+                        overlapMatch: overlapCounts[r.id],
+                        sharedItems: sharedItemsMap[r.id] || []
+                    }))
                     .sort((a, b) => b.overlapMatch - a.overlapMatch)
                     .slice(0, 6);
 
@@ -1417,7 +1437,7 @@ export default function RecipeDetailsPage() {
                                             href={`/dashboard/library/recipes/${meal.id}`}
                                             className="group relative flex flex-col items-center text-center gap-3 p-4 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-indigo-500/30 transition-all duration-500 shadow-xl shadow-slate-200/50 dark:shadow-none hover:-translate-y-1"
                                         >
-                                            <div className="w-full aspect-square rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 group-hover:scale-105 transition-transform duration-700 relative">
+                                            <div className="w-full aspect-square rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 group-hover:scale-110 transition-transform duration-700 relative">
                                                 {meal.image ? (
                                                     <img src={meal.image} className="w-full h-full object-cover" alt={meal.title} />
                                                 ) : (
@@ -1425,9 +1445,24 @@ export default function RecipeDetailsPage() {
                                                         <ChefHat size={32} className="opacity-10" />
                                                     </div>
                                                 )}
-                                                {/* Overlay with Type */}
-                                                <div className="absolute top-2 left-2 px-2 py-1 rounded-lg bg-white/90 dark:bg-slate-900/90 backdrop-blur shadow-sm border border-slate-100 dark:border-slate-800">
-                                                    <p className="text-[7px] font-black uppercase tracking-widest text-indigo-500">{(meal as any).overlapMatch} Shared</p>
+
+                                                {/* Overlay with Shared Count */}
+                                                <div className="absolute top-3 left-3 px-2 py-1.5 rounded-xl bg-white dark:bg-slate-900 shadow-xl border border-slate-200 dark:border-slate-700 z-30 animate-in fade-in zoom-in duration-500">
+                                                    <p className="text-[9px] font-black uppercase tracking-widest text-indigo-500 whitespace-nowrap">
+                                                        {(meal as any).overlapMatch} Shared
+                                                    </p>
+                                                </div>
+
+                                                {/* Shared Ingredients List (Visible on Hover) */}
+                                                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-4 z-20">
+                                                    <p className="text-[8px] font-black uppercase tracking-[0.2em] text-indigo-300 mb-2">SHARED ITEMS:</p>
+                                                    <div className="flex flex-wrap gap-1 justify-center">
+                                                        {(meal as any).sharedItems?.map((item: string) => (
+                                                            <span key={item} className="px-1.5 py-0.5 rounded bg-white/10 text-white text-[7px] font-bold uppercase tracking-wider whitespace-nowrap">
+                                                                {item}
+                                                            </span>
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </div>
 
