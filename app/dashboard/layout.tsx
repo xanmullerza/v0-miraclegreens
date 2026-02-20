@@ -8,7 +8,8 @@ import {
     ChevronLeft,
     User,
     ArrowLeft,
-    LogIn
+    LogIn,
+    Settings
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
@@ -59,7 +60,11 @@ function DashboardLayoutContent({
                             <BreadcrumbPillbox
                                 searchQuery={searchQuery}
                                 setSearchQuery={setSearchQuery}
-                                actions={actions}
+                                actions={
+                                    <Link href="/dashboard/settings" className="p-2 text-slate-400 hover:text-emerald-500 transition-colors">
+                                        <Settings size={18} />
+                                    </Link>
+                                }
                                 userProfile={
                                     <div className="flex items-center gap-2">
                                         <Link

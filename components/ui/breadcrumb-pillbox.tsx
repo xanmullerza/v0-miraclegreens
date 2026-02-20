@@ -258,7 +258,7 @@ export function BreadcrumbPillbox({
                     )}
 
                     {/* User Profile - Hidden on mobile */}
-                    {userProfile && !isSearchExpanded && pathname !== '/dashboard' && (
+                    {userProfile && !isSearchExpanded && (
                         <div className="hidden md:flex pl-3 border-l border-slate-100 dark:border-slate-800 flex-shrink-0 ml-2">
                             {userProfile}
                         </div>
