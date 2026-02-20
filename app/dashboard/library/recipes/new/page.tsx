@@ -255,7 +255,7 @@ function UserRecipeBuilder() {
                     <IngredientBuilder
                         ingredients={ingredients}
                         onChange={setIngredients}
-                        initialShowPicker={true}
+                        initialShowPicker={!recipeIdToEdit}
                         onNext={handleNextStep}
                     />
                 </Card>
