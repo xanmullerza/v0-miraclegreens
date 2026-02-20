@@ -11,8 +11,20 @@ const tabs = [
     { id: 'support', label: 'Support', icon: LifeBuoy },
     { id: 'media', label: 'Media', icon: MonitorPlay },
 ];
+import { HeaderActionsProvider } from '@/lib/context/header-actions-context';
+import { SearchProvider } from '@/lib/context/search-context';
 
 export default function BrowsePage() {
+    return (
+        <SearchProvider>
+            <HeaderActionsProvider>
+                <BrowsePageContent />
+            </HeaderActionsProvider>
+        </SearchProvider>
+    );
+}
+
+function BrowsePageContent() {
     const [activeTab, setActiveTab] = useState('about');
     const [searchQuery, setSearchQuery] = useState('');
 
