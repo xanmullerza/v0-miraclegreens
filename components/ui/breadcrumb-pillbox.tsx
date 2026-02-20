@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import {
     Search, X, LayoutGrid, ChevronRight, Filter, Home, Zap, Activity,
-    LayoutDashboard, Library, Apple, FlaskConical, ChefHat, BookOpen, Utensils, User, Settings, FileText
+    LayoutDashboard, Library, Apple, FlaskConical, ChefHat, BookOpen, Utensils, User, Settings, FileText, Globe
 } from 'lucide-react';
 import { useHeaderActions } from '@/lib/context/header-actions-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -21,6 +21,7 @@ const segmentIconMap: Record<string, React.ComponentType<{ size?: number; classN
     meals: Utensils,
     profile: User,
     settings: Settings,
+    browse: Globe,
 };
 
 interface BreadcrumbPillboxProps {
@@ -128,9 +129,13 @@ export function BreadcrumbPillbox({
                         >
                             <Search size={14} />
                         </button>
-                        <div className="h-6 w-12 flex items-center justify-center text-slate-300 dark:text-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-default">
-                            <Activity size={14} className="opacity-40" />
-                        </div>
+                        <Link
+                            href="/browse"
+                            className="h-6 w-12 flex items-center justify-center text-slate-300 dark:text-slate-700 hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                            title="Browse"
+                        >
+                            <Globe size={14} className="opacity-40" />
+                        </Link>
                     </div>
                 </div>
 
