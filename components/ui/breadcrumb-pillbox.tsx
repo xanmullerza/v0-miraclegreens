@@ -254,7 +254,6 @@ export function BreadcrumbPillbox({
                                 )}
                             </div>
                         </div>
-                    )}
 
                     {/* User Profile - Hidden on mobile */}
                     {userProfile && !isSearchExpanded && (
