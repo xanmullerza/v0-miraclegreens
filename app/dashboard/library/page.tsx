@@ -112,7 +112,7 @@ export default function LibraryPage() {
                             </div>
 
                             <div className="flex-none">
-                                <div className="grid grid-cols-2 lg:grid-cols-3 gap-1 lg:gap-2 justify-items-center">
+                                <div className="grid grid-cols-2 grid-rows-2 gap-1 lg:gap-2 justify-items-center">
                                     {heroCards.map((card) => {
                                         const Icon = card.icon;
                                         return (
@@ -136,7 +136,7 @@ export default function LibraryPage() {
                     </div>
                 ) : (
                     <div className="w-full max-w-7xl flex justify-center mt-6 lg:mt-8">
-                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-1 lg:gap-2 justify-items-center">
+                        <div className="grid grid-cols-2 grid-rows-2 gap-1 lg:gap-2 justify-items-center">
                             {heroCards.map((card) => {
                                 const Icon = card.icon;
                                 return (
