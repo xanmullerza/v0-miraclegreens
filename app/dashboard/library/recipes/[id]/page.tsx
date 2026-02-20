@@ -1446,11 +1446,9 @@ export default function RecipeDetailsPage() {
                                                     </div>
                                                 )}
 
-                                                {/* Overlay with Shared Count */}
-                                                <div className="absolute top-3 left-3 px-2 py-1.5 rounded-xl bg-white dark:bg-slate-900 shadow-xl border border-slate-200 dark:border-slate-700 z-30 animate-in fade-in zoom-in duration-500">
-                                                    <p className="text-[9px] font-black uppercase tracking-widest text-indigo-500 whitespace-nowrap">
-                                                        {(meal as any).overlapMatch} Shared
-                                                    </p>
+                                                {/* Overlay with Shared Count - High Contrast */}
+                                                <div className="absolute top-3 left-3 px-2 py-1 bg-emerald-600 text-white rounded-lg shadow-lg z-[100] font-black text-[10px] uppercase tracking-wider">
+                                                    {(meal as any).overlapMatch} Shared
                                                 </div>
 
                                                 {/* Shared Ingredients List (Visible on Hover) */}
