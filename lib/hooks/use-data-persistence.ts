@@ -279,11 +279,39 @@ export function useDataPersistence() {
         }
     };
 
+    const getRecipe = async (id: string) => {
+        try {
+            if (id.startsWith('local-')) {
+                const localData = localStorage.getItem('local_recipes');
+                if (!localData) return null;
+                const localRecipes: Recipe[] = JSON.parse(localData);
+                return localRecipes.find(r => r.id === id) || null;
+            } else {
+                const { data: recipe, error } = await supabase
+                    .from('recipes')
+                    .select(`
+                        *,
+                        ingredients (*),
+                        instructions (*)
+                    `)
+                    .eq('id', id)
+                    .single();
+
+                if (error) throw error;
+                return recipe;
+            }
+        } catch (error) {
+            console.error('Error in useDataPersistence.getRecipe:', error);
+            throw error;
+        }
+    };
+
     return {
         user,
         loading,
         fetchRecipes,
         saveRecipe,
-        deleteRecipe
+        deleteRecipe,
+        getRecipe
     };
 }

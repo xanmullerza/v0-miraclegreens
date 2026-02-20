@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import IngredientBuilder, { RecipeIngredient } from '@/components/recipe/ingredient-builder';
 import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus, ListOrdered, ChevronUp, ChevronDown, ClipboardList, Heart, Library, Scale, Database, Calendar } from 'lucide-react';
@@ -27,8 +27,11 @@ Card.displayName = "Card";
 
 export default function UserRecipeBuilderPage() {
     const router = useRouter();
-    const { user, saveRecipe, loading: authLoading } = useDataPersistence();
+    const searchParams = useSearchParams();
+    const recipeIdToEdit = searchParams.get('edit');
+    const { user, saveRecipe, getRecipe, loading: authLoading } = useDataPersistence();
 
+    const [editingRecipeId, setEditingRecipeId] = useState<string | null>(null);
     const [title, setTitle] = useState('');
     const [source, setSource] = useState('');
     const [type, setType] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('dinner');
@@ -52,6 +55,68 @@ export default function UserRecipeBuilderPage() {
 
     const instructionsRef = useRef<HTMLDivElement>(null);
     const detailsRef = useRef<HTMLDivElement>(null);
+
+    // Load recipe if editing
+    useEffect(() => {
+        if (recipeIdToEdit) {
+            const loadRecipe = async () => {
+                try {
+                    const recipe = await getRecipe(recipeIdToEdit);
+                    if (recipe) {
+                        setEditingRecipeId(recipe.id);
+                        setTitle(recipe.title);
+                        setSource(recipe.source || '');
+                        setType(recipe.type as any);
+                        setPrepTime(recipe.prep_time);
+                        setServings(recipe.servings);
+                        setDiet(recipe.diet || []);
+                        setImage(recipe.image || '');
+                        setIsFavorite(recipe.is_favorite);
+
+                        // Map ingredients
+                        if (recipe.ingredients) {
+                            const mappedIngs: RecipeIngredient[] = recipe.ingredients.map((ing: any) => ({
+                                food_item_id: ing.food_item_id,
+                                food_item_name: ing.item || ing.food_item_name || 'Ingredient',
+                                weight_g: ing.weight_g,
+                                quantity: ing.quantity,
+                                measure_label: ing.measure_label,
+                                modifier: ing.modifier,
+                                calories: ing.calories || 0,
+                                energy_kj: ing.energy_kj || 0,
+                                protein: ing.protein || 0,
+                                fat: ing.fat || 0,
+                                carbs: ing.carbs || 0,
+                                micronutrients: ing.micronutrients || {},
+                                base_nutrition: ing.base_nutrition || {
+                                    calories: ing.food_item?.energy_kcal || 0,
+                                    energy_kj: ing.food_item?.energy_kj || 0,
+                                    protein: ing.food_item?.protein_g || 0,
+                                    fat: ing.food_item?.fat_g || 0,
+                                    carbs: ing.food_item?.carbs_g || 0,
+                                    micronutrients: ing.food_item?.micronutrients || {},
+                                    phytonutrients: ing.food_item?.phytonutrients || {}
+                                }
+                            }));
+                            setIngredients(mappedIngs);
+                        }
+
+                        // Map instructions
+                        if (recipe.instructions) {
+                            const sortedInst = [...recipe.instructions].sort((a, b) => (a.step_order || 0) - (b.step_order || 0));
+                            setInstructions(sortedInst.map((i: any) => i.step_text));
+                        }
+
+                        setStep(3); // Jump to details view if editing
+                    }
+                } catch (error) {
+                    console.error("Failed to load recipe for editing", error);
+                    toast.error("Failed to load recipe for editing");
+                }
+            };
+            loadRecipe();
+        }
+    }, [recipeIdToEdit]);
 
     const handleNextStep = () => {
         setStep(2);
@@ -145,7 +210,8 @@ export default function UserRecipeBuilderPage() {
                 servings,
                 image,
                 source,
-                is_favorite: isFavorite
+                is_favorite: isFavorite,
+                id: editingRecipeId || undefined
             };
 
             await saveRecipe(recipeData, ingredients, instructions);

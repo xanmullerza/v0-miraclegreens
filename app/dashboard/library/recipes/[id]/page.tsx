@@ -58,6 +58,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -118,6 +119,8 @@ interface Recipe {
     micronutrients?: Record<string, number>;
     phytonutrients?: Record<string, string>;
     calculated_nutrition?: import('@/lib/utils/nutrition-calculator').CalculatedNutrition;
+    user_id?: string;
+    is_curated?: boolean;
 }
 
 export default function RecipeDetailsPage() {
@@ -141,6 +144,7 @@ export default function RecipeDetailsPage() {
     const [showDetailedNutrients, setShowDetailedNutrients] = useState(true);
     const { searchQuery, setSearchQuery } = useSearch();
     const { setCustomSegmentLabel } = useHeaderActions();
+    const { deleteRecipe } = useDataPersistence();
 
     // Update header label when recipe loads
     useEffect(() => {
@@ -965,21 +969,28 @@ export default function RecipeDetailsPage() {
         setDraggedItemIndex(null);
     };
 
-    const toggleFavorite = async () => {
+    const toggleFavorite = () => {
         if (!recipe) return;
-        const newStatus = !recipe.is_favorite;
-        try {
-            const { error } = await supabase
-                .from('recipes')
-                .update({ is_favorite: newStatus } as any)
-                .eq('id', recipe.id);
+        setRecipe({ ...recipe, is_favorite: !recipe.is_favorite });
+        toast.success(recipe.is_favorite ? "Removed from favorites" : "Added to favorites");
+    };
 
-            if (error) throw error;
-            setRecipe({ ...recipe, is_favorite: newStatus });
-            toast.success(newStatus ? 'Added to collections' : 'Removed from collections');
-        } catch (error) {
-            toast.error('Failed to update favorite status');
+    const handleDelete = async () => {
+        if (!recipe) return;
+        if (confirm("Are you sure you want to delete this recipe? This action cannot be undone.")) {
+            try {
+                await deleteRecipe(recipe.id);
+                toast.success("Recipe deleted successfully");
+                router.push('/dashboard/library/recipes');
+            } catch (error) {
+                toast.error("Failed to delete recipe");
+            }
         }
+    };
+
+    const handleEdit = () => {
+        if (!recipe) return;
+        router.push(`/dashboard/library/recipes/new?edit=${recipe.id}`);
     };
 
     if (loading) {
@@ -1280,6 +1291,27 @@ export default function RecipeDetailsPage() {
                                 <Heart size={16} className={cn("inline mr-2", recipe.is_favorite && "fill-current")} />
                                 {recipe.is_favorite ? 'Favorited' : 'Add to Favorites'}
                             </button>
+
+                            {recipe && (String(recipe.id).startsWith('local-') || recipe.is_curated === false) && (
+                                <div className="grid grid-cols-2 gap-3 pt-2">
+                                    <Button
+                                        variant="outline"
+                                        onClick={handleEdit}
+                                        className="rounded-2xl font-black text-[10px] uppercase tracking-wider h-12 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 shadow-sm"
+                                    >
+                                        <Pencil size={14} className="mr-2" />
+                                        Edit Protocol
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        onClick={handleDelete}
+                                        className="rounded-2xl font-black text-[10px] uppercase tracking-wider h-12 border-rose-100 dark:border-rose-950 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:border-rose-300 shadow-sm"
+                                    >
+                                        <Trash2 size={14} className="mr-2" />
+                                        Delete
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     </div>
 
