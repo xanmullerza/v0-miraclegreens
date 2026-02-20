@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import IngredientBuilder, { RecipeIngredient } from '@/components/recipe/ingredient-builder';
 import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
 import { toast } from 'sonner';
 
+
 const Card = React.forwardRef<HTMLDivElement, { children: React.ReactNode, className?: string }>(({ children, className }, ref) => (
     <div ref={ref} className={cn("bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden", className)}>
         {children}
@@ -25,7 +26,7 @@ const Card = React.forwardRef<HTMLDivElement, { children: React.ReactNode, class
 ));
 Card.displayName = "Card";
 
-export default function UserRecipeBuilderPage() {
+function UserRecipeBuilder() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const recipeIdToEdit = searchParams.get('edit');
@@ -328,5 +329,17 @@ export default function UserRecipeBuilderPage() {
                 </SheetContent>
             </Sheet>
         </div>
+    );
+}
+
+export default function UserRecipeBuilderPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-[400px]">
+                <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+            </div>
+        }>
+            <UserRecipeBuilder />
+        </Suspense>
     );
 }
