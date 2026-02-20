@@ -56,6 +56,7 @@ interface RecipesViewProps {
     hideControls?: boolean;
     isFilterOpen?: boolean;
     setIsFilterOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+    isMix?: boolean;
 }
 
 export function RecipesView({
@@ -65,7 +66,8 @@ export function RecipesView({
     setSelectedTypes: externalSetSelectedTypes,
     hideControls = false,
     isFilterOpen: externalIsFilterOpen,
-    setIsFilterOpen: externalSetIsFilterOpen
+    setIsFilterOpen: externalSetIsFilterOpen,
+    isMix = false
 }: RecipesViewProps) {
     const router = useRouter();
     const PAGE_SIZE = 20;
@@ -122,7 +124,8 @@ export function RecipesView({
                 page: pageNum,
                 pageSize: PAGE_SIZE,
                 sortField,
-                sortDirection
+                sortDirection,
+                isMix
             });
 
             if (count !== null) setTotalCount(count);
@@ -279,11 +282,14 @@ export function RecipesView({
                     </div>
 
                     <Button
-                        onClick={() => router.push('/dashboard/library/recipes/new')}
-                        className="h-14 px-8 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-black uppercase tracking-widest gap-2 shadow-xl shadow-blue-500/10"
+                        onClick={() => router.push(`/dashboard/library/recipes/new${isMix ? '?is_mix=true' : ''}`)}
+                        className={cn(
+                            "h-14 px-8 rounded-2xl text-white font-black uppercase tracking-widest gap-2 shadow-xl",
+                            isMix ? "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/10" : "bg-blue-600 hover:bg-blue-700 shadow-blue-500/10"
+                        )}
                     >
                         <Plus size={18} />
-                        Add Meal
+                        {isMix ? 'Add Mix' : 'Add Meal'}
                     </Button>
                 </div>
             )}
@@ -291,8 +297,8 @@ export function RecipesView({
             {/* Content Area */}
             {loading ? (
                 <div className="h-96 flex flex-col items-center justify-center gap-4 bg-white/50 dark:bg-slate-900/20 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800">
-                    <Loader2 className="animate-spin text-blue-500" size={32} />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Loading meals...</p>
+                    <Loader2 className={cn("animate-spin", isMix ? "text-indigo-500" : "text-blue-500")} size={32} />
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Loading {isMix ? 'mixes' : 'meals'}...</p>
                 </div>
             ) : recipes.length === 0 ? (
                 <div className="h-96 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] bg-white/30 dark:bg-slate-900/10 backdrop-blur-sm group">
@@ -300,7 +306,7 @@ export function RecipesView({
                         <ChefHat size={32} />
                     </div>
                     <p className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                        {showFavoritesOnly ? "Collection Empty" : "No meals found."}
+                        {showFavoritesOnly ? "Collection Empty" : `No ${isMix ? 'mixes' : 'meals'} found.`}
                     </p>
                 </div>
             ) : (
@@ -311,7 +317,10 @@ export function RecipesView({
                             <div
                                 key={recipe.id}
                                 onClick={() => router.push(`/dashboard/library/recipes/${recipe.id}`)}
-                                className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
+                                className={cn(
+                                    "group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all cursor-pointer overflow-hidden p-2 lg:p-0",
+                                    isMix ? "hover:border-indigo-500/30 hover:shadow-lg" : "hover:border-blue-500/30 hover:shadow-lg"
+                                )}
                             >
                                 <div className="flex flex-row lg:grid lg:grid-cols-[120px_1fr_100px_80px_80px_80px_150px] gap-3 lg:gap-4 items-center lg:px-8">
                                     {/* Thumbnail */}
@@ -416,9 +425,12 @@ export function RecipesView({
                             <Button
                                 onClick={handleLoadMore}
                                 disabled={loadingMore}
-                                className="h-14 px-8 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black uppercase tracking-[0.2em] shadow-xl group transition-all"
+                                className={cn(
+                                    "h-14 px-8 rounded-2xl text-white font-black uppercase tracking-[0.2em] shadow-xl group transition-all",
+                                    isMix ? "bg-indigo-900 hover:bg-indigo-800" : "bg-slate-900 hover:bg-slate-800"
+                                )}
                             >
-                                {loadingMore ? <Loader2 className="animate-spin mr-3" size={18} /> : "View More Meals"}
+                                {loadingMore ? <Loader2 className="animate-spin mr-3" size={18} /> : `View More ${isMix ? 'Mixes' : 'Meals'}`}
                             </Button>
                         </div>
                     )}

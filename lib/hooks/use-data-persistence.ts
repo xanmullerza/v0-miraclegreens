@@ -17,6 +17,7 @@ export interface Recipe {
     diet: string[];
     user_id?: string | null;
     is_curated?: boolean;
+    is_mix?: boolean;
 }
 
 export function useDataPersistence() {
@@ -42,6 +43,7 @@ export function useDataPersistence() {
         searchQuery?: string,
         selectedTypes?: string[],
         showFavoritesOnly?: boolean,
+        isMix?: boolean,
         page?: number,
         pageSize?: number,
         sortField?: string,
@@ -52,6 +54,7 @@ export function useDataPersistence() {
             searchQuery = '',
             selectedTypes = [],
             showFavoritesOnly = false,
+            isMix = undefined,
             page = 0,
             pageSize = 20,
             sortField = 'title',
@@ -90,6 +93,10 @@ export function useDataPersistence() {
 
             if (showFavoritesOnly) {
                 query = query.eq('is_favorite', true);
+            }
+
+            if (isMix !== undefined) {
+                query = query.eq('is_mix', isMix);
             }
 
             // Pagination & Sorting
@@ -199,6 +206,45 @@ export function useDataPersistence() {
                     if (insError) throw insError;
                 }
 
+                // NEW: Mix to Food Item Sync
+                if (recipeData.is_mix) {
+                    const totalWeight = ingredients?.reduce((sum, ing) => sum + (ing.weight_g || 0), 0) || 0;
+                    // Only sync if there's weight data, otherwise we can't calculate density
+                    if (totalWeight > 0) {
+                        const density = 100 / totalWeight; // per 100g
+
+                        // We use the same totals calculation as the builder did, but we'll do it here to be safe
+                        const totals = ingredients?.reduce((acc, ing) => ({
+                            calories: acc.calories + (ing.calories || 0),
+                            protein: acc.protein + (ing.protein || 0),
+                            fat: acc.fat + (ing.fat || 0),
+                            carbs: acc.carbs + (ing.carbs || 0),
+                        }), { calories: 0, protein: 0, fat: 0, carbs: 0 }) || { calories: 0, protein: 0, fat: 0, carbs: 0 };
+
+                        const foodItemData = {
+                            name: recipeData.title,
+                            common_name: recipeData.title,
+                            energy_kcal: totals.calories * density,
+                            protein_g: totals.protein * density,
+                            fat_g: totals.fat * density,
+                            carbs_g: totals.carbs * density,
+                            image: recipeData.image,
+                            category: 'Mixes',
+                            source: 'mix',
+                            recipe_id: recipeId
+                        };
+
+                        const { error: foodError } = await supabase
+                            .from('food_items')
+                            .upsert(foodItemData, { onConflict: 'recipe_id' });
+
+                        if (foodError) {
+                            console.error('Error syncing mix to food_items:', foodError);
+                            // We don't throw here to avoid breaking the recipe save, but log it
+                        }
+                    }
+                }
+
                 return { ...recipeData, ingredients, instructions };
             } else {
                 // Save to LocalStorage
@@ -234,7 +280,8 @@ export function useDataPersistence() {
                     id: recipeId,
                     ingredients: mappedIngredients,
                     instructions: mappedInstructions,
-                    is_favorite: recipe.is_favorite ?? false
+                    is_favorite: recipe.is_favorite ?? false,
+                    is_mix: recipe.is_mix ?? false
                 } as Recipe;
 
                 const existingIndex = localRecipes.findIndex(r => r.id === recipeId);

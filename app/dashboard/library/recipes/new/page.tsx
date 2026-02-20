@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import IngredientBuilder, { RecipeIngredient } from '@/components/recipe/ingredient-builder';
 import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
-import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus, ListOrdered, ChevronUp, ChevronDown, ClipboardList, Heart, Library, Scale, Database, Calendar } from 'lucide-react';
+import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus, ListOrdered, ChevronUp, ChevronDown, ClipboardList, Heart, Library, Scale, Database, Calendar, Beaker } from 'lucide-react';
 import { parseInstructionsOnly, parseRecipeText } from '@/lib/utils/recipe-parser';
 import { searchLocalFood, searchUSDAFood, getUSDAMeasures, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
@@ -14,6 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 import { useDataPersistence } from '@/lib/hooks/use-data-persistence';
 import { toast } from 'sonner';
@@ -40,6 +41,7 @@ function UserRecipeBuilder() {
     const [servings, setServings] = useState(4);
     const [diet, setDiet] = useState<string[]>([]);
     const [ingredients, setIngredients] = useState<RecipeIngredient[]>([]);
+    const [isMix, setIsMix] = useState(false);
     const [instructions, setInstructions] = useState<string[]>(['']);
     const [image, setImage] = useState('');
     const [saving, setSaving] = useState(false);
@@ -58,6 +60,13 @@ function UserRecipeBuilder() {
     const instructionsRef = useRef<HTMLDivElement>(null);
     const detailsRef = useRef<HTMLDivElement>(null);
 
+    // Initial state from URL
+    useEffect(() => {
+        if (searchParams.get('is_mix') === 'true') {
+            setIsMix(true);
+        }
+    }, [searchParams]);
+
     // Load recipe if editing
     useEffect(() => {
         if (recipeIdToEdit) {
@@ -75,6 +84,7 @@ function UserRecipeBuilder() {
                         setDiet(recipe.diet || []);
                         setImage(recipe.image || '');
                         setIsFavorite(recipe.is_favorite);
+                        setIsMix(recipe.is_mix || false);
 
                         // Map ingredients
                         if (recipe.ingredients) {
@@ -216,12 +226,13 @@ function UserRecipeBuilder() {
                 image,
                 source,
                 is_favorite: isFavorite,
+                is_mix: isMix,
                 id: editingRecipeId || undefined
             };
 
             await saveRecipe(recipeData, ingredients, instructions);
-            toast.success('Protocol saved successfully!');
-            router.push('/dashboard/library/recipes');
+            toast.success(`${isMix ? 'Mix' : 'Protocol'} saved successfully!`);
+            router.push(`/dashboard/library/${isMix ? 'mixes' : 'recipes'}`);
         } catch (error: any) {
             toast.error(`Failed to save: ${error.message}`);
         } finally {
@@ -244,7 +255,9 @@ function UserRecipeBuilder() {
         <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100 pb-20">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-4 border-b border-slate-200 dark:border-slate-800">
                 <div className="space-y-1">
-                    <h1 className="text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic">Protocol Builder</h1>
+                    <h1 className="text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic">
+                        {isMix ? 'Mix Formulator' : 'Protocol Builder'}
+                    </h1>
                     <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">{user ? 'Cloud Sync Enabled' : 'Local Storage Mode'}</p>
                 </div>
                 <div className="flex items-center gap-4">
@@ -325,8 +338,32 @@ function UserRecipeBuilder() {
                                     <Input type="number" value={prepTime} onChange={(e) => setPrepTime(Number(e.target.value))} />
                                     <Input type="number" value={servings} onChange={(e) => setServings(Number(e.target.value))} />
                                 </div>
-                                <Button className="w-full bg-violet-600 h-16 rounded-2xl font-black uppercase tracking-widest" disabled={saving} onClick={handleSave}>
-                                    {saving ? <Loader2 className="animate-spin" /> : <Save className="mr-2" />} Save Protocol
+
+                                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800">
+                                    <div className="space-y-0.5">
+                                        <Label className="text-sm font-bold flex items-center gap-2">
+                                            <Beaker size={14} className="text-indigo-500" />
+                                            Save as Mix
+                                        </Label>
+                                        <p className="text-[10px] text-slate-500 font-medium">Makes this item available as an ingredient in other recipes.</p>
+                                    </div>
+                                    <Switch
+                                        checked={isMix}
+                                        onCheckedChange={setIsMix}
+                                        className="data-[state=checked]:bg-indigo-600"
+                                    />
+                                </div>
+
+                                <Button
+                                    className={cn(
+                                        "w-full h-16 rounded-2xl font-black uppercase tracking-widest transition-all",
+                                        isMix ? "bg-indigo-600 hover:bg-indigo-700" : "bg-violet-600 hover:bg-violet-700"
+                                    )}
+                                    disabled={saving}
+                                    onClick={handleSave}
+                                >
+                                    {saving ? <Loader2 className="animate-spin" /> : <Save className="mr-2" />}
+                                    Save {isMix ? 'Mix' : 'Protocol'}
                                 </Button>
                             </div>
                         </div>
@@ -343,7 +380,7 @@ function UserRecipeBuilder() {
                     </div>
                 </SheetContent>
             </Sheet>
-        </div>
+        </div >
     );
 }
 

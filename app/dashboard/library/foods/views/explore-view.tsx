@@ -103,7 +103,7 @@ export function ExploreView({
 
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
-    const CATEGORIES = ["General", "Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
+    const CATEGORIES = ["General", "Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements", "Mixes"];
 
     useEffect(() => {
         fetchFoods(1, true);
