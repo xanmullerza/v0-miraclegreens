@@ -123,12 +123,12 @@ export function BreadcrumbPillbox({
                     <div className="flex flex-col h-12 w-12 divide-y divide-slate-100 dark:divide-slate-800">
                         <button
                             onClick={() => setIsSearchExpanded(true)}
-                            className="h-6 w-12 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 transition-colors"
+                            className="h-6 w-12 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                             title="Search"
                         >
                             <Search size={14} />
                         </button>
-                        <div className="h-6 w-12 flex items-center justify-center text-slate-300 dark:text-slate-700">
+                        <div className="h-6 w-12 flex items-center justify-center text-slate-300 dark:text-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-default">
                             <Activity size={14} className="opacity-40" />
                         </div>
                     </div>
@@ -257,13 +257,13 @@ export function BreadcrumbPillbox({
                         </Link>
 
                         {/* Settings Link in Bottom Half */}
-                        <div className="h-6 w-12 flex items-center justify-center overflow-hidden">
+                        <div className="h-6 w-12 flex items-center justify-center overflow-hidden hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                             {actions ? (
-                                <div className="flex items-center justify-center scale-75 transform origin-center">
+                                <div className="flex items-center justify-center scale-75 transform origin-center w-full h-full">
                                     {actions}
                                 </div>
                             ) : (
-                                <Link href="/dashboard/settings" title="Settings" className="p-1 text-slate-300 hover:text-emerald-500 transition-colors">
+                                <Link href="/dashboard/settings" title="Settings" className="w-full h-full flex items-center justify-center text-slate-300 hover:text-emerald-500 transition-colors">
                                     <Settings size={12} />
                                 </Link>
                             )}
