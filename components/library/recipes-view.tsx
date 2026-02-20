@@ -26,7 +26,7 @@ import {
     Wheat,
     Beef,
     Droplet,
-    Camera,
+    Trash2,
     Activity
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -77,7 +77,7 @@ export function RecipesView({
     const [hasMore, setHasMore] = useState(true);
     const { searchQuery } = useSearch();
     const { energyUnit } = useUserPreferences();
-    const { user, fetchRecipes: fetchRecipesBridge, saveRecipe, loading: authLoading } = useDataPersistence();
+    const { user, fetchRecipes: fetchRecipesBridge, saveRecipe, deleteRecipe, loading: authLoading } = useDataPersistence();
 
     const [localSelectedTypes, setLocalSelectedTypes] = useState<string[]>(MEAL_TYPES);
     const [localShowFavoritesOnly, setLocalShowFavoritesOnly] = useState(false);
@@ -175,6 +175,24 @@ export function RecipesView({
         } catch (error) {
             toast.error('Failed to update favorite status');
         }
+    };
+
+    const handleDelete = async (e: React.MouseEvent, recipe: Recipe) => {
+        e.stopPropagation();
+        if (confirm(`Are you sure you want to delete "${recipe.title}"?`)) {
+            try {
+                await deleteRecipe(recipe.id);
+                setRecipes(prev => prev.filter(r => r.id !== recipe.id));
+                toast.success('Recipe deleted successfully');
+            } catch (error) {
+                toast.error('Failed to delete recipe');
+            }
+        }
+    };
+
+    const handleEdit = (e: React.MouseEvent, recipeId: string) => {
+        e.stopPropagation();
+        router.push(`/dashboard/library/recipes/new?edit=${recipeId}`);
     };
 
     return (
@@ -356,13 +374,31 @@ export function RecipesView({
 
                                     {/* Actions */}
                                     <div className="shrink-0 flex items-center lg:justify-end gap-1">
+                                        {(String(recipe.id).startsWith('local-') || recipe.is_curated === false) && (
+                                            <>
+                                                <button
+                                                    onClick={(e) => handleEdit(e, recipe.id)}
+                                                    className="w-8 h-8 rounded-full text-slate-400 hover:text-blue-500 transition-all flex items-center justify-center hover:bg-blue-50 dark:hover:bg-blue-950/30"
+                                                    title="Edit Recipe"
+                                                >
+                                                    <Pencil size={12} />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => handleDelete(e, recipe)}
+                                                    className="w-8 h-8 rounded-full text-slate-400 hover:text-rose-500 transition-all flex items-center justify-center hover:bg-rose-50 dark:hover:bg-rose-950/30"
+                                                    title="Delete Recipe"
+                                                >
+                                                    <Trash2 size={12} />
+                                                </button>
+                                            </>
+                                        )}
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 toggleFavorite(recipe);
                                             }}
                                             className={cn(
-                                                "w-8 h-8 rounded-full transition-all flex items-center justify-center",
+                                                "w-8 h-8 rounded-full transition-all flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800",
                                                 recipe.is_favorite ? "text-rose-500" : "text-slate-400 hover:text-rose-500"
                                             )}
                                         >
