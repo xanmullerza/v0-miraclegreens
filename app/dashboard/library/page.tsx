@@ -17,7 +17,7 @@ import { PageContainer } from '@/components/ui/page-container';
 
 export default function LibraryPage() {
     const { showHeroes } = useUserPreferences();
-    const [stats, setStats] = useState({ foods: 0, recipes: 0, nutrients: 0 });
+    const [stats, setStats] = useState({ foods: 0, recipes: 0, mixes: 0, nutrients: 0 });
 
     useEffect(() => {
         const fetchStats = async () => {
@@ -95,7 +95,7 @@ export default function LibraryPage() {
                                             <Beaker size={14} className="text-indigo-400" />
                                         </div>
                                         <div>
-                                            <p className="text-lg font-black text-white leading-none">{(stats as any).mixes || 0}</p>
+                                            <p className="text-lg font-black text-white leading-none">{stats.mixes}</p>
                                             <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Mixes</p>
                                         </div>
                                     </div>
