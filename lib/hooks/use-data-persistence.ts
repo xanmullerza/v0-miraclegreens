@@ -213,25 +213,46 @@ export function useDataPersistence() {
                     if (totalWeight > 0) {
                         const density = 100 / totalWeight; // per 100g
 
-                        // We use the same totals calculation as the builder did, but we'll do it here to be safe
                         const totals = ingredients?.reduce((acc, ing) => ({
                             calories: acc.calories + (ing.calories || 0),
+                            energy_kj: acc.energy_kj + (ing.energy_kj || 0),
                             protein: acc.protein + (ing.protein || 0),
                             fat: acc.fat + (ing.fat || 0),
                             carbs: acc.carbs + (ing.carbs || 0),
-                        }), { calories: 0, protein: 0, fat: 0, carbs: 0 }) || { calories: 0, protein: 0, fat: 0, carbs: 0 };
+                        }), { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0 }) || { calories: 0, energy_kj: 0, protein: 0, fat: 0, carbs: 0 };
 
                         const foodItemData = {
                             name: recipeData.title,
                             common_name: recipeData.title,
                             energy_kcal: totals.calories * density,
+                            energy_kj: totals.energy_kj * density,
                             protein_g: totals.protein * density,
                             fat_g: totals.fat * density,
                             carbs_g: totals.carbs * density,
                             image: recipeData.image,
                             category: 'Mixes',
                             source: 'mix',
-                            recipe_id: recipeId
+                            recipe_id: recipeId,
+                            micronutrients: Object.fromEntries(
+                                Object.entries(ingredients?.reduce((acc, ing) => {
+                                    if (ing.micronutrients) {
+                                        Object.entries(ing.micronutrients).forEach(([k, v]) => {
+                                            acc[k] = (acc[k] || 0) + (Number(v) || 0);
+                                        });
+                                    }
+                                    return acc;
+                                }, {} as Record<string, number>) || {}).map(([k, v]: [string, any]) => [k, (v as number) * density])
+                            ),
+                            phytonutrients: Object.fromEntries(
+                                Object.entries(ingredients?.reduce((acc, ing) => {
+                                    if (ing.phytonutrients) {
+                                        Object.entries(ing.phytonutrients).forEach(([k, v]) => {
+                                            acc[k] = (acc[k] || 0) + (Number(v) || 0);
+                                        });
+                                    }
+                                    return acc;
+                                }, {} as Record<string, number>) || {}).map(([k, v]: [string, any]) => [k, (v as number) * density])
+                            )
                         };
 
                         const { error: foodError } = await supabase
