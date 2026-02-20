@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PageContainer } from '@/components/ui/page-container';
 import { BreadcrumbPillbox } from '@/components/ui/breadcrumb-pillbox';
 import { cn } from '@/lib/utils';
@@ -16,7 +16,6 @@ import { SearchProvider } from '@/lib/context/search-context';
 
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { useEffect, useState } from 'react';
 
 export default function BrowsePage() {
     return (
