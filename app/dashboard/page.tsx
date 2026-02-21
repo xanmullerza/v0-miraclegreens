@@ -121,7 +121,7 @@ export default function DashboardOverview() {
                                         <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Nutrients</p>
                                     </div>
                                 </div>
-                                <div className="w-px h-6 bg-slate-700/40" />
+                                <div className="hidden sm:block w-px h-6 bg-slate-700/40" />
                                 <div className="flex items-center gap-3 group/stat">
                                     <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
                                         <Leaf size={16} className="text-emerald-400" />
@@ -131,7 +131,7 @@ export default function DashboardOverview() {
                                         <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Foods</p>
                                     </div>
                                 </div>
-                                <div className="w-px h-6 bg-slate-700/40" />
+                                <div className="hidden sm:block w-px h-6 bg-slate-700/40" />
                                 <div className="flex items-center gap-3 group/stat">
                                     <div className="w-9 h-9 rounded-lg bg-indigo-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
                                         <Beaker size={16} className="text-indigo-400" />
@@ -141,7 +141,7 @@ export default function DashboardOverview() {
                                         <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Mixes</p>
                                     </div>
                                 </div>
-                                <div className="w-px h-6 bg-slate-700/40" />
+                                <div className="hidden sm:block w-px h-6 bg-slate-700/40" />
                                 <div className="flex items-center gap-3 group/stat">
                                     <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
                                         <ChefHat size={16} className="text-amber-400" />
