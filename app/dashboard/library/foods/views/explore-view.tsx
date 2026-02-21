@@ -252,110 +252,120 @@ export function ExploreView({
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* Filter Section Below Header */}
             {!hideControls && (
-                <div className="max-w-7xl mx-auto flex items-center gap-2 px-4 md:px-0">
-                    {/* Scope/Favorites Dropdown */}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <button className={cn(
-                                "flex items-center gap-2 px-2.5 py-1.5 rounded-xl border transition-all duration-300 shrink-0 shadow-sm group outline-none",
-                                showFavoritesOnly
-                                    ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
-                                    : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-emerald-200 hover:text-emerald-500"
-                            )}>
-                                <Heart size={12} className={cn("transition-transform group-hover:scale-110", showFavoritesOnly && "fill-current")} />
-                                <span className="text-[8px] font-black uppercase tracking-widest hidden sm:inline">
-                                    {showFavoritesOnly ? "Favorites" : "All Samples"}
-                                </span>
-                                <ChevronDown size={10} className="opacity-50" />
-                            </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-48 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
-                            <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Filter Scope</DropdownMenuLabel>
-                            <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
-                            <DropdownMenuCheckboxItem
-                                checked={!showFavoritesOnly}
-                                onCheckedChange={(checked) => checked && setShowFavoritesOnly(false)}
-                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-slate-50 py-2.5 cursor-pointer"
-                            >
-                                Show All Samples
-                            </DropdownMenuCheckboxItem>
-                            <DropdownMenuCheckboxItem
-                                checked={showFavoritesOnly}
-                                onCheckedChange={(checked) => checked && setShowFavoritesOnly(true)}
-                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-rose-50 dark:focus:bg-rose-900/10 focus:text-rose-600 py-2.5 cursor-pointer"
-                            >
-                                Favorites Only
-                            </DropdownMenuCheckboxItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 justify-between items-center px-4 md:px-0">
+                    <div className="flex items-center gap-2">
+                        {/* Scope/Favorites Dropdown */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className={cn(
+                                    "flex items-center gap-2 px-2.5 py-1.5 rounded-xl border transition-all duration-300 shrink-0 shadow-sm group outline-none",
+                                    showFavoritesOnly
+                                        ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
+                                        : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-emerald-200 hover:text-emerald-500"
+                                )}>
+                                    <Heart size={12} className={cn("transition-transform group-hover:scale-110", showFavoritesOnly && "fill-current")} />
+                                    <span className="text-[8px] font-black uppercase tracking-widest hidden sm:inline">
+                                        {showFavoritesOnly ? "Favorites" : "All Samples"}
+                                    </span>
+                                    <ChevronDown size={10} className="opacity-50" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start" className="w-48 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
+                                <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Filter Scope</DropdownMenuLabel>
+                                <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
+                                <DropdownMenuCheckboxItem
+                                    checked={!showFavoritesOnly}
+                                    onCheckedChange={(checked) => checked && setShowFavoritesOnly(false)}
+                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-slate-50 py-2.5 cursor-pointer"
+                                >
+                                    Show All Samples
+                                </DropdownMenuCheckboxItem>
+                                <DropdownMenuCheckboxItem
+                                    checked={showFavoritesOnly}
+                                    onCheckedChange={(checked) => checked && setShowFavoritesOnly(true)}
+                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-rose-50 dark:focus:bg-rose-900/10 focus:text-rose-600 py-2.5 cursor-pointer"
+                                >
+                                    Favorites Only
+                                </DropdownMenuCheckboxItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
 
-                    {/* Category Filter */}
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <button className={cn(
-                                "px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
-                                selectedCategories.length > 0 && selectedCategories.length < CATEGORIES.length
-                                    ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20"
-                                    : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-emerald-200 hover:text-emerald-600"
-                            )}>
-                                <Filter size={12} />
-                                <span className="hidden sm:inline">
-                                    {selectedCategories.length === 0 || selectedCategories.length === CATEGORIES.length ? "All Groups" :
-                                        `${selectedCategories.length} Groups`}
-                                </span>
-                                <ChevronDown size={10} className="opacity-50" />
-                            </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start" className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
-                            <div className="flex items-center justify-between pr-2">
-                                <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Groups</DropdownMenuLabel>
-                                <div className="flex items-center gap-1">
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault(); e.stopPropagation();
-                                            setSelectedCategories(CATEGORIES);
-                                        }}
-                                        className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-emerald-500 transition-colors"
-                                        title="Select All"
-                                    >
-                                        <CheckSquare size={14} />
-                                    </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault(); e.stopPropagation();
-                                            setSelectedCategories([]);
-                                        }}
-                                        className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
-                                        title="Select None"
-                                    >
-                                        <Square size={14} />
-                                    </button>
-                                </div>
-                            </div>
-                            <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
-                            <div className="py-1 max-h-[300px] overflow-y-auto no-scrollbar">
-                                {CATEGORIES.map(category => {
-                                    const isActive = selectedCategories.includes(category);
-                                    return (
-                                        <DropdownMenuCheckboxItem
-                                            key={category}
-                                            checked={isActive}
-                                            onCheckedChange={(checked) => {
-                                                if (checked) {
-                                                    setSelectedCategories(prev => [...prev, category]);
-                                                } else {
-                                                    setSelectedCategories(prev => prev.filter(c => c !== category));
-                                                }
+                        {/* Category Filter */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button className={cn(
+                                    "px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
+                                    selectedCategories.length > 0 && selectedCategories.length < CATEGORIES.length
+                                        ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20"
+                                        : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-emerald-200 hover:text-emerald-600"
+                                )}>
+                                    <Filter size={12} />
+                                    <span className="hidden sm:inline">
+                                        {selectedCategories.length === 0 || selectedCategories.length === CATEGORIES.length ? "All Groups" :
+                                            `${selectedCategories.length} Groups`}
+                                    </span>
+                                    <ChevronDown size={10} className="opacity-50" />
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="start" className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
+                                <div className="flex items-center justify-between pr-2">
+                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Groups</DropdownMenuLabel>
+                                    <div className="flex items-center gap-1">
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault(); e.stopPropagation();
+                                                setSelectedCategories(CATEGORIES);
                                             }}
-                                            className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-emerald-50 dark:focus:bg-emerald-900/10 focus:text-emerald-600 py-2.5 cursor-pointer"
+                                            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-emerald-500 transition-colors"
+                                            title="Select All"
                                         >
-                                            {category}
-                                        </DropdownMenuCheckboxItem>
-                                    );
-                                })}
-                            </div>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                                            <CheckSquare size={14} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault(); e.stopPropagation();
+                                                setSelectedCategories([]);
+                                            }}
+                                            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
+                                            title="Select None"
+                                        >
+                                            <Square size={14} />
+                                        </button>
+                                    </div>
+                                </div>
+                                <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
+                                <div className="py-1 max-h-[300px] overflow-y-auto no-scrollbar">
+                                    {CATEGORIES.map(category => {
+                                        const isActive = selectedCategories.includes(category);
+                                        return (
+                                            <DropdownMenuCheckboxItem
+                                                key={category}
+                                                checked={isActive}
+                                                onCheckedChange={(checked) => {
+                                                    if (checked) {
+                                                        setSelectedCategories(prev => [...prev, category]);
+                                                    } else {
+                                                        setSelectedCategories(prev => prev.filter(c => c !== category));
+                                                    }
+                                                }}
+                                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-emerald-50 dark:focus:bg-emerald-900/10 focus:text-emerald-600 py-2.5 cursor-pointer"
+                                            >
+                                                {category}
+                                            </DropdownMenuCheckboxItem>
+                                        );
+                                    })}
+                                </div>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+
+                    <Button
+                        onClick={() => router.push('/dashboard/library/foods/new')}
+                        className="h-14 px-8 rounded-2xl text-white font-black uppercase tracking-widest gap-2 shadow-xl bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/10"
+                    >
+                        <Plus size={18} />
+                        Add Food
+                    </Button>
                 </div>
             )}
 
