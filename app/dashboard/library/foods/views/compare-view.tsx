@@ -345,7 +345,7 @@ export function CompareView({ showStats = false, stats }: CompareViewProps) {
 
             {/* Dynamic Workspace: Onboarding OR Search OR Summary */}
             {/* Unified Workspace: Stable Header + Persistent Search */}
-            <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col">
+            <div className="w-full md:max-w-[900px] mx-auto bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col">
 
                 {/* 1. Dynamic Content Area (Fixed Height to prevent shifts) */}
                 <div className="h-[180px] overflow-y-auto p-4 md:p-8 no-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1">
