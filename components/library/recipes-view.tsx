@@ -203,81 +203,83 @@ export function RecipesView({
             {/* Controls Row */}
             {!hideControls && (
                 <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
-                    <div className="flex items-center gap-4">
-                        {/* Favorites Switch Toggle */}
-                        <div className="flex items-center gap-4 bg-white dark:bg-slate-900/50 h-14 px-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm shrink-0 transition-all">
-                            <Globe
-                                size={18}
+                    {/* Unified Filter Bar */}
+                    <div className="relative">
+                        <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar h-14 items-center shadow-sm w-fit transition-all duration-500">
+                            <button
+                                onClick={() => setIsFilterOpen(!isFilterOpen)}
                                 className={cn(
-                                    "transition-all cursor-pointer",
-                                    !showFavoritesOnly ? "text-blue-500 scale-110 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)]" : "text-slate-300 hover:text-slate-400"
+                                    "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300 shrink-0",
+                                    isFilterOpen ? "bg-slate-900 text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
                                 )}
-                                onClick={() => setShowFavoritesOnly(false)}
-                            />
-                            <Switch
-                                id="favorites-mode"
-                                checked={showFavoritesOnly}
-                                onCheckedChange={setShowFavoritesOnly}
-                                className="data-[state=checked]:bg-rose-500 data-[state=unchecked]:bg-blue-600 dark:data-[state=unchecked]:bg-blue-600"
-                            />
-                            <Heart
-                                size={18}
-                                className={cn(
-                                    "transition-all cursor-pointer",
-                                    showFavoritesOnly ? "text-rose-500 fill-rose-500 scale-110 drop-shadow-[0_0_8px_rgba(244,63,94,0.3)]" : "text-slate-300 hover:text-slate-400"
-                                )}
-                                onClick={() => setShowFavoritesOnly(true)}
-                            />
-                        </div>
+                            >
+                                <Filter size={18} />
+                                <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter</span>
+                                <ChevronDown size={14} className={cn("transition-transform duration-300", isFilterOpen && "rotate-180")} />
+                            </button>
 
-                        {/* Type Filter */}
-                        <div className="relative">
-                            <div className="flex bg-white dark:bg-slate-900/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 gap-1 overflow-x-auto no-scrollbar h-14 items-center shadow-sm w-fit transition-all duration-500">
-                                <button
-                                    onClick={() => setIsFilterOpen(!isFilterOpen)}
-                                    className={cn(
-                                        "px-4 h-full rounded-xl flex items-center gap-2 transition-all duration-300 shrink-0",
-                                        isFilterOpen ? "bg-blue-600 text-white" : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-                                    )}
-                                >
-                                    <Filter size={18} />
-                                    <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Filter Types</span>
-                                    <ChevronDown size={14} className={cn("transition-transform duration-300", isFilterOpen && "rotate-180")} />
-                                </button>
+                            <div className="w-px h-6 bg-slate-100 dark:bg-slate-800 mx-1 shrink-0" />
+
+                            <div className={cn("flex items-center gap-1 transition-all duration-500 ease-in-out overflow-hidden", isFilterOpen ? "max-w-[1000px] opacity-100 px-1" : "max-w-0 opacity-0 px-0")}>
+                                {/* Scope Toggle (All / Favorites) */}
+                                <div className="flex bg-slate-100 dark:bg-slate-800/50 p-1 rounded-xl shrink-0">
+                                    <button
+                                        onClick={() => setShowFavoritesOnly(false)}
+                                        className={cn(
+                                            "w-10 h-8 rounded-lg flex items-center justify-center transition-all",
+                                            !showFavoritesOnly ? "bg-white dark:bg-slate-700 text-blue-500 shadow-sm" : "text-slate-400 hover:text-slate-500"
+                                        )}
+                                        title="All Recipes"
+                                    >
+                                        <Globe size={16} />
+                                    </button>
+                                    <button
+                                        onClick={() => setShowFavoritesOnly(true)}
+                                        className={cn(
+                                            "w-10 h-8 rounded-lg flex items-center justify-center transition-all",
+                                            showFavoritesOnly ? "bg-white dark:bg-slate-700 text-rose-500 shadow-sm" : "text-slate-400 hover:text-slate-500"
+                                        )}
+                                        title="Favorites Only"
+                                    >
+                                        <Heart size={16} className={showFavoritesOnly ? "fill-current" : ""} />
+                                    </button>
+                                </div>
 
                                 <div className="w-px h-6 bg-slate-100 dark:bg-slate-800 mx-1 shrink-0" />
 
-                                <div className={cn("flex items-center gap-1 transition-all duration-500 ease-in-out overflow-hidden", isFilterOpen ? "max-w-[1000px] opacity-100 px-1" : "max-w-0 opacity-0 px-0")}>
-                                    {MEAL_TYPES.map(type => {
-                                        const isActive = selectedTypes.includes(type);
-                                        return (
-                                            <button
-                                                key={type}
-                                                onClick={() => isActive
-                                                    ? setSelectedTypes(prev => prev.filter(t => t !== type))
-                                                    : setSelectedTypes(prev => [...prev, type])
-                                                }
-                                                className={cn(
-                                                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
-                                                    isActive
-                                                        ? "bg-blue-600/10 text-blue-600 border border-blue-600/20"
-                                                        : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
-                                                )}
-                                            >
-                                                {type}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-
-                                {!isFilterOpen && (
-                                    <div className="px-4 whitespace-nowrap">
-                                        <span className="text-[10px] font-bold text-slate-400 italic">
-                                            {selectedTypes.length === MEAL_TYPES.length ? "All Meal Types" : `${selectedTypes.length} Types Selected`}
-                                        </span>
-                                    </div>
-                                )}
+                                {MEAL_TYPES.map(type => {
+                                    const isActive = selectedTypes.includes(type);
+                                    return (
+                                        <button
+                                            key={type}
+                                            onClick={() => isActive
+                                                ? setSelectedTypes(prev => prev.filter(t => t !== type))
+                                                : setSelectedTypes(prev => [...prev, type])
+                                            }
+                                            className={cn(
+                                                "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
+                                                isActive
+                                                    ? isMix ? "bg-indigo-600/10 text-indigo-600 border border-indigo-600/20" : "bg-blue-600/10 text-blue-600 border border-blue-600/20"
+                                                    : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500"
+                                            )}
+                                        >
+                                            {type}
+                                        </button>
+                                    );
+                                })}
                             </div>
+
+                            {!isFilterOpen && (
+                                <div className="px-4 whitespace-nowrap flex items-center gap-2">
+                                    <span className={cn("text-[10px] font-black uppercase tracking-widest", showFavoritesOnly ? "text-rose-500" : "text-blue-500")}>
+                                        {showFavoritesOnly ? "Favorites" : "All Collections"}
+                                    </span>
+                                    <span className="text-slate-300 text-[8px]">•</span>
+                                    <span className="text-[10px] font-bold text-slate-400 italic">
+                                        {selectedTypes.length === MEAL_TYPES.length ? "All Meal Types" : `${selectedTypes.length} Types Selected`}
+                                    </span>
+                                </div>
+                            )}
                         </div>
                     </div>
 
