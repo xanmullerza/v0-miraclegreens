@@ -7,6 +7,7 @@ import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus, ListOrdered, ChevronUp, ChevronDown, ClipboardList, Heart, Library, Scale, Database, Calendar, Beaker } from 'lucide-react';
 import { parseInstructionsOnly, parseRecipeText } from '@/lib/utils/recipe-parser';
 import { searchLocalFood, searchUSDAFood, getUSDAMeasures, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';
+import { supabase } from '@/lib/supabase';
 import { scaleIngredient } from '@/lib/utils/recipe-scaling';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -148,17 +149,48 @@ function UserRecipeBuilder() {
     };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        // ... (Simpler image upload or keep existing)
         const file = e.target.files?.[0];
         if (!file) return;
+
         setUploading(true);
-        // For now, use reader as placeholder if storage bucket not ready, or implement full upload
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setImage(reader.result as string);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
+            const filePath = fileName;
+
+            const { data, error: uploadError } = await supabase.storage
+                .from('recipes')
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+
+            if (uploadError) {
+                // Fallback to data URL if upload fails (e.g. bucket missing)
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    setImage(reader.result as string);
+                    setUploading(false);
+                };
+                reader.readAsDataURL(file);
+                return;
+            }
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('recipes')
+                .getPublicUrl(filePath);
+
+            setImage(publicUrl);
             setUploading(false);
-        };
-        reader.readAsDataURL(file);
+        } catch (err: any) {
+            console.error("Upload error:", err);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImage(reader.result as string);
+                setUploading(false);
+            };
+            reader.readAsDataURL(file);
+        }
     };
 
     const handleAddInstruction = () => setInstructions([...instructions, '']);
@@ -365,6 +397,51 @@ function UserRecipeBuilder() {
                                     {saving ? <Loader2 className="animate-spin" /> : <Save className="mr-2" />}
                                     Save {isMix ? 'Mix' : 'Protocol'}
                                 </Button>
+                            </div>
+
+                            <div className="flex flex-col justify-end pt-6 border-t md:border-t-0 md:border-l border-slate-100 dark:border-slate-800 md:pl-8 space-y-6">
+                                {/* Photo Upload Block */}
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                                        <Camera size={12} /> Recipe Photo
+                                    </Label>
+                                    <div className="relative aspect-video rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group hover:border-violet-500/50 transition-all flex flex-col items-center justify-center">
+                                        {image ? (
+                                            <>
+                                                <img src={image} alt="Recipe" className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                    <Button variant="secondary" size="sm" className="gap-2" onClick={() => setImage('')}>
+                                                        <Trash2 size={14} /> Remove
+                                                    </Button>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="text-center p-4 pointer-events-none">
+                                                    {uploading ? (
+                                                        <Loader2 className="h-8 w-8 animate-spin text-violet-500 mx-auto" />
+                                                    ) : (
+                                                        <>
+                                                            <Upload size={20} className="text-slate-400 mx-auto mb-2" />
+                                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 text-center">Upload Photo</p>
+                                                        </>
+                                                    )}
+                                                </div>
+                                                {!uploading && (
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                                        onChange={handleImageUpload}
+                                                    />
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+                                    <p className="text-[10px] text-center text-slate-400 tracking-tighter uppercase px-4 pt-2">
+                                        Optional: Add a visual reference for this {isMix ? 'mix' : 'protocol'}.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </Card>
