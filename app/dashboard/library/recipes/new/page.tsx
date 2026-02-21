@@ -405,19 +405,19 @@ function UserRecipeBuilder() {
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
                                         <Camera size={12} /> Recipe Photo
                                     </Label>
-                                    <div className="relative aspect-video rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group hover:border-violet-500/50 transition-all flex flex-col items-center justify-center">
+                                    <div className="relative aspect-video rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group hover:border-violet-500/50 transition-all">
                                         {image ? (
-                                            <>
+                                            <div className="w-full h-full relative">
                                                 <img src={image} alt="Recipe" className="w-full h-full object-cover" />
                                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                                     <Button variant="secondary" size="sm" className="gap-2" onClick={() => setImage('')}>
                                                         <Trash2 size={14} /> Remove
                                                     </Button>
                                                 </div>
-                                            </>
+                                            </div>
                                         ) : (
-                                            <>
-                                                <div className="text-center p-4 pointer-events-none">
+                                            <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer">
+                                                <div className="text-center p-4">
                                                     {uploading ? (
                                                         <Loader2 className="h-8 w-8 animate-spin text-violet-500 mx-auto" />
                                                     ) : (
@@ -431,11 +431,11 @@ function UserRecipeBuilder() {
                                                     <input
                                                         type="file"
                                                         accept="image/*"
-                                                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                                        className="hidden"
                                                         onChange={handleImageUpload}
                                                     />
                                                 )}
-                                            </>
+                                            </label>
                                         )}
                                     </div>
                                     <p className="text-[10px] text-center text-slate-400 tracking-tighter uppercase px-4 pt-2">
