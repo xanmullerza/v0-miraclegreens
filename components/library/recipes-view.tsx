@@ -336,7 +336,7 @@ export function RecipesView({
 
                                     {/* Info */}
                                     <div className="flex-1 min-w-0 lg:p-0">
-                                        <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize truncate">
+                                        <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize line-clamp-2">
                                             {recipe.title}
                                         </h3>
 
@@ -393,9 +393,7 @@ export function RecipesView({
                                                 </button>
                                             </>
                                         )}
-                                        <button className={cn("w-8 h-8 rounded-full flex items-center justify-center border text-white shadow-lg", isMix ? "bg-indigo-500 shadow-indigo-500/10" : "bg-blue-500 shadow-blue-500/10")}>
-                                            <ArrowRight size={14} />
-                                        </button>
+
                                     </div>
                                 </div>
                             </div>
