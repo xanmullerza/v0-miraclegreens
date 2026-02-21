@@ -114,10 +114,6 @@ export default function KitchenPage() {
                                                 <p className="text-[14px] text-slate-500 leading-relaxed max-w-[280px]">{card.desc}</p>
                                             </div>
                                         </div>
-
-                                        <div className={cn("flex items-center gap-1 text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-300", card.color, "opacity-60 group-hover:opacity-100 mt-auto")}>
-                                            Explore Section <ChevronRight size={10} className="transition-transform group-hover:translate-x-1" />
-                                        </div>
                                     </div>
                                 </Link>
                             );
