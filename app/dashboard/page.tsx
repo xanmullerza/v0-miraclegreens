@@ -24,7 +24,7 @@ import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
 export default function DashboardOverview() {
     const { showHeroes } = useUserPreferences();
-    const [stats, setStats] = useState({ foods: 0, recipes: 0, nutrients: 0 });
+    const [stats, setStats] = useState({ foods: 0, recipes: 0, nutrients: 0, mixes: 0 });
     const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
@@ -39,11 +39,17 @@ export default function DashboardOverview() {
 
         const fetchStats = async () => {
             try {
-                const [foodsCount, recipesCount] = await Promise.all([
+                const [foodsCount, recipesCount, mixesCount] = await Promise.all([
                     supabase.from('food_items').select('id', { count: 'exact', head: true }),
-                    supabase.from('recipes').select('id', { count: 'exact', head: true }),
+                    supabase.from('recipes').select('id', { count: 'exact', head: true }).eq('is_mix', false),
+                    supabase.from('recipes').select('id', { count: 'exact', head: true }).eq('is_mix', true),
                 ]);
-                setStats({ foods: foodsCount.count || 0, recipes: recipesCount.count || 0, nutrients: 30 });
+                setStats({
+                    foods: foodsCount.count || 0,
+                    recipes: recipesCount.count || 0,
+                    nutrients: 30,
+                    mixes: mixesCount.count || 0
+                });
             } catch (e) {
                 console.error('Error fetching dashboard stats:', e);
             }
@@ -105,7 +111,17 @@ export default function DashboardOverview() {
                                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-500 rounded-full blur-3xl" />
                             </div>
 
-                            <div className="relative z-10 flex flex-wrap items-center justify-center gap-8 lg:gap-16">
+                            <div className="relative z-10 flex flex-wrap items-center justify-center gap-8 lg:gap-12">
+                                <div className="flex items-center gap-3 group/stat">
+                                    <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
+                                        <Activity size={16} className="text-blue-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-lg font-black text-white leading-none">{stats.nutrients}+</p>
+                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Nutrients</p>
+                                    </div>
+                                </div>
+                                <div className="w-px h-6 bg-slate-700/40" />
                                 <div className="flex items-center gap-3 group/stat">
                                     <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
                                         <Leaf size={16} className="text-emerald-400" />
@@ -117,22 +133,22 @@ export default function DashboardOverview() {
                                 </div>
                                 <div className="w-px h-6 bg-slate-700/40" />
                                 <div className="flex items-center gap-3 group/stat">
+                                    <div className="w-9 h-9 rounded-lg bg-indigo-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
+                                        <Beaker size={16} className="text-indigo-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-lg font-black text-white leading-none">{stats.mixes}</p>
+                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Mixes</p>
+                                    </div>
+                                </div>
+                                <div className="w-px h-6 bg-slate-700/40" />
+                                <div className="flex items-center gap-3 group/stat">
                                     <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
                                         <ChefHat size={16} className="text-amber-400" />
                                     </div>
                                     <div>
                                         <p className="text-lg font-black text-white leading-none">{stats.recipes}</p>
-                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Recipes</p>
-                                    </div>
-                                </div>
-                                <div className="w-px h-6 bg-slate-700/40" />
-                                <div className="flex items-center gap-3 group/stat">
-                                    <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
-                                        <Activity size={16} className="text-blue-400" />
-                                    </div>
-                                    <div>
-                                        <p className="text-lg font-black text-white leading-none">{stats.nutrients}+</p>
-                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Nutrients</p>
+                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Meals</p>
                                     </div>
                                 </div>
                             </div>
