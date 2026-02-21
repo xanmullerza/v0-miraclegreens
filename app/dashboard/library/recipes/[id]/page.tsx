@@ -1295,10 +1295,10 @@ export default function RecipeDetailsPage() {
                                                 {/* Actions */}
                                                 <button
                                                     onClick={(e) => removeIngredient(index, e)}
-                                                    className="text-slate-300 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100"
+                                                    className="text-rose-400 hover:text-rose-600 transition-colors"
                                                     title="Remove"
                                                 >
-                                                    <Trash2 size={14} />
+                                                    <Trash2 size={16} />
                                                 </button>
                                             </div>
                                         ))}

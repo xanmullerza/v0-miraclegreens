@@ -1351,10 +1351,11 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
                                     <button
                                         type="button"
                                         onClick={() => handleRemoveIngredient(index)}
-                                        className="p-2 bg-rose-50 dark:bg-rose-950/30 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl transition-all shadow-sm border border-rose-100 dark:border-rose-900/50"
+                                        className="flex items-center gap-2 px-3 py-2 bg-rose-50 dark:bg-rose-950/30 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl transition-all shadow-sm border border-rose-100 dark:border-rose-900/50 group/delete"
                                         title="Delete Ingredient"
                                     >
                                         <Trash2 className="w-4 h-4" />
+                                        <span className="text-[10px] font-black uppercase tracking-widest">Delete</span>
                                     </button>
                                 </div>
 

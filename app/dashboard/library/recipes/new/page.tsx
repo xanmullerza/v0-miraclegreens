@@ -349,7 +349,7 @@ function UserRecipeBuilder() {
                                             className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-violet-500/50 rounded-xl p-4 text-sm min-h-[80px] transition-all resize-none"
                                             placeholder={`Step ${index + 1}...`}
                                         />
-                                        <button onClick={() => handleRemoveInstruction(index)} className="absolute top-2 right-2 text-slate-300 hover:text-rose-500 opacity-0 group-hover:opacity-100"><Trash2 size={16} /></button>
+                                        <button onClick={() => handleRemoveInstruction(index)} className="absolute top-2 right-2 text-rose-400 hover:text-rose-600 transition-colors"><Trash2 size={16} /></button>
                                     </div>
                                 </div>
                             ))}

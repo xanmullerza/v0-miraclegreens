@@ -695,7 +695,7 @@ export default function EditRecipePage() {
                                     {instructions.length > 1 && (
                                         <button
                                             onClick={() => handleRemoveInstruction(index)}
-                                            className="absolute top-2 right-2 text-slate-300 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100"
+                                            className="absolute top-2 right-2 text-rose-400 hover:text-rose-600 transition-colors"
                                         >
                                             <Trash2 size={16} />
                                         </button>
