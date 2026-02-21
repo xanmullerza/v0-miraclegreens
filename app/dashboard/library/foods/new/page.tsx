@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense, useMemo } from 'react';
+import { useState, useEffect, Suspense, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -70,7 +70,14 @@ const CATEGORIZED_MARKERS: Record<string, string[]> = {
 
 export default function AddFoodPage() {
     return (
-        <Suspense fallback={<div className="h-full flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500" /></div>}>
+        <Suspense fallback={
+            <div className="max-w-7xl mx-auto min-h-[60vh] flex flex-col items-center justify-center gap-4">
+                <Loader2 className="w-10 h-10 animate-spin text-emerald-500" />
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 italic animate-pulse">
+                    Initializing Food Workspace...
+                </p>
+            </div>
+        }>
             <FoodItemCreatorContent />
         </Suspense>
     );
@@ -78,7 +85,24 @@ export default function AddFoodPage() {
 
 function FoodItemCreatorContent() {
     const router = useRouter();
+    const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(false);
+    const [authLoading, setAuthLoading] = useState(true);
+
+    useEffect(() => {
+        // Get initial session
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setUser(session?.user ?? null);
+            setAuthLoading(false);
+        });
+
+        // Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
 
 
     // State for the food item
@@ -207,6 +231,7 @@ function FoodItemCreatorContent() {
             });
 
             const foodData = {
+                id: `food-${Date.now()}`,
                 name,
                 common_name: commonName || null,
                 source: source || 'manual',
@@ -218,16 +243,27 @@ function FoodItemCreatorContent() {
                 fat_g: finalFat,
                 image: image || null,
                 micronutrients: finalMicros,
-                portions: parsedPortions
+                portions: parsedPortions,
+                user_id: user?.id || null,
+                is_curated: false
             };
 
-            const { data: item, error: itemError } = await supabase
-                .from('food_items')
-                .upsert(foodData, { onConflict: 'name' })
-                .select()
-                .single();
+            if (user) {
+                // Cloud Save
+                const { data: item, error: itemError } = await supabase
+                    .from('food_items')
+                    .upsert(foodData, { onConflict: 'name' })
+                    .select()
+                    .single();
 
-            if (itemError) throw itemError;
+                if (itemError) throw itemError;
+            } else {
+                // Local Save
+                const localData = localStorage.getItem('local_foods');
+                let localFoods = localData ? JSON.parse(localData) : [];
+                localFoods.push(foodData);
+                localStorage.setItem('local_foods', JSON.stringify(localFoods));
+            }
 
             toast.success('Food item saved successfully!');
 
@@ -243,6 +279,17 @@ function FoodItemCreatorContent() {
             setLoading(false);
         }
     };
+
+    if (authLoading) {
+        return (
+            <div className="max-w-7xl mx-auto min-h-[60vh] flex flex-col items-center justify-center gap-4">
+                <Loader2 className="w-10 h-10 animate-spin text-emerald-500" />
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 italic animate-pulse">
+                    Verifying Workspace...
+                </p>
+            </div>
+        );
+    }
 
     const updateMicro = (name: string, value: string) => {
         setMicronutrients(prev => ({ ...prev, [name]: value }));
@@ -292,13 +339,27 @@ Fat: ${item.fat_g || 0}g
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
-            {/* Back Button */}
-            <button
-                onClick={() => router.push('/dashboard/library/foods')}
-                className="flex items-center gap-2 text-emerald-500 font-bold text-xs uppercase tracking-widest mb-2 hover:translate-x-[-4px] transition-transform"
-            >
-                <ArrowLeft size={14} /> Back to Foods
-            </button>
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-4 border-b border-slate-200 dark:border-slate-800">
+                <div className="space-y-1">
+                    <button
+                        onClick={() => router.push('/dashboard/library/foods')}
+                        className="flex items-center gap-2 text-emerald-500 font-bold text-xs uppercase tracking-widest mb-2 hover:translate-x-[-4px] transition-transform"
+                    >
+                        <ArrowLeft size={14} /> Back to Foods
+                    </button>
+                    <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
+                            <Plus className="text-emerald-500" size={24} />
+                        </div>
+                        <h1 className="text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic">
+                            Add New Food
+                        </h1>
+                    </div>
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">
+                        {user ? 'Cloud Sync Enabled' : 'Local Storage Mode'}
+                    </p>
+                </div>
+            </div>
 
             {/* Sub-Hero Actions */}
             <div className="flex justify-start">

@@ -91,7 +91,24 @@ export function ExploreView({
 
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+    const [user, setUser] = useState<any>(null);
     const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+
+    useEffect(() => {
+        // Get initial session
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setUser(session?.user ?? null);
+            setCurrentUserEmail(session?.user?.email ?? null);
+        });
+
+        // Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+            setCurrentUserEmail(session?.user?.email ?? null);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
 
     // Quick Add State (Sophisticated matching Pantry)
     const [quickAddItem, setQuickAddItem] = useState<FoodItem | null>(null);
@@ -107,13 +124,21 @@ export function ExploreView({
 
     useEffect(() => {
         fetchFoods(1, true);
-    }, [searchQuery, showFavoritesOnly, selectedCategories]);
+    }, [searchQuery, showFavoritesOnly, selectedCategories, user]);
 
     const fetchFoods = async (pageNum: number, isNewSearch = false) => {
         setLoading(true);
         try {
-            let query = supabase.from('food_items').select('*').order('name', { ascending: true });
+            let query = supabase.from('food_items').select('*', { count: 'exact' });
 
+            // 1. Scoping: Curated OR User's own
+            if (user) {
+                query = query.or(`is_curated.eq.true,user_id.eq.${user.id}`);
+            } else {
+                query = query.eq('is_curated', true);
+            }
+
+            // 2. Filtering
             if (searchQuery) {
                 query = query.or(`name.ilike.%${searchQuery}%,common_name.ilike.%${searchQuery}%`);
             }
@@ -130,10 +155,38 @@ export function ExploreView({
             const to = from + 49;
             query = query.range(from, to);
 
-            const { data, error } = await query;
+            const { data, error, count } = await query.order('name', { ascending: true });
             if (error) throw error;
 
-            const fetchedItems = data || [];
+            let fetchedItems = (data as FoodItem[]) || [];
+
+            // 3. If NOT logged in, merge with LocalStorage foods
+            if (!user) {
+                try {
+                    const localFoodsData = localStorage.getItem('local_foods');
+                    if (localFoodsData) {
+                        let localFoods: FoodItem[] = JSON.parse(localFoodsData);
+
+                        // Apply filters to local foods
+                        if (searchQuery.trim()) {
+                            localFoods = localFoods.filter(f =>
+                                f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                                (f.common_name && f.common_name.toLowerCase().includes(searchQuery.toLowerCase()))
+                            );
+                        }
+                        if (showFavoritesOnly) {
+                            localFoods = localFoods.filter(f => f.is_favorite);
+                        }
+                        if (selectedCategories.length > 0 && selectedCategories.length < CATEGORIES.length) {
+                            localFoods = localFoods.filter(f => f.category && selectedCategories.includes(f.category));
+                        }
+
+                        fetchedItems = [...localFoods, ...fetchedItems];
+                    }
+                } catch (e) {
+                    console.error("Error loading local foods:", e);
+                }
+            }
 
             // Merge in locally-stored quantities (persists without login)
             try {
