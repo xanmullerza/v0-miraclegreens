@@ -32,6 +32,20 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
     const [loading, setLoading] = useState(false);
     const [searchingUSDA, setSearchingUSDA] = useState(false);
     const [view, setView] = useState<'local' | 'usda'>('local');
+    const [user, setUser] = useState<any>(null);
+
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setUser(session?.user ?? null);
+        });
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
+
 
     // Initialize view based on mode
     useEffect(() => {
@@ -100,7 +114,7 @@ export default function FoodItemPicker({ onSelect, onClose, mode = 'all', isAdmi
             };
 
             // Sync to local
-            const localId = await syncToLocal(detailedItem, portions);
+            const localId = await syncToLocal(detailedItem, portions, user?.id, isAdmin);
 
             if (localId) {
                 // Prepare portions for immediate UI use without re-fetch

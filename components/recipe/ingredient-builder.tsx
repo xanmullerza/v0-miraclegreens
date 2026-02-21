@@ -91,6 +91,8 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
     const [expandedBreakdownSections, setExpandedBreakdownSections] = useState<Record<string, boolean>>({});
     const [isAdmin, setIsAdmin] = useState(false);
+    const [currentUser, setCurrentUser] = useState<any>(null);
+
 
     const { energyUnit, setEnergyUnit, nutrientDisplayMode, profile } = useUserPreferences();
     const useKilojoules = energyUnit === 'kJ';
@@ -99,10 +101,12 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
         const checkAdmin = async () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
+                setCurrentUser(user);
                 const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
                 const userEmail = (user.email || user.user_metadata?.email || '').toLowerCase();
                 setIsAdmin(userEmail === adminEmail.toLowerCase() && adminEmail !== '');
             }
+
         };
         checkAdmin();
     }, []);
@@ -192,7 +196,8 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
         // If it's a USDA item, we need to sync it or at least get measures
         if ('source' in foodItem && foodItem.source === 'usda' && foodItem.fdcId) {
             const usdaMeasures = await getUSDAMeasures(foodItem.fdcId);
-            const syncedId = await syncToLocal(foodItem as FoodItemMatch, usdaMeasures);
+            const syncedId = await syncToLocal(foodItem as FoodItemMatch, usdaMeasures, currentUser?.id, isAdmin);
+
             if (syncedId) {
                 finalFoodItem = { ...foodItem, id: syncedId };
                 measures = usdaMeasures;

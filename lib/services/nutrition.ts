@@ -476,7 +476,12 @@ export async function getUSDAMeasures(fdcId: number): Promise<FoodMeasure[]> {
  * Syncs a USDA food item to our local database.
  * Uses UPSERT to prevent duplicates and preserve existing data.
  */
-export async function syncToLocal(food: FoodItemMatch, measures: FoodMeasure[]): Promise<string | null> {
+export async function syncToLocal(
+    food: FoodItemMatch,
+    measures: FoodMeasure[],
+    userId?: string | null,
+    isCurated: boolean = false
+): Promise<string | null> {
     // 1. Clean and standardize measures before sync
     const standardizeLabel = (l: string) => {
         let clean = l.toLowerCase().trim();
@@ -529,7 +534,9 @@ export async function syncToLocal(food: FoodItemMatch, measures: FoodMeasure[]):
             source: food.source || 'usda',
             micronutrients: food.micronutrients,
             phytonutrients: food.phytonutrients || {},
-            portions: uniquePortions // Save to JSONB
+            portions: uniquePortions, // Save to JSONB
+            user_id: userId || null,
+            is_curated: isCurated
         }, { onConflict: 'name' })
         .select()
         .single();
@@ -538,9 +545,6 @@ export async function syncToLocal(food: FoodItemMatch, measures: FoodMeasure[]):
         console.error("Sync Item Error:", itemError);
         return null;
     }
-
-    // Legacy: We can still save to food_measures table if needed, but 'portions' column is now primary.
-    // We skip the separate table insert to rely on the JSONB column as requested.
 
     return itemData.id;
 }

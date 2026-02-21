@@ -46,6 +46,33 @@ export default function EditRecipePage() {
     const [autoImportText, setAutoImportText] = useState('');
     const [isImporting, setIsImporting] = useState(false);
     const [isFavorite, setIsFavorite] = useState(true);
+    const [currentUser, setCurrentUser] = useState<any>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setCurrentUser(session?.user ?? null);
+            checkAdmin(session?.user);
+        });
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setCurrentUser(session?.user ?? null);
+            checkAdmin(session?.user);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
+
+    const checkAdmin = (user: any) => {
+        if (user) {
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
+            const userEmail = (user.email || user.user_metadata?.email || '').toLowerCase();
+            setIsAdmin(userEmail === adminEmail.toLowerCase() && adminEmail !== '');
+        } else {
+            setIsAdmin(false);
+        }
+    };
+
 
     useEffect(() => {
         if (id) {
@@ -301,7 +328,8 @@ export default function EditRecipePage() {
                     if (usdaResults.length > 0) {
                         const usdaMatch = usdaResults[0];
                         const measuresArr = usdaMatch.fdcId ? await getUSDAMeasures(usdaMatch.fdcId) : [];
-                        const localId = await syncToLocal(usdaMatch, measuresArr);
+                        const localId = await syncToLocal(usdaMatch, measuresArr, currentUser?.id, isAdmin);
+
                         if (localId) {
                             match = { ...usdaMatch, id: localId, source: 'local' };
                         } else {
