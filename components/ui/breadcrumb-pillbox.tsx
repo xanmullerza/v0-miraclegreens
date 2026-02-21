@@ -118,17 +118,17 @@ export function BreadcrumbPillbox({
                 "sticky top-0 z-50 flex items-center p-2 pt-0 bg-white dark:bg-slate-900 rounded-b-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden w-full md:max-w-[900px] mx-auto xl:mx-0 transition-all duration-500",
                 isSearchExpanded ? "ring-2 ring-emerald-500/20" : ""
             )}>
-                {/* Left side - Globe Search Trigger */}
-                <button
-                    onClick={() => setIsSearchExpanded(true)}
+                {/* Left side - Globe Browse Link */}
+                <Link
+                    href="/browse"
                     className={cn(
                         "flex transition-all duration-500 h-12 w-12 border-r border-slate-200 dark:border-slate-800 mr-2 items-center justify-center text-slate-400 hover:text-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors focus:outline-none",
                         isSearchExpanded ? "w-0 opacity-0 overflow-hidden" : "flex-shrink-0"
                     )}
-                    title="Search"
+                    title="Browse"
                 >
                     <Globe size={18} />
-                </button>
+                </Link>
 
                 {/* Center - Breadcrumb or Search Input */}
                 <div className={cn("flex items-center justify-center overflow-hidden transition-all duration-500 h-12", isSearchExpanded ? "flex-1" : "flex-1")}>
