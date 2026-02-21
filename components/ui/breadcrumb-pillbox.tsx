@@ -183,8 +183,8 @@ export function BreadcrumbPillbox({
                                     <span className="text-3xl font-black italic uppercase bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent tracking-tighter animate-in fade-in zoom-in-95 duration-1000 drop-shadow-md leading-none font-sans">
                                         VITALA
                                     </span>
-                                    <div className="flex flex-col text-[10px] font-black uppercase tracking-[0.15em] text-slate-400 dark:text-slate-500 leading-tight border-l border-slate-200 dark:border-slate-800 pl-3 animate-in fade-in slide-in-from-right-4 duration-1000 font-sans">
-                                        <span className="whitespace-nowrap">Simple</span>
+                                    <div className="flex flex-col text-[10px] font-black uppercase tracking-[0.15em] leading-tight border-l border-slate-200 dark:border-slate-800 pl-3 animate-in fade-in slide-in-from-right-4 duration-1000 font-sans">
+                                        <span className="whitespace-nowrap text-blue-400">Simple</span>
                                         <span className="whitespace-nowrap text-emerald-500">Nutrition</span>
                                     </div>
                                 </div>
