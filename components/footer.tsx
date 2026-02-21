@@ -11,6 +11,11 @@ export function Footer() {
   const { searchQuery, setSearchQuery } = useSearch();
   const isHomepage = pathname === '/dashboard';
 
+  // Hide footer on foods page
+  if (pathname === '/dashboard/library/foods') {
+    return null;
+  }
+
   if (isHomepage) {
     // Homepage footer with copyright and legal info
     return (
