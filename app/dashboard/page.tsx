@@ -87,7 +87,7 @@ export default function DashboardOverview() {
             gradient: 'from-emerald-500 to-teal-600',
             items: [
                 { title: 'Mealomatic', icon: Calendar, href: '/dashboard/kitchen/meal-o-matic', desc: 'meal planner' },
-                { title: 'Compare', icon: Scale, href: '/dashboard/kitchen/comparefoods', desc: 'versus 3 foods' },
+                { title: 'Comparator', icon: Scale, href: '/dashboard/kitchen/comparefoods', desc: 'versus 3 foods' },
                 { title: 'Pantry', icon: Package, href: '/dashboard/kitchen/pantry', desc: 'In-stock essentials' },
                 { title: 'Groceries', icon: ShoppingCart, href: '/dashboard/kitchen/groceries', desc: 'shopping list' },
             ]
