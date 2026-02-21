@@ -1346,23 +1346,19 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
                     <div className="space-y-3">
                         {ingredients.map((ing, index) => (
                             <div key={index} className="relative group p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md">
-                                {/* Action Buttons - Top Right */}
-                                <div className="absolute top-6 right-6 flex items-center gap-2 transition-all z-10">
-                                    <button
-                                        type="button"
-                                        onClick={() => handleRemoveIngredient(index)}
-                                        className="flex items-center gap-2 px-3 py-2 bg-rose-50 dark:bg-rose-950/30 text-rose-500 hover:bg-rose-500 hover:text-white rounded-xl transition-all shadow-sm border border-rose-100 dark:border-rose-900/50 group/delete"
-                                        title="Delete Ingredient"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">Delete</span>
-                                    </button>
-                                </div>
 
                                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                                     {/* Left Section: Identity & Quick Macros */}
                                     <div className="lg:col-span-4 space-y-4">
                                         <div className="flex items-center gap-4 group/name">
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveIngredient(index)}
+                                                className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white flex items-center justify-center transition-all shadow-sm border border-rose-500/20 shrink-0"
+                                                title="Delete Ingredient"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
                                             <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
                                                 {ing.image ? (
                                                     <img src={ing.image} alt="" className="w-full h-full object-cover" />
