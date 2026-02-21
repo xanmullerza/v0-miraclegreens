@@ -230,8 +230,7 @@ function FoodItemCreatorContent() {
                 }
             });
 
-            const foodData = {
-                id: `food-${Date.now()}`,
+            const foodData: any = {
                 name,
                 common_name: commonName || null,
                 source: source || 'manual',
@@ -249,7 +248,7 @@ function FoodItemCreatorContent() {
             };
 
             if (user) {
-                // Cloud Save
+                // Cloud Save - Don't provide a manual string ID as the DB requires a UUID
                 const { data: item, error: itemError } = await supabase
                     .from('food_items')
                     .upsert(foodData, { onConflict: 'name' })
@@ -258,7 +257,8 @@ function FoodItemCreatorContent() {
 
                 if (itemError) throw itemError;
             } else {
-                // Local Save
+                // Local Save - Manual ID is fine here since it's just JSON
+                foodData.id = `food-${Date.now()}`;
                 const localData = localStorage.getItem('local_foods');
                 let localFoods = localData ? JSON.parse(localData) : [];
                 localFoods.push(foodData);

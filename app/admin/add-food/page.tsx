@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, Suspense, useMemo } from 'react';
+import { useState, useEffect, Suspense, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -78,7 +78,21 @@ export default function DashboardFoodPage() {
 
 function FoodItemCreatorContent() {
     const router = useRouter();
+    const [currentUser, setCurrentUser] = useState<any>(null);
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setCurrentUser(session?.user ?? null);
+        });
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setCurrentUser(session?.user ?? null);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
+
 
 
     // State for the food item
@@ -218,8 +232,11 @@ function FoodItemCreatorContent() {
                 fat_g: finalFat,
                 image: image || null,
                 micronutrients: finalMicros,
-                portions: parsedPortions
+                portions: parsedPortions,
+                user_id: currentUser?.id || null,
+                is_curated: true
             };
+
 
             const { data: item, error: itemError } = await supabase
                 .from('food_items')
