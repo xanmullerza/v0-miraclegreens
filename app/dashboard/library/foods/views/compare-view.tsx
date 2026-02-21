@@ -529,7 +529,7 @@ export function CompareView({ showStats = false, stats }: CompareViewProps) {
             )}
 
             {/* Comparison Table */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl md:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden mx-[-1rem] md:mx-0">
+            <div className="w-full md:max-w-[900px] mx-auto bg-white dark:bg-slate-900 rounded-2xl md:rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
                 <div className="overflow-x-auto scrollbar-hide">
                     <table className="w-full border-collapse table-fixed md:table-auto">
                         <thead className="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-sm">
