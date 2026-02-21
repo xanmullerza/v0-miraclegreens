@@ -61,6 +61,7 @@ export default function DashboardOverview() {
             color: 'text-blue-400',
             bg: 'bg-blue-500/10',
             borderHover: 'hover:border-blue-500/40',
+            titleHover: 'group-hover/title:text-blue-400',
             gradient: 'from-blue-500 to-indigo-600',
             items: [
                 { title: 'Nutrients', icon: Activity, href: '/dashboard/library/nutrients', desc: 'Vitamins & minerals' },
@@ -78,6 +79,7 @@ export default function DashboardOverview() {
             color: 'text-emerald-400',
             bg: 'bg-emerald-500/10',
             borderHover: 'hover:border-emerald-500/40',
+            titleHover: 'group-hover/title:text-emerald-400',
             gradient: 'from-emerald-500 to-teal-600',
             items: [
                 { title: 'Mealomatic', icon: Calendar, href: '/dashboard/kitchen/meal-o-matic', desc: 'Weekly planner' },
@@ -180,7 +182,7 @@ export default function DashboardOverview() {
                                                         <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover/title:scale-110", card.bg)}><Icon size={24} className={card.color} /></div>
                                                         <div>
                                                             <div className="flex items-center gap-2">
-                                                                <h3 className="text-lg font-black text-white tracking-tight group-hover/title:text-emerald-400 transition-colors">{card.title}</h3>
+                                                                <h3 className={cn("text-lg font-black text-white tracking-tight transition-colors", card.titleHover)}>{card.title}</h3>
                                                                 <ArrowRight size={14} className={cn("opacity-0 -translate-x-2 transition-all duration-300 group-hover/title:opacity-100 group-hover/title:translate-x-0", card.color)} />
                                                             </div>
                                                             <p className="text-[13px] text-slate-500 leading-snug">{card.desc}</p>
@@ -256,7 +258,7 @@ export default function DashboardOverview() {
                                                 <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover/title:scale-110", card.bg)}><Icon size={24} className={card.color} /></div>
                                                 <div>
                                                     <div className="flex items-center gap-2">
-                                                        <h3 className="text-lg font-black text-white tracking-tight group-hover/title:text-emerald-400 transition-colors">{card.title}</h3>
+                                                        <h3 className={cn("text-lg font-black text-white tracking-tight transition-colors", card.titleHover)}>{card.title}</h3>
                                                         <ArrowRight size={14} className={cn("opacity-0 -translate-x-2 transition-all duration-300 group-hover/title:opacity-100 group-hover/title:translate-x-0", card.color)} />
                                                     </div>
                                                     <p className="text-[13px] text-slate-500 leading-snug">{card.desc}</p>
