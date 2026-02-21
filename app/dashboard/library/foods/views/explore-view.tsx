@@ -23,8 +23,10 @@ import {
     Filter,
     ChevronDown,
     ChevronRight,
-    CheckCircle2
+    CheckCircle2,
+    Trash2
 } from 'lucide-react';
+
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -59,7 +61,10 @@ interface FoodItem {
     is_in_pantry: boolean;
     category?: string;
     quantity?: string;
+    user_id?: string | null;
+    is_curated?: boolean;
 }
+
 
 interface ExploreViewProps {
     showFavoritesOnly?: boolean;
@@ -93,22 +98,34 @@ export function ExploreView({
     const [hasMore, setHasMore] = useState(true);
     const [user, setUser] = useState<any>(null);
     const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
         // Get initial session
         supabase.auth.getSession().then(({ data: { session } }) => {
-            setUser(session?.user ?? null);
-            setCurrentUserEmail(session?.user?.email ?? null);
+            const u = session?.user ?? null;
+            setUser(u);
+            const email = u?.email ?? null;
+            setCurrentUserEmail(email);
+
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
+            setIsAdmin(email?.toLowerCase() === adminEmail.toLowerCase());
         });
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null);
-            setCurrentUserEmail(session?.user?.email ?? null);
+            const u = session?.user ?? null;
+            setUser(u);
+            const email = u?.email ?? null;
+            setCurrentUserEmail(email);
+
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
+            setIsAdmin(email?.toLowerCase() === adminEmail.toLowerCase());
         });
 
         return () => subscription.unsubscribe();
     }, []);
+
 
     // Quick Add State (Sophisticated matching Pantry)
     const [quickAddItem, setQuickAddItem] = useState<FoodItem | null>(null);
@@ -261,6 +278,34 @@ export function ExploreView({
             toast.success(item.is_favorite ? "Removed from favourites" : "Added to favourites");
         } catch (error) { toast.error("Action failed"); }
     };
+
+    const handleDelete = async (e: React.MouseEvent, food: FoodItem) => {
+        e.stopPropagation();
+        if (!confirm(`Are you sure you want to delete "${food.name}"?`)) return;
+
+        try {
+            if (food.id.startsWith('food-')) {
+                // Local Deletion
+                const localData = localStorage.getItem('local_foods');
+                if (localData) {
+                    const localFoods = JSON.parse(localData).filter((f: any) => f.id !== food.id);
+                    localStorage.setItem('local_foods', JSON.stringify(localFoods));
+                }
+                setFoods(prev => prev.filter(f => f.id !== food.id));
+                toast.success("Food item removed locally");
+            } else {
+                // Cloud Deletion
+                const { error } = await supabase.from('food_items').delete().eq('id', food.id);
+                if (error) throw error;
+                setFoods(prev => prev.filter(f => f.id !== food.id));
+                toast.success("Food item deleted successfully");
+            }
+        } catch (error: any) {
+            console.error("Delete error:", error);
+            toast.error(error.message || "Failed to delete food item");
+        }
+    };
+
 
 
     const handleQuickAdd = async () => {
@@ -527,6 +572,18 @@ export function ExploreView({
                                                         <Edit2 size={14} />
                                                     </Button>
                                                 )}
+
+                                                {(food.id.startsWith('food-') || food.is_curated === false || isAdmin) && (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={(e) => handleDelete(e, food)}
+                                                        className="h-8 w-8 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-colors"
+                                                        title="Delete Food"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </Button>
+                                                )}
                                             </div>
                                         </div>
 
@@ -628,22 +685,24 @@ export function ExploreView({
                 })}
             </div>
 
-            {hasMore && (
-                <div className="flex justify-center pt-8">
-                    <Button
-                        variant="outline"
-                        onClick={() => fetchFoods(page + 1)}
-                        className="h-16 w-16 p-0 rounded-full border border-slate-300 dark:border-slate-700 flex items-center justify-center hover:bg-transparent bg-transparent"
-                    >
-                        {loading ? (
-                            <Loader2 className="animate-spin text-slate-300 dark:text-slate-700" />
-                        ) : (
-                            <ChevronDown size={36} className="text-slate-100 dark:text-slate-100" />
-                        )}
-                    </Button>
-                </div>
-            )}
-        </div>
+            {
+                hasMore && (
+                    <div className="flex justify-center pt-8">
+                        <Button
+                            variant="outline"
+                            onClick={() => fetchFoods(page + 1)}
+                            className="h-16 w-16 p-0 rounded-full border border-slate-300 dark:border-slate-700 flex items-center justify-center hover:bg-transparent bg-transparent"
+                        >
+                            {loading ? (
+                                <Loader2 className="animate-spin text-slate-300 dark:text-slate-700" />
+                            ) : (
+                                <ChevronDown size={36} className="text-slate-100 dark:text-slate-100" />
+                            )}
+                        </Button>
+                    </div>
+                )
+            }
+        </div >
     );
 }
 
