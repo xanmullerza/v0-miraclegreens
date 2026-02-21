@@ -168,20 +168,21 @@ export function useDataPersistence() {
                         await supabase.from('ingredients').delete().eq('recipe_id', recipe.id);
                     }
 
+                    const servings = recipe.servings || 1;
                     const ingredientsData = ingredients.map(ing => {
                         // Ensure we have a descriptive item name and amount for legacy support/fallback
                         const itemName = ing.food_item_name || 'Ingredient';
-                        const amountStr = `${ing.quantity || 0} ${ing.measure_label || 'unit'}`;
+                        const amountStr = `${ing.quantity / servings} ${ing.measure_label || 'unit'}`;
 
                         return {
                             recipe_id: recipeId,
                             food_item_id: ing.food_item_id,
                             item: itemName,
                             amount: amountStr,
-                            weight_g: ing.weight_g,
-                            quantity: ing.quantity,
+                            weight_g: ing.weight_g / servings,
+                            quantity: ing.quantity / servings,
                             measure_label: ing.measure_label,
-                            base_ingredient: ing.base_ingredient || null,
+                            base_ingredient: itemName, // Fallback
                             modifier: ing.modifier || null,
                         };
                     });
@@ -275,9 +276,13 @@ export function useDataPersistence() {
                 const recipeId = recipe.id || `local-${Date.now()}`;
 
                 // Standardize ingredients for local storage to match cloud structure (include nesting)
+                const servings = recipe.servings || 1;
+                // Standardize ingredients for local storage to match cloud structure (include nesting)
                 const mappedIngredients = ingredients?.map(ing => ({
                     ...ing,
                     item: ing.food_item_name || (ing as any).item || 'Ingredient', // Map to expected 'item' field
+                    weight_g: ing.weight_g / servings,
+                    quantity: ing.quantity / servings,
                     food_item: ing.food_item || {
                         id: ing.food_item_id,
                         name: ing.food_item_name,
@@ -359,7 +364,7 @@ export function useDataPersistence() {
                     .from('recipes')
                     .select(`
                         *,
-                        ingredients (*),
+                        ingredients (*, food_item:food_items(*)),
                         instructions (*)
                     `)
                     .eq('id', id)

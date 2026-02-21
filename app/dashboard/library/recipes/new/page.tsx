@@ -89,29 +89,41 @@ function UserRecipeBuilder() {
 
                         // Map ingredients
                         if (recipe.ingredients) {
-                            const mappedIngs: RecipeIngredient[] = recipe.ingredients.map((ing: any) => ({
-                                food_item_id: ing.food_item_id,
-                                food_item_name: ing.item || ing.food_item_name || 'Ingredient',
-                                weight_g: ing.weight_g,
-                                quantity: ing.quantity,
-                                measure_label: ing.measure_label,
-                                modifier: ing.modifier,
-                                calories: ing.calories || 0,
-                                energy_kj: ing.energy_kj || 0,
-                                protein: ing.protein || 0,
-                                fat: ing.fat || 0,
-                                carbs: ing.carbs || 0,
-                                micronutrients: ing.micronutrients || {},
-                                base_nutrition: ing.base_nutrition || {
-                                    calories: ing.food_item?.energy_kcal || 0,
-                                    energy_kj: ing.food_item?.energy_kj || 0,
-                                    protein: ing.food_item?.protein_g || 0,
-                                    fat: ing.food_item?.fat_g || 0,
-                                    carbs: ing.food_item?.carbs_g || 0,
-                                    micronutrients: ing.food_item?.micronutrients || {},
-                                    phytonutrients: ing.food_item?.phytonutrients || {}
-                                }
-                            }));
+                            const mappedIngs: RecipeIngredient[] = recipe.ingredients.map((ing: any) => {
+                                const food = ing.food_item;
+                                // DB stores per-serving, Builder needs total
+                                const servs = recipe.servings || 1;
+                                const totalWeight = (ing.weight_g || 0) * servs;
+                                const totalQty = (ing.quantity || 0) * servs;
+                                const ratio = totalWeight / 100;
+
+                                return {
+                                    food_item_id: ing.food_item_id,
+                                    food_item_name: ing.item || ing.food_item_name || 'Ingredient',
+                                    weight_g: totalWeight,
+                                    quantity: totalQty,
+                                    measure_label: ing.measure_label,
+                                    modifier: ing.modifier,
+                                    calories: (food?.energy_kcal || 0) * ratio,
+                                    energy_kj: (food?.energy_kj || (food?.energy_kcal || 0) * 4.184) * ratio,
+                                    protein: (food?.protein_g || 0) * ratio,
+                                    fat: (food?.fat_g || 0) * ratio,
+                                    carbs: (food?.carbs_g || 0) * ratio,
+                                    micronutrients: food?.micronutrients ? Object.entries(food.micronutrients).reduce((acc, [k, v]) => {
+                                        acc[k] = (Number(v) || 0) * ratio;
+                                        return acc;
+                                    }, {} as Record<string, number>) : {},
+                                    base_nutrition: {
+                                        calories: food?.energy_kcal || 0,
+                                        energy_kj: food?.energy_kj || (food?.energy_kcal || 0) * 4.184,
+                                        protein: food?.protein_g || 0,
+                                        fat: food?.fat_g || 0,
+                                        carbs: food?.carbs_g || 0,
+                                        micronutrients: food?.micronutrients || {},
+                                        phytonutrients: food?.phytonutrients || {}
+                                    }
+                                };
+                            });
                             setIngredients(mappedIngs);
                         }
 
