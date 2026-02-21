@@ -354,8 +354,8 @@ export function RecipesView({
 
                                     {/* Stats (Desktop View) */}
                                     <div className="hidden lg:flex flex-col items-end">
+                                        <span className="text-[8px] uppercase font-black text-slate-400">Energy</span>
                                         <span className="font-black text-[11px] text-slate-900 dark:text-white">{formatEnergy(recipe.calories, energyUnit)}</span>
-                                        <span className="text-[8px] uppercase font-black text-slate-400">E</span>
                                     </div>
                                     <div className="hidden lg:flex flex-col items-end">
                                         <span className="text-[8px] uppercase font-black text-slate-400">Carbs</span>
