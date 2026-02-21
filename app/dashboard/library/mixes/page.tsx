@@ -20,8 +20,8 @@ export default function MixesPage() {
 
 function MixesContent() {
     return (
-        <PageContainer maxWidth="max-w-7xl">
-            <div className="space-y-10 animate-in fade-in duration-700 pb-32 pt-8">
+        <PageContainer maxWidth="max-w-7xl" className="-mt-12 md:-mt-16">
+            <div className="space-y-10 animate-in fade-in duration-700 pb-32 pt-0">
                 {/* Dynamic Content Area */}
                 <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
                     <RecipesView hideControls={false} isMix={true} />
