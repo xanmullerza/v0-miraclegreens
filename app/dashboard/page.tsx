@@ -67,9 +67,9 @@ export default function DashboardOverview() {
             gradient: 'from-blue-500 to-indigo-600',
             items: [
                 { title: 'Nutrients', icon: Activity, href: '/dashboard/library/nutrients', desc: 'Vitamins & minerals' },
-                { title: 'Foods', icon: Leaf, href: '/dashboard/library/foods', desc: 'nutritious ingredients' },
-                { title: 'Mixes', icon: Beaker, href: '/dashboard/library/mixes', desc: 'Blends & bases' },
-                { title: 'Meals', icon: ChefHat, href: '/dashboard/library/recipes', desc: 'Health eating' },
+                { title: 'Foods', icon: Leaf, href: '/dashboard/library/foods', desc: 'nutritious edibles' },
+                { title: 'Mixes', icon: Beaker, href: '/dashboard/library/mixes', desc: 'custom blends' },
+                { title: 'Meals', icon: ChefHat, href: '/dashboard/library/recipes', desc: 'healthy eating' },
             ]
         },
         {
@@ -89,7 +89,7 @@ export default function DashboardOverview() {
                 { title: 'Mealomatic', icon: Calendar, href: '/dashboard/kitchen/meal-o-matic', desc: 'meal planner' },
                 { title: 'Compare', icon: Scale, href: '/dashboard/kitchen/comparefoods', desc: 'versus 3 foods' },
                 { title: 'Pantry', icon: Package, href: '/dashboard/kitchen/pantry', desc: 'In-stock essentials' },
-                { title: 'Groceries', icon: ShoppingCart, href: '/dashboard/kitchen/groceries', desc: 'Shopping lists' },
+                { title: 'Groceries', icon: ShoppingCart, href: '/dashboard/kitchen/groceries', desc: 'shopping list' },
             ]
         },
     ];
