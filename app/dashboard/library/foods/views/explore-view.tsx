@@ -570,12 +570,12 @@ export function ExploreView({
                     <Button
                         variant="outline"
                         onClick={() => fetchFoods(page + 1)}
-                        className="h-14 w-14 p-0 rounded-full border-slate-200 dark:border-slate-800 flex items-center justify-center hover:bg-slate-50"
+                        className="h-14 w-14 p-0 rounded-full border-slate-200 dark:border-slate-800 flex items-center justify-center hover:bg-transparent bg-transparent"
                     >
                         {loading ? (
                             <Loader2 className="animate-spin" />
                         ) : (
-                            <ChevronDown size={24} className="text-slate-700 dark:text-slate-200" />
+                            <ChevronDown size={32} className="text-slate-700 dark:text-slate-200" />
                         )}
                     </Button>
                 </div>
