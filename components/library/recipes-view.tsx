@@ -199,7 +199,7 @@ export function RecipesView({
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8 animate-in fade-in duration-500">
             {/* Controls Row */}
             {!hideControls && (
                 <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
@@ -312,54 +312,66 @@ export function RecipesView({
             ) : (
                 <div className="space-y-4">
                     {/* Recipe List */}
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                         {recipes.map((recipe) => (
                             <div
                                 key={recipe.id}
                                 onClick={() => router.push(`/dashboard/library/recipes/${recipe.id}`)}
                                 className={cn(
-                                    "group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 transition-all cursor-pointer overflow-hidden p-2 lg:p-0",
+                                    "group relative bg-transparent rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-800 transition-all duration-500 cursor-pointer overflow-hidden",
                                     isMix ? "hover:border-indigo-500/30 hover:shadow-lg" : "hover:border-blue-500/30 hover:shadow-lg"
                                 )}
                             >
-                                <div className="lg:grid lg:grid-cols-[80px_1fr_100px_80px_80px_80px_120px] gap-4 lg:items-center lg:px-8">
+                                <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px_150px] gap-3 lg:gap-4 lg:items-center lg:px-10 py-1">
                                     {/* Thumbnail */}
-                                    <div className="aspect-[4/3] lg:aspect-square w-full lg:w-20 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
+                                    <div className="aspect-square w-16 lg:w-12 shrink-0 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-500">
                                         {recipe.image ? (
-                                            <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                            <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover" />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                <ChefHat size={24} className="opacity-20" />
+                                                <ChefHat size={24} className="opacity-10" />
                                             </div>
                                         )}
                                     </div>
 
                                     {/* Info */}
-                                    <div className="p-3 lg:p-0">
-                                        <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
+                                    <div className="flex-1 min-w-0 lg:p-0">
+                                        <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize truncate">
                                             {recipe.title}
                                         </h3>
+
+                                        {/* Mobile-only stats row */}
+                                        <div className="flex lg:hidden items-center gap-2 mt-1.5 text-[9px] font-black">
+                                            <span className={isMix ? "text-indigo-500" : "text-blue-500"}>{formatEnergy(recipe.calories, energyUnit)}</span>
+                                            <span className="text-slate-300 text-[8px]">•</span>
+                                            <span className="text-emerald-500">{recipe.protein.toFixed(0)}g P</span>
+                                            <span className="text-slate-300 text-[8px]">•</span>
+                                            <span className="text-amber-500">{recipe.carbs.toFixed(0)}g C</span>
+                                            <span className="text-slate-300 text-[8px]">•</span>
+                                            <span className="text-rose-500">{recipe.fat.toFixed(0)}g F</span>
+                                        </div>
                                     </div>
 
                                     {/* Stats (Desktop View) */}
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">{formatEnergy(recipe.calories, energyUnit)}</div>
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">{recipe.carbs.toFixed(1)}g</div>
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">{recipe.fat.toFixed(1)}g</div>
-                                    <div className="hidden lg:block text-right font-black text-sm text-slate-600 dark:text-slate-300">{recipe.protein.toFixed(1)}g</div>
-
-                                    {/* Mobile-only stats row */}
-                                    <div className="p-3 lg:hidden flex items-center gap-2 text-[10px] font-black">
-                                        <span className={isMix ? "text-indigo-500" : "text-blue-500"}>{formatEnergy(recipe.calories, energyUnit)}</span>
-                                        <span className="text-slate-300 text-[8px]">•</span>
-                                        <span className="text-emerald-500">{recipe.protein.toFixed(0)}g P</span>
-                                        <span className="text-slate-300 text-[8px]">•</span>
-                                        <span className="text-amber-500">{recipe.carbs.toFixed(0)}g C</span>
-                                        <span className="text-slate-300 text-[8px]">•</span>
-                                        <span className="text-rose-500">{recipe.fat.toFixed(0)}g F</span>
+                                    <div className="hidden lg:flex flex-col items-end">
+                                        <span className="font-black text-[11px] text-slate-900 dark:text-white">{formatEnergy(recipe.calories, energyUnit)}</span>
+                                        <span className="text-[8px] uppercase font-black text-slate-400">E</span>
+                                    </div>
+                                    <div className="hidden lg:flex flex-col items-end">
+                                        <span className="text-[8px] uppercase font-black text-slate-400">Carbs</span>
+                                        <span className="font-black text-[11px] text-slate-900 dark:text-white">{recipe.carbs.toFixed(1)}g</span>
+                                    </div>
+                                    <div className="hidden lg:flex flex-col items-end">
+                                        <span className="text-[8px] uppercase font-black text-slate-400">Fat</span>
+                                        <span className="font-black text-[11px] text-slate-900 dark:text-white">{recipe.fat.toFixed(1)}g</span>
+                                    </div>
+                                    <div className="hidden lg:flex flex-col items-end">
+                                        <span className="text-[8px] uppercase font-black text-slate-400">Protein</span>
+                                        <span className="font-black text-[11px] text-slate-900 dark:text-white">{recipe.protein.toFixed(1)}g</span>
                                     </div>
 
                                     {/* Actions */}
-                                    <div className="p-3 lg:p-0 flex justify-end lg:justify-center gap-2">
+                                    <div className="shrink-0 flex items-center lg:justify-end gap-1 px-2 lg:px-0">
                                         {(String(recipe.id).startsWith('local-') || recipe.is_curated === false || isAdmin) && (
                                             <>
                                                 <button
