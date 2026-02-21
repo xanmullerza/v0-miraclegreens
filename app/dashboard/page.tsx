@@ -62,6 +62,8 @@ export default function DashboardOverview() {
             bg: 'bg-blue-500/10',
             borderHover: 'hover:border-blue-500/40',
             titleHover: 'group-hover/title:text-blue-400',
+            itemTitleHover: 'group-hover/item:text-blue-400',
+            itemBorderHover: 'hover:border-blue-500/50',
             gradient: 'from-blue-500 to-indigo-600',
             items: [
                 { title: 'Nutrients', icon: Activity, href: '/dashboard/library/nutrients', desc: 'Vitamins & minerals' },
@@ -80,6 +82,8 @@ export default function DashboardOverview() {
             bg: 'bg-emerald-500/10',
             borderHover: 'hover:border-emerald-500/40',
             titleHover: 'group-hover/title:text-emerald-400',
+            itemTitleHover: 'group-hover/item:text-emerald-400',
+            itemBorderHover: 'hover:border-emerald-500/50',
             gradient: 'from-emerald-500 to-teal-600',
             items: [
                 { title: 'Mealomatic', icon: Calendar, href: '/dashboard/kitchen/meal-o-matic', desc: 'Weekly planner' },
@@ -196,14 +200,14 @@ export default function DashboardOverview() {
                                                                 <Link
                                                                     key={item.href}
                                                                     href={item.href}
-                                                                    className="group/item relative overflow-hidden rounded-xl border border-slate-700/40 bg-slate-900/40 p-3 transition-all duration-300 hover:border-slate-500/40 hover:bg-slate-800/60"
+                                                                    className={cn("group/item relative overflow-hidden rounded-xl border border-slate-700/40 bg-slate-900/40 p-3 transition-all duration-300 hover:bg-slate-800/60", card.itemBorderHover)}
                                                                 >
                                                                     <div className="flex items-center gap-2.5 relative z-10">
                                                                         <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center bg-slate-800 transition-colors group-hover/item:bg-slate-700")}>
                                                                             <ItemIcon size={14} className={card.color} />
                                                                         </div>
                                                                         <div className="min-w-0">
-                                                                            <p className="text-[11px] font-black text-white leading-none mb-1 truncate">{item.title}</p>
+                                                                            <p className={cn("text-[11px] font-black text-white leading-none mb-1 truncate transition-colors", card.itemTitleHover)}>{item.title}</p>
                                                                             <p className="text-[9px] text-slate-500 leading-none truncate">{item.desc}</p>
                                                                         </div>
                                                                     </div>
@@ -272,14 +276,14 @@ export default function DashboardOverview() {
                                                         <Link
                                                             key={item.href}
                                                             href={item.href}
-                                                            className="group/item relative overflow-hidden rounded-xl border border-slate-700/40 bg-slate-900/40 p-3 transition-all duration-300 hover:border-slate-500/40 hover:bg-slate-800/60"
+                                                            className={cn("group/item relative overflow-hidden rounded-xl border border-slate-700/40 bg-slate-900/40 p-3 transition-all duration-300 hover:bg-slate-800/60", card.itemBorderHover)}
                                                         >
                                                             <div className="flex items-center gap-2.5 relative z-10">
                                                                 <div className={cn("w-8 h-8 rounded-lg flex items-center justify-center bg-slate-800 transition-colors group-hover/item:bg-slate-700")}>
                                                                     <ItemIcon size={14} className={card.color} />
                                                                 </div>
                                                                 <div className="min-w-0">
-                                                                    <p className="text-[11px] font-black text-white leading-none mb-1 truncate">{item.title}</p>
+                                                                    <p className={cn("text-[11px] font-black text-white leading-none mb-1 truncate transition-colors", card.itemTitleHover)}>{item.title}</p>
                                                                     <p className="text-[9px] text-slate-500 leading-none truncate">{item.desc}</p>
                                                                 </div>
                                                             </div>
