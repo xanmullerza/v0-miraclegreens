@@ -486,7 +486,7 @@ export function ExploreView({
                                     >
                                         <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px_150px] gap-3 lg:gap-4 lg:items-center lg:px-10 py-1">
                                             {/* Thumbnail */}
-                                            <div className="aspect-square w-16 lg:w-12 shrink-0 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-500">
+                                            <div className="aspect-square w-16 lg:w-12 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-500">
                                                 {food.image ? (
                                                     <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
                                                 ) : (
