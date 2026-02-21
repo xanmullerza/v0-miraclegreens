@@ -56,7 +56,7 @@ function DashboardLayoutContent({
                         "z-40 px-2 sm:px-4 w-full flex justify-center pointer-events-none transition-all duration-500",
                         pathname === '/dashboard/library/comparefoods' ? "relative pt-0" : "sticky top-0"
                     )}>
-                        <div className="pointer-events-auto w-full max-w-[800px]">
+                        <div className="pointer-events-auto w-full max-w-[900px]">
                             <BreadcrumbPillbox
                                 searchQuery={searchQuery}
                                 setSearchQuery={setSearchQuery}
@@ -76,8 +76,10 @@ function DashboardLayoutContent({
                         </div>
                     </div>
 
-                    <div className="px-2 sm:px-4 pt-4 pb-20 flex-1">
-                        {children}
+                    <div className="px-2 sm:px-4 pt-4 pb-20 flex-1 flex justify-center">
+                        <div className="w-full max-w-[900px]">
+                            {children}
+                        </div>
                     </div>
 
                     <Footer />
