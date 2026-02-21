@@ -55,7 +55,7 @@ export default function DashboardOverview() {
         {
             id: 'library',
             title: 'Library',
-            desc: 'Nutrient database & tools',
+            desc: 'Explore our vast library of nutritious foods, essential nutrients, and custom blends. Access professional tools to research ingredients and discover healthy meals tailored to your needs.',
             href: '/dashboard/library',
             icon: Library,
             color: 'text-blue-400',
@@ -75,7 +75,7 @@ export default function DashboardOverview() {
         {
             id: 'kitchen',
             title: 'Kitchen',
-            desc: 'Manage your pantry & meals',
+            desc: 'Take full control of your kitchen with our inventory management and meal planning tools. Sync your pantry, create custom meal plans, and generate automated shopping lists based on your goals.',
             href: '/dashboard/kitchen',
             icon: ChefHat,
             color: 'text-emerald-400',
@@ -164,7 +164,7 @@ export default function DashboardOverview() {
                                                             <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-slate-800/50"><Icon size={24} className="text-slate-500" /></div>
                                                             <div>
                                                                 <h3 className="text-lg font-black text-slate-400 tracking-tight">{card.title}</h3>
-                                                                <p className="text-[13px] text-slate-600 leading-snug">{card.desc}</p>
+                                                                <p className="text-[13px] text-slate-600 leading-relaxed max-w-[280px]">{card.desc}</p>
                                                             </div>
                                                         </div>
                                                         <div className="grid grid-cols-2 gap-2">
@@ -189,7 +189,7 @@ export default function DashboardOverview() {
                                                                 <h3 className={cn("text-lg font-black text-white tracking-tight transition-colors", card.titleHover)}>{card.title}</h3>
                                                                 <ArrowRight size={14} className={cn("opacity-0 -translate-x-2 transition-all duration-300 group-hover/title:opacity-100 group-hover/title:translate-x-0", card.color)} />
                                                             </div>
-                                                            <p className="text-[13px] text-slate-500 leading-snug">{card.desc}</p>
+                                                            <p className="text-[13px] text-slate-500 leading-relaxed max-w-[280px]">{card.desc}</p>
                                                         </div>
                                                     </Link>
 
@@ -265,7 +265,7 @@ export default function DashboardOverview() {
                                                         <h3 className={cn("text-lg font-black text-white tracking-tight transition-colors", card.titleHover)}>{card.title}</h3>
                                                         <ArrowRight size={14} className={cn("opacity-0 -translate-x-2 transition-all duration-300 group-hover/title:opacity-100 group-hover/title:translate-x-0", card.color)} />
                                                     </div>
-                                                    <p className="text-[13px] text-slate-500 leading-snug">{card.desc}</p>
+                                                    <p className="text-[13px] text-slate-500 leading-relaxed max-w-[280px]">{card.desc}</p>
                                                 </div>
                                             </Link>
 
