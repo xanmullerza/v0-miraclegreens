@@ -521,7 +521,24 @@ export async function syncToLocal(
         uniquePortions = Array.from(new Map(measuresToInsert.map(m => [m.label, m])).values());
     }
 
-    // 4. Insert or get Food Item (with portions)
+    // 4. Check if item already exists by name
+    const { data: existing } = await supabase
+        .from('food_items')
+        .select('id, is_curated, user_id')
+        .eq('name', food.name)
+        .maybeSingle();
+
+    if (existing) {
+        // If it's curated, we're done. Just return this ID.
+        if (existing.is_curated) return existing.id;
+
+        // If it belongs to the current user, we can proceed with upsert to update it
+        // If it belongs to someone else, we technically can't update it but names are unique
+        // To be safe, if we can't update it, we should just return the existing ID
+        if (userId && existing.user_id !== userId) return existing.id;
+    }
+
+    // 5. Insert or get Food Item (with portions)
     const { data: itemData, error: itemError } = await supabase
         .from('food_items')
         .upsert({
@@ -541,8 +558,21 @@ export async function syncToLocal(
         .select()
         .single();
 
-    if (itemError || !itemData) {
+    if (itemError) {
         console.error("Sync Item Error:", itemError);
+        // If RLS blocked the update but the item exists, try one last time to just get the ID
+        if (itemError.code === '42501') {
+            const { data: retry } = await supabase
+                .from('food_items')
+                .select('id')
+                .eq('name', food.name)
+                .maybeSingle();
+            if (retry) return retry.id;
+        }
+        return null;
+    }
+    if (!itemData) { // This case should ideally be covered by itemError, but keeping for robustness
+        console.error("Sync Item Error: No data returned after upsert.");
         return null;
     }
 

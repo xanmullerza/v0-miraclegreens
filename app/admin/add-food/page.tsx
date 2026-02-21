@@ -545,7 +545,9 @@ Fat: ${item.fat_g || 0}g
                     onSelect={handleImportSelect}
                     onClose={() => setShowImportPicker(false)}
                     mode="usda-only"
+                    isAdmin={true}
                 />
+
             )}
         </div>
     );

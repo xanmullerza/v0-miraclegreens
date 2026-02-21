@@ -532,8 +532,9 @@ Fat: ${item.fat_g || 0}g
                     onSelect={handleImportSelect}
                     onClose={() => setShowImportPicker(false)}
                     mode="usda-only"
-                    isAdmin={user?.email === 'theospeak.za@gmail.com'}
+                    isAdmin={user?.email?.toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase()}
                 />
+
             )}
         </div>
     );
