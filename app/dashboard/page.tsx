@@ -99,54 +99,40 @@ export default function DashboardOverview() {
             <div className="space-y-12 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)]">
 
                 {showHeroes && (
-                    <div className="w-full md:max-w-[900px] mx-auto relative px-0 pt-6">
-                        <div className="relative rounded-[2.5rem] bg-slate-900 border border-slate-800 p-8 lg:p-12 xl:p-16 w-full overflow-hidden">
-                            <div className="absolute top-0 right-0 w-96 h-96 opacity-[0.06] pointer-events-none">
+                    <div className="w-full md:max-w-[900px] mx-auto relative px-0 mb-6 group/stats">
+                        <div className="relative rounded-2xl bg-slate-900/40 border border-slate-800/60 p-5 px-8 w-full overflow-hidden backdrop-blur-md transition-all duration-500 hover:bg-slate-900/60 hover:border-slate-700/60">
+                            <div className="absolute top-0 right-0 w-64 h-64 opacity-[0.03] pointer-events-none group-hover/stats:opacity-[0.05] transition-opacity duration-500">
                                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-500 rounded-full blur-3xl" />
                             </div>
-                            <div className="absolute bottom-0 left-0 w-64 h-64 opacity-[0.04] pointer-events-none">
-                                <div className="absolute inset-0 bg-gradient-to-tr from-amber-400 to-rose-500 rounded-full blur-3xl" />
-                            </div>
 
-                            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-12 text-center md:text-left">
-                                <div className="flex-1">
-                                    <h1 className="text-4xl lg:text-5xl xl:text-6xl font-black text-white tracking-tighter leading-[0.95] mb-6">
-                                        Welcome to <span className="bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 bg-clip-text text-transparent">Vitala.</span>
-                                    </h1>
-                                    <p className="text-base lg:text-lg text-slate-400 leading-relaxed max-w-xl mx-auto md:mx-0">
-                                        Everything you need to find healthy food, great recipes, and plan your week. Discover how to eat well and feel your best.
-                                    </p>
+                            <div className="relative z-10 flex flex-wrap items-center justify-center gap-8 lg:gap-16">
+                                <div className="flex items-center gap-3 group/stat">
+                                    <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
+                                        <Leaf size={16} className="text-emerald-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-lg font-black text-white leading-none">{stats.foods}</p>
+                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Foods</p>
+                                    </div>
                                 </div>
-
-                                <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 lg:gap-8 bg-slate-800/30 backdrop-blur-sm p-6 rounded-[2rem] border border-slate-700/50">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
-                                            <Leaf size={18} className="text-emerald-400" />
-                                        </div>
-                                        <div>
-                                            <p className="text-xl font-black text-white leading-none">{stats.foods}</p>
-                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-1">Foods</p>
-                                        </div>
+                                <div className="w-px h-6 bg-slate-700/40" />
+                                <div className="flex items-center gap-3 group/stat">
+                                    <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
+                                        <ChefHat size={16} className="text-amber-400" />
                                     </div>
-                                    <div className="hidden sm:block w-px h-10 bg-slate-700/60" />
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center">
-                                            <ChefHat size={18} className="text-amber-400" />
-                                        </div>
-                                        <div>
-                                            <p className="text-xl font-black text-white leading-none">{stats.recipes}</p>
-                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-1">Recipes</p>
-                                        </div>
+                                    <div>
+                                        <p className="text-lg font-black text-white leading-none">{stats.recipes}</p>
+                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Recipes</p>
                                     </div>
-                                    <div className="hidden sm:block w-px h-10 bg-slate-700/60" />
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
-                                            <Activity size={18} className="text-blue-400" />
-                                        </div>
-                                        <div>
-                                            <p className="text-xl font-black text-white leading-none">{stats.nutrients}+</p>
-                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-1">Nutrients</p>
-                                        </div>
+                                </div>
+                                <div className="w-px h-6 bg-slate-700/40" />
+                                <div className="flex items-center gap-3 group/stat">
+                                    <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
+                                        <Activity size={16} className="text-blue-400" />
+                                    </div>
+                                    <div>
+                                        <p className="text-lg font-black text-white leading-none">{stats.nutrients}+</p>
+                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Nutrients</p>
                                     </div>
                                 </div>
                             </div>
