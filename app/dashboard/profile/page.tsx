@@ -35,9 +35,14 @@ import {
     X,
     ChevronUp,
     ChevronDown,
-    BarChart3
+    BarChart3,
+    Eye,
+    Tag,
+    Shapes,
+    Settings
 } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
+import { useTheme } from 'next-themes';
 import { useRDA } from '@/hooks/use-rda';
 import { supabase } from '@/lib/supabase';
 import { Input } from '@/components/ui/input';
@@ -178,8 +183,13 @@ function ProfilePageContent() {
         setMeasurementUnit,
         nutrientDisplayMode,
         setNutrientDisplayMode,
-        setShowRDADrawer
+        setShowRDADrawer,
+        showHeroes,
+        setShowHeroes,
+        headerStyle,
+        setHeaderStyle,
     } = useUserPreferences();
+    const { theme, setTheme } = useTheme();
     const router = useRouter();
     const searchParams = useSearchParams();
     const from = searchParams.get('from');
@@ -879,6 +889,110 @@ function ProfilePageContent() {
                                             })}
                                         </div>
                                         <p className="text-[10px] text-slate-400 italic">Select conditions to optimize meal plans with appropriate nutritional considerations.</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* App Settings Card */}
+                            <section className="space-y-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
+                                        <Settings size={24} className="stroke-[2.5]" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">App Settings</h2>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Interface & Display</p>
+                                    </div>
+                                </div>
+                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                    {/* Show Heroes */}
+                                    <div className="space-y-3">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Dashboard Hero Sections</Label>
+                                        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
+                                            <button
+                                                onClick={() => setShowHeroes(true)}
+                                                className={cn(
+                                                    "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
+                                                    showHeroes ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                )}
+                                                title="Show hero sections with welcome and overview"
+                                            >
+                                                <Eye size={12} /> Show
+                                            </button>
+                                            <button
+                                                onClick={() => setShowHeroes(false)}
+                                                className={cn(
+                                                    "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
+                                                    !showHeroes ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                )}
+                                                title="Hide hero sections for experienced users"
+                                            >
+                                                <Eye size={12} className="line-through" /> Hide
+                                            </button>
+                                        </div>
+                                        <p className="text-[9px] text-slate-400 italic px-1">For experienced users who prefer to go straight to the action grid.</p>
+                                    </div>
+
+                                    {/* Header Navigation Style */}
+                                    <div className="space-y-3">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Header Navigation</Label>
+                                        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
+                                            <button
+                                                onClick={() => setHeaderStyle('labels')}
+                                                className={cn(
+                                                    "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
+                                                    headerStyle === 'labels' ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                )}
+                                                title="Show text labels in the header breadcrumb bar"
+                                            >
+                                                <Tag size={12} /> Labels
+                                            </button>
+                                            <button
+                                                onClick={() => setHeaderStyle('icons')}
+                                                className={cn(
+                                                    "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
+                                                    headerStyle === 'icons' ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                )}
+                                                title="Show icons in the header breadcrumb bar"
+                                            >
+                                                <Shapes size={12} /> Icons
+                                            </button>
+                                        </div>
+                                        <p className="text-[9px] text-slate-400 italic px-1">Switch between text labels and icons in the header breadcrumb bar.</p>
+                                    </div>
+
+                                    {/* Theme */}
+                                    <div className="space-y-3">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-2">Interface Theme</Label>
+                                        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
+                                            <button
+                                                onClick={() => setTheme("light")}
+                                                className={cn(
+                                                    "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
+                                                    theme === "light" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                )}
+                                            >
+                                                <Sun size={12} /> Light
+                                            </button>
+                                            <button
+                                                onClick={() => setTheme("dark")}
+                                                className={cn(
+                                                    "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
+                                                    theme === "dark" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                )}
+                                            >
+                                                <Moon size={12} /> Dark
+                                            </button>
+                                            <button
+                                                onClick={() => setTheme("system")}
+                                                className={cn(
+                                                    "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-tight rounded-lg transition-all",
+                                                    theme === "system" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                )}
+                                            >
+                                                <Monitor size={12} /> System
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </section>

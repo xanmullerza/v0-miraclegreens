@@ -1,15 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
     ChevronRight,
     ChevronLeft,
     User,
     ArrowLeft,
-    LogIn,
-    Settings
+    LogIn
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
@@ -70,11 +68,7 @@ function DashboardLayoutContent({
                             <BreadcrumbPillbox
                                 searchQuery={searchQuery}
                                 setSearchQuery={setSearchQuery}
-                                actions={
-                                    <Link href="/dashboard/settings" className="p-2 text-slate-400 hover:text-emerald-500 transition-colors">
-                                        <Settings size={18} />
-                                    </Link>
-                                }
+
                                 userStatus={
                                     user ? 'cloud' :
                                         (profile.name || profile.nickname) ? 'local' :
