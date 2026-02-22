@@ -22,6 +22,7 @@ import { BreadcrumbPillbox } from '@/components/ui/breadcrumb-pillbox';
 
 
 import { Footer } from '@/components/footer';
+import { RDADrawer } from '@/components/rda-drawer';
 
 function DashboardLayoutContent({
     children,
@@ -105,6 +106,7 @@ function DashboardLayoutContent({
 
 
             {/* Removed the old fixed-overlay that was in the wrong stacking context */}
+            <RDADrawer />
         </div>
     );
 }

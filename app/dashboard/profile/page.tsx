@@ -47,7 +47,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { type FamilyMember } from '@/lib/context/user-preferences-context';
 import { GoalType, ActivityLevel } from '@/lib/utils/nutrition-calculator';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+
 
 function FamilyMemberForm({ initialData, onSave, onCancel }: { initialData?: Partial<FamilyMember>, onSave: (data: FamilyMember) => void, onCancel: () => void }) {
     const generateId = () => {
@@ -178,7 +178,6 @@ function ProfilePageContent() {
         setMeasurementUnit,
         nutrientDisplayMode,
         setNutrientDisplayMode,
-        showRDADrawer,
         setShowRDADrawer
     } = useUserPreferences();
     const router = useRouter();
@@ -452,592 +451,507 @@ function ProfilePageContent() {
                     </div>
                 </div>
 
-                <Sheet open={showRDADrawer} onOpenChange={setShowRDADrawer} modal={!isDesktop}>
-                    <div className="flex flex-col lg:flex-row gap-6 items-start justify-center">
-                        {/* Main Content (Compact Settings) */}
-                        <div className="max-w-2xl w-full space-y-8 pb-32">
-                            <div className="grid grid-cols-1 gap-8">
-                                {/* Measures Card */}
-                                <section className="space-y-6">
-                                    <div className="flex items-center gap-4">
-                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                            <Globe size={24} className="stroke-[2.5]" />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Measures</h2>
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Location & Units</p>
+                <div className="flex flex-col lg:flex-row gap-6 items-start justify-center">
+                    {/* Main Content (Compact Settings) */}
+                    <div className="max-w-2xl w-full space-y-8 pb-32">
+                        <div className="grid grid-cols-1 gap-8">
+                            {/* Measures Card */}
+                            <section className="space-y-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
+                                        <Globe size={24} className="stroke-[2.5]" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Measures</h2>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Location & Units</p>
+                                    </div>
+                                </div>
+                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                    {/* Country Selector */}
+                                    <div className="space-y-4">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Your Region</Label>
+                                        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl h-10">
+                                            {Object.keys(COUNTRY_PRESETS).map(country => (
+                                                <button
+                                                    key={country}
+                                                    onClick={() => handleCountryChange(country)}
+                                                    className={cn(
+                                                        "flex-1 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all text-center",
+                                                        formData.country === country
+                                                            ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm"
+                                                            : "text-slate-500 hover:text-purple-600 dark:hover:text-purple-400"
+                                                    )}
+                                                >
+                                                    {country}
+                                                </button>
+                                            ))}
                                         </div>
                                     </div>
-                                    <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
-                                        {/* Country Selector */}
-                                        <div className="space-y-4">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Your Region</Label>
-                                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl h-10">
-                                                {Object.keys(COUNTRY_PRESETS).map(country => (
-                                                    <button
-                                                        key={country}
-                                                        onClick={() => handleCountryChange(country)}
-                                                        className={cn(
-                                                            "flex-1 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all text-center",
-                                                            formData.country === country
-                                                                ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm"
-                                                                : "text-slate-500 hover:text-purple-600 dark:hover:text-purple-400"
-                                                        )}
-                                                    >
-                                                        {country}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
-                                            {/* Energy Unit */}
-                                            <div className="space-y-3">
-                                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Energy Unit</Label>
-                                                <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
-                                                    <button
-                                                        onClick={(e) => { e.preventDefault(); setEnergyUnit("kJ"); }}
-                                                        className={cn(
-                                                            "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
-                                                            energyUnit === "kJ" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
-                                                        )}
-                                                    >
-                                                        <Zap size={14} /> kJ
-                                                    </button>
-                                                    <button
-                                                        onClick={(e) => { e.preventDefault(); setEnergyUnit("kcal"); }}
-                                                        className={cn(
-                                                            "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
-                                                            energyUnit === "kcal" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
-                                                        )}
-                                                    >
-                                                        <Flame size={14} /> kcal
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {/* Measurement System */}
-                                            <div className="space-y-3">
-                                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Measurement</Label>
-                                                <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
-                                                    <button
-                                                        onClick={(e) => { e.preventDefault(); setMeasurementUnit("metric"); }}
-                                                        className={cn(
-                                                            "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
-                                                            measurementUnit === "metric" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
-                                                        )}
-                                                    >
-                                                        <Scale size={14} /> Metric
-                                                    </button>
-                                                    <button
-                                                        onClick={(e) => { e.preventDefault(); setMeasurementUnit("imperial"); }}
-                                                        className={cn(
-                                                            "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
-                                                            measurementUnit === "imperial" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
-                                                        )}
-                                                    >
-                                                        <Scale size={14} /> Imperial
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Nutrient Display Mode */}
-                                        <div className="space-y-3 pt-6 border-t border-slate-100 dark:border-slate-800">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">RDA Display</Label>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
+                                        {/* Energy Unit */}
+                                        <div className="space-y-3">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Energy Unit</Label>
                                             <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
                                                 <button
-                                                    onClick={(e) => { e.preventDefault(); setNutrientDisplayMode("value"); }}
+                                                    onClick={(e) => { e.preventDefault(); setEnergyUnit("kJ"); }}
                                                     className={cn(
-                                                        "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
-                                                        nutrientDisplayMode === "value" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                        "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
+                                                        energyUnit === "kJ" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
                                                     )}
                                                 >
-                                                    <BarChart3 size={12} /> Value
+                                                    <Zap size={14} /> kJ
                                                 </button>
                                                 <button
-                                                    onClick={(e) => { e.preventDefault(); setNutrientDisplayMode("percentage"); }}
+                                                    onClick={(e) => { e.preventDefault(); setEnergyUnit("kcal"); }}
                                                     className={cn(
-                                                        "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
-                                                        nutrientDisplayMode === "percentage" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                        "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
+                                                        energyUnit === "kcal" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
                                                     )}
                                                 >
-                                                    %
-                                                </button>
-                                                <button
-                                                    onClick={(e) => { e.preventDefault(); setNutrientDisplayMode("both"); }}
-                                                    className={cn(
-                                                        "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
-                                                        nutrientDisplayMode === "both" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
-                                                    )}
-                                                >
-                                                    Both
+                                                    <Flame size={14} /> kcal
                                                 </button>
                                             </div>
-                                            <p className="text-[9px] text-slate-400 italic px-1">Show nutrient values as raw amounts, RDA percentages, or both.</p>
                                         </div>
-                                    </div>
-                                </section>
 
-                                {/* Identification Card */}
-                                <section className="space-y-6">
-                                    <div className="flex items-center gap-4">
-                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                            <User size={24} className="stroke-[2.5]" />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Identification</h2>
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Know Your Profile</p>
+                                        {/* Measurement System */}
+                                        <div className="space-y-3">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Measurement</Label>
+                                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
+                                                <button
+                                                    onClick={(e) => { e.preventDefault(); setMeasurementUnit("metric"); }}
+                                                    className={cn(
+                                                        "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
+                                                        measurementUnit === "metric" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                    )}
+                                                >
+                                                    <Scale size={14} /> Metric
+                                                </button>
+                                                <button
+                                                    onClick={(e) => { e.preventDefault(); setMeasurementUnit("imperial"); }}
+                                                    className={cn(
+                                                        "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
+                                                        measurementUnit === "imperial" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                    )}
+                                                >
+                                                    <Scale size={14} /> Imperial
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+
+                                    {/* Nutrient Display Mode */}
+                                    <div className="space-y-3 pt-6 border-t border-slate-100 dark:border-slate-800">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">RDA Display</Label>
+                                        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
+                                            <button
+                                                onClick={(e) => { e.preventDefault(); setNutrientDisplayMode("value"); }}
+                                                className={cn(
+                                                    "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
+                                                    nutrientDisplayMode === "value" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                )}
+                                            >
+                                                <BarChart3 size={12} /> Value
+                                            </button>
+                                            <button
+                                                onClick={(e) => { e.preventDefault(); setNutrientDisplayMode("percentage"); }}
+                                                className={cn(
+                                                    "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
+                                                    nutrientDisplayMode === "percentage" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                )}
+                                            >
+                                                %
+                                            </button>
+                                            <button
+                                                onClick={(e) => { e.preventDefault(); setNutrientDisplayMode("both"); }}
+                                                className={cn(
+                                                    "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
+                                                    nutrientDisplayMode === "both" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                )}
+                                            >
+                                                Both
+                                            </button>
+                                        </div>
+                                        <p className="text-[9px] text-slate-400 italic px-1">Show nutrient values as raw amounts, RDA percentages, or both.</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* Identification Card */}
+                            <section className="space-y-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
+                                        <User size={24} className="stroke-[2.5]" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Identification</h2>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Know Your Profile</p>
+                                    </div>
+                                </div>
+                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Name</Label>
+                                        <Input
+                                            value={formData.nickname}
+                                            onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
+                                            placeholder="Enter your name"
+                                            className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
                                         <div className="space-y-2">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Name</Label>
-                                            <Input
-                                                value={formData.nickname}
-                                                onChange={(e) => setFormData({ ...formData, nickname: e.target.value })}
-                                                placeholder="Enter your name"
-                                                className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl"
-                                            />
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Gender</Label>
+                                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl h-8 mt-1">
+                                                <button
+                                                    onClick={() => setFormData({ ...formData, gender: 'male' })}
+                                                    className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'male' ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-400")}
+                                                >
+                                                    M
+                                                </button>
+                                                <button
+                                                    onClick={() => setFormData({ ...formData, gender: 'female' })}
+                                                    className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'female' ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-400")}
+                                                >
+                                                    F
+                                                </button>
+                                            </div>
                                         </div>
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-slate-100 dark:border-slate-800">
-                                            <div className="space-y-2">
-                                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Gender</Label>
-                                                <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl h-8 mt-1">
-                                                    <button
-                                                        onClick={() => setFormData({ ...formData, gender: 'male' })}
-                                                        className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'male' ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-400")}
-                                                    >
-                                                        M
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Age</Label>
+                                            <div className="relative group/stepper">
+                                                <Input
+                                                    type="number"
+                                                    value={formData.age === '' ? '' : formData.age}
+                                                    onChange={(e) => setFormData({ ...formData, age: e.target.value ? Number(e.target.value) : '' })}
+                                                    placeholder="Age"
+                                                    className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
+                                                />
+                                                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
+                                                    <button onClick={() => setFormData(prev => ({ ...prev, age: (Number(prev.age) || 0) + 1 }))} className="hover:text-purple-500 transition-colors">
+                                                        <ChevronUp size={12} />
                                                     </button>
-                                                    <button
-                                                        onClick={() => setFormData({ ...formData, gender: 'female' })}
-                                                        className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'female' ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-400")}
-                                                    >
-                                                        F
+                                                    <button onClick={() => setFormData(prev => ({ ...prev, age: Math.max(0, (Number(prev.age) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
+                                                        <ChevronDown size={12} />
                                                     </button>
                                                 </div>
                                             </div>
-                                            <div className="space-y-2">
-                                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Age</Label>
-                                                <div className="relative group/stepper">
-                                                    <Input
-                                                        type="number"
-                                                        value={formData.age === '' ? '' : formData.age}
-                                                        onChange={(e) => setFormData({ ...formData, age: e.target.value ? Number(e.target.value) : '' })}
-                                                        placeholder="Age"
-                                                        className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
-                                                    />
-                                                    <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
-                                                        <button onClick={() => setFormData(prev => ({ ...prev, age: (Number(prev.age) || 0) + 1 }))} className="hover:text-purple-500 transition-colors">
-                                                            <ChevronUp size={12} />
-                                                        </button>
-                                                        <button onClick={() => setFormData(prev => ({ ...prev, age: Math.max(0, (Number(prev.age) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
-                                                            <ChevronDown size={12} />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Weight ({measurementUnit === 'imperial' ? 'lb' : 'kg'})</Label>
-                                                <div className="relative group/stepper">
-                                                    <Input
-                                                        type="number"
-                                                        value={formData.weight === '' ? '' : formData.weight}
-                                                        onChange={(e) => setFormData({ ...formData, weight: e.target.value ? Number(e.target.value) : '' })}
-                                                        placeholder={measurementUnit === 'imperial' ? "lb" : "kg"}
-                                                        className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
-                                                    />
-                                                    <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
-                                                        <button onClick={() => setFormData(prev => ({ ...prev, weight: (Number(prev.weight) || 0) + 1 }))} className="hover:text-purple-500 transition-colors">
-                                                            <ChevronUp size={12} />
-                                                        </button>
-                                                        <button onClick={() => setFormData(prev => ({ ...prev, weight: Math.max(0, (Number(prev.weight) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
-                                                            <ChevronDown size={12} />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Height ({measurementUnit === 'imperial' ? 'in' : 'cm'})</Label>
-                                                <div className="relative group/stepper">
-                                                    <Input
-                                                        type="number"
-                                                        value={formData.height === '' ? '' : formData.height}
-                                                        onChange={(e) => setFormData({ ...formData, height: e.target.value ? Number(e.target.value) : '' })}
-                                                        placeholder={measurementUnit === 'imperial' ? "in" : "cm"}
-                                                        className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
-                                                    />
-                                                    <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
-                                                        <button onClick={() => setFormData(prev => ({ ...prev, height: (Number(prev.height) || 0) + 1 }))} className="hover:text-purple-500 transition-colors">
-                                                            <ChevronUp size={12} />
-                                                        </button>
-                                                        <button onClick={() => setFormData(prev => ({ ...prev, height: Math.max(0, (Number(prev.height) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
-                                                            <ChevronDown size={12} />
-                                                        </button>
-                                                    </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Weight ({measurementUnit === 'imperial' ? 'lb' : 'kg'})</Label>
+                                            <div className="relative group/stepper">
+                                                <Input
+                                                    type="number"
+                                                    value={formData.weight === '' ? '' : formData.weight}
+                                                    onChange={(e) => setFormData({ ...formData, weight: e.target.value ? Number(e.target.value) : '' })}
+                                                    placeholder={measurementUnit === 'imperial' ? "lb" : "kg"}
+                                                    className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
+                                                />
+                                                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
+                                                    <button onClick={() => setFormData(prev => ({ ...prev, weight: (Number(prev.weight) || 0) + 1 }))} className="hover:text-purple-500 transition-colors">
+                                                        <ChevronUp size={12} />
+                                                    </button>
+                                                    <button onClick={() => setFormData(prev => ({ ...prev, weight: Math.max(0, (Number(prev.weight) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
+                                                        <ChevronDown size={12} />
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
-
-                                        {/* BMR Result Section */}
-                                        <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className="bg-purple-500/10 p-2 rounded-xl text-purple-500">
-                                                    <Flame size={16} />
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Height ({measurementUnit === 'imperial' ? 'in' : 'cm'})</Label>
+                                            <div className="relative group/stepper">
+                                                <Input
+                                                    type="number"
+                                                    value={formData.height === '' ? '' : formData.height}
+                                                    onChange={(e) => setFormData({ ...formData, height: e.target.value ? Number(e.target.value) : '' })}
+                                                    placeholder={measurementUnit === 'imperial' ? "in" : "cm"}
+                                                    className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
+                                                />
+                                                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
+                                                    <button onClick={() => setFormData(prev => ({ ...prev, height: (Number(prev.height) || 0) + 1 }))} className="hover:text-purple-500 transition-colors">
+                                                        <ChevronUp size={12} />
+                                                    </button>
+                                                    <button onClick={() => setFormData(prev => ({ ...prev, height: Math.max(0, (Number(prev.height) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
+                                                        <ChevronDown size={12} />
+                                                    </button>
                                                 </div>
-                                                <div>
-                                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white leading-none">Basal Metabolic Rate</h4>
-                                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight mt-1">Calculated using Mifflin-St Jeor equation</p>
-                                                </div>
-                                            </div>
-                                            <div className="text-right">
-                                                <div className="flex items-baseline gap-1 justify-end">
-                                                    <span className="text-xl font-black italic tracking-tighter text-slate-900 dark:text-white">
-                                                        {energyUnit === 'kJ'
-                                                            ? Math.round(bmr * 4.184).toLocaleString()
-                                                            : Math.round(bmr).toLocaleString()}
-                                                    </span>
-                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                                        {energyUnit === 'kJ' ? 'kJ' : 'kcal'}
-                                                    </span>
-                                                </div>
-                                                <p className="text-[9px] font-black text-purple-500/60 uppercase tracking-widest mt-0.5">
-                                                    ≈ {energyUnit === 'kJ'
-                                                        ? `${Math.round(bmr).toLocaleString()} kcal`
-                                                        : `${Math.round(bmr * 4.184).toLocaleString()} kJ`}
-                                                </p>
                                             </div>
                                         </div>
                                     </div>
-                                </section>
 
-                                {/* Goals Card */}
-                                <section className="space-y-6">
-                                    <div className="flex items-center gap-4">
-                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                            <Activity size={24} className="stroke-[2.5]" />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Goals</h2>
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Fitness Direction</p>
-                                        </div>
-                                    </div>
-                                    <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
-                                        {/* Biological Goal */}
-                                        <div className="space-y-4">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Goal</Label>
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                <GoalCard type="lose-fat" label="Lose Fat" selected={formData.goal === 'lose-fat'} onClick={() => setFormData({ ...formData, goal: 'lose-fat' })} icon={TrendingDown} />
-                                                <GoalCard type="maintain" label="Maintain" selected={formData.goal === 'maintain'} onClick={() => setFormData({ ...formData, goal: 'maintain' })} icon={Activity} />
-                                                <GoalCard type="build-muscle" label="Build Muscle" selected={formData.goal === 'build-muscle'} onClick={() => setFormData({ ...formData, goal: 'build-muscle' })} icon={Dumbbell} />
-                                            </div>
-                                        </div>
-                                        {/* Activity Level */}
-                                        <div className="space-y-4">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Activity Level</Label>
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                                <GoalCard type="sedentary" label="Sedentary" selected={formData.activityLevel === 'sedentary'} onClick={() => setFormData({ ...formData, activityLevel: 'sedentary' })} icon={User} />
-                                                <GoalCard type="light" label="Lightly Active" selected={formData.activityLevel === 'light'} onClick={() => setFormData({ ...formData, activityLevel: 'light' })} icon={ChevronRight} />
-                                                <GoalCard type="moderate" label="Moderate" selected={formData.activityLevel === 'moderate'} onClick={() => setFormData({ ...formData, activityLevel: 'moderate' })} icon={Zap} />
-                                                <GoalCard type="active" label="Very Active" selected={formData.activityLevel === 'active'} onClick={() => setFormData({ ...formData, activityLevel: 'active' })} icon={Flame} />
-                                            </div>
-                                        </div>
-
-                                        {/* TDEE Result Section */}
-                                        <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className="bg-purple-500/10 p-2 rounded-xl text-purple-500">
-                                                    <Target size={16} />
-                                                </div>
-                                                <div>
-                                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white leading-none">Total Daily Expenditure (TDEE)</h4>
-                                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight mt-1">BMR × Activity Multiplier ± Goal Offset</p>
-                                                </div>
-                                            </div>
-                                            <div className="text-right">
-                                                <div className="flex items-baseline gap-1 justify-end">
-                                                    <span className="text-xl font-black italic tracking-tighter text-slate-900 dark:text-white">
-                                                        {energyUnit === 'kJ'
-                                                            ? Math.round(tdee * 4.184).toLocaleString()
-                                                            : Math.round(tdee).toLocaleString()}
-                                                    </span>
-                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                                                        {energyUnit === 'kJ' ? 'kJ' : 'kcal'}
-                                                    </span>
-                                                </div>
-                                                <p className="text-[9px] font-black text-purple-500/60 uppercase tracking-widest mt-0.5">
-                                                    Daily Target Energy
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </section>
-
-                                {/* Dietary Profile Card */}
-                                <section className="space-y-6">
-                                    <div className="flex items-center gap-4">
-                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                            <Utensils size={24} className="stroke-[2.5]" />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Dietary Profile</h2>
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Nutritional Approach</p>
-                                        </div>
-                                    </div>
-                                    <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
-                                        {/* Dietary Protocol */}
-                                        <div className="space-y-4">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Dietary Protocol</Label>
-                                            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                                                <GoalCard type="anything" label="Balanced" selected={formData.dietType === 'anything'} onClick={() => setFormData({ ...formData, dietType: 'anything' })} icon={Apple} />
-                                                <GoalCard type="pescatarian" label="Pescatarian" selected={formData.dietType === 'pescatarian'} onClick={() => setFormData({ ...formData, dietType: 'pescatarian' })} icon={Fish} />
-                                                <GoalCard type="vegetarian" label="Vegetarian" selected={formData.dietType === 'vegetarian'} onClick={() => setFormData({ ...formData, dietType: 'vegetarian' })} icon={Egg} />
-                                                <GoalCard type="vegan" label="Vegan" selected={formData.dietType === 'vegan'} onClick={() => setFormData({ ...formData, dietType: 'vegan' })} icon={Leaf} />
-                                            </div>
-                                        </div>
-                                        {/* Nutrient Strategy */}
-                                        <div className="space-y-4">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nutrient Strategy</Label>
-                                            <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-                                                <GoalCard type="balanced" label="Balanced" selected={formData.nutrientStrategy === 'balanced'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'balanced' })} icon={Activity} />
-                                                <GoalCard type="low-carb" label="Low Carb" selected={formData.nutrientStrategy === 'low-carb'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'low-carb' })} icon={TrendingDown} />
-                                                <GoalCard type="high-protein" label="High Protein" selected={formData.nutrientStrategy === 'high-protein'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'high-protein' })} icon={Dumbbell} />
-                                                <GoalCard type="keto" label="Keto Diet" selected={formData.nutrientStrategy === 'keto'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'keto' })} icon={Zap} />
-                                                <GoalCard type="high-carb" label="High Carb" selected={formData.nutrientStrategy === 'high-carb'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'high-carb' })} icon={Apple} />
-                                            </div>
-                                            <p className="text-[10px] text-slate-400 italic">Adjusts your macro ratio targets (Energy/Protein/Carbs/Fat) across the entire app.</p>
-                                        </div>
-                                    </div>
-                                </section>
-
-                                {/* Health Considerations Card */}
-                                <section className="space-y-6">
-                                    <div className="flex items-center gap-4">
-                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                            <Zap size={24} className="stroke-[2.5]" />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Health Considerations</h2>
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Wellness & Conditions</p>
-                                        </div>
-                                    </div>
-                                    <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
-                                        {/* Exclusions */}
-                                        <div className="space-y-4">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Specific Exclusions</Label>
-                                            <div className="flex flex-wrap gap-2">
-                                                {['Eggs', 'Dairy', 'Honey', 'Nuts', 'Peanuts', 'Soy', 'Gluten', 'Shellfish', 'Fish', 'Corn', 'Nightshades'].map(exclusion => {
-                                                    const isSelected = formData.exclusions?.includes(exclusion);
-                                                    return (
-                                                        <button
-                                                            key={exclusion}
-                                                            onClick={() => {
-                                                                const newExclusions = isSelected
-                                                                    ? formData.exclusions.filter(e => e !== exclusion)
-                                                                    : [...(formData.exclusions || []), exclusion];
-                                                                setFormData({ ...formData, exclusions: newExclusions });
-                                                            }}
-                                                            className={cn(
-                                                                "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-                                                                isSelected
-                                                                    ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20"
-                                                                    : "bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
-                                                            )}
-                                                        >
-                                                            {exclusion}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                            <p className="text-[10px] text-slate-400 italic">These items will be marked as "Excluded" even if the meal otherwise fits your diet.</p>
-                                        </div>
-
-                                        {/* Health Conditions */}
-                                        <div className="space-y-4 border-t border-slate-100 dark:border-slate-800 pt-4">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Health Conditions</Label>
-                                            <div className="flex flex-wrap gap-2">
-                                                {['Diabetes', 'Hypertension', 'Heart Disease', 'High Cholesterol', 'Celiac', 'IBS', 'Kidney Disease', 'Thyroid Issues', 'PCOS', 'Gout'].map(condition => {
-                                                    const isSelected = (formData.healthConditions || [])?.includes(condition);
-                                                    return (
-                                                        <button
-                                                            key={condition}
-                                                            onClick={() => {
-                                                                const newConditions = isSelected
-                                                                    ? (formData.healthConditions || []).filter(c => c !== condition)
-                                                                    : [...(formData.healthConditions || []), condition];
-                                                                setFormData({ ...formData, healthConditions: newConditions });
-                                                            }}
-                                                            className={cn(
-                                                                "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-                                                                isSelected
-                                                                    ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20"
-                                                                    : "bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
-                                                            )}
-                                                        >
-                                                            {condition}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-                                            <p className="text-[10px] text-slate-400 italic">Select conditions to optimize meal plans with appropriate nutritional considerations.</p>
-                                        </div>
-                                    </div>
-                                </section>
-
-
-                                {/* FAMILY PROTOCOLS - Hidden for now */}
-                                {false && (
-                                    <section className="space-y-6">
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                                <Users size={24} className="stroke-[2.5]" />
+                                    {/* BMR Result Section */}
+                                    <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="bg-purple-500/10 p-2 rounded-xl text-purple-500">
+                                                <Flame size={16} />
                                             </div>
                                             <div>
-                                                <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Family Protocols</h2>
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Household Management</p>
+                                                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white leading-none">Basal Metabolic Rate</h4>
+                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight mt-1">Calculated using Mifflin-St Jeor equation</p>
                                             </div>
                                         </div>
-                                        <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                {/* Existing Members */}
-                                                {formData.familyMembers.map((member) => (
-                                                    <div key={member.id} onClick={() => setEditingMember(member)} className="group cursor-pointer p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-900 transition-all relative">
-                                                        <div className="flex justify-between items-start mb-2">
-                                                            <div className="flex items-center gap-2">
-                                                                <div className={cn("w-2 h-2 rounded-full", member.gender === 'male' ? "bg-blue-400" : "bg-rose-400")} />
-                                                                <h3 className="font-bold text-sm text-slate-700 dark:text-slate-200">{member.name || 'Unnamed'}</h3>
-                                                            </div>
-                                                            <button onClick={(e) => { e.stopPropagation(); handleDeleteMember(member.id); }} className="text-slate-300 hover:text-rose-500 transition-colors p-1"><X size={14} /></button>
-                                                        </div>
-                                                        <div className="flex flex-wrap gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-tight">
-                                                            <span className="bg-white dark:bg-slate-950 px-2 py-1 rounded-md">{member.age} yrs</span>
-                                                            <span className="bg-white dark:bg-slate-950 px-2 py-1 rounded-md">{member.goal}</span>
-                                                        </div>
-                                                    </div>
-                                                ))}
-
-                                                {/* Add Button */}
-                                                <button
-                                                    onClick={() => setIsAddingMember(true)}
-                                                    className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-purple-500/50 hover:bg-purple-50/50 dark:hover:bg-purple-500/5 transition-all text-slate-400 hover:text-purple-500 h-[100px]"
-                                                >
-                                                    <div className="p-2 rounded-full bg-slate-50 dark:bg-slate-900 group-hover:bg-white transition-colors">
-                                                        <Plus size={20} />
-                                                    </div>
-                                                    <span className="text-[10px] font-black uppercase tracking-widest">Add Member</span>
-                                                </button>
+                                        <div className="text-right">
+                                            <div className="flex items-baseline gap-1 justify-end">
+                                                <span className="text-xl font-black italic tracking-tighter text-slate-900 dark:text-white">
+                                                    {energyUnit === 'kJ'
+                                                        ? Math.round(bmr * 4.184).toLocaleString()
+                                                        : Math.round(bmr).toLocaleString()}
+                                                </span>
+                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                    {energyUnit === 'kJ' ? 'kJ' : 'kcal'}
+                                                </span>
                                             </div>
-                                            <p className="text-[10px] text-slate-400 italic">Add family members to automatically calculate scale-appropriate portion sizes in recipes.</p>
+                                            <p className="text-[9px] font-black text-purple-500/60 uppercase tracking-widest mt-0.5">
+                                                ≈ {energyUnit === 'kJ'
+                                                    ? `${Math.round(bmr).toLocaleString()} kcal`
+                                                    : `${Math.round(bmr * 4.184).toLocaleString()} kJ`}
+                                            </p>
                                         </div>
-                                    </section>
-                                )}
-
-                                {(isAddingMember || editingMember) && (
-                                    <FamilyMemberForm
-                                        initialData={editingMember || {}}
-                                        onSave={handleSaveMember}
-                                        onCancel={() => { setIsAddingMember(false); setEditingMember(null); }}
-                                    />
-                                )}
-                            </div>
-
-                            {/* Action Buttons */}
-                            <div className="flex flex-col gap-4 justify-center pt-8 border-t border-slate-100 dark:border-slate-800">
-                                <Button
-                                    onClick={handleSave}
-                                    className="bg-purple-600 hover:bg-purple-700 text-white font-black px-8 h-12 rounded-xl shadow-lg shadow-purple-500/30 flex items-center gap-2 text-xs uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98]"
-                                >
-                                    <Save size={16} />
-                                    Save Profile
-                                </Button>
-                            </div>
-                        </div>
-
-                        {/* RDA Sheet Slider */}
-                        <SheetContent
-                            side="left"
-                            className="max-w-md w-full bg-slate-950 border-l-0 border-r border-slate-800 p-0 flex flex-col focus:outline-none"
-                            hideOverlay={isDesktop}
-                            onInteractOutside={(e) => {
-                                if (isDesktop) e.preventDefault();
-                            }}
-                        >
-                            <SheetHeader className="bg-slate-900/80 p-6 border-b border-slate-800">
-                                <SheetTitle className="text-lg font-black text-purple-400 uppercase tracking-widest font-sans">Recommended Intake</SheetTitle>
-                            </SheetHeader>
-                            <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8">
-                                {(() => {
-                                    const categories = [
-                                        {
-                                            title: "Essential Macros",
-                                            nutrients: ['Energy', 'Protein', 'Carbs', 'Fat', 'Fiber', 'ALA', 'EPA + DHA']
-                                        },
-                                        {
-                                            title: "Minerals",
-                                            nutrients: ['Sodium', 'Potassium', 'Magnesium', 'Calcium', 'Phosphorus', 'Iron', 'Zinc', 'Selenium', 'Copper', 'Manganese']
-                                        },
-                                        {
-                                            title: "Vitamins & Choline",
-                                            nutrients: ['Vitamin A', 'Vitamin C', 'Vitamin D', 'Vitamin E', 'Vitamin K', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B7 (Biotin)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Choline']
-                                        },
-                                        {
-                                            title: "Amino Acids",
-                                            nutrients: ['Histidine', 'Isoleucine', 'Leucine', 'Lysine', 'Methionine', 'Phenylalanine', 'Threonine', 'Tryptophan', 'Valine']
-                                        }
-                                    ];
-
-                                    return categories.map((cat, idx) => {
-                                        const availableNutrients = Object.entries(combinedRDAs).filter(([name]) => cat.nutrients.includes(name));
-                                        if (availableNutrients.length === 0) return null;
-
-                                        return (
-                                            <div key={idx} className="space-y-3">
-                                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-purple-500/60 pl-1 font-sans">{cat.title}</h4>
-                                                <div className="space-y-1">
-                                                    {availableNutrients.map(([nutrient, value]) => {
-                                                        const unit = (nutrient === 'Energy') ? energyUnit : (nutrient === 'Protein' || nutrient === 'Carbs' || nutrient === 'Fat' || nutrient === 'Fiber' || nutrient === 'ALA' || nutrient.includes('_g') || cat.title === "Amino Acids") ? 'g' : (nutrient === 'Vitamin D') ? 'IU' : (nutrient.includes('Folate') || nutrient.includes('B12') || nutrient.includes('Biotin') || nutrient.includes('Selenium') || nutrient === 'Vitamin A' || nutrient === 'Vitamin K' || nutrient.includes('EPA')) ? 'µg' : 'mg';
-                                                        const displayVal = value < 1 ? value.toFixed(2) : value < 10 ? value.toFixed(1) : Math.round(value);
-                                                        return (
-                                                            <div key={nutrient} className="bg-slate-900/40 px-5 py-3 rounded-2xl flex items-center justify-between hover:bg-slate-900 transition-colors group/item border border-transparent hover:border-slate-800">
-                                                                <div className="flex flex-col min-w-0 pr-2">
-                                                                    <p className="text-[11px] uppercase font-black text-slate-400 group-hover/item:text-slate-200 transition-colors leading-none font-sans">{nutrient}</p>
-                                                                    {['ALA', 'EPA', 'Histidine', 'Leucine', 'Isoleucine', 'Lysine', 'Methionine', 'Phenylalanine', 'Threonine', 'Tryptophan', 'Valine'].includes(nutrient) && (
-                                                                        <span className="text-[7px] text-blue-500 font-black uppercase mt-1 tracking-widest font-sans">Constituent</span>
-                                                                    )}
-                                                                </div>
-                                                                <div className="flex items-baseline gap-1 font-sans">
-                                                                    <span className="text-sm font-black text-white tracking-tighter leading-none">{displayVal}</span>
-                                                                    <span className="text-[9px] text-slate-500 font-black uppercase">{unit}</span>
-                                                                </div>
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                        );
-                                    });
-                                })()}
-                                {/* Nutrition Toggles */}
-                                <div className="flex bg-slate-900 p-1 rounded-2xl">
-                                    <button className="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl bg-slate-800 text-purple-400 shadow-lg">Daily Targets</button>
-                                    <button className="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl text-slate-500 hover:text-slate-300 transition-colors">Safety Limits</button>
-                                </div>
-                            </div>
-
-                            <div className="p-6 border-t border-slate-800 bg-slate-900/50">
-                                <div className="bg-purple-500/5 rounded-2xl p-4 border border-purple-500/10">
-                                    <div className="flex items-start gap-3">
-                                        <Info size={14} className="text-purple-500 mt-0.5" />
-                                        <p className="text-[9px] leading-relaxed text-slate-400 uppercase tracking-tight font-bold">
-                                            These values reflect your current bio-data presets. Updating your weight or activity level will automatically recalibrate these targets.
-                                        </p>
                                     </div>
                                 </div>
-                            </div>
-                        </SheetContent>
+                            </section>
+
+                            {/* Goals Card */}
+                            <section className="space-y-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
+                                        <Activity size={24} className="stroke-[2.5]" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Goals</h2>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Fitness Direction</p>
+                                    </div>
+                                </div>
+                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                    {/* Biological Goal */}
+                                    <div className="space-y-4">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Goal</Label>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <GoalCard type="lose-fat" label="Lose Fat" selected={formData.goal === 'lose-fat'} onClick={() => setFormData({ ...formData, goal: 'lose-fat' })} icon={TrendingDown} />
+                                            <GoalCard type="maintain" label="Maintain" selected={formData.goal === 'maintain'} onClick={() => setFormData({ ...formData, goal: 'maintain' })} icon={Activity} />
+                                            <GoalCard type="build-muscle" label="Build Muscle" selected={formData.goal === 'build-muscle'} onClick={() => setFormData({ ...formData, goal: 'build-muscle' })} icon={Dumbbell} />
+                                        </div>
+                                    </div>
+                                    {/* Activity Level */}
+                                    <div className="space-y-4">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Activity Level</Label>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                            <GoalCard type="sedentary" label="Sedentary" selected={formData.activityLevel === 'sedentary'} onClick={() => setFormData({ ...formData, activityLevel: 'sedentary' })} icon={User} />
+                                            <GoalCard type="light" label="Lightly Active" selected={formData.activityLevel === 'light'} onClick={() => setFormData({ ...formData, activityLevel: 'light' })} icon={ChevronRight} />
+                                            <GoalCard type="moderate" label="Moderate" selected={formData.activityLevel === 'moderate'} onClick={() => setFormData({ ...formData, activityLevel: 'moderate' })} icon={Zap} />
+                                            <GoalCard type="active" label="Very Active" selected={formData.activityLevel === 'active'} onClick={() => setFormData({ ...formData, activityLevel: 'active' })} icon={Flame} />
+                                        </div>
+                                    </div>
+
+                                    {/* TDEE Result Section */}
+                                    <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="bg-purple-500/10 p-2 rounded-xl text-purple-500">
+                                                <Target size={16} />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white leading-none">Total Daily Expenditure (TDEE)</h4>
+                                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight mt-1">BMR × Activity Multiplier ± Goal Offset</p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="flex items-baseline gap-1 justify-end">
+                                                <span className="text-xl font-black italic tracking-tighter text-slate-900 dark:text-white">
+                                                    {energyUnit === 'kJ'
+                                                        ? Math.round(tdee * 4.184).toLocaleString()
+                                                        : Math.round(tdee).toLocaleString()}
+                                                </span>
+                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                    {energyUnit === 'kJ' ? 'kJ' : 'kcal'}
+                                                </span>
+                                            </div>
+                                            <p className="text-[9px] font-black text-purple-500/60 uppercase tracking-widest mt-0.5">
+                                                Daily Target Energy
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* Dietary Profile Card */}
+                            <section className="space-y-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
+                                        <Utensils size={24} className="stroke-[2.5]" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Dietary Profile</h2>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Nutritional Approach</p>
+                                    </div>
+                                </div>
+                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                    {/* Dietary Protocol */}
+                                    <div className="space-y-4">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Dietary Protocol</Label>
+                                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                                            <GoalCard type="anything" label="Balanced" selected={formData.dietType === 'anything'} onClick={() => setFormData({ ...formData, dietType: 'anything' })} icon={Apple} />
+                                            <GoalCard type="pescatarian" label="Pescatarian" selected={formData.dietType === 'pescatarian'} onClick={() => setFormData({ ...formData, dietType: 'pescatarian' })} icon={Fish} />
+                                            <GoalCard type="vegetarian" label="Vegetarian" selected={formData.dietType === 'vegetarian'} onClick={() => setFormData({ ...formData, dietType: 'vegetarian' })} icon={Egg} />
+                                            <GoalCard type="vegan" label="Vegan" selected={formData.dietType === 'vegan'} onClick={() => setFormData({ ...formData, dietType: 'vegan' })} icon={Leaf} />
+                                        </div>
+                                    </div>
+                                    {/* Nutrient Strategy */}
+                                    <div className="space-y-4">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nutrient Strategy</Label>
+                                        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                                            <GoalCard type="balanced" label="Balanced" selected={formData.nutrientStrategy === 'balanced'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'balanced' })} icon={Activity} />
+                                            <GoalCard type="low-carb" label="Low Carb" selected={formData.nutrientStrategy === 'low-carb'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'low-carb' })} icon={TrendingDown} />
+                                            <GoalCard type="high-protein" label="High Protein" selected={formData.nutrientStrategy === 'high-protein'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'high-protein' })} icon={Dumbbell} />
+                                            <GoalCard type="keto" label="Keto Diet" selected={formData.nutrientStrategy === 'keto'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'keto' })} icon={Zap} />
+                                            <GoalCard type="high-carb" label="High Carb" selected={formData.nutrientStrategy === 'high-carb'} onClick={() => setFormData({ ...formData, nutrientStrategy: 'high-carb' })} icon={Apple} />
+                                        </div>
+                                        <p className="text-[10px] text-slate-400 italic">Adjusts your macro ratio targets (Energy/Protein/Carbs/Fat) across the entire app.</p>
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* Health Considerations Card */}
+                            <section className="space-y-6">
+                                <div className="flex items-center gap-4">
+                                    <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
+                                        <Zap size={24} className="stroke-[2.5]" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Health Considerations</h2>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Wellness & Conditions</p>
+                                    </div>
+                                </div>
+                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                    {/* Exclusions */}
+                                    <div className="space-y-4">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Specific Exclusions</Label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {['Eggs', 'Dairy', 'Honey', 'Nuts', 'Peanuts', 'Soy', 'Gluten', 'Shellfish', 'Fish', 'Corn', 'Nightshades'].map(exclusion => {
+                                                const isSelected = formData.exclusions?.includes(exclusion);
+                                                return (
+                                                    <button
+                                                        key={exclusion}
+                                                        onClick={() => {
+                                                            const newExclusions = isSelected
+                                                                ? formData.exclusions.filter(e => e !== exclusion)
+                                                                : [...(formData.exclusions || []), exclusion];
+                                                            setFormData({ ...formData, exclusions: newExclusions });
+                                                        }}
+                                                        className={cn(
+                                                            "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                                            isSelected
+                                                                ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20"
+                                                                : "bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                                        )}
+                                                    >
+                                                        {exclusion}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                        <p className="text-[10px] text-slate-400 italic">These items will be marked as "Excluded" even if the meal otherwise fits your diet.</p>
+                                    </div>
+
+                                    {/* Health Conditions */}
+                                    <div className="space-y-4 border-t border-slate-100 dark:border-slate-800 pt-4">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Health Conditions</Label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {['Diabetes', 'Hypertension', 'Heart Disease', 'High Cholesterol', 'Celiac', 'IBS', 'Kidney Disease', 'Thyroid Issues', 'PCOS', 'Gout'].map(condition => {
+                                                const isSelected = (formData.healthConditions || [])?.includes(condition);
+                                                return (
+                                                    <button
+                                                        key={condition}
+                                                        onClick={() => {
+                                                            const newConditions = isSelected
+                                                                ? (formData.healthConditions || []).filter(c => c !== condition)
+                                                                : [...(formData.healthConditions || []), condition];
+                                                            setFormData({ ...formData, healthConditions: newConditions });
+                                                        }}
+                                                        className={cn(
+                                                            "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                                            isSelected
+                                                                ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20"
+                                                                : "bg-white dark:bg-slate-900 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                                        )}
+                                                    >
+                                                        {condition}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                        <p className="text-[10px] text-slate-400 italic">Select conditions to optimize meal plans with appropriate nutritional considerations.</p>
+                                    </div>
+                                </div>
+                            </section>
+
+
+                            {/* FAMILY PROTOCOLS - Hidden for now */}
+                            {false && (
+                                <section className="space-y-6">
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
+                                            <Users size={24} className="stroke-[2.5]" />
+                                        </div>
+                                        <div>
+                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Family Protocols</h2>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Household Management</p>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white dark:bg-slate-950 rounded-3xl p-6 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {/* Existing Members */}
+                                            {formData.familyMembers.map((member) => (
+                                                <div key={member.id} onClick={() => setEditingMember(member)} className="group cursor-pointer p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 hover:bg-white dark:hover:bg-slate-900 transition-all relative">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className={cn("w-2 h-2 rounded-full", member.gender === 'male' ? "bg-blue-400" : "bg-rose-400")} />
+                                                            <h3 className="font-bold text-sm text-slate-700 dark:text-slate-200">{member.name || 'Unnamed'}</h3>
+                                                        </div>
+                                                        <button onClick={(e) => { e.stopPropagation(); handleDeleteMember(member.id); }} className="text-slate-300 hover:text-rose-500 transition-colors p-1"><X size={14} /></button>
+                                                    </div>
+                                                    <div className="flex flex-wrap gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-tight">
+                                                        <span className="bg-white dark:bg-slate-950 px-2 py-1 rounded-md">{member.age} yrs</span>
+                                                        <span className="bg-white dark:bg-slate-950 px-2 py-1 rounded-md">{member.goal}</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+
+                                            {/* Add Button */}
+                                            <button
+                                                onClick={() => setIsAddingMember(true)}
+                                                className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-purple-500/50 hover:bg-purple-50/50 dark:hover:bg-purple-500/5 transition-all text-slate-400 hover:text-purple-500 h-[100px]"
+                                            >
+                                                <div className="p-2 rounded-full bg-slate-50 dark:bg-slate-900 group-hover:bg-white transition-colors">
+                                                    <Plus size={20} />
+                                                </div>
+                                                <span className="text-[10px] font-black uppercase tracking-widest">Add Member</span>
+                                            </button>
+                                        </div>
+                                        <p className="text-[10px] text-slate-400 italic">Add family members to automatically calculate scale-appropriate portion sizes in recipes.</p>
+                                    </div>
+                                </section>
+                            )}
+
+                            {(isAddingMember || editingMember) && (
+                                <FamilyMemberForm
+                                    initialData={editingMember || {}}
+                                    onSave={handleSaveMember}
+                                    onCancel={() => { setIsAddingMember(false); setEditingMember(null); }}
+                                />
+                            )}
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="flex flex-col gap-4 justify-center pt-8 border-t border-slate-100 dark:border-slate-800">
+                            <Button
+                                onClick={handleSave}
+                                className="bg-purple-600 hover:bg-purple-700 text-white font-black px-8 h-12 rounded-xl shadow-lg shadow-purple-500/30 flex items-center gap-2 text-xs uppercase tracking-widest transition-all hover:scale-[1.02] active:scale-[0.98]"
+                            >
+                                <Save size={16} />
+                                Save Profile
+                            </Button>
+                        </div>
                     </div>
-                </Sheet>
+                </div>
             </div>
         </PageContainer>
     );

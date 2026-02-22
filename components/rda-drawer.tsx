@@ -1,0 +1,174 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { useRDA } from '@/hooks/use-rda';
+import { Info } from 'lucide-react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+
+export function RDADrawer() {
+    const {
+        profile,
+        energyUnit,
+        measurementUnit,
+        showRDADrawer,
+        setShowRDADrawer
+    } = useUserPreferences();
+
+    const [isDesktop, setIsDesktop] = useState(false);
+
+    useEffect(() => {
+        const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024);
+        checkDesktop();
+        window.addEventListener('resize', checkDesktop);
+        return () => window.removeEventListener('resize', checkDesktop);
+    }, []);
+
+    // 1. Calculate BMR (Mifflin-St Jeor) - Formula expects metric (kg, cm)
+    const weightVal = Number(profile.weight) || 70;
+    const heightVal = Number(profile.height) || 170;
+
+    // Convert to metric if needed
+    const weight = measurementUnit === 'imperial' ? weightVal * 0.453592 : weightVal;
+    const height = measurementUnit === 'imperial' ? heightVal * 2.54 : heightVal;
+
+    const age = Number(profile.age) || 30;
+    const gender = profile.gender || 'female';
+    const s = gender === 'male' ? 5 : -161;
+    const bmr = (10 * weight) + (6.25 * height) - (5 * age) + s;
+
+    // 2. Apply Activity Factor
+    const activityFactors: Record<string, number> = {
+        sedentary: 1.2,
+        light: 1.375,
+        moderate: 1.55,
+        active: 1.725
+    };
+    const factor = activityFactors[profile.activityLevel || 'sedentary'] || 1.2;
+    let tdee = bmr * factor;
+
+    // 3. Adjust for Goal
+    if (profile.goal === 'lose-fat') tdee -= 500;
+    if (profile.goal === 'build-muscle') tdee += 500;
+    tdee = Math.max(tdee, 1200); // Floor safety
+
+    // Strategy Allocation
+    let pPct = 0.25, cPct = 0.45, fPct = 0.30;
+    switch (profile.nutrientStrategy) {
+        case 'low-carb': pPct = 0.35; cPct = 0.15; fPct = 0.50; break;
+        case 'high-protein': pPct = 0.40; cPct = 0.35; fPct = 0.25; break;
+        case 'keto': pPct = 0.25; cPct = 0.05; fPct = 0.70; break;
+        case 'high-carb': pPct = 0.20; cPct = 0.60; fPct = 0.20; break;
+    }
+
+    let proteinTarget, carbsTarget, fatTarget;
+    if (age < 14) {
+        proteinTarget = weight * 1.0;
+        const remainingCals = tdee - (proteinTarget * 4);
+        const macroRatioSum = cPct + fPct;
+        carbsTarget = (remainingCals * (cPct / macroRatioSum)) / 4;
+        fatTarget = (remainingCals * (fPct / macroRatioSum)) / 9;
+    } else {
+        proteinTarget = (tdee * pPct) / 4;
+        carbsTarget = (tdee * cPct) / 4;
+        fatTarget = (tdee * fPct) / 9;
+    }
+
+    const macroRDAs: Record<string, number> = {
+        'Energy': energyUnit === 'kJ' ? tdee * 4.184 : tdee,
+        'Protein': proteinTarget,
+        'Carbs': carbsTarget,
+        'Fat': fatTarget
+    };
+
+    const userRDAs = useRDA(age, gender, tdee, weight);
+    const combinedRDAs = { ...macroRDAs, ...(userRDAs || {}) };
+
+    if (!showRDADrawer) return null;
+
+    return (
+        <Sheet open={showRDADrawer} onOpenChange={setShowRDADrawer} modal={!isDesktop}>
+            <SheetContent
+                side="left"
+                className="max-w-md w-full bg-slate-950 border-l-0 border-r border-slate-800 p-0 flex flex-col focus:outline-none"
+                hideOverlay={isDesktop}
+                onInteractOutside={(e) => {
+                    if (isDesktop) e.preventDefault();
+                }}
+            >
+                <SheetHeader className="bg-slate-900/80 p-6 border-b border-slate-800">
+                    <SheetTitle className="text-lg font-black text-purple-400 uppercase tracking-widest font-sans">Recommended Intake</SheetTitle>
+                </SheetHeader>
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8">
+                    {(() => {
+                        const categories = [
+                            {
+                                title: "Essential Macros",
+                                nutrients: ['Energy', 'Protein', 'Carbs', 'Fat', 'Fiber', 'ALA', 'EPA + DHA']
+                            },
+                            {
+                                title: "Minerals",
+                                nutrients: ['Sodium', 'Potassium', 'Magnesium', 'Calcium', 'Phosphorus', 'Iron', 'Zinc', 'Selenium', 'Copper', 'Manganese']
+                            },
+                            {
+                                title: "Vitamins & Choline",
+                                nutrients: ['Vitamin A', 'Vitamin C', 'Vitamin D', 'Vitamin E', 'Vitamin K', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B7 (Biotin)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Choline']
+                            },
+                            {
+                                title: "Amino Acids",
+                                nutrients: ['Histidine', 'Isoleucine', 'Leucine', 'Lysine', 'Methionine', 'Phenylalanine', 'Threonine', 'Tryptophan', 'Valine']
+                            }
+                        ];
+
+                        return categories.map((cat, idx) => {
+                            const availableNutrients = Object.entries(combinedRDAs).filter(([name]) => cat.nutrients.includes(name));
+                            if (availableNutrients.length === 0) return null;
+
+                            return (
+                                <div key={idx} className="space-y-3">
+                                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-purple-500/60 pl-1 font-sans">{cat.title}</h4>
+                                    <div className="space-y-1">
+                                        {availableNutrients.map(([nutrient, value]) => {
+                                            const unit = (nutrient === 'Energy') ? energyUnit : (nutrient === 'Protein' || nutrient === 'Carbs' || nutrient === 'Fat' || nutrient === 'Fiber' || nutrient === 'ALA' || nutrient.includes('_g') || cat.title === "Amino Acids") ? 'g' : (nutrient === 'Vitamin D') ? 'IU' : (nutrient.includes('Folate') || nutrient.includes('B12') || nutrient.includes('Biotin') || nutrient.includes('Selenium') || nutrient === 'Vitamin A' || nutrient === 'Vitamin K' || nutrient.includes('EPA')) ? 'µg' : 'mg';
+                                            const displayVal = value < 1 ? value.toFixed(2) : value < 10 ? value.toFixed(1) : Math.round(value);
+                                            return (
+                                                <div key={nutrient} className="bg-slate-900/40 px-5 py-3 rounded-2xl flex items-center justify-between hover:bg-slate-900 transition-colors group/item border border-transparent hover:border-slate-800">
+                                                    <div className="flex flex-col min-w-0 pr-2">
+                                                        <p className="text-[11px] uppercase font-black text-slate-400 group-hover/item:text-slate-200 transition-colors leading-none font-sans">{nutrient}</p>
+                                                        {['ALA', 'EPA', 'Histidine', 'Leucine', 'Isoleucine', 'Lysine', 'Methionine', 'Phenylalanine', 'Threonine', 'Tryptophan', 'Valine'].includes(nutrient) && (
+                                                            <span className="text-[7px] text-blue-500 font-black uppercase mt-1 tracking-widest font-sans">Constituent</span>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-baseline gap-1 font-sans">
+                                                        <span className="text-sm font-black text-white tracking-tighter leading-none">{displayVal}</span>
+                                                        <span className="text-[9px] text-slate-500 font-black uppercase">{unit}</span>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            );
+                        });
+                    })()}
+                    {/* Nutrition Toggles */}
+                    <div className="flex bg-slate-900 p-1 rounded-2xl">
+                        <button className="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl bg-slate-800 text-purple-400 shadow-lg">Daily Targets</button>
+                        <button className="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl text-slate-500 hover:text-slate-300 transition-colors">Safety Limits</button>
+                    </div>
+                </div>
+
+                <div className="p-6 border-t border-slate-800 bg-slate-900/50">
+                    <div className="bg-purple-500/5 rounded-2xl p-4 border border-purple-500/10">
+                        <div className="flex items-start gap-3">
+                            <Info size={14} className="text-purple-500 mt-0.5" />
+                            <p className="text-[9px] leading-relaxed text-slate-400 uppercase tracking-tight font-bold">
+                                These values reflect your current bio-data presets. Updating your weight or activity level will automatically recalibrate these targets.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </SheetContent>
+        </Sheet>
+    );
+}
