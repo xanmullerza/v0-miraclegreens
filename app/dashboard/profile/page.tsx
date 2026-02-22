@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -39,7 +39,9 @@ import {
     Eye,
     Tag,
     Shapes,
-    Settings
+    Settings,
+    ShieldCheck,
+    ExternalLink
 } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { useTheme } from 'next-themes';
@@ -194,6 +196,35 @@ function ProfilePageContent() {
     const searchParams = useSearchParams();
     const from = searchParams.get('from');
 
+    const [user, setUser] = useState<any>(null);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const getUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+        };
+        getUser();
+    }, []);
+
+    const isAdmin = (user?.email || user?.user_metadata?.email || '').toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase();
+
+    const handleLogin = async () => {
+        setLoading(true);
+        try {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: `${window.location.origin}/auth/callback`,
+                },
+            });
+            if (error) throw error;
+        } catch (error: any) {
+            toast.error(error.message);
+            setLoading(false);
+        }
+    };
+
     const [formData, setFormData] = useState({
         ...profile,
         exclusions: profile.exclusions || [],
@@ -347,34 +378,7 @@ function ProfilePageContent() {
         return () => window.removeEventListener('resize', checkDesktop);
     }, []);
 
-    const [user, setUser] = useState<any>(null);
-    const [loading, setLoading] = useState(false);
 
-    React.useEffect(() => {
-        const getUser = async () => {
-            const { data: { user: supabaseUser } } = await supabase.auth.getUser();
-            setUser(supabaseUser);
-        };
-        getUser();
-    }, []);
-
-    const handleLogin = async () => {
-        setLoading(true);
-        try {
-            const { error } = await supabase.auth.signInWithOAuth({
-                provider: 'google',
-                options: {
-                    redirectTo: `${window.location.origin}/auth/callback`,
-                },
-            });
-            if (error) throw error;
-        } catch (error: any) {
-            toast.error(error.message);
-            setLoading(false);
-        }
-    };
-
-    const isAdmin = (user?.email || user?.user_metadata?.email || '').toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase();
 
     return (
         <PageContainer maxWidth="max-w-7xl">
@@ -1041,6 +1045,45 @@ function ProfilePageContent() {
                                             </button>
                                         </div>
                                         <p className="text-[10px] text-slate-400 italic">Add family members to automatically calculate scale-appropriate portion sizes in recipes.</p>
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Admin Terminal Card - Only for Admins */}
+                            {isAdmin && (
+                                <section className="space-y-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500">
+                                            <ShieldCheck size={24} className="stroke-[2.5]" />
+                                        </div>
+                                        <div>
+                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Admin Terminal</h2>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Authorized Access Only</p>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-6 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50">
+                                        <div className="flex flex-col gap-4">
+                                            <p className="text-[11px] text-slate-500 font-bold uppercase tracking-widest italic">Welcome to the central command unit.</p>
+                                            <Button
+                                                asChild
+                                                variant="outline"
+                                                className="w-full bg-slate-100 dark:bg-slate-900 border-none hover:bg-emerald-500/10 hover:text-emerald-500 text-slate-600 dark:text-slate-400 font-black h-16 rounded-2xl flex items-center justify-between px-6 group transition-all"
+                                            >
+                                                <a href="https://www.yourtestsite.xyz/admin" target="_blank" rel="noopener noreferrer">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="bg-emerald-500/10 p-2 rounded-xl text-emerald-500 group-hover:bg-emerald-500/20 transition-colors">
+                                                            <Settings size={20} />
+                                                        </div>
+                                                        <div className="text-left">
+                                                            <h3 className="text-xs font-black uppercase tracking-wider italic leading-none">Access Admin Workspace</h3>
+                                                        </div>
+                                                    </div>
+                                                    <div className="p-2 rounded-lg group-hover:bg-emerald-500/20 transition-all">
+                                                        <ExternalLink size={16} />
+                                                    </div>
+                                                </a>
+                                            </Button>
+                                        </div>
                                     </div>
                                 </section>
                             )}

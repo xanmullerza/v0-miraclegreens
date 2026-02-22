@@ -229,49 +229,33 @@ export function BreadcrumbPillbox({
                     )}
                 </div>
 
-                {/* Right side - Profile & Settings Split Button */}
+                {/* Right side - Unified Profile Button */}
                 <div className={cn(
                     "flex transition-all duration-500 flex-shrink-0 ml-2 border-l border-slate-200 dark:border-slate-800",
                     isSearchExpanded ? "w-0 opacity-0 overflow-hidden" : ""
                 )}>
-                    <div className="flex flex-col h-12 w-12 divide-y divide-slate-100 dark:divide-slate-800">
-                        {/* Profile Link in Top Half */}
-                        <Link
-                            href="/dashboard/profile"
-                            className="h-6 w-12 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-                            title="Profile"
-                        >
-                            <div className={cn(
-                                "h-4 w-4 rounded-full flex items-center justify-center text-white overflow-hidden transition-colors",
-                                userStatus === 'cloud' ? "bg-emerald-500" :
-                                    userStatus === 'local' ? "bg-blue-500" :
-                                        "bg-orange-500"
-                            )}>
-                                {userAvatarUrl ? (
-                                    <img
-                                        src={userAvatarUrl}
-                                        alt="P"
-                                        className="w-full h-full object-cover"
-                                    />
-                                ) : (
-                                    <User size={10} />
-                                )}
-                            </div>
-                        </Link>
-
-                        {/* Settings Link in Bottom Half */}
-                        <div className="h-6 w-12 flex items-center justify-center overflow-hidden hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                            {actions ? (
-                                <div className="flex items-center justify-center scale-75 transform origin-center w-full h-full">
-                                    {actions}
-                                </div>
+                    <Link
+                        href="/dashboard/profile"
+                        className="h-12 w-12 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                        title="Profile"
+                    >
+                        <div className={cn(
+                            "h-6 w-6 rounded-full flex items-center justify-center text-white overflow-hidden transition-colors shadow-sm",
+                            userStatus === 'cloud' ? "bg-emerald-500" :
+                                userStatus === 'local' ? "bg-blue-500" :
+                                    "bg-orange-500"
+                        )}>
+                            {userAvatarUrl ? (
+                                <img
+                                    src={userAvatarUrl}
+                                    alt="P"
+                                    className="w-full h-full object-cover"
+                                />
                             ) : (
-                                <Link href="/dashboard/settings" title="Settings" className="w-full h-full flex items-center justify-center text-slate-300 hover:text-emerald-500 transition-colors">
-                                    <Settings size={12} />
-                                </Link>
+                                <User size={14} />
                             )}
                         </div>
-                    </div>
+                    </Link>
                 </div>
             </div>
         </div>
