@@ -83,7 +83,7 @@ export default function NutrientsPage() {
     const MACROS = ['carbs_g', 'protein_g', 'fat_g'];
     const MINERALS = ['Sodium', 'Potassium', 'Magnesium', 'Calcium', 'Phosphorus', 'Iron', 'Zinc', 'Copper', 'Manganese', 'Selenium'];
     const VITAMINS = ['Vitamin A', 'Vitamin D', 'Vitamin E', 'Vitamin K', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Vitamin C'];
-    const OTHER = ['Fiber', 'Choline', 'water_g', 'biotin_ug'];
+    const OTHER = ['Fiber', 'biotin_ug', 'Choline', 'water_g'];
 
     const handleNutrientSelect = (id: string) => {
         setSelectedNutrientId(id);
