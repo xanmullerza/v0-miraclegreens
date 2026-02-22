@@ -331,6 +331,145 @@ export default function NutrientsPage() {
                         </div>
                     </div>
 
+                    {/* Nutrient List */}
+                    <div className="space-y-6 mt-6">
+                        {/* Macros Group */}
+                        <div>
+                            <div className="flex items-center gap-2 mb-3 px-2">
+                                <Zap size={14} className="text-amber-500" />
+                                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Macronutrients</h3>
+                                <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
+                            </div>
+                            <div className="space-y-1">
+                                {NUTRIENTS.filter(n => MACROS.includes(n.id)).map(nutrient => {
+                                    const Icon = nutrient.icon;
+                                    return (
+                                        <div
+                                            key={nutrient.id}
+                                            onClick={() => handleNutrientSelect(nutrient.id)}
+                                            className="group relative bg-transparent rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:border-blue-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden cursor-pointer"
+                                        >
+                                            <div className="flex items-center gap-4 px-4 md:px-6 py-3">
+                                                <div className={cn("w-10 h-10 rounded-xl shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-500", nutrient.color + '/10')}>
+                                                    <Icon size={18} className={cn(nutrient.color.replace('bg-', 'text-'))} />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{nutrient.label}</h4>
+                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">
+                                                        {nutrient.unit ? `Measured in ${nutrient.unit}` : 'Overview'}
+                                                    </p>
+                                                </div>
+                                                <ChevronRight className="text-slate-200 dark:text-slate-700 group-hover:text-blue-500 transition-colors shrink-0" size={18} />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Minerals Group */}
+                        <div>
+                            <div className="flex items-center gap-2 mb-3 px-2">
+                                <Gem size={14} className="text-purple-500" />
+                                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Minerals</h3>
+                                <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
+                            </div>
+                            <div className="space-y-1">
+                                {NUTRIENTS.filter(n => MINERALS.includes(n.id)).map(nutrient => {
+                                    const Icon = nutrient.icon;
+                                    return (
+                                        <div
+                                            key={nutrient.id}
+                                            onClick={() => handleNutrientSelect(nutrient.id)}
+                                            className="group relative bg-transparent rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:border-blue-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden cursor-pointer"
+                                        >
+                                            <div className="flex items-center gap-4 px-4 md:px-6 py-3">
+                                                <div className={cn("w-10 h-10 rounded-xl shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-500", nutrient.color + '/10')}>
+                                                    <Icon size={18} className={cn(nutrient.color.replace('bg-', 'text-'))} />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{nutrient.label}</h4>
+                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">
+                                                        {nutrient.unit ? `Measured in ${nutrient.unit}` : 'Overview'}
+                                                    </p>
+                                                </div>
+                                                <ChevronRight className="text-slate-200 dark:text-slate-700 group-hover:text-blue-500 transition-colors shrink-0" size={18} />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Vitamins Group */}
+                        <div>
+                            <div className="flex items-center gap-2 mb-3 px-2">
+                                <Battery size={14} className="text-yellow-500" />
+                                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Vitamins</h3>
+                                <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
+                            </div>
+                            <div className="space-y-1">
+                                {NUTRIENTS.filter(n => VITAMINS.includes(n.id)).map(nutrient => {
+                                    const Icon = nutrient.icon;
+                                    return (
+                                        <div
+                                            key={nutrient.id}
+                                            onClick={() => handleNutrientSelect(nutrient.id)}
+                                            className="group relative bg-transparent rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:border-blue-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden cursor-pointer"
+                                        >
+                                            <div className="flex items-center gap-4 px-4 md:px-6 py-3">
+                                                <div className={cn("w-10 h-10 rounded-xl shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-500", nutrient.color + '/10')}>
+                                                    <Icon size={18} className={cn(nutrient.color.replace('bg-', 'text-'))} />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{nutrient.label}</h4>
+                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">
+                                                        {nutrient.unit ? `Measured in ${nutrient.unit}` : 'Overview'}
+                                                    </p>
+                                                </div>
+                                                <ChevronRight className="text-slate-200 dark:text-slate-700 group-hover:text-blue-500 transition-colors shrink-0" size={18} />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {/* Other Nutrients */}
+                        <div>
+                            <div className="flex items-center gap-2 mb-3 px-2">
+                                <Activity size={14} className="text-emerald-500" />
+                                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Other</h3>
+                                <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
+                            </div>
+                            <div className="space-y-1">
+                                {NUTRIENTS.filter(n => !MACROS.includes(n.id) && !MINERALS.includes(n.id) && !VITAMINS.includes(n.id) && n.id !== 'welcome').map(nutrient => {
+                                    const Icon = nutrient.icon;
+                                    return (
+                                        <div
+                                            key={nutrient.id}
+                                            onClick={() => handleNutrientSelect(nutrient.id)}
+                                            className="group relative bg-transparent rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:border-blue-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden cursor-pointer"
+                                        >
+                                            <div className="flex items-center gap-4 px-4 md:px-6 py-3">
+                                                <div className={cn("w-10 h-10 rounded-xl shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-500", nutrient.color + '/10')}>
+                                                    <Icon size={18} className={cn(nutrient.color.replace('bg-', 'text-'))} />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{nutrient.label}</h4>
+                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">
+                                                        {nutrient.unit ? `Measured in ${nutrient.unit}` : 'Overview'}
+                                                    </p>
+                                                </div>
+                                                <ChevronRight className="text-slate-200 dark:text-slate-700 group-hover:text-blue-500 transition-colors shrink-0" size={18} />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </PageContainer>
