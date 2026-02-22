@@ -88,7 +88,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         nutrientStrategy: "balanced",
         exclusions: [],
         healthConditions: [],
-        country: "Australia",
+        country: "Oceania",
         familyMembers: []
     });
     const [skipPlannerQuiz, setSkipPlannerQuizState] = useState(false);

@@ -269,12 +269,11 @@ function ProfilePageContent() {
     const combinedRDAs = { ...macroRDAs, ...(userRDAs || {}) };
 
     const COUNTRY_PRESETS: Record<string, { energy: 'kJ' | 'kcal', measurement: 'metric' | 'imperial' }> = {
-        'Australia': { energy: 'kJ', measurement: 'metric' },
-        'USA': { energy: 'kcal', measurement: 'imperial' },
-        'UK': { energy: 'kcal', measurement: 'metric' },
-        'Canada': { energy: 'kcal', measurement: 'metric' },
+        'America': { energy: 'kcal', measurement: 'imperial' },
         'Europe': { energy: 'kJ', measurement: 'metric' },
-        'Other': { energy: 'kJ', measurement: 'metric' }
+        'Asia': { energy: 'kJ', measurement: 'metric' },
+        'Africa': { energy: 'kJ', measurement: 'metric' },
+        'Oceania': { energy: 'kJ', measurement: 'metric' }
     };
 
     const handleCountryChange = (country: string) => {
