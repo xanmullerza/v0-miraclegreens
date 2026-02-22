@@ -30,10 +30,18 @@ function DashboardLayoutContent({
 }) {
     const pathname = usePathname();
     const router = useRouter();
-    const { profile } = useUserPreferences();
+    const { profile, showRDADrawer } = useUserPreferences();
     const { actions } = useHeaderActions();
     const { searchQuery, setSearchQuery } = useSearch();
     const [user, setUser] = useState<any>(null);
+    const [isDesktop, setIsDesktop] = useState(false);
+
+    useEffect(() => {
+        const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024);
+        checkDesktop();
+        window.addEventListener('resize', checkDesktop);
+        return () => window.removeEventListener('resize', checkDesktop);
+    }, []);
 
     useEffect(() => {
         const getUser = async () => {
@@ -50,11 +58,15 @@ function DashboardLayoutContent({
 
 
                 {/* Main Content */}
-                <main className="dashboard-main flex-1 overflow-y-auto relative bg-slate-50 dark:bg-[#020617] custom-scrollbar flex flex-col">
+                <main className={cn(
+                    "dashboard-main flex-1 overflow-y-auto relative bg-slate-50 dark:bg-[#020617] custom-scrollbar flex flex-col transition-all duration-500 ease-in-out",
+                    showRDADrawer && isDesktop && "lg:translate-x-[192px]"
+                )}>
                     {/* Main Header (BreadcrumbPillbox) */}
                     <div className={cn(
-                        "z-40 px-2 sm:px-4 w-full flex justify-center pointer-events-none transition-all duration-500",
-                        pathname === '/dashboard/library/comparefoods' ? "relative pt-0" : "sticky top-0"
+                        "z-40 px-2 sm:px-4 w-full flex justify-center pointer-events-none transition-all duration-500 ease-in-out",
+                        pathname === '/dashboard/library/comparefoods' ? "relative pt-0" : "sticky top-0",
+                        showRDADrawer && isDesktop && "lg:translate-x-[192px]"
                     )}>
                         <div className="pointer-events-auto w-full max-w-[900px]">
                             <BreadcrumbPillbox
@@ -82,7 +94,12 @@ function DashboardLayoutContent({
                         </div>
                     </div>
 
-                    <Footer />
+                    <div className={cn(
+                        "w-full transition-all duration-500 ease-in-out",
+                        showRDADrawer && isDesktop && "lg:translate-x-[192px]"
+                    )}>
+                        <Footer />
+                    </div>
                 </main>
             </div>
 

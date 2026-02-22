@@ -61,6 +61,8 @@ interface UserPreferencesContextType {
     };
     dailyPlan: DailyPlan | null;
     updateDailyPlan: (plan: DailyPlan | null) => void;
+    showRDADrawer: boolean;
+    setShowRDADrawer: (show: boolean) => void;
 }
 
 const UserPreferencesContext = createContext<UserPreferencesContextType | undefined>(
@@ -91,6 +93,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
     });
     const [skipPlannerQuiz, setSkipPlannerQuizState] = useState(false);
     const [dailyPlan, setDailyPlanState] = useState<DailyPlan | null>(null);
+    const [showRDADrawer, setShowRDADrawer] = useState(false);
 
     // Load initial data from localStorage and cloud
     useEffect(() => {
@@ -297,7 +300,9 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
             setHeaderStyle,
             dailyTargets,
             dailyPlan,
-            updateDailyPlan
+            updateDailyPlan,
+            showRDADrawer,
+            setShowRDADrawer
         }}>
             {children}
         </UserPreferencesContext.Provider>

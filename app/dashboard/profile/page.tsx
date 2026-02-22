@@ -174,7 +174,9 @@ function ProfilePageContent() {
         energyUnit,
         setEnergyUnit,
         measurementUnit,
-        setMeasurementUnit
+        setMeasurementUnit,
+        showRDADrawer,
+        setShowRDADrawer
     } = useUserPreferences();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -315,7 +317,15 @@ function ProfilePageContent() {
         </div>
     );
 
-    const [showRDASheet, setShowRDASheet] = useState(false);
+    const [isDesktop, setIsDesktop] = useState(false);
+
+    React.useEffect(() => {
+        const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024);
+        checkDesktop();
+        window.addEventListener('resize', checkDesktop);
+        return () => window.removeEventListener('resize', checkDesktop);
+    }, []);
+
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(false);
 
@@ -351,7 +361,7 @@ function ProfilePageContent() {
                 {/* Profile Header */}
                 <div className="max-w-2xl mx-auto mb-12 flex flex-col items-center text-center space-y-4">
                     <div className="relative group">
-                        <div className="w-24 h-24 rounded-[2.5rem] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-500 shadow-2xl shadow-emerald-500/10 overflow-hidden transition-transform group-hover:scale-105 duration-500">
+                        <div className="w-24 h-24 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-500 shadow-2xl shadow-emerald-500/10 overflow-hidden transition-transform group-hover:scale-105 duration-500">
                             {user?.user_metadata?.avatar_url ? (
                                 <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
                             ) : (
@@ -384,23 +394,23 @@ function ProfilePageContent() {
                     </div>
                 </div>
 
-                <Sheet open={showRDASheet} onOpenChange={setShowRDASheet}>
+                <Sheet open={showRDADrawer} onOpenChange={setShowRDADrawer}>
                     <div className="flex flex-col lg:flex-row gap-6 items-start justify-center">
                         {/* Main Content (Compact Settings) */}
                         <div className="max-w-2xl w-full space-y-8 pb-32">
                             <div className="grid grid-cols-1 gap-8">
-                                {/* Regional Standards Card */}
+                                {/* Measures Card */}
                                 <section className="space-y-6">
                                     <div className="flex items-center gap-4">
-                                        <div className="flex-shrink-0 bg-yellow-500/20 p-3 rounded-2xl text-yellow-500">
+                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
                                             <Globe size={24} className="stroke-[2.5]" />
                                         </div>
                                         <div>
-                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Regional Standards</h2>
+                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Measures</h2>
                                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Location & Units</p>
                                         </div>
                                     </div>
-                                    <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-yellow-500 before:to-yellow-500/50">
+                                    <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
                                         {/* Country Selector */}
                                         <div className="space-y-4">
                                             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Your Region</Label>
@@ -412,7 +422,7 @@ function ProfilePageContent() {
                                                         className={cn(
                                                             "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-center",
                                                             formData.country === country
-                                                                ? "bg-yellow-500 text-slate-900 shadow-lg shadow-yellow-500/20"
+                                                                ? "bg-purple-500 text-white shadow-lg shadow-purple-500/20"
                                                                 : "bg-slate-50 dark:bg-slate-900 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
                                                         )}
                                                     >
@@ -431,7 +441,7 @@ function ProfilePageContent() {
                                                         onClick={(e) => { e.preventDefault(); setEnergyUnit("kJ"); }}
                                                         className={cn(
                                                             "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
-                                                            energyUnit === "kJ" ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
+                                                            energyUnit === "kJ" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
                                                         )}
                                                     >
                                                         <Zap size={14} /> kJ
@@ -440,7 +450,7 @@ function ProfilePageContent() {
                                                         onClick={(e) => { e.preventDefault(); setEnergyUnit("kcal"); }}
                                                         className={cn(
                                                             "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
-                                                            energyUnit === "kcal" ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
+                                                            energyUnit === "kcal" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
                                                         )}
                                                     >
                                                         <Flame size={14} /> kcal
@@ -456,7 +466,7 @@ function ProfilePageContent() {
                                                         onClick={(e) => { e.preventDefault(); setMeasurementUnit("metric"); }}
                                                         className={cn(
                                                             "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
-                                                            measurementUnit === "metric" ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
+                                                            measurementUnit === "metric" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
                                                         )}
                                                     >
                                                         <Scale size={14} /> Metric
@@ -465,7 +475,7 @@ function ProfilePageContent() {
                                                         onClick={(e) => { e.preventDefault(); setMeasurementUnit("imperial"); }}
                                                         className={cn(
                                                             "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
-                                                            measurementUnit === "imperial" ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
+                                                            measurementUnit === "imperial" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
                                                         )}
                                                     >
                                                         <Scale size={14} /> Imperial
@@ -503,13 +513,13 @@ function ProfilePageContent() {
                                                 <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl h-8 mt-1">
                                                     <button
                                                         onClick={() => setFormData({ ...formData, gender: 'male' })}
-                                                        className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'male' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
+                                                        className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'male' ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-400")}
                                                     >
                                                         M
                                                     </button>
                                                     <button
                                                         onClick={() => setFormData({ ...formData, gender: 'female' })}
-                                                        className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'female' ? "bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-sm" : "text-slate-400")}
+                                                        className={cn("flex-1 text-[10px] font-bold rounded-lg transition-all", formData.gender === 'female' ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-400")}
                                                     >
                                                         F
                                                     </button>
@@ -851,7 +861,7 @@ function ProfilePageContent() {
                                 <Button
                                     variant="outline"
                                     className="w-full font-black text-xs uppercase tracking-widest border-purple-500 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/10 h-12 rounded-xl"
-                                    onClick={() => setShowRDASheet(true)}
+                                    onClick={() => setShowRDADrawer(true)}
                                 >
                                     Recommended Intake
                                 </Button>
@@ -949,6 +959,22 @@ function ProfilePageContent() {
                                         );
                                     });
                                 })()}
+                                {/* Nutrition Toggles */}
+                                <div className="flex bg-slate-900 p-1 rounded-2xl">
+                                    <button className="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl bg-slate-800 text-emerald-400 shadow-lg">Daily Targets</button>
+                                    <button className="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl text-slate-500 hover:text-slate-300 transition-colors">Safety Limits</button>
+                                </div>
+                            </div>
+
+                            <div className="p-6 border-t border-slate-800 bg-slate-900/50">
+                                <div className="bg-emerald-500/5 rounded-2xl p-4 border border-emerald-500/10">
+                                    <div className="flex items-start gap-3">
+                                        <Info size={14} className="text-emerald-500 mt-0.5" />
+                                        <p className="text-[9px] leading-relaxed text-slate-400 uppercase tracking-tight font-bold">
+                                            These values reflect your current bio-data presets. Updating your weight or activity level will automatically recalibrate these targets.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                         </SheetContent>
                     </div>
