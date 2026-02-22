@@ -1,20 +1,19 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
     Activity,
     Scale,
     ChevronDown,
-    ChevronRight,
     Gem,
     Battery,
     Sparkles,
     Droplet,
     Zap,
-    Search,
-    X,
-    Library
+    Library,
+    Dna,
+    Target
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -27,462 +26,343 @@ import {
 import { cn } from '@/lib/utils';
 import { useHeaderActions } from '@/lib/context/header-actions-context';
 import { PageContainer } from '@/components/ui/page-container';
-
-const NUTRIENTS = [
-    { id: 'B1 (Thiamine)', label: 'B1 (Thiamine)', unit: 'mg', color: 'bg-blue-500', icon: Droplet },
-    { id: 'B2 (Riboflavin)', label: 'B2 (Riboflavin)', unit: 'mg', color: 'bg-blue-500', icon: Droplet },
-    { id: 'B3 (Niacin)', label: 'B3 (Niacin)', unit: 'mg', color: 'bg-blue-500', icon: Droplet },
-    { id: 'B5 (Pantothenic Acid)', label: 'B5 (Pantothenic Acid)', unit: 'mg', color: 'bg-blue-500', icon: Droplet },
-    { id: 'B6 (Pyridoxine)', label: 'B6 (Pyridoxine)', unit: 'mg', color: 'bg-blue-500', icon: Droplet },
-    { id: 'B9 (Folate)', label: 'B9 (Folate)', unit: 'µg', color: 'bg-blue-500', icon: Droplet },
-    { id: 'B12 (Cobalamin)', label: 'B12 (Cobalamin)', unit: 'µg', color: 'bg-blue-500', icon: Droplet },
-    { id: 'Calcium', label: 'Calcium', unit: 'mg', color: 'bg-slate-500', icon: Gem },
-    { id: 'carbs_g', label: 'Carbs', unit: 'g', color: 'bg-orange-500', icon: Zap },
-    { id: 'Choline', label: 'Choline', unit: 'mg', color: 'bg-indigo-500', icon: Droplet },
-    { id: 'Copper', label: 'Copper', unit: 'mg', color: 'bg-rose-500', icon: Gem },
-    { id: 'energy_kcal', label: 'Energy', unit: 'kcal', color: 'bg-amber-500', icon: Zap },
-    { id: 'fat_g', label: 'Fat', unit: 'g', color: 'bg-amber-500', icon: Zap },
-    { id: 'Fiber', label: 'Fiber', unit: 'g', color: 'bg-emerald-500', icon: Activity },
-    { id: 'Iron', label: 'Iron', unit: 'mg', color: 'bg-red-500', icon: Gem },
-    { id: 'Magnesium', label: 'Magnesium', unit: 'mg', color: 'bg-purple-500', icon: Gem },
-    { id: 'Manganese', label: 'Manganese', unit: 'mg', color: 'bg-stone-500', icon: Gem },
-    { id: 'Phosphorus', label: 'Phosphorus', unit: 'mg', color: 'bg-indigo-400', icon: Gem },
-    { id: 'Potassium', label: 'Potassium', unit: 'mg', color: 'bg-sky-500', icon: Gem },
-    { id: 'protein_g', label: 'Protein', unit: 'g', color: 'bg-blue-600', icon: Scale },
-    { id: 'Selenium', label: 'Selenium', unit: 'µg', color: 'bg-pink-500', icon: Gem },
-    { id: 'Sodium', label: 'Sodium', unit: 'mg', color: 'bg-slate-400', icon: Gem },
-    { id: 'Vitamin A', label: 'Vitamin A', unit: 'µg', color: 'bg-orange-400', icon: Battery },
-    { id: 'Vitamin C', label: 'Vitamin C', unit: 'mg', color: 'bg-yellow-400', icon: Droplet },
-    { id: 'Vitamin D', label: 'Vitamin D', unit: 'IU', color: 'bg-yellow-200', icon: Battery },
-    { id: 'Vitamin E', label: 'Vitamin E', unit: 'mg', color: 'bg-emerald-400', icon: Battery },
-    { id: 'Vitamin K', label: 'Vitamin K', unit: 'µg', color: 'bg-green-600', icon: Battery },
-    { id: 'Zinc', label: 'Zinc', unit: 'mg', color: 'bg-cyan-500', icon: Gem },
-    { id: 'Cholesterol', label: 'Cholesterol', unit: 'mg', color: 'bg-red-400', icon: Activity },
-    { id: 'Omega-3', label: 'Omega-3', unit: 'g', color: 'bg-teal-500', icon: Droplet },
-    { id: 'Oxalate', label: 'Oxalate', unit: 'mg', color: 'bg-amber-600', icon: Gem },
-    { id: 'Sugar', label: 'Sugar', unit: 'g', color: 'bg-pink-400', icon: Zap },
-    { id: 'water_g', label: 'Water', unit: 'g', color: 'bg-blue-400', icon: Droplet },
-    { id: 'biotin_ug', label: 'B7 (Biotin)', unit: 'µg', color: 'bg-blue-500', icon: Droplet },
-    { id: 'welcome', label: 'Welcome', unit: '', color: 'bg-emerald-500', icon: Sparkles },
-];
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { useRDA } from '@/hooks/use-rda';
 
 export default function NutrientsPage() {
     const router = useRouter();
-    const pathname = usePathname();
+    const { profile, dailyTargets, energyUnit } = useUserPreferences();
+    const [selectedNutrientId, setSelectedNutrientId] = useState<string | null>(null);
 
-    // We maintain a 'selected' state just for the UI of the dropdowns (to show what was last picked or highlight hierarchy)
-    // But realistically, selecting one navigates away.
-    const [selectedNutrientId, setSelectedNutrientId] = useState<string | null>('welcome');
-
-    // Filter States passed to NutrientsView if we want to filter the grid (optional, but good for "Browse" feel)
-    // The user asked for the "exact same filter", which usually implies the strip of dropdowns.
-    // In the Library page, those dropdowns controlled the 'Top 10' view.
-    // Here, we'll use them as quick navigation or high-level filtering.
-    // Since the dropdowns pick a SPECIFIC nutrient, navigation is the best UX.
-
-    const MACROS = ['carbs_g', 'protein_g', 'fat_g'];
-    const MINERALS = ['Sodium', 'Potassium', 'Magnesium', 'Calcium', 'Phosphorus', 'Iron', 'Zinc', 'Copper', 'Manganese', 'Selenium'];
-    const VITAMINS = ['Vitamin A', 'Vitamin D', 'Vitamin E', 'Vitamin K', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Vitamin C'];
-    const OTHER = ['Fiber', 'biotin_ug', 'Choline', 'water_g'];
+    // Context-aware RDAs for the profile
+    const userRDAs = useRDA(
+        typeof profile.age === 'number' ? profile.age : 30,
+        profile.gender || 'female',
+        dailyTargets.energy || 2000
+    );
 
     const handleNutrientSelect = (id: string) => {
-        setSelectedNutrientId(id);
         const encodedId = encodeURIComponent(id);
         router.push(`/dashboard/library/nutrients/${encodedId}`);
     };
 
-    // Hero Search State
-    const [heroSearchQuery, setHeroSearchQuery] = useState('');
-    const [isHeroActive, setIsHeroActive] = useState(false);
+    // Header Actions
+    const { setFilterContent } = useHeaderActions();
 
-    const heroResults = useMemo(() => {
-        if (!heroSearchQuery || heroSearchQuery.length < 1) return [];
-        const q = heroSearchQuery.toLowerCase();
-        return NUTRIENTS.filter(n =>
-            n.id !== 'welcome' &&
-            (n.label.toLowerCase().includes(q) || n.id.toLowerCase().includes(q))
-        ).slice(0, 8);
-    }, [heroSearchQuery]);
-
-    const handleHeroSearchInput = (val: string) => {
-        setHeroSearchQuery(val);
+    // Groups for sections
+    const MACROS_MAP = {
+        'Energy': ['Energy', 'energy_kcal', 'Calories'],
+        'Protein': ['Protein', 'protein_g'],
+        'Carbs': ['Carbohydrates', 'Carbs', 'carbs_g'],
+        'Fat': ['Fat', 'fat_g']
     };
 
-    const { setFilterContent } = useHeaderActions();
+    const MINERALS_MAP = {
+        'Sodium': ['Sodium', 'sodium_mg'],
+        'Potassium': ['Potassium', 'potassium_mg'],
+        'Magnesium': ['Magnesium', 'magnesium_mg'],
+        'Calcium': ['Calcium', 'calcium_mg'],
+        'Phosphorus': ['Phosphorus', 'phosphorus_mg'],
+        'Iron': ['Iron', 'iron_mg'],
+        'Zinc': ['Zinc', 'zinc_mg'],
+        'Copper': ['Copper', 'copper_mg'],
+        'Manganese': ['Manganese', 'manganese_mg'],
+        'Selenium': ['Selenium', 'selenium_ug']
+    };
+
+    const VITAMINS_MAP = {
+        'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
+        'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
+        'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
+        'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
+        'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
+        'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
+        'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
+        'B5 (Pantothenic Acid)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
+        'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
+        'B7 (Biotin)': ['Biotin', 'B7 (Biotin)', 'biotin_ug'],
+        'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
+        'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
+        'Vitamin C': ['Vitamin C', 'vitamin_c_mg']
+    };
+
+    const OTHER_MAP = {
+        'Fiber': ['Fiber', 'fiber_g'],
+        'Choline': ['Choline', 'choline_mg'],
+        'Omega-3': ['Omega-3', 'omega_3_g'],
+        'ALA': ['ALA', 'alpha_linolenic_acid_g'],
+        'EPA + DHA': ['EPA + DHA', 'epa_dha_combined_mg'],
+        'Oxalate': ['Oxalate', 'oxalate_mg'],
+        'Sugars': ['Sugars', 'Sugar', 'sugars_g'],
+        'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
+        'Water': ['Water', 'water_g']
+    };
 
     useEffect(() => {
         setFilterContent(
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
-                {/* Macro Dropdown */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <button className={cn(
-                            "px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
-                            selectedNutrientId && MACROS.includes(selectedNutrientId)
-                                ? "bg-indigo-600 text-white border-indigo-600 shadow-md"
-                                : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
-                        )}>
+                        <button className="px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500 flex items-center gap-2 shrink-0 shadow-sm outline-none transition-all">
                             <Scale size={12} />
-                            <span>{selectedNutrientId && MACROS.includes(selectedNutrientId) ? NUTRIENTS.find(n => n.id === selectedNutrientId)?.label : "Macros"}</span>
+                            <span>Macros</span>
                             <ChevronDown size={10} className="opacity-50" />
                         </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
-                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Macro</DropdownMenuLabel>
-                        <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
-                        {MACROS.map(id => {
-                            const nutrient = NUTRIENTS.find(n => n.id === id);
-                            if (!nutrient) return null;
-                            return (
-                                <DropdownMenuCheckboxItem
-                                    key={id}
-                                    checked={selectedNutrientId === id}
-                                    onCheckedChange={() => handleNutrientSelect(id)}
-                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
-                                >
-                                    {nutrient.label}
-                                </DropdownMenuCheckboxItem>
-                            )
-                        })}
+                        {Object.keys(MACROS_MAP).map(id => (
+                            <DropdownMenuCheckboxItem
+                                key={id}
+                                onCheckedChange={() => handleNutrientSelect(id)}
+                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 py-2.5 cursor-pointer"
+                            >
+                                {id}
+                            </DropdownMenuCheckboxItem>
+                        ))}
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* Mineral Dropdown */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <button className={cn(
-                            "px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
-                            selectedNutrientId && MINERALS.includes(selectedNutrientId)
-                                ? "bg-indigo-600 text-white border-indigo-600 shadow-md"
-                                : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
-                        )}>
+                        <button className="px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500 flex items-center gap-2 shrink-0 shadow-sm outline-none transition-all">
                             <Gem size={12} />
-                            <span>{selectedNutrientId && MINERALS.includes(selectedNutrientId) ? NUTRIENTS.find(n => n.id === selectedNutrientId)?.label : "Minerals"}</span>
+                            <span>Minerals</span>
                             <ChevronDown size={10} className="opacity-50" />
                         </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 max-h-[400px] overflow-y-auto no-scrollbar">
-                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Mineral</DropdownMenuLabel>
-                        <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
-                        {MINERALS.map(id => {
-                            const nutrient = NUTRIENTS.find(n => n.id === id);
-                            if (!nutrient) return null;
-                            return (
-                                <DropdownMenuCheckboxItem
-                                    key={id}
-                                    checked={selectedNutrientId === id}
-                                    onCheckedChange={() => handleNutrientSelect(id)}
-                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
-                                >
-                                    {nutrient.label}
-                                </DropdownMenuCheckboxItem>
-                            )
-                        })}
+                        {Object.keys(MINERALS_MAP).map(id => (
+                            <DropdownMenuCheckboxItem
+                                key={id}
+                                onCheckedChange={() => handleNutrientSelect(id)}
+                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 py-2.5 cursor-pointer"
+                            >
+                                {id}
+                            </DropdownMenuCheckboxItem>
+                        ))}
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                {/* Vitamin Dropdown */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <button className={cn(
-                            "px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
-                            selectedNutrientId && VITAMINS.includes(selectedNutrientId)
-                                ? "bg-indigo-600 text-white border-indigo-600 shadow-md"
-                                : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500"
-                        )}>
+                        <button className="px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-blue-500 flex items-center gap-2 shrink-0 shadow-sm outline-none transition-all">
                             <Battery size={12} />
-                            <span>{selectedNutrientId && VITAMINS.includes(selectedNutrientId) ? NUTRIENTS.find(n => n.id === selectedNutrientId)?.label : "Vitamins"}</span>
+                            <span>Vitamins</span>
                             <ChevronDown size={10} className="opacity-50" />
                         </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 max-h-[400px] overflow-y-auto no-scrollbar">
-                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Vitamin</DropdownMenuLabel>
-                        <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
-                        {VITAMINS.map(id => {
-                            const nutrient = NUTRIENTS.find(n => n.id === id);
-                            if (!nutrient) return null;
-                            return (
-                                <DropdownMenuCheckboxItem
-                                    key={id}
-                                    checked={selectedNutrientId === id}
-                                    onCheckedChange={() => handleNutrientSelect(id)}
-                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600 py-2.5 cursor-pointer"
-                                >
-                                    {nutrient.label}
-                                </DropdownMenuCheckboxItem>
-                            )
-                        })}
+                        {Object.keys(VITAMINS_MAP).map(id => (
+                            <DropdownMenuCheckboxItem
+                                key={id}
+                                onCheckedChange={() => handleNutrientSelect(id)}
+                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 py-2.5 cursor-pointer"
+                            >
+                                {id}
+                            </DropdownMenuCheckboxItem>
+                        ))}
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
         );
-
         return () => setFilterContent(null);
-    }, [selectedNutrientId, router]); // Added dependencies
+    }, [handleNutrientSelect, dailyTargets, profile, energyUnit, userRDAs]);
+
+    const NutrientGrid = ({ title, items, icon: Icon, theme = 'indigo', subtitle }: { title: string, items: Record<string, string[]>, icon: any, theme?: string, subtitle?: string }) => {
+        const themes = {
+            indigo: { bg: "bg-slate-900 border-slate-800", text: "text-indigo-400", border: "border-slate-800", itemBorder: "border-indigo-900/50" },
+            rose: { bg: "bg-slate-900 border-slate-800", text: "text-rose-400", border: "border-slate-800", itemBorder: "border-rose-900/50" },
+            orange: { bg: "bg-slate-900 border-slate-800", text: "text-orange-400", border: "border-slate-800", itemBorder: "border-orange-900/50" },
+            emerald: { bg: "bg-slate-900 border-slate-800", text: "text-emerald-400", border: "border-slate-800", itemBorder: "border-emerald-900/50" },
+            blue: { bg: "bg-slate-900 border-slate-800", text: "text-blue-400", border: "border-slate-800", itemBorder: "border-blue-900/50" },
+            amber: { bg: "bg-slate-900 border-slate-800", text: "text-amber-400", border: "border-slate-800", itemBorder: "border-amber-900/50" }
+        };
+        const t = (themes as any)[theme] || themes.indigo;
+
+        return (
+            <div className={cn("p-6 pt-5 rounded-[2.5rem] border bg-gradient-to-br mb-10", t.bg)}>
+                <h4 className={cn("font-black flex items-center gap-2 mb-1 uppercase tracking-widest text-[10px]", t.text)}>
+                    <Icon className="h-4 w-4" /> {title}
+                </h4>
+                {subtitle && <p className={cn("text-[9px] text-slate-400 mb-4 border-b pb-2 transition-colors", t.border)}>{subtitle}</p>}
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                    {Object.entries(items).map(([label, keys]) => {
+                        let rda = 0;
+                        let unitStr = '';
+
+                        // Special handling for Energy units to match preferred kJ/kcal
+                        const macroRDAs: Record<string, number> = {
+                            'Energy': energyUnit === 'kJ' ? dailyTargets.energy * 4.184 : dailyTargets.energy,
+                            'Protein': dailyTargets.protein,
+                            'Carbs': dailyTargets.carbs,
+                            'Fat': dailyTargets.fat,
+                            'Fiber': (dailyTargets.energy / 1000) * 14,
+                            'Sugars': (dailyTargets.energy * 0.10) / 4
+                        };
+
+                        // Primary RDA lookup
+                        rda = userRDAs?.[label] || macroRDAs[label] || 0;
+
+                        // Fallback unit determination
+                        unitStr = (label === 'Energy') ? energyUnit :
+                            (label === 'Protein' || label === 'Carbs' || label === 'Fat' || label === 'Fiber' || label === 'Sugars' || label === 'ALA' || label === 'Water') ? 'g' :
+                                (label === 'Vitamin D') ? 'IU' :
+                                    (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg')) ? 'µg' : 'mg';
+
+                        return (
+                            <div
+                                key={label}
+                                onClick={() => handleNutrientSelect(label)}
+                                className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-xl hover:scale-[1.02] transition-all relative group", t.itemBorder)}
+                            >
+                                <p className="text-[9px] font-black truncate mb-2 uppercase text-foreground/60 tracking-widest group-hover:text-blue-500 transition-colors">
+                                    {label}
+                                </p>
+                                <div className="space-y-0.5">
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-xl font-black italic tracking-tighter text-slate-900 dark:text-white">
+                                            {rda > 0 ? (rda >= 100 ? Math.round(rda) : rda.toFixed(1)) : '—'}
+                                        </span>
+                                        <span className="text-[10px] font-bold text-muted-foreground">{unitStr}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1 mt-1">
+                                        <Target size={10} className="text-emerald-500/50" />
+                                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">
+                                            Daily Target
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        );
+    };
 
     return (
-        <PageContainer maxWidth="max-w-7xl" className="-mt-12 md:-mt-16">
-            <div className="space-y-10 animate-in fade-in duration-700 pb-32 pt-0">
-                <div className="flex flex-col w-full min-h-screen">
+        <PageContainer maxWidth="max-w-6xl">
+            <div className="space-y-10 animate-in fade-in duration-700 pb-32 pt-4">
 
-                    {/* Nutrient Search Hero Workspace */}
-                    <div className="w-full md:max-w-[900px] mx-auto bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col mb-10">
-                        <div className="h-[180px] overflow-y-auto p-4 md:p-8 no-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1">
-                            {isHeroActive ? (
-                                <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                                    {heroResults.length > 0 ? (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                            {heroResults.map(nutrient => {
-                                                const Icon = nutrient.icon;
-                                                return (
-                                                    <button
-                                                        key={nutrient.id}
-                                                        onClick={() => handleNutrientSelect(nutrient.id)}
-                                                        className="w-full p-4 rounded-2xl hover:bg-blue-50 dark:hover:bg-blue-900/10 flex items-center justify-between group transition-all border border-slate-100 dark:border-slate-800 hover:border-blue-500/30 text-left"
-                                                    >
-                                                        <div className="flex items-center gap-4 min-w-0">
-                                                            <div className={cn("w-12 h-12 rounded-xl overflow-hidden shrink-0 flex items-center justify-center", nutrient.color + '/10')}>
-                                                                <Icon size={20} className={cn(nutrient.color.replace('bg-', 'text-'))} />
-                                                            </div>
-                                                            <div className="min-w-0">
-                                                                <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{nutrient.label}</h4>
-                                                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
-                                                                    {nutrient.unit ? `Measured in ${nutrient.unit}` : 'Nutrient'}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                        <ChevronRight className="text-slate-200 group-hover:text-blue-500 transition-colors shrink-0" size={20} />
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    ) : heroSearchQuery.length > 0 ? (
-                                        <div className="py-12 text-center text-slate-400">
-                                            <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-dashed border-slate-200 dark:border-slate-700">
-                                                <Search size={24} className="opacity-20" />
-                                            </div>
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">No matching nutrients found</p>
-                                        </div>
-                                    ) : (
-                                        <div className="py-12 text-center text-slate-400">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">Enter nutrient name to explore</p>
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <div className="flex flex-col items-center justify-center text-center h-full animate-in fade-in duration-700">
-                                    <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center mb-3 relative">
-                                        <Sparkles size={18} className="text-blue-500" />
-                                        <div className="absolute inset-0 rounded-full bg-blue-500/20 animate-ping" />
-                                    </div>
-                                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase italic tracking-tight mb-1">Essential Nutrients Guide</h3>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-md mb-3">
-                                        Search for any nutrient or use the <span className="font-bold text-slate-700 dark:text-slate-300">Macros</span>, <span className="font-bold text-slate-700 dark:text-slate-300">Minerals</span>, and <span className="font-bold text-slate-700 dark:text-slate-300">Vitamins</span> filters above.
-                                    </p>
-                                    <div className="flex items-center gap-2">
-                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-[8px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400"><Zap size={10} />Macros</span>
-                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-500/10 text-[8px] font-black uppercase tracking-widest text-purple-600 dark:text-purple-400"><Gem size={10} />Minerals</span>
-                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-yellow-500/10 text-[8px] font-black uppercase tracking-widest text-yellow-600 dark:text-yellow-400"><Battery size={10} />Vitamins</span>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="p-4 md:p-6 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3 bg-white dark:bg-slate-900 order-2 rounded-b-[2.5rem]">
-                            <div className="flex-1 relative flex items-center">
-                                <div className={cn("absolute left-5 transition-colors", isHeroActive ? "text-blue-500/50" : "text-slate-300")}>
-                                    <Search size={16} className="md:w-5 md:h-5" />
-                                </div>
-                                <input
-                                    placeholder={isHeroActive ? "SEARCH NUTRIENTS..." : "CLICK TO SEARCH..."}
-                                    className={cn(
-                                        "w-full bg-slate-50 dark:bg-slate-800/50 border-2 transition-all shadow-sm text-[10px] md:text-sm font-black uppercase tracking-widest h-12 md:h-14 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300",
-                                        isHeroActive
-                                            ? "border-blue-500/30 focus:border-blue-500/80 focus:ring-4 focus:ring-blue-500/10 focus:bg-white dark:focus:bg-slate-800/80"
-                                            : "border-slate-100 dark:border-slate-800 cursor-pointer hover:border-blue-500/20"
-                                    )}
-                                    value={heroSearchQuery}
-                                    onFocus={() => setIsHeroActive(true)}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Escape') {
-                                            setIsHeroActive(false);
-                                            setHeroSearchQuery('');
-                                        }
-                                    }}
-                                    onChange={(e) => {
-                                        if (!isHeroActive) setIsHeroActive(true);
-                                        handleHeroSearchInput(e.target.value);
-                                    }}
-                                />
-                            </div>
-                            {isHeroActive ? (
-                                <button
-                                    onClick={() => {
-                                        setIsHeroActive(false);
-                                        setHeroSearchQuery("");
-                                    }}
-                                    className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-full bg-blue-50 dark:bg-blue-950/30 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/40 flex items-center justify-center transition-all active:scale-95 group/cancel shadow-sm"
-                                    title="Close Search"
-                                >
-                                    <X size={18} className="md:w-6 md:h-6 group-hover/cancel:rotate-90 transition-transform duration-300" />
-                                </button>
-                            ) : (
-                                <div className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-full bg-slate-50 dark:bg-slate-800/50 text-slate-300 flex items-center justify-center">
-                                    <Search size={18} className="md:w-6 md:h-6" />
-                                </div>
-                            )}
-                        </div>
+                {/* Section Header */}
+                <div className="flex items-center gap-4 px-2">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shadow-sm border border-emerald-500/10">
+                        <Activity size={24} />
                     </div>
-
-                    {/* Nutrient List */}
-                    <div className="space-y-6 mt-6">
-                        {/* Macros Group */}
-                        <div>
-                            <div className="flex items-center gap-2 mb-3 px-2">
-                                <Zap size={14} className="text-amber-500" />
-                                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Macronutrients</h3>
-                                <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
-                            </div>
-                            <div className="space-y-1">
-                                {MACROS.map(id => {
-                                    const nutrient = NUTRIENTS.find(n => n.id === id);
-                                    if (!nutrient) return null;
-                                    const Icon = nutrient.icon;
-                                    return (
-                                        <div
-                                            key={nutrient.id}
-                                            onClick={() => handleNutrientSelect(nutrient.id)}
-                                            className="group relative bg-transparent rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:border-blue-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden cursor-pointer"
-                                        >
-                                            <div className="flex items-center gap-4 px-4 md:px-6 py-3">
-                                                <div className={cn("w-10 h-10 rounded-xl shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-500", nutrient.color + '/10')}>
-                                                    <Icon size={18} className={cn(nutrient.color.replace('bg-', 'text-'))} />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{nutrient.label}</h4>
-                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">
-                                                        {nutrient.unit ? `Measured in ${nutrient.unit}` : 'Overview'}
-                                                    </p>
-                                                </div>
-                                                <ChevronRight className="text-slate-200 dark:text-slate-700 group-hover:text-blue-500 transition-colors shrink-0" size={18} />
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {/* Minerals Group */}
-                        <div>
-                            <div className="flex items-center gap-2 mb-3 px-2">
-                                <Gem size={14} className="text-purple-500" />
-                                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Minerals</h3>
-                                <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
-                            </div>
-                            <div className="space-y-1">
-                                {MINERALS.map(id => {
-                                    const nutrient = NUTRIENTS.find(n => n.id === id);
-                                    if (!nutrient) return null;
-                                    const Icon = nutrient.icon;
-                                    return (
-                                        <div
-                                            key={nutrient.id}
-                                            onClick={() => handleNutrientSelect(nutrient.id)}
-                                            className="group relative bg-transparent rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:border-blue-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden cursor-pointer"
-                                        >
-                                            <div className="flex items-center gap-4 px-4 md:px-6 py-3">
-                                                <div className={cn("w-10 h-10 rounded-xl shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-500", nutrient.color + '/10')}>
-                                                    <Icon size={18} className={cn(nutrient.color.replace('bg-', 'text-'))} />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{nutrient.label}</h4>
-                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">
-                                                        {nutrient.unit ? `Measured in ${nutrient.unit}` : 'Overview'}
-                                                    </p>
-                                                </div>
-                                                <ChevronRight className="text-slate-200 dark:text-slate-700 group-hover:text-blue-500 transition-colors shrink-0" size={18} />
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {/* Vitamins Group */}
-                        <div>
-                            <div className="flex items-center gap-2 mb-3 px-2">
-                                <Battery size={14} className="text-yellow-500" />
-                                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Vitamins</h3>
-                                <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
-                            </div>
-                            <div className="space-y-1">
-                                {VITAMINS.map(id => {
-                                    const nutrient = NUTRIENTS.find(n => n.id === id);
-                                    if (!nutrient) return null;
-                                    const Icon = nutrient.icon;
-                                    return (
-                                        <div
-                                            key={nutrient.id}
-                                            onClick={() => handleNutrientSelect(nutrient.id)}
-                                            className="group relative bg-transparent rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:border-blue-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden cursor-pointer"
-                                        >
-                                            <div className="flex items-center gap-4 px-4 md:px-6 py-3">
-                                                <div className={cn("w-10 h-10 rounded-xl shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-500", nutrient.color + '/10')}>
-                                                    <Icon size={18} className={cn(nutrient.color.replace('bg-', 'text-'))} />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{nutrient.label}</h4>
-                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">
-                                                        {nutrient.unit ? `Measured in ${nutrient.unit}` : 'Overview'}
-                                                    </p>
-                                                </div>
-                                                <ChevronRight className="text-slate-200 dark:text-slate-700 group-hover:text-blue-500 transition-colors shrink-0" size={18} />
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {/* Other Nutrients */}
-                        <div>
-                            <div className="flex items-center gap-2 mb-3 px-2">
-                                <Activity size={14} className="text-emerald-500" />
-                                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Other</h3>
-                                <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
-                            </div>
-                            <div className="space-y-1">
-                                {OTHER.map(id => {
-                                    const nutrient = NUTRIENTS.find(n => n.id === id);
-                                    if (!nutrient) return null;
-                                    const Icon = nutrient.icon;
-                                    return (
-                                        <div
-                                            key={nutrient.id}
-                                            onClick={() => handleNutrientSelect(nutrient.id)}
-                                            className="group relative bg-transparent rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:border-blue-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden cursor-pointer"
-                                        >
-                                            <div className="flex items-center gap-4 px-4 md:px-6 py-3">
-                                                <div className={cn("w-10 h-10 rounded-xl shrink-0 flex items-center justify-center group-hover:scale-105 transition-transform duration-500", nutrient.color + '/10')}>
-                                                    <Icon size={18} className={cn(nutrient.color.replace('bg-', 'text-'))} />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{nutrient.label}</h4>
-                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">
-                                                        {nutrient.unit ? `Measured in ${nutrient.unit}` : 'Overview'}
-                                                    </p>
-                                                </div>
-                                                <ChevronRight className="text-slate-200 dark:text-slate-700 group-hover:text-blue-500 transition-colors shrink-0" size={18} />
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
+                    <div>
+                        <h2 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white leading-none">
+                            Essential Nutrients
+                        </h2>
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">
+                            Biological reference guide & profile targets
+                        </p>
                     </div>
-
                 </div>
+
+                <div className="space-y-4">
+                    <NutrientGrid
+                        title="Macronutrients"
+                        icon={Zap}
+                        theme="orange"
+                        subtitle="Detailed breakdown of energy and macro density"
+                        items={MACROS_MAP}
+                    />
+
+                    <NutrientGrid
+                        title="Electrolytes"
+                        icon={Zap}
+                        theme="indigo"
+                        subtitle="Essential minerals for cellular hydration and nerve signal transmission"
+                        items={{
+                            'Sodium': MINERALS_MAP['Sodium'],
+                            'Potassium': MINERALS_MAP['Potassium'],
+                            'Magnesium': MINERALS_MAP['Magnesium'],
+                            'Calcium': MINERALS_MAP['Calcium'],
+                            'Phosphorus': MINERALS_MAP['Phosphorus']
+                        }}
+                    />
+
+                    <NutrientGrid
+                        title="Trace Minerals"
+                        icon={Gem}
+                        theme="rose"
+                        subtitle="Essential minerals for energy and immune support"
+                        items={{
+                            'Iron': MINERALS_MAP['Iron'],
+                            'Zinc': MINERALS_MAP['Zinc'],
+                            'Copper': MINERALS_MAP['Copper'],
+                            'Manganese': MINERALS_MAP['Manganese'],
+                            'Selenium': MINERALS_MAP['Selenium']
+                        }}
+                    />
+
+                    <NutrientGrid
+                        title="Water-Soluble Vitamins"
+                        icon={Droplet}
+                        theme="blue"
+                        subtitle="Daily vitamins for a healthy mind and body"
+                        items={{
+                            'B1 (Thiamine)': VITAMINS_MAP['B1 (Thiamine)'],
+                            'B2 (Riboflavin)': VITAMINS_MAP['B2 (Riboflavin)'],
+                            'B3 (Niacin)': VITAMINS_MAP['B3 (Niacin)'],
+                            'B5 (Pantothenic Acid)': VITAMINS_MAP['B5 (Pantothenic Acid)'],
+                            'B6 (Pyridoxine)': VITAMINS_MAP['B6 (Pyridoxine)'],
+                            'B7 (Biotin)': VITAMINS_MAP['B7 (Biotin)'],
+                            'B9 (Folate)': VITAMINS_MAP['B9 (Folate)'],
+                            'B12 (Cobalamin)': VITAMINS_MAP['B12 (Cobalamin)'],
+                            'Vitamin C': VITAMINS_MAP['Vitamin C'],
+                            'Choline': OTHER_MAP['Choline']
+                        }}
+                    />
+
+                    <NutrientGrid
+                        title="Fat-Soluble Vitamins"
+                        icon={Battery}
+                        theme="emerald"
+                        subtitle="Stored vitamins for long-term vitality"
+                        items={{
+                            'Vitamin A': VITAMINS_MAP['Vitamin A'],
+                            'Vitamin D': VITAMINS_MAP['Vitamin D'],
+                            'Vitamin E': VITAMINS_MAP['Vitamin E'],
+                            'Vitamin K': VITAMINS_MAP['Vitamin K'],
+                        }}
+                    />
+
+                    <div className="pt-8 px-2 flex items-center gap-4">
+                        <div className="flex items-center gap-2">
+                            <Dna size={18} className="text-amber-500" />
+                            <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic">Advanced Nutrition</h3>
+                        </div>
+                        <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
+                    </div>
+
+                    <NutrientGrid
+                        title="Extra Markers"
+                        icon={Activity}
+                        theme="amber"
+                        subtitle="Key health markers and constituent nutrients"
+                        items={OTHER_MAP}
+                    />
+                </div>
+
+                {/* Info Card at the bottom */}
+                <div className="pt-10">
+                    <div className="w-full bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 p-8 flex flex-col md:flex-row items-center gap-8 shadow-sm">
+                        <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-500 shrink-0">
+                            <Sparkles size={32} />
+                        </div>
+                        <div className="space-y-4 flex-1">
+                            <div className="space-y-1">
+                                <h4 className="font-black text-[10px] uppercase tracking-[0.3em] text-blue-500">Biological Reference</h4>
+                                <h3 className="text-xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white">Profile-Aware Intelligence</h3>
+                            </div>
+                            <p className="text-sm font-bold text-slate-500 dark:text-slate-400 leading-relaxed italic border-l-4 border-blue-500/20 pl-6">
+                                "The targets shown above are custom-calculated based on your age, gender, and activity levels. Tap any card to discover life-enhancing benefits, deficiency warnings, and the best whole-food sources."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </PageContainer>
     );
