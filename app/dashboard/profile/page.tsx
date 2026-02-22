@@ -425,6 +425,30 @@ function ProfilePageContent() {
                                                 />
                                             </div>
                                         </div>
+
+                                        {/* BMR Result Section */}
+                                        <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className="bg-emerald-500/10 p-2 rounded-xl text-emerald-500">
+                                                    <Flame size={16} />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white leading-none">Basal Metabolic Rate</h4>
+                                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight mt-1">Calculated Energy Floor</p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="flex items-baseline gap-1 justify-end">
+                                                    <span className="text-xl font-black italic tracking-tighter text-slate-900 dark:text-white">
+                                                        {Math.round(bmr).toLocaleString()}
+                                                    </span>
+                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Kcal</span>
+                                                </div>
+                                                <p className="text-[9px] font-black text-emerald-500/60 uppercase tracking-widest mt-0.5">
+                                                    ≈ {Math.round(bmr * 4.184).toLocaleString()} kJ
+                                                </p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </section>
 
