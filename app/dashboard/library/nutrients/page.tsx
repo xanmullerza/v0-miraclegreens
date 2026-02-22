@@ -224,7 +224,7 @@ export default function NutrientsPage() {
 
                     {/* Nutrient Search Hero Workspace */}
                     <div className="w-full md:max-w-[900px] mx-auto bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col mb-10">
-                        <div className="h-[180px] overflow-y-auto p-4 md:p-8 no-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1">
+                        <div className="min-h-[180px] max-h-[420px] overflow-y-auto p-4 md:p-8 no-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1">
                             {isHeroActive ? (
                                 <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                                     {heroResults.length > 0 ? (
@@ -267,15 +267,58 @@ export default function NutrientsPage() {
                                     )}
                                 </div>
                             ) : (
-                                <div className="flex flex-col items-center justify-start pt-8 md:pt-10 text-center h-full animate-in fade-in duration-700">
-                                    <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center mb-4 relative">
-                                        <Library size={24} className="text-blue-500" />
-                                        <div className="absolute inset-0 rounded-full bg-blue-500/20 animate-ping" />
+                                <div className="space-y-4 animate-in fade-in duration-700">
+                                    {/* Header */}
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center relative shrink-0">
+                                            <Sparkles size={18} className="text-blue-500" />
+                                            <div className="absolute inset-0 rounded-full bg-blue-500/20 animate-ping" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase italic tracking-tight">Essential Nutrients Guide</h3>
+                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Search or use the filters above</p>
+                                        </div>
                                     </div>
-                                    <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase italic tracking-tight mb-1">Ready to Explore?</h3>
-                                    <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest max-w-xs">
-                                        Search below to discover nutrients
-                                    </p>
+
+                                    {/* Condensed Info Cards */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Activity size={14} className="text-emerald-500" />
+                                                <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">The Basics</span>
+                                            </div>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                                Essential nutrients are substances your body needs but cannot make on its own — carbs, proteins, fats, vitamins, minerals, and water. We need all of them to stay healthy.
+                                            </p>
+                                        </div>
+                                        <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Gem size={14} className="text-purple-500" />
+                                                <span className="text-[9px] font-black uppercase tracking-widest text-purple-600 dark:text-purple-400">Minerals</span>
+                                            </div>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                                Calcium strengthens bones, iron carries oxygen, potassium keeps your heart beating, and magnesium helps muscles relax. Eat a variety of vegetables, whole grains, nuts, and beans.
+                                            </p>
+                                        </div>
+                                        <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Battery size={14} className="text-yellow-500" />
+                                                <span className="text-[9px] font-black uppercase tracking-widest text-yellow-600 dark:text-yellow-400">Vitamins</span>
+                                            </div>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                                13 essential vitamins keep your body running — C fights infections, B vitamins give energy, D helps absorb calcium. Eat fruits, vegetables, and whole foods to cover your needs.
+                                            </p>
+                                        </div>
+                                        <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <Zap size={14} className="text-amber-500" />
+                                                <span className="text-[9px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">Macros</span>
+                                            </div>
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                                Carbs fuel your brain, proteins build muscle, fats protect organs. Fiber keeps digestion smooth and blood sugar stable. Balance all three for optimal health.
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
@@ -326,113 +369,6 @@ export default function NutrientsPage() {
                         </div>
                     </div>
 
-                    {/* Main Content */}
-                    <div className="flex-1 space-y-12 p-4 md:p-8 pb-24 max-w-3xl mx-auto w-full">
-                        {/* Advisory Card */}
-                        <section className="space-y-6">
-                            <div className="flex items-center gap-4">
-                                <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500">
-                                    <Sparkles size={24} className="stroke-[2.5]" />
-                                </div>
-                                <div>
-                                    <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Explore Essential Nutrients</h2>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Learn About Your Health</p>
-                                </div>
-                            </div>
-                            <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50">
-                                <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                                    Click on the <span className="font-bold">Macros</span>, <span className="font-bold">Minerals</span>, or <span className="font-bold">Vitamins</span> filters above to discover detailed information about each nutrient, including recommended daily intake, food sources, health benefits, and more.
-                                </p>
-                            </div>
-                        </section>
-
-                        {/* Essential Nutrients Guide */}
-                        <div className="space-y-8 prose prose-invert max-w-none">
-                            {/* Understanding Essential Nutrients */}
-                            <section className="space-y-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500">
-                                        <Activity size={24} className="stroke-[2.5]" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Understanding Essential Nutrients</h3>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">The Basics</p>
-                                    </div>
-                                </div>
-                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-4 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50">
-                                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                                        Essential nutrients are substances your body needs but cannot make on its own. Think of them like ingredients your body needs daily to work properly. Without them, your body can't do basic things like get energy, build muscle, fight infections, or think clearly.
-                                    </p>
-                                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                                        There are six main groups of nutrients: carbohydrates (energy), proteins (building material), fats (hormone and energy support), vitamins (help with body functions), minerals (strengthen bones and regulate body processes), and water. We need all of them to stay healthy.
-                                    </p>
-                                </div>
-                            </section>
-
-                            {/* Why Minerals Matter */}
-                            <section className="space-y-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500">
-                                        <Gem size={24} className="stroke-[2.5]" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Why Minerals Matter</h3>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Building Blocks of Health</p>
-                                    </div>
-                                </div>
-                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-4 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50">
-                                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                                        Minerals are natural substances found in foods that your body needs to function. Common minerals like calcium, magnesium, iron, and potassium do important jobs: calcium makes bones strong, iron carries oxygen in your blood, potassium keeps your heart beating properly, and magnesium helps your muscles relax.
-                                    </p>
-                                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                                        Without enough minerals, your body struggles. For example, if you don't get enough iron, you feel tired and weak. If you don't get enough calcium, your bones become weak and fragile. The good news is that eating a variety of foods—vegetables, whole grains, nuts, and beans—gives you the minerals you need to feel your best and stay healthy.
-                                    </p>
-                                </div>
-                            </section>
-
-                            {/* The Vital Role of Vitamins */}
-                            <section className="space-y-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500">
-                                        <Battery size={24} className="stroke-[2.5]" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">The Vital Role of Vitamins</h3>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Essential Compounds</p>
-                                    </div>
-                                </div>
-                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-4 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50">
-                                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                                        Vitamins are organic compounds that keep your body running smoothly. They help turn food into energy, boost your immune system, heal wounds, and protect your cells from damage. There are 13 essential vitamins your body can't do without.
-                                    </p>
-                                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                                        Think of vitamins like the spark plugs in a car—they make things happen. Vitamin C helps you fight colds and makes your skin glow. B vitamins give you energy and keep your brain working well. Vitamin D helps your body absorb calcium and keeps you feeling happy. Without the right vitamins, you get tired, get sick more often, and don't feel like yourself. Eating fruits, vegetables, and whole foods makes sure you get all the vitamins you need.
-                                    </p>
-                                </div>
-                            </section>
-
-                            {/* Macronutrients */}
-                            <section className="space-y-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="flex-shrink-0 bg-emerald-500/20 p-3 rounded-2xl text-emerald-500">
-                                        <Zap size={24} className="stroke-[2.5]" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Macronutrients: Your Body's Fuel</h3>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Energy & Structure</p>
-                                    </div>
-                                </div>
-                                <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-4 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-emerald-500 before:to-emerald-500/50">
-                                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                                        Macronutrients are the big three: carbs, proteins, and fats. You need them in larger amounts because they provide energy and build your body. Carbs are your brain's favorite fuel—they give you energy to think and move. Proteins build your muscles, skin, and hair. Fats help your brain work, protect your organs, and help your body absorb vitamins.
-                                    </p>
-                                    <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-base">
-                                        Fiber is also important—it helps your digestion work smoothly, keeps your blood sugar stable, and makes you feel full longer. The secret to good health is eating the right balance of all these nutrients. That's where this tool comes in handy. By exploring individual nutrients, you'll learn which foods give you what you need, so you can eat smart and feel great.
-                                    </p>
-                                </div>
-                            </section>
-                        </div>
-                    </div>
                 </div>
             </div>
         </PageContainer>
