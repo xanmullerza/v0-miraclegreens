@@ -192,6 +192,16 @@ function ProfilePageContent() {
     const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
     const [isAddingMember, setIsAddingMember] = useState(false);
 
+    // Sync formData with profile when profile changes (e.g. after async cloud sync)
+    React.useEffect(() => {
+        setFormData({
+            ...profile,
+            exclusions: profile.exclusions || [],
+            healthConditions: profile.healthConditions || [],
+            familyMembers: profile.familyMembers || []
+        });
+    }, [profile]);
+
     // 1. Calculate BMR (Mifflin-St Jeor) - Formula expects metric (kg, cm)
     const weightVal = Number(formData.weight) || 70;
     const heightVal = Number(formData.height) || 170;

@@ -245,6 +245,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
                     exclusions: newProfile.exclusions
                 },
                 country: newProfile.country,
+                health_conditions: newProfile.healthConditions,
                 family_members: newProfile.familyMembers,
                 updated_at: new Date().toISOString()
             } as any);
