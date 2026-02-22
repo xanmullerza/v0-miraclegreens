@@ -394,7 +394,7 @@ function ProfilePageContent() {
                     </div>
                 </div>
 
-                <Sheet open={showRDADrawer} onOpenChange={setShowRDADrawer}>
+                <Sheet open={showRDADrawer} onOpenChange={setShowRDADrawer} modal={!isDesktop}>
                     <div className="flex flex-col lg:flex-row gap-6 items-start justify-center">
                         {/* Main Content (Compact Settings) */}
                         <div className="max-w-2xl w-full space-y-8 pb-32">
