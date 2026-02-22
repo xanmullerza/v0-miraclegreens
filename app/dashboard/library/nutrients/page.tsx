@@ -61,6 +61,8 @@ const NUTRIENTS = [
     { id: 'Omega-3', label: 'Omega-3', unit: 'g', color: 'bg-teal-500', icon: Droplet },
     { id: 'Oxalate', label: 'Oxalate', unit: 'mg', color: 'bg-amber-600', icon: Gem },
     { id: 'Sugar', label: 'Sugar', unit: 'g', color: 'bg-pink-400', icon: Zap },
+    { id: 'water_g', label: 'Water', unit: 'g', color: 'bg-blue-400', icon: Droplet },
+    { id: 'biotin_ug', label: 'B7 (Biotin)', unit: 'µg', color: 'bg-blue-500', icon: Droplet },
     { id: 'welcome', label: 'Welcome', unit: '', color: 'bg-emerald-500', icon: Sparkles },
 ];
 
@@ -81,7 +83,7 @@ export default function NutrientsPage() {
     const MACROS = ['carbs_g', 'protein_g', 'fat_g'];
     const MINERALS = ['Sodium', 'Potassium', 'Magnesium', 'Calcium', 'Phosphorus', 'Iron', 'Zinc', 'Copper', 'Manganese', 'Selenium'];
     const VITAMINS = ['Vitamin A', 'Vitamin D', 'Vitamin E', 'Vitamin K', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Vitamin C'];
-    const OTHER = ['Fiber', 'Choline'];
+    const OTHER = ['Fiber', 'Choline', 'water_g', 'biotin_ug'];
 
     const handleNutrientSelect = (id: string) => {
         setSelectedNutrientId(id);
