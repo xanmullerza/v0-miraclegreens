@@ -27,7 +27,8 @@ import {
     ChevronDown,
     ChevronUp,
     X,
-    Users
+    Users,
+    Target
 } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { useRDA } from '@/hooks/use-rda';
@@ -489,6 +490,68 @@ function ProfilePageContent() {
                                     </div>
                                 </section>
 
+                                {/* Goals Card */}
+                                <section className="space-y-6">
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
+                                            <Activity size={24} className="stroke-[2.5]" />
+                                        </div>
+                                        <div>
+                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Goals</h2>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Fitness Direction</p>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
+                                        {/* Biological Goal */}
+                                        <div className="space-y-4">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Goal</Label>
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <GoalCard type="lose-fat" label="Lose Fat" selected={formData.goal === 'lose-fat'} onClick={() => setFormData({ ...formData, goal: 'lose-fat' })} icon={TrendingDown} />
+                                                <GoalCard type="maintain" label="Maintain" selected={formData.goal === 'maintain'} onClick={() => setFormData({ ...formData, goal: 'maintain' })} icon={Activity} />
+                                                <GoalCard type="build-muscle" label="Build Muscle" selected={formData.goal === 'build-muscle'} onClick={() => setFormData({ ...formData, goal: 'build-muscle' })} icon={Dumbbell} />
+                                            </div>
+                                        </div>
+                                        {/* Activity Level */}
+                                        <div className="space-y-4">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Activity Level</Label>
+                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                <GoalCard type="sedentary" label="Sedentary" selected={formData.activityLevel === 'sedentary'} onClick={() => setFormData({ ...formData, activityLevel: 'sedentary' })} icon={User} />
+                                                <GoalCard type="light" label="Lightly Active" selected={formData.activityLevel === 'light'} onClick={() => setFormData({ ...formData, activityLevel: 'light' })} icon={ChevronRight} />
+                                                <GoalCard type="moderate" label="Moderate" selected={formData.activityLevel === 'moderate'} onClick={() => setFormData({ ...formData, activityLevel: 'moderate' })} icon={Zap} />
+                                                <GoalCard type="active" label="Very Active" selected={formData.activityLevel === 'active'} onClick={() => setFormData({ ...formData, activityLevel: 'active' })} icon={Flame} />
+                                            </div>
+                                        </div>
+
+                                        {/* TDEE Result Section */}
+                                        <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                            <div className="flex items-center gap-3">
+                                                <div className="bg-purple-500/10 p-2 rounded-xl text-purple-500">
+                                                    <Target size={16} />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white leading-none">Total Daily Expenditure (TDEE)</h4>
+                                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight mt-1">BMR × Activity Multiplier ± Goal Offset</p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="flex items-baseline gap-1 justify-end">
+                                                    <span className="text-xl font-black italic tracking-tighter text-slate-900 dark:text-white">
+                                                        {energyUnit === 'kJ'
+                                                            ? Math.round(tdee * 4.184).toLocaleString()
+                                                            : Math.round(tdee).toLocaleString()}
+                                                    </span>
+                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                        {energyUnit === 'kJ' ? 'kJ' : 'kcal'}
+                                                    </span>
+                                                </div>
+                                                <p className="text-[9px] font-black text-purple-500/60 uppercase tracking-widest mt-0.5">
+                                                    Daily Target Energy
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+
                                 {/* Dietary Profile Card */}
                                 <section className="space-y-6">
                                     <div className="flex items-center gap-4">
@@ -600,39 +663,6 @@ function ProfilePageContent() {
                                     </div>
                                 </section>
 
-                                {/* Goals Card */}
-                                <section className="space-y-6">
-                                    <div className="flex items-center gap-4">
-                                        <div className="flex-shrink-0 bg-purple-500/20 p-3 rounded-2xl text-purple-500">
-                                            <Activity size={24} className="stroke-[2.5]" />
-                                        </div>
-                                        <div>
-                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Goals</h2>
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Fitness Direction</p>
-                                        </div>
-                                    </div>
-                                    <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-purple-500 before:to-purple-500/50">
-                                        {/* Biological Goal */}
-                                        <div className="space-y-4">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Goal</Label>
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                <GoalCard type="lose-fat" label="Lose Fat" selected={formData.goal === 'lose-fat'} onClick={() => setFormData({ ...formData, goal: 'lose-fat' })} icon={TrendingDown} />
-                                                <GoalCard type="maintain" label="Maintain" selected={formData.goal === 'maintain'} onClick={() => setFormData({ ...formData, goal: 'maintain' })} icon={Activity} />
-                                                <GoalCard type="build-muscle" label="Build Muscle" selected={formData.goal === 'build-muscle'} onClick={() => setFormData({ ...formData, goal: 'build-muscle' })} icon={Dumbbell} />
-                                            </div>
-                                        </div>
-                                        {/* Activity Level */}
-                                        <div className="space-y-4">
-                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Activity Level</Label>
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                                <GoalCard type="sedentary" label="Sedentary" selected={formData.activityLevel === 'sedentary'} onClick={() => setFormData({ ...formData, activityLevel: 'sedentary' })} icon={User} />
-                                                <GoalCard type="light" label="Lightly Active" selected={formData.activityLevel === 'light'} onClick={() => setFormData({ ...formData, activityLevel: 'light' })} icon={ChevronRight} />
-                                                <GoalCard type="moderate" label="Moderate" selected={formData.activityLevel === 'moderate'} onClick={() => setFormData({ ...formData, activityLevel: 'moderate' })} icon={Zap} />
-                                                <GoalCard type="active" label="Very Active" selected={formData.activityLevel === 'active'} onClick={() => setFormData({ ...formData, activityLevel: 'active' })} icon={Flame} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </section>
 
                                 {/* FAMILY PROTOCOLS - Hidden for now */}
                                 {false && (
