@@ -60,7 +60,7 @@ const NutrientItem = ({
         <div className="space-y-0.5">
             <div className="flex items-baseline gap-1">
                 <span className="text-xl font-black italic tracking-tighter text-slate-900 dark:text-white">
-                    {rda > 0 ? (rda >= 100 ? Math.round(rda) : rda.toFixed(1)) : '—'}
+                    {rda > 0 ? (rda >= 100 ? Math.round(rda) : parseFloat(rda.toFixed(1))) : '—'}
                 </span>
                 <span className="text-[10px] font-bold text-muted-foreground">{unitStr}</span>
             </div>
