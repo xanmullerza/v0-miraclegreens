@@ -344,7 +344,9 @@ export default function NutrientsPage() {
                                 <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
                             </div>
                             <div className="space-y-1">
-                                {NUTRIENTS.filter(n => MACROS.includes(n.id)).map(nutrient => {
+                                {MACROS.map(id => {
+                                    const nutrient = NUTRIENTS.find(n => n.id === id);
+                                    if (!nutrient) return null;
                                     const Icon = nutrient.icon;
                                     return (
                                         <div
@@ -378,7 +380,9 @@ export default function NutrientsPage() {
                                 <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
                             </div>
                             <div className="space-y-1">
-                                {NUTRIENTS.filter(n => MINERALS.includes(n.id)).map(nutrient => {
+                                {MINERALS.map(id => {
+                                    const nutrient = NUTRIENTS.find(n => n.id === id);
+                                    if (!nutrient) return null;
                                     const Icon = nutrient.icon;
                                     return (
                                         <div
@@ -412,7 +416,9 @@ export default function NutrientsPage() {
                                 <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
                             </div>
                             <div className="space-y-1">
-                                {NUTRIENTS.filter(n => VITAMINS.includes(n.id)).map(nutrient => {
+                                {VITAMINS.map(id => {
+                                    const nutrient = NUTRIENTS.find(n => n.id === id);
+                                    if (!nutrient) return null;
                                     const Icon = nutrient.icon;
                                     return (
                                         <div
@@ -446,7 +452,9 @@ export default function NutrientsPage() {
                                 <div className="flex-1 h-px bg-slate-100 dark:bg-slate-800" />
                             </div>
                             <div className="space-y-1">
-                                {NUTRIENTS.filter(n => OTHER.includes(n.id)).map(nutrient => {
+                                {OTHER.map(id => {
+                                    const nutrient = NUTRIENTS.find(n => n.id === id);
+                                    if (!nutrient) return null;
                                     const Icon = nutrient.icon;
                                     return (
                                         <div
