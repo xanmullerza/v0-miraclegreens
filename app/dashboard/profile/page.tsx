@@ -25,6 +25,7 @@ import {
     Fingerprint,
     Info,
     ChevronDown,
+    ChevronUp,
     X,
     Users
 } from 'lucide-react';
@@ -396,33 +397,63 @@ function ProfilePageContent() {
                                             </div>
                                             <div className="space-y-2">
                                                 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Age</Label>
-                                                <Input
-                                                    type="number"
-                                                    value={formData.age === '' ? '' : formData.age}
-                                                    onChange={(e) => setFormData({ ...formData, age: e.target.value ? Number(e.target.value) : '' })}
-                                                    placeholder="Age"
-                                                    className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold"
-                                                />
+                                                <div className="relative group/stepper">
+                                                    <Input
+                                                        type="number"
+                                                        value={formData.age === '' ? '' : formData.age}
+                                                        onChange={(e) => setFormData({ ...formData, age: e.target.value ? Number(e.target.value) : '' })}
+                                                        placeholder="Age"
+                                                        className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
+                                                    />
+                                                    <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
+                                                        <button onClick={() => setFormData(prev => ({ ...prev, age: (Number(prev.age) || 0) + 1 }))} className="hover:text-emerald-500 transition-colors">
+                                                            <ChevronUp size={12} />
+                                                        </button>
+                                                        <button onClick={() => setFormData(prev => ({ ...prev, age: Math.max(0, (Number(prev.age) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
+                                                            <ChevronDown size={12} />
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div className="space-y-2">
                                                 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Weight (kg)</Label>
-                                                <Input
-                                                    type="number"
-                                                    value={formData.weight === '' ? '' : formData.weight}
-                                                    onChange={(e) => setFormData({ ...formData, weight: e.target.value ? Number(e.target.value) : '' })}
-                                                    placeholder="kg"
-                                                    className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold"
-                                                />
+                                                <div className="relative group/stepper">
+                                                    <Input
+                                                        type="number"
+                                                        value={formData.weight === '' ? '' : formData.weight}
+                                                        onChange={(e) => setFormData({ ...formData, weight: e.target.value ? Number(e.target.value) : '' })}
+                                                        placeholder="kg"
+                                                        className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
+                                                    />
+                                                    <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
+                                                        <button onClick={() => setFormData(prev => ({ ...prev, weight: (Number(prev.weight) || 0) + 1 }))} className="hover:text-emerald-500 transition-colors">
+                                                            <ChevronUp size={12} />
+                                                        </button>
+                                                        <button onClick={() => setFormData(prev => ({ ...prev, weight: Math.max(0, (Number(prev.weight) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
+                                                            <ChevronDown size={12} />
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div className="space-y-2">
                                                 <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Height (cm)</Label>
-                                                <Input
-                                                    type="number"
-                                                    value={formData.height === '' ? '' : formData.height}
-                                                    onChange={(e) => setFormData({ ...formData, height: e.target.value ? Number(e.target.value) : '' })}
-                                                    placeholder="cm"
-                                                    className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold"
-                                                />
+                                                <div className="relative group/stepper">
+                                                    <Input
+                                                        type="number"
+                                                        value={formData.height === '' ? '' : formData.height}
+                                                        onChange={(e) => setFormData({ ...formData, height: e.target.value ? Number(e.target.value) : '' })}
+                                                        placeholder="cm"
+                                                        className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
+                                                    />
+                                                    <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
+                                                        <button onClick={() => setFormData(prev => ({ ...prev, height: (Number(prev.height) || 0) + 1 }))} className="hover:text-emerald-500 transition-colors">
+                                                            <ChevronUp size={12} />
+                                                        </button>
+                                                        <button onClick={() => setFormData(prev => ({ ...prev, height: Math.max(0, (Number(prev.height) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
+                                                            <ChevronDown size={12} />
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -434,18 +465,24 @@ function ProfilePageContent() {
                                                 </div>
                                                 <div>
                                                     <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white leading-none">Basal Metabolic Rate</h4>
-                                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight mt-1">Calculated Energy Floor</p>
+                                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tight mt-1">Calculated using Mifflin-St Jeor equation</p>
                                                 </div>
                                             </div>
                                             <div className="text-right">
                                                 <div className="flex items-baseline gap-1 justify-end">
                                                     <span className="text-xl font-black italic tracking-tighter text-slate-900 dark:text-white">
-                                                        {Math.round(bmr).toLocaleString()}
+                                                        {energyUnit === 'kJ'
+                                                            ? Math.round(bmr * 4.184).toLocaleString()
+                                                            : Math.round(bmr).toLocaleString()}
                                                     </span>
-                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Kcal</span>
+                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                                        {energyUnit === 'kJ' ? 'kJ' : 'kcal'}
+                                                    </span>
                                                 </div>
                                                 <p className="text-[9px] font-black text-emerald-500/60 uppercase tracking-widest mt-0.5">
-                                                    ≈ {Math.round(bmr * 4.184).toLocaleString()} kJ
+                                                    ≈ {energyUnit === 'kJ'
+                                                        ? `${Math.round(bmr).toLocaleString()} kcal`
+                                                        : `${Math.round(bmr * 4.184).toLocaleString()} kJ`}
                                                 </p>
                                             </div>
                                         </div>
