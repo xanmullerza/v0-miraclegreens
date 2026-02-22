@@ -34,7 +34,8 @@ import {
     Moon,
     X,
     ChevronUp,
-    ChevronDown
+    ChevronDown,
+    BarChart3
 } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { useRDA } from '@/hooks/use-rda';
@@ -175,6 +176,8 @@ function ProfilePageContent() {
         setEnergyUnit,
         measurementUnit,
         setMeasurementUnit,
+        nutrientDisplayMode,
+        setNutrientDisplayMode,
         showRDADrawer,
         setShowRDADrawer
     } = useUserPreferences();
@@ -537,6 +540,41 @@ function ProfilePageContent() {
                                                     </button>
                                                 </div>
                                             </div>
+                                        </div>
+
+                                        {/* Nutrient Display Mode */}
+                                        <div className="space-y-3 pt-6 border-t border-slate-100 dark:border-slate-800">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">RDA Display</Label>
+                                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
+                                                <button
+                                                    onClick={(e) => { e.preventDefault(); setNutrientDisplayMode("value"); }}
+                                                    className={cn(
+                                                        "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
+                                                        nutrientDisplayMode === "value" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                    )}
+                                                >
+                                                    <BarChart3 size={12} /> Value
+                                                </button>
+                                                <button
+                                                    onClick={(e) => { e.preventDefault(); setNutrientDisplayMode("percentage"); }}
+                                                    className={cn(
+                                                        "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
+                                                        nutrientDisplayMode === "percentage" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                    )}
+                                                >
+                                                    %
+                                                </button>
+                                                <button
+                                                    onClick={(e) => { e.preventDefault(); setNutrientDisplayMode("both"); }}
+                                                    className={cn(
+                                                        "flex-1 flex items-center justify-center gap-1.5 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
+                                                        nutrientDisplayMode === "both" ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm" : "text-slate-500"
+                                                    )}
+                                                >
+                                                    Both
+                                                </button>
+                                            </div>
+                                            <p className="text-[9px] text-slate-400 italic px-1">Show nutrient values as raw amounts, RDA percentages, or both.</p>
                                         </div>
                                     </div>
                                 </section>
