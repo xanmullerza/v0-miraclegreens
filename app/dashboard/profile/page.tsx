@@ -361,7 +361,7 @@ function ProfilePageContent() {
                 {/* Profile Header */}
                 <div className="max-w-2xl mx-auto mb-12 flex flex-col items-center text-center space-y-4">
                     <div className="relative group">
-                        <div className="w-24 h-24 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-500 shadow-2xl shadow-emerald-500/10 overflow-hidden transition-transform group-hover:scale-105 duration-500">
+                        <div className="w-24 h-24 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-500 shadow-2xl shadow-purple-500/10 overflow-hidden transition-transform group-hover:scale-105 duration-500">
                             {user?.user_metadata?.avatar_url ? (
                                 <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
                             ) : (
@@ -376,8 +376,8 @@ function ProfilePageContent() {
                         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mt-2 flex items-center justify-center gap-2">
                             {isAdmin ? (
                                 <>
-                                    <Fingerprint size={12} className="text-emerald-500" />
-                                    <span className="text-emerald-500">Security Officer / Admin</span>
+                                    <Fingerprint size={12} className="text-purple-500" />
+                                    <span className="text-purple-500">Security Officer / Admin</span>
                                 </>
                             ) : user ? (
                                 <>
@@ -414,16 +414,16 @@ function ProfilePageContent() {
                                         {/* Country Selector */}
                                         <div className="space-y-4">
                                             <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Your Region</Label>
-                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                            <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl h-10">
                                                 {Object.keys(COUNTRY_PRESETS).map(country => (
                                                     <button
                                                         key={country}
                                                         onClick={() => handleCountryChange(country)}
                                                         className={cn(
-                                                            "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-center",
+                                                            "flex-1 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all text-center",
                                                             formData.country === country
-                                                                ? "bg-purple-500 text-white shadow-lg shadow-purple-500/20"
-                                                                : "bg-slate-50 dark:bg-slate-900 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                                                ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm"
+                                                                : "text-slate-500 hover:text-purple-600 dark:hover:text-purple-400"
                                                         )}
                                                     >
                                                         {country}
@@ -536,7 +536,7 @@ function ProfilePageContent() {
                                                         className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
                                                     />
                                                     <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
-                                                        <button onClick={() => setFormData(prev => ({ ...prev, age: (Number(prev.age) || 0) + 1 }))} className="hover:text-emerald-500 transition-colors">
+                                                        <button onClick={() => setFormData(prev => ({ ...prev, age: (Number(prev.age) || 0) + 1 }))} className="hover:text-purple-500 transition-colors">
                                                             <ChevronUp size={12} />
                                                         </button>
                                                         <button onClick={() => setFormData(prev => ({ ...prev, age: Math.max(0, (Number(prev.age) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
@@ -556,7 +556,7 @@ function ProfilePageContent() {
                                                         className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
                                                     />
                                                     <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
-                                                        <button onClick={() => setFormData(prev => ({ ...prev, weight: (Number(prev.weight) || 0) + 1 }))} className="hover:text-emerald-500 transition-colors">
+                                                        <button onClick={() => setFormData(prev => ({ ...prev, weight: (Number(prev.weight) || 0) + 1 }))} className="hover:text-purple-500 transition-colors">
                                                             <ChevronUp size={12} />
                                                         </button>
                                                         <button onClick={() => setFormData(prev => ({ ...prev, weight: Math.max(0, (Number(prev.weight) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
@@ -576,7 +576,7 @@ function ProfilePageContent() {
                                                         className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
                                                     />
                                                     <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
-                                                        <button onClick={() => setFormData(prev => ({ ...prev, height: (Number(prev.height) || 0) + 1 }))} className="hover:text-emerald-500 transition-colors">
+                                                        <button onClick={() => setFormData(prev => ({ ...prev, height: (Number(prev.height) || 0) + 1 }))} className="hover:text-purple-500 transition-colors">
                                                             <ChevronUp size={12} />
                                                         </button>
                                                         <button onClick={() => setFormData(prev => ({ ...prev, height: Math.max(0, (Number(prev.height) || 0) - 1) }))} className="hover:text-rose-500 transition-colors">
@@ -590,7 +590,7 @@ function ProfilePageContent() {
                                         {/* BMR Result Section */}
                                         <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                                             <div className="flex items-center gap-3">
-                                                <div className="bg-emerald-500/10 p-2 rounded-xl text-emerald-500">
+                                                <div className="bg-purple-500/10 p-2 rounded-xl text-purple-500">
                                                     <Flame size={16} />
                                                 </div>
                                                 <div>
@@ -609,7 +609,7 @@ function ProfilePageContent() {
                                                         {energyUnit === 'kJ' ? 'kJ' : 'kcal'}
                                                     </span>
                                                 </div>
-                                                <p className="text-[9px] font-black text-emerald-500/60 uppercase tracking-widest mt-0.5">
+                                                <p className="text-[9px] font-black text-purple-500/60 uppercase tracking-widest mt-0.5">
                                                     ≈ {energyUnit === 'kJ'
                                                         ? `${Math.round(bmr).toLocaleString()} kcal`
                                                         : `${Math.round(bmr * 4.184).toLocaleString()} kJ`}
@@ -827,7 +827,7 @@ function ProfilePageContent() {
                                                 {/* Add Button */}
                                                 <button
                                                     onClick={() => setIsAddingMember(true)}
-                                                    className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/5 transition-all text-slate-400 hover:text-emerald-500 h-[100px]"
+                                                    className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 hover:border-purple-500/50 hover:bg-purple-50/50 dark:hover:bg-purple-500/5 transition-all text-slate-400 hover:text-purple-500 h-[100px]"
                                                 >
                                                     <div className="p-2 rounded-full bg-slate-50 dark:bg-slate-900 group-hover:bg-white transition-colors">
                                                         <Plus size={20} />
@@ -882,10 +882,10 @@ function ProfilePageContent() {
                                     <Button
                                         onClick={handleLogin}
                                         disabled={loading}
-                                        className="w-full mt-8 h-12 bg-slate-950 hover:bg-black dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 border-none shadow-2xl shadow-emerald-500/10 font-black text-xs uppercase tracking-widest rounded-xl flex items-center justify-center gap-4 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+                                        className="w-full mt-8 h-12 bg-slate-950 hover:bg-black dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 border-none shadow-2xl shadow-purple-500/10 font-black text-xs uppercase tracking-widest rounded-xl flex items-center justify-center gap-4 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
                                     >
                                         {loading ? (
-                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-emerald-500" />
+                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-500" />
                                         ) : (
                                             <>
                                                 <svg className="w-4 h-4" viewBox="0 0 24 24">
@@ -903,7 +903,14 @@ function ProfilePageContent() {
                         </div>
 
                         {/* RDA Sheet Slider */}
-                        <SheetContent side="left" className="max-w-md w-full bg-slate-950 border-l-0 border-r border-slate-800 p-0 flex flex-col">
+                        <SheetContent
+                            side="left"
+                            className="max-w-md w-full bg-slate-950 border-l-0 border-r border-slate-800 p-0 flex flex-col focus:outline-none"
+                            hideOverlay={isDesktop}
+                            onInteractOutside={(e) => {
+                                if (isDesktop) e.preventDefault();
+                            }}
+                        >
                             <SheetHeader className="bg-slate-900/80 p-6 border-b border-slate-800">
                                 <SheetTitle className="text-lg font-black text-purple-400 uppercase tracking-widest font-sans">Recommended Intake</SheetTitle>
                             </SheetHeader>
@@ -961,15 +968,15 @@ function ProfilePageContent() {
                                 })()}
                                 {/* Nutrition Toggles */}
                                 <div className="flex bg-slate-900 p-1 rounded-2xl">
-                                    <button className="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl bg-slate-800 text-emerald-400 shadow-lg">Daily Targets</button>
+                                    <button className="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl bg-slate-800 text-purple-400 shadow-lg">Daily Targets</button>
                                     <button className="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl text-slate-500 hover:text-slate-300 transition-colors">Safety Limits</button>
                                 </div>
                             </div>
 
                             <div className="p-6 border-t border-slate-800 bg-slate-900/50">
-                                <div className="bg-emerald-500/5 rounded-2xl p-4 border border-emerald-500/10">
+                                <div className="bg-purple-500/5 rounded-2xl p-4 border border-purple-500/10">
                                     <div className="flex items-start gap-3">
-                                        <Info size={14} className="text-emerald-500 mt-0.5" />
+                                        <Info size={14} className="text-purple-500 mt-0.5" />
                                         <p className="text-[9px] leading-relaxed text-slate-400 uppercase tracking-tight font-bold">
                                             These values reflect your current bio-data presets. Updating your weight or activity level will automatically recalibrate these targets.
                                         </p>
@@ -988,7 +995,7 @@ export default function ProfilePage() {
     return (
         <React.Suspense fallback={
             <div className="min-h-[400px] flex flex-col items-center justify-center space-y-4">
-                <div className="animate-spin h-8 w-8 border-4 border-emerald-500 border-t-transparent rounded-full" />
+                <div className="animate-spin h-8 w-8 border-4 border-purple-500 border-t-transparent rounded-full" />
                 <p className="text-xs font-black uppercase tracking-widest text-slate-400">Loading DNA Protocol...</p>
             </div>
         }>
