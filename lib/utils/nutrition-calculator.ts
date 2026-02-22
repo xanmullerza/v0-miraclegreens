@@ -26,10 +26,15 @@ export interface UserTargetParams {
     activityLevel: ActivityLevel;
     goal: GoalType;
     nutrientStrategy: NutrientStrategy;
+    measurementUnit?: 'metric' | 'imperial';
 }
 
 export function calculateIndividualTargets(params: UserTargetParams) {
-    const { weight, height, age, gender, activityLevel, goal, nutrientStrategy } = params;
+    const { weight: wInput, height: hInput, age, gender, activityLevel, goal, nutrientStrategy, measurementUnit } = params;
+
+    // Convert to metric for formula if needed
+    const weight = measurementUnit === 'imperial' ? wInput * 0.453592 : wInput;
+    const height = measurementUnit === 'imperial' ? hInput * 2.54 : hInput;
 
     // BMR (Mifflin-St Jeor)
     const s = gender === 'male' ? 5 : -161;

@@ -34,6 +34,7 @@ interface UserProfile {
     nutrientStrategy: NutrientStrategy;
     exclusions: string[];
     healthConditions: string[];
+    country: string;
     familyMembers: FamilyMember[];
 }
 
@@ -85,6 +86,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         nutrientStrategy: "balanced",
         exclusions: [],
         healthConditions: [],
+        country: "Australia",
         familyMembers: []
     });
     const [skipPlannerQuiz, setSkipPlannerQuizState] = useState(false);
@@ -166,6 +168,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
                                 nutrientStrategy: data.nutrient_strategy || "balanced",
                                 exclusions: data.dietary_preferences?.exclusions || [],
                                 healthConditions: data.health_conditions || [],
+                                country: data.country || "Australia",
                                 familyMembers: data.family_members || []
                             };
                             setProfileState(cloudProfile);
@@ -238,6 +241,7 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
                     dietType: newProfile.dietType,
                     exclusions: newProfile.exclusions
                 },
+                country: newProfile.country,
                 family_members: newProfile.familyMembers,
                 updated_at: new Date().toISOString()
             } as any);
@@ -271,7 +275,8 @@ export function UserPreferencesProvider({ children }: { children: React.ReactNod
         gender: profile.gender || 'female',
         activityLevel: profile.activityLevel,
         goal: profile.goal,
-        nutrientStrategy: profile.nutrientStrategy
+        nutrientStrategy: profile.nutrientStrategy,
+        measurementUnit: measurementUnit
     });
 
     return (

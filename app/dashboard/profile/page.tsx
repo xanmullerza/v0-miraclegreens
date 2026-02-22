@@ -24,11 +24,17 @@ import {
     LogOut,
     Fingerprint,
     Info,
-    ChevronDown,
-    ChevronUp,
-    X,
     Users,
-    Target
+    Target,
+    Globe,
+    Check,
+    Scale,
+    Monitor,
+    Sun,
+    Moon,
+    X,
+    ChevronUp,
+    ChevronDown
 } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { useRDA } from '@/hooks/use-rda';
@@ -166,6 +172,9 @@ function ProfilePageContent() {
         profile,
         updateProfile,
         energyUnit,
+        setEnergyUnit,
+        measurementUnit,
+        setMeasurementUnit
     } = useUserPreferences();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -181,9 +190,14 @@ function ProfilePageContent() {
     const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
     const [isAddingMember, setIsAddingMember] = useState(false);
 
-    // 1. Calculate BMR (Mifflin-St Jeor)
-    const weight = Number(formData.weight) || 70;
-    const height = Number(formData.height) || 170;
+    // 1. Calculate BMR (Mifflin-St Jeor) - Formula expects metric (kg, cm)
+    const weightVal = Number(formData.weight) || 70;
+    const heightVal = Number(formData.height) || 170;
+
+    // Convert to metric if needed
+    const weight = measurementUnit === 'imperial' ? weightVal * 0.453592 : weightVal;
+    const height = measurementUnit === 'imperial' ? heightVal * 2.54 : heightVal;
+
     const age = Number(formData.age) || 30;
     const gender = formData.gender || 'female';
     const s = gender === 'male' ? 5 : -161;
@@ -241,6 +255,24 @@ function ProfilePageContent() {
     );
 
     const combinedRDAs = { ...macroRDAs, ...(userRDAs || {}) };
+
+    const COUNTRY_PRESETS: Record<string, { energy: 'kJ' | 'kcal', measurement: 'metric' | 'imperial' }> = {
+        'Australia': { energy: 'kJ', measurement: 'metric' },
+        'USA': { energy: 'kcal', measurement: 'imperial' },
+        'UK': { energy: 'kcal', measurement: 'metric' },
+        'Canada': { energy: 'kcal', measurement: 'metric' },
+        'Europe': { energy: 'kJ', measurement: 'metric' },
+        'Other': { energy: 'kJ', measurement: 'metric' }
+    };
+
+    const handleCountryChange = (country: string) => {
+        const preset = COUNTRY_PRESETS[country];
+        if (preset) {
+            setEnergyUnit(preset.energy);
+            setMeasurementUnit(preset.measurement);
+        }
+        setFormData({ ...formData, country });
+    };
 
     const handleSave = () => {
         updateProfile(formData);
@@ -357,6 +389,93 @@ function ProfilePageContent() {
                         {/* Main Content (Compact Settings) */}
                         <div className="max-w-2xl w-full space-y-8 pb-32">
                             <div className="grid grid-cols-1 gap-8">
+                                {/* Regional Standards Card */}
+                                <section className="space-y-6">
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex-shrink-0 bg-yellow-500/20 p-3 rounded-2xl text-yellow-500">
+                                            <Globe size={24} className="stroke-[2.5]" />
+                                        </div>
+                                        <div>
+                                            <h2 className="text-lg font-black uppercase tracking-wider text-slate-900 dark:text-white italic">Regional Standards</h2>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Location & Units</p>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white dark:bg-slate-950 rounded-3xl p-8 space-y-8 shadow-sm relative overflow-hidden before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:bg-gradient-to-b before:from-yellow-500 before:to-yellow-500/50">
+                                        {/* Country Selector */}
+                                        <div className="space-y-4">
+                                            <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Your Region</Label>
+                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                                {Object.keys(COUNTRY_PRESETS).map(country => (
+                                                    <button
+                                                        key={country}
+                                                        onClick={() => handleCountryChange(country)}
+                                                        className={cn(
+                                                            "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all text-center",
+                                                            formData.country === country
+                                                                ? "bg-yellow-500 text-slate-900 shadow-lg shadow-yellow-500/20"
+                                                                : "bg-slate-50 dark:bg-slate-900 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                                        )}
+                                                    >
+                                                        {country}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-2">
+                                            {/* Energy Unit */}
+                                            <div className="space-y-3">
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Energy Unit</Label>
+                                                <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
+                                                    <button
+                                                        onClick={(e) => { e.preventDefault(); setEnergyUnit("kJ"); }}
+                                                        className={cn(
+                                                            "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
+                                                            energyUnit === "kJ" ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
+                                                        )}
+                                                    >
+                                                        <Zap size={14} /> kJ
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => { e.preventDefault(); setEnergyUnit("kcal"); }}
+                                                        className={cn(
+                                                            "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
+                                                            energyUnit === "kcal" ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
+                                                        )}
+                                                    >
+                                                        <Flame size={14} /> kcal
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {/* Measurement System */}
+                                            <div className="space-y-3">
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Measurement</Label>
+                                                <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
+                                                    <button
+                                                        onClick={(e) => { e.preventDefault(); setMeasurementUnit("metric"); }}
+                                                        className={cn(
+                                                            "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
+                                                            measurementUnit === "metric" ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
+                                                        )}
+                                                    >
+                                                        <Scale size={14} /> Metric
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => { e.preventDefault(); setMeasurementUnit("imperial"); }}
+                                                        className={cn(
+                                                            "flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-black uppercase tracking-widest rounded-lg transition-all",
+                                                            measurementUnit === "imperial" ? "bg-white dark:bg-slate-800 text-yellow-600 dark:text-yellow-400 shadow-sm" : "text-slate-500"
+                                                        )}
+                                                    >
+                                                        <Scale size={14} /> Imperial
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+
                                 {/* Identification Card */}
                                 <section className="space-y-6">
                                     <div className="flex items-center gap-4">
@@ -417,13 +536,13 @@ function ProfilePageContent() {
                                                 </div>
                                             </div>
                                             <div className="space-y-2">
-                                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Weight (kg)</Label>
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Weight ({measurementUnit === 'imperial' ? 'lb' : 'kg'})</Label>
                                                 <div className="relative group/stepper">
                                                     <Input
                                                         type="number"
                                                         value={formData.weight === '' ? '' : formData.weight}
                                                         onChange={(e) => setFormData({ ...formData, weight: e.target.value ? Number(e.target.value) : '' })}
-                                                        placeholder="kg"
+                                                        placeholder={measurementUnit === 'imperial' ? "lb" : "kg"}
                                                         className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
                                                     />
                                                     <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
@@ -437,13 +556,13 @@ function ProfilePageContent() {
                                                 </div>
                                             </div>
                                             <div className="space-y-2">
-                                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Height (cm)</Label>
+                                                <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Height ({measurementUnit === 'imperial' ? 'in' : 'cm'})</Label>
                                                 <div className="relative group/stepper">
                                                     <Input
                                                         type="number"
                                                         value={formData.height === '' ? '' : formData.height}
                                                         onChange={(e) => setFormData({ ...formData, height: e.target.value ? Number(e.target.value) : '' })}
-                                                        placeholder="cm"
+                                                        placeholder={measurementUnit === 'imperial' ? "in" : "cm"}
                                                         className="bg-slate-50/50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-xl h-8 text-xs font-bold text-center pr-6 pl-2"
                                                     />
                                                     <div className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col -space-y-1 opacity-40 group-hover/stepper:opacity-100 transition-opacity">
