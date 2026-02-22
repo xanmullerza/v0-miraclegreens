@@ -224,7 +224,7 @@ export default function NutrientsPage() {
 
                     {/* Nutrient Search Hero Workspace */}
                     <div className="w-full md:max-w-[900px] mx-auto bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col mb-10">
-                        <div className="min-h-[180px] max-h-[420px] overflow-y-auto p-4 md:p-8 no-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1">
+                        <div className="h-[180px] overflow-y-auto p-4 md:p-8 no-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1">
                             {isHeroActive ? (
                                 <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                                     {heroResults.length > 0 ? (
@@ -267,57 +267,19 @@ export default function NutrientsPage() {
                                     )}
                                 </div>
                             ) : (
-                                <div className="space-y-4 animate-in fade-in duration-700">
-                                    {/* Header */}
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center relative shrink-0">
-                                            <Sparkles size={18} className="text-blue-500" />
-                                            <div className="absolute inset-0 rounded-full bg-blue-500/20 animate-ping" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase italic tracking-tight">Essential Nutrients Guide</h3>
-                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Search or use the filters above</p>
-                                        </div>
+                                <div className="flex flex-col items-center justify-center text-center h-full animate-in fade-in duration-700">
+                                    <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center mb-3 relative">
+                                        <Sparkles size={18} className="text-blue-500" />
+                                        <div className="absolute inset-0 rounded-full bg-blue-500/20 animate-ping" />
                                     </div>
-
-                                    {/* Condensed Info Cards */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <Activity size={14} className="text-emerald-500" />
-                                                <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">The Basics</span>
-                                            </div>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                                                Essential nutrients are substances your body needs but cannot make on its own — carbs, proteins, fats, vitamins, minerals, and water. We need all of them to stay healthy.
-                                            </p>
-                                        </div>
-                                        <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <Gem size={14} className="text-purple-500" />
-                                                <span className="text-[9px] font-black uppercase tracking-widest text-purple-600 dark:text-purple-400">Minerals</span>
-                                            </div>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                                                Calcium strengthens bones, iron carries oxygen, potassium keeps your heart beating, and magnesium helps muscles relax. Eat a variety of vegetables, whole grains, nuts, and beans.
-                                            </p>
-                                        </div>
-                                        <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <Battery size={14} className="text-yellow-500" />
-                                                <span className="text-[9px] font-black uppercase tracking-widest text-yellow-600 dark:text-yellow-400">Vitamins</span>
-                                            </div>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                                                13 essential vitamins keep your body running — C fights infections, B vitamins give energy, D helps absorb calcium. Eat fruits, vegetables, and whole foods to cover your needs.
-                                            </p>
-                                        </div>
-                                        <div className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50">
-                                            <div className="flex items-center gap-2 mb-2">
-                                                <Zap size={14} className="text-amber-500" />
-                                                <span className="text-[9px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">Macros</span>
-                                            </div>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                                                Carbs fuel your brain, proteins build muscle, fats protect organs. Fiber keeps digestion smooth and blood sugar stable. Balance all three for optimal health.
-                                            </p>
-                                        </div>
+                                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase italic tracking-tight mb-1">Essential Nutrients Guide</h3>
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed max-w-md mb-3">
+                                        Search for any nutrient or use the <span className="font-bold text-slate-700 dark:text-slate-300">Macros</span>, <span className="font-bold text-slate-700 dark:text-slate-300">Minerals</span>, and <span className="font-bold text-slate-700 dark:text-slate-300">Vitamins</span> filters above.
+                                    </p>
+                                    <div className="flex items-center gap-2">
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 text-[8px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400"><Zap size={10} />Macros</span>
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-500/10 text-[8px] font-black uppercase tracking-widest text-purple-600 dark:text-purple-400"><Gem size={10} />Minerals</span>
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-yellow-500/10 text-[8px] font-black uppercase tracking-widest text-yellow-600 dark:text-yellow-400"><Battery size={10} />Vitamins</span>
                                     </div>
                                 </div>
                             )}
