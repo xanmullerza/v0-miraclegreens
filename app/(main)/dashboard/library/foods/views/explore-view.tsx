@@ -517,7 +517,7 @@ export function ExploreView({
                                         : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-emerald-200 hover:text-emerald-500"
                                 )}>
                                     <Heart size={12} className={cn("transition-transform group-hover:scale-110", showFavoritesOnly && "fill-current")} />
-                                    <span className="text-[8px] font-black uppercase tracking-widest hidden sm:inline">
+                                    <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">
                                         {showFavoritesOnly ? "Favorites" : "All Samples"}
                                     </span>
                                     <ChevronDown size={10} className="opacity-50" />
@@ -553,7 +553,7 @@ export function ExploreView({
                                         : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-emerald-200 hover:text-emerald-600"
                                 )}>
                                     <Filter size={12} />
-                                    <span className="hidden sm:inline">
+                                    <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">
                                         {selectedCategories.length === 0 || selectedCategories.length === CATEGORIES.length ? "All Groups" :
                                             `${selectedCategories.length} Groups`}
                                     </span>
