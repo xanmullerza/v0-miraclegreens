@@ -131,11 +131,7 @@ export default function DashboardOverview() {
 
                 {showHeroes && (
                     <div className="w-full md:max-w-[900px] mx-auto relative px-0 mb-6 group/stats">
-                        <div className="relative rounded-2xl bg-slate-900/40 border border-slate-800/60 p-5 px-8 w-full overflow-hidden backdrop-blur-md transition-all duration-500 hover:bg-slate-900/60 hover:border-slate-700/60">
-                            <div className="absolute top-0 right-0 w-64 h-64 opacity-[0.03] pointer-events-none group-hover/stats:opacity-[0.05] transition-opacity duration-500">
-                                <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-500 rounded-full blur-3xl" />
-                            </div>
-
+                        <div className="relative p-5 px-8 w-full transition-all duration-500">
                             <div className="relative z-10 grid grid-cols-2 gap-4 md:flex md:flex-wrap md:items-start md:justify-center md:gap-8 lg:gap-12">
                                 <div className="flex items-center gap-3 group/stat">
                                     <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
@@ -146,7 +142,7 @@ export default function DashboardOverview() {
                                         <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Nutrients</p>
                                     </div>
                                 </div>
-                                <div className="hidden sm:block w-px h-6 bg-slate-700/40" />
+
                                 <div className="flex items-center gap-3 group/stat">
                                     <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
                                         <Leaf size={16} className="text-emerald-400" />
@@ -156,7 +152,7 @@ export default function DashboardOverview() {
                                         <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Foods</p>
                                     </div>
                                 </div>
-                                <div className="hidden sm:block w-px h-6 bg-slate-700/40" />
+
                                 <div className="flex items-center gap-3 group/stat">
                                     <div className="w-9 h-9 rounded-lg bg-indigo-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
                                         <Beaker size={16} className="text-indigo-400" />
@@ -166,7 +162,7 @@ export default function DashboardOverview() {
                                         <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Mixes</p>
                                     </div>
                                 </div>
-                                <div className="hidden sm:block w-px h-6 bg-slate-700/40" />
+
                                 <div className="flex items-center gap-3 group/stat">
                                     <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
                                         <ChefHat size={16} className="text-amber-400" />
