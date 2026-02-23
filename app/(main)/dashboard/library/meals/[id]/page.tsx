@@ -1441,13 +1441,6 @@ export default function RecipeDetailsPage() {
                                         <Layers className="text-emerald-500" size={20} />
                                         <h2 className="text-lg font-black uppercase tracking-wider">Ingredients</h2>
                                     </div>
-                                    <button
-                                        onClick={resetOrder}
-                                        className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-500 transition-colors flex items-center gap-1"
-                                        title="Reset to original recipe"
-                                    >
-                                        <RotateCcw size={12} /> Reset
-                                    </button>
                                 </div>
 
                                 {ingredients.length === 0 ? (
@@ -1459,84 +1452,31 @@ export default function RecipeDetailsPage() {
                                         {ingredients.map((ing, index) => (
                                             <div
                                                 key={ing.id || index}
-                                                draggable
-                                                onDragStart={(e) => onDragStart(e, index)}
-                                                onDragOver={(e) => onDragOver(e, index)}
-                                                onDrop={(e) => onDrop(e, index)}
-                                                className={cn(
-                                                    "group flex items-center gap-3 p-3 rounded-2xl border transition-all",
-                                                    hiddenIngredientIds.includes(ing.id)
-                                                        ? "bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 opacity-50"
-                                                        : "bg-emerald-50/30 dark:bg-emerald-500/5 border-emerald-200 dark:border-emerald-800/30 hover:border-emerald-400"
-                                                )}
+                                                className="flex items-center gap-4 p-4 rounded-2xl border bg-emerald-50/30 dark:bg-emerald-500/5 border-emerald-200 dark:border-emerald-800/30"
                                             >
-                                                {/* Drag Handle */}
-                                                <button
-                                                    className="text-slate-300 hover:text-slate-500 dark:hover:text-slate-400 cursor-grab active:cursor-grabbing opacity-0 group-hover:opacity-100 transition-opacity"
-                                                    title="Drag to reorder"
-                                                >
-                                                    <GripVertical size={14} />
-                                                </button>
-
-                                                {/* Toggle Visibility */}
-                                                <button
-                                                    onClick={(e) => toggleIngredient(ing.id, e)}
-                                                    className={cn(
-                                                        "flex-shrink-0 transition-colors",
-                                                        hiddenIngredientIds.includes(ing.id)
-                                                            ? "text-slate-400 hover:text-slate-600"
-                                                            : "text-emerald-500 hover:text-emerald-600"
-                                                    )}
-                                                    title={hiddenIngredientIds.includes(ing.id) ? "Show" : "Hide"}
-                                                >
-                                                    {hiddenIngredientIds.includes(ing.id) ? (
-                                                        <EyeOff size={16} />
-                                                    ) : (
-                                                        <Eye size={16} />
-                                                    )}
-                                                </button>
-
                                                 {/* Content */}
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-bold text-slate-900 dark:text-white truncate">
+                                                    <p className="text-sm font-black text-slate-900 dark:text-white truncate">
                                                         {ing.item}
                                                     </p>
-                                                    <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                                                    <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400">
                                                         {ing.food_item?.energy_kcal ? `${(ing.weight_g / 100 * ing.food_item.energy_kcal).toFixed(0)} kcal` : 'No data'}
                                                     </p>
                                                 </div>
 
                                                 {/* Amount Display */}
                                                 <div className="text-right flex-shrink-0">
-                                                    <p className="text-xs font-black text-slate-900 dark:text-white">
+                                                    <p className="text-sm font-black text-slate-900 dark:text-white">
                                                         {ing.quantity?.toFixed(2) || ing.weight_g}
                                                     </p>
-                                                    <p className="text-[9px] text-slate-500 dark:text-slate-400">
+                                                    <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                                                         {ing.measure_label || 'g'}
                                                     </p>
                                                 </div>
-
-                                                {/* Actions */}
-                                                <button
-                                                    onClick={(e) => removeIngredient(index, e)}
-                                                    className="text-rose-400 hover:text-rose-600 transition-colors"
-                                                    title="Remove"
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
                                             </div>
                                         ))}
                                     </div>
                                 )}
-
-                                {/* Add Ingredient Button */}
-                                <button
-                                    onClick={() => setShowPicker(true)}
-                                    className="w-full py-3 rounded-2xl border-2 border-dashed border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 text-emerald-600 dark:text-emerald-400 font-bold text-sm transition-all"
-                                >
-                                    <Plus size={16} className="inline mr-2" />
-                                    Add Ingredient
-                                </button>
                             </Card>
 
                             {/* ═══ INSTRUCTIONS SECTION ═══ */}
