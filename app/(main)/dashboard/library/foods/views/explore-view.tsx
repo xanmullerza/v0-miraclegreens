@@ -211,8 +211,8 @@ export function ExploreView({
                 query = query.in('category', selectedCategories);
             }
 
-            const from = (pageNum - 1) * 50;
-            const to = from + 49;
+            const from = (pageNum - 1) * 20;
+            const to = from + 19;
             query = query.range(from, to);
 
             const { data, error, count } = await query.order('name', { ascending: true });
@@ -275,7 +275,7 @@ export function ExploreView({
                 });
                 setPage(pageNum);
             }
-            setHasMore(fetchedItems.length === 50);
+            setHasMore(fetchedItems.length === 20);
         } catch (error) {
             console.error(error);
             toast.error("Failed to load foods");
