@@ -1357,10 +1357,16 @@ export default function RecipeDetailsPage() {
                                 )}
 
                                 <div className="flex items-center gap-6">
-                                    {/* Prep Time */}
-                                    <span className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px] flex items-center gap-1.5">
-                                        <Clock size={12} className="text-emerald-500/50" /> {recipe.prep_time}m
-                                    </span>
+                                    {/* Prep Time Widget */}
+                                    <div className="flex items-center bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700/50 shadow-sm transition-all hover:border-emerald-500/30">
+                                        <span className="text-sm font-black italic text-slate-900 dark:text-white pr-2 border-r border-slate-200 dark:border-slate-700 flex items-center gap-1.5">
+                                            <Clock size={14} className="text-emerald-500/50" />
+                                            {recipe.prep_time}
+                                        </span>
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 pl-2">
+                                            Minutes
+                                        </span>
+                                    </div>
 
                                     {/* Servings Module */}
                                     <div className="flex items-center gap-2">
