@@ -339,27 +339,6 @@ Fat: ${item.fat_g || 0}g
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-4 border-b border-slate-200 dark:border-slate-800">
-                <div className="space-y-1">
-                    <button
-                        onClick={() => router.push('/dashboard/library/foods')}
-                        className="flex items-center gap-2 text-emerald-500 font-bold text-xs uppercase tracking-widest mb-2 hover:translate-x-[-4px] transition-transform"
-                    >
-                        <ArrowLeft size={14} /> Back to Foods
-                    </button>
-                    <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
-                            <Plus className="text-emerald-500" size={24} />
-                        </div>
-                        <h1 className="text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic">
-                            Add New Food
-                        </h1>
-                    </div>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">
-                        {user ? 'Cloud Sync Enabled' : 'Local Storage Mode'}
-                    </p>
-                </div>
-            </div>
 
             {/* Sub-Hero Actions */}
             <div className="flex justify-start">
