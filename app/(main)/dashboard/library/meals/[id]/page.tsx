@@ -1366,7 +1366,7 @@ export default function RecipeDetailsPage() {
                                     <div className="flex items-center gap-2">
                                         <div className="flex items-center bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700/50 shadow-sm transition-all hover:border-emerald-500/30">
                                             <span className="text-sm font-black italic text-slate-900 dark:text-white border-r border-slate-200 dark:border-slate-700 pr-2">
-                                                {calculations.totalServings.toFixed(1)}
+                                                {Number(calculations.totalServings.toFixed(2))}
                                             </span>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger className="flex items-center gap-1 pl-1 text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
@@ -1471,7 +1471,7 @@ export default function RecipeDetailsPage() {
                                                 {/* Amount Display */}
                                                 <div className="text-right flex-shrink-0">
                                                     <p className="text-sm font-black text-slate-900 dark:text-white">
-                                                        {ing.quantity?.toFixed(2) || ing.weight_g}
+                                                        {ing.quantity ? Number(ing.quantity.toFixed(2)) : ing.weight_g}
                                                     </p>
                                                     <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                                                         {ing.measure_label || 'g'}
