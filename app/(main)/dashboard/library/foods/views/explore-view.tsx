@@ -507,62 +507,40 @@ export function ExploreView({
             {!hideControls && (
                 <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 justify-between items-center px-4 md:px-0">
                     <div className="flex items-center gap-2">
-                        {/* Scope/Favorites Dropdown */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <button className={cn(
-                                    "flex items-center gap-2 px-2.5 py-1.5 rounded-xl border transition-all duration-300 shrink-0 shadow-sm group outline-none",
-                                    showFavoritesOnly
-                                        ? "bg-rose-500 text-white border-rose-600 shadow-lg shadow-rose-500/20"
-                                        : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:border-emerald-200 hover:text-emerald-500"
-                                )}>
-                                    <Heart size={12} className={cn("transition-transform group-hover:scale-110", showFavoritesOnly && "fill-current")} />
-                                    <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">
-                                        {showFavoritesOnly ? "Favorites" : "All Samples"}
-                                    </span>
-                                    <ChevronDown size={10} className="opacity-50" />
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="w-48 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
-                                <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Filter Scope</DropdownMenuLabel>
-                                <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
-                                <DropdownMenuCheckboxItem
-                                    checked={!showFavoritesOnly}
-                                    onCheckedChange={(checked) => checked && setShowFavoritesOnly(false)}
-                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-slate-50 py-2.5 cursor-pointer"
-                                >
-                                    Show All Samples
-                                </DropdownMenuCheckboxItem>
-                                <DropdownMenuCheckboxItem
-                                    checked={showFavoritesOnly}
-                                    onCheckedChange={(checked) => checked && setShowFavoritesOnly(true)}
-                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-rose-50 dark:focus:bg-rose-900/10 focus:text-rose-600 py-2.5 cursor-pointer"
-                                >
-                                    Favorites Only
-                                </DropdownMenuCheckboxItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-
-                        {/* Category Filter */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button className={cn(
-                                    "px-3 py-1.5 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
-                                    selectedCategories.length > 0 && selectedCategories.length < CATEGORIES.length
+                                    "px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
+                                    (showFavoritesOnly || (selectedCategories.length > 0 && selectedCategories.length < CATEGORIES.length))
                                         ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20"
                                         : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-emerald-200 hover:text-emerald-600"
                                 )}>
                                     <Filter size={12} />
-                                    <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">
-                                        {selectedCategories.length === 0 || selectedCategories.length === CATEGORIES.length ? "All Groups" :
-                                            `${selectedCategories.length} Groups`}
+                                    <span className="hidden sm:inline">
+                                        {showFavoritesOnly ? "Favorites" :
+                                            (selectedCategories.length === 0 || selectedCategories.length === CATEGORIES.length ? "All Groups" :
+                                                `${selectedCategories.length} Groups`)}
                                     </span>
                                     <ChevronDown size={10} className="opacity-50" />
                                 </button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="start" className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
+                                {/* Scope Section */}
+                                <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Scope</DropdownMenuLabel>
+                                <DropdownMenuCheckboxItem
+                                    checked={showFavoritesOnly}
+                                    onCheckedChange={setShowFavoritesOnly}
+                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-rose-50 dark:focus:bg-rose-900/10 focus:text-rose-600 py-2.5 cursor-pointer"
+                                >
+                                    <Heart size={12} className={cn("mr-2 transition-transform", showFavoritesOnly && "fill-current scale-110")} />
+                                    Favorites Only
+                                </DropdownMenuCheckboxItem>
+
+                                <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
+
+                                {/* Category Section */}
                                 <div className="flex items-center justify-between pr-2">
-                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Select Groups</DropdownMenuLabel>
+                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Groups</DropdownMenuLabel>
                                     <div className="flex items-center gap-1">
                                         <button
                                             onClick={(e) => {
@@ -586,7 +564,6 @@ export function ExploreView({
                                         </button>
                                     </div>
                                 </div>
-                                <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
                                 <div className="py-1 max-h-[300px] overflow-y-auto no-scrollbar">
                                     {CATEGORIES.map(category => {
                                         const isActive = selectedCategories.includes(category);
