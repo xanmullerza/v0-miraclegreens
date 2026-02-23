@@ -2,17 +2,17 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Beaker, ArrowRight, Scale, Plus } from 'lucide-react';
+import { Wrench, ArrowRight, Scale, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PageContainer } from '@/components/ui/page-container';
 
-export default function LabPage() {
-    const labTools = [
+export default function WorkshopPage() {
+    const workshopTools = [
         {
             id: 'compare',
             title: 'Comparator',
-            desc: 'Advanced side-by-side food and nutrient analysis.',
-            href: '/dashboard/lab/comparefoods',
+            desc: 'A handy tool for side-by-side food and nutrient checks.',
+            href: '/dashboard/workshop/comparefoods',
             icon: Scale,
             color: 'text-violet-400',
             bg: 'bg-violet-500/10',
@@ -22,8 +22,8 @@ export default function LabPage() {
         },
         {
             id: 'request-1',
-            title: 'Feature Request',
-            desc: 'Have an idea for a laboratory tool? Let us know.',
+            title: 'Tool Request',
+            desc: 'Have an idea for a new tool? We\'d love to hear it.',
             href: '#',
             icon: Plus,
             color: 'text-slate-400',
@@ -34,8 +34,8 @@ export default function LabPage() {
         },
         {
             id: 'request-2',
-            title: 'Feature Request',
-            desc: 'Help us build the ultimate molecular nutrition lab.',
+            title: 'Tool Request',
+            desc: 'Help us shape the future of these helpful modules.',
             href: '#',
             icon: Plus,
             color: 'text-slate-400',
@@ -46,8 +46,8 @@ export default function LabPage() {
         },
         {
             id: 'request-3',
-            title: 'Feature Request',
-            desc: 'New interactive research modules coming soon.',
+            title: 'Tool Request',
+            desc: 'More ways to refine your nutrition are on the way.',
             href: '#',
             icon: Plus,
             color: 'text-slate-400',
@@ -64,20 +64,20 @@ export default function LabPage() {
 
                 <div className="max-w-2xl mx-auto text-center space-y-4">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest mb-4">
-                        <Beaker size={12} />
-                        Interactive Laboratory
+                        <Wrench size={12} />
+                        Personal Workshop
                     </div>
                     <h1 className="text-4xl font-black tracking-tight text-white uppercase italic leading-none">
-                        The Lab
+                        The Workshop
                     </h1>
                     <p className="text-slate-400 text-sm max-w-md mx-auto">
-                        Experimental tools and advanced analytics for molecular nutrition research and precision meal engineering.
+                        Explore helpful tools and insights to build, refine, and perfect your personal nutrition strategy.
                     </p>
                 </div>
 
                 <div className="w-full mx-auto md:max-w-[900px]">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-                        {labTools.map((tool) => {
+                        {workshopTools.map((tool) => {
                             const Icon = tool.icon;
                             return (
                                 <Link

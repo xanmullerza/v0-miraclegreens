@@ -16,7 +16,9 @@ import {
     Calendar,
     Package,
     ShoppingCart,
-    Plus
+    Plus,
+    Wrench, // Added Wrench icon
+    ChevronRight // Added ChevronRight icon
 } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { supabase } from '@/lib/supabase';
@@ -82,11 +84,11 @@ export default function DashboardOverview() {
             ]
         },
         {
-            id: 'lab',
-            title: 'The Lab',
-            desc: 'Interactive research modules and advanced analytics. Experiment with molecular nutrition tools like the Comparator and precision engineering modules.',
-            href: '/dashboard/lab',
-            icon: Beaker,
+            id: 'workshop',
+            title: 'The Workshop',
+            desc: 'Build and refine your nutrition strategies with interactive tools. Craft personal meal plans, compare ingredients, and use our handy modules to perfect your diet.',
+            href: '/dashboard/workshop',
+            icon: Wrench,
             color: 'text-indigo-400',
             bg: 'bg-indigo-500/10',
             borderHover: 'hover:border-indigo-500/40',
@@ -95,10 +97,10 @@ export default function DashboardOverview() {
             itemBorderHover: 'hover:border-indigo-500/50',
             gradient: 'from-indigo-500 to-purple-600',
             items: [
-                { title: 'Comparator', icon: Scale, href: '/dashboard/lab/comparefoods', desc: 'versus 3 foods' },
-                { title: 'Feature Request', icon: Plus, href: '#', desc: 'suggest a tool' },
-                { title: 'Feature Request', icon: Plus, href: '#', desc: 'science module' },
-                { title: 'Feature Request', icon: Plus, href: '#', desc: 'research lab' },
+                { title: 'Comparator', icon: Scale, href: '/dashboard/workshop/comparefoods', desc: 'versus 3 foods' },
+                { title: 'Tool Request', icon: Plus, href: '#', desc: 'suggest a tool' },
+                { title: 'Module Request', icon: Plus, href: '#', desc: 'new features' },
+                { title: 'Craft Lab', icon: Wrench, href: '#', desc: 'coming soon' },
             ]
         },
         {
@@ -183,7 +185,7 @@ export default function DashboardOverview() {
                     <Carousel
                         indicators={[
                             <Library key="lib" size={20} />,
-                            <Beaker key="lab" size={20} />,
+                            <Wrench key="work" size={20} />,
                             <ChefHat key="kit" size={20} />
                         ]}
                     >
