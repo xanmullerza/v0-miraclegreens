@@ -159,7 +159,12 @@ export default function DashboardOverview() {
                 )}
 
                 <div className="w-full mx-auto md:max-w-[700px] mt-6 lg:mt-8 px-4">
-                    <Carousel>
+                    <Carousel
+                        indicators={[
+                            <Library key="lib" size={20} />,
+                            <ChefHat key="kit" size={20} />
+                        ]}
+                    >
                         {heroCards.map((card) => {
                             const Icon = card.icon;
                             const isKitchen = card.id === 'kitchen';

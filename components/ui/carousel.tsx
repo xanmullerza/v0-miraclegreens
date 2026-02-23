@@ -10,13 +10,15 @@ interface CarouselProps {
     containerClassName?: string;
     autoPlay?: boolean;
     showDots?: boolean;
+    indicators?: ReactNode[];
 }
 
 export function Carousel({
     children,
     className,
     containerClassName,
-    showDots = true
+    showDots = true,
+    indicators
 }: CarouselProps) {
     const [emblaRef, emblaApi] = useEmblaCarousel({
         align: 'start',
@@ -68,19 +70,26 @@ export function Carousel({
             </div>
 
             {showDots && scrollSnaps.length > 1 && (
-                <div className="flex justify-center gap-2 mt-8">
+                <div className="flex justify-center items-center gap-4 mt-8">
                     {scrollSnaps.map((_, index) => (
                         <button
                             key={index}
                             onClick={() => onDotButtonClick(index)}
                             className={cn(
-                                "h-1.5 rounded-full transition-all duration-300",
+                                "transition-all duration-300 flex items-center justify-center",
+                                indicators ? "p-2 rounded-xl" : "h-1.5 rounded-full",
                                 selectedIndex === index
-                                    ? "w-8 bg-emerald-500 shadow-lg shadow-emerald-500/30"
-                                    : "w-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700"
+                                    ? indicators
+                                        ? "bg-emerald-500/10 text-emerald-500 scale-125 shadow-sm"
+                                        : "w-8 bg-emerald-500 shadow-lg shadow-emerald-500/30"
+                                    : indicators
+                                        ? "text-slate-400 dark:text-slate-600 hover:text-slate-300 scale-100"
+                                        : "w-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700"
                             )}
                             aria-label={`Go to slide ${index + 1}`}
-                        />
+                        >
+                            {indicators ? indicators[index] : null}
+                        </button>
                     ))}
                 </div>
             )}
