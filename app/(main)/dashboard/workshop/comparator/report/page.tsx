@@ -43,7 +43,7 @@ function ComparisonReportContent() {
 
     useEffect(() => {
         if (ids.length === 0) {
-            router.push('/dashboard/kitchen/comparefoods');
+            router.push('/dashboard/workshop/comparator');
             return;
         }
 

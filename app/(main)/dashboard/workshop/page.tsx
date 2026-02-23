@@ -12,7 +12,7 @@ export default function WorkshopPage() {
             id: 'compare',
             title: 'Comparator',
             desc: 'A handy tool for side-by-side food and nutrient checks.',
-            href: '/dashboard/workshop/comparefoods',
+            href: '/dashboard/workshop/comparator',
             icon: Scale,
             color: 'text-purple-400',
             bg: 'bg-purple-500/10',

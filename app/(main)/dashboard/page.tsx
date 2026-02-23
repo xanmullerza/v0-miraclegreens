@@ -116,7 +116,7 @@ export default function DashboardOverview() {
             itemBorderHover: 'hover:border-purple-500/50',
             gradient: 'from-purple-500 to-violet-600',
             items: [
-                { title: 'Comparator', icon: Scale, href: '/dashboard/workshop/comparefoods', desc: 'versus 3 foods' },
+                { title: 'Comparator', icon: Scale, href: '/dashboard/workshop/comparator', desc: 'versus 3 foods' },
             ]
         },
     ];
