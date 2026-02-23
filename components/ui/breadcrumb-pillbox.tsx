@@ -229,33 +229,43 @@ export function BreadcrumbPillbox({
                     )}
                 </div>
 
-                {/* Right side - Unified Profile Button */}
+                {/* Right side - Unified Profile/Dashboard Button */}
                 <div className={cn(
                     "flex transition-all duration-500 flex-shrink-0 ml-2 border-l border-slate-200 dark:border-slate-800",
                     isSearchExpanded ? "w-0 opacity-0 overflow-hidden" : ""
                 )}>
-                    <Link
-                        href="/profile"
-                        className="h-12 w-12 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-                        title="Profile"
-                    >
-                        <div className={cn(
-                            "h-6 w-6 rounded-full flex items-center justify-center text-white overflow-hidden transition-colors shadow-sm",
-                            userStatus === 'cloud' ? "bg-emerald-500" :
-                                userStatus === 'local' ? "bg-blue-500" :
-                                    "bg-orange-500"
-                        )}>
-                            {userAvatarUrl ? (
-                                <img
-                                    src={userAvatarUrl}
-                                    alt="P"
-                                    className="w-full h-full object-cover"
-                                />
-                            ) : (
-                                <User size={14} />
-                            )}
-                        </div>
-                    </Link>
+                    {pathname === '/profile' ? (
+                        <Link
+                            href="/dashboard"
+                            className="h-12 w-12 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-400 hover:text-emerald-500"
+                            title="Go to Dashboard"
+                        >
+                            <LayoutDashboard size={18} />
+                        </Link>
+                    ) : (
+                        <Link
+                            href="/profile"
+                            className="h-12 w-12 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                            title="Profile"
+                        >
+                            <div className={cn(
+                                "h-6 w-6 rounded-full flex items-center justify-center text-white overflow-hidden transition-colors shadow-sm",
+                                userStatus === 'cloud' ? "bg-emerald-500" :
+                                    userStatus === 'local' ? "bg-blue-500" :
+                                        "bg-orange-500"
+                            )}>
+                                {userAvatarUrl ? (
+                                    <img
+                                        src={userAvatarUrl}
+                                        alt="P"
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <User size={14} />
+                                )}
+                            </div>
+                        </Link>
+                    )}
                 </div>
             </div>
         </div>
