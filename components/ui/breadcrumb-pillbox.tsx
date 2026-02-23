@@ -238,9 +238,9 @@ export function BreadcrumbPillbox({
                         <Link
                             href="/dashboard"
                             className="h-12 w-12 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-400 hover:text-emerald-500"
-                            title="Go to Dashboard"
+                            title="Go Home"
                         >
-                            <LayoutDashboard size={18} />
+                            <Home size={18} />
                         </Link>
                     ) : (
                         <Link
