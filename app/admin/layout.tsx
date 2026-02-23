@@ -189,7 +189,7 @@ function AdminLayoutContent({
                                     <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 border-2 border-slate-50 dark:border-[#020617] rounded-full" />
                                 </button>
                                 <Link
-                                    href="/dashboard/profile"
+                                    href="/profile"
                                     className="flex items-center gap-3 px-2 py-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
                                 >
                                     <div className="text-right hidden sm:block">

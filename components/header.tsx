@@ -93,7 +93,7 @@ export function Header() {
 						{user ? (
 							<>
 								<Button variant="secondary" size="sm" className="hidden lg:flex gap-2" asChild>
-									<Link href="/dashboard/profile">
+									<Link href="/profile">
 										<User className="h-4 w-4" />
 										<span className="max-w-[100px] truncate">{user.email?.split('@')[0]}</span>
 									</Link>

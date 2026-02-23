@@ -235,7 +235,7 @@ export function BreadcrumbPillbox({
                     isSearchExpanded ? "w-0 opacity-0 overflow-hidden" : ""
                 )}>
                     <Link
-                        href="/dashboard/profile"
+                        href="/profile"
                         className="h-12 w-12 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                         title="Profile"
                     >

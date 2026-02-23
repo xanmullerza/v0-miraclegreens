@@ -69,7 +69,7 @@ export default function AdminOverview() {
         {
             name: 'Lab Profile',
             desc: 'Manage account access.',
-            href: '/dashboard/profile',
+            href: '/profile',
             icon: User,
             color: 'text-purple-500',
             bg: 'bg-purple-500/10'
