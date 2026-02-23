@@ -188,8 +188,7 @@ export default function DashboardOverview() {
                                         <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-slate-800/50 mb-6">
                                             <Icon size={32} className="text-slate-500" />
                                         </div>
-                                        <h3 className="text-xl font-black text-white tracking-tight mb-3 uppercase italic">{card.title}</h3>
-                                        <p className="text-[13px] text-slate-500 font-bold leading-relaxed">{card.desc}</p>
+                                        <h3 className="text-xl font-black text-white tracking-tight uppercase italic">{card.title}</h3>
                                     </div>
                                 </div>
                             );
@@ -220,14 +219,11 @@ export default function DashboardOverview() {
 
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-center gap-2">
-                                            <h3 className={cn("text-2xl font-black text-slate-900 dark:text-white tracking-tight transition-colors uppercase italic", card.titleHover)}>
+                                            <h3 className={cn("text-3xl font-black text-slate-900 dark:text-white tracking-tight transition-colors uppercase italic", card.titleHover)}>
                                                 {card.title}
                                             </h3>
-                                            <ArrowRight size={20} className={cn("opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0", card.color)} />
+                                            <ArrowRight size={24} className={cn("opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0", card.color)} />
                                         </div>
-                                        <p className="text-[14px] text-slate-500 font-medium leading-relaxed max-w-[240px]">
-                                            {card.desc}
-                                        </p>
                                     </div>
                                 </div>
 
