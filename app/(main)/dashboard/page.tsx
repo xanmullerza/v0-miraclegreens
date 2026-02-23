@@ -29,18 +29,8 @@ import { useUserPreferences } from '@/lib/context/user-preferences-context';
 export default function DashboardOverview() {
     const { showHeroes } = useUserPreferences();
     const [stats, setStats] = useState({ foods: 0, recipes: 0, nutrients: 0, mixes: 0 });
-    const [isAdmin, setIsAdmin] = useState(false);
 
     useEffect(() => {
-        const checkUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
-            if (user?.email && adminEmail && user.email.toLowerCase() === adminEmail.toLowerCase()) {
-                setIsAdmin(true);
-            }
-        };
-        checkUser();
-
         const fetchStats = async () => {
             try {
                 const [foodsCount, recipesCount, mixesCount] = await Promise.all([
@@ -175,24 +165,6 @@ export default function DashboardOverview() {
                 <div className="w-full max-w-[900px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
                     {heroCards.map((card) => {
                         const Icon = card.icon;
-                        const isKitchen = card.id === 'kitchen';
-                        const isDisabled = isKitchen && !isAdmin;
-
-                        if (isDisabled) {
-                            return (
-                                <div key={card.id} className="relative overflow-hidden rounded-[2.5rem] border border-slate-800/50 bg-slate-900/40 p-8 opacity-60 cursor-not-allowed select-none group min-h-[320px]">
-                                    <div className="absolute top-6 right-6 z-20">
-                                        <span className="px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700 text-[9px] font-black uppercase tracking-widest text-slate-500">Locked</span>
-                                    </div>
-                                    <div className="relative z-10 grayscale opacity-50 flex flex-col h-full text-center items-center justify-center">
-                                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-slate-800/50 mb-6">
-                                            <Icon size={32} className="text-slate-500" />
-                                        </div>
-                                        <h3 className="text-xl font-black text-white tracking-tight uppercase italic">{card.title}</h3>
-                                    </div>
-                                </div>
-                            );
-                        }
 
                         return (
                             <Link
