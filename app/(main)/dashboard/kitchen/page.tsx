@@ -36,18 +36,6 @@ export default function KitchenPage() {
         { id: "mealomatic", title: "Mealomatic", desc: "Plan your weekly meals", href: "/dashboard/kitchen/meal-o-matic", icon: Calendar, color: "text-amber-400", bg: "bg-amber-500/10", borderHover: "hover:border-amber-500/40", gradient: "from-amber-500 to-orange-600" },
         { id: "pantry", title: "Pantry", desc: "Manage what you have", href: "/dashboard/kitchen/pantry", icon: Package, color: "text-emerald-400", bg: "bg-emerald-500/10", borderHover: "hover:border-emerald-500/40", gradient: "from-emerald-500 to-teal-600" },
         { id: "groceries", title: "Groceries", desc: "Shopping list & needs", href: "/dashboard/kitchen/groceries", icon: ShoppingCart, color: "text-blue-400", bg: "bg-blue-500/10", borderHover: "hover:border-blue-500/40", gradient: "from-blue-500 to-indigo-600" },
-        {
-            id: "request-kitchen",
-            title: "Feature Request",
-            desc: "New kitchen automation tool?",
-            href: "#",
-            icon: Plus,
-            color: "text-slate-400",
-            bg: "bg-slate-500/5",
-            borderHover: "hover:border-slate-500/20",
-            gradient: "from-slate-500/20 to-slate-600/20",
-            inactive: true
-        },
     ];
 
     return (

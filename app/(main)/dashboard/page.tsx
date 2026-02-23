@@ -84,26 +84,6 @@ export default function DashboardOverview() {
             ]
         },
         {
-            id: 'workshop',
-            title: 'Workshop',
-            desc: 'The place for experimentation and trying out new things. Craft personal meal plans, compare ingredients, and use our workshop modules to perfect your diet.',
-            href: '/dashboard/workshop',
-            icon: Wrench,
-            color: 'text-purple-400',
-            bg: 'bg-purple-500/10',
-            borderHover: 'hover:border-purple-500/40',
-            titleHover: 'group-hover/title:text-purple-400',
-            itemTitleHover: 'group-hover/item:text-purple-400',
-            itemBorderHover: 'hover:border-purple-500/50',
-            gradient: 'from-purple-500 to-violet-600',
-            items: [
-                { title: 'Comparator', icon: Scale, href: '/dashboard/workshop/comparefoods', desc: 'versus 3 foods' },
-                { title: 'Feature Request', icon: Plus, href: '#', desc: 'suggest a tool' },
-                { title: 'Feature Request', icon: Plus, href: '#', desc: 'new features' },
-                { title: 'Feature Request', icon: Plus, href: '#', desc: 'research' },
-            ]
-        },
-        {
             id: 'kitchen',
             title: 'Kitchen',
             desc: 'Take full control of your kitchen with our inventory management and meal planning tools. Sync your pantry, create custom meal plans, and generate automated shopping lists based on your goals.',
@@ -120,7 +100,23 @@ export default function DashboardOverview() {
                 { title: 'Mealomatic', icon: Calendar, href: '/dashboard/kitchen/meal-o-matic', desc: 'meal planner' },
                 { title: 'Pantry', icon: Package, href: '/dashboard/kitchen/pantry', desc: 'In-stock essentials' },
                 { title: 'Groceries', icon: ShoppingCart, href: '/dashboard/kitchen/groceries', desc: 'shopping list' },
-                { title: 'Feature Request', icon: Plus, href: '#', desc: 'kitchen tool' },
+            ]
+        },
+        {
+            id: 'workshop',
+            title: 'Workshop',
+            desc: 'The place for experimentation and trying out new things. Craft personal meal plans, compare ingredients, and use our workshop modules to perfect your diet.',
+            href: '/dashboard/workshop',
+            icon: Wrench,
+            color: 'text-purple-400',
+            bg: 'bg-purple-500/10',
+            borderHover: 'hover:border-purple-500/40',
+            titleHover: 'group-hover/title:text-purple-400',
+            itemTitleHover: 'group-hover/item:text-purple-400',
+            itemBorderHover: 'hover:border-purple-500/50',
+            gradient: 'from-purple-500 to-violet-600',
+            items: [
+                { title: 'Comparator', icon: Scale, href: '/dashboard/workshop/comparefoods', desc: 'versus 3 foods' },
             ]
         },
     ];
@@ -181,13 +177,13 @@ export default function DashboardOverview() {
                     <Carousel
                         indicators={[
                             <Library key="lib" size={20} />,
-                            <Wrench key="work" size={20} />,
-                            <ChefHat key="kit" size={20} />
+                            <ChefHat key="kit" size={20} />,
+                            <Wrench key="work" size={20} />
                         ]}
                         activeIndicatorClassNames={[
                             "bg-blue-500/10 text-blue-400",
-                            "bg-purple-500/10 text-purple-400",
-                            "bg-emerald-500/10 text-emerald-400"
+                            "bg-emerald-500/10 text-emerald-400",
+                            "bg-purple-500/10 text-purple-400"
                         ]}
                     >
                         {heroCards.map((card) => {

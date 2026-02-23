@@ -20,42 +20,6 @@ export default function WorkshopPage() {
             gradient: 'from-purple-500 to-violet-600',
             active: true
         },
-        {
-            id: 'request-1',
-            title: 'Feature Request',
-            desc: 'Have an idea for a new tool? We\'d love to hear it.',
-            href: '#',
-            icon: Plus,
-            color: 'text-slate-400',
-            bg: 'bg-slate-500/5',
-            borderHover: 'hover:border-slate-500/20',
-            gradient: 'from-slate-500/20 to-slate-600/20',
-            active: false
-        },
-        {
-            id: 'request-2',
-            title: 'Feature Request',
-            desc: 'Help us shape the future of these helpful modules.',
-            href: '#',
-            icon: Plus,
-            color: 'text-slate-400',
-            bg: 'bg-slate-500/5',
-            borderHover: 'hover:border-slate-500/20',
-            gradient: 'from-slate-500/20 to-slate-600/20',
-            active: false
-        },
-        {
-            id: 'request-3',
-            title: 'Feature Request',
-            desc: 'More ways to refine your nutrition are on the way.',
-            href: '#',
-            icon: Plus,
-            color: 'text-slate-400',
-            bg: 'bg-slate-500/5',
-            borderHover: 'hover:border-slate-500/20',
-            gradient: 'from-slate-500/20 to-slate-600/20',
-            active: false
-        },
     ];
 
     return (
