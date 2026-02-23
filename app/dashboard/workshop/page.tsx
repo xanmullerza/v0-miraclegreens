@@ -22,7 +22,7 @@ export default function WorkshopPage() {
         },
         {
             id: 'request-1',
-            title: 'Tool Request',
+            title: 'Feature Request',
             desc: 'Have an idea for a new tool? We\'d love to hear it.',
             href: '#',
             icon: Plus,
@@ -34,7 +34,7 @@ export default function WorkshopPage() {
         },
         {
             id: 'request-2',
-            title: 'Tool Request',
+            title: 'Feature Request',
             desc: 'Help us shape the future of these helpful modules.',
             href: '#',
             icon: Plus,
@@ -46,7 +46,7 @@ export default function WorkshopPage() {
         },
         {
             id: 'request-3',
-            title: 'Tool Request',
+            title: 'Feature Request',
             desc: 'More ways to refine your nutrition are on the way.',
             href: '#',
             icon: Plus,
@@ -68,10 +68,10 @@ export default function WorkshopPage() {
                         Personal Workshop
                     </div>
                     <h1 className="text-4xl font-black tracking-tight text-white uppercase italic leading-none">
-                        The Workshop
+                        Workshop
                     </h1>
                     <p className="text-slate-400 text-sm max-w-md mx-auto">
-                        Explore helpful tools and insights to build, refine, and perfect your personal nutrition strategy.
+                        The place for experimentation and trying out new things. Build, refine, and perfect your personal nutrition strategy.
                     </p>
                 </div>
 

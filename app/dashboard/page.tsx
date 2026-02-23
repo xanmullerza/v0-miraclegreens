@@ -85,8 +85,8 @@ export default function DashboardOverview() {
         },
         {
             id: 'workshop',
-            title: 'The Workshop',
-            desc: 'Build and refine your nutrition strategies with interactive tools. Craft personal meal plans, compare ingredients, and use our handy modules to perfect your diet.',
+            title: 'Workshop',
+            desc: 'The place for experimentation and trying out new things. Craft personal meal plans, compare ingredients, and use our workshop modules to perfect your diet.',
             href: '/dashboard/workshop',
             icon: Wrench,
             color: 'text-indigo-400',
@@ -98,9 +98,9 @@ export default function DashboardOverview() {
             gradient: 'from-indigo-500 to-purple-600',
             items: [
                 { title: 'Comparator', icon: Scale, href: '/dashboard/workshop/comparefoods', desc: 'versus 3 foods' },
-                { title: 'Tool Request', icon: Plus, href: '#', desc: 'suggest a tool' },
-                { title: 'Module Request', icon: Plus, href: '#', desc: 'new features' },
-                { title: 'Craft Lab', icon: Wrench, href: '#', desc: 'coming soon' },
+                { title: 'Feature Request', icon: Plus, href: '#', desc: 'suggest a tool' },
+                { title: 'Feature Request', icon: Plus, href: '#', desc: 'new features' },
+                { title: 'Feature Request', icon: Plus, href: '#', desc: 'research' },
             ]
         },
         {
