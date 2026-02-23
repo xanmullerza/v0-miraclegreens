@@ -369,7 +369,12 @@ export function RecipesView({
                                     <ChevronDown size={10} className="opacity-50" />
                                 </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start" className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950">
+                            <DropdownMenuContent
+                                side="bottom"
+                                align="start"
+                                sideOffset={8}
+                                className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 z-[100]"
+                            >
                                 {/* Scope Section */}
                                 <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Scope</DropdownMenuLabel>
                                 <DropdownMenuCheckboxItem
