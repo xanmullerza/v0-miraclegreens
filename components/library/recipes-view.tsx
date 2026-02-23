@@ -4,6 +4,18 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import {
+    Heart,
+    Search,
+    ChefHat,
+    ChevronRight,
+    Library,
+    X,
+    ChevronDown,
+    Filter,
+    Plus,
+    Loader2,
+    Pencil,
+    Trash2,
     Activity,
     CheckSquare,
     Square
@@ -79,6 +91,7 @@ export function RecipesView({
 
     const [localSelectedTypes, setLocalSelectedTypes] = useState<string[]>(MEAL_TYPES);
     const [localShowFavoritesOnly, setLocalShowFavoritesOnly] = useState(false);
+    const [localIsFilterOpen, setLocalIsFilterOpen] = useState(false);
 
     const selectedTypes = externalSelectedTypes !== undefined ? externalSelectedTypes : localSelectedTypes;
     const setSelectedTypes = externalSetSelectedTypes !== undefined ? externalSetSelectedTypes : setLocalSelectedTypes;
