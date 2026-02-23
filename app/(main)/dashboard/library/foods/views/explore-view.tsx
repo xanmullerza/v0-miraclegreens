@@ -528,67 +528,70 @@ export function ExploreView({
                                 side="bottom"
                                 align="start"
                                 sideOffset={8}
-                                className="w-56 p-2 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 z-[100]"
+                                collisionPadding={20}
+                                className="w-56 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 z-[100] flex flex-col max-h-[var(--radix-dropdown-menu-content-available-height)]"
                             >
-                                {/* Scope Section */}
-                                <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Scope</DropdownMenuLabel>
-                                <DropdownMenuCheckboxItem
-                                    checked={showFavoritesOnly}
-                                    onCheckedChange={setShowFavoritesOnly}
-                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-rose-50 dark:focus:bg-rose-900/10 focus:text-rose-600 py-2.5 cursor-pointer"
-                                >
-                                    <Heart size={12} className={cn("mr-2 transition-transform", showFavoritesOnly && "fill-current scale-110")} />
-                                    Favorites Only
-                                </DropdownMenuCheckboxItem>
+                                <div className="p-2 overflow-y-auto no-scrollbar">
+                                    {/* Scope Section */}
+                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Scope</DropdownMenuLabel>
+                                    <DropdownMenuCheckboxItem
+                                        checked={showFavoritesOnly}
+                                        onCheckedChange={setShowFavoritesOnly}
+                                        className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-rose-50 dark:focus:bg-rose-900/10 focus:text-rose-600 py-2.5 cursor-pointer"
+                                    >
+                                        <Heart size={12} className={cn("mr-2 transition-transform", showFavoritesOnly && "fill-current scale-110")} />
+                                        Favorites Only
+                                    </DropdownMenuCheckboxItem>
 
-                                <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
+                                    <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
 
-                                {/* Category Section */}
-                                <div className="flex items-center justify-between pr-2">
-                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Groups</DropdownMenuLabel>
-                                    <div className="flex items-center gap-1">
-                                        <button
-                                            onClick={(e) => {
-                                                e.preventDefault(); e.stopPropagation();
-                                                setSelectedCategories(CATEGORIES);
-                                            }}
-                                            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-emerald-500 transition-colors"
-                                            title="Select All"
-                                        >
-                                            <CheckSquare size={14} />
-                                        </button>
-                                        <button
-                                            onClick={(e) => {
-                                                e.preventDefault(); e.stopPropagation();
-                                                setSelectedCategories([]);
-                                            }}
-                                            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
-                                            title="Select None"
-                                        >
-                                            <Square size={14} />
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="py-1 max-h-[300px] overflow-y-auto no-scrollbar">
-                                    {CATEGORIES.map(category => {
-                                        const isActive = selectedCategories.includes(category);
-                                        return (
-                                            <DropdownMenuCheckboxItem
-                                                key={category}
-                                                checked={isActive}
-                                                onCheckedChange={(checked) => {
-                                                    if (checked) {
-                                                        setSelectedCategories(prev => [...prev, category]);
-                                                    } else {
-                                                        setSelectedCategories(prev => prev.filter(c => c !== category));
-                                                    }
+                                    {/* Category Section */}
+                                    <div className="flex items-center justify-between pr-2">
+                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Groups</DropdownMenuLabel>
+                                        <div className="flex items-center gap-1">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault(); e.stopPropagation();
+                                                    setSelectedCategories(CATEGORIES);
                                                 }}
-                                                className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-emerald-50 dark:focus:bg-emerald-900/10 focus:text-emerald-600 py-2.5 cursor-pointer"
+                                                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-emerald-500 transition-colors"
+                                                title="Select All"
                                             >
-                                                {category}
-                                            </DropdownMenuCheckboxItem>
-                                        );
-                                    })}
+                                                <CheckSquare size={14} />
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault(); e.stopPropagation();
+                                                    setSelectedCategories([]);
+                                                }}
+                                                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
+                                                title="Select None"
+                                            >
+                                                <Square size={14} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className="py-1">
+                                        {CATEGORIES.map(category => {
+                                            const isActive = selectedCategories.includes(category);
+                                            return (
+                                                <DropdownMenuCheckboxItem
+                                                    key={category}
+                                                    checked={isActive}
+                                                    onCheckedChange={(checked) => {
+                                                        if (checked) {
+                                                            setSelectedCategories(prev => [...prev, category]);
+                                                        } else {
+                                                            setSelectedCategories(prev => prev.filter(c => c !== category));
+                                                        }
+                                                    }}
+                                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-emerald-50 dark:focus:bg-emerald-900/10 focus:text-emerald-600 py-2.5 cursor-pointer"
+                                                >
+                                                    {category}
+                                                </DropdownMenuCheckboxItem>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             </DropdownMenuContent>
                         </DropdownMenu>
