@@ -14,10 +14,10 @@ export default function WorkshopPage() {
             desc: 'A handy tool for side-by-side food and nutrient checks.',
             href: '/dashboard/workshop/comparefoods',
             icon: Scale,
-            color: 'text-violet-400',
-            bg: 'bg-violet-500/10',
-            borderHover: 'hover:border-violet-500/40',
-            gradient: 'from-violet-500 to-purple-600',
+            color: 'text-purple-400',
+            bg: 'bg-purple-500/10',
+            borderHover: 'hover:border-purple-500/40',
+            gradient: 'from-purple-500 to-violet-600',
             active: true
         },
         {
@@ -63,7 +63,7 @@ export default function WorkshopPage() {
             <div className="space-y-12 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)]">
 
                 <div className="max-w-2xl mx-auto text-center space-y-4">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest mb-4">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[10px] font-black uppercase tracking-widest mb-4">
                         <Wrench size={12} />
                         Personal Workshop
                     </div>

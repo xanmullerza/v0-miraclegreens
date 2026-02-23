@@ -89,13 +89,13 @@ export default function DashboardOverview() {
             desc: 'The place for experimentation and trying out new things. Craft personal meal plans, compare ingredients, and use our workshop modules to perfect your diet.',
             href: '/dashboard/workshop',
             icon: Wrench,
-            color: 'text-indigo-400',
-            bg: 'bg-indigo-500/10',
-            borderHover: 'hover:border-indigo-500/40',
-            titleHover: 'group-hover/title:text-indigo-400',
-            itemTitleHover: 'group-hover/item:text-indigo-400',
-            itemBorderHover: 'hover:border-indigo-500/50',
-            gradient: 'from-indigo-500 to-purple-600',
+            color: 'text-purple-400',
+            bg: 'bg-purple-500/10',
+            borderHover: 'hover:border-purple-500/40',
+            titleHover: 'group-hover/title:text-purple-400',
+            itemTitleHover: 'group-hover/item:text-purple-400',
+            itemBorderHover: 'hover:border-purple-500/50',
+            gradient: 'from-purple-500 to-violet-600',
             items: [
                 { title: 'Comparator', icon: Scale, href: '/dashboard/workshop/comparefoods', desc: 'versus 3 foods' },
                 { title: 'Feature Request', icon: Plus, href: '#', desc: 'suggest a tool' },
@@ -154,8 +154,8 @@ export default function DashboardOverview() {
                                 </div>
 
                                 <div className="flex items-center gap-3 group/stat">
-                                    <div className="w-9 h-9 rounded-lg bg-indigo-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
-                                        <Beaker size={16} className="text-indigo-400" />
+                                    <div className="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
+                                        <Beaker size={16} className="text-purple-400" />
                                     </div>
                                     <div>
                                         <p className="text-lg font-black text-white leading-none">{stats.mixes}</p>
