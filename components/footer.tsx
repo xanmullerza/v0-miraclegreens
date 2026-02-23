@@ -6,8 +6,8 @@ import { usePathname } from 'next/navigation';
 export function Footer() {
   const pathname = usePathname();
 
-  // Hide footer on foods page and comparefoods page
-  if (pathname === '/dashboard/library/foods' || pathname === '/dashboard/workshop/comparator') {
+  // Hide footer on foods page, comparefoods page, and dashboard overview
+  if (pathname === '/dashboard/library/foods' || pathname === '/dashboard/workshop/comparator' || pathname === '/dashboard') {
     return null;
   }
 
