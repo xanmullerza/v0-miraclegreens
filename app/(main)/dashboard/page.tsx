@@ -25,7 +25,6 @@ import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
-import { Carousel } from '@/components/ui/carousel';
 
 export default function DashboardOverview() {
     const { showHeroes } = useUserPreferences();
@@ -173,90 +172,73 @@ export default function DashboardOverview() {
                     </div>
                 )}
 
-                <div className="w-full mx-auto md:max-w-[700px] mt-6 lg:mt-8 px-4">
-                    <Carousel
-                        indicators={[
-                            <Library key="lib" size={20} />,
-                            <ChefHat key="kit" size={20} />,
-                            <Wrench key="work" size={20} />
-                        ]}
-                        activeIndicatorClassNames={[
-                            "bg-blue-500/10 text-blue-400",
-                            "bg-emerald-500/10 text-emerald-400",
-                            "bg-purple-500/10 text-purple-400"
-                        ]}
-                    >
-                        {heroCards.map((card) => {
-                            const Icon = card.icon;
-                            const isKitchen = card.id === 'kitchen';
-                            const isDisabled = isKitchen && !isAdmin;
+                <div className="w-full max-w-[900px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
+                    {heroCards.map((card) => {
+                        const Icon = card.icon;
+                        const isKitchen = card.id === 'kitchen';
+                        const isDisabled = isKitchen && !isAdmin;
 
-                            if (isDisabled) {
-                                return (
-                                    <div key={card.id} className="relative overflow-hidden rounded-[2.5rem] border border-slate-700/30 bg-slate-800/20 p-8 opacity-60 cursor-not-allowed select-none group h-full">
-                                        <div className="absolute top-6 right-6 z-20"><span className="px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700 text-[10px] font-black uppercase tracking-widest text-slate-500">Locked</span></div>
-                                        <div className="relative z-10 grayscale opacity-50">
-                                            <div className="flex items-center gap-5 mb-6">
-                                                <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-slate-800/50"><Icon size={28} className="text-slate-500" /></div>
-                                                <div>
-                                                    <h3 className="text-xl font-black text-white tracking-tight">{card.title}</h3>
-                                                    <p className="text-[14px] text-slate-600 leading-relaxed max-w-[280px]">{card.desc}</p>
-                                                </div>
-                                            </div>
-                                            <div className="grid grid-cols-2 gap-3">
-                                                {[1, 2, 3, 4].map((i) => (
-                                                    <div key={i} className="h-14 rounded-xl bg-slate-800/30 border border-slate-700/20" />
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            }
-
+                        if (isDisabled) {
                             return (
-                                <div key={card.id} className={cn("group/main relative overflow-hidden rounded-[2.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-8 transition-all duration-500 h-full", card.borderHover, "hover:bg-slate-800/70 hover:shadow-2xl")}>
-                                    <div className={cn("absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r opacity-0 group-hover/main:opacity-100 transition-all duration-500", card.gradient)} />
-
-                                    <div className="relative z-10">
-                                        <Link href={card.href} className="flex items-center gap-5 mb-8 group/title">
-                                            <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover/title:scale-110", card.bg)}><Icon size={28} className={card.color} /></div>
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2">
-                                                    <h3 className={cn("text-xl font-black text-white tracking-tight transition-colors", card.titleHover)}>{card.title}</h3>
-                                                    <ArrowRight size={16} className={cn("opacity-0 -translate-x-2 transition-all duration-300 group-hover/title:opacity-100 group-hover/title:translate-x-0", card.color)} />
-                                                </div>
-                                                <p className="text-[14px] text-slate-500 leading-relaxed">{card.desc}</p>
-                                            </div>
-                                        </Link>
-
-                                        <div className="space-y-1">
-                                            {card.items?.map((item) => {
-                                                const ItemIcon = item.icon;
-                                                return (
-                                                    <Link
-                                                        key={item.href}
-                                                        href={item.href}
-                                                        className={cn("group/item flex items-center justify-between py-4 px-2 hover:bg-slate-700/20 transition-all duration-300 rounded-xl")}
-                                                    >
-                                                        <div className="flex items-center gap-4 relative z-10">
-                                                            <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center bg-slate-800 transition-colors group-hover/item:bg-slate-700")}>
-                                                                <ItemIcon size={16} className={card.color} />
-                                                            </div>
-                                                            <div className="min-w-0">
-                                                                <p className={cn("text-[14px] font-black text-white leading-none mb-1 truncate transition-colors", card.itemTitleHover)}>{item.title}</p>
-                                                                <p className="text-[11px] text-slate-500 leading-none truncate">{item.desc}</p>
-                                                            </div>
-                                                        </div>
-                                                        <ChevronRight size={16} className="text-slate-600 group-hover/item:text-white group-hover/item:translate-x-1 transition-all duration-300" />
-                                                    </Link>
-                                                );
-                                            })}
+                                <div key={card.id} className="relative overflow-hidden rounded-[2.5rem] border border-slate-800/50 bg-slate-900/40 p-8 opacity-60 cursor-not-allowed select-none group min-h-[320px]">
+                                    <div className="absolute top-6 right-6 z-20">
+                                        <span className="px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700 text-[9px] font-black uppercase tracking-widest text-slate-500">Locked</span>
+                                    </div>
+                                    <div className="relative z-10 grayscale opacity-50 flex flex-col h-full text-center items-center justify-center">
+                                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-slate-800/50 mb-6">
+                                            <Icon size={32} className="text-slate-500" />
                                         </div>
+                                        <h3 className="text-xl font-black text-white tracking-tight mb-3 uppercase italic">{card.title}</h3>
+                                        <p className="text-[13px] text-slate-500 font-bold leading-relaxed">{card.desc}</p>
                                     </div>
                                 </div>
                             );
-                        })}
-                    </Carousel>
+                        }
+
+                        return (
+                            <Link
+                                key={card.id}
+                                href={card.href}
+                                className={cn(
+                                    "group relative overflow-hidden rounded-[2.5rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 transition-all duration-500 min-h-[320px] flex flex-col items-center justify-center text-center",
+                                    card.borderHover,
+                                    "hover:shadow-2xl hover:-translate-y-1"
+                                )}
+                            >
+                                <div className={cn(
+                                    "absolute top-0 left-0 right-0 h-1 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-all duration-500",
+                                    card.gradient
+                                )} />
+
+                                <div className="relative z-10 flex flex-col items-center">
+                                    <div className={cn(
+                                        "w-20 h-20 rounded-[2rem] flex items-center justify-center mb-8 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-sm",
+                                        card.bg
+                                    )}>
+                                        <Icon size={40} className={card.color} />
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-center gap-2">
+                                            <h3 className={cn("text-2xl font-black text-slate-900 dark:text-white tracking-tight transition-colors uppercase italic", card.titleHover)}>
+                                                {card.title}
+                                            </h3>
+                                            <ArrowRight size={20} className={cn("opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0", card.color)} />
+                                        </div>
+                                        <p className="text-[14px] text-slate-500 font-medium leading-relaxed max-w-[240px]">
+                                            {card.desc}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Subtle background glow */}
+                                <div className={cn(
+                                    "absolute -bottom-12 -right-12 w-32 h-32 rounded-full blur-[60px] opacity-0 group-hover:opacity-20 transition-all duration-700",
+                                    card.bg
+                                )} />
+                            </Link>
+                        );
+                    })}
                 </div>
             </div>
         </PageContainer>
