@@ -621,9 +621,9 @@ export function ShoppingListView() {
                     <Button
                         onClick={addManualItem}
                         disabled={!newItemName.trim()}
-                        className="h-14 px-8 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20"
+                        className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20 hover:bg-emerald-700 h-auto"
                     >
-                        <Plus size={20} className="mr-2" />
+                        <Plus size={14} />
                         Add
                     </Button>
                 </div>

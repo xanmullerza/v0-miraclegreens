@@ -445,11 +445,13 @@ export function RecipesView({
                     <Button
                         onClick={() => router.push(`/dashboard/library/meals/new${isMix ? '?is_mix=true' : ''}`)}
                         className={cn(
-                            "h-14 px-8 rounded-2xl text-white font-black uppercase tracking-widest gap-2 shadow-xl",
-                            isMix ? "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/10" : "bg-blue-600 hover:bg-blue-700 shadow-blue-500/10"
+                            "px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 shadow-lg h-auto",
+                            isMix
+                                ? "bg-indigo-600 text-white border-indigo-600 shadow-indigo-500/20 hover:bg-indigo-700"
+                                : "bg-blue-600 text-white border-blue-600 shadow-blue-500/20 hover:bg-blue-700"
                         )}
                     >
-                        <Plus size={18} />
+                        <Plus size={12} />
                         {isMix ? 'Add Mix' : 'Add Meal'}
                     </Button>
                 </div>

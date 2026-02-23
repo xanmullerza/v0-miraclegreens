@@ -599,9 +599,9 @@ export function ExploreView({
 
                     <Button
                         onClick={() => router.push('/dashboard/library/foods/new')}
-                        className="h-14 px-8 rounded-2xl text-white font-black uppercase tracking-widest gap-2 shadow-xl bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/10"
+                        className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20 hover:bg-emerald-700 h-auto"
                     >
-                        <Plus size={18} />
+                        <Plus size={12} />
                         Add Food
                     </Button>
                 </div>
