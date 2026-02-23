@@ -45,7 +45,7 @@ export default function LibraryPage() {
         { id: "nutrients", title: "Nutrients", desc: "Vitamins, minerals & more", href: "/dashboard/library/nutrients", icon: Activity, color: "text-blue-400", bg: "bg-blue-500/10", borderHover: "hover:border-blue-500/40", gradient: "from-blue-500 to-indigo-600" },
         { id: "foods", title: "Foods", desc: "Browse whole food profiles", href: "/dashboard/library/foods", icon: Leaf, color: "text-emerald-400", bg: "bg-emerald-500/10", borderHover: "hover:border-emerald-500/40", gradient: "from-emerald-500 to-teal-600" },
         { id: "mixes", title: "Mixes", desc: "Ingredient blends & bases", href: "/dashboard/library/mixes", icon: Beaker, color: "text-indigo-400", bg: "bg-indigo-500/10", borderHover: "hover:border-indigo-500/40", gradient: "from-indigo-500 to-blue-600" },
-        { id: "recipes", title: "Recipes", desc: "Meals with full nutrition", href: "/dashboard/library/recipes", icon: ChefHat, color: "text-amber-400", bg: "bg-amber-500/10", borderHover: "hover:border-amber-500/40", gradient: "from-amber-500 to-orange-600" },
+        { id: "recipes", title: "Recipes", desc: "Meals with full nutrition", href: "/dashboard/library/meals", icon: ChefHat, color: "text-amber-400", bg: "bg-amber-500/10", borderHover: "hover:border-amber-500/40", gradient: "from-amber-500 to-orange-600" },
     ];
 
     return (

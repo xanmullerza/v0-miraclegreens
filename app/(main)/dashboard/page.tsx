@@ -80,7 +80,7 @@ export default function DashboardOverview() {
                 { title: 'Nutrients', icon: Activity, href: '/dashboard/library/nutrients', desc: 'Vitamins & minerals' },
                 { title: 'Foods', icon: Leaf, href: '/dashboard/library/foods', desc: 'nutritious edibles' },
                 { title: 'Mixes', icon: Beaker, href: '/dashboard/library/mixes', desc: 'custom blends' },
-                { title: 'Meals', icon: ChefHat, href: '/dashboard/library/recipes', desc: 'healthy eating' },
+                { title: 'Meals', icon: ChefHat, href: '/dashboard/library/meals', desc: 'healthy eating' },
             ]
         },
         {

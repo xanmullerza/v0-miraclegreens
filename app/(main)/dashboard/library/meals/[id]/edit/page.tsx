@@ -173,7 +173,7 @@ export default function EditRecipePage() {
         } catch (error: any) {
             console.error('Error fetching recipe:', error);
             toast.error(`Failed to load recipe: ${error.message}`);
-            router.push('/dashboard/library/recipes');
+            router.push('/dashboard/library/meals');
         } finally {
             setLoading(false);
         }
@@ -579,7 +579,7 @@ export default function EditRecipePage() {
             if (instructionsError) throw instructionsError;
 
             toast.success('Recipe updated successfully!');
-            router.push(`/dashboard/library/recipes/${recipeId}`);
+            router.push(`/dashboard/library/meals/${recipeId}`);
         } catch (error: any) {
             console.error('Error updating recipe:', error);
             toast.error(`Failed: ${error.message}`);
