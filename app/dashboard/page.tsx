@@ -22,6 +22,8 @@ import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
+import { Carousel } from '@/components/ui/carousel';
+
 export default function DashboardOverview() {
     const { showHeroes } = useUserPreferences();
     const [stats, setStats] = useState({ foods: 0, recipes: 0, nutrients: 0, mixes: 0 });
@@ -156,8 +158,8 @@ export default function DashboardOverview() {
                     </div>
                 )}
 
-                <div className="w-full mx-auto md:max-w-[900px] mt-6 lg:mt-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                <div className="w-full mx-auto md:max-w-[700px] mt-6 lg:mt-8 px-4">
+                    <Carousel>
                         {heroCards.map((card) => {
                             const Icon = card.icon;
                             const isKitchen = card.id === 'kitchen';
@@ -165,7 +167,7 @@ export default function DashboardOverview() {
 
                             if (isDisabled) {
                                 return (
-                                    <div key={card.id} className="relative overflow-hidden rounded-[2.5rem] border border-slate-700/30 bg-slate-800/20 p-8 opacity-60 cursor-not-allowed select-none group">
+                                    <div key={card.id} className="relative overflow-hidden rounded-[2.5rem] border border-slate-700/30 bg-slate-800/20 p-8 opacity-60 cursor-not-allowed select-none group h-full">
                                         <div className="absolute top-6 right-6 z-20"><span className="px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700 text-[10px] font-black uppercase tracking-widest text-slate-500">Locked</span></div>
                                         <div className="relative z-10 grayscale opacity-50">
                                             <div className="flex items-center gap-5 mb-6">
@@ -186,7 +188,7 @@ export default function DashboardOverview() {
                             }
 
                             return (
-                                <div key={card.id} className={cn("group/main relative overflow-hidden rounded-[2.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-8 transition-all duration-500", card.borderHover, "hover:bg-slate-800/70 hover:shadow-2xl")}>
+                                <div key={card.id} className={cn("group/main relative overflow-hidden rounded-[2.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-8 transition-all duration-500 h-full", card.borderHover, "hover:bg-slate-800/70 hover:shadow-2xl")}>
                                     <div className={cn("absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r opacity-0 group-hover/main:opacity-100 transition-all duration-500", card.gradient)} />
 
                                     <div className="relative z-10">
@@ -197,7 +199,7 @@ export default function DashboardOverview() {
                                                     <h3 className={cn("text-xl font-black text-white tracking-tight transition-colors", card.titleHover)}>{card.title}</h3>
                                                     <ArrowRight size={16} className={cn("opacity-0 -translate-x-2 transition-all duration-300 group-hover/title:opacity-100 group-hover/title:translate-x-0", card.color)} />
                                                 </div>
-                                                <p className="text-[14px] text-slate-500 leading-relaxed max-w-[280px]">{card.desc}</p>
+                                                <p className="text-[14px] text-slate-500 leading-relaxed">{card.desc}</p>
                                             </div>
                                         </Link>
 
@@ -227,9 +229,8 @@ export default function DashboardOverview() {
                                 </div>
                             );
                         })}
-                    </div>
+                    </Carousel>
                 </div>
-
             </div>
         </PageContainer>
     );
