@@ -61,7 +61,7 @@ export default function KitchenPage() {
                                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-500 rounded-full blur-3xl" />
                             </div>
 
-                            <div className="relative z-10 grid grid-cols-1 gap-4 md:flex md:flex-wrap md:items-start md:justify-center md:gap-8 lg:gap-12">
+                            <div className="relative z-10 grid grid-cols-2 gap-4 md:flex md:flex-wrap md:items-start md:justify-center md:gap-8 lg:gap-12">
                                 <div className="flex items-center gap-3 group/stat">
                                     <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
                                         <Activity size={16} className="text-blue-400" />
@@ -107,25 +107,28 @@ export default function KitchenPage() {
                 )}
 
                 <div className="w-full mx-auto md:max-w-[900px] mt-6 lg:mt-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-                        {heroCards.map((card) => {
+                    <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/60 rounded-[2.5rem] overflow-hidden p-2">
+                        {heroCards.map((card, index) => {
                             const Icon = card.icon;
                             return (
-                                <Link key={card.id} href={card.href} className={cn("group relative overflow-hidden rounded-[2.5rem] border border-slate-700/60 bg-slate-800/40 backdrop-blur-sm p-8 transition-all duration-500", card.borderHover, "hover:bg-slate-800/70 hover:shadow-2xl")}>
-                                    <div className={cn("absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-all duration-500", card.gradient)} />
-
-                                    <div className="relative z-10 flex flex-col h-full justify-between">
-                                        <div className="flex items-center gap-5 mb-6 group/title">
-                                            <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover/title:scale-110 shadow-lg", card.bg)}><Icon size={28} className={card.color} /></div>
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2">
-                                                    <h3 className="text-xl font-black text-white tracking-tight">{card.title}</h3>
-                                                    <ArrowRight size={16} className={cn("opacity-0 -translate-x-2 transition-all duration-300 group-hover/title:opacity-100 group-hover/title:translate-x-0", card.color)} />
-                                                </div>
-                                                <p className="text-[14px] text-slate-500 leading-relaxed max-w-[280px]">{card.desc}</p>
-                                            </div>
+                                <Link
+                                    key={card.id}
+                                    href={card.href}
+                                    className={cn(
+                                        "group flex items-center justify-between p-6 transition-all duration-300 hover:bg-slate-800/60 rounded-2xl",
+                                        index !== heroCards.length - 1 && "border-b border-white/[0.03]"
+                                    )}
+                                >
+                                    <div className="flex items-center gap-6">
+                                        <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 shadow-lg", card.bg)}>
+                                            <Icon size={28} className={card.color} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-black text-white tracking-tight">{card.title}</h3>
+                                            <p className="text-[14px] text-slate-500 leading-relaxed">{card.desc}</p>
                                         </div>
                                     </div>
+                                    <ChevronRight size={20} className="text-slate-600 group-hover:text-white group-hover:translate-x-1 transition-all duration-300" />
                                 </Link>
                             );
                         })}

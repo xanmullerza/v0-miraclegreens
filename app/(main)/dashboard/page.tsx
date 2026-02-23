@@ -132,7 +132,7 @@ export default function DashboardOverview() {
                 {showHeroes && (
                     <div className="w-full md:max-w-[900px] mx-auto relative px-0 mb-6 group/stats">
                         <div className="relative p-5 px-8 w-full transition-all duration-500">
-                            <div className="relative z-10 grid grid-cols-1 gap-4 md:flex md:flex-wrap md:items-start md:justify-center md:gap-8 lg:gap-12">
+                            <div className="relative z-10 grid grid-cols-2 gap-4 md:flex md:flex-wrap md:items-start md:justify-center md:gap-8 lg:gap-12">
                                 <div className="flex items-center gap-3 group/stat">
                                     <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
                                         <Activity size={16} className="text-blue-400" />
@@ -233,24 +233,25 @@ export default function DashboardOverview() {
                                             </div>
                                         </Link>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        <div className="space-y-1">
                                             {card.items?.map((item) => {
                                                 const ItemIcon = item.icon;
                                                 return (
                                                     <Link
                                                         key={item.href}
                                                         href={item.href}
-                                                        className={cn("group/item relative overflow-hidden rounded-2xl border border-slate-700/40 bg-slate-900/40 p-4 transition-all duration-300 hover:bg-slate-800/60", card.itemBorderHover)}
+                                                        className={cn("group/item flex items-center justify-between py-4 px-2 hover:bg-slate-700/20 transition-all duration-300 rounded-xl")}
                                                     >
-                                                        <div className="flex items-center gap-3 relative z-10">
+                                                        <div className="flex items-center gap-4 relative z-10">
                                                             <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center bg-slate-800 transition-colors group-hover/item:bg-slate-700")}>
                                                                 <ItemIcon size={16} className={card.color} />
                                                             </div>
                                                             <div className="min-w-0">
-                                                                <p className={cn("text-[12px] font-black text-white leading-none mb-1 truncate transition-colors", card.itemTitleHover)}>{item.title}</p>
-                                                                <p className="text-[10px] text-slate-500 leading-none truncate">{item.desc}</p>
+                                                                <p className={cn("text-[14px] font-black text-white leading-none mb-1 truncate transition-colors", card.itemTitleHover)}>{item.title}</p>
+                                                                <p className="text-[11px] text-slate-500 leading-none truncate">{item.desc}</p>
                                                             </div>
                                                         </div>
+                                                        <ChevronRight size={16} className="text-slate-600 group-hover/item:text-white group-hover/item:translate-x-1 transition-all duration-300" />
                                                     </Link>
                                                 );
                                             })}
