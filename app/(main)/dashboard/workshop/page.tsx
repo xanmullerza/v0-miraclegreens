@@ -60,7 +60,7 @@ export default function WorkshopPage() {
 
     return (
         <PageContainer>
-            <div className="space-y-12 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)]">
+            <div className="space-y-12 animate-in fade-in duration-700 pb-20 md:pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)]">
 
                 <div className="max-w-2xl mx-auto text-center space-y-4">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-[10px] font-black uppercase tracking-widest mb-4">

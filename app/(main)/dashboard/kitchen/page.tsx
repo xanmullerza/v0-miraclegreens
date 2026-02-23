@@ -52,7 +52,7 @@ export default function KitchenPage() {
 
     return (
         <PageContainer>
-            <div className="space-y-12 animate-in fade-in duration-700 pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)]">
+            <div className="space-y-12 animate-in fade-in duration-700 pb-20 md:pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)]">
 
                 {showHeroes && (
                     <div className="w-full md:max-w-[900px] mx-auto relative px-0 mb-6 group/stats">
@@ -61,7 +61,7 @@ export default function KitchenPage() {
                                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-500 rounded-full blur-3xl" />
                             </div>
 
-                            <div className="relative z-10 grid grid-cols-2 gap-4 md:flex md:flex-wrap md:items-start md:justify-center md:gap-8 lg:gap-12">
+                            <div className="relative z-10 grid grid-cols-1 gap-4 md:flex md:flex-wrap md:items-start md:justify-center md:gap-8 lg:gap-12">
                                 <div className="flex items-center gap-3 group/stat">
                                     <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
                                         <Activity size={16} className="text-blue-400" />
