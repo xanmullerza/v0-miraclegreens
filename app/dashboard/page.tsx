@@ -15,7 +15,8 @@ import {
     Scale,
     Calendar,
     Package,
-    ShoppingCart
+    ShoppingCart,
+    Plus
 } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { supabase } from '@/lib/supabase';
@@ -81,6 +82,26 @@ export default function DashboardOverview() {
             ]
         },
         {
+            id: 'lab',
+            title: 'The Lab',
+            desc: 'Interactive research modules and advanced analytics. Experiment with molecular nutrition tools like the Comparator and precision engineering modules.',
+            href: '/dashboard/lab',
+            icon: Beaker,
+            color: 'text-indigo-400',
+            bg: 'bg-indigo-500/10',
+            borderHover: 'hover:border-indigo-500/40',
+            titleHover: 'group-hover/title:text-indigo-400',
+            itemTitleHover: 'group-hover/item:text-indigo-400',
+            itemBorderHover: 'hover:border-indigo-500/50',
+            gradient: 'from-indigo-500 to-purple-600',
+            items: [
+                { title: 'Comparator', icon: Scale, href: '/dashboard/lab/comparefoods', desc: 'versus 3 foods' },
+                { title: 'Feature Request', icon: Plus, href: '#', desc: 'suggest a tool' },
+                { title: 'Feature Request', icon: Plus, href: '#', desc: 'science module' },
+                { title: 'Feature Request', icon: Plus, href: '#', desc: 'research lab' },
+            ]
+        },
+        {
             id: 'kitchen',
             title: 'Kitchen',
             desc: 'Take full control of your kitchen with our inventory management and meal planning tools. Sync your pantry, create custom meal plans, and generate automated shopping lists based on your goals.',
@@ -95,9 +116,9 @@ export default function DashboardOverview() {
             gradient: 'from-emerald-500 to-teal-600',
             items: [
                 { title: 'Mealomatic', icon: Calendar, href: '/dashboard/kitchen/meal-o-matic', desc: 'meal planner' },
-                { title: 'Comparator', icon: Scale, href: '/dashboard/kitchen/comparefoods', desc: 'versus 3 foods' },
                 { title: 'Pantry', icon: Package, href: '/dashboard/kitchen/pantry', desc: 'In-stock essentials' },
                 { title: 'Groceries', icon: ShoppingCart, href: '/dashboard/kitchen/groceries', desc: 'shopping list' },
+                { title: 'Feature Request', icon: Plus, href: '#', desc: 'kitchen tool' },
             ]
         },
     ];
@@ -162,6 +183,7 @@ export default function DashboardOverview() {
                     <Carousel
                         indicators={[
                             <Library key="lib" size={20} />,
+                            <Beaker key="lab" size={20} />,
                             <ChefHat key="kit" size={20} />
                         ]}
                     >
