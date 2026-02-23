@@ -101,7 +101,7 @@ export function NutrientsView() {
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h2 className="text-2xl font-black tracking-tight text-blue-500 dark:text-blue-400 uppercase italic">Nutrients Library</h2>
+                    <h2 className="text-2xl font-black tracking-tight text-blue-500 dark:text-blue-400 uppercase italic">Nutridex</h2>
                     <p className="text-slate-500 font-medium text-sm max-w-lg">
                         Explore the role and benefits of vitamins, minerals, and macronutrients.
                     </p>
@@ -172,7 +172,7 @@ export function NutrientsView() {
                         return (
                             <div
                                 key={name}
-                                onClick={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(name)}`)}
+                                onClick={() => router.push(`/dashboard/workshop/nutridex/${encodeURIComponent(name)}`)}
                                 className="group bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-4"
                             >
                                 <div className="flex items-center gap-6">

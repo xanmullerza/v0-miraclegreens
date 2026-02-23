@@ -42,10 +42,9 @@ export default function LibraryPage() {
     }, []);
 
     const heroCards = [
-        { id: "nutrients", title: "Nutrients", desc: "Vitamins, minerals & more", href: "/dashboard/library/nutrients", icon: Activity, color: "text-blue-400", bg: "bg-blue-500/10", borderHover: "hover:border-blue-500/40", gradient: "from-blue-500 to-indigo-600" },
         { id: "foods", title: "Foods", desc: "Browse whole food profiles", href: "/dashboard/library/foods", icon: Leaf, color: "text-emerald-400", bg: "bg-emerald-500/10", borderHover: "hover:border-emerald-500/40", gradient: "from-emerald-500 to-teal-600" },
         { id: "mixes", title: "Mixes", desc: "Ingredient blends & bases", href: "/dashboard/library/mixes", icon: Beaker, color: "text-indigo-400", bg: "bg-indigo-500/10", borderHover: "hover:border-indigo-500/40", gradient: "from-indigo-500 to-blue-600" },
-        { id: "recipes", title: "Recipes", desc: "Meals with full nutrition", href: "/dashboard/library/meals", icon: ChefHat, color: "text-amber-400", bg: "bg-amber-500/10", borderHover: "hover:border-amber-500/40", gradient: "from-amber-500 to-orange-600" },
+        { id: "meals", title: "Meals", desc: "Meals with full nutrition", href: "/dashboard/library/meals", icon: ChefHat, color: "text-amber-400", bg: "bg-amber-500/10", borderHover: "hover:border-amber-500/40", gradient: "from-amber-500 to-orange-600" },
     ];
 
     return (
@@ -59,17 +58,7 @@ export default function LibraryPage() {
                                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-500 rounded-full blur-3xl" />
                             </div>
 
-                            <div className="relative z-10 grid grid-cols-2 gap-4 md:flex md:flex-wrap md:items-start md:justify-center md:gap-8 lg:gap-12">
-                                <div className="flex items-center gap-3 group/stat">
-                                    <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
-                                        <Activity size={16} className="text-blue-400" />
-                                    </div>
-                                    <div>
-                                        <p className="text-lg font-black text-white leading-none">{stats.nutrients}+</p>
-                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Nutrients</p>
-                                    </div>
-                                </div>
-                                <div className="hidden sm:block w-px h-6 bg-slate-700/40" />
+                            <div className="relative z-10 grid grid-cols-3 gap-4 md:flex md:flex-wrap md:items-start md:justify-center md:gap-8 lg:gap-16">
                                 <div className="flex items-center gap-3 group/stat">
                                     <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
                                         <Leaf size={16} className="text-emerald-400" />

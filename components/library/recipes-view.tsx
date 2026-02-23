@@ -247,7 +247,7 @@ export function RecipesView({
                                             <Activity className="animate-spin text-blue-500" size={32} />
                                             <div className="absolute inset-0 animate-ping bg-blue-500/20 rounded-full" />
                                         </div>
-                                        <p className="text-[10px] font-black uppercase tracking-widest">Searching Recipes...</p>
+                                        <p className="text-[10px] font-black uppercase tracking-widest">Searching Meals...</p>
                                     </div>
                                 ) : heroResults.length > 0 ? (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -277,7 +277,7 @@ export function RecipesView({
                                         <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-dashed border-slate-200 dark:border-slate-700">
                                             <Search size={24} className="opacity-20" />
                                         </div>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">No matching recipes found</p>
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">No matching meals found</p>
                                     </div>
                                 ) : (
                                     <div className="py-12 text-center text-slate-400">

@@ -5,20 +5,20 @@ import { Loader2 } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { RecipesView } from '@/components/library/recipes-view';
 
-export default function RecipesPage() {
+export default function MealsPage() {
     return (
         <Suspense fallback={
             <div className="h-96 flex flex-col items-center justify-center gap-4">
                 <Loader2 className="animate-spin text-emerald-500" size={48} />
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Loading Recipes...</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Loading Meals...</p>
             </div>
         }>
-            <RecipesContent />
+            <MealsContent />
         </Suspense>
     );
 }
 
-function RecipesContent() {
+function MealsContent() {
     return (
         <PageContainer maxWidth="max-w-7xl" className="-mt-12 md:-mt-16">
             <div className="space-y-10 animate-in fade-in duration-700 pb-32 pt-0">

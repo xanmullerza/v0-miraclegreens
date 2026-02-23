@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Wrench, ArrowRight, Scale, Plus, ChevronRight } from 'lucide-react';
+import { Wrench, ArrowRight, Scale, Plus, ChevronRight, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PageContainer } from '@/components/ui/page-container';
 
@@ -18,6 +18,18 @@ export default function WorkshopPage() {
             bg: 'bg-purple-500/10',
             borderHover: 'hover:border-purple-500/40',
             gradient: 'from-purple-500 to-violet-600',
+            active: true
+        },
+        {
+            id: 'nutridex',
+            title: 'Nutridex',
+            desc: 'Vitamins, minerals & biological guide.',
+            href: '/dashboard/workshop/nutridex',
+            icon: Activity,
+            color: 'text-blue-400',
+            bg: 'bg-blue-500/10',
+            borderHover: 'hover:border-blue-500/40',
+            gradient: 'from-blue-500 to-indigo-600',
             active: true
         },
     ];

@@ -77,7 +77,6 @@ export default function DashboardOverview() {
             itemBorderHover: 'hover:border-blue-500/50',
             gradient: 'from-blue-500 to-indigo-600',
             items: [
-                { title: 'Nutrients', icon: Activity, href: '/dashboard/library/nutrients', desc: 'Vitamins & minerals' },
                 { title: 'Foods', icon: Leaf, href: '/dashboard/library/foods', desc: 'nutritious edibles' },
                 { title: 'Mixes', icon: Beaker, href: '/dashboard/library/mixes', desc: 'custom blends' },
                 { title: 'Meals', icon: ChefHat, href: '/dashboard/library/meals', desc: 'healthy eating' },
@@ -117,6 +116,7 @@ export default function DashboardOverview() {
             gradient: 'from-purple-500 to-violet-600',
             items: [
                 { title: 'Comparator', icon: Scale, href: '/dashboard/workshop/comparator', desc: 'versus 3 foods' },
+                { title: 'Nutridex', icon: Activity, href: '/dashboard/workshop/nutridex', desc: 'biological guide' },
             ]
         },
     ];
@@ -135,7 +135,7 @@ export default function DashboardOverview() {
                                     </div>
                                     <div>
                                         <p className="text-lg font-black text-white leading-none">{stats.nutrients}+</p>
-                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Nutrients</p>
+                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Nutridex</p>
                                     </div>
                                 </div>
 

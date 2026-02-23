@@ -166,7 +166,7 @@ export default function NutrientsPage() {
     const handleNutrientSelect = useCallback((id: string) => {
         setSelectedNutrientId(id);
         const encodedId = encodeURIComponent(id);
-        router.push(`/dashboard/library/nutrients/${encodedId}`);
+        router.push(`/dashboard/workshop/nutridex/${encodedId}`);
     }, [router]);
 
     // Data Maps
@@ -278,7 +278,7 @@ export default function NutrientsPage() {
                     </div>
                     <div>
                         <h2 className="text-2xl font-black italic uppercase tracking-tighter text-slate-900 dark:text-white leading-none">
-                            Essential Nutrients
+                            Nutridex
                         </h2>
                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">
                             Biological reference guide & profile targets

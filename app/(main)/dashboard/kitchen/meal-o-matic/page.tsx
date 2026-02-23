@@ -1188,7 +1188,7 @@ export function MealPlannerContent({
                                                             const hasBreakdown = breakdownLabels.includes(label);
 
                                                             return (
-                                                                <div key={label} onClick={() => router.push(`/dashboard/library/nutrients/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, (pct !== null || title === 'Biological Ratios') ? `${styles.borderLight} ${styles.fade}` : "")}>
+                                                                <div key={label} onClick={() => router.push(`/dashboard/workshop/nutridex/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, (pct !== null || title === 'Biological Ratios') ? `${styles.borderLight} ${styles.fade}` : "")}>
                                                                     <p className={cn("text-[8px] uppercase font-black truncate mb-1 flex items-center gap-0.5 whitespace-nowrap overflow-hidden")}>
                                                                         {title === 'Biological Ratios' && label.includes(':') ? (
                                                                             <>
