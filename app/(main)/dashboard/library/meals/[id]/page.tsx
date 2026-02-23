@@ -1562,67 +1562,57 @@ export default function RecipeDetailsPage() {
                             )}
                         </div>
 
-                        {/* Right Column - Nutrition Summary */}
+                        {/* Right Column - Related Meals & Sidebar Content */}
                         <div className="space-y-6">
-                            <Card className="p-6 space-y-6">
-                                <h3 className="text-lg font-black uppercase tracking-wider flex items-center gap-2">
-                                    <Zap size={20} className="text-emerald-500" />
-                                    Macros
-                                </h3>
-                                <div className="space-y-4">
-                                    <div className="flex items-baseline justify-between">
-                                        <span className="text-sm font-bold text-slate-600 dark:text-slate-400">Calories</span>
-                                        <span className="text-2xl font-black text-emerald-500">{calculatedTotals?.calories.toFixed(0) || '0'}</span>
-                                    </div>
-                                    <div className="grid grid-cols-3 gap-3">
-                                        <div className="text-center p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/20">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">P</p>
-                                            <p className="text-lg font-black text-slate-900 dark:text-white">{calculatedTotals?.protein.toFixed(1) || '0'}g</p>
-                                        </div>
-                                        <div className="text-center p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">C</p>
-                                            <p className="text-lg font-black text-slate-900 dark:text-white">{calculatedTotals?.carbs.toFixed(1) || '0'}g</p>
-                                        </div>
-                                        <div className="text-center p-3 rounded-xl bg-orange-50 dark:bg-orange-900/20">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">F</p>
-                                            <p className="text-lg font-black text-slate-900 dark:text-white">{calculatedTotals?.fat.toFixed(1) || '0'}g</p>
+                            {(relatedRecipes.length > 0 || loadingRelated) && (
+                                <div className="space-y-6">
+                                    <div className="flex items-center justify-between px-2">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-xl bg-indigo-500 text-white flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                                                <ChefHat size={16} />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-black text-[10px] uppercase italic text-slate-900 dark:text-white leading-none mb-1">Related Meals</h3>
+                                                <p className="text-[8px] font-black text-indigo-500 uppercase tracking-widest leading-none">Shared items</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </Card>
 
-                            {/* Favorite Button */}
-                            <button
-                                onClick={toggleFavorite}
-                                className={cn(
-                                    "w-full py-3 rounded-2xl font-black text-sm uppercase tracking-wider transition-all",
-                                    recipe.is_favorite
-                                        ? "bg-rose-500/10 text-rose-500 border border-rose-300 dark:border-rose-900"
-                                        : "bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:border-rose-300"
-                                )}
-                            >
-                                <Heart size={16} className={cn("inline mr-2", recipe.is_favorite && "fill-current")} />
-                                {recipe.is_favorite ? 'Favorited' : 'Add to Favorites'}
-                            </button>
+                                    {loadingRelated ? (
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {[0, 1, 2, 3].map((i) => (
+                                                <div key={i} className="aspect-[4/5] rounded-[1.5rem] bg-slate-100 dark:bg-slate-800 animate-pulse border border-slate-200 dark:border-slate-700" />
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-2 gap-3">
+                                            {relatedRecipes.map((meal) => (
+                                                <a
+                                                    key={meal.id}
+                                                    href={`/dashboard/library/meals/${meal.id}`}
+                                                    className="group relative flex flex-col items-center text-center gap-2 p-3 rounded-[1.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-indigo-500/30 transition-all duration-500 shadow-sm shadow-slate-200/50 dark:shadow-none hover:-translate-y-1"
+                                                >
+                                                    <div className="w-full aspect-square rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 group-hover:scale-110 transition-transform duration-700 relative">
+                                                        {meal.image ? (
+                                                            <img src={meal.image} className="w-full h-full object-cover" alt={meal.title} />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-slate-200">
+                                                                <ChefHat size={20} className="opacity-10" />
+                                                            </div>
+                                                        )}
 
-                            {recipe && (String(recipe.id).startsWith('local-') || recipe.is_curated === false || isAdmin) && (
-                                <div className="grid grid-cols-2 gap-3 pt-2">
-                                    <Button
-                                        variant="outline"
-                                        onClick={handleEdit}
-                                        className="rounded-2xl font-black text-[10px] uppercase tracking-wider h-12 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 shadow-sm"
-                                    >
-                                        <Pencil size={14} className="mr-2" />
-                                        Edit Protocol
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        onClick={handleDelete}
-                                        className="rounded-2xl font-black text-[10px] uppercase tracking-wider h-12 border-rose-100 dark:border-rose-950 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:border-rose-300 shadow-sm"
-                                    >
-                                        <Trash2 size={14} className="mr-2" />
-                                        Delete
-                                    </Button>
+                                                        <div className="absolute top-2 left-2 px-1.5 py-0.5 bg-emerald-600 text-white rounded-md shadow-lg z-[100] font-black text-[7px] uppercase tracking-wider">
+                                                            {(meal as any).overlapMatch} Shared
+                                                        </div>
+                                                    </div>
+
+                                                    <h4 className="font-black text-[9px] uppercase italic text-slate-900 dark:text-white line-clamp-1">
+                                                        {meal.title}
+                                                    </h4>
+                                                </a>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -1703,11 +1693,6 @@ export default function RecipeDetailsPage() {
                             'Calcium & Phosphorus': ['Calcium', 'Phosphorus'],
                         }} />
 
-                        <DidYouKnow
-                            phytonutrients={recipe.phytonutrients}
-                            foodName={recipe.title}
-                            className="py-4"
-                        />
                     </div>
 
                     {/* Breakdown Overlay */}
@@ -1790,92 +1775,14 @@ export default function RecipeDetailsPage() {
                         </div>
                     )}
 
-                    {/* Related Meals Section */}
-                    {(relatedRecipes.length > 0 || loadingRelated) && (
-                        <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-700 pt-10 border-t border-slate-100 dark:border-slate-800">
-                            <div className="flex items-center justify-between px-2 md:px-0">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-indigo-500 text-white flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                                        <ChefHat size={20} />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-black text-sm md:text-lg uppercase italic text-slate-900 dark:text-white leading-none mb-1">Related Meals</h3>
-                                        <p className="text-[9px] md:text-[11px] font-black text-indigo-500 uppercase tracking-widest leading-none">Meals containing these ingredients</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
-                                    <History size={14} className="opacity-50" />
-                                    Suggested
-                                </div>
-                            </div>
-
-                            {loadingRelated ? (
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                                    {[0, 1, 2, 3, 4, 5].map((i) => (
-                                        <div key={i} className="aspect-[4/5] rounded-[2rem] bg-slate-100 dark:bg-slate-800 animate-pulse border border-slate-200 dark:border-slate-700" />
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                                    {relatedRecipes.map((meal) => (
-                                        <a
-                                            key={meal.id}
-                                            href={`/dashboard/library/meals/${meal.id}`}
-                                            className="group relative flex flex-col items-center text-center gap-3 p-4 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-indigo-500/30 transition-all duration-500 shadow-xl shadow-slate-200/50 dark:shadow-none hover:-translate-y-1"
-                                        >
-                                            <div className="w-full aspect-square rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 group-hover:scale-110 transition-transform duration-700 relative">
-                                                {meal.image ? (
-                                                    <img src={meal.image} className="w-full h-full object-cover" alt={meal.title} />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-slate-200">
-                                                        <ChefHat size={32} className="opacity-10" />
-                                                    </div>
-                                                )}
-
-                                                {/* Overlay with Shared Count - High Contrast */}
-                                                <div className="absolute top-3 left-3 px-2 py-1 bg-emerald-600 text-white rounded-lg shadow-lg z-[100] font-black text-[10px] uppercase tracking-wider">
-                                                    {(meal as any).overlapMatch} Shared
-                                                </div>
-
-                                                {/* Shared Ingredients List (Visible on Hover) */}
-                                                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center p-4 z-20">
-                                                    <p className="text-[8px] font-black uppercase tracking-[0.2em] text-indigo-300 mb-2">SHARED ITEMS:</p>
-                                                    <div className="flex flex-wrap gap-1 justify-center">
-                                                        {(meal as any).sharedItems?.map((item: string) => (
-                                                            <span key={item} className="px-1.5 py-0.5 rounded bg-white/10 text-white text-[7px] font-bold uppercase tracking-wider whitespace-nowrap">
-                                                                {item}
-                                                            </span>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-1 px-1">
-                                                <h4 className="font-black text-[10px] md:text-xs uppercase italic text-slate-900 dark:text-white line-clamp-2 min-h-[2.5em]">
-                                                    {meal.title}
-                                                </h4>
-                                                <div className="flex flex-wrap gap-1 justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                                    {meal.diet?.slice(0, 2).map((d) => (
-                                                        <span key={d} className="text-[6px] font-black uppercase tracking-widest text-slate-400">
-                                                            #{d}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </div>
-
-                                            <div className="absolute inset-0 border-2 border-indigo-500/0 group-hover:border-indigo-500/20 rounded-[2.5rem] transition-all duration-500 pointer-events-none" />
-                                            <div className="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-500 shadow-lg shadow-indigo-500/40">
-                                                <ArrowRight size={14} />
-                                            </div>
-                                        </a>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    )}
-
                     {/* DidYouKnow Section */}
-                    <DidYouKnow />
+                    {recipe && (
+                        <DidYouKnow
+                            phytonutrients={recipe.phytonutrients}
+                            foodName={recipe.title}
+                            className="py-10 border-t border-slate-100 dark:border-slate-800 mt-10"
+                        />
+                    )}
                 </div>
 
                 {/* Modals */}
