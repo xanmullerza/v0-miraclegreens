@@ -518,7 +518,7 @@ export function ExploreView({
                                     <Filter size={12} />
                                     <span className="hidden sm:inline">
                                         {showFavoritesOnly ? "Favorites" :
-                                            (selectedCategories.length === 0 || selectedCategories.length === CATEGORIES.length ? "All Groups" :
+                                            (selectedCategories.length === 0 || selectedCategories.length === CATEGORIES.length ? "FILTER" :
                                                 `${selectedCategories.length} Groups`)}
                                     </span>
                                     <ChevronDown size={10} className="opacity-50" />

@@ -363,7 +363,7 @@ export function RecipesView({
                                     <Filter size={12} />
                                     <span className="hidden sm:inline">
                                         {showFavoritesOnly ? "Favorites" :
-                                            (selectedTypes.length === 0 || selectedTypes.length === MEAL_TYPES.length ? "All Types" :
+                                            (selectedTypes.length === 0 || selectedTypes.length === MEAL_TYPES.length ? "FILTER" :
                                                 `${selectedTypes.length} Types`)}
                                     </span>
                                     <ChevronDown size={10} className="opacity-50" />
