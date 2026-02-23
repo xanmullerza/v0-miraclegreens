@@ -184,6 +184,11 @@ export default function DashboardOverview() {
                             <Wrench key="work" size={20} />,
                             <ChefHat key="kit" size={20} />
                         ]}
+                        activeIndicatorClassNames={[
+                            "bg-blue-500/10 text-blue-400",
+                            "bg-purple-500/10 text-purple-400",
+                            "bg-emerald-500/10 text-emerald-400"
+                        ]}
                     >
                         {heroCards.map((card) => {
                             const Icon = card.icon;

@@ -11,6 +11,7 @@ interface CarouselProps {
     autoPlay?: boolean;
     showDots?: boolean;
     indicators?: ReactNode[];
+    activeIndicatorClassNames?: string[];
 }
 
 export function Carousel({
@@ -18,7 +19,8 @@ export function Carousel({
     className,
     containerClassName,
     showDots = true,
-    indicators
+    indicators,
+    activeIndicatorClassNames
 }: CarouselProps) {
     const [emblaRef, emblaApi] = useEmblaCarousel({
         align: 'start',
@@ -80,7 +82,10 @@ export function Carousel({
                                 indicators ? "p-2 rounded-xl" : "h-1.5 rounded-full",
                                 selectedIndex === index
                                     ? indicators
-                                        ? "bg-emerald-500/10 text-emerald-500 scale-125 shadow-sm"
+                                        ? cn(
+                                            activeIndicatorClassNames?.[index] || "bg-emerald-500/10 text-emerald-500",
+                                            "scale-125 shadow-sm"
+                                        )
                                         : "w-8 bg-emerald-500 shadow-lg shadow-emerald-500/30"
                                     : indicators
                                         ? "text-slate-400 dark:text-slate-600 hover:text-slate-300 scale-100"
