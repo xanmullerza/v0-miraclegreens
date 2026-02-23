@@ -1324,16 +1324,17 @@ export default function RecipeDetailsPage() {
             <div className="w-full space-y-10 animate-in fade-in duration-700 pb-32 px-4">
                 <div className="max-w-7xl mx-auto space-y-8">
                     {/* Main Header Section (Image + Name) - Matching Food Page */}
-                    <div className="flex flex-row items-end gap-6 animate-in slide-in-from-top-4 duration-700 pb-1">
+                    {/* Main Header Section (Image + Name) - Matching Food Page */}
+                    <div className="flex flex-row items-start gap-6 animate-in slide-in-from-top-4 duration-700 pb-1">
                         {/* Left Side: Image (Small, Inline) */}
-                        <div className="w-24 h-24 lg:w-24 lg:h-24 shrink-0">
+                        <div className="w-24 h-24 lg:w-32 lg:h-32 shrink-0">
                             <Card className="w-full h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden rounded-2xl">
                                 <div className="w-full h-full rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
                                     {recipe.image ? (
                                         <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-slate-200">
-                                            <ChefHat size={24} className="opacity-10" />
+                                            <ChefHat size={32} className="opacity-10" />
                                         </div>
                                     )}
                                     <div className="absolute top-1 left-1">
@@ -1346,88 +1347,91 @@ export default function RecipeDetailsPage() {
                         </div>
 
                         {/* Right Side: Text Content */}
-                        <div className="flex-1 flex flex-col">
-                            <h1 className="text-4xl lg:text-6xl font-black tracking-tighter uppercase italic leading-[0.85] mb-2">
+                        <div className="flex-1 flex flex-col pt-1">
+                            <h1 className="text-4xl lg:text-7xl font-black tracking-tighter uppercase italic leading-[0.8] mb-4">
                                 <span className="text-emerald-500">{recipe.title}</span>
                             </h1>
-                            <div className="flex items-center gap-3 flex-wrap">
+                            <div className="flex items-center gap-4 flex-wrap">
                                 {recipe.source && (
                                     <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Source: {recipe.source}</span>
                                 )}
-                                <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px] flex items-center gap-1">
-                                    <Clock size={10} /> {recipe.prep_time}m
-                                </span>
-                            </div>
-                        </div>
-                    </div>
 
+                                <div className="flex items-center gap-6">
+                                    {/* Prep Time */}
+                                    <span className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px] flex items-center gap-1.5">
+                                        <Clock size={12} className="text-emerald-500/50" /> {recipe.prep_time}m
+                                    </span>
 
-                    {/* Controls Row - Like Food Page's Amount/Measure Row */}
-                    <div className="flex flex-col gap-4 items-start w-full">
-                        <div className="flex items-center gap-3 flex-wrap animate-in fade-in slide-in-from-right-8 duration-700">
-                            {/* Servings Input (Mirrors Food Page's Amount Input) */}
-                            <div className="flex items-center bg-white dark:bg-slate-900 px-2 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm group/amount transition-all hover:border-emerald-500/50 shrink-0">
-                                <div className="flex items-center">
-                                    <input
-                                        type="number"
-                                        value={calculations.totalServings.toFixed(1)}
-                                        readOnly
-                                        className="w-16 bg-transparent text-lg font-black italic text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-center border-r border-slate-100 dark:border-slate-800"
-                                    />
-                                    <div className="relative group/select pl-3 pr-2">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger className="flex items-center gap-1.5 pr-2 text-[10px] font-black uppercase tracking-tighter text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
-                                                Servings
-                                                <ChevronDown className="w-3 h-3 text-slate-400 group-hover/select:text-emerald-500" />
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent
-                                                align="end"
-                                                className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-[1.5rem] p-2 min-w-[160px] shadow-2xl animate-in zoom-in-95 duration-200"
-                                            >
-                                                <DropdownMenuItem
-                                                    className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
-                                                    onClick={() => setSelectedMemberIds(allPeople.map(p => p.id))}
+                                    {/* Servings Module */}
+                                    <div className="flex items-center gap-2">
+                                        <div className="flex items-center bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700/50 shadow-sm transition-all hover:border-emerald-500/30">
+                                            <span className="text-sm font-black italic text-slate-900 dark:text-white border-r border-slate-200 dark:border-slate-700 pr-2">
+                                                {calculations.totalServings.toFixed(1)}
+                                            </span>
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger className="flex items-center gap-1 pl-1 text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
+                                                    Servings
+                                                    <ChevronDown className="w-3 h-3 text-slate-400" />
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent
+                                                    align="start"
+                                                    className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl p-2 min-w-[160px] shadow-2xl animate-in zoom-in-95 duration-200 z-[2000]"
                                                 >
-                                                    Full Family ({allPeople.length})
-                                                </DropdownMenuItem>
-                                                {allPeople.map(person => (
                                                     <DropdownMenuItem
-                                                        key={person.id}
-                                                        className={cn(
-                                                            "text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all",
-                                                            selectedMemberIds.includes(person.id) ? "text-emerald-500" : "text-slate-500 dark:text-slate-400"
-                                                        )}
-                                                        onClick={() => {
-                                                            if (selectedMemberIds.includes(person.id)) {
-                                                                setSelectedMemberIds(prev => prev.filter(pid => pid !== person.id));
-                                                            } else {
-                                                                setSelectedMemberIds(prev => [...prev, person.id]);
-                                                            }
-                                                        }}
+                                                        className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
+                                                        onClick={() => setSelectedMemberIds(allPeople.map(p => p.id))}
                                                     >
-                                                        {selectedMemberIds.includes(person.id) ? '✓ ' : ''}{person.name || (person as any).nickname || 'User'}
+                                                        Full Family ({allPeople.length})
                                                     </DropdownMenuItem>
-                                                ))}
-                                                <DropdownMenuItem
-                                                    className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-rose-500 focus:text-white transition-all text-slate-400"
-                                                    onClick={() => setSelectedMemberIds([])}
-                                                >
-                                                    Clear All
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                                    {allPeople.map(person => (
+                                                        <DropdownMenuItem
+                                                            key={person.id}
+                                                            className={cn(
+                                                                "text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all",
+                                                                selectedMemberIds.includes(person.id) ? "text-emerald-500" : "text-slate-500 dark:text-slate-400"
+                                                            )}
+                                                            onClick={() => {
+                                                                if (selectedMemberIds.includes(person.id)) {
+                                                                    setSelectedMemberIds(prev => prev.filter(pid => pid !== person.id));
+                                                                } else {
+                                                                    setSelectedMemberIds(prev => [...prev, person.id]);
+                                                                }
+                                                            }}
+                                                        >
+                                                            {selectedMemberIds.includes(person.id) ? '✓ ' : ''}{person.name || (person as any).nickname || 'User'}
+                                                        </DropdownMenuItem>
+                                                    ))}
+                                                    <DropdownMenuItem
+                                                        className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-rose-500 focus:text-white transition-all text-slate-400"
+                                                        onClick={() => setSelectedMemberIds([])}
+                                                    >
+                                                        Clear All
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
+                                        </div>
+                                    </div>
+
+                                    {/* Weight Widget */}
+                                    <div className="flex items-center bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700/50 shadow-sm">
+                                        <span className="text-sm font-black italic text-emerald-500 pr-2 border-r border-slate-200 dark:border-slate-700">
+                                            {totalWeight.toFixed(0)}
+                                        </span>
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 pl-2">
+                                            Total Grams
+                                        </span>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        {/* Scaling Factor Indicator */}
-                        {currentScalingFactor !== 1 && (
-                            <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-emerald-500">
-                                <Scale size={12} />
-                                Scaled to {(currentScalingFactor * 100).toFixed(0)}% · Based on {calculations.maxTDEE.toFixed(0)} {energyUnit}
-                            </div>
-                        )}
+                            {/* Scaling Factor Indicator - Integrated into Header */}
+                            {currentScalingFactor !== 1 && (
+                                <div className="mt-4 flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-500/5 w-fit px-3 py-1 rounded-full border border-emerald-500/20">
+                                    <Scale size={12} />
+                                    Scaled to {(currentScalingFactor * 100).toFixed(0)}% · Based on {calculations.maxTDEE.toFixed(0)} {energyUnit}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Main Content Grid - Ingredients + Nutrition */}
