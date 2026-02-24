@@ -312,59 +312,9 @@ export default function SurvivalModePage() {
             </div>
 
             <div className="max-w-4xl mx-auto space-y-12 animate-in fade-in duration-700 pb-20">
-                {/* Header (hidden on pantry step) */}
-                {step !== 'ingredients' && (
-                <div className="text-center space-y-4">
-                    <div className="w-16 h-16 bg-amber-500/10 rounded-[2rem] flex items-center justify-center mx-auto mb-6">
-                        <Wallet className="text-amber-500 w-8 h-8" />
-                    </div>
-                    <div className="flex flex-col items-center">
-                        <h1 className="text-4xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic">
-                            Survival Mode
-                        </h1>
-                        <div className="mt-2 flex items-center gap-3">
-                            <div className="px-4 py-1 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center gap-2">
-                                <div className={cn("w-2 h-2 rounded-full", simStatus.isTerminal ? "bg-rose-500 animate-pulse" : "bg-emerald-500")} />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Biological Integrity: {simStatus.isTerminal ? 'CRITICAL' : 'STABLE'}</span>
-                            </div>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={resetSimulation}
-                                className="text-[8px] uppercase font-black text-slate-400 hover:text-rose-500 transition-colors"
-                            >
-                                Reset Sim
-                            </Button>
-                        </div>
-                    </div>
-                </div>
-                )}
 
-                {/* Step Indicators (hidden during pantry step to clear path to hero) */}
-                {step !== 'ingredients' && (
-                <div className="flex justify-center gap-4">
-                    {[
-                        { id: 'security', label: (s: string) => 'Security' },
-                        { id: 'water', label: (s: string) => 'Hydration' },
-                        { id: 'ingredients', label: (s: string) => 'Pantry' },
-                        { id: 'lifeline', label: (s: string) => 'Lifeline' }
-                    ].map((s, idx) => (
-                        <div key={s.id} className="flex items-center gap-2">
-                            <div className={cn(
-                                "w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black",
-                                step === s.id ? "bg-amber-500 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-400"
-                            )}>
-                                {idx + 1}
-                            </div>
-                            <span className={cn(
-                                "text-[9px] font-black uppercase tracking-widest",
-                                step === s.id ? "text-slate-900 dark:text-white" : "text-slate-400"
-                            )}>{s.label(step)}</span>
-                            {idx < 3 && <ArrowRight size={10} className="text-slate-200" />}
-                        </div>
-                    ))}
-                </div>
-                )}
+
+
 
                 <div className="min-h-[400px]">
                     {step === 'security' && (
