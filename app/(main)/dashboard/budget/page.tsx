@@ -108,11 +108,11 @@ export default function SurvivalModePage() {
         } else {
             setInventory([...inventory, {
                 id: food.id,
-                name: food.name,
+                name: food.common_name || food.name,
                 weight_g: 500, // Default start
                 nutrition: food
             }]);
-            toast.success(`Added ${food.name} to Survival Pantry`);
+            toast.success(`Added ${food.common_name || food.name} to Survival Pantry`);
         }
 
         setHeroSearchQuery('');
@@ -443,7 +443,7 @@ export default function SurvivalModePage() {
                                                                         <Plus size={16} className="text-slate-400 group-hover:text-amber-500 transition-colors" />
                                                                     </div>
                                                                     <div className="min-w-0">
-                                                                        <h4 className="font-black text-xs uppercase truncate">{food.name}</h4>
+                                                                        <h4 className="font-black text-xs uppercase truncate">{food.common_name || food.name}</h4>
                                                                         <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">
                                                                             {food.energy_kcal || 0} KCAL / 100G
                                                                         </p>
@@ -685,6 +685,6 @@ export default function SurvivalModePage() {
                     </div>
                 </div>
             </div>
-        </PageContainer>
+        </PageContainer >
     );
 }
