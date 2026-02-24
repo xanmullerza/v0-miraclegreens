@@ -1325,7 +1325,7 @@ export default function RecipeDetailsPage() {
                 <div className="max-w-7xl mx-auto space-y-8">
                     {/* Main Header Section (Image + Name) - Matching Food Page */}
                     {/* Main Header Section (Image + Name) - Matching Food Page */}
-                    <div className="flex flex-row items-start gap-6 animate-in slide-in-from-top-4 duration-700 pb-1">
+                    <div className="flex flex-col sm:flex-row items-start gap-6 animate-in slide-in-from-top-4 duration-700 pb-1">
                         {/* Left Side: Image (Small, Inline) */}
                         <div className="w-24 h-24 lg:w-32 lg:h-32 shrink-0">
                             <Card className="w-full h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden rounded-2xl">
@@ -1347,8 +1347,8 @@ export default function RecipeDetailsPage() {
                         </div>
 
                         {/* Right Side: Text Content */}
-                        <div className="flex-1 flex flex-col pt-1">
-                            <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic leading-[0.8] mb-4">
+                        <div className="flex-1 flex flex-col pt-1 w-full">
+                            <h1 className="text-2xl sm:text-3xl font-black tracking-tighter uppercase italic leading-tight mb-4">
                                 <span className="text-emerald-500">{recipe.title}</span>
                             </h1>
                             <div className="flex items-center gap-4 flex-wrap">
@@ -1356,7 +1356,7 @@ export default function RecipeDetailsPage() {
                                     <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Source: {recipe.source}</span>
                                 )}
 
-                                <div className="flex items-center gap-6">
+                                <div className="flex items-center gap-3 sm:gap-6 flex-wrap w-full sm:w-auto">
                                     {/* Prep Time Widget */}
                                     <div className="flex items-center bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700/50 shadow-sm transition-all hover:border-emerald-500/30">
                                         <span className="text-sm font-black italic text-slate-900 dark:text-white pr-2 border-r border-slate-200 dark:border-slate-700 flex items-center gap-1.5">
