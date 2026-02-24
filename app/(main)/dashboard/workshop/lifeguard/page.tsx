@@ -429,6 +429,22 @@ export default function SurvivalModePage() {
                                 noResultsMessage="No matching items found"
                                 enterMessage="Enter item name to compare"
                                 searchingMessage="Searching Library..."
+                                renderResult={(food: any) => (
+                                    <>
+                                        <div className="flex items-center gap-4 min-w-0">
+                                            <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
+                                                {food.image ? <img src={food.image} className="w-full h-full object-cover" /> : <Beef className="m-auto opacity-10 h-full w-5" />}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{food.common_name || food.name}</h4>
+                                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                                                    {energyUnit === 'kJ' ? (food.energy_kcal * 4.184).toFixed(0) : food.energy_kcal.toFixed(0)} {energyUnit} <span className="text-slate-200 dark:text-slate-700">|</span> 100g
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={20} />
+                                    </>
+                                )}
                             />
 
 
