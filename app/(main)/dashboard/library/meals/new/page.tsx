@@ -306,30 +306,6 @@ function UserRecipeBuilder() {
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100 pb-20">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-4 border-b border-slate-200 dark:border-slate-800">
-                <div className="space-y-1">
-                    <h1 className="text-3xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic">
-                        {isMix ? 'Mix Formulator' : 'Protocol Builder'}
-                    </h1>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">{user ? 'Cloud Sync Enabled' : 'Local Storage Mode'}</p>
-                </div>
-                <div className="flex items-center gap-4">
-                    <Button
-                        onClick={() => setShowAutoImport(true)}
-                        className="bg-violet-600 hover:bg-violet-700 text-white h-12 px-6 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center gap-3 transition-all shadow-lg shadow-violet-500/20"
-                    >
-                        <Database className="w-3 h-3" />
-                        <span>Smart Protocol Import</span>
-                    </Button>
-                    <Button
-                        onClick={() => router.back()}
-                        variant="outline"
-                        className="h-12 border-slate-200 dark:border-slate-800 text-slate-500 rounded-2xl font-black uppercase tracking-widest text-[10px]"
-                    >
-                        Cancel
-                    </Button>
-                </div>
-            </div>
 
             <LibraryHeroSearch
                 onSelect={handleImportSelect}
