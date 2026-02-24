@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Wrench, ArrowRight, Scale, Plus, ChevronRight, Activity } from 'lucide-react';
+import { Wrench, ArrowRight, Scale, Plus, ChevronRight, Activity, Wallet } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { PageContainer } from '@/components/ui/page-container';
 
@@ -30,6 +30,18 @@ export default function WorkshopPage() {
             bg: 'bg-blue-500/10',
             borderHover: 'hover:border-blue-500/40',
             gradient: 'from-blue-500 to-indigo-600',
+            active: true
+        },
+        {
+            id: 'lifeguard',
+            title: 'Life Guard',
+            desc: 'Biological survival simulation and assessment.',
+            href: '/dashboard/workshop/lifeguard',
+            icon: Wallet,
+            color: 'text-amber-400',
+            bg: 'bg-amber-500/10',
+            borderHover: 'hover:border-amber-500/40',
+            gradient: 'from-amber-500 to-orange-600',
             active: true
         },
     ];
