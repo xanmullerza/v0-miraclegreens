@@ -1348,7 +1348,7 @@ export default function RecipeDetailsPage() {
 
                         {/* Right Side: Text Content */}
                         <div className="flex-1 flex flex-col pt-1">
-                            <h1 className="text-4xl lg:text-7xl font-black tracking-tighter uppercase italic leading-[0.8] mb-4">
+                            <h1 className="text-3xl md:text-5xl font-black tracking-tighter uppercase italic leading-[0.8] mb-4">
                                 <span className="text-emerald-500">{recipe.title}</span>
                             </h1>
                             <div className="flex items-center gap-4 flex-wrap">
