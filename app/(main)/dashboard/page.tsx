@@ -17,8 +17,9 @@ import {
     Package,
     ShoppingCart,
     Plus,
-    Wrench, // Added Wrench icon
-    ChevronRight // Added ChevronRight icon
+    Wrench,
+    ChevronRight,
+    Wallet
 } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { supabase } from '@/lib/supabase';
@@ -118,15 +119,15 @@ export default function DashboardOverview() {
                     <div className="w-full md:max-w-[900px] mx-auto relative px-0 mb-6 group/stats">
                         <div className="relative p-5 px-8 w-full transition-all duration-500">
                             <div className="relative z-10 grid grid-cols-2 gap-4 md:flex md:flex-wrap md:items-start md:justify-center md:gap-8 lg:gap-12">
-                                <div className="flex items-center gap-3 group/stat">
-                                    <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
-                                        <Activity size={16} className="text-blue-400" />
+                                <Link href="/dashboard/budget" className="flex items-center gap-3 group/stat hover:opacity-80 transition-opacity">
+                                    <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
+                                        <Wallet size={16} className="text-emerald-400" />
                                     </div>
                                     <div>
-                                        <p className="text-lg font-black text-white leading-none">{stats.nutrients}+</p>
-                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Nutridex</p>
+                                        <p className="text-lg font-black text-white leading-none">Budget</p>
+                                        <p className="text-[9px] uppercase tracking-widest text-emerald-500/60 font-bold mt-1">Activate Mode</p>
                                     </div>
-                                </div>
+                                </Link>
 
                                 <div className="flex items-center gap-3 group/stat">
                                     <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
