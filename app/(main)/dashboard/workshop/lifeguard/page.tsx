@@ -413,7 +413,7 @@ export default function SurvivalModePage() {
                     {step === 'ingredients' && (
                         <div className="space-y-12 animate-in fade-in duration-500">
                             {/* Search Hero Bar - Prominent and Full-Width (Like Comparator) */}
-                            <div>
+                            <div className="w-full md:max-w-[900px] mx-auto">
                                 <div className={cn(
                                     "w-full bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col h-[180px]",
                                     isHeroActive ? "ring-4 ring-emerald-500/10 border-emerald-500/30" : ""
