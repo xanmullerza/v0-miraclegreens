@@ -4,12 +4,17 @@ import React, { useState, useEffect } from 'react';
 import { PageContainer } from '@/components/ui/page-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
 import { Wallet, Search, ChefHat, ArrowRight, X, Sparkles, Loader2, Utensils, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import Link from 'next/link';
+
+const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
+    <div className={cn("bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden", className)}>
+        {children}
+    </div>
+);
 
 export default function BudgetModePage() {
     const [ingredients, setIngredients] = useState<string[]>([]);
