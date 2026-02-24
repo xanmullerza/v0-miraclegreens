@@ -338,7 +338,8 @@ export default function SurvivalModePage() {
                     </div>
                 </div>
 
-                {/* Step Indicators */}
+                {/* Step Indicators (hidden during pantry step to clear path to hero) */}
+                {step !== 'ingredients' && (
                 <div className="flex justify-center gap-4">
                     {[
                         { id: 'security', label: (s: string) => 'Security' },
@@ -361,6 +362,7 @@ export default function SurvivalModePage() {
                         </div>
                     ))}
                 </div>
+                )}
 
                 <div className="min-h-[400px]">
                     {step === 'security' && (
