@@ -505,45 +505,41 @@ export default function SurvivalModePage() {
                             {/* Right: Integrated Hero Search (Comparator Replicated) */}
                             <div className="lg:col-span-2">
                                 <div className={cn(
-                                    "w-full bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col h-[500px]",
-                                    isHeroActive ? "ring-4 ring-amber-500/5 border-amber-500/20" : ""
+                                    "w-full bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col h-[180px]",
+                                    isHeroActive ? "ring-4 ring-emerald-500/10 border-emerald-500/30" : ""
                                 )}>
-                                    {/* 1. Dynamic Content Area */}
-                                    <div className="flex-1 overflow-y-auto p-8 no-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1">
+                                    {/* 1. Dynamic Content Area (Fixed Height to prevent shifts) */}
+                                    <div className="h-[180px] overflow-y-auto p-4 md:p-8 no-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1">
                                         {isHeroActive ? (
                                             <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                                                 {isHeroSearching ? (
-                                                    <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-4">
+                                                    <div className="py-12 flex flex-col items-center justify-center text-slate-400 gap-4">
                                                         <div className="relative">
-                                                            <Loader2 className="animate-spin text-amber-500" size={32} />
-                                                            <div className="absolute inset-0 animate-ping bg-amber-500/20 rounded-full" />
+                                                            <Activity className="animate-spin text-emerald-500" size={32} />
+                                                            <div className="absolute inset-0 animate-ping bg-emerald-500/20 rounded-full" />
                                                         </div>
-                                                        <p className="text-[10px] font-black uppercase tracking-widest text-amber-500">Scanning Library...</p>
+                                                        <p className="text-[10px] font-black uppercase tracking-widest">Searching Library...</p>
                                                     </div>
                                                 ) : heroResults.length > 0 ? (
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                         {heroResults.map(food => (
                                                             <button
                                                                 key={food.id}
                                                                 onClick={() => addIngredient(food)}
-                                                                className="w-full p-5 rounded-2xl hover:bg-amber-50 dark:hover:bg-amber-950/20 flex items-center justify-between group transition-all border border-slate-100 dark:border-slate-800 hover:border-amber-500/30 text-left"
+                                                                className="w-full p-4 rounded-2xl hover:bg-emerald-50 dark:hover:bg-emerald-900/10 flex items-center justify-between group transition-all border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 text-left"
                                                             >
                                                                 <div className="flex items-center gap-4 min-w-0">
                                                                     <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
-                                                                        {food.image ? (
-                                                                            <img src={food.image} className="w-full h-full object-cover" />
-                                                                        ) : (
-                                                                            <Beef className="m-auto opacity-10 h-full w-5" />
-                                                                        )}
+                                                                        {food.image ? <img src={food.image} className="w-full h-full object-cover" /> : <Beef className="m-auto opacity-10 h-full w-5" />}
                                                                     </div>
                                                                     <div className="min-w-0">
                                                                         <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{food.common_name || food.name}</h4>
                                                                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
-                                                                            {energyUnit === 'kJ' ? (food.energy_kcal * 4.184).toFixed(0) : food.energy_kcal?.toFixed(0) || 0} {energyUnit} <span className="text-slate-200 dark:text-slate-700">|</span> 100g
+                                                                            {energyUnit === 'kJ' ? (food.energy_kcal * 4.184).toFixed(0) : food.energy_kcal.toFixed(0)} {energyUnit} <span className="text-slate-200 dark:text-slate-700">|</span> 100g
                                                                         </p>
                                                                     </div>
                                                                 </div>
-                                                                <ChevronRight className="text-slate-200 group-hover:text-amber-500 transition-colors shrink-0" size={20} />
+                                                                <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={20} />
                                                             </button>
                                                         ))}
                                                     </div>
@@ -552,52 +548,76 @@ export default function SurvivalModePage() {
                                                         <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-dashed border-slate-200 dark:border-slate-700">
                                                             <Search size={24} className="opacity-20" />
                                                         </div>
-                                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">No matching essentials found</p>
+                                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">No matching items found</p>
                                                     </div>
                                                 ) : (
                                                     <div className="py-12 text-center text-slate-400">
-                                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">Enter item name to stock pantry</p>
+                                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">Enter item name to compare</p>
                                                     </div>
                                                 )}
                                             </div>
                                         ) : (
-                                            <div className="flex flex-col items-center justify-center h-full text-center space-y-6 animate-in fade-in duration-700">
-                                                <div className="w-16 h-16 rounded-[2rem] bg-amber-500/10 flex items-center justify-center relative">
-                                                    <Search size={28} className="text-amber-500" />
-                                                    <div className="absolute inset-0 rounded-[2rem] bg-amber-500/20 animate-ping opacity-20" />
+                                            <div className="flex flex-col items-center justify-start pt-8 md:pt-10 text-center h-full animate-in fade-in duration-700">
+                                                <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4 relative">
+                                                    <Info size={24} className="text-emerald-500" />
+                                                    <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
                                                 </div>
-                                                <div className="space-y-2">
-                                                    <h3 className="text-xl font-black uppercase italic tracking-tight">Stock Your Inventory</h3>
-                                                    <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest max-w-xs mx-auto">
-                                                        Search below to add your first survival essential
-                                                    </p>
-                                                </div>
+                                                <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase italic tracking-tight mb-1">Ready to Search?</h3>
+                                                <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest max-w-xs">
+                                                    Search below to add items to inventory
+                                                </p>
                                             </div>
                                         )}
                                     </div>
 
                                     {/* 2. Permanent Search Footer */}
-                                    <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 order-2 flex items-center gap-3">
+                                    <div className="p-4 md:p-6 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3 bg-white dark:bg-slate-900 order-2 rounded-b-[2.5rem]">
                                         <div className="flex-1 relative flex items-center">
-                                            <Search className={cn("absolute left-6 transition-colors", isHeroActive ? "text-amber-500" : "text-slate-300")} size={18} />
+                                            <div className={cn("absolute left-5 transition-colors", isHeroActive ? "text-emerald-500/50" : "text-slate-300")}>
+                                                <Search size={16} className="md:w-5 md:h-5" />
+                                            </div>
                                             <input
-                                                placeholder="SEARCH SURVIVAL ESSENTIALS..."
+                                                autoFocus={isHeroActive}
+                                                placeholder={isHeroActive ? "SEARCH FOOD LIBRARY..." : ""}
                                                 className={cn(
-                                                    "w-full bg-slate-50 dark:bg-slate-800/50 border-2 transition-all shadow-sm text-xs font-black uppercase tracking-widest h-16 rounded-[2rem] pl-16 pr-6 outline-none",
-                                                    isHeroActive ? "border-amber-500/80 ring-4 ring-amber-500/10 bg-white" : "border-slate-100 dark:border-slate-800"
+                                                    "w-full bg-slate-50 dark:bg-slate-800/50 border-2 transition-all shadow-sm text-[10px] md:text-sm font-black uppercase tracking-widest h-12 md:h-14 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300",
+                                                    isHeroActive
+                                                        ? "border-emerald-500/30 focus:border-emerald-500/80 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white dark:focus:bg-slate-800/80"
+                                                        : "border-slate-100 dark:border-slate-800 cursor-pointer hover:border-emerald-500/20"
                                                 )}
                                                 value={heroSearchQuery}
-                                                onFocus={() => setIsHeroActive(true)}
-                                                onChange={(e) => handleHeroSearchInput(e.target.value)}
+                                                onFocus={() => {
+                                                    if (!isHeroActive) {
+                                                        setIsHeroActive(true);
+                                                    }
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Escape') setIsHeroActive(false);
+                                                }}
+                                                onChange={(e) => {
+                                                    if (!isHeroActive) {
+                                                        setIsHeroActive(true);
+                                                    }
+                                                    handleHeroSearchInput(e.target.value);
+                                                }}
                                             />
                                         </div>
-                                        {isHeroActive && (
+                                        {isHeroActive ? (
                                             <button
-                                                onClick={() => { setIsHeroActive(false); setHeroSearchQuery(""); }}
-                                                className="w-16 h-16 flex-shrink-0 rounded-full bg-amber-50 dark:bg-amber-950/30 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/40 flex items-center justify-center transition-all active:scale-95 group/cancel shadow-sm"
+                                                onClick={() => {
+                                                    setIsHeroActive(false);
+                                                    setHeroSearchQuery("");
+                                                    setHeroResults([]);
+                                                }}
+                                                className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-500 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 flex items-center justify-center transition-all active:scale-95 group/cancel shadow-sm"
+                                                title="Close Search"
                                             >
-                                                <X size={20} className="group-hover/cancel:rotate-90 transition-transform duration-300" />
+                                                <X size={18} className="md:w-6 md:h-6 group-hover/cancel:rotate-90 transition-transform duration-300" />
                                             </button>
+                                        ) : (
+                                            <div className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-full bg-slate-50 dark:bg-slate-800/50 text-slate-300 flex items-center justify-center">
+                                                <Search size={18} className="md:w-6 md:h-6" />
+                                            </div>
                                         )}
                                     </div>
                                 </div>
