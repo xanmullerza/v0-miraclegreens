@@ -430,54 +430,7 @@ export default function SurvivalModePage() {
                                 enterMessage="Enter item name to compare"
                                 searchingMessage="Searching Library..."
                             />
-                                                <Search size={16} className="md:w-5 md:h-5" />
-                                            </div>
-                                            <input
-                                                autoFocus={isHeroActive}
-                                                placeholder={isHeroActive ? "SEARCH FOOD LIBRARY..." : ""}
-                                                className={cn(
-                                                    "w-full bg-slate-50 dark:bg-slate-800/50 border-2 transition-all shadow-sm text-[10px] md:text-sm font-black uppercase tracking-widest h-12 md:h-14 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300",
-                                                    isHeroActive
-                                                        ? "border-emerald-500/30 focus:border-emerald-500/80 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white dark:focus:bg-slate-800/80"
-                                                        : "border-slate-100 dark:border-slate-800 cursor-pointer hover:border-emerald-500/20"
-                                                )}
-                                                value={heroSearchQuery}
-                                                onFocus={() => {
-                                                    if (!isHeroActive) {
-                                                        setIsHeroActive(true);
-                                                    }
-                                                }}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Escape') setIsHeroActive(false);
-                                                }}
-                                                onChange={(e) => {
-                                                    if (!isHeroActive) {
-                                                        setIsHeroActive(true);
-                                                    }
-                                                    handleHeroSearchInput(e.target.value);
-                                                }}
-                                            />
-                                        </div>
-                                        {isHeroActive ? (
-                                            <button
-                                                onClick={() => {
-                                                    setIsHeroActive(false);
-                                                    setHeroSearchQuery("");
-                                                    setHeroResults([]);
-                                                }}
-                                                className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-500 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 flex items-center justify-center transition-all active:scale-95 group/cancel shadow-sm"
-                                                title="Close Search"
-                                            >
-                                                <X size={18} className="md:w-6 md:h-6 group-hover/cancel:rotate-90 transition-transform duration-300" />
-                                            </button>
-                                        ) : (
-                                            <div className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-full bg-slate-50 dark:bg-slate-800/50 text-slate-300 flex items-center justify-center">
-                                                <Search size={18} className="md:w-6 md:h-6" />
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
+
 
                             {/* Inventory Section - Below Search Bar */}
                             <div className="space-y-6">

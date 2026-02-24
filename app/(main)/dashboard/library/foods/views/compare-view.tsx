@@ -397,55 +397,6 @@ export function CompareView({ showStats = false, stats }: CompareViewProps) {
                     </>
                 )}
             />
-                            <Search size={16} className="md:w-5 md:h-5" />
-                        </div>
-                        <input
-                            autoFocus={activeSlot !== null}
-                            placeholder={activeSlot !== null ? "SEARCH FOOD LIBRARY..." : ""}
-                            className={cn(
-                                "w-full bg-slate-50 dark:bg-slate-800/50 border-2 transition-all shadow-sm text-[10px] md:text-sm font-black uppercase tracking-widest h-12 md:h-14 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300",
-                                activeSlot !== null
-                                    ? "border-blue-500/30 focus:border-blue-500/80 focus:ring-4 focus:ring-blue-500/10 focus:bg-white dark:focus:bg-slate-800/80"
-                                    : "border-slate-100 dark:border-slate-800 cursor-pointer hover:border-blue-500/20"
-                            )}
-                            value={searchQuery}
-                            onFocus={() => {
-                                if (activeSlot === null) {
-                                    const firstEmpty = selectedFoods.findIndex(f => f === null);
-                                    setActiveSlot(firstEmpty !== -1 ? firstEmpty : 0);
-                                }
-                            }}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Escape') setActiveSlot(null);
-                            }}
-                            onChange={(e) => {
-                                if (activeSlot === null) {
-                                    const firstEmpty = selectedFoods.findIndex(f => f === null);
-                                    setActiveSlot(firstEmpty !== -1 ? firstEmpty : 0);
-                                }
-                                handleSearchInput(e.target.value);
-                            }}
-                        />
-                    </div>
-                    {activeSlot !== null ? (
-                        <button
-                            onClick={() => {
-                                setActiveSlot(null);
-                                setSearchQuery("");
-                            }}
-                            className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-full bg-blue-50 dark:bg-blue-950/30 text-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/40 flex items-center justify-center transition-all active:scale-95 group/cancel shadow-sm"
-                            title="Close Search"
-                        >
-                            <X size={18} className="md:w-6 md:h-6 group-hover/cancel:rotate-90 transition-transform duration-300" />
-                        </button>
-                    ) : (
-                        <div className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-full bg-slate-50 dark:bg-slate-800/50 text-slate-300 flex items-center justify-center">
-                            <Search size={18} className="md:w-6 md:h-6" />
-                        </div>
-                    )}
-                </div>
-            </div>
-
 
             {/* Comparison Table */}
             {showStats && stats && (
