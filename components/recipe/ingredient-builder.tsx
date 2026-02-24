@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useImperativeHandle, forwardRef } from 'react';
 import { Plus, Trash2, Scale, Wand2, Sparkles, Loader2, Check, Apple, Pencil, Zap, X as CloseIcon, ChevronDown, Layers, Gem, Droplet, Battery, Activity, Utensils, ShoppingBasket, ArrowRight, Beaker } from 'lucide-react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -68,6 +68,10 @@ export interface RecipeIngredient {
     cooking_state?: CookingState;
 }
 
+export interface IngredientBuilderHandle {
+    handleAddIngredient: (foodItem: FoodItem | FoodItemMatch, initialValues?: { weightG?: number, quantity?: number, unit?: string, modifier?: string }) => Promise<void>;
+}
+
 interface IngredientBuilderProps {
     ingredients: RecipeIngredient[];
     onChange: (ingredients: RecipeIngredient[]) => void;
@@ -76,7 +80,7 @@ interface IngredientBuilderProps {
     onNext?: () => void;
 }
 
-function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = false, initialShowMagicPaste = false, onNext }: IngredientBuilderProps) {
+const IngredientBuilderContent = forwardRef<IngredientBuilderHandle, IngredientBuilderProps>(({ ingredients, onChange, initialShowPicker = false, initialShowMagicPaste = false, onNext }, ref) => {
     const [showPicker, setShowPicker] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
@@ -110,6 +114,12 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
         };
         checkAdmin();
     }, []);
+
+    useImperativeHandle(ref, () => ({
+        handleAddIngredient: async (foodItem, initialValues) => {
+            await handleAddIngredient(foodItem, initialValues);
+        }
+    }));
 
     useEffect(() => {
         if (initialShowPicker) setShowPicker(true);
@@ -1885,9 +1895,9 @@ function IngredientBuilderContent({ ingredients, onChange, initialShowPicker = f
             }
         </div >
     );
-}
+});
 
-export default function IngredientBuilder(props: IngredientBuilderProps) {
+const IngredientBuilder = forwardRef<IngredientBuilderHandle, IngredientBuilderProps>((props, ref) => {
     return (
         <Suspense fallback={
             <div className="p-12 text-center bg-slate-50/50 dark:bg-slate-900/20 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
@@ -1895,7 +1905,9 @@ export default function IngredientBuilder(props: IngredientBuilderProps) {
                 <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">Initializing Protocol Lab...</p>
             </div>
         }>
-            <IngredientBuilderContent {...props} />
+            <IngredientBuilderContent {...props} ref={ref} />
         </Suspense>
     );
-}
+});
+
+export default IngredientBuilder;

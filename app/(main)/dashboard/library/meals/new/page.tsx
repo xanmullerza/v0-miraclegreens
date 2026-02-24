@@ -2,7 +2,8 @@
 
 import React, { useState, useRef, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import IngredientBuilder, { RecipeIngredient } from '@/components/recipe/ingredient-builder';
+import IngredientBuilder, { RecipeIngredient, IngredientBuilderHandle } from '@/components/recipe/ingredient-builder';
+import { USDAHeroSearch } from '@/components/recipe/usda-hero-search';
 import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus, ListOrdered, ChevronUp, ChevronDown, ClipboardList, Heart, Library, Scale, Database, Calendar, Beaker } from 'lucide-react';
 import { parseInstructionsOnly, parseRecipeText } from '@/lib/utils/recipe-parser';
@@ -60,6 +61,7 @@ function UserRecipeBuilder() {
 
     const instructionsRef = useRef<HTMLDivElement>(null);
     const detailsRef = useRef<HTMLDivElement>(null);
+    const builderRef = useRef<IngredientBuilderHandle>(null);
 
     // Initial state from URL
     useEffect(() => {
@@ -145,6 +147,13 @@ function UserRecipeBuilder() {
             loadRecipe();
         }
     }, [recipeIdToEdit]);
+
+    const handleImportSelect = (item: any) => {
+        if (builderRef.current) {
+            builderRef.current.handleAddIngredient(item);
+            toast.success(`Imported "${item.name}" from USDA`);
+        }
+    };
 
     const handleNextStep = () => {
         setStep(2);
@@ -322,9 +331,15 @@ function UserRecipeBuilder() {
                 </div>
             </div>
 
+            <USDAHeroSearch
+                onSelect={handleImportSelect}
+                placeholder="FAST IMPORT USDA INGREDIENTS..."
+            />
+
             <div className="space-y-8">
                 <Card className="p-8 space-y-6">
                     <IngredientBuilder
+                        ref={builderRef}
                         ingredients={ingredients}
                         onChange={setIngredients}
                         initialShowPicker={!recipeIdToEdit}
