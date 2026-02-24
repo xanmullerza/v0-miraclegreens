@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import IngredientBuilder, { RecipeIngredient, IngredientBuilderHandle } from '@/components/recipe/ingredient-builder';
-import { USDAHeroSearch } from '@/components/recipe/usda-hero-search';
+import { LibraryHeroSearch } from '@/components/recipe/library-hero-search';
 import { findNutrientMatch } from '@/lib/utils/nutrition-calculator';
 import { ChefHat, Clock, Users, Save, Camera, Upload, Trash2, Loader2, Wand2, Sparkles, Zap, ArrowRight, ArrowLeft, Plus, ListOrdered, ChevronUp, ChevronDown, ClipboardList, Heart, Library, Scale, Database, Calendar, Beaker } from 'lucide-react';
 import { parseInstructionsOnly, parseRecipeText } from '@/lib/utils/recipe-parser';
@@ -151,7 +151,7 @@ function UserRecipeBuilder() {
     const handleImportSelect = (item: any) => {
         if (builderRef.current) {
             builderRef.current.handleAddIngredient(item);
-            toast.success(`Imported "${item.name}" from USDA`);
+            toast.success(`Imported "${item.name}" from Library`);
         }
     };
 
@@ -331,9 +331,9 @@ function UserRecipeBuilder() {
                 </div>
             </div>
 
-            <USDAHeroSearch
+            <LibraryHeroSearch
                 onSelect={handleImportSelect}
-                placeholder="FAST IMPORT USDA INGREDIENTS..."
+                placeholder="FAST IMPORT LIBRARY INGREDIENTS..."
             />
 
             <div className="space-y-8">

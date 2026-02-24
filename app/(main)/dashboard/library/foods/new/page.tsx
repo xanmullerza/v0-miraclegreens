@@ -39,7 +39,7 @@ import { Badge } from '@/components/ui/badge';
 
 import { parseNutritionText, parseMeasures } from '@/lib/utils/nutrition-parser';
 import FoodItemPicker from '@/components/recipe/food-item-picker';
-import { USDAHeroSearch } from '@/components/recipe/usda-hero-search';
+import { LibraryHeroSearch } from '@/components/recipe/library-hero-search';
 import { Database } from 'lucide-react';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
@@ -340,14 +340,14 @@ Fat: ${item.fat_g || 0}g
         setServingText(sText);
 
         setShowImportPicker(false);
-        toast.success("Imported data from USDA. You can now edit and save.");
+        toast.success("Imported data from Library. You can now edit and save.");
     };
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
 
             {/* Food Search Hero Workspace */}
-            <USDAHeroSearch onSelect={handleImportSelect} />
+            <LibraryHeroSearch onSelect={handleImportSelect} />
 
             {/* Top Row: Info Entry */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

@@ -1,18 +1,18 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Search, X, Activity, Leaf, ArrowRight, Database } from 'lucide-react';
+import { Search, X, Activity, Leaf, ArrowRight, Library } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { searchUSDAFood, getUSDAFoodDetails } from '@/lib/services/nutrition';
+import { searchLocalFood } from '@/lib/services/nutrition';
 import { toast } from 'sonner';
 
-interface USDAHeroSearchProps {
+interface LibraryHeroSearchProps {
     onSelect: (item: any) => void;
     placeholder?: string;
     className?: string;
 }
 
-export function USDAHeroSearch({ onSelect, placeholder = "CLICK TO SEARCH GLOBAL DATABASE...", className }: USDAHeroSearchProps) {
+export function LibraryHeroSearch({ onSelect, placeholder = "SEARCH LOCAL REGISTRY...", className }: LibraryHeroSearchProps) {
     const [heroSearchQuery, setHeroSearchQuery] = useState('');
     const [heroResults, setHeroResults] = useState<any[]>([]);
     const [isHeroSearching, setIsHeroSearching] = useState(false);
@@ -20,17 +20,17 @@ export function USDAHeroSearch({ onSelect, placeholder = "CLICK TO SEARCH GLOBAL
     const [loading, setLoading] = useState(false);
     const heroSearchTimeoutRef = useMemo(() => ({ current: null as NodeJS.Timeout | null }), []);
 
-    const performUSDASearch = async (query: string) => {
+    const performLocalSearch = async (query: string) => {
         if (!query || query.length < 2) {
             setHeroResults([]);
             return;
         }
         setIsHeroSearching(true);
         try {
-            const results = await searchUSDAFood(query);
+            const results = await searchLocalFood(query);
             setHeroResults(results);
         } catch (error) {
-            console.error('USDA search error:', error);
+            console.error('Local search error:', error);
         } finally {
             setIsHeroSearching(false);
         }
@@ -39,25 +39,20 @@ export function USDAHeroSearch({ onSelect, placeholder = "CLICK TO SEARCH GLOBAL
     const handleHeroSearchInput = (val: string) => {
         setHeroSearchQuery(val);
         if (heroSearchTimeoutRef.current) clearTimeout(heroSearchTimeoutRef.current);
-        heroSearchTimeoutRef.current = setTimeout(() => performUSDASearch(val), 300);
+        heroSearchTimeoutRef.current = setTimeout(() => performLocalSearch(val), 300);
     };
 
-    const handleSelectUSDAResult = async (heroItem: any) => {
+    const handleSelectResult = async (heroItem: any) => {
         setLoading(true);
         try {
-            const details = await getUSDAFoodDetails(heroItem.fdcId);
-            const itemToImport = {
-                ...heroItem,
-                ...details,
-                common_name: heroItem.name
-            };
-            onSelect(itemToImport);
+            // Local items already have details, just normalize and pass it up
+            onSelect(heroItem);
             setIsHeroActive(false);
             setHeroSearchQuery('');
             setHeroResults([]);
         } catch (error) {
-            console.error('Error selecting USDA result:', error);
-            toast.error('Failed to import food details');
+            console.error('Error selecting result:', error);
+            toast.error('Failed to select food item');
         } finally {
             setLoading(false);
         }
@@ -75,15 +70,15 @@ export function USDAHeroSearch({ onSelect, placeholder = "CLICK TO SEARCH GLOBAL
                                     <div className="absolute inset-0 animate-ping bg-emerald-500/20 rounded-full" />
                                 </div>
                                 <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500">
-                                    {loading ? "Importing Food Details..." : "Searching Global Database..."}
+                                    {loading ? "Selecting Item..." : "Searching Local Registry..."}
                                 </p>
                             </div>
                         ) : heroResults.length > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 {heroResults.map(food => (
                                     <button
-                                        key={food.fdcId}
-                                        onClick={() => handleSelectUSDAResult(food)}
+                                        key={food.id}
+                                        onClick={() => handleSelectResult(food)}
                                         className="w-full p-4 rounded-2xl hover:bg-emerald-50 dark:hover:bg-emerald-900/10 flex items-center justify-between group transition-all border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 text-left"
                                     >
                                         <div className="flex items-center gap-4 min-w-0">
@@ -93,7 +88,7 @@ export function USDAHeroSearch({ onSelect, placeholder = "CLICK TO SEARCH GLOBAL
                                             <div className="min-w-0">
                                                 <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{food.name}</h4>
                                                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
-                                                    {Math.round(food.energy_kcal)} KCAL <span className="text-slate-200 dark:text-slate-700">|</span> {food.dataType || 'USDA'}
+                                                    {Math.round(food.energy_kcal)} KCAL <span className="text-slate-200 dark:text-slate-700">|</span> {food.source || 'LOCAL'}
                                                 </p>
                                             </div>
                                         </div>
@@ -110,19 +105,19 @@ export function USDAHeroSearch({ onSelect, placeholder = "CLICK TO SEARCH GLOBAL
                             </div>
                         ) : (
                             <div className="py-12 text-center text-slate-400">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">Enter ingredient name to import details</p>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">Enter item name to search library</p>
                             </div>
                         )}
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center h-full text-center animate-in fade-in duration-700">
                         <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4 relative">
-                            <Database size={24} className="text-emerald-500" />
+                            <Library size={24} className="text-emerald-500" />
                             <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
                         </div>
-                        <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase italic tracking-tight mb-1">Ready to Import?</h3>
+                        <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase italic tracking-tight mb-1">Library Search</h3>
                         <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest max-w-xs">
-                            Search the Global USDA Database for instant nutrition facts
+                            Search your local registry for instant nutrition facts
                         </p>
                     </div>
                 )}
@@ -134,7 +129,7 @@ export function USDAHeroSearch({ onSelect, placeholder = "CLICK TO SEARCH GLOBAL
                         <Search size={16} className="md:w-5 md:h-5" />
                     </div>
                     <input
-                        placeholder={isHeroActive ? "SEARCH GLOBAL DATABASE..." : placeholder}
+                        placeholder={isHeroActive ? "SEARCH REGISTRY..." : placeholder}
                         className={cn(
                             "w-full bg-slate-50 dark:bg-slate-800/50 border-2 transition-all shadow-sm text-[10px] md:text-sm font-black uppercase tracking-widest h-12 md:h-14 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300 outline-none",
                             isHeroActive
