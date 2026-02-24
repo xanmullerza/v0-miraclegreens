@@ -578,7 +578,6 @@ export default function SurvivalModePage() {
                                     </div>
                                 </div>
                             </div>
-                            </div>
 
                             {/* Inventory Section - Below Search Bar */}
                             <div className="space-y-6">
