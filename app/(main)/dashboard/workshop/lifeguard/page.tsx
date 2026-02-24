@@ -312,7 +312,8 @@ export default function SurvivalModePage() {
             </div>
 
             <div className="max-w-4xl mx-auto space-y-12 animate-in fade-in duration-700 pb-20">
-                {/* Header */}
+                {/* Header (hidden on pantry step) */}
+                {step !== 'ingredients' && (
                 <div className="text-center space-y-4">
                     <div className="w-16 h-16 bg-amber-500/10 rounded-[2rem] flex items-center justify-center mx-auto mb-6">
                         <Wallet className="text-amber-500 w-8 h-8" />
@@ -337,6 +338,7 @@ export default function SurvivalModePage() {
                         </div>
                     </div>
                 </div>
+                )}
 
                 {/* Step Indicators (hidden during pantry step to clear path to hero) */}
                 {step !== 'ingredients' && (
