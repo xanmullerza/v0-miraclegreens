@@ -121,11 +121,11 @@ export default function DashboardOverview() {
                             <div className="relative z-10 grid grid-cols-2 gap-4 md:flex md:flex-wrap md:items-start md:justify-center md:gap-8 lg:gap-12">
                                 <Link href="/dashboard/budget" className="flex items-center gap-3 group/stat hover:opacity-80 transition-opacity">
                                     <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
-                                        <Wallet size={16} className="text-emerald-400" />
+                                        <Wallet size={16} className="text-amber-400" />
                                     </div>
                                     <div>
-                                        <p className="text-lg font-black text-white leading-none">Budget</p>
-                                        <p className="text-[9px] uppercase tracking-widest text-emerald-500/60 font-bold mt-1">Activate Mode</p>
+                                        <p className="text-lg font-black text-white leading-none">Survival</p>
+                                        <p className="text-[9px] uppercase tracking-widest text-amber-500/60 font-bold mt-1">Life Guard</p>
                                     </div>
                                 </Link>
 
