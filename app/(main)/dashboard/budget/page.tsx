@@ -4,9 +4,10 @@ import React, { useState, useEffect } from 'react';
 import { PageContainer } from '@/components/ui/page-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Wallet, Search, ChefHat, ArrowRight, X, Sparkles, Loader2, Utensils, Info } from 'lucide-react';
+import { Wallet, Search, ChefHat, ArrowRight, X, Sparkles, Loader2, Utensils, Info, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
+import { searchLocalFood } from '@/lib/services/nutrition';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
@@ -19,16 +20,39 @@ const Card = ({ children, className }: { children: React.ReactNode, className?: 
 export default function BudgetModePage() {
     const [ingredients, setIngredients] = useState<string[]>([]);
     const [currentInput, setCurrentInput] = useState('');
+    const [inputSuggestions, setInputSuggestions] = useState<any[]>([]);
+    const [isInputSearching, setIsInputSearching] = useState(false);
     const [suggestions, setSuggestions] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
 
-    const addIngredient = (e?: React.FormEvent) => {
-        if (e) e.preventDefault();
-        const trimmed = currentInput.trim();
+    // Debounced search for ingredients
+    useEffect(() => {
+        const timer = setTimeout(async () => {
+            if (currentInput.length > 1) {
+                setIsInputSearching(true);
+                try {
+                    const results = await searchLocalFood(currentInput);
+                    setInputSuggestions(results.slice(0, 5));
+                } catch (error) {
+                    console.error('Error searching ingredients:', error);
+                } finally {
+                    setIsInputSearching(false);
+                }
+            } else {
+                setInputSuggestions([]);
+            }
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [currentInput]);
+
+    const addIngredient = (name: string) => {
+        const trimmed = name.trim();
         if (trimmed && !ingredients.includes(trimmed)) {
             setIngredients([...ingredients, trimmed]);
             setCurrentInput('');
+            setInputSuggestions([]);
         }
     };
 
@@ -45,18 +69,13 @@ export default function BudgetModePage() {
         setIsSearching(true);
         setHasSearched(true);
         try {
-            // Very simple "fuzzy" match across recipes
-            // In a real app, this would be a specialized RPC or complex query
-            // Here we'll fetch all recipes and do a basic client-side filter for demo/simple purposes
-            // but we'll try to be efficient by searching for at least one ingredient match in the title/ingredients first
-
+            // Updated logic to search for recipes containing added ingredients
             const { data: recipes, error } = await supabase
                 .from('recipes')
                 .select('*, ingredients(*)');
 
             if (error) throw error;
 
-            // Score recipes based on available ingredients
             const scored = recipes.map(recipe => {
                 let matchCount = 0;
                 const recipeIngredientNames = recipe.ingredients?.map((i: any) => i.item.toLowerCase()) || [];
@@ -64,14 +83,14 @@ export default function BudgetModePage() {
 
                 ingredients.forEach(myIng => {
                     const search = myIng.toLowerCase();
-                    if (recipeTitle.includes(search)) matchCount += 2; // Title matches weight more
+                    if (recipeTitle.includes(search)) matchCount += 2;
                     if (recipeIngredientNames.some((ri: string) => ri.includes(search))) matchCount += 1;
                 });
 
                 return { ...recipe, matchCount };
             }).filter(r => r.matchCount > 0)
                 .sort((a, b) => b.matchCount - a.matchCount)
-                .slice(0, 3); // Just get the top 3 hearty options
+                .slice(0, 3);
 
             setSuggestions(scored);
         } catch (error) {
@@ -101,19 +120,46 @@ export default function BudgetModePage() {
                 {/* Single Form Card */}
                 <Card className="p-8 md:p-12 rounded-[3rem] shadow-2xl shadow-emerald-500/5 border-emerald-500/10 bg-white dark:bg-slate-900/50">
                     <div className="space-y-8">
-                        <form onSubmit={addIngredient} className="relative">
+                        <form
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                if (inputSuggestions.length > 0) {
+                                    addIngredient(inputSuggestions[0].name);
+                                } else {
+                                    addIngredient(currentInput);
+                                }
+                            }}
+                            className="relative"
+                        >
                             <Input
                                 placeholder="TYPE INGREDIENT (EG. RICE, BEANS...)"
-                                className="h-16 pl-6 pr-16 rounded-[1.5rem] md:rounded-[2rem] bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-100 dark:border-slate-800 focus:border-emerald-500/30 text-xs md:text-sm font-black uppercase tracking-widest placeholder:text-slate-300"
+                                className="h-16 pl-6 pr-16 rounded-[1.5rem] md:rounded-[2rem] bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-100 dark:border-slate-800 focus:border-emerald-500/30 text-xs md:text-sm font-black uppercase tracking-widest placeholder:text-slate-300 transition-all outline-none"
                                 value={currentInput}
                                 onChange={(e) => setCurrentInput(e.target.value)}
                             />
-                            <button
-                                type="submit"
-                                className="absolute right-3 top-3 w-10 h-10 bg-emerald-500 text-white rounded-xl flex items-center justify-center hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20"
-                            >
-                                <Search size={20} />
-                            </button>
+                            <div className="absolute right-3 top-3 w-10 h-10 bg-emerald-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                                {isInputSearching ? <Loader2 className="animate-spin w-5 h-5" /> : <Search size={20} />}
+                            </div>
+
+                            {/* Suggestions Dropdown */}
+                            {inputSuggestions.length > 0 && (
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                                    {inputSuggestions.map((item) => (
+                                        <button
+                                            key={item.id}
+                                            type="button"
+                                            onClick={() => addIngredient(item.name)}
+                                            className="w-full px-6 py-4 text-left hover:bg-emerald-50 dark:hover:bg-emerald-500/10 flex items-center justify-between group transition-colors border-b border-slate-50 dark:border-slate-800 last:border-0"
+                                        >
+                                            <div className="flex flex-col">
+                                                <span className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">{item.name}</span>
+                                                <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{item.common_name || 'Library Item'}</span>
+                                            </div>
+                                            <Plus size={14} className="text-slate-200 group-hover:text-emerald-500 transition-colors" />
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                         </form>
 
                         {/* Ingredients List */}
