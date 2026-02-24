@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { PageContainer } from '@/components/ui/page-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
