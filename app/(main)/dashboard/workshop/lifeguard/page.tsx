@@ -457,53 +457,9 @@ export default function SurvivalModePage() {
                     )}
 
                     {step === 'ingredients' && (
-                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 animate-in fade-in duration-500">
-                            {/* Left: Inventory List */}
-                            <div className="lg:col-span-1 space-y-6">
-                                <div className="flex items-center justify-between">
-                                    <h2 className="text-xl font-black uppercase italic italic tracking-tight">Active Pantry</h2>
-                                    <Badge className="bg-amber-500">{inventory.length} ITEMS</Badge>
-                                </div>
-                                <div className="space-y-3 overflow-y-auto max-h-[400px] pr-2 custom-scrollbar">
-                                    {inventory.length === 0 ? (
-                                        <div className="p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl text-center">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Pantry is empty.</p>
-                                        </div>
-                                    ) : (
-                                        inventory.map(item => (
-                                            <div key={item.id} className="p-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center justify-between group shadow-sm">
-                                                <div className="min-w-0">
-                                                    <h4 className="text-xs font-black uppercase truncate">{item.name}</h4>
-                                                    <div className="flex items-center gap-2 mt-1">
-                                                        <input
-                                                            type="number"
-                                                            value={item.weight_g}
-                                                            onChange={(e) => updateInventoryWeight(item.id, parseInt(e.target.value))}
-                                                            className="w-16 bg-slate-50 dark:bg-slate-800 border-none rounded-lg text-[10px] font-black p-1 text-center"
-                                                        />
-                                                        <span className="text-[9px] font-bold text-slate-400 uppercase">Grams</span>
-                                                    </div>
-                                                </div>
-                                                <button onClick={() => removeInventoryItem(item.id)} className="text-slate-200 hover:text-rose-500 transition-colors">
-                                                    <X size={16} />
-                                                </button>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-                                {inventory.length > 0 && (
-                                    <Button
-                                        onClick={findMeals}
-                                        className="w-full h-14 bg-amber-500 hover:bg-amber-600 rounded-2xl font-black uppercase tracking-widest text-[10px]"
-                                        disabled={isSearching}
-                                    >
-                                        {isSearching ? <Loader2 className="animate-spin" /> : 'Project Lifeline'}
-                                    </Button>
-                                )}
-                            </div>
-
-                            {/* Right: Integrated Hero Search (Comparator Replicated) */}
-                            <div className="lg:col-span-2">
+                        <div className="space-y-12 animate-in fade-in duration-500">
+                            {/* Search Hero Bar - Prominent and Full-Width (Like Comparator) */}
+                            <div>
                                 <div className={cn(
                                     "w-full bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col h-[180px]",
                                     isHeroActive ? "ring-4 ring-emerald-500/10 border-emerald-500/30" : ""
@@ -621,6 +577,51 @@ export default function SurvivalModePage() {
                                         )}
                                     </div>
                                 </div>
+                            </div>
+                            </div>
+
+                            {/* Inventory Section - Below Search Bar */}
+                            <div className="space-y-6">
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-xl font-black uppercase italic italic tracking-tight">Active Pantry</h2>
+                                    <Badge className="bg-amber-500">{inventory.length} ITEMS</Badge>
+                                </div>
+                                <div className="space-y-3 overflow-y-auto max-h-[400px] pr-2 custom-scrollbar">
+                                    {inventory.length === 0 ? (
+                                        <div className="p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl text-center">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Pantry is empty.</p>
+                                        </div>
+                                    ) : (
+                                        inventory.map(item => (
+                                            <div key={item.id} className="p-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center justify-between group shadow-sm">
+                                                <div className="min-w-0">
+                                                    <h4 className="text-xs font-black uppercase truncate">{item.name}</h4>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <input
+                                                            type="number"
+                                                            value={item.weight_g}
+                                                            onChange={(e) => updateInventoryWeight(item.id, parseInt(e.target.value))}
+                                                            className="w-16 bg-slate-50 dark:bg-slate-800 border-none rounded-lg text-[10px] font-black p-1 text-center"
+                                                        />
+                                                        <span className="text-[9px] font-bold text-slate-400 uppercase">Grams</span>
+                                                    </div>
+                                                </div>
+                                                <button onClick={() => removeInventoryItem(item.id)} className="text-slate-200 hover:text-rose-500 transition-colors">
+                                                    <X size={16} />
+                                                </button>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                                {inventory.length > 0 && (
+                                    <Button
+                                        onClick={findMeals}
+                                        className="w-full h-14 bg-amber-500 hover:bg-amber-600 rounded-2xl font-black uppercase tracking-widest text-[10px]"
+                                        disabled={isSearching}
+                                    >
+                                        {isSearching ? <Loader2 className="animate-spin" /> : 'Project Lifeline'}
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     )}
