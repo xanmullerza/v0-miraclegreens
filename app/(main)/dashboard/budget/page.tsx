@@ -66,6 +66,84 @@ export default function SurvivalModePage() {
         setTimeout(() => setBoosts(prev => prev.filter(b => b.id !== id)), 4000);
     };
 
+    // --- PERSISTENCE ENGINE ---
+    // 1. Initial Load
+    useEffect(() => {
+        const loadPersistence = async () => {
+            // Priority 1: LocalStorage (Fastest)
+            const savedInventory = localStorage.getItem('miraclegreens_survival_inventory');
+            const savedState = localStorage.getItem('miraclegreens_survival_state');
+
+            if (savedInventory) {
+                try {
+                    const parsed = JSON.parse(savedInventory);
+                    setInventory(parsed);
+                } catch (e) { console.error("Failed to parse inventory", e); }
+            }
+
+            if (savedState) {
+                try {
+                    const { step, security, water, profile } = JSON.parse(savedState);
+                    if (step) setStep(step);
+                    if (security) setSecurityStatus(security);
+                    if (water) setWaterStatus(water);
+                    if (profile) setProfileType(profile);
+                } catch (e) { console.error("Failed to parse survival state", e); }
+            }
+
+            // Priority 2: Cloud Sync (If authenticated)
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user) {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('survival_state')
+                    .eq('id', session.user.id)
+                    .single();
+
+                if (data?.survival_state && !error) {
+                    const { inventory: cloudInv, state: cloudState } = data.survival_state;
+                    if (cloudInv) setInventory(cloudInv);
+                    if (cloudState) {
+                        if (cloudState.step) setStep(cloudState.step);
+                        if (cloudState.security) setSecurityStatus(cloudState.security);
+                        if (cloudState.water) setWaterStatus(cloudState.water);
+                        if (cloudState.profile) setProfileType(cloudState.profile);
+                    }
+                }
+            }
+        };
+
+        loadPersistence();
+    }, []);
+
+    // 2. Automatic Saving
+    useEffect(() => {
+        if (inventory.length === 0 && step === 'security') return; // Don't save empty initial state
+
+        const savePersistence = async () => {
+            const state = { step, security: securityStatus, water: waterStatus, profile: profileType };
+
+            // Save to LocalStorage
+            localStorage.setItem('miraclegreens_survival_inventory', JSON.stringify(inventory));
+            localStorage.setItem('miraclegreens_survival_state', JSON.stringify(state));
+
+            // Sync to Cloud (throttled/background)
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user) {
+                await supabase
+                    .from('profiles')
+                    .update({
+                        survival_state: { inventory, state }
+                    } as any)
+                    .eq('id', session.user.id);
+            }
+        };
+
+        const timer = setTimeout(savePersistence, 1000);
+        return () => clearTimeout(timer);
+    }, [inventory, step, securityStatus, waterStatus, profileType]);
+    // --- END PERSISTENCE ---
+
     const performLocalSearch = async (query: string) => {
         if (!query || query.length < 2) {
             setHeroResults([]);
@@ -138,6 +216,11 @@ export default function SurvivalModePage() {
         setSimulationDay(0);
         setSuggestions([]);
         setHasSearched(false);
+
+        // Clear Persistence
+        localStorage.removeItem('miraclegreens_survival_inventory');
+        localStorage.removeItem('miraclegreens_survival_state');
+
         toast.success("Simulation Reset.");
     };
 
