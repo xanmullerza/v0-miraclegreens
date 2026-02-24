@@ -1,15 +1,19 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { PageContainer } from '@/components/ui/page-container';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Wallet, Search, ChefHat, ArrowRight, X, Sparkles, Loader2, Utensils, Info, Plus } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import {
+    Wallet, Search, X, ArrowRight, Loader2, Sparkles,
+    Zap, Activity, Info, Utensils, ChefHat, Plus
+} from 'lucide-react';
+import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import { searchLocalFood } from '@/lib/services/nutrition';
-import { toast } from 'sonner';
 import Link from 'next/link';
+import { calculateSurvivalStatus, SURVIVAL_PROFILES } from '@/lib/utils/survival-sim';
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden", className)}>
@@ -17,20 +21,50 @@ const Card = ({ children, className }: { children: React.ReactNode, className?: 
     </div>
 );
 
+interface InventoryItem {
+    id: string;
+    name: string;
+    weight_g: number;
+    nutrition: any; // We'll store per-100g or total
+}
+
+interface LifeSign {
+    name: string;
+    status: 'optimal' | 'stable' | 'depleted' | 'critical' | 'terminal';
+    value: number;
+    unit: string;
+    symptom?: string;
+}
+
 export default function SurvivalModePage() {
-    const [step, setStep] = useState<'security' | 'water' | 'ingredients' | 'results'>('security');
+    const [step, setStep] = useState<'security' | 'water' | 'ingredients' | 'lifeline' | 'results'>('security');
     const [securityStatus, setSecurityStatus] = useState<'safe' | 'unsafe' | null>(null);
     const [waterStatus, setWaterStatus] = useState<'clean' | 'dirty' | 'none' | null>(null);
 
-    const [ingredients, setIngredients] = useState<string[]>([]);
+    // Inventory System
+    const [inventory, setInventory] = useState<InventoryItem[]>([]);
     const [heroSearchQuery, setHeroSearchQuery] = useState('');
     const [heroResults, setHeroResults] = useState<any[]>([]);
     const [isHeroSearching, setIsHeroSearching] = useState(false);
     const [isHeroActive, setIsHeroActive] = useState(false);
+
+    // Simulation Slider
+    const [simulationDay, setSimulationDay] = useState(0);
+    const [profileType, setProfileType] = useState<'maintenance' | 'starvation'>('starvation');
+
     const [suggestions, setSuggestions] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [hasSearched, setHasSearched] = useState(false);
     const heroSearchTimeoutRef = useMemo(() => ({ current: null as NodeJS.Timeout | null }), []);
+
+    // Achievements / Boosts
+    const [boosts, setBoosts] = useState<{ id: string, message: string }[]>([]);
+
+    const addBoost = (message: string) => {
+        const id = Math.random().toString(36).substr(2, 9);
+        setBoosts(prev => [...prev, { id, message }]);
+        setTimeout(() => setBoosts(prev => prev.filter(b => b.id !== id)), 4000);
+    };
 
     const performLocalSearch = async (query: string) => {
         if (!query || query.length < 2) {
@@ -54,22 +88,61 @@ export default function SurvivalModePage() {
         heroSearchTimeoutRef.current = setTimeout(() => performLocalSearch(val), 300);
     };
 
-    const addIngredient = (name: string) => {
-        const trimmed = name.trim();
-        if (trimmed && !ingredients.includes(trimmed)) {
-            setIngredients([...ingredients, trimmed]);
-            setHeroSearchQuery('');
-            setHeroResults([]);
-            setIsHeroActive(false);
+    const addIngredient = (food: any) => {
+        const existing = inventory.find(item => item.id === food.id);
+
+        // Check for "Boosts"
+        if (food.name.toLowerCase().includes('cabbage')) {
+            addBoost("ULTRA BOOST: Vitamin C & K reserves extended +4 days!");
+        } else if (food.name.toLowerCase().includes('lemon') || food.name.toLowerCase().includes('orange')) {
+            addBoost("SCURVY SHIELD: Scurvy progression halted!");
         }
+
+        if (existing) {
+            setInventory(inventory.map(item =>
+                item.id === food.id
+                    ? { ...item, weight_g: item.weight_g + 500 } // Default to adding 500g for now
+                    : item
+            ));
+            toast.success(`Replenished ${food.name} stocks (+500g)`);
+        } else {
+            setInventory([...inventory, {
+                id: food.id,
+                name: food.name,
+                weight_g: 500, // Default start
+                nutrition: food
+            }]);
+            toast.success(`Added ${food.name} to Survival Pantry`);
+        }
+
+        setHeroSearchQuery('');
+        setHeroResults([]);
+        setIsHeroActive(false);
     };
 
-    const removeIngredient = (index: number) => {
-        setIngredients(ingredients.filter((_, i) => i !== index));
+    const updateInventoryWeight = (id: string, weight: number) => {
+        setInventory(inventory.map(item =>
+            item.id === id ? { ...item, weight_g: Math.max(0, weight) } : item
+        ));
+    };
+
+    const removeInventoryItem = (id: string) => {
+        setInventory(inventory.filter(item => item.id !== id));
+    };
+
+    const resetSimulation = () => {
+        setStep('security');
+        setSecurityStatus(null);
+        setWaterStatus(null);
+        setInventory([]);
+        setSimulationDay(0);
+        setSuggestions([]);
+        setHasSearched(false);
+        toast.success("Simulation Reset.");
     };
 
     const findMeals = async () => {
-        if (ingredients.length === 0) {
+        if (inventory.length === 0) {
             toast.error("Add some essentials first!");
             return;
         }
@@ -83,15 +156,21 @@ export default function SurvivalModePage() {
 
             if (error) throw error;
 
+            // Score recipes based on missing nutrients in simStatus
             const scored = recipes.map(recipe => {
                 let matchCount = 0;
                 const recipeIngredientNames = recipe.ingredients?.map((i: any) => i.item.toLowerCase()) || [];
                 const recipeTitle = recipe.title.toLowerCase();
 
-                ingredients.forEach(myIng => {
-                    const search = myIng.toLowerCase();
+                inventory.forEach(invItem => {
+                    const search = invItem.name.toLowerCase();
                     if (recipeTitle.includes(search)) matchCount += 2;
                     if (recipeIngredientNames.some((ri: string) => ri.includes(search))) matchCount += 1;
+                });
+
+                // Bonus for recipes that provide nutrients the user is low on
+                simStatus.activeSymptoms.forEach(s => {
+                    if (recipe.title.toLowerCase().includes(s.nutrient.toLowerCase())) matchCount += 5;
                 });
 
                 return { ...recipe, matchCount };
@@ -100,37 +179,86 @@ export default function SurvivalModePage() {
                 .slice(0, 3);
 
             setSuggestions(scored);
-            setStep('results');
+            setStep('lifeline'); // Move to lifeline which now shows results
         } catch (error) {
             console.error('Error finding survival meals:', error);
-            toast.error("Failed to find protocols. Try again!");
+            toast.error("Failed to find protocols.");
         } finally {
             setIsSearching(false);
         }
     };
 
+    const eatMeal = (recipe: any) => {
+        // Subtract 200g of each matching ingredient from inventory
+        let updated = [...inventory];
+        let count = 0;
+        inventory.forEach(invItem => {
+            const search = invItem.name.toLowerCase();
+            const isInRecipe = recipe.ingredients?.some((ri: any) => ri.item.toLowerCase().includes(search));
+            if (isInRecipe) {
+                updated = updated.map(item =>
+                    item.id === invItem.id ? { ...item, weight_g: Math.max(0, item.weight_g - 250) } : item
+                );
+                count++;
+            }
+        });
+        setInventory(updated);
+        toast.info(`Protocol marked as eaten. Pantry adjusted (-${count} items).`);
+    };
+
+    const simStatus = calculateSurvivalStatus(
+        inventory,
+        simulationDay,
+        profileType,
+        waterStatus === 'clean'
+    );
+
     return (
         <PageContainer>
+            {/* Boost Toasts */}
+            <div className="fixed top-24 right-8 z-50 flex flex-col gap-2 pointer-events-none">
+                {boosts.map(boost => (
+                    <div key={boost.id} className="bg-emerald-500 text-white px-6 py-3 rounded-2xl shadow-xl font-black uppercase text-[10px] tracking-widest animate-in slide-in-from-right-8 fade-in flex items-center gap-3">
+                        <Sparkles size={16} />
+                        {boost.message}
+                    </div>
+                ))}
+            </div>
+
             <div className="max-w-4xl mx-auto space-y-12 animate-in fade-in duration-700 pb-20">
                 {/* Header */}
                 <div className="text-center space-y-4">
                     <div className="w-16 h-16 bg-amber-500/10 rounded-[2rem] flex items-center justify-center mx-auto mb-6">
                         <Wallet className="text-amber-500 w-8 h-8" />
                     </div>
-                    <h1 className="text-4xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic">
-                        Survival Mode
-                    </h1>
-                    <p className="text-slate-500 font-bold text-xs uppercase tracking-[0.2em] max-w-sm mx-auto">
-                        Stability First. Then Nutrition. Then Survival.
-                    </p>
+                    <div className="flex flex-col items-center">
+                        <h1 className="text-4xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic">
+                            Survival Mode
+                        </h1>
+                        <div className="mt-2 flex items-center gap-3">
+                            <div className="px-4 py-1 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center gap-2">
+                                <div className={cn("w-2 h-2 rounded-full", simStatus.isTerminal ? "bg-rose-500 animate-pulse" : "bg-emerald-500")} />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Biological Integrity: {simStatus.isTerminal ? 'CRITICAL' : 'STABLE'}</span>
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={resetSimulation}
+                                className="text-[8px] uppercase font-black text-slate-400 hover:text-rose-500 transition-colors"
+                            >
+                                Reset Sim
+                            </Button>
+                        </div>
+                    </div>
                 </div>
 
                 {/* Step Indicators */}
                 <div className="flex justify-center gap-4">
                     {[
-                        { id: 'security', label: 'Security' },
-                        { id: 'water', label: 'Hydration' },
-                        { id: 'ingredients', label: 'Intake' }
+                        { id: 'security', label: (s: string) => 'Security' },
+                        { id: 'water', label: (s: string) => 'Hydration' },
+                        { id: 'ingredients', label: (s: string) => 'Pantry' },
+                        { id: 'lifeline', label: (s: string) => 'Lifeline' }
                     ].map((s, idx) => (
                         <div key={s.id} className="flex items-center gap-2">
                             <div className={cn(
@@ -142,8 +270,8 @@ export default function SurvivalModePage() {
                             <span className={cn(
                                 "text-[9px] font-black uppercase tracking-widest",
                                 step === s.id ? "text-slate-900 dark:text-white" : "text-slate-400"
-                            )}>{s.label}</span>
-                            {idx < 2 && <ArrowRight size={10} className="text-slate-200" />}
+                            )}>{s.label(step)}</span>
+                            {idx < 3 && <ArrowRight size={10} className="text-slate-200" />}
                         </div>
                     ))}
                 </div>
@@ -243,220 +371,315 @@ export default function SurvivalModePage() {
                     )}
 
                     {step === 'ingredients' && (
-                        <div className="space-y-8 animate-in slide-in-from-right-4 duration-500">
-                            {/* Integrated Hero Search */}
-                            <div className={cn(
-                                "w-full bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col",
-                                isHeroActive ? "ring-4 ring-amber-500/5 border-amber-500/20" : ""
-                            )}>
-                                <div className="h-[240px] overflow-y-auto p-4 md:p-8 no-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1">
-                                    {isHeroActive ? (
-                                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                                            {isHeroSearching ? (
-                                                <div className="py-12 flex flex-col items-center justify-center text-slate-400 gap-4">
-                                                    <div className="relative">
-                                                        <Loader2 className="animate-spin text-amber-500" size={32} />
-                                                        <div className="absolute inset-0 animate-ping bg-amber-500/20 rounded-full" />
-                                                    </div>
-                                                    <p className="text-[10px] font-black uppercase tracking-widest text-amber-500">Scanning Library...</p>
-                                                </div>
-                                            ) : heroResults.length > 0 ? (
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                    {heroResults.map(food => (
-                                                        <button
-                                                            key={food.id}
-                                                            onClick={() => addIngredient(food.name)}
-                                                            className="w-full p-4 rounded-2xl hover:bg-amber-50 dark:hover:bg-amber-950/20 flex items-center justify-between group transition-all border border-slate-100 dark:border-slate-800 hover:border-amber-500/30 text-left"
-                                                        >
-                                                            <div className="flex items-center gap-4 min-w-0">
-                                                                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-slate-100 dark:border-slate-800">
-                                                                    <Utensils size={16} className="text-slate-400 group-hover:text-amber-500 transition-colors" />
-                                                                </div>
-                                                                <div className="min-w-0">
-                                                                    <h4 className="font-black text-xs uppercase text-slate-900 dark:text-white truncate">{food.name}</h4>
-                                                                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">
-                                                                        {food.common_name || 'Library Item'}
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                            <Plus className="text-slate-200 group-hover:text-amber-500 transition-colors shrink-0" size={16} />
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            ) : (
-                                                <div className="py-12 text-center text-slate-400">
-                                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">
-                                                        {heroSearchQuery.length > 1 ? "No matching items found" : "Enter survival essential name"}
-                                                    </p>
-                                                </div>
-                                            )}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 animate-in fade-in duration-500">
+                            {/* Left: Inventory List */}
+                            <div className="lg:col-span-1 space-y-6">
+                                <div className="flex items-center justify-between">
+                                    <h2 className="text-xl font-black uppercase italic italic tracking-tight">Active Pantry</h2>
+                                    <Badge className="bg-amber-500">{inventory.length} ITEMS</Badge>
+                                </div>
+                                <div className="space-y-3 overflow-y-auto max-h-[400px] pr-2 custom-scrollbar">
+                                    {inventory.length === 0 ? (
+                                        <div className="p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl text-center">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Pantry is empty.</p>
                                         </div>
                                     ) : (
-                                        <div className="flex flex-col items-center justify-center h-full text-center animate-in fade-in duration-700">
-                                            <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center mb-4 relative">
-                                                <Utensils size={24} className="text-amber-500" />
-                                                <div className="absolute inset-0 rounded-full bg-amber-500/20 animate-ping" />
+                                        inventory.map(item => (
+                                            <div key={item.id} className="p-4 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl flex items-center justify-between group shadow-sm">
+                                                <div className="min-w-0">
+                                                    <h4 className="text-xs font-black uppercase truncate">{item.name}</h4>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <input
+                                                            type="number"
+                                                            value={item.weight_g}
+                                                            onChange={(e) => updateInventoryWeight(item.id, parseInt(e.target.value))}
+                                                            className="w-16 bg-slate-50 dark:bg-slate-800 border-none rounded-lg text-[10px] font-black p-1 text-center"
+                                                        />
+                                                        <span className="text-[9px] font-bold text-slate-400 uppercase">Grams</span>
+                                                    </div>
+                                                </div>
+                                                <button onClick={() => removeInventoryItem(item.id)} className="text-slate-200 hover:text-rose-500 transition-colors">
+                                                    <X size={16} />
+                                                </button>
                                             </div>
-                                            <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase italic tracking-tight mb-1 font-inter">Add Intake</h3>
-                                            <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest max-w-xs">
-                                                List what edibles you have available.
-                                            </p>
-                                        </div>
+                                        ))
                                     )}
                                 </div>
-
-                                <div className="p-4 md:p-6 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3 bg-white dark:bg-slate-900 order-2">
-                                    <div className="flex-1 relative flex items-center">
-                                        <div className={cn("absolute left-5 transition-colors", isHeroActive ? "text-amber-500/50" : "text-slate-300")}>
-                                            <Search size={20} />
-                                        </div>
-                                        <input
-                                            placeholder="SEARCH LIBRARY FOR FOOD SOURCES..."
-                                            className={cn(
-                                                "w-full bg-slate-50 dark:bg-slate-800/50 border-2 transition-all shadow-sm text-xs md:text-sm font-black uppercase tracking-widest h-14 md:h-16 rounded-[1.5rem] md:rounded-[2rem] pl-14 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300 outline-none",
-                                                isHeroActive
-                                                    ? "border-amber-500/30 focus:border-amber-500/80 focus:ring-4 focus:ring-amber-500/10"
-                                                    : "border-slate-100 dark:border-slate-800"
-                                            )}
-                                            value={heroSearchQuery}
-                                            onFocus={() => setIsHeroActive(true)}
-                                            onChange={(e) => handleHeroSearchInput(e.target.value)}
-                                        />
-                                    </div>
-                                    {isHeroActive && (
-                                        <button
-                                            onClick={() => {
-                                                setIsHeroActive(false);
-                                                setHeroSearchQuery("");
-                                                setHeroResults([]);
-                                            }}
-                                            className="w-14 h-14 md:w-16 md:h-16 flex-shrink-0 rounded-full bg-amber-50 dark:bg-amber-950/30 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/40 flex items-center justify-center transition-all group/cancel"
-                                        >
-                                            <X size={20} className="group-hover/cancel:rotate-90 transition-transform duration-300" />
-                                        </button>
-                                    )}
-                                </div>
+                                {inventory.length > 0 && (
+                                    <Button
+                                        onClick={findMeals}
+                                        className="w-full h-14 bg-amber-500 hover:bg-amber-600 rounded-2xl font-black uppercase tracking-widest text-[10px]"
+                                        disabled={isSearching}
+                                    >
+                                        {isSearching ? <Loader2 className="animate-spin" /> : 'Project Lifeline'}
+                                    </Button>
+                                )}
                             </div>
 
-                            {/* Ingredients Chip List */}
-                            {ingredients.length > 0 && (
-                                <div className="flex flex-wrap gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                                    {ingredients.map((ing, idx) => (
-                                        <div
-                                            key={idx}
-                                            className="group px-4 py-2 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 border border-amber-500/20"
-                                        >
-                                            {ing}
-                                            <button onClick={() => removeIngredient(idx)} className="hover:text-amber-800 dark:hover:text-amber-200 transition-colors">
-                                                <X size={12} />
-                                            </button>
-                                        </div>
-                                    ))}
-                                    <Button
-                                        variant="ghost"
-                                        className="text-[10px] uppercase font-black tracking-wider text-slate-400 hover:text-rose-500"
-                                        onClick={() => setIngredients([])}
-                                    >
-                                        Clear All
-                                    </Button>
-                                </div>
-                            )}
-
-                            {/* Big Search Trigger */}
-                            <Button
-                                onClick={findMeals}
-                                disabled={ingredients.length === 0 || isSearching}
-                                className="w-full h-16 md:h-20 bg-amber-500 hover:bg-amber-600 text-white rounded-[1.5rem] md:rounded-[3rem] font-black uppercase tracking-[0.2em] text-xs md:text-sm shadow-xl shadow-amber-500/20 transition-all active:scale-[0.98]"
-                            >
-                                {isSearching ? (
-                                    <Loader2 className="animate-spin w-5 h-5" />
-                                ) : (
-                                    <div className="flex items-center gap-3">
-                                        <ChefHat size={20} />
-                                        <span>Scan Profiles For Lifeline Matches</span>
+                            {/* Right: Integrated Hero Search */}
+                            <div className="lg:col-span-2">
+                                <div className={cn(
+                                    "w-full bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col h-[500px]",
+                                    isHeroActive ? "ring-4 ring-amber-500/5 border-amber-500/20" : ""
+                                )}>
+                                    <div className="flex-1 overflow-y-auto p-8 no-scrollbar bg-slate-50/50 dark:bg-slate-800/10">
+                                        {isHeroActive ? (
+                                            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                                                {isHeroSearching ? (
+                                                    <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-4">
+                                                        <Loader2 className="animate-spin text-amber-500" size={32} />
+                                                        <p className="text-[10px] font-black uppercase tracking-widest text-amber-500">Scanning Library...</p>
+                                                    </div>
+                                                ) : heroResults.length > 0 ? (
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        {heroResults.map(food => (
+                                                            <button
+                                                                key={food.id}
+                                                                onClick={() => addIngredient(food)}
+                                                                className="w-full p-5 rounded-2xl hover:bg-amber-50 dark:hover:bg-amber-950/20 flex items-center justify-between group transition-all border border-slate-100 dark:border-slate-800 hover:border-amber-500/30 text-left"
+                                                            >
+                                                                <div className="flex items-center gap-4 min-w-0">
+                                                                    <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                                                                        <Plus size={16} className="text-slate-400 group-hover:text-amber-500 transition-colors" />
+                                                                    </div>
+                                                                    <div className="min-w-0">
+                                                                        <h4 className="font-black text-xs uppercase truncate">{food.name}</h4>
+                                                                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                                                                            {food.energy_kcal || 0} KCAL / 100G
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                                <ArrowRight className="text-slate-200 group-hover:text-amber-500 transition-colors -translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all" size={16} />
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <div className="py-24 text-center text-slate-300">
+                                                        <p className="text-xs font-black uppercase tracking-[0.2em] italic">No results found for "{heroSearchQuery}"</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center h-full text-center space-y-6">
+                                                <div className="w-20 h-20 rounded-[2.5rem] bg-amber-500/10 flex items-center justify-center relative">
+                                                    <Search size={32} className="text-amber-500" />
+                                                    <div className="absolute inset-0 rounded-[2.5rem] bg-amber-500/20 animate-ping opacity-20" />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <h3 className="text-2xl font-black uppercase italic tracking-tight">Stock Your Inventory</h3>
+                                                    <p className="text-slate-500 font-bold text-xs uppercase tracking-widest max-w-sm">
+                                                        Every gram added extends your biological lifeline and unlocks new survival protocols.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                            </Button>
+
+                                    <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
+                                        <div className="relative flex items-center">
+                                            <Search className={cn("absolute left-6 transition-colors", isHeroActive ? "text-amber-500" : "text-slate-300")} size={18} />
+                                            <input
+                                                placeholder="SEARCH SURVIVAL ESSENTIALS..."
+                                                className={cn(
+                                                    "w-full bg-slate-50 dark:bg-slate-800 border-2 transition-all text-xs font-black uppercase tracking-widest h-16 rounded-[2rem] pl-16 pr-6 outline-none",
+                                                    isHeroActive ? "border-amber-500/30 ring-4 ring-amber-500/5" : "border-slate-100 dark:border-slate-800"
+                                                )}
+                                                value={heroSearchQuery}
+                                                onFocus={() => setIsHeroActive(true)}
+                                                onChange={(e) => handleHeroSearchInput(e.target.value)}
+                                            />
+                                            {isHeroActive && (
+                                                <button
+                                                    onClick={() => { setIsHeroActive(false); setHeroSearchQuery(""); }}
+                                                    className="absolute right-6 text-slate-300 hover:text-slate-900"
+                                                >
+                                                    <X size={18} />
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     )}
 
-                    {step === 'results' && (
-                        <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
-                            {/* Lifeline Status */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                                <Card className="p-8 bg-amber-500/10 border-amber-500/20 text-center space-y-2">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-amber-600">Calculated Lifeline</p>
-                                    <h4 className="text-4xl font-black italic">3-5 DAYS</h4>
-                                    <p className="text-[9px] font-bold text-slate-400 uppercase">Estimated based on minimum caloric floor</p>
-                                </Card>
-                                <Card className="p-8 bg-blue-500/10 border-blue-500/20 text-center space-y-2">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-blue-600">Hydration Runway</p>
-                                    <h4 className="text-4xl font-black italic">{waterStatus === 'clean' ? 'UNLIMITED' : 'CRITICAL'}</h4>
-                                    <p className="text-[9px] font-bold text-slate-400 uppercase">{waterStatus === 'clean' ? 'Access to clean water secured' : 'Water source is unstable or absent'}</p>
-                                </Card>
-                            </div>
-
-                            <div className="flex items-center gap-2 mb-2 ml-4">
-                                <Sparkles size={16} className="text-amber-500" />
-                                <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Survival Protocols</h2>
-                            </div>
-
-                            <div className="space-y-4">
-                                {suggestions.map((recipe) => (
-                                    <Link key={recipe.id} href={`/dashboard/library/meals/${recipe.id}`}>
-                                        <div className="group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-6 md:p-8 rounded-[2rem] hover:border-amber-500/40 transition-all duration-300 flex items-center justify-between shadow-sm hover:shadow-xl hover:-translate-y-1">
-                                            <div className="flex items-center gap-6">
-                                                <div className="w-16 h-16 md:w-20 md:h-20 rounded-[1.5rem] bg-slate-50 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-slate-100 dark:border-slate-800 overflow-hidden relative">
-                                                    {recipe.image ? (
-                                                        <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                                                    ) : (
-                                                        <ChefHat className="text-slate-200 w-8 h-8 md:w-10 md:h-10" />
-                                                    )}
+                    {step === 'lifeline' && (
+                        <div className="space-y-12 animate-in slide-in-from-bottom-8 duration-700">
+                            {/* Visual Timeline Sticky Wrapper */}
+                            <div className="sticky top-20 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl p-8 rounded-[3rem] border-2 border-slate-100 dark:border-slate-800 shadow-2xl">
+                                <div className="space-y-8">
+                                    <div className="flex items-center justify-between">
+                                        <div className="space-y-1">
+                                            <h2 className="text-3xl font-black uppercase italic tracking-tighter">Day {simulationDay} Project</h2>
+                                            <div className="flex items-center gap-2">
+                                                <div className={cn("px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest",
+                                                    profileType === 'starvation' ? "bg-rose-500 text-white" : "bg-emerald-500 text-white")}>
+                                                    {profileType} Profile
                                                 </div>
-                                                <div className="space-y-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <h3 className="text-lg md:text-xl font-black text-slate-900 dark:text-white uppercase italic tracking-tight font-inter">{recipe.title}</h3>
-                                                        <div className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 text-[8px] font-black rounded-lg uppercase">High Sustenance</div>
-                                                    </div>
-                                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                                                        {recipe.calories} KCAL <span className="text-slate-200 dark:text-slate-700 mx-1">|</span> {Math.round(recipe.calories / 1500 * 100)}% DAILY FLOOR
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-300 group-hover:bg-amber-500 group-hover:text-white transition-all">
-                                                <ArrowRight size={20} />
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="text-[8px] uppercase font-black"
+                                                    onClick={() => setProfileType(profileType === 'maintenance' ? 'starvation' : 'maintenance')}
+                                                >
+                                                    Switch Calculation
+                                                </Button>
                                             </div>
                                         </div>
-                                    </Link>
-                                ))}
+                                        <div className="text-right">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Status</p>
+                                            <p className={cn("text-xl font-black uppercase italic", simStatus.isTerminal ? "text-rose-500" : "text-emerald-500")}>
+                                                {simStatus.isTerminal ? 'Critical Failure' : 'Stable Ops'}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* The Slider */}
+                                    <div className="space-y-4">
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="30"
+                                            step="1"
+                                            value={simulationDay}
+                                            onChange={(e) => setSimulationDay(parseInt(e.target.value))}
+                                            className="w-full h-4 bg-slate-100 dark:bg-slate-800 rounded-full appearance-none cursor-pointer accent-amber-500"
+                                        />
+                                        <div className="flex justify-between px-2 text-[8px] font-black text-slate-400 uppercase tracking-widest">
+                                            <span>Immediate (Day 0)</span>
+                                            <span>The Red Line (Day 30)</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <Button
-                                variant="outline"
-                                onClick={() => setStep('security')}
-                                className="w-full h-14 rounded-full font-black uppercase tracking-widest text-[10px] border-slate-200"
-                            >
-                                Start New Assessment
-                            </Button>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                {/* Biological Reserves */}
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-2 ml-4">
+                                        <Activity size={16} className="text-amber-500" />
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Biological Reserves</h3>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {[
+                                            { label: 'Energy', val: simStatus.results.energy, unit: 'kcal', icon: <Zap size={14} /> },
+                                            { label: 'Hydration', val: simStatus.results.water, unit: 'days', icon: <Utensils size={14} /> },
+                                            { label: 'Thiamine', val: simStatus.results.b1, unit: 'mg', icon: <Sparkles size={14} /> },
+                                            { label: 'Vitamin C', val: simStatus.results.vit_c, unit: 'mg', icon: <Plus size={14} /> },
+                                            { label: 'Potassium', val: simStatus.results.potassium, unit: 'mg', icon: <Activity size={14} /> },
+                                            { label: 'Sodium', val: simStatus.results.sodium, unit: 'mg', icon: <Info size={14} /> }
+                                        ].map(stat => (
+                                            <Card key={stat.label} className="p-5 flex flex-col justify-between border-slate-100 dark:border-slate-800">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">{stat.label}</span>
+                                                    <div className={cn("p-1.5 rounded-lg", stat.val <= 0 ? "bg-rose-500/10 text-rose-500" : "bg-emerald-500/10 text-emerald-500")}>
+                                                        {stat.icon}
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-baseline gap-1">
+                                                    <span className={cn("text-xl font-black italic", stat.val <= 0 ? "text-rose-500" : "text-slate-900 dark:text-white")}>
+                                                        {Math.round(stat.val)}
+                                                    </span>
+                                                    <span className="text-[8px] font-bold text-slate-400 uppercase">{stat.unit}</span>
+                                                </div>
+                                            </Card>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Active Symptoms */}
+                                <div className="space-y-6">
+                                    <div className="flex items-center gap-2 ml-4">
+                                        <Info size={16} className="text-rose-500" />
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-500">Diagnostic Warnings</h3>
+                                    </div>
+                                    <div className="space-y-4">
+                                        {simStatus.activeSymptoms.length === 0 ? (
+                                            <div className="p-12 bg-emerald-500/5 border border-emerald-500/20 rounded-[2.5rem] flex flex-col items-center justify-center text-center">
+                                                <div className="w-12 h-12 bg-emerald-500/10 rounded-full flex items-center justify-center mb-4">
+                                                    <Sparkles size={24} className="text-emerald-500" />
+                                                </div>
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Bio-Integrity Maintained.</p>
+                                                <p className="text-[8px] font-bold text-slate-400 uppercase max-w-xs mt-2">Current inventory sustains all critical functions through Day {simulationDay}.</p>
+                                            </div>
+                                        ) : (
+                                            simStatus.activeSymptoms.map(s => (
+                                                <div key={s.name} className="p-6 bg-rose-50 dark:bg-rose-500/5 border-2 border-rose-500/20 rounded-[2.5rem] animate-in zoom-in-95 duration-300">
+                                                    <div className="flex items-center gap-3 mb-3">
+                                                        <div className="bg-rose-500 text-white p-2 rounded-xl">
+                                                            <Activity size={18} />
+                                                        </div>
+                                                        <h4 className="text-lg font-black uppercase italic text-rose-600">{s.name}</h4>
+                                                    </div>
+                                                    <p className="text-[10px] font-black text-slate-600 dark:text-slate-400 uppercase leading-relaxed mb-3">
+                                                        {s.symptom}
+                                                    </p>
+                                                    <div className="bg-rose-500/10 p-3 rounded-xl border border-rose-500/10">
+                                                        <p className="text-[8px] font-black uppercase tracking-[0.1em] text-rose-500">Terminal Risk: {s.terminal}</p>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Suggested Protocols to Fix Issues */}
+                            <div className="space-y-6 pt-12 border-t border-slate-100 dark:border-slate-800">
+                                <div className="flex items-center justify-between px-4">
+                                    <h3 className="text-2xl font-black uppercase italic tracking-tight">Protocol Lifelines</h3>
+                                    <Button variant="ghost" onClick={() => setStep('ingredients')} className="text-[10px] font-black uppercase">Adjust Pantry</Button>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {suggestions.length === 0 ? (
+                                        <div className="md:col-span-2 p-12 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2.5rem] text-center">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">No matching protocols in library.</p>
+                                            <p className="text-[8px] font-bold text-slate-400 uppercase mt-2">Add more diverse ingredients to unlock recommendations.</p>
+                                        </div>
+                                    ) : (
+                                        suggestions.map(recipe => (
+                                            <div key={recipe.id} className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-6 rounded-[2.5rem] flex flex-col justify-between hover:shadow-xl transition-all">
+                                                <div className="flex items-center gap-4 mb-4">
+                                                    <div className="w-16 h-16 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                                                        {recipe.image ? <img src={recipe.image} className="w-full h-full object-cover rounded-2xl" /> : <ChefHat className="text-slate-300" size={24} />}
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-lg font-black uppercase italic truncate max-w-[200px]">{recipe.title}</h4>
+                                                        <p className="text-[9px] font-bold text-emerald-500 uppercase">{recipe.calories} KCAL SHIELD</p>
+                                                    </div>
+                                                </div>
+                                                <Button
+                                                    onClick={() => eatMeal(recipe)}
+                                                    className="w-full h-12 bg-slate-900 hover:bg-black text-white rounded-2xl font-black uppercase tracking-widest text-[9px]"
+                                                >
+                                                    Consume Protocol
+                                                </Button>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>
 
                 {/* Survival Context Note */}
-                <div className="p-8 bg-slate-900 text-white rounded-[3rem] space-y-4 animate-in fade-in delay-500 border border-amber-500/20 shadow-2xl">
-                    <div className="flex items-center gap-3">
-                        <Info className="text-amber-500" size={20} />
-                        <h5 className="font-black uppercase tracking-[0.2em] text-xs">The Rules of Three</h5>
+                <div className="p-10 bg-slate-900 text-white rounded-[4rem] space-y-6 animate-in fade-in delay-500 border border-amber-500/10 shadow-3xl">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-amber-500/20 rounded-2xl">
+                            <Info className="text-amber-500" size={24} />
+                        </div>
+                        <h5 className="text-xl font-black uppercase italic tracking-[0.1em]">Biological Hierarchy of Needs</h5>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                         {[
-                            { label: '3 Minutes', detail: 'Without air or in icy water' },
-                            { label: '3 Hours', detail: 'Without shelter in extreme heat/cold' },
-                            { label: '3 Days', detail: 'Without water' }
+                            { label: 'Stability (3 Hrs)', detail: 'Regulate core temp or face hypothermia.', color: 'text-amber-500' },
+                            { label: 'Hydration (3 Days)', detail: 'Without water, blood thickens and kidneys fail.', color: 'text-blue-500' },
+                            { label: 'Nutrition (3 Weeks)', detail: 'Body begins consuming vital organs for energy.', color: 'text-emerald-500' }
                         ].map((rule, idx) => (
-                            <div key={idx} className="space-y-1 border-l-2 border-amber-500/30 pl-4">
-                                <p className="text-amber-500 font-black text-sm">{rule.label}</p>
-                                <p className="text-[9px] font-bold uppercase text-slate-400">{rule.detail}</p>
+                            <div key={idx} className="space-y-2 border-l-2 border-slate-800 pl-6">
+                                <p className={cn("font-black text-xs uppercase tracking-widest", rule.color)}>{rule.label}</p>
+                                <p className="text-[10px] font-medium text-slate-400 leading-relaxed italic">{rule.detail}</p>
                             </div>
                         ))}
                     </div>
