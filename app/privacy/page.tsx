@@ -2,11 +2,13 @@
 
 import { PageContainer } from '@/components/ui/page-container';
 import { Footer } from '@/components/footer';
+import { Header } from '@/components/header';
 import { Shield, Mail } from 'lucide-react';
 
 export default function PrivacyPolicyPage() {
   return (
     <>
+      <Header />
       <PageContainer maxWidth="max-w-4xl">
         <div className="space-y-8 animate-in fade-in duration-700 py-16 md:py-24 px-4">
           <div className="space-y-4">
