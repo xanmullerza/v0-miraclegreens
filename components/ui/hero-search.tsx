@@ -82,7 +82,7 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
         <div className="w-full md:max-w-[900px] mx-auto">
             <div
                 className={cn(
-                    'w-full bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col max-h-[180px]',
+                    'w-full bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col max-h-[240px]',
                     isActive ? `${style.ring} ${style.border}` : ''
                 )}
             >
@@ -138,7 +138,7 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
                     )}
                 </div>
                 {/* Footer */}
-                <div className="p-2 md:p-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2 bg-white dark:bg-slate-900 order-2 rounded-b-[2.5rem]">
+                <div className="p-2 md:p-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2 bg-transparent dark:bg-transparent order-2 rounded-b-[2.5rem]">
                     <div className="flex-1 relative flex items-center">
                         <div className={cn("absolute left-4 transition-colors", isActive ? style.accent : 'text-slate-300')}>
                             <Search size={16} className="md:w-5 md:h-5" />
