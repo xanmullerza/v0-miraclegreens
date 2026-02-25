@@ -5,29 +5,16 @@ import { PageContainer } from '@/components/ui/page-container';
 import { BreadcrumbPillbox } from '@/components/ui/breadcrumb-pillbox';
 import { cn } from '@/lib/utils';
 import { Info, LifeBuoy, MonitorPlay, ChevronRight, Globe, Shield, Scale, Mail } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 
 const tabs = [
     { id: 'about', label: 'About Us', icon: Info },
     { id: 'support', label: 'Support', icon: LifeBuoy },
     { id: 'media', label: 'Media', icon: MonitorPlay },
 ];
-import { HeaderActionsProvider } from '@/lib/context/header-actions-context';
-import { SearchProvider } from '@/lib/context/search-context';
-
-import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
 
 export default function BrowsePage() {
-    return (
-        <SearchProvider>
-            <HeaderActionsProvider>
-                <BrowsePageContent />
-            </HeaderActionsProvider>
-        </SearchProvider>
-    );
-}
-
-function BrowsePageContent() {
     const [activeTab, setActiveTab] = useState('about');
     const [searchQuery, setSearchQuery] = useState('');
     const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
