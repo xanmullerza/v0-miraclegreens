@@ -5,6 +5,7 @@ import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useRDA } from '@/hooks/use-rda';
 import { Info } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
 
 export function RDADrawer() {
     const {
@@ -84,6 +85,8 @@ export function RDADrawer() {
     const userRDAs = useRDA(age, gender, tdee, weight);
     const combinedRDAs = { ...macroRDAs, ...(userRDAs || {}) };
 
+    const [showSafety, setShowSafety] = useState(false);
+
     if (!showRDADrawer) return null;
 
     return (
@@ -130,7 +133,17 @@ export function RDADrawer() {
                                     <div className="space-y-1">
                                         {availableNutrients.map(([nutrient, value]) => {
                                             const unit = (nutrient === 'Energy') ? energyUnit : (nutrient === 'Protein' || nutrient === 'Carbs' || nutrient === 'Fat' || nutrient === 'Fiber' || nutrient === 'ALA' || nutrient.includes('_g') || cat.title === "Amino Acids") ? 'g' : (nutrient === 'Vitamin D') ? 'IU' : (nutrient.includes('Folate') || nutrient.includes('B12') || nutrient.includes('Biotin') || nutrient.includes('Selenium') || nutrient === 'Vitamin A' || nutrient === 'Vitamin K' || nutrient.includes('EPA')) ? 'µg' : 'mg';
-                                            const displayVal = value < 1 ? value.toFixed(2) : value < 10 ? value.toFixed(1) : Math.round(value);
+                                            // compute display value depending on view
+                                            let displayVal: string | number;
+                                            if (showSafety) {
+                                                // simple min-max: 50% to 200% of target
+                                                const min = value * 0.5;
+                                                const max = value * 2;
+                                                const fmt = (v: number) => v < 1 ? v.toFixed(2) : v < 10 ? v.toFixed(1) : Math.round(v);
+                                                displayVal = `${fmt(min)} - ${fmt(max)} ${unit}`;
+                                            } else {
+                                                displayVal = value < 1 ? value.toFixed(2) : value < 10 ? value.toFixed(1) : Math.round(value);
+                                            }
                                             return (
                                                 <div key={nutrient} className="bg-slate-900/40 px-5 py-3 rounded-2xl flex items-center justify-between hover:bg-slate-900 transition-colors group/item border border-transparent hover:border-slate-800">
                                                     <div className="flex flex-col min-w-0 pr-2">
@@ -141,7 +154,7 @@ export function RDADrawer() {
                                                     </div>
                                                     <div className="flex items-baseline gap-1 font-sans">
                                                         <span className="text-sm font-black text-white tracking-tighter leading-none">{displayVal}</span>
-                                                        <span className="text-[9px] text-slate-500 font-black uppercase">{unit}</span>
+                                                        {!showSafety && <span className="text-[9px] text-slate-500 font-black uppercase">{unit}</span>}
                                                     </div>
                                                 </div>
                                             );
@@ -153,8 +166,28 @@ export function RDADrawer() {
                     })()}
                     {/* Nutrition Toggles */}
                     <div className="flex bg-slate-900 p-1 rounded-2xl">
-                        <button className="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl bg-slate-800 text-purple-400 shadow-lg">Daily Targets</button>
-                        <button className="flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl text-slate-500 hover:text-slate-300 transition-colors">Safety Limits</button>
+                        <button
+                            onClick={() => setShowSafety(false)}
+                            className={cn(
+                                "flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-colors",
+                                !showSafety
+                                    ? "bg-slate-800 text-purple-400 shadow-lg"
+                                    : "text-slate-500 hover:text-slate-300"
+                            )}
+                        >
+                            Daily Targets
+                        </button>
+                        <button
+                            onClick={() => setShowSafety(true)}
+                            className={cn(
+                                "flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-colors",
+                                showSafety
+                                    ? "bg-slate-800 text-purple-400 shadow-lg"
+                                    : "text-slate-500 hover:text-slate-300"
+                            )}
+                        >
+                            Safety Limits
+                        </button>
                     </div>
                 </div>
 
