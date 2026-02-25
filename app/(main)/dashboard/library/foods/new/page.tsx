@@ -454,8 +454,8 @@ Fat: ${item.fat_g || 0}g
                     </div>
                 )}
 
-                {/* Basic Details */}
-                <Card className={cn(showParser ? "lg:col-span-4" : "lg:col-span-12", "p-8 space-y-8")}>
+                {/* Name Details Card */}
+                <Card className={cn(showParser ? "lg:col-span-4" : "lg:col-span-12", "p-8")}>
                     {/* Basic Info Section */}
                     <div className="space-y-6">
                         <div className="flex items-center gap-3 mb-2">
@@ -498,53 +498,55 @@ Fat: ${item.fat_g || 0}g
                             </div>
                         </div>
                     </div>
-
-                    {/* Food Visualization */}
-                    <div className="space-y-6 pt-6 border-t border-slate-100 dark:border-slate-800">
-                        <div className="flex items-center gap-3 mb-2">
-                            <Camera size={20} className="text-emerald-500" />
-                            <h3 className="font-black text-sm uppercase tracking-widest">Photo</h3>
-                        </div>
-                        <div className="space-y-4">
-                            <div className="relative aspect-video rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group hover:border-emerald-500/50 transition-all flex flex-col items-center justify-center">
-                                {image ? (
-                                    <>
-                                        <img src={image} alt="Food item" className="w-full h-full object-cover" />
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <Button variant="secondary" size="sm" className="gap-2" onClick={() => setImage('')}>
-                                                <Trash2 size={14} /> Remove Image
-                                            </Button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="text-center p-6">
-                                        {uploading ? (
-                                            <div className="space-y-3">
-                                                <Loader2 className="h-10 w-10 animate-spin text-emerald-500 mx-auto" />
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Uploading Item...</p>
-                                            </div>
-                                        ) : (
-                                            <>
-                                                <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 mx-auto mb-3">
-                                                    <Upload size={24} />
-                                                </div>
-                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Capture or Upload Reference</p>
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                                    onChange={handleImageUpload}
-                                                />
-                                            </>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-
-                        </div>
-                    </div>
                 </Card>
             </div>
+
+            {/* Photo Section - Full Width */}
+            <Card className="p-8 w-full">
+                <div className="space-y-6">
+                    <div className="flex items-center gap-3 mb-2">
+                        <Camera size={20} className="text-emerald-500" />
+                        <h3 className="font-black text-sm uppercase tracking-widest">Photo</h3>
+                    </div>
+                    <div className="space-y-4">
+                        <div className="relative aspect-video rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group hover:border-emerald-500/50 transition-all flex flex-col items-center justify-center">
+                            {image ? (
+                                <>
+                                    <img src={image} alt="Food item" className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <Button variant="secondary" size="sm" className="gap-2" onClick={() => setImage('')}>
+                                            <Trash2 size={14} /> Remove Image
+                                        </Button>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="text-center p-6">
+                                    {uploading ? (
+                                        <div className="space-y-3">
+                                            <Loader2 className="h-10 w-10 animate-spin text-emerald-500 mx-auto" />
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Uploading Item...</p>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 mx-auto mb-3">
+                                                <Upload size={24} />
+                                            </div>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Capture or Upload Reference</p>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                onChange={handleImageUpload}
+                                            />
+                                        </>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                    </div>
+                </div>
+            </Card>
 
             {/* parser control bar moved here for mobile bottom placement */}
             {showParser && (
