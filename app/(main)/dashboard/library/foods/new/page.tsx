@@ -202,6 +202,28 @@ function FoodItemCreatorContent() {
                             });
                             setMicronutrients(micros);
                         }
+
+                        // Construct nutrient text for the textarea
+                        let nText = `Calories: ${food.energy_kcal || 0}
+Protein: ${food.protein_g || 0}g
+Carbs: ${food.carbs_g || 0}g
+Fat: ${food.fat_g || 0}g
+`;
+                        if (food.micronutrients) {
+                            Object.entries(food.micronutrients).forEach(([key, val]) => {
+                                nText += `${key}: ${val}\n`;
+                            });
+                        }
+                        setNutrientText(nText);
+
+                        // Construct serving text for the textarea
+                        let sText = '';
+                        if (food.portions && Array.isArray(food.portions)) {
+                            food.portions.forEach((p: any) => {
+                                sText += `1 ${p.label} = ${p.weight_g}g\n`;
+                            });
+                        }
+                        setServingText(sText);
                     }
                 } catch (error) {
                     console.error('Failed to load food for editing:', error);
