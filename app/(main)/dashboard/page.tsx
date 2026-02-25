@@ -120,7 +120,7 @@ export default function DashboardOverview() {
                     <div className="w-full md:max-w-[900px] mx-auto relative px-0 mb-6 group/stats">
                         <div className="relative p-5 px-8 w-full transition-all duration-500">
                             <div className="relative z-10 grid grid-cols-2 gap-4 md:flex md:flex-wrap md:items-start md:justify-center md:gap-8 lg:gap-12">
-                                <Link href="/dashboard/workshop/lifeguard" className="flex items-center gap-3 group/stat hover:opacity-80 transition-opacity">
+                                <Link href="/dashboard/workshop/lifeguard" className="hidden flex items-center gap-3 group/stat hover:opacity-80 transition-opacity">
                                     <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
                                         <Wallet size={16} className="text-amber-400" />
                                     </div>
