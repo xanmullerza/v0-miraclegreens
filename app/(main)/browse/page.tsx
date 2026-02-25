@@ -369,7 +369,7 @@ export default function BrowsePage() {
                         )}
                     >
                         <tab.icon size={14} />
-                        <span className="hidden md:inline">{tab.label}</span>
+                        <span className="hidden sm:inline">{tab.label}</span>
                     </button>
                 ))}
             </div>
