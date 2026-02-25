@@ -509,7 +509,7 @@ Fat: ${item.fat_g || 0}g
                         <h3 className="font-black text-sm uppercase tracking-widest">Photo</h3>
                     </div>
                     <div className="space-y-4">
-                        <div className="relative aspect-video rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group hover:border-emerald-500/50 transition-all flex flex-col items-center justify-center">
+                        <div className="relative aspect-video md:aspect-auto md:h-[120px] rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group hover:border-emerald-500/50 transition-all flex flex-col items-center justify-center">
                             {image ? (
                                 <>
                                     <img src={image} alt="Food item" className="w-full h-full object-cover" />
