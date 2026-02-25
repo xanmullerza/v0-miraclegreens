@@ -690,6 +690,25 @@ export function ExploreView({
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
+                                                    className={cn("h-8 w-8 rounded-xl transition-all", quickAddItem?.id === food.id ? "text-emerald-500 bg-emerald-50 dark:bg-emerald-900/10" : "text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10")}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        if (quickAddItem?.id === food.id) {
+                                                            setQuickAddItem(null);
+                                                        } else {
+                                                            setQuickAddItem(food);
+                                                            setQuickAddQty('1');
+                                                            setQuickAddWeight('');
+                                                        }
+                                                    }}
+                                                    title="Add to Pantry or Groceries"
+                                                >
+                                                    <Plus size={14} />
+                                                </Button>
+
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
                                                     className={cn("h-8 w-8 rounded-xl transition-all bg-transparent", food.is_favorite ? "text-rose-500" : "text-slate-400 hover:text-rose-500")}
                                                     onClick={(e) => toggleFavorite(food, e)}
                                                     title="Favorite"
