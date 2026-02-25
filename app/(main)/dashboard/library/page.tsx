@@ -94,7 +94,7 @@ export default function LibraryPage() {
                 )}
 
                 <div className="w-full mx-auto md:max-w-[900px] mt-6 lg:mt-8">
-                    <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/60 rounded-[2.5rem] overflow-hidden p-2">
+                    <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/60 rounded-[2.5rem] p-2">
                         {heroCards.map((card, index) => {
                             const Icon = card.icon;
                             const count = card.id === 'foods' ? stats.foods : card.id === 'mixes' ? stats.mixes : stats.recipes;
