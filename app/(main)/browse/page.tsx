@@ -350,7 +350,7 @@ export default function BrowsePage() {
     return (
         <PageContainer className="p-0 sm:p-0">
             {/* Tabs */}
-            <div className="max-w-[800px] mx-auto xl:mx-0 flex items-center gap-4 px-6 overflow-x-auto no-scrollbar pb-4 border-b border-slate-100 dark:border-slate-800">
+            <div className="max-w-[800px] mx-auto xl:mx-0 flex items-center justify-center gap-4 px-6 overflow-x-auto no-scrollbar pb-4">
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}
@@ -358,7 +358,13 @@ export default function BrowsePage() {
                         className={cn(
                             "flex items-center gap-2 px-6 py-3 rounded-2xl transition-all duration-300 font-black uppercase tracking-widest text-[10px] whitespace-nowrap",
                             activeTab === tab.id
-                                ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                ? tab.id === 'about'
+                                    ? "bg-purple-500 text-white shadow-lg shadow-purple-500/20"
+                                    : tab.id === 'privacy'
+                                    ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                    : tab.id === 'support'
+                                    ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20"
+                                    : "bg-yellow-500 text-white shadow-lg shadow-yellow-500/20"
                                 : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
                         )}
                     >
