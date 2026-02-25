@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { PageContainer } from '@/components/ui/page-container';
-import { BreadcrumbPillbox } from '@/components/ui/breadcrumb-pillbox';
 import { cn } from '@/lib/utils';
 import { Info, LifeBuoy, MonitorPlay, ChevronRight, Globe, Shield, Scale, Mail } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -16,7 +15,6 @@ const tabs = [
 
 export default function BrowsePage() {
     const [activeTab, setActiveTab] = useState('about');
-    const [searchQuery, setSearchQuery] = useState('');
     const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
     const router = useRouter();
 
@@ -136,33 +134,23 @@ export default function BrowsePage() {
 
     return (
         <PageContainer className="p-0 sm:p-0">
-            {/* Custom Header for Browse Page */}
-            <div className="sticky top-0 z-50 p-4 pb-0 bg-white dark:bg-slate-950/80 backdrop-blur-xl">
-                <BreadcrumbPillbox
-                    searchQuery={searchQuery}
-                    setSearchQuery={setSearchQuery}
-                    sectionLabel="Vitala Hub"
-                    sectionColor="text-emerald-500"
-                />
-
-                {/* Tabs Under Pillbox */}
-                <div className="max-w-[800px] mx-auto xl:mx-0 mt-6 flex items-center gap-4 px-2 overflow-x-auto no-scrollbar pb-4 border-b border-slate-100 dark:border-slate-800">
-                    {tabs.map((tab) => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                            className={cn(
-                                "flex items-center gap-2 px-6 py-3 rounded-2xl transition-all duration-300 font-black uppercase tracking-widest text-[10px] whitespace-nowrap",
-                                activeTab === tab.id
-                                    ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
-                                    : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
-                            )}
-                        >
-                            <tab.icon size={14} />
-                            {tab.label}
-                        </button>
-                    ))}
-                </div>
+            {/* Tabs */}
+            <div className="max-w-[800px] mx-auto xl:mx-0 flex items-center gap-4 px-6 overflow-x-auto no-scrollbar pb-4 border-b border-slate-100 dark:border-slate-800">
+                {tabs.map((tab) => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={cn(
+                            "flex items-center gap-2 px-6 py-3 rounded-2xl transition-all duration-300 font-black uppercase tracking-widest text-[10px] whitespace-nowrap",
+                            activeTab === tab.id
+                                ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                                : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                        )}
+                    >
+                        <tab.icon size={14} />
+                        {tab.label}
+                    </button>
+                ))}
             </div>
 
             <main className="max-w-[800px] mx-auto xl:mx-0 p-8 pt-12">
