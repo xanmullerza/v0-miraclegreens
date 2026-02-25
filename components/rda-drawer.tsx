@@ -102,7 +102,38 @@ export function RDADrawer() {
                 <SheetHeader className="bg-slate-900/80 p-6 border-b border-slate-800">
                     <SheetTitle className="text-lg font-black text-purple-400 uppercase tracking-widest font-sans">Recommended Intake</SheetTitle>
                 </SheetHeader>
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8">
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+                    {/* view toggles */}
+                    <div className="mb-6">
+                        <div className="flex bg-slate-900 p-1 rounded-2xl">
+                            <button
+                                onClick={() => setShowSafety(false)}
+                                className={cn(
+                                    "flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-colors",
+                                    !showSafety
+                                        ? "bg-slate-800 text-purple-400 shadow-lg"
+                                        : "text-slate-500 hover:text-slate-300"
+                                )}
+                            >
+                                Daily Targets
+                            </button>
+                            <button
+                                onClick={() => setShowSafety(true)}
+                                className={cn(
+                                    "flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-colors",
+                                    showSafety
+                                        ? "bg-slate-800 text-purple-400 shadow-lg"
+                                        : "text-slate-500 hover:text-slate-300"
+                                )}
+                            >
+                                Safety Limits
+                            </button>
+                        </div>
+                        <p className="mt-2 text-[8px] uppercase tracking-widest text-slate-400">
+                            {showSafety ? 'Showing safety range (50%-200%)' : 'Showing daily targets'}
+                        </p>
+                    </div>
+
                     {(() => {
                         const categories = [
                             {
@@ -165,30 +196,7 @@ export function RDADrawer() {
                         });
                     })()}
                     {/* Nutrition Toggles */}
-                    <div className="flex bg-slate-900 p-1 rounded-2xl">
-                        <button
-                            onClick={() => setShowSafety(false)}
-                            className={cn(
-                                "flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-colors",
-                                !showSafety
-                                    ? "bg-slate-800 text-purple-400 shadow-lg"
-                                    : "text-slate-500 hover:text-slate-300"
-                            )}
-                        >
-                            Daily Targets
-                        </button>
-                        <button
-                            onClick={() => setShowSafety(true)}
-                            className={cn(
-                                "flex-1 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl transition-colors",
-                                showSafety
-                                    ? "bg-slate-800 text-purple-400 shadow-lg"
-                                    : "text-slate-500 hover:text-slate-300"
-                            )}
-                        >
-                            Safety Limits
-                        </button>
-                    </div>
+
                 </div>
 
                 <div className="p-6 border-t border-slate-800 bg-slate-900/50">
