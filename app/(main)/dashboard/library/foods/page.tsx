@@ -10,6 +10,7 @@ import { CompareView } from './views/compare-view';
 import { NutrientsView } from './views/nutrients-view';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
+import { supabase } from '@/lib/supabase';
 
 export default function IngredientsHub() {
     return (
@@ -34,6 +35,34 @@ function IngredientsContent() {
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [isSearchActive, setIsSearchActive] = useState(false);
+    const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+    const performSearch = async (query: string) => {
+        if (!query || query.length < 2) {
+            setSearchResults([]);
+            return;
+        }
+        setIsSearching(true);
+        try {
+            const { data, error } = await supabase
+                .from('food_items')
+                .select('*')
+                .or(`name.ilike.%${query}%,common_name.ilike.%${query}%`)
+                .limit(8);
+            if (error) throw error;
+            setSearchResults(data || []);
+        } catch (error) {
+            console.error('Search error:', error);
+        } finally {
+            setIsSearching(false);
+        }
+    };
+
+    const handleSearchInput = (val: string) => {
+        setSearchQuery(val);
+        if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+        searchTimeoutRef.current = setTimeout(() => performSearch(val), 300);
+    };
 
     return (
         <PageContainer maxWidth="max-w-7xl">
@@ -42,7 +71,7 @@ function IngredientsContent() {
                 {activeTab === 'foods' && (
                     <HeroSearch
                         searchQuery={searchQuery}
-                        onQueryChange={setSearchQuery}
+                        onQueryChange={handleSearchInput}
                         results={searchResults}
                         isLoading={isSearching}
                         isActive={isSearchActive}
@@ -60,7 +89,7 @@ function IngredientsContent() {
 
                 {/* Dynamic Content Area */}
                 <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
-                    {activeTab === 'foods' && <ExploreView hideControls={false} />}
+                    {activeTab === 'foods' && <ExploreView hideControls={true} />}
                     {activeTab === 'groceries' && <ShoppingView />}
                     {activeTab === 'pantry' && <StaplesView />}
                     {activeTab === 'compare' && <CompareView />}
