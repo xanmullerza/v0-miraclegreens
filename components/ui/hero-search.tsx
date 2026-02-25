@@ -87,7 +87,7 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
                 )}
             >
                 {/* Dynamic content */}
-                <div className="overflow-y-auto flex-1 p-4 md:p-8 no-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1 rounded-t-[2.5rem]">
+                <div className="overflow-y-auto flex-1 p-3 md:p-6 no-scrollbar scrollbar-hide bg-slate-50/50 dark:bg-slate-800/10 order-1 rounded-t-[2.5rem]">
                     {isActive ? (
                         <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                             {isLoading ? (
@@ -147,7 +147,7 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
                             autoFocus={isActive}
                             placeholder={isActive ? placeholder : ''}
                             className={cn(
-                                "w-full bg-slate-50 dark:bg-slate-800/50 border-2 transition-all shadow-sm text-[10px] md:text-sm font-black uppercase tracking-widest h-12 md:h-14 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300",
+                                "w-full bg-slate-50 dark:bg-slate-800/50 border-2 transition-all shadow-sm text-[10px] md:text-sm font-black uppercase tracking-widest h-10 md:h-12 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300",
                                 isActive
                                     ? `border-${theme}-500/30 focus:border-${theme}-500/80 focus:ring-4 focus:ring-${theme}-500/10 focus:bg-white dark:focus:bg-slate-800/80`
                                     : "border-slate-100 dark:border-slate-800 cursor-pointer hover:border-blue-500/20"
