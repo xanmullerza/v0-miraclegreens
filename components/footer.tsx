@@ -19,9 +19,11 @@ export function Footer() {
           <div className="flex flex-wrap justify-center items-center gap-4 text-[10px] uppercase font-bold tracking-widest opacity-70 dark:opacity-60 text-slate-900 dark:text-slate-100">
             <span>© 2026 Vitala. All rights reserved.</span>
             <span className="w-1 h-1 rounded-full bg-current opacity-30 hidden sm:block"></span>
-            <Link href="#" className="hover:text-emerald-500 transition-all">Privacy Policy</Link>
+            <Link href="/privacy" className="hover:text-emerald-500 transition-all">Privacy Policy</Link>
             <span className="w-1 h-1 rounded-full bg-current opacity-30 hidden sm:block"></span>
-            <Link href="#" className="hover:text-emerald-500 transition-all">Terms of Service</Link>
+            <Link href="/terms" className="hover:text-emerald-500 transition-all">Terms of Service</Link>
+            <span className="w-1 h-1 rounded-full bg-current opacity-30 hidden sm:block"></span>
+            <Link href="/support" className="hover:text-emerald-500 transition-all">Support</Link>
           </div>
         </div>
       </div>
