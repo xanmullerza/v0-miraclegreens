@@ -117,8 +117,9 @@ export default function DashboardOverview() {
         <>
         <PageContainer>
             <div className="flex flex-col min-h-screen">
-                {/* Main content area, flex-grow to fill space between header/footer */}
-                <div className="flex flex-col flex-grow items-center justify-center">
+                {/* Main content area, flex-grow to fill space between header/footer, but bias upward */}
+                <div className="flex flex-col flex-grow items-center justify-between pt-12 pb-24">
+                    <div />
                     <div className="w-full max-w-[900px] mx-auto flex flex-col md:flex-row gap-6 px-4 items-center justify-center animate-in fade-in duration-700">
                         {heroCards.map((card) => {
                             const Icon = card.icon;
@@ -161,8 +162,9 @@ export default function DashboardOverview() {
                             );
                         })}
                     </div>
-                    </div>
+                    <div />
                 </div>
+            </div>
             </PageContainer>
             <Footer />
         </>
