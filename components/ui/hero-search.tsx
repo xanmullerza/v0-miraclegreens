@@ -87,7 +87,7 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
                 )}
             >
                 {/* Dynamic content */}
-                <div className="overflow-y-auto flex-1 p-3 md:p-6 no-scrollbar scrollbar-hide bg-slate-50/50 dark:bg-slate-800/10 order-1 rounded-t-[2.5rem]">
+                <div className="overflow-y-auto flex-1 p-3 md:p-6 custom-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1 rounded-[2.5rem]">
                     {isActive ? (
                         <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                             {isLoading ? (
@@ -126,7 +126,7 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
                             )}
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center justify-start pt-8 md:pt-10 text-center h-full animate-in fade-in duration-700">
+                        <div className="flex flex-col items-center justify-start pt-4 md:pt-6 text-center h-full animate-in fade-in duration-700">
                             <div className={cn("w-12 h-12 rounded-full flex items-center justify-center mb-4 relative", style.accentBg)}>
                                 {idleIcon}
                                 <div className={cn("absolute inset-0 rounded-full animate-ping", style.accentBg)} />
