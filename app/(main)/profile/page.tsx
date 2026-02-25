@@ -313,8 +313,7 @@ function ProfilePageContent() {
 
     const COUNTRY_PRESETS: Record<string, { energy: 'kJ' | 'kcal', measurement: 'metric' | 'imperial' }> = {
         'America': { energy: 'kcal', measurement: 'imperial' },
-        'Europe': { energy: 'kJ', measurement: 'metric' },
-        'Asia': { energy: 'kJ', measurement: 'metric' },
+        'Eurasia': { energy: 'kJ', measurement: 'metric' },
         'Africa': { energy: 'kJ', measurement: 'metric' },
         'Oceania': { energy: 'kJ', measurement: 'metric' }
     };
