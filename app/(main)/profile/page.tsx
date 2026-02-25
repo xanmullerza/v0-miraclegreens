@@ -312,8 +312,10 @@ function ProfilePageContent() {
     const combinedRDAs = { ...macroRDAs, ...(userRDAs || {}) };
 
     const COUNTRY_PRESETS: Record<string, { energy: 'kJ' | 'kcal', measurement: 'metric' | 'imperial' }> = {
-        'America': { energy: 'kcal', measurement: 'imperial' },
-        'Eurasia': { energy: 'kJ', measurement: 'metric' },
+        'N America': { energy: 'kcal', measurement: 'imperial' },
+        'Europe': { energy: 'kJ', measurement: 'metric' },
+        'Asia': { energy: 'kJ', measurement: 'metric' },
+        'S America': { energy: 'kJ', measurement: 'metric' },
         'Africa': { energy: 'kJ', measurement: 'metric' },
         'Oceania': { energy: 'kJ', measurement: 'metric' }
     };
@@ -483,16 +485,16 @@ function ProfilePageContent() {
                                     {/* Country Selector */}
                                     <div className="space-y-4">
                                         <Label className="text-[10px] font-black uppercase tracking-widest text-slate-400 border-b border-slate-100 dark:border-slate-800 pb-1 block">Your Region</Label>
-                                        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl h-10">
+                                        <div className="grid grid-cols-3 gap-2">
                                             {Object.keys(COUNTRY_PRESETS).map(country => (
                                                 <button
                                                     key={country}
                                                     onClick={() => handleCountryChange(country)}
                                                     className={cn(
-                                                        "flex-1 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all text-center",
+                                                        "px-3 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all text-center",
                                                         formData.country === country
                                                             ? "bg-white dark:bg-slate-800 text-purple-600 dark:text-purple-400 shadow-sm"
-                                                            : "text-slate-500 hover:text-purple-600 dark:hover:text-purple-400"
+                                                            : "bg-slate-100 dark:bg-slate-900 text-slate-500 hover:text-purple-600 dark:hover:text-purple-400"
                                                     )}
                                                 >
                                                     {country}
