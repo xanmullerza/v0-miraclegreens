@@ -397,6 +397,7 @@ export function CompareView({ showStats = false, stats }: CompareViewProps) {
                     </>
                 )}
             />
+            </div>
 
             {/* Comparison Table */}
             {showStats && stats && (
