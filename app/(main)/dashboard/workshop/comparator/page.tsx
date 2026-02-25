@@ -7,7 +7,7 @@ import { PageContainer } from '@/components/ui/page-container';
 export default function CompareFoodsPage() {
 
     return (
-        <PageContainer maxWidth="max-w-7xl" className="-mt-12 md:-mt-16">
+        <PageContainer maxWidth="max-w-7xl">
             <div className="space-y-6 md:space-y-12 animate-in fade-in duration-700 pb-32 pt-0">
                 {/* Content */}
                 <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
