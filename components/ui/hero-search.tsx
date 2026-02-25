@@ -126,7 +126,7 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
                             )}
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center justify-start pt-4 md:pt-6 text-center h-full animate-in fade-in duration-700">
+                        <div className="flex flex-col items-center justify-start pt-2 md:pt-4 text-center h-full animate-in fade-in duration-700">
                             <div className={cn("w-12 h-12 rounded-full flex items-center justify-center mb-4 relative", style.accentBg)}>
                                 {idleIcon}
                                 <div className={cn("absolute inset-0 rounded-full animate-ping", style.accentBg)} />
@@ -138,7 +138,7 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
                     )}
                 </div>
                 {/* Footer */}
-                <div className="p-2 md:p-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2 bg-transparent dark:bg-transparent order-2 rounded-b-[2.5rem]">
+                <div className="p-2 md:p-4 flex items-center gap-2 bg-transparent dark:bg-transparent order-2 rounded-b-[2.5rem]">
                     <div className="flex-1 relative flex items-center">
                         <div className={cn("absolute left-4 transition-colors", isActive ? style.accent : 'text-slate-300')}>
                             <Search size={16} className="md:w-5 md:h-5" />
