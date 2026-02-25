@@ -97,18 +97,24 @@ export default function LibraryPage() {
                     <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/60 rounded-[2.5rem] overflow-hidden p-2">
                         {heroCards.map((card, index) => {
                             const Icon = card.icon;
+                            const count = card.id === 'foods' ? stats.foods : card.id === 'mixes' ? stats.mixes : stats.recipes;
                             return (
                                 <Link
                                     key={card.id}
                                     href={card.href}
                                     className={cn(
-                                        "group flex items-center justify-between p-6 transition-all duration-300 hover:bg-slate-800/60 rounded-2xl",
+                                        "group flex items-center justify-between p-6 transition-all duration-300 hover:bg-slate-800/60 rounded-2xl relative",
                                         index !== heroCards.length - 1 && "border-b border-white/[0.03]"
                                     )}
                                 >
                                     <div className="flex items-center gap-6">
-                                        <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 shadow-lg", card.bg)}>
-                                            <Icon size={28} className={card.color} />
+                                        <div className="relative">
+                                            <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 shadow-lg", card.bg)}>
+                                                <Icon size={28} className={card.color} />
+                                            </div>
+                                            <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-red-500/20 border-2 border-red-500 flex items-center justify-center">
+                                                <span className="text-sm font-black text-red-400">{count}</span>
+                                            </div>
                                         </div>
                                         <div>
                                             <h3 className="text-xl font-black text-white tracking-tight">{card.title}</h3>
