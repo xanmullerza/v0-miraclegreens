@@ -22,6 +22,7 @@ import {
     Wallet
 } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
+import { Footer } from '@/components/footer';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -113,6 +114,7 @@ export default function DashboardOverview() {
     ];
 
     return (
+        <>
         <PageContainer>
             <div className="space-y-12 animate-in fade-in duration-700 pb-20 md:pb-32 flex flex-col items-center justify-start min-h-[calc(100vh-100px)]">
 
@@ -212,5 +214,7 @@ export default function DashboardOverview() {
                 </div>
             </div>
         </PageContainer>
+        <Footer />
+        </>
     );
 }
