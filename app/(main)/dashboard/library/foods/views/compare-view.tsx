@@ -344,43 +344,44 @@ export function CompareView({ showStats = false, stats }: CompareViewProps) {
         <div className="space-y-12 animate-in fade-in duration-500">
 
             {/* Shared search hero */}
-            <HeroSearch
-                searchQuery={searchQuery}
-                onQueryChange={handleSearchInput}
-                results={searchResults}
-                isLoading={isSearching}
-                isActive={activeSlot !== null}
-                setIsActive={(active) => {
-                    if (!active) setActiveSlot(null);
-                }}
-                onSelect={selectFood}
-                onFocus={() => {
-                    if (activeSlot === null) {
-                        const firstEmpty = selectedFoods.findIndex(f => f === null);
-                        setActiveSlot(firstEmpty !== -1 ? firstEmpty : 0);
+            <div className="pt-6"> {/* extra padding to drop the viewer */}
+                <HeroSearch
+                    searchQuery={searchQuery}
+                    onQueryChange={handleSearchInput}
+                    results={searchResults}
+                    isLoading={isSearching}
+                    isActive={activeSlot !== null}
+                    setIsActive={(active) => {
+                        if (!active) setActiveSlot(null);
+                    }}
+                    onSelect={selectFood}
+                    onFocus={() => {
+                        if (activeSlot === null) {
+                            const firstEmpty = selectedFoods.findIndex(f => f === null);
+                            setActiveSlot(firstEmpty !== -1 ? firstEmpty : 0);
+                        }
+                    }}
+                    theme="emerald"
+                    placeholder="SEARCH FOOD LIBRARY..."
+                    idleTitle="Ready to Compare?"
+                    idleSubtitle="Search below to add your first food item"
+                    noResultsMessage="No matching items found"
+                    enterMessage="Enter item name to compare"
+                    searchingMessage="Searching Library..."
+                    idleExtra={
+                        activeSlot === null && selectedFoods.some(f => f !== null) ? (
+                            <div className="flex flex-col items-center justify-center h-full animate-in fade-in duration-500 mt-4">
+                                <button
+                                    onClick={clearAll}
+                                    className="px-5 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-black text-[10px] uppercase tracking-widest text-rose-500 hover:border-rose-500/50 transition-all flex items-center gap-2 shadow-sm active:scale-95"
+                                >
+                                    <Trash2 size={14} /> Clear All
+                                </button>
+                            </div>
+                        ) : null
                     }
-                }}
-                theme="emerald"
-                placeholder="SEARCH FOOD LIBRARY..."
-                idleTitle="Ready to Compare?"
-                idleSubtitle="Search below to add your first food item"
-                noResultsMessage="No matching items found"
-                enterMessage="Enter item name to compare"
-                searchingMessage="Searching Library..."
-                idleExtra={
-                    activeSlot === null && selectedFoods.some(f => f !== null) ? (
-                        <div className="flex flex-col items-center justify-center h-full animate-in fade-in duration-500 mt-4">
-                            <button
-                                onClick={clearAll}
-                                className="px-5 py-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 font-black text-[10px] uppercase tracking-widest text-rose-500 hover:border-rose-500/50 transition-all flex items-center gap-2 shadow-sm active:scale-95"
-                            >
-                                <Trash2 size={14} /> Clear All
-                            </button>
-                        </div>
-                    ) : null
-                }
-                renderResult={(food: any) => (
-                    <>
+                    renderResult={(food: any) => (
+                        <>
                         <div className="flex items-center gap-4 min-w-0">
                             <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
                                 {food.image ? <img src={food.image} className="w-full h-full object-cover" /> : <Beef className="m-auto opacity-10 h-full w-5" />}
