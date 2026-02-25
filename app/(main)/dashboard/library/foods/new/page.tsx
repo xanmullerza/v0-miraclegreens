@@ -22,6 +22,7 @@ import {
     AlertCircle,
     ChevronDown,
     ChevronUp,
+    ChevronRight,
     Info,
     Camera,
     Upload,
@@ -38,9 +39,11 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
 import { parseNutritionText, parseMeasures } from '@/lib/utils/nutrition-parser';
+import { searchLocalFood } from '@/lib/services/nutrition';
 import FoodItemPicker from '@/components/recipe/food-item-picker';
-import { LibraryHeroSearch } from '@/components/recipe/library-hero-search';
-import { Database } from 'lucide-react';
+import { HeroSearch } from '@/components/ui/hero-search';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
+
 
 const Card = ({ children, className }: { children: React.ReactNode, className?: string }) => (
     <div className={cn("bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden", className)}>
@@ -90,9 +93,15 @@ export default function AddFoodPage() {
 
 function FoodItemCreatorContent() {
     const router = useRouter();
+    const { energyUnit } = useUserPreferences();
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [authLoading, setAuthLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [isSearchActive, setIsSearchActive] = useState(false);
+    const searchTimeoutRef = useMemo(() => ({ current: null as NodeJS.Timeout | null }), []);
 
     useEffect(() => {
         // Get initial session
@@ -301,6 +310,30 @@ function FoodItemCreatorContent() {
         setMicronutrients(prev => ({ ...prev, [name]: value }));
     };
 
+    // Perform Search
+    const performSearch = async (query: string) => {
+        if (!query || query.length < 2) {
+            setSearchResults([]);
+            return;
+        }
+        setIsSearching(true);
+        try {
+            const results = await searchLocalFood(query);
+            setSearchResults(results);
+        } catch (error) {
+            console.error('Search error:', error);
+        } finally {
+            setIsSearching(false);
+        }
+    };
+
+    // Debounce handler
+    const handleSearchInput = (val: string) => {
+        setSearchQuery(val);
+        if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+        searchTimeoutRef.current = setTimeout(() => performSearch(val), 300);
+    };
+
     const handleImportSelect = (item: any) => {
         // Populate the form with the imported item's data
         setName(item.name);
@@ -339,7 +372,9 @@ Fat: ${item.fat_g || 0}g
         }
         setServingText(sText);
 
-        setShowImportPicker(false);
+        setIsSearchActive(false);
+        setSearchQuery('');
+        setSearchResults([]);
         toast.success("Imported data from Library. You can now edit and save.");
     };
 
@@ -347,7 +382,41 @@ Fat: ${item.fat_g || 0}g
         <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
 
             {/* Food Search Hero Workspace */}
-            <LibraryHeroSearch onSelect={handleImportSelect} />
+            <div className="pt-6">
+                <HeroSearch
+                    searchQuery={searchQuery}
+                    onQueryChange={handleSearchInput}
+                    results={searchResults}
+                    isLoading={isSearching}
+                    isActive={isSearchActive}
+                    setIsActive={setIsSearchActive}
+                    onSelect={handleImportSelect}
+                    onFocus={() => setIsSearchActive(true)}
+                    theme="emerald"
+                    placeholder="SEARCH FOOD LIBRARY..."
+                    idleTitle="Library Search"
+                    idleSubtitle="Search your local registry for instant nutrition facts"
+                    noResultsMessage="No matching items found"
+                    enterMessage="Enter item name to search library"
+                    searchingMessage="Searching Local Registry..."
+                    renderResult={(food: any) => (
+                        <>
+                            <div className="flex items-center gap-4 min-w-0">
+                                <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
+                                    {food.image ? <img src={food.image} className="w-full h-full object-cover" /> : <Beef className="m-auto opacity-10 h-full w-5" />}
+                                </div>
+                                <div className="min-w-0">
+                                    <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{food.common_name || food.name}</h4>
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                                        {energyUnit === 'kJ' ? (food.energy_kcal * 4.184).toFixed(0) : food.energy_kcal.toFixed(0)} {energyUnit} <span className="text-slate-200 dark:text-slate-700">|</span> 100g
+                                    </p>
+                                </div>
+                            </div>
+                            <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={20} />
+                        </>
+                    )}
+                />
+            </div>
 
             {/* Top Row: Info Entry */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -516,3 +585,4 @@ Fat: ${item.fat_g || 0}g
         </div>
     );
 }
+
