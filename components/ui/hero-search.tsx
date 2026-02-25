@@ -138,16 +138,16 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
                     )}
                 </div>
                 {/* Footer */}
-                <div className="p-4 md:p-6 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3 bg-white dark:bg-slate-900 order-2 rounded-b-[2.5rem]">
+                <div className="p-2 md:p-4 border-t border-slate-100 dark:border-slate-800 flex items-center gap-2 bg-white dark:bg-slate-900 order-2 rounded-b-[2.5rem]">
                     <div className="flex-1 relative flex items-center">
-                        <div className={cn("absolute left-5 transition-colors", isActive ? style.accent : 'text-slate-300')}>
+                        <div className={cn("absolute left-4 transition-colors", isActive ? style.accent : 'text-slate-300')}>
                             <Search size={16} className="md:w-5 md:h-5" />
                         </div>
                         <input
                             autoFocus={isActive}
                             placeholder={isActive ? placeholder : ''}
                             className={cn(
-                                "w-full bg-slate-50 dark:bg-slate-800/50 border-2 transition-all shadow-sm text-[10px] md:text-sm font-black uppercase tracking-widest h-10 md:h-12 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300",
+                                "w-full bg-slate-50 dark:bg-slate-800/50 border-2 transition-all shadow-sm text-[10px] md:text-sm font-black uppercase tracking-widest h-8 md:h-10 rounded-[1.5rem] md:rounded-[2rem] pl-10 pr-4 text-slate-900 dark:text-white placeholder:text-slate-300",
                                 isActive
                                     ? `border-${theme}-500/30 focus:border-${theme}-500/80 focus:ring-4 focus:ring-${theme}-500/10 focus:bg-white dark:focus:bg-slate-800/80`
                                     : "border-slate-100 dark:border-slate-800 cursor-pointer hover:border-blue-500/20"
