@@ -356,7 +356,7 @@ export default function BrowsePage() {
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={cn(
-                            "flex items-center gap-2 px-6 py-3 rounded-2xl transition-all duration-300 font-black uppercase tracking-widest text-[10px] whitespace-nowrap",
+                            "flex items-center gap-2 px-3 md:px-6 py-3 rounded-2xl transition-all duration-300 font-black uppercase tracking-widest text-[10px] whitespace-nowrap",
                             activeTab === tab.id
                                 ? tab.id === 'about'
                                     ? "bg-purple-500 text-white shadow-lg shadow-purple-500/20"
@@ -369,7 +369,7 @@ export default function BrowsePage() {
                         )}
                     >
                         <tab.icon size={14} />
-                        {tab.label}
+                        <span className="hidden md:inline">{tab.label}</span>
                     </button>
                 ))}
             </div>
