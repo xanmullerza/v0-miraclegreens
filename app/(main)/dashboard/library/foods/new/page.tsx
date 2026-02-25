@@ -510,6 +510,12 @@ Fat: ${item.fat_g || 0}g
                     </div>
                     <div className="space-y-4">
                         <div className="relative aspect-video md:aspect-auto md:h-[120px] rounded-2xl bg-slate-50 dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 overflow-hidden group hover:border-emerald-500/50 transition-all flex flex-col items-center justify-center">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                onChange={handleImageUpload}
+                            />
                             {image ? (
                                 <>
                                     <img src={image} alt="Food item" className="w-full h-full object-cover" />
@@ -520,7 +526,7 @@ Fat: ${item.fat_g || 0}g
                                     </div>
                                 </>
                             ) : (
-                                <div className="text-center p-6">
+                                <div className="text-center p-6 pointer-events-none">
                                     {uploading ? (
                                         <div className="space-y-3">
                                             <Loader2 className="h-10 w-10 animate-spin text-emerald-500 mx-auto" />
@@ -532,12 +538,6 @@ Fat: ${item.fat_g || 0}g
                                                 <Upload size={24} />
                                             </div>
                                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Capture or Upload Reference</p>
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                                onChange={handleImageUpload}
-                                            />
                                         </>
                                     )}
                                 </div>
