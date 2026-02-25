@@ -119,98 +119,52 @@ export default function DashboardOverview() {
             <div className="flex flex-col min-h-screen">
                 {/* Main content area, flex-grow to fill space between header/footer */}
                 <div className="flex flex-col flex-grow items-center justify-center">
-                    <div className="space-y-12 animate-in fade-in duration-700 w-full">
-                        {showHeroes && (
-                            <div className="w-full md:max-w-[900px] mx-auto relative px-0 mb-6 group/stats">
-                                <div className="relative p-5 px-8 w-full transition-all duration-500">
-                                    <div className="relative z-10 grid grid-cols-2 gap-4 md:flex md:flex-wrap md:items-start md:justify-center md:gap-8 lg:gap-12">
-                                        <Link href="/dashboard/workshop/lifeguard" className="hidden flex items-center gap-3 group/stat hover:opacity-80 transition-opacity">
-                                            <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
-                                                <Wallet size={16} className="text-amber-400" />
-                                            </div>
-                                            <div>
-                                                <p className="text-lg font-black text-white leading-none">Survival</p>
-                                                <p className="text-[9px] uppercase tracking-widest text-amber-500/60 font-bold mt-1">Life Guard</p>
-                                            </div>
-                                        </Link>
-                                        <div className="flex items-center gap-3 group/stat">
-                                            <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
-                                                <Leaf size={16} className="text-emerald-400" />
-                                            </div>
-                                            <div>
-                                                <p className="text-lg font-black text-white leading-none">{stats.foods}</p>
-                                                <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Foods</p>
-                                            </div>
+                    <div className="w-full max-w-[900px] mx-auto flex flex-col md:flex-row gap-6 px-4 items-center justify-center animate-in fade-in duration-700">
+                        {heroCards.map((card) => {
+                            const Icon = card.icon;
+                            return (
+                                <Link
+                                    key={card.id}
+                                    href={card.href}
+                                    className={cn(
+                                        "group relative overflow-hidden rounded-[2.5rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 transition-all duration-500 min-h-[320px] flex flex-col items-center justify-center text-center w-full md:w-auto",
+                                        card.borderHover,
+                                        "hover:shadow-2xl hover:-translate-y-1"
+                                    )}
+                                >
+                                    <div className={cn(
+                                        "absolute top-0 left-0 right-0 h-1 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-all duration-500",
+                                        card.gradient
+                                    )} />
+                                    <div className="relative z-10 flex flex-col items-center">
+                                        <div className={cn(
+                                            "w-20 h-20 rounded-[2rem] flex items-center justify-center mb-8 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-sm",
+                                            card.bg
+                                        )}>
+                                            <Icon size={40} className={card.color} />
                                         </div>
-                                        <div className="flex items-center gap-3 group/stat">
-                                            <div className="w-9 h-9 rounded-lg bg-purple-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
-                                                <Beaker size={16} className="text-purple-400" />
-                                            </div>
-                                            <div>
-                                                <p className="text-lg font-black text-white leading-none">{stats.mixes}</p>
-                                                <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Mixes</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-3 group/stat">
-                                            <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
-                                                <ChefHat size={16} className="text-amber-400" />
-                                            </div>
-                                            <div>
-                                                <p className="text-lg font-black text-white leading-none">{stats.recipes}</p>
-                                                <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Meals</p>
+                                        <div className="space-y-3">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <h3 className={cn("text-3xl font-black text-slate-900 dark:text-white tracking-tight transition-colors uppercase italic", card.titleHover)}>
+                                                    {card.title}
+                                                </h3>
+                                                <ArrowRight size={24} className={cn("opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0", card.color)} />
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        )}
-                        <div className="w-full max-w-[900px] mx-auto flex flex-col md:flex-row gap-6 px-4 items-center justify-center">
-                            {heroCards.map((card) => {
-                                const Icon = card.icon;
-                                return (
-                                    <Link
-                                        key={card.id}
-                                        href={card.href}
-                                        className={cn(
-                                            "group relative overflow-hidden rounded-[2.5rem] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 transition-all duration-500 min-h-[320px] flex flex-col items-center justify-center text-center w-full md:w-auto",
-                                            card.borderHover,
-                                            "hover:shadow-2xl hover:-translate-y-1"
-                                        )}
-                                    >
-                                        <div className={cn(
-                                            "absolute top-0 left-0 right-0 h-1 bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-all duration-500",
-                                            card.gradient
-                                        )} />
-                                        <div className="relative z-10 flex flex-col items-center">
-                                            <div className={cn(
-                                                "w-20 h-20 rounded-[2rem] flex items-center justify-center mb-8 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-sm",
-                                                card.bg
-                                            )}>
-                                                <Icon size={40} className={card.color} />
-                                            </div>
-                                            <div className="space-y-3">
-                                                <div className="flex items-center justify-center gap-2">
-                                                    <h3 className={cn("text-3xl font-black text-slate-900 dark:text-white tracking-tight transition-colors uppercase italic", card.titleHover)}>
-                                                        {card.title}
-                                                    </h3>
-                                                    <ArrowRight size={24} className={cn("opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0", card.color)} />
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {/* Subtle background glow */}
-                                        <div className={cn(
-                                            "absolute -bottom-12 -right-12 w-32 h-32 rounded-full blur-[60px] opacity-0 group-hover:opacity-20 transition-all duration-700",
-                                            card.bg
-                                        )} />
-                                    </Link>
-                                );
-                            })}
-                        </div>
+                                    {/* Subtle background glow */}
+                                    <div className={cn(
+                                        "absolute -bottom-12 -right-12 w-32 h-32 rounded-full blur-[60px] opacity-0 group-hover:opacity-20 transition-all duration-700",
+                                        card.bg
+                                    )} />
+                                </Link>
+                            );
+                        })}
+                    </div>
                     </div>
                 </div>
-            </div>
-        </PageContainer>
-        <Footer />
+            </PageContainer>
+            <Footer />
         </>
     );
 }
