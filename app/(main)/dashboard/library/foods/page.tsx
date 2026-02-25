@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { Loader2, Leaf, ChevronRight } from 'lucide-react';
 import { ExploreView } from './views/explore-view';
 import { ShoppingView } from './views/shopping-view';
 import { StaplesView } from '@/components/library/staples-view';
@@ -11,6 +11,16 @@ import { NutrientsView } from './views/nutrients-view';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
 import { supabase } from '@/lib/supabase';
+import { useUserPreferences } from '@/lib/context/user-preferences-context';
+
+const CAL_TO_KJ = 4.184;
+
+function formatEnergy(calories: number, unit: 'kcal' | 'kJ') {
+    if (unit === 'kJ') {
+        return `${Math.round(calories * CAL_TO_KJ).toLocaleString()} kJ`;
+    }
+    return `${Math.round(calories).toLocaleString()} kC`;
+}
 
 export default function IngredientsHub() {
     return (
@@ -29,6 +39,8 @@ type FoodTab = 'foods' | 'groceries' | 'pantry' | 'compare' | 'nutrients';
 
 function IngredientsContent() {
 
+    const router = useRouter();
+    const { energyUnit } = useUserPreferences();
     const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState<FoodTab>('foods');
     const [searchQuery, setSearchQuery] = useState('');
@@ -36,6 +48,28 @@ function IngredientsContent() {
     const [isSearching, setIsSearching] = useState(false);
     const [isSearchActive, setIsSearchActive] = useState(false);
     const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+    const renderResult = (item: any) => (
+        <div className="flex items-center gap-4 min-w-0 w-full">
+            <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
+                {item.image ? (
+                    <img src={item.image} className="w-full h-full object-cover" alt={item.common_name || item.name} />
+                ) : (
+                    <Leaf className="m-auto opacity-10 h-full w-5" />
+                )}
+            </div>
+            <div className="min-w-0 flex-1">
+                <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">
+                    {item.common_name || item.name}
+                </h4>
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                    {formatEnergy(item.energy_kcal, energyUnit)} <span className="text-slate-200 dark:text-slate-700">|</span> {item.category || 'General'}
+                </p>
+            </div>
+            <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={20} />
+        </div>
+    );
+
 
     const performSearch = async (query: string) => {
         if (!query || query.length < 2) {
@@ -76,7 +110,8 @@ function IngredientsContent() {
                         isLoading={isSearching}
                         isActive={isSearchActive}
                         setIsActive={setIsSearchActive}
-                        onSelect={() => {}}
+                        onSelect={(item) => router.push(`/dashboard/library/foods/${item.id}`)}
+                        renderResult={renderResult}
                         theme="emerald"
                         placeholder="SEARCH FOOD LIBRARY..."
                         idleTitle="Ready to Explore?"
