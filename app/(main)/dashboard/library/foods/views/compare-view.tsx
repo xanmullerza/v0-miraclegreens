@@ -341,7 +341,7 @@ export function CompareView({ showStats = false, stats }: CompareViewProps) {
     };
 
     return (
-        <div className="space-y-6 md:space-y-12 animate-in fade-in duration-700 pb-20 pt-0">
+        <div className="space-y-12 animate-in fade-in duration-500">
 
             {/* Shared search hero */}
             <HeroSearch
