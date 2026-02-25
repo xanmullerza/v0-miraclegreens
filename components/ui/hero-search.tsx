@@ -82,12 +82,12 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
         <div className="w-full md:max-w-[900px] mx-auto">
             <div
                 className={cn(
-                    'w-full bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col h-[180px]',
+                    'w-full bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col max-h-[180px]',
                     isActive ? `${style.ring} ${style.border}` : ''
                 )}
             >
                 {/* Dynamic content */}
-                <div className="h-[180px] overflow-y-auto p-4 md:p-8 no-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1">
+                <div className="overflow-y-auto flex-1 p-4 md:p-8 no-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1 rounded-t-[2.5rem]">
                     {isActive ? (
                         <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                             {isLoading ? (
