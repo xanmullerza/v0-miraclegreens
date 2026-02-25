@@ -124,7 +124,7 @@ function IngredientsContent() {
 
                 {/* Dynamic Content Area */}
                 <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
-                    {activeTab === 'foods' && <ExploreView hideControls={true} />}
+                    {activeTab === 'foods' && <ExploreView hideControls={true} showHero={false} />}
                     {activeTab === 'groceries' && <ShoppingView />}
                     {activeTab === 'pantry' && <StaplesView />}
                     {activeTab === 'compare' && <CompareView />}
