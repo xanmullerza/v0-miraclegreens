@@ -5,6 +5,7 @@ export interface FoodItemMatch {
     id?: string;
     name: string;
     common_name?: string;
+    image?: string | null; // some searches include an image URL
     energy_kcal: number;
     energy_kj: number;
     protein_g: number;
@@ -118,6 +119,7 @@ export async function searchLocalFood(query: string): Promise<FoodItemMatch[]> {
         id: item.id,
         name: item.name,
         common_name: item.common_name,
+        image: item.image || null,
         energy_kcal: item.energy_kcal || Math.round((item.energy_kj || 0) / 4.184),
         energy_kj: item.energy_kj || Math.round((item.energy_kcal || 0) * 4.184),
         protein_g: item.protein_g,
