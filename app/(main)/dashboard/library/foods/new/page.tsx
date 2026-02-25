@@ -39,7 +39,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
 import { parseNutritionText, parseMeasures } from '@/lib/utils/nutrition-parser';
-import { searchLocalFood } from '@/lib/services/nutrition';
+import { searchUSDAFood } from '@/lib/services/nutrition';
 import FoodItemPicker from '@/components/recipe/food-item-picker';
 import { HeroSearch } from '@/components/ui/hero-search';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -318,7 +318,7 @@ function FoodItemCreatorContent() {
         }
         setIsSearching(true);
         try {
-            const results = await searchLocalFood(query);
+            const results = await searchUSDAFood(query);
             setSearchResults(results);
         } catch (error) {
             console.error('Search error:', error);
