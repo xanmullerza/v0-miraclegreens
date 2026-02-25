@@ -198,9 +198,9 @@ export default function BrowsePage() {
                                 <p className="text-slate-600 dark:text-slate-400 text-xs mb-4">
                                     Call us for urgent issues. Available Monday-Friday, 9am-6pm EST.
                                 </p>
-                                <a href="tel:+1-555-VITALA-1" className="text-amber-500 font-bold text-xs hover:underline">
-                                    +1 (555) 848-2521
-                                </a>
+                                <button className="text-amber-500 font-bold text-xs hover:underline">
+                                    Call Us
+                                </button>
                             </div>
                         </div>
 
