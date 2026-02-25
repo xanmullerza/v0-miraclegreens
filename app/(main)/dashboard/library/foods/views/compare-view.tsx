@@ -12,7 +12,6 @@ import {
     Scale,
     Trash2,
     Plus,
-    Info,
     Beef,
     Trophy,
     Medal,
@@ -363,7 +362,7 @@ export function CompareView({ showStats = false, stats }: CompareViewProps) {
                 }}
                 theme="emerald"
                 placeholder="SEARCH FOOD LIBRARY..."
-                idleTitle={<><Info /><span className="ml-2">Ready to Compare?</span></>}
+                idleTitle="Ready to Compare?"
                 idleSubtitle="Search below to add your first food item"
                 noResultsMessage="No matching items found"
                 enterMessage="Enter item name to compare"
