@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -93,10 +93,14 @@ export default function AddFoodPage() {
 
 function FoodItemCreatorContent() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const foodIdToEdit = searchParams.get('edit');
     const { energyUnit } = useUserPreferences();
     const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [authLoading, setAuthLoading] = useState(true);
+    const [loadingFood, setLoadingFood] = useState(false);
+    const [editingFoodId, setEditingFoodId] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
@@ -162,6 +166,53 @@ function FoodItemCreatorContent() {
     const [category, setCategory] = useState('General');
 
     const CATEGORIES = ["General", "Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements"];
+
+    // Load food item if editing
+    useEffect(() => {
+        if (foodIdToEdit) {
+            const loadFood = async () => {
+                setLoadingFood(true);
+                try {
+                    const { data: food, error } = await supabase
+                        .from('food_items')
+                        .select('*')
+                        .eq('id', foodIdToEdit)
+                        .single();
+
+                    if (error) throw error;
+                    if (food) {
+                        // Populate all form fields with the loaded food data
+                        setEditingFoodId(food.id);
+                        setName(food.name);
+                        setCommonName(food.common_name || '');
+                        setEnergyKcal(food.energy_kcal?.toString() || '');
+                        setEnergyKj(food.energy_kj?.toString() || '');
+                        setProtein(food.protein_g?.toString() || '');
+                        setFat(food.fat_g?.toString() || '');
+                        setCarbs(food.carbs_g?.toString() || '');
+                        setSource(food.source || 'manual');
+                        setCategory(food.category || 'General');
+                        setImage(food.image || '');
+
+                        // Set micronutrients
+                        if (food.micronutrients) {
+                            const micros: Record<string, string> = {};
+                            Object.entries(food.micronutrients).forEach(([key, val]) => {
+                                micros[key] = val?.toString() || '';
+                            });
+                            setMicronutrients(micros);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to load food for editing:', error);
+                    toast.error('Failed to load food for editing');
+                } finally {
+                    setLoadingFood(false);
+                }
+            };
+            loadFood();
+        }
+    }, [foodIdToEdit]);
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -263,20 +314,40 @@ function FoodItemCreatorContent() {
             };
 
             if (user) {
-                // Cloud Save - Don't provide a manual string ID as the DB requires a UUID
+                // If editing, include the ID to update the existing record
+                if (editingFoodId) {
+                    foodData.id = editingFoodId;
+                }
+                // Cloud Save - upsert will insert or update based on conflict strategy
                 const { data: item, error: itemError } = await supabase
                     .from('food_items')
-                    .upsert(foodData, { onConflict: 'name' })
+                    .upsert(foodData, { onConflict: editingFoodId ? 'id' : 'name' })
                     .select()
                     .single();
 
                 if (itemError) throw itemError;
             } else {
                 // Local Save - Manual ID is fine here since it's just JSON
-                foodData.id = `food-${Date.now()}`;
+                if (editingFoodId) {
+                    foodData.id = editingFoodId;
+                } else {
+                    foodData.id = `food-${Date.now()}`;
+                }
                 const localData = localStorage.getItem('local_foods');
                 let localFoods = localData ? JSON.parse(localData) : [];
-                localFoods.push(foodData);
+                
+                if (editingFoodId) {
+                    // Update existing local food
+                    const index = localFoods.findIndex((f: any) => f.id === editingFoodId);
+                    if (index !== -1) {
+                        localFoods[index] = foodData;
+                    } else {
+                        localFoods.push(foodData);
+                    }
+                } else {
+                    // Create new local food
+                    localFoods.push(foodData);
+                }
                 localStorage.setItem('local_foods', JSON.stringify(localFoods));
             }
 
@@ -380,6 +451,31 @@ Fat: ${item.fat_g || 0}g
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
+
+            {/* Page Header */}
+            <div className="pt-6 flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-black uppercase tracking-tight">{editingFoodId ? 'Edit Food' : 'Add Food'}</h1>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+                        {editingFoodId ? 'Update food details and nutritional information' : 'Create a new food item with detailed nutrition facts'}
+                    </p>
+                </div>
+                <Button
+                    variant="ghost"
+                    onClick={() => router.back()}
+                    className="text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                >
+                    <ArrowLeft className="w-5 h-5 mr-2" />
+                    Back
+                </Button>
+            </div>
+
+            {loadingFood && (
+                <div className="flex items-center justify-center gap-3 p-6 bg-amber-50 dark:bg-amber-950/20 rounded-2xl border border-amber-200 dark:border-amber-800/30">
+                    <Loader2 className="w-4 h-4 animate-spin text-amber-600 dark:text-amber-400" />
+                    <p className="text-sm font-medium text-amber-600 dark:text-amber-400">Loading food item...</p>
+                </div>
+            )}
 
             {/* Food Search Hero Workspace */}
             <div className="pt-6">
