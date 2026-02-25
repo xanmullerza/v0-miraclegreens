@@ -113,7 +113,7 @@ function MealsContent() {
 
                 {/* Dynamic Content Area */}
                 <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
-                    <RecipesView hideControls={true} showHero={false} />
+                    <RecipesView showHero={false} />
                 </div>
             </div>
         </PageContainer>

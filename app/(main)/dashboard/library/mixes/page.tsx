@@ -113,7 +113,7 @@ function MixesContent() {
 
                 {/* Dynamic Content Area */}
                 <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
-                    <RecipesView hideControls={true} showHero={false} isMix={true} />
+                    <RecipesView showHero={false} isMix={true} />
                 </div>
             </div>
         </PageContainer>
