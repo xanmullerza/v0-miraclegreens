@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import {
     Flame,
     Check,
+    CheckCircle2,
     ChevronRight,
     RotateCcw,
     ChefHat,
@@ -174,11 +175,13 @@ const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onRegenerate }: {
     );
 };
 
-const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, pantryItems = [] }: {
+const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEaten, isEaten = false, pantryItems = [] }: {
     recipe: Recipe,
     mealLabel: string,
     unit?: UnitType,
     onRegenerate?: () => void,
+    onMarkEaten?: () => void,
+    isEaten?: boolean,
     pantryItems?: any[]
 }) => {
     const router = useRouter();
@@ -222,8 +225,18 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, pantryIt
     return (
         <div
             onClick={() => router.push(`/dashboard/recipes/meals/${recipe.id}`)}
-            className="group relative bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0"
+            className={cn(
+                "group relative rounded-2xl border hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0",
+                isEaten
+                    ? "bg-emerald-50/60 dark:bg-emerald-900/20 border-emerald-400/40 opacity-75"
+                    : "bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 hover:border-emerald-500/30"
+            )}
         >
+            {isEaten && (
+                <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5 bg-emerald-500 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
+                    <CheckCircle2 size={10} /> Eaten
+                </div>
+            )}
             <div className="lg:grid lg:grid-cols-[120px_1fr_100px_80px_80px_80px_150px] gap-4 lg:items-center lg:px-8">
                 {/* Thumbnail */}
                 <div className="aspect-[4/3] lg:aspect-square w-full lg:w-30 rounded-xl lg:rounded-none bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative">
@@ -304,8 +317,19 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, pantryIt
                 </div>
 
                 {/* Actions */}
-                <div className="p-3 lg:p-0 flex justify-end">
-                    {onRegenerate && (
+                <div className="p-3 lg:p-0 flex justify-end gap-2">
+                    {onMarkEaten && !isEaten && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => { e.stopPropagation(); onMarkEaten(); }}
+                            className="h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-50 dark:hover:bg-emerald-900/30 text-emerald-500 hover:text-emerald-700 transition-all gap-2"
+                        >
+                            <Check size={14} />
+                            Eaten
+                        </Button>
+                    )}
+                    {onRegenerate && !isEaten && (
                         <Button
                             variant="ghost"
                             size="sm"
@@ -347,6 +371,67 @@ export function MealPlannerContent({
     const [step, setStep] = useState<1 | 2 | 3>(1);
     const [generating, setGenerating] = useState(false);
     const [pantryItems, setPantryItems] = useState<any[]>([]);
+    const [eatenMeals, setEatenMeals] = useState<Set<string>>(new Set());
+
+    // Parse a pantry quantity string to total grams (returns null if no weight info)
+    const parseTotalGrams = (quantityStr: string): number | null => {
+        if (!quantityStr) return null;
+        const entries = quantityStr.split(/\s*\+\s*/).map(s => s.trim()).filter(Boolean);
+        let total = 0;
+        let hasWeight = false;
+        for (const entry of entries) {
+            // "5 Large (223g)" or "1 kilogram (1000g)"
+            const labeled = entry.match(/^(\d+(?:\.\d+)?)\s+.+?\s+\((\d+(?:\.\d+)?)g\)$/);
+            if (labeled) { total += parseFloat(labeled[1]) * parseFloat(labeled[2]); hasWeight = true; continue; }
+            // "1 x 100g"
+            const weighted = entry.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*g$/i);
+            if (weighted) { total += parseFloat(weighted[1]) * parseFloat(weighted[2]); hasWeight = true; continue; }
+            // plain grams e.g. "500g"
+            const plainG = entry.match(/^(\d+(?:\.\d+)?)\s*g$/i);
+            if (plainG) { total += parseFloat(plainG[1]); hasWeight = true; continue; }
+        }
+        return hasWeight ? total : null;
+    };
+
+    const handleMarkEaten = async (recipe: Recipe, mealType: string) => {
+        const servings = recipe.servings || 1;
+        const ingredients = recipe.ingredients || [];
+
+        const saved = localStorage.getItem('pantry_quantities');
+        const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
+
+        let subtracted = 0;
+
+        for (const ing of ingredients) {
+            const weightToSubtract = (ing.weightG ?? 0) * servings;
+            if (!weightToSubtract) continue;
+
+            // Find matching pantry item by food_item_id or name
+            const matchItem = pantryItems.find(p =>
+                (ing.food_item_id && p.id === ing.food_item_id) ||
+                (ing.baseIngredient && (p.common_name || p.name)?.toLowerCase().trim() === ing.baseIngredient.toLowerCase().trim()) ||
+                (ing.item && (p.common_name || p.name)?.toLowerCase().trim() === ing.item.toLowerCase().trim())
+            );
+            if (!matchItem) continue;
+
+            const currentQtyStr = quantities[matchItem.id] || matchItem.quantity || '';
+            const totalG = parseTotalGrams(currentQtyStr);
+            if (totalG === null) continue; // no weight info, skip
+
+            const remaining = Math.max(0, totalG - weightToSubtract);
+            quantities[matchItem.id] = remaining > 0 ? `1 x ${remaining}g` : '0';
+            subtracted++;
+        }
+
+        localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+        setEatenMeals(prev => new Set([...prev, mealType]));
+
+        if (subtracted > 0) {
+            toast.success(`Marked as eaten — ${subtracted} pantry item${subtracted !== 1 ? 's' : ''} updated`);
+        } else {
+            toast.success(`${recipe.title} marked as eaten`);
+        }
+    };
 
     useEffect(() => {
         const fetchPantry = async () => {
@@ -934,13 +1019,13 @@ export function MealPlannerContent({
 
                         <div className="space-y-4">
                             {selectedTypes.map(st => st.toLowerCase()).includes('breakfast') && (
-                                <RecipeListItem recipe={plan.breakfast} mealLabel="Breakfast" unit={unit} onRegenerate={() => handleRegenerateMeal('breakfast', plan.breakfast.id)} pantryItems={pantryItems} />
+                                <RecipeListItem recipe={plan.breakfast} mealLabel="Breakfast" unit={unit} onRegenerate={() => handleRegenerateMeal('breakfast', plan.breakfast.id)} onMarkEaten={() => handleMarkEaten(plan.breakfast, 'breakfast')} isEaten={eatenMeals.has('breakfast')} pantryItems={pantryItems} />
                             )}
                             {selectedTypes.map(st => st.toLowerCase()).includes('lunch') && (
-                                <RecipeListItem recipe={plan.lunch} mealLabel="Lunch" unit={unit} onRegenerate={() => handleRegenerateMeal('lunch', plan.lunch.id)} pantryItems={pantryItems} />
+                                <RecipeListItem recipe={plan.lunch} mealLabel="Lunch" unit={unit} onRegenerate={() => handleRegenerateMeal('lunch', plan.lunch.id)} onMarkEaten={() => handleMarkEaten(plan.lunch, 'lunch')} isEaten={eatenMeals.has('lunch')} pantryItems={pantryItems} />
                             )}
                             {selectedTypes.map(st => st.toLowerCase()).includes('dinner') && (
-                                <RecipeListItem recipe={plan.dinner} mealLabel="Dinner" unit={unit} onRegenerate={() => handleRegenerateMeal('dinner', plan.dinner.id)} pantryItems={pantryItems} />
+                                <RecipeListItem recipe={plan.dinner} mealLabel="Dinner" unit={unit} onRegenerate={() => handleRegenerateMeal('dinner', plan.dinner.id)} onMarkEaten={() => handleMarkEaten(plan.dinner, 'dinner')} isEaten={eatenMeals.has('dinner')} pantryItems={pantryItems} />
                             )}
                         </div>
 
