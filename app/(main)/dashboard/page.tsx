@@ -74,10 +74,10 @@ export default function DashboardOverview() {
             ]
         },
         {
-            id: 'kitchen',
-            title: 'Kitchen',
-            desc: 'Take full control of your kitchen with our inventory management and meal planning tools. Sync your pantry, create custom meal plans, and generate automated shopping lists based on your goals.',
-            href: '/dashboard/kitchen',
+            id: 'recipes',
+            title: 'Recipes',
+            desc: 'Take full control of your recipes with our inventory management and meal planning tools. Sync your pantry, create custom meal plans, and generate automated shopping lists based on your goals.',
+            href: '/dashboard/recipes',
             icon: ChefHat,
             color: 'text-emerald-400',
             bg: 'bg-emerald-500/10',
@@ -87,9 +87,9 @@ export default function DashboardOverview() {
             itemBorderHover: 'hover:border-emerald-500/50',
             gradient: 'from-emerald-500 to-teal-600',
             items: [
-                { title: 'Mealomatic', icon: Calendar, href: '/dashboard/kitchen/meal-o-matic', desc: 'meal planner' },
-                { title: 'Pantry', icon: Package, href: '/dashboard/kitchen/pantry', desc: 'In-stock essentials' },
-                { title: 'Groceries', icon: ShoppingCart, href: '/dashboard/kitchen/groceries', desc: 'shopping list' },
+                { title: 'Mealomatic', icon: Calendar, href: '/dashboard/recipes/meal-o-matic', desc: 'meal planner' },
+                { title: 'Pantry', icon: Package, href: '/dashboard/recipes/pantry', desc: 'In-stock essentials' },
+                { title: 'Groceries', icon: ShoppingCart, href: '/dashboard/recipes/groceries', desc: 'shopping list' },
             ]
         },
         {
