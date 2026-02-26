@@ -292,6 +292,29 @@ export function ShoppingListView() {
         }
     };
 
+    const handleDirectAddToPantry = async (item: ShoppingListItem) => {
+        // If linked to a known food item → add directly to localStorage, no dialog
+        if (item.food_item_id) {
+            try {
+                const saved = localStorage.getItem('pantry_quantities');
+                const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
+                const current = quantities[item.food_item_id] || '';
+                const incoming = item.quantity || '1';
+                quantities[item.food_item_id] = current ? aggregateQuantities(current, incoming) : incoming;
+                localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+                // Ensure the food item is marked as in-pantry in DB (best effort)
+                await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', item.food_item_id);
+                removeItem(item.id);
+                toast.success(`"${item.name}" added to pantry`);
+            } catch (e) {
+                toast.error('Failed to add to pantry');
+            }
+            return;
+        }
+        // No food_item_id — fall back to the match dialog
+        moveToPantry(item);
+    };
+
     const moveToPantry = async (item: ShoppingListItem) => {
         try {
             const { data: { session } } = await supabase.auth.getSession();
@@ -794,6 +817,13 @@ export function ShoppingListView() {
                                                             </span>
                                                         )}
                                                         <button
+                                                            onClick={(e) => { e.stopPropagation(); handleDirectAddToPantry(item); }}
+                                                            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-all"
+                                                            title="Add to pantry"
+                                                        >
+                                                            <Package size={14} />
+                                                        </button>
+                                                        <button
                                                             onClick={(e) => { e.stopPropagation(); removeItem(item.id); }}
                                                             className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-500 transition-all"
                                                         >
@@ -840,10 +870,10 @@ export function ShoppingListView() {
                                         <Button
                                             size="sm"
                                             variant="ghost"
-                                            onClick={(e) => { e.stopPropagation(); moveToPantry(item); }}
+                                            onClick={(e) => { e.stopPropagation(); handleDirectAddToPantry(item); }}
                                             className="opacity-0 group-hover:opacity-100 h-6 px-2 text-[8px] font-black uppercase tracking-tight text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
                                         >
-                                            <Package size={10} className="mr-0.5" /> Add
+                                            <Package size={10} className="mr-0.5" /> Add to Pantry
                                         </Button>
                                     </div>
                                 ))}
