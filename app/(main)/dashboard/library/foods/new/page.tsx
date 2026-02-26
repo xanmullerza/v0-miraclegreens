@@ -9,7 +9,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import {
     Save,
-    ArrowLeft,
     Plus,
     Trash2,
     Sparkles,
@@ -473,24 +472,6 @@ Fat: ${item.fat_g || 0}g
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 pb-20 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100">
-
-            {/* Page Header */}
-            <div className="pt-6 flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-black uppercase tracking-tight">{editingFoodId ? 'Edit Food' : 'Add Food'}</h1>
-                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
-                        {editingFoodId ? 'Update food details and nutritional information' : 'Create a new food item with detailed nutrition facts'}
-                    </p>
-                </div>
-                <Button
-                    variant="ghost"
-                    onClick={() => router.back()}
-                    className="text-slate-400 hover:text-slate-900 dark:hover:text-white"
-                >
-                    <ArrowLeft className="w-5 h-5 mr-2" />
-                    Back
-                </Button>
-            </div>
 
             {loadingFood && (
                 <div className="flex items-center justify-center gap-3 p-6 bg-amber-50 dark:bg-amber-950/20 rounded-2xl border border-amber-200 dark:border-amber-800/30">
