@@ -25,7 +25,8 @@ import {
     Check,
     Activity,
     Heart,
-    X
+    X,
+    List
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -144,6 +145,12 @@ export function PantryView({
     const [buyMorePortions, setBuyMorePortions] = useState<{ label: string; weight_g: number }[]>([]);
     const [buyMoreSelectedPortion, setBuyMoreSelectedPortion] = useState<{ label: string; weight_g: number } | null>(null);
     const [buyMoreAdding, setBuyMoreAdding] = useState(false);
+    const [expandedQuantityId, setExpandedQuantityId] = useState<string | null>(null);
+
+    const parseQuantityEntries = (quantity: string | undefined): string[] => {
+        if (!quantity) return [];
+        return quantity.split(/\s*\+\s*/).map(s => s.trim()).filter(Boolean);
+    };
 
     useEffect(() => {
         fetchPantry();
@@ -606,7 +613,23 @@ export function PantryView({
                                                                 {food.common_name || food.name}
                                                             </span>
                                                         </div>
-                                                        <span className="text-xs text-slate-500 dark:text-slate-400">{food.quantity || 'In Stock'}</span>
+                                                        <div className="flex items-center gap-1.5">
+                                                            {(() => {
+                                                                const entries = parseQuantityEntries(food.quantity);
+                                                                if (entries.length === 0) return <span className="text-xs text-slate-400">In Stock</span>;
+                                                                if (entries.length === 1) return <span className="text-xs text-slate-500 dark:text-slate-400">{entries[0]}</span>;
+                                                                return <span className="text-xs text-slate-500 dark:text-slate-400">{entries.length} entries</span>;
+                                                            })()}
+                                                            {parseQuantityEntries(food.quantity).length > 0 && (
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); setExpandedQuantityId(expandedQuantityId === food.id ? null : food.id); }}
+                                                                    className={cn("p-0.5 rounded transition-colors", expandedQuantityId === food.id ? "text-emerald-500" : "text-slate-300 dark:text-slate-600 hover:text-slate-500")}
+                                                                    title="View breakdown"
+                                                                >
+                                                                    <List size={12} />
+                                                                </button>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); buyMoreItem?.id === food.id ? setBuyMoreItem(null) : openBuyMore(food); }}
@@ -630,6 +653,22 @@ export function PantryView({
                                                         <X size={14} />
                                                     </button>
                                                 </div>
+
+                                                {/* Quantity breakdown accordion */}
+                                                {expandedQuantityId === food.id && (() => {
+                                                    const entries = parseQuantityEntries(food.quantity);
+                                                    return (
+                                                        <div className="mt-1 mb-0.5 px-4 py-3 rounded-xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/20 animate-in slide-in-from-top-2 duration-200 space-y-1.5">
+                                                            <p className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">Stock Breakdown</p>
+                                                            {entries.map((entry, i) => (
+                                                                <div key={i} className="flex items-center gap-2">
+                                                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                                                                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{entry}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    );
+                                                })()}
 
                                                 {/* Inline quick-add panel */}
                                                 {buyMoreItem?.id === food.id && (
