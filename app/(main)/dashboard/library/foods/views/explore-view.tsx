@@ -608,7 +608,7 @@ export function ExploreView({
             )}
 
             {/* List Area */}
-            <div className="space-y-0 mx-auto max-w-6xl">
+            <div className="space-y-0 w-full max-w-6xl mx-auto">
                 {groupNames.map((groupName) => {
                     const items = groupedFoods[groupName];
                     const isExpanded = expandedGroups[groupName] || (searchQuery.length > 0 && items.length > 0);

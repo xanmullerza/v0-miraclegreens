@@ -100,7 +100,7 @@ function IngredientsContent() {
 
     return (
         <PageContainer maxWidth="max-w-7xl">
-            <div className="space-y-12 animate-in fade-in duration-500 mx-auto flex flex-col items-center">
+            <div className="space-y-12 animate-in fade-in duration-500">
                 {/* Search Hero */}
                 {activeTab === 'foods' && (
                     <HeroSearch
