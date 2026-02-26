@@ -26,6 +26,7 @@ export default function PantryPage() {
     const [quickAddWeight, setQuickAddWeight] = useState('');
     const [quickAddUnit, setQuickAddUnit] = useState('g');
     const [quickAddMode, setQuickAddMode] = useState<'pantry' | 'shopping'>('pantry');
+    const [selectedPortion, setSelectedPortion] = useState<{ label: string; weight_g: number } | null>(null);
 
     useEffect(() => {
         const searchFoods = async () => {
@@ -38,7 +39,7 @@ export default function PantryPage() {
             try {
                 const { data, error } = await supabase
                     .from('food_items')
-                    .select('id, name, common_name, image, energy_kcal')
+                    .select('id, name, common_name, image, energy_kcal, portions')
                     .or(`name.ilike.%${searchQuery}%,common_name.ilike.%${searchQuery}%`)
                     .limit(20);
 
@@ -69,6 +70,7 @@ export default function PantryPage() {
         setQuickAddWeight('');
         setQuickAddUnit('g');
         setQuickAddMode('pantry');
+        setSelectedPortion(null);
     };
 
     const handleQuickAdd = async () => {
@@ -76,7 +78,9 @@ export default function PantryPage() {
 
         setIsAdding(true);
         try {
-            const quantityString = quickAddWeight ? `${quickAddQty} x ${quickAddWeight}${quickAddUnit}` : quickAddQty;
+            // If a portion is selected, use its weight; otherwise use the weight input
+            const finalWeight = selectedPortion ? selectedPortion.weight_g : quickAddWeight;
+            const quantityString = finalWeight ? `${quickAddQty} x ${finalWeight}${quickAddUnit}` : quickAddQty;
 
             if (quickAddMode === 'pantry') {
                 const { error } = await supabase
@@ -111,6 +115,7 @@ export default function PantryPage() {
             setSelectedFood(null);
             setQuickAddQty('1');
             setQuickAddWeight('');
+            setSelectedPortion(null);
         } catch (error) {
             console.error('Error adding to pantry:', error);
             toast.error('Failed to add item');
@@ -187,30 +192,72 @@ export default function PantryPage() {
                                     />
                                 </div>
 
-                                <div className="flex-1 md:flex-none">
-                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Weight</Label>
-                                    <Input
-                                        type="number"
-                                        value={quickAddWeight}
-                                        onChange={(e) => setQuickAddWeight(e.target.value)}
-                                        placeholder="e.g. 100"
-                                        className="w-20 text-center"
-                                    />
-                                </div>
+                                {selectedPortion ? (
+                                    <div className="flex-1 md:flex-none">
+                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Serving</Label>
+                                        <select
+                                            value={selectedPortion.label}
+                                            onChange={(e) => {
+                                                const portion = selectedFood.portions?.find((p: any) => p.label === e.target.value);
+                                                if (portion) {
+                                                    setSelectedPortion(portion);
+                                                } else {
+                                                    setSelectedPortion(null);
+                                                }
+                                            }}
+                                            className="w-auto px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                        >
+                                            {selectedFood.portions?.map((p: any) => (
+                                                <option key={p.label} value={p.label}>
+                                                    {p.label} ({p.weight_g}g)
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="flex-1 md:flex-none">
+                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Weight</Label>
+                                            <Input
+                                                type="number"
+                                                value={quickAddWeight}
+                                                onChange={(e) => setQuickAddWeight(e.target.value)}
+                                                placeholder="e.g. 100"
+                                                className="w-20 text-center"
+                                            />
+                                        </div>
 
-                                <div className="flex-1 md:flex-none">
-                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Unit</Label>
-                                    <select
-                                        value={quickAddUnit}
-                                        onChange={(e) => setQuickAddUnit(e.target.value)}
-                                        className="w-20 px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                        <div className="flex-1 md:flex-none">
+                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Unit</Label>
+                                            <select
+                                                value={quickAddUnit}
+                                                onChange={(e) => setQuickAddUnit(e.target.value)}
+                                                className="w-20 px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                            >
+                                                <option value="g">g</option>
+                                                <option value="ml">ml</option>
+                                                <option value="oz">oz</option>
+                                                <option value="lb">lb</option>
+                                            </select>
+                                        </div>
+                                    </>
+                                )}
+                                {selectedFood.portions && selectedFood.portions.length > 0 && (
+                                    <button
+                                        onClick={() => {
+                                            if (selectedPortion) {
+                                                setSelectedPortion(null);
+                                                setQuickAddWeight(`${selectedPortion.weight_g}`);
+                                                setQuickAddUnit('g');
+                                            } else {
+                                                setSelectedPortion(selectedFood.portions[0]);
+                                            }
+                                        }}
+                                        className="text-[9px] font-black uppercase tracking-widest text-slate-500 hover:text-amber-500 transition-colors whitespace-nowrap self-end mb-0.5"
                                     >
-                                        <option value="g">g</option>
-                                        <option value="ml">ml</option>
-                                        <option value="oz">oz</option>
-                                        <option value="lb">lb</option>
-                                    </select>
-                                </div>
+                                        {selectedPortion ? 'Use Weight' : 'Use Serving'}
+                                    </button>
+                                )}
 
                                 <div className="flex-1 md:flex-none">
                                     <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Destination</Label>
