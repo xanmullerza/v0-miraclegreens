@@ -631,7 +631,7 @@ export function CompareView({ showStats = false, stats }: CompareViewProps) {
                             {relatedMeals.map((meal) => (
                                 <a
                                     key={meal.id}
-                                    href={`/dashboard/ingredients/meals/${meal.id}`}
+                                    href={`/dashboard/recipes/meals/${meal.id}`}
                                     className="group relative flex flex-col items-center text-center gap-3 p-4 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-indigo-500/30 transition-all duration-500 shadow-xl shadow-slate-200/50 dark:shadow-none hover:-translate-y-1"
                                 >
                                     <div className="w-full aspect-square rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 group-hover:scale-105 transition-transform duration-700">

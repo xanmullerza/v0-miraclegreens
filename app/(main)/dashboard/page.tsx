@@ -57,7 +57,7 @@ export default function DashboardOverview() {
         {
             id: 'ingredients',
             title: 'Ingredients',
-            desc: 'Explore our vast library of nutritious foods, essential nutrients, and custom blends. Access professional tools to research ingredients and discover healthy meals tailored to your needs.',
+            desc: 'Explore our vast library of nutritious foods, manage your pantry inventory, and create shopping lists. Access professional tools to research ingredients and organize your kitchen efficiently.',
             href: '/dashboard/ingredients',
             icon: Library,
             color: 'text-blue-400',
@@ -69,14 +69,14 @@ export default function DashboardOverview() {
             gradient: 'from-blue-500 to-indigo-600',
             items: [
                 { title: 'Foods', icon: Leaf, href: '/dashboard/ingredients/foods', desc: 'nutritious edibles' },
-                { title: 'Mixes', icon: Beaker, href: '/dashboard/ingredients/mixes', desc: 'custom blends' },
-                { title: 'Meals', icon: ChefHat, href: '/dashboard/ingredients/meals', desc: 'healthy eating' },
+                { title: 'Pantry', icon: Package, href: '/dashboard/ingredients/pantry', desc: 'In-stock essentials' },
+                { title: 'Groceries', icon: ShoppingCart, href: '/dashboard/ingredients/groceries', desc: 'shopping list' },
             ]
         },
         {
             id: 'recipes',
             title: 'Recipes',
-            desc: 'Take full control of your recipes with our inventory management and meal planning tools. Sync your pantry, create custom meal plans, and generate automated shopping lists based on your goals.',
+            desc: 'Plan your meals with AI-powered recommendations and custom ingredient mixes. Create ingredient blends, build comprehensive recipes, and organize your cooking workflow.',
             href: '/dashboard/recipes',
             icon: ChefHat,
             color: 'text-emerald-400',
@@ -88,8 +88,8 @@ export default function DashboardOverview() {
             gradient: 'from-emerald-500 to-teal-600',
             items: [
                 { title: 'Mealomatic', icon: Calendar, href: '/dashboard/recipes/meal-o-matic', desc: 'meal planner' },
-                { title: 'Pantry', icon: Package, href: '/dashboard/recipes/pantry', desc: 'In-stock essentials' },
-                { title: 'Groceries', icon: ShoppingCart, href: '/dashboard/recipes/groceries', desc: 'shopping list' },
+                { title: 'Mixes', icon: Beaker, href: '/dashboard/recipes/mixes', desc: 'custom blends' },
+                { title: 'Meals', icon: ChefHat, href: '/dashboard/recipes/meals', desc: 'healthy eating' },
             ]
         },
         {

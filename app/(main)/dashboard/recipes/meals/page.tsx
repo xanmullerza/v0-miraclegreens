@@ -100,7 +100,7 @@ function MealsContent() {
                     isLoading={isSearching}
                     isActive={isSearchActive}
                     setIsActive={setIsSearchActive}
-                    onSelect={(item) => router.push(`/dashboard/ingredients/meals/${item.id}`)}
+                    onSelect={(item) => router.push(`/dashboard/recipes/meals/${item.id}`)}
                     renderResult={renderResult}
                     theme="amber"
                     placeholder="SEARCH MEALS..."

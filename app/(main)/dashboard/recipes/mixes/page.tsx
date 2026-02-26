@@ -100,7 +100,7 @@ function MixesContent() {
                     isLoading={isSearching}
                     isActive={isSearchActive}
                     setIsActive={setIsSearchActive}
-                    onSelect={(item) => router.push(`/dashboard/ingredients/mixes/${item.id}`)}
+                    onSelect={(item) => router.push(`/dashboard/recipes/mixes/${item.id}`)}
                     renderResult={renderResult}
                     theme="emerald"
                     placeholder="SEARCH MIXES..."
