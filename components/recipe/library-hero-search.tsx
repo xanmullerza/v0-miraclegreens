@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useMemo } from 'react';
 import { Search, X, Activity, Leaf, ArrowRight, Library } from 'lucide-react';

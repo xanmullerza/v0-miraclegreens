@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Lightbulb, ShieldCheck, Sparkles, Leaf } from 'lucide-react';
 import { cn } from '@/lib/utils';
 

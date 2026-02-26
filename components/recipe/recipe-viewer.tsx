@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from 'react';
 import { fetchRecipeWithNutrition, scaleNutrition, CalculatedNutrition } from '@/lib/utils/nutrition-calculator';

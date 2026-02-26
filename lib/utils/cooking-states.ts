@@ -1,4 +1,4 @@
-
+﻿
 /**
  * Cooking State Transformations
  * Logic for scaling nutrients and adjusting measures based on the state of the ingredient.

@@ -1,4 +1,4 @@
-import { supabase } from '../supabase';
+﻿import { supabase } from '../supabase';
 import { Recipe, DietType } from '../data/recipes';
 import { scaleIngredient } from './recipe-scaling';
 

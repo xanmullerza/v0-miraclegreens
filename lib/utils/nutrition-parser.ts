@@ -1,4 +1,4 @@
-
+﻿
 /**
  * Utility to parse nutritional data from various text formats.
  * Primarily designed for copy-pasted data from common nutrition databases.

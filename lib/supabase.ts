@@ -1,4 +1,4 @@
-import { createBrowserClient } from '@supabase/ssr';
+﻿import { createBrowserClient } from '@supabase/ssr';
 
 // Create a client that uses cookies for auth sharing with server
 export const supabase = createBrowserClient(

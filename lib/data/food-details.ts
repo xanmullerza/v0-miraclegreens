@@ -1,4 +1,4 @@
-export interface FoodDetail {
+﻿export interface FoodDetail {
     description: string;
     history: string;
     producers: string;

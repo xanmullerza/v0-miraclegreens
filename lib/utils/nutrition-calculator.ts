@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+﻿import { supabase } from '@/lib/supabase';
 import { COOKING_STATES, CookingState } from './cooking-states';
 import { findSpiceFactor, SpiceState } from './spice-conversion';
 

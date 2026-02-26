@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Spice Conversion Utility
  * Handles the transformation of nutritional data and portion weights 
  * when converting spices between whole (seeds/pods) and ground (powder) forms.

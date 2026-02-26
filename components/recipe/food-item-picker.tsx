@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Search, X, Database, Loader2, Sparkles } from 'lucide-react';
 import { searchUSDAFood, getUSDAFoodDetails, syncToLocal, FoodItemMatch } from '@/lib/services/nutrition';

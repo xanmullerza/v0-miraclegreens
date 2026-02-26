@@ -1,4 +1,4 @@
-export interface SurvivalProfile {
+﻿export interface SurvivalProfile {
     energy_floor: number;
     water_floor: number;
     b1_floor: number;

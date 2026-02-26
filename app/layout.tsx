@@ -1,4 +1,4 @@
-import type React from 'react';
+﻿import type React from 'react';
 import { DM_Sans, Playfair_Display } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css';

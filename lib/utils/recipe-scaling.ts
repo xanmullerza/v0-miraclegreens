@@ -1,4 +1,4 @@
-
+﻿
 /**
  * Utility to scale ingredient amount strings.
  * scales "1 cup" -> "2 cup", "1/2 tbsp" -> "1 tbsp", etc.

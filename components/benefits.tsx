@@ -1,4 +1,4 @@
-import { TrendingDown, Award, Users, Scaling } from 'lucide-react';
+﻿import { TrendingDown, Award, Users, Scaling } from 'lucide-react';
 
 const benefits = [
   {

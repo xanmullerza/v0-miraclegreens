@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { CompareView } from '../../ingredients/foods/views/compare-view';

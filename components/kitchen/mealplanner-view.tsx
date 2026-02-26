@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 // This component re-exports the meal planner content for use in the Recipes tabs.
 // The actual meal planner logic is maintained in app/dashboard/recipes/meal-o-matic/page.tsx

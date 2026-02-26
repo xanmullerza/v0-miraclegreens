@@ -1,4 +1,4 @@
-export interface NutrientInfo {
+﻿export interface NutrientInfo {
     description: string;
     history: string;
     importance: string;

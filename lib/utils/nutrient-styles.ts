@@ -1,4 +1,4 @@
-export const getNutrientLevelStyles = (percentage: number, label?: string) => {
+﻿export const getNutrientLevelStyles = (percentage: number, label?: string) => {
     const l = label?.toLowerCase() || '';
     const isLimit = l.includes('sugar');
     const isStrictCurve = l.includes('sodium') || l.includes('vitamin d');

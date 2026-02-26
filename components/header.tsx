@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Menu, LayoutDashboard, User, LogOut, Leaf } from 'lucide-react';
