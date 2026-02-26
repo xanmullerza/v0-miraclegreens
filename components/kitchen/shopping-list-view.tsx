@@ -303,21 +303,21 @@ export function ShoppingListView() {
                 // Normalize incoming quantity to a standard gram-weight string so
                 // parseTotalGrams in handleMarkEaten can always deduct correctly.
                 const rawQty = item.quantity || '1';
+                // Helper: format grams as kg when >= 1000g
+                const fmtG = (g: number) => {
+                    if (g >= 1000) {
+                        const kg = g / 1000;
+                        const kgStr = kg % 1 === 0 ? kg.toString() : kg.toFixed(1);
+                        return `${kgStr} kilogram (1000g)`;
+                    }
+                    return `1 x ${Math.round(g)}g`;
+                };
                 const normalizeToGrams = (s: string): string => {
                     const t = s.trim();
                     // Already labeled, e.g. "1 kilogram (1000g)"
                     if (/\(\d+(?:\.\d+)?g\)$/.test(t)) return t;
                     // "1 x 100g"
                     if (/^\d+(?:\.\d+)?\s*x\s*\d+(?:\.\d+)?\s*g$/i.test(t)) return t;
-                    // Helper: format grams as kg when >= 1000g
-                    const fmtG = (g: number) => {
-                        if (g >= 1000) {
-                            const kg = g / 1000;
-                            const kgStr = kg % 1 === 0 ? kg.toString() : kg.toFixed(1);
-                            return `${kgStr} kilogram (1000g)`;
-                        }
-                        return `1 x ${Math.round(g)}g`;
-                    };
                     // "500g"
                     const plainG = t.match(/^(\d+(?:\.\d+)?)\s*g$/i);
                     if (plainG) return fmtG(parseFloat(plainG[1]));
@@ -338,11 +338,50 @@ export function ShoppingListView() {
                 };
                 const incoming = normalizeToGrams(rawQty);
 
-                const currentStripped = current
+                // Merge with existing quantity, consolidating pure-weight entries
+                const existingEntries = current
                     .split(/\s*\+\s*/)
-                    .filter(s => { const m = s.trim().match(/^(\d+(?:\.\d+)?)/); return m ? parseFloat(m[1]) > 0 : !!s.trim(); })
-                    .join(' + ');
-                quantities[item.food_item_id] = currentStripped ? `${currentStripped} + ${incoming}` : incoming;
+                    .map(s => s.trim())
+                    .filter(s => {
+                        if (!s) return false;
+                        const m = s.match(/^(\d+(?:\.\d+)?)/);
+                        return m ? parseFloat(m[1]) > 0 : true;
+                    });
+
+                // Parse an entry to check if it's a pure gram/kg weight
+                const parseEntry = (s: string) => {
+                    const labeled = s.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+                    if (labeled) return { qty: parseFloat(labeled[1]), label: labeled[2], wg: parseFloat(labeled[3]) };
+                    const xFmt = s.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*g$/i);
+                    if (xFmt) return { qty: parseFloat(xFmt[1]), label: null, wg: parseFloat(xFmt[2]) };
+                    return null;
+                };
+                const isWeightOnly = (p: ReturnType<typeof parseEntry>) =>
+                    p != null && (p.label === null || /^(gram|kilogram)s?$/i.test(p.label));
+                const totalG = (p: NonNullable<ReturnType<typeof parseEntry>>) => p.qty * p.wg;
+
+                const incomingParsed = parseEntry(incoming);
+                if (incomingParsed && isWeightOnly(incomingParsed)) {
+                    // Consolidate all weight entries
+                    let grams = totalG(incomingParsed);
+                    const nonWeight: string[] = [];
+                    for (const raw of existingEntries) {
+                        const p = parseEntry(raw);
+                        if (p && isWeightOnly(p)) {
+                            grams += totalG(p);
+                        } else {
+                            nonWeight.push(raw);
+                        }
+                    }
+                    const consolidated = fmtG(grams);
+                    quantities[item.food_item_id] = nonWeight.length > 0
+                        ? `${nonWeight.join(' + ')} + ${consolidated}`
+                        : consolidated;
+                } else {
+                    // Non-weight entry — append as before
+                    const currentStripped = existingEntries.join(' + ');
+                    quantities[item.food_item_id] = currentStripped ? `${currentStripped} + ${incoming}` : incoming;
+                }
                 localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
                 // Ensure the food item is marked as in-pantry in DB (best effort)
                 await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', item.food_item_id);

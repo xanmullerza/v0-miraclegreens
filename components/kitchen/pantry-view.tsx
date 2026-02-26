@@ -254,6 +254,26 @@ export function PantryView({
         return qty;
     };
 
+    // Detect entries that are pure weight measures (gram, kilogram, or "1 x Ng") — these are fungible
+    const isWeightOnlyEntry = (entry: QuantityEntry): boolean => {
+        if (!entry.label) return entry.weight_g != null && (entry.unit === 'g' || entry.unit === null);
+        return /^(gram|kilogram)s?$/i.test(entry.label);
+    };
+
+    const entryTotalGrams = (entry: QuantityEntry): number => {
+        return entry.qty * (entry.weight_g ?? 0);
+    };
+
+    // Format a gram total into the standard labeled format (kg when >= 1000g)
+    const formatGramsEntry = (grams: number): string => {
+        if (grams >= 1000) {
+            const kg = grams / 1000;
+            const kgStr = kg % 1 === 0 ? kg.toString() : kg.toFixed(1);
+            return `${kgStr} kilogram (1000g)`;
+        }
+        return `${Math.round(grams)} gram (1g)`;
+    };
+
     const mergeQuantityStrings = (existing: string | undefined, incoming: string): string => {
         if (!existing) return incoming;
         // Drop zero-quantity entries before merging (e.g. '0' left after items are consumed)
@@ -265,7 +285,26 @@ export function PantryView({
         // If all existing entries were zeros, just return incoming
         if (existingEntries.length === 0) return incoming;
         const b = parseQuantityEntry(incoming);
-        // Find a matching existing entry to sum into
+
+        // If incoming is a pure weight entry, consolidate with ALL existing weight entries
+        if (isWeightOnlyEntry(b)) {
+            let totalGrams = entryTotalGrams(b);
+            const nonWeightEntries: string[] = [];
+            for (const raw of existingEntries) {
+                const parsed = parseQuantityEntry(raw);
+                if (isWeightOnlyEntry(parsed)) {
+                    totalGrams += entryTotalGrams(parsed);
+                } else {
+                    nonWeightEntries.push(raw);
+                }
+            }
+            const consolidated = formatGramsEntry(totalGrams);
+            return nonWeightEntries.length > 0
+                ? `${nonWeightEntries.join(' + ')} + ${consolidated}`
+                : consolidated;
+        }
+
+        // For non-weight entries (e.g. "5 Large (223g)"), match by label + weight_g as before
         const matchIndex = existingEntries.findIndex(e => {
             const a = parseQuantityEntry(e);
             return a.label === b.label && a.weight_g === b.weight_g && a.unit === b.unit;
@@ -706,10 +745,24 @@ export function PantryView({
                                                             </span>
                                                         </div>
                                                         {(() => {
-                                                            const entries = parseQuantityEntries(food.quantity);
-                                                            if (entries.length === 0) return <span className="text-xs text-slate-400">In Stock</span>;
-                                                            if (entries.length === 1) return <span className="text-xs text-slate-500 dark:text-slate-400">{entries[0]}</span>;
-                                                            return <span className="text-xs text-slate-500 dark:text-slate-400">{entries.length} stock entries</span>;
+                                                            const rawEntries = parseQuantityEntries(food.quantity);
+                                                            if (rawEntries.length === 0) return <span className="text-xs text-slate-400">In Stock</span>;
+                                                            // Consolidate pure-weight entries for display
+                                                            let weightGramsTotal = 0;
+                                                            const nonWeightStrs: string[] = [];
+                                                            for (const raw of rawEntries) {
+                                                                const parsed = parseQuantityEntry(raw);
+                                                                if (parsed.qty > 0 && isWeightOnlyEntry(parsed)) {
+                                                                    weightGramsTotal += entryTotalGrams(parsed);
+                                                                } else if (parsed.qty > 0) {
+                                                                    nonWeightStrs.push(raw);
+                                                                }
+                                                            }
+                                                            const consolidated: string[] = [...nonWeightStrs];
+                                                            if (weightGramsTotal > 0) consolidated.push(formatGramsEntry(weightGramsTotal));
+                                                            if (consolidated.length === 0) return <span className="text-xs text-slate-400">In Stock</span>;
+                                                            if (consolidated.length === 1) return <span className="text-xs text-slate-500 dark:text-slate-400">{consolidated[0]}</span>;
+                                                            return <span className="text-xs text-slate-500 dark:text-slate-400">{consolidated.length} stock entries</span>;
                                                         })()}
                                                     </div>
                                                     {parseQuantityEntries(food.quantity).length > 0 && (
@@ -746,7 +799,21 @@ export function PantryView({
 
                                                 {/* Quantity breakdown accordion */}
                                                 {expandedQuantityId === food.id && (() => {
-                                                    const entries = parseQuantityEntries(food.quantity).map(e => parseQuantityEntry(e)).filter(e => e.qty > 0);
+                                                    const rawEntries = parseQuantityEntries(food.quantity).map(e => parseQuantityEntry(e)).filter(e => e.qty > 0);
+                                                    // Consolidate pure-weight entries (gram, kilogram, "1 x Ng") into one line
+                                                    let weightGramsTotal = 0;
+                                                    const nonWeightEntries: QuantityEntry[] = [];
+                                                    for (const e of rawEntries) {
+                                                        if (isWeightOnlyEntry(e)) {
+                                                            weightGramsTotal += entryTotalGrams(e);
+                                                        } else {
+                                                            nonWeightEntries.push(e);
+                                                        }
+                                                    }
+                                                    const entries = [...nonWeightEntries];
+                                                    if (weightGramsTotal > 0) {
+                                                        entries.push(parseQuantityEntry(formatGramsEntry(weightGramsTotal)));
+                                                    }
                                                     const foodName = formatFoodName(food.common_name || food.name);
                                                     return (
                                                         <div className="mt-1 mb-0.5 px-4 py-3 rounded-xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/20 animate-in slide-in-from-top-2 duration-200">
