@@ -276,6 +276,39 @@ export function PantryView({
         }
     };
 
+    const clearPantry = async () => {
+        if (!confirm('Remove all items from your pantry?')) return;
+        try {
+            const foodItemIds = foods.filter(f => f.source_table === 'food_items').map(f => f.id);
+            const pantryItemIds = foods.filter(f => f.source_table === 'pantry_items').map(f => f.id);
+
+            if (foodItemIds.length > 0) {
+                const { error } = await supabase.from('food_items').update({ is_in_pantry: false } as any).in('id', foodItemIds);
+                if (error) throw error;
+            }
+            if (pantryItemIds.length > 0) {
+                const { error } = await supabase.from('pantry_items').delete().in('id', pantryItemIds);
+                if (error) throw error;
+            }
+
+            // Clear localStorage quantities
+            try {
+                const saved = localStorage.getItem('pantry_quantities');
+                if (saved) {
+                    const quantities: Record<string, string> = JSON.parse(saved);
+                    foods.forEach(f => delete quantities[f.id]);
+                    localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+                }
+            } catch (e) { /* ignore */ }
+
+            setFoods([]);
+            toast.success('Pantry cleared');
+        } catch (error) {
+            console.error('Error clearing pantry:', error);
+            toast.error('Failed to clear pantry');
+        }
+    };
+
     const updatePantryQuantity = async (item: FoodItem, newQty: string, newWeight: string, newUnit: string) => {
         const quantityString = newWeight ? `${newQty} x ${newWeight}${newUnit}` : newQty;
 
@@ -444,6 +477,19 @@ export function PantryView({
                 </div>
             ) : (
                 <div className="space-y-4">
+                    {/* Toolbar */}
+                    <div className="flex items-center justify-between">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            {filteredFoods.length} item{filteredFoods.length !== 1 ? 's' : ''}
+                        </p>
+                        <button
+                            onClick={clearPantry}
+                            className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 transition-colors flex items-center gap-1.5"
+                        >
+                            <Trash2 size={12} />
+                            Clear All
+                        </button>
+                    </div>
                     {/* Food Items Grouped by Category */}
                     <div className="space-y-3">
                         {groupNames.map((groupName) => {
@@ -499,7 +545,7 @@ export function PantryView({
                                                 </button>
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); removeFromPantry(food.id, food.name, food.source_table); }}
-                                                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-500 transition-all"
+                                                    className="p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-300 dark:text-slate-600 hover:text-rose-500 transition-all"
                                                     title="Remove from pantry"
                                                 >
                                                     <X size={14} />
