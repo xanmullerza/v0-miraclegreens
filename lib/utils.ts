@@ -16,6 +16,9 @@ export function formatFoodName(name: string): string {
   ];
   let result = name;
   for (const word of cookingWords) {
+    // Handle "(Cooked)", "( cooked )", "(cooked, roasted)" style — strip the whole parenthetical
+    result = result.replace(new RegExp(`,?\\s*\\(\\s*${word}\\s*\\)`, 'gi'), ' 🔥');
+    // Handle plain ", cooked" or " cooked" style
     result = result.replace(new RegExp(`,?\\s*\\b${word}\\b`, 'gi'), ' 🔥');
   }
   // Collapse multiple fire emojis into one

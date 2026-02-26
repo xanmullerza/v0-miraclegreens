@@ -695,7 +695,7 @@ export function PantryView({
                                                 {/* Quantity breakdown accordion */}
                                                 {expandedQuantityId === food.id && (() => {
                                                     const entries = parseQuantityEntries(food.quantity).map(e => parseQuantityEntry(e));
-                                                    const foodName = food.common_name || food.name;
+                                                    const foodName = formatFoodName(food.common_name || food.name);
                                                     return (
                                                         <div className="mt-1 mb-0.5 px-4 py-3 rounded-xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/20 animate-in slide-in-from-top-2 duration-200">
                                                             <p className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-3">Stock Breakdown</p>
