@@ -39,7 +39,7 @@ export default function PantryPage() {
             try {
                 const { data, error } = await supabase
                     .from('food_items')
-                    .select('id, name, common_name, image, energy_kcal, portions')
+                    .select('id, name, common_name, image, energy_kcal')
                     .or(`name.ilike.%${searchQuery}%,common_name.ilike.%${searchQuery}%`)
                     .limit(20);
 
