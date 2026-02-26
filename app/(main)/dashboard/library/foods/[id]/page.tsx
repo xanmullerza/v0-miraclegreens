@@ -111,6 +111,11 @@ export default function FoodDetailsPage() {
     const [user, setUser] = useState<any>(null);
     const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [showQuickAdd, setShowQuickAdd] = useState(false);
+    const [quickAddQty, setQuickAddQty] = useState('1');
+    const [quickAddWeight, setQuickAddWeight] = useState('');
+    const [quickAddUnit, setQuickAddUnit] = useState('g');
+    const [quickAddMode, setQuickAddMode] = useState<'pantry' | 'shopping'>('pantry');
 
     const { nutrientDisplayMode, profile, energyUnit, dailyTargets } = useUserPreferences();
 
@@ -296,6 +301,48 @@ export default function FoodDetailsPage() {
             console.error('Delete error:', error);
             toast.error(error.message || 'Failed to delete food item');
         }
+    };
+
+    const handleQuickAdd = async () => {
+        if (!food) return;
+
+        const quantityString = quickAddWeight ? `${quickAddQty} x ${quickAddWeight}${quickAddUnit}` : quickAddQty;
+
+        if (quickAddMode === 'pantry') {
+            try {
+                // Update UI
+                setFood(prev => prev ? { ...prev, is_in_pantry: true, quantity: quantityString } : null);
+
+                // Persist to localStorage
+                const saved = localStorage.getItem('pantry_quantities');
+                const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
+                quantities[food.id] = quantityString;
+                localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+
+                // Update DB
+                const { error } = await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', food.id);
+                if (error) throw error;
+
+                toast.success(`Added to pantry with ${quantityString}`);
+            } catch (error) {
+                toast.error('Failed to update pantry');
+            }
+        } else {
+            const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
+            const newItem = {
+                id: `manual-${Date.now()}`,
+                name: food.name,
+                quantity: quantityString,
+                unit: '',
+                checked: false,
+                source: 'manual'
+            };
+            localStorage.setItem('vitala_shopping_manual_items', JSON.stringify([...currentList, newItem]));
+            toast.success(`Added to groceries`);
+        }
+        setShowQuickAdd(false);
+        setQuickAddQty('1');
+        setQuickAddWeight('');
     };
 
     const handleEditStart = () => {
@@ -698,6 +745,24 @@ export default function FoodDetailsPage() {
                                 <Button
                                     variant="ghost"
                                     size="icon"
+                                    className={cn("h-8 w-8 rounded-xl transition-all", showQuickAdd ? "text-emerald-500 bg-emerald-50 dark:bg-emerald-900/10" : "text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10")}
+                                    onClick={() => {
+                                        if (showQuickAdd) {
+                                            setShowQuickAdd(false);
+                                        } else {
+                                            setShowQuickAdd(true);
+                                            setQuickAddQty('1');
+                                            setQuickAddWeight('');
+                                        }
+                                    }}
+                                    title="Add to Pantry or Groceries"
+                                >
+                                    <Plus size={16} />
+                                </Button>
+
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
                                     className={cn("h-8 w-8 rounded-xl transition-all", food.is_favorite ? "text-rose-500" : "text-slate-400 hover:text-rose-500")}
                                     onClick={toggleFavorite}
                                     title="Favorite"
@@ -746,6 +811,79 @@ export default function FoodDetailsPage() {
                     </div>
                 </div>
 
+                {/* Quick Add Panel */}
+                {showQuickAdd && (
+                    <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-6 animate-in slide-in-from-top duration-300 rounded-2xl">
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div className="flex items-center gap-4 flex-1">
+                                <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center">
+                                    <ShoppingBasket size={24} className="text-emerald-500" />
+                                </div>
+                                <div className="flex-1">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Quick Action</p>
+                                    <p className="text-sm font-black text-slate-900 dark:text-white">{food?.name}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-4 w-full md:w-auto">
+                                <div className="flex-1 md:flex-none">
+                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Quantity</Label>
+                                    <Input
+                                        type="number"
+                                        value={quickAddQty}
+                                        onChange={(e) => setQuickAddQty(e.target.value)}
+                                        className="w-20 text-center"
+                                    />
+                                </div>
+
+                                <div className="flex-1 md:flex-none">
+                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Weight</Label>
+                                    <Input
+                                        type="number"
+                                        value={quickAddWeight}
+                                        onChange={(e) => setQuickAddWeight(e.target.value)}
+                                        placeholder="e.g. 100"
+                                        className="w-20 text-center"
+                                    />
+                                </div>
+
+                                <div className="flex-1 md:flex-none">
+                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Unit</Label>
+                                    <select
+                                        value={quickAddUnit}
+                                        onChange={(e) => setQuickAddUnit(e.target.value)}
+                                        className="w-20 px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                    >
+                                        <option value="g">g</option>
+                                        <option value="ml">ml</option>
+                                        <option value="oz">oz</option>
+                                        <option value="lb">lb</option>
+                                    </select>
+                                </div>
+
+                                <div className="flex-1 md:flex-none">
+                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Destination</Label>
+                                    <select
+                                        value={quickAddMode}
+                                        onChange={(e) => setQuickAddMode(e.target.value as 'pantry' | 'shopping')}
+                                        className="w-auto px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                    >
+                                        <option value="pantry">Pantry</option>
+                                        <option value="shopping">Groceries</option>
+                                    </select>
+                                </div>
+
+                                <Button
+                                    onClick={handleQuickAdd}
+                                    className="gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest text-[9px] h-10"
+                                >
+                                    <Plus size={16} />
+                                    Add
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div className="flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-700">
                     <div className="flex items-center bg-white dark:bg-slate-900 px-2 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm group/amount transition-all hover:border-emerald-500/50 shrink-0">
