@@ -409,29 +409,29 @@ export function MealPlannerContent({
         return hasWeight ? total : null;
     };
 
+    // Format a gram value as a readable weight string: kg when >= 1000g, g otherwise
+    // Uses labeled portion format: "{qty} kilogram (1000g)" where (1000g) is the per-unit weight
+    const formatWeightStr = (grams: number): string => {
+        if (grams >= 1000) {
+            const kg = grams / 1000;
+            const kgStr = kg % 1 === 0 ? kg.toString() : kg.toFixed(1);
+            return `${kgStr} kilogram (1000g)`;
+        }
+        return `1 x ${Math.round(grams)}g`;
+    };
+
     const handleMarkEaten = async (recipe: Recipe, mealType: string) => {
         const servings = recipe.servings || 1;
         const ingredients = recipe.ingredients || [];
 
-        console.log('[EATEN DEBUG] Recipe:', recipe.title, '| Servings:', servings);
-        console.log('[EATEN DEBUG] Ingredients:', JSON.stringify(ingredients.map(i => ({
-            item: i.item, weightG: i.weightG, food_item_id: i.food_item_id, baseIngredient: i.baseIngredient, amount: i.amount
-        })), null, 2));
-        console.log('[EATEN DEBUG] Pantry items count:', pantryItems.length);
-        console.log('[EATEN DEBUG] Pantry items:', JSON.stringify(pantryItems.map(p => ({
-            id: p.id, name: p.name, common_name: p.common_name
-        })).slice(0, 20)));
-
         const saved = localStorage.getItem('pantry_quantities');
         const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-        console.log('[EATEN DEBUG] localStorage pantry_quantities:', JSON.stringify(quantities));
 
         let subtracted = 0;
 
         for (const ing of ingredients) {
             const weightToSubtract = (ing.weightG ?? 0) * servings;
-            console.log(`[EATEN DEBUG] Ingredient "${ing.item}" weightG=${ing.weightG} × servings=${servings} = ${weightToSubtract}g`);
-            if (!weightToSubtract) { console.log('[EATEN DEBUG]   → SKIP: no weight'); continue; }
+            if (!weightToSubtract) continue;
 
             // Find matching pantry item by food_item_id or name
             const matchItem = pantryItems.find(p =>
@@ -439,23 +439,29 @@ export function MealPlannerContent({
                 (ing.baseIngredient && (p.common_name || p.name)?.toLowerCase().trim() === ing.baseIngredient.toLowerCase().trim()) ||
                 (ing.item && (p.common_name || p.name)?.toLowerCase().trim() === ing.item.toLowerCase().trim())
             );
-            if (!matchItem) { console.log(`[EATEN DEBUG]   → SKIP: no pantry match for "${ing.item}" / "${ing.baseIngredient}" / food_item_id=${ing.food_item_id}`); continue; }
-            console.log(`[EATEN DEBUG]   → MATCH: pantry item "${matchItem.common_name || matchItem.name}" (id=${matchItem.id})`);
+            if (!matchItem) continue;
 
             const currentQtyStr = quantities[matchItem.id] || matchItem.quantity || '';
             const totalG = parseTotalGrams(currentQtyStr);
-            console.log(`[EATEN DEBUG]   → qty string="${currentQtyStr}" parsedTotalG=${totalG}`);
-            if (totalG === null) { console.log('[EATEN DEBUG]   → SKIP: could not parse weight'); continue; }
+            if (totalG === null) continue;
 
             const remaining = Math.max(0, totalG - weightToSubtract);
-            quantities[matchItem.id] = remaining > 0 ? `1 x ${remaining}g` : '0';
-            console.log(`[EATEN DEBUG]   → ${totalG}g - ${weightToSubtract}g = ${remaining}g → stored as "${quantities[matchItem.id]}"`);
+            if (remaining > 0) {
+                if (remaining >= 1000) {
+                    const kg = remaining / 1000;
+                    const kgStr = kg % 1 === 0 ? kg.toString() : kg.toFixed(1);
+                    quantities[matchItem.id] = `${kgStr} kilogram (1000g)`;
+                } else {
+                    quantities[matchItem.id] = `1 x ${Math.round(remaining)}g`;
+                }
+            } else {
+                quantities[matchItem.id] = '0';
+            }
             subtracted++;
         }
 
         localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
         setEatenMeals(prev => new Set([...prev, mealType]));
-        console.log('[EATEN DEBUG] Total subtracted:', subtracted);
 
         if (subtracted > 0) {
             toast.success(`Marked as eaten — ${subtracted} pantry item${subtracted !== 1 ? 's' : ''} updated`);

@@ -309,21 +309,30 @@ export function ShoppingListView() {
                     if (/\(\d+(?:\.\d+)?g\)$/.test(t)) return t;
                     // "1 x 100g"
                     if (/^\d+(?:\.\d+)?\s*x\s*\d+(?:\.\d+)?\s*g$/i.test(t)) return t;
+                    // Helper: format grams as kg when >= 1000g
+                    const fmtG = (g: number) => {
+                        if (g >= 1000) {
+                            const kg = g / 1000;
+                            const kgStr = kg % 1 === 0 ? kg.toString() : kg.toFixed(1);
+                            return `${kgStr} kilogram (1000g)`;
+                        }
+                        return `1 x ${Math.round(g)}g`;
+                    };
                     // "500g"
                     const plainG = t.match(/^(\d+(?:\.\d+)?)\s*g$/i);
-                    if (plainG) return `1 x ${plainG[1]}g`;
+                    if (plainG) return fmtG(parseFloat(plainG[1]));
                     // "10 kg" / "10kg" / "10 kilogram(s)"
                     const kg = t.match(/^(\d+(?:\.\d+)?)\s*(?:kg|kilo(?:gram)?s?)$/i);
-                    if (kg) return `1 x ${parseFloat(kg[1]) * 1000}g`;
+                    if (kg) return fmtG(parseFloat(kg[1]) * 1000);
                     // "10 ml"
                     const ml = t.match(/^(\d+(?:\.\d+)?)\s*ml$/i);
-                    if (ml) return `1 x ${ml[1]}g`;
+                    if (ml) return fmtG(parseFloat(ml[1]));
                     // "10 lb"
                     const lb = t.match(/^(\d+(?:\.\d+)?)\s*(?:lb|lbs|pounds?)$/i);
-                    if (lb) return `1 x ${Math.round(parseFloat(lb[1]) * 453.592)}g`;
+                    if (lb) return fmtG(Math.round(parseFloat(lb[1]) * 453.592));
                     // "10 oz"
                     const oz = t.match(/^(\d+(?:\.\d+)?)\s*(?:oz|ounces?)$/i);
-                    if (oz) return `1 x ${Math.round(parseFloat(oz[1]) * 28.3495)}g`;
+                    if (oz) return fmtG(Math.round(parseFloat(oz[1]) * 28.3495));
                     // Unknown — return as-is
                     return t;
                 };
