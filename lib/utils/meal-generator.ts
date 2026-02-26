@@ -156,6 +156,7 @@ export const getRandomRecipeByType = async (
                         amount: i.amount,
                         isMiracleProduct: i.is_miracle_product,
                         baseIngredient: i.base_ingredient,
+                        food_item_id: i.food_item_id,
                         weightG: i.weight_g,
                         measureLabel: i.measure_label
                     })),
@@ -232,6 +233,7 @@ export const generateDailyPlan = async (settings: PlanSettings): Promise<DailyPl
                 amount: i.amount,
                 isMiracleProduct: i.is_miracle_product,
                 baseIngredient: i.base_ingredient,
+                food_item_id: i.food_item_id,
                 weightG: i.weight_g,
                 measureLabel: i.measure_label
             })),
