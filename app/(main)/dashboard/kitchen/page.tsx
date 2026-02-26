@@ -34,6 +34,8 @@ export default function KitchenPage() {
 
     const heroCards = [
         { id: "mealomatic", title: "Mealomatic", desc: "Plan your weekly meals", href: "/dashboard/kitchen/meal-o-matic", icon: Calendar, color: "text-amber-400", bg: "bg-amber-500/10", borderHover: "hover:border-amber-500/40", gradient: "from-amber-500 to-orange-600" },
+        { id: "mixes", title: "Mixes", desc: "Ingredient blends & bases", href: "/dashboard/kitchen/mixes", icon: Beaker, color: "text-indigo-400", bg: "bg-indigo-500/10", borderHover: "hover:border-indigo-500/40", gradient: "from-indigo-500 to-blue-600" },
+        { id: "meals", title: "Meals", desc: "Meals with full nutrition", href: "/dashboard/kitchen/meals", icon: ChefHat, color: "text-amber-400", bg: "bg-amber-500/10", borderHover: "hover:border-amber-500/40", gradient: "from-amber-500 to-orange-600" },
     ];
 
     return (
