@@ -410,14 +410,25 @@ export function MealPlannerContent({
         const servings = recipe.servings || 1;
         const ingredients = recipe.ingredients || [];
 
+        console.log('[EATEN DEBUG] Recipe:', recipe.title, '| Servings:', servings);
+        console.log('[EATEN DEBUG] Ingredients:', JSON.stringify(ingredients.map(i => ({
+            item: i.item, weightG: i.weightG, food_item_id: i.food_item_id, baseIngredient: i.baseIngredient, amount: i.amount
+        })), null, 2));
+        console.log('[EATEN DEBUG] Pantry items count:', pantryItems.length);
+        console.log('[EATEN DEBUG] Pantry items:', JSON.stringify(pantryItems.map(p => ({
+            id: p.id, name: p.name, common_name: p.common_name
+        })).slice(0, 20)));
+
         const saved = localStorage.getItem('pantry_quantities');
         const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
+        console.log('[EATEN DEBUG] localStorage pantry_quantities:', JSON.stringify(quantities));
 
         let subtracted = 0;
 
         for (const ing of ingredients) {
             const weightToSubtract = (ing.weightG ?? 0) * servings;
-            if (!weightToSubtract) continue;
+            console.log(`[EATEN DEBUG] Ingredient "${ing.item}" weightG=${ing.weightG} × servings=${servings} = ${weightToSubtract}g`);
+            if (!weightToSubtract) { console.log('[EATEN DEBUG]   → SKIP: no weight'); continue; }
 
             // Find matching pantry item by food_item_id or name
             const matchItem = pantryItems.find(p =>
@@ -425,19 +436,23 @@ export function MealPlannerContent({
                 (ing.baseIngredient && (p.common_name || p.name)?.toLowerCase().trim() === ing.baseIngredient.toLowerCase().trim()) ||
                 (ing.item && (p.common_name || p.name)?.toLowerCase().trim() === ing.item.toLowerCase().trim())
             );
-            if (!matchItem) continue;
+            if (!matchItem) { console.log(`[EATEN DEBUG]   → SKIP: no pantry match for "${ing.item}" / "${ing.baseIngredient}" / food_item_id=${ing.food_item_id}`); continue; }
+            console.log(`[EATEN DEBUG]   → MATCH: pantry item "${matchItem.common_name || matchItem.name}" (id=${matchItem.id})`);
 
             const currentQtyStr = quantities[matchItem.id] || matchItem.quantity || '';
             const totalG = parseTotalGrams(currentQtyStr);
-            if (totalG === null) continue; // no weight info, skip
+            console.log(`[EATEN DEBUG]   → qty string="${currentQtyStr}" parsedTotalG=${totalG}`);
+            if (totalG === null) { console.log('[EATEN DEBUG]   → SKIP: could not parse weight'); continue; }
 
             const remaining = Math.max(0, totalG - weightToSubtract);
             quantities[matchItem.id] = remaining > 0 ? `1 x ${remaining}g` : '0';
+            console.log(`[EATEN DEBUG]   → ${totalG}g - ${weightToSubtract}g = ${remaining}g → stored as "${quantities[matchItem.id]}"`);
             subtracted++;
         }
 
         localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
         setEatenMeals(prev => new Set([...prev, mealType]));
+        console.log('[EATEN DEBUG] Total subtracted:', subtracted);
 
         if (subtracted > 0) {
             toast.success(`Marked as eaten — ${subtracted} pantry item${subtracted !== 1 ? 's' : ''} updated`);
