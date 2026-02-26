@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { fetchFoodMeasures } from '@/lib/utils/nutrition-calculator';
 import {
     Heart,
     ArrowLeft,
@@ -172,6 +173,38 @@ export default function FoodDetailsPage() {
             fetchFoodDetails();
         }
     }, [id]);
+
+    // Fetch measures when food loads
+    useEffect(() => {
+        const loadMeasures = async () => {
+            if (!food?.id) return;
+
+            try {
+                const measures = await fetchFoodMeasures(food.id);
+                setFood(prev => prev ? { ...prev, portions: measures } : null);
+            } catch (error) {
+                console.error('Error fetching measures:', error);
+            }
+        };
+
+        loadMeasures();
+    }, [food?.id]);
+
+    // Fetch measures when food loads
+    useEffect(() => {
+        const loadMeasures = async () => {
+            if (!food?.id) return;
+
+            try {
+                const measures = await fetchFoodMeasures(food.id);
+                setFood(prev => prev ? { ...prev, portions: measures } : null);
+            } catch (error) {
+                console.error('Error fetching measures:', error);
+            }
+        };
+
+        loadMeasures();
+    }, [food?.id]);
 
     const fetchFoodDetails = async () => {
         setLoading(true);
@@ -836,30 +869,90 @@ export default function FoodDetailsPage() {
                                     />
                                 </div>
 
-                                <div className="flex-1 md:flex-none">
-                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Weight</Label>
-                                    <Input
-                                        type="number"
-                                        value={quickAddWeight}
-                                        onChange={(e) => setQuickAddWeight(e.target.value)}
-                                        placeholder="e.g. 100"
-                                        className="w-20 text-center"
-                                    />
-                                </div>
+                                {food?.portions && food.portions.length > 0 && !selectedPortion ? (
+                                    <div className="flex-1 md:flex-none">
+                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Serving</Label>
+                                        <select
+                                            onChange={(e) => {
+                                                const portion = food.portions?.find((p: any) => p.label === e.target.value);
+                                                if (portion) {
+                                                    setSelectedPortion(portion);
+                                                }
+                                            }}
+                                            className="w-auto px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                        >
+                                            <option value="">Select a serving...</option>
+                                            {food.portions?.map((p: any) => (
+                                                <option key={p.label} value={p.label}>
+                                                    {p.label} ({p.weight_g}g)
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                ) : selectedPortion ? (
+                                    <div className="flex-1 md:flex-none">
+                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Serving</Label>
+                                        <select
+                                            value={selectedPortion.label}
+                                            onChange={(e) => {
+                                                const portion = food?.portions?.find((p: any) => p.label === e.target.value);
+                                                if (portion) {
+                                                    setSelectedPortion(portion);
+                                                }
+                                            }}
+                                            className="w-auto px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                        >
+                                            {food?.portions?.map((p: any) => (
+                                                <option key={p.label} value={p.label}>
+                                                    {p.label} ({p.weight_g}g)
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="flex-1 md:flex-none">
+                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Weight</Label>
+                                            <Input
+                                                type="number"
+                                                value={quickAddWeight}
+                                                onChange={(e) => setQuickAddWeight(e.target.value)}
+                                                placeholder="e.g. 100"
+                                                className="w-20 text-center"
+                                            />
+                                        </div>
 
-                                <div className="flex-1 md:flex-none">
-                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Unit</Label>
-                                    <select
-                                        value={quickAddUnit}
-                                        onChange={(e) => setQuickAddUnit(e.target.value)}
-                                        className="w-20 px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                        <div className="flex-1 md:flex-none">
+                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Unit</Label>
+                                            <select
+                                                value={quickAddUnit}
+                                                onChange={(e) => setQuickAddUnit(e.target.value)}
+                                                className="w-20 px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                            >
+                                                <option value="g">g</option>
+                                                <option value="ml">ml</option>
+                                                <option value="oz">oz</option>
+                                                <option value="lb">lb</option>
+                                            </select>
+                                        </div>
+                                    </>
+                                )}
+                                {food?.portions && food.portions.length > 0 && (
+                                    <button
+                                        onClick={() => {
+                                            if (selectedPortion) {
+                                                setSelectedPortion(null);
+                                                setQuickAddWeight(`${selectedPortion.weight_g}`);
+                                                setQuickAddUnit('g');
+                                            } else {
+                                                setSelectedPortion(food?.portions?.[0] || null);
+                                            }
+                                        }}
+                                        className="text-[9px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-500 transition-colors whitespace-nowrap self-end mb-0.5"
                                     >
-                                        <option value="g">g</option>
-                                        <option value="ml">ml</option>
-                                        <option value="oz">oz</option>
-                                        <option value="lb">lb</option>
-                                    </select>
-                                </div>
+                                        {selectedPortion ? 'Use Weight' : 'Use Serving'}
+                                    </button>
+                                )}
 
                                 <div className="flex-1 md:flex-none">
                                     <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Destination</Label>

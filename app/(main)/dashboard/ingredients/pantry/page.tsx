@@ -209,7 +209,27 @@ export default function PantryPage() {
                                     />
                                 </div>
 
-                                {selectedPortion ? (
+                                {selectedFood.portions && selectedFood.portions.length > 0 && !selectedPortion ? (
+                                    <div className="flex-1 md:flex-none">
+                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Serving</Label>
+                                        <select
+                                            onChange={(e) => {
+                                                const portion = selectedFood.portions?.find((p: any) => p.label === e.target.value);
+                                                if (portion) {
+                                                    setSelectedPortion(portion);
+                                                }
+                                            }}
+                                            className="w-auto px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                        >
+                                            <option value="">Select a serving...</option>
+                                            {selectedFood.portions?.map((p: any) => (
+                                                <option key={p.label} value={p.label}>
+                                                    {p.label} ({p.weight_g}g)
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                ) : selectedPortion ? (
                                     <div className="flex-1 md:flex-none">
                                         <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Serving</Label>
                                         <select
@@ -218,8 +238,6 @@ export default function PantryPage() {
                                                 const portion = selectedFood.portions?.find((p: any) => p.label === e.target.value);
                                                 if (portion) {
                                                     setSelectedPortion(portion);
-                                                } else {
-                                                    setSelectedPortion(null);
                                                 }
                                             }}
                                             className="w-auto px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
