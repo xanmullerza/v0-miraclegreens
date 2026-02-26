@@ -168,6 +168,24 @@ export function PantryView({
         setQuickAddMode('pantry');
     };
 
+    const mergeQuantityStrings = (existing: string | undefined, incoming: string): string => {
+        if (!existing) return incoming;
+        // Parse "N x descriptor" or plain "N"
+        const parse = (s: string) => {
+            const match = s.trim().match(/^(\d+(?:\.\d+)?)\s*(?:x\s*(.+))?$/i);
+            if (!match) return null;
+            return { qty: parseFloat(match[1]), descriptor: match[2]?.trim() ?? null };
+        };
+        const a = parse(existing);
+        const b = parse(incoming);
+        if (a && b && a.descriptor === b.descriptor) {
+            const total = a.qty + b.qty;
+            return a.descriptor ? `${total} x ${a.descriptor}` : `${total}`;
+        }
+        // Descriptors differ — append
+        return `${existing} + ${incoming}`;
+    };
+
     const handleBuyMoreAdd = async () => {
         if (!buyMoreItem) return;
         setBuyMoreAdding(true);
@@ -181,9 +199,11 @@ export function PantryView({
                 }
                 const saved = localStorage.getItem('pantry_quantities');
                 const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-                quantities[buyMoreItem.id] = quantityString;
+                const currentQty = quantities[buyMoreItem.id] || buyMoreItem.quantity;
+                const merged = mergeQuantityStrings(currentQty, quantityString);
+                quantities[buyMoreItem.id] = merged;
                 localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-                setFoods(prev => prev.map(f => f.id === buyMoreItem.id ? { ...f, quantity: quantityString } : f));
+                setFoods(prev => prev.map(f => f.id === buyMoreItem.id ? { ...f, quantity: merged } : f));
                 toast.success(`Updated quantity for ${buyMoreItem.common_name || buyMoreItem.name}`);
             } else {
                 const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
