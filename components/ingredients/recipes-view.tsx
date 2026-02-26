@@ -230,7 +230,7 @@ export function RecipesView({
 
     const handleEdit = (e: React.MouseEvent, recipeId: string) => {
         e.stopPropagation();
-        router.push(`/dashboard/library/meals/new?edit=${recipeId}`);
+        router.push(`/dashboard/ingredients/meals/new?edit=${recipeId}`);
     };
 
     return (
@@ -254,7 +254,7 @@ export function RecipesView({
                                         {heroResults.map(recipe => (
                                             <button
                                                 key={recipe.id}
-                                                onClick={() => router.push(`/dashboard/library/meals/${recipe.id}`)}
+                                                onClick={() => router.push(`/dashboard/ingredients/meals/${recipe.id}`)}
                                                 className="w-full p-4 rounded-2xl hover:bg-blue-50 dark:hover:bg-blue-900/10 flex items-center justify-between group transition-all border border-slate-100 dark:border-slate-800 hover:border-blue-500/30 text-left"
                                             >
                                                 <div className="flex items-center gap-4 min-w-0">
@@ -443,7 +443,7 @@ export function RecipesView({
                     </div>
 
                     <Button
-                        onClick={() => router.push(`/dashboard/library/meals/new${isMix ? '?is_mix=true' : ''}`)}
+                        onClick={() => router.push(`/dashboard/ingredients/meals/new${isMix ? '?is_mix=true' : ''}`)}
                         className={cn(
                             "px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 shadow-lg h-auto",
                             isMix
@@ -479,7 +479,7 @@ export function RecipesView({
                         {recipes.map((recipe) => (
                             <div
                                 key={recipe.id}
-                                onClick={() => router.push(`/dashboard/library/meals/${recipe.id}`)}
+                                onClick={() => router.push(`/dashboard/ingredients/meals/${recipe.id}`)}
                                 className={cn(
                                     "group relative bg-transparent rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-800 transition-all duration-500 cursor-pointer overflow-hidden",
                                     isMix ? "hover:border-indigo-500/30 hover:shadow-lg" : "hover:border-blue-500/30 hover:shadow-lg"

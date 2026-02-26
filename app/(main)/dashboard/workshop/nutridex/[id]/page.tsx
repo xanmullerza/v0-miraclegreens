@@ -535,7 +535,7 @@ export default function NutrientDetailsPage() {
                                                 return (
                                                     <button
                                                         key={food.id}
-                                                        onClick={() => router.push(`/dashboard/library/foods/${food.id}`)}
+                                                        onClick={() => router.push(`/dashboard/ingredients/foods/${food.id}`)}
                                                         className="relative flex flex-col gap-3 p-4 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/5 transition-all group text-left"
                                                     >
                                                         <div className="w-full h-24 rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform duration-500">

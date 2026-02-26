@@ -77,7 +77,7 @@ export default function AdminOverview() {
         {
             name: 'View Nutrients',
             desc: 'Deep-dive into biological markers.',
-            href: '/dashboard/library/nutrients',
+            href: '/dashboard/ingredients/nutrients',
             icon: Zap,
             color: 'text-amber-500',
             bg: 'bg-amber-500/10'

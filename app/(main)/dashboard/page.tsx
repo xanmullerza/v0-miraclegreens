@@ -55,10 +55,10 @@ export default function DashboardOverview() {
 
     const heroCards = [
         {
-            id: 'library',
-            title: 'Library',
+            id: 'ingredients',
+            title: 'Ingredients',
             desc: 'Explore our vast library of nutritious foods, essential nutrients, and custom blends. Access professional tools to research ingredients and discover healthy meals tailored to your needs.',
-            href: '/dashboard/library',
+            href: '/dashboard/ingredients',
             icon: Library,
             color: 'text-blue-400',
             bg: 'bg-blue-500/10',
@@ -68,9 +68,9 @@ export default function DashboardOverview() {
             itemBorderHover: 'hover:border-blue-500/50',
             gradient: 'from-blue-500 to-indigo-600',
             items: [
-                { title: 'Foods', icon: Leaf, href: '/dashboard/library/foods', desc: 'nutritious edibles' },
-                { title: 'Mixes', icon: Beaker, href: '/dashboard/library/mixes', desc: 'custom blends' },
-                { title: 'Meals', icon: ChefHat, href: '/dashboard/library/meals', desc: 'healthy eating' },
+                { title: 'Foods', icon: Leaf, href: '/dashboard/ingredients/foods', desc: 'nutritious edibles' },
+                { title: 'Mixes', icon: Beaker, href: '/dashboard/ingredients/mixes', desc: 'custom blends' },
+                { title: 'Meals', icon: ChefHat, href: '/dashboard/ingredients/meals', desc: 'healthy eating' },
             ]
         },
         {

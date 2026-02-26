@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { LabView } from '@/app/(main)/dashboard/library/foods/views/lab-view';
+import { LabView } from '@/app/(main)/dashboard/ingredients/foods/views/lab-view';
 
 interface MixItem {
     id: string;
@@ -197,7 +197,7 @@ export function MixLabView() {
                     {filteredMixes.map((mix) => (
                         <div
                             key={mix.id}
-                            onClick={() => router.push(`/dashboard/library/meals/${mix.id}`)}
+                            onClick={() => router.push(`/dashboard/ingredients/meals/${mix.id}`)}
                             className="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-purple-500/30 hover:shadow-xl transition-all cursor-pointer overflow-hidden"
                         >
                             <div className="aspect-video bg-gradient-to-br from-purple-100 to-fuchsia-100 dark:from-purple-900/30 dark:to-fuchsia-900/30 flex items-center justify-center">

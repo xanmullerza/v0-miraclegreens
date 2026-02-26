@@ -410,7 +410,7 @@ export function ExploreView({
                                         {heroResults.map(food => (
                                             <button
                                                 key={food.id}
-                                                onClick={() => router.push(`/dashboard/library/foods/${food.id}`)}
+                                                onClick={() => router.push(`/dashboard/ingredients/foods/${food.id}`)}
                                                 className="w-full p-4 rounded-2xl hover:bg-emerald-50 dark:hover:bg-emerald-900/10 flex items-center justify-between group transition-all border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 text-left"
                                             >
                                                 <div className="flex items-center gap-4 min-w-0">
@@ -598,7 +598,7 @@ export function ExploreView({
                     </div>
 
                     <Button
-                        onClick={() => router.push('/dashboard/library/foods/new')}
+                        onClick={() => router.push('/dashboard/ingredients/foods/new')}
                         className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20 hover:bg-emerald-700 h-auto"
                     >
                         <Plus size={12} />
@@ -621,7 +621,7 @@ export function ExploreView({
                                 {items.map((food) => (
                                     <div
                                         key={food.id}
-                                        onClick={() => router.push(`/dashboard/library/foods/${food.id}`)}
+                                        onClick={() => router.push(`/dashboard/ingredients/foods/${food.id}`)}
                                         className="group relative bg-transparent rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden cursor-pointer"
                                     >
                                         <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px_150px] gap-3 lg:gap-4 lg:items-center lg:px-6 py-1 w-full">

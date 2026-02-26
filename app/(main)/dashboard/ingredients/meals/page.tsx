@@ -4,7 +4,7 @@ import React, { useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, ChefHat, ChevronRight } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
-import { RecipesView } from '@/components/library/recipes-view';
+import { RecipesView } from '@/components/ingredients/recipes-view';
 import { HeroSearch } from '@/components/ui/hero-search';
 import { supabase } from '@/lib/supabase';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
@@ -18,20 +18,20 @@ function formatEnergy(calories: number, unit: 'kcal' | 'kJ') {
     return `${Math.round(calories).toLocaleString()} kC`;
 }
 
-export default function MixesPage() {
+export default function MealsPage() {
     return (
         <Suspense fallback={
             <div className="h-96 flex flex-col items-center justify-center gap-4">
-                <Loader2 className="animate-spin text-indigo-500" size={48} />
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Loading Mixes...</p>
+                <Loader2 className="animate-spin text-emerald-500" size={48} />
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Loading Meals...</p>
             </div>
         }>
-            <MixesContent />
+            <MealsContent />
         </Suspense>
     );
 }
 
-function MixesContent() {
+function MealsContent() {
     const router = useRouter();
     const { energyUnit } = useUserPreferences();
     const [searchQuery, setSearchQuery] = useState('');
@@ -57,7 +57,7 @@ function MixesContent() {
                     {formatEnergy(item.calories, energyUnit)} <span className="text-slate-200 dark:text-slate-700">|</span> {item.type}
                 </p>
             </div>
-            <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={20} />
+            <ChevronRight className="text-slate-200 group-hover:text-amber-500 transition-colors shrink-0" size={20} />
         </div>
     );
 
@@ -71,7 +71,7 @@ function MixesContent() {
             const { data, error } = await supabase
                 .from('recipes')
                 .select('*')
-                .eq('is_mix', true)
+                .eq('is_mix', false)
                 .ilike('title', `%${query}%`)
                 .limit(8);
             if (error) throw error;
@@ -100,20 +100,20 @@ function MixesContent() {
                     isLoading={isSearching}
                     isActive={isSearchActive}
                     setIsActive={setIsSearchActive}
-                    onSelect={(item) => router.push(`/dashboard/library/mixes/${item.id}`)}
+                    onSelect={(item) => router.push(`/dashboard/ingredients/meals/${item.id}`)}
                     renderResult={renderResult}
-                    theme="emerald"
-                    placeholder="SEARCH MIXES..."
-                    idleTitle="Ready to Browse?"
-                    idleSubtitle="Search for custom ingredient blends"
-                    noResultsMessage="No matching mixes found"
-                    enterMessage="Enter mix name to search"
-                    searchingMessage="Searching Mixes..."
+                    theme="amber"
+                    placeholder="SEARCH MEALS..."
+                    idleTitle="Ready to Discover?"
+                    idleSubtitle="Search for nutritious meal ideas"
+                    noResultsMessage="No matching meals found"
+                    enterMessage="Enter meal name to search"
+                    searchingMessage="Searching Meals..."
                 />
 
                 {/* Dynamic Content Area */}
                 <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
-                    <RecipesView showHero={false} isMix={true} />
+                    <RecipesView showHero={false} />
                 </div>
             </div>
         </PageContainer>

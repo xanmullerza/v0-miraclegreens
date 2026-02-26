@@ -376,7 +376,7 @@ Fat: ${food.fat_g || 0}g
 
             // Navigate back to foods list
             setTimeout(() => {
-                router.push('/dashboard/library/foods');
+                router.push('/dashboard/ingredients/foods');
             }, 1500);
 
         } catch (err: any) {

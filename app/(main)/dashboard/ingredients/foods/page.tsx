@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Loader2, Leaf, ChevronRight } from 'lucide-react';
 import { ExploreView } from './views/explore-view';
 import { ShoppingView } from './views/shopping-view';
-import { StaplesView } from '@/components/library/staples-view';
+import { StaplesView } from '@/components/ingredients/staples-view';
 import { CompareView } from './views/compare-view';
 import { NutrientsView } from './views/nutrients-view';
 import { PageContainer } from '@/components/ui/page-container';
@@ -110,7 +110,7 @@ function IngredientsContent() {
                         isLoading={isSearching}
                         isActive={isSearchActive}
                         setIsActive={setIsSearchActive}
-                        onSelect={(item) => router.push(`/dashboard/library/foods/${item.id}`)}
+                        onSelect={(item) => router.push(`/dashboard/ingredients/foods/${item.id}`)}
                         renderResult={renderResult}
                         theme="emerald"
                         placeholder="SEARCH FOOD LIBRARY..."

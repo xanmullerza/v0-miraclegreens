@@ -41,7 +41,7 @@ import {
 } from 'lucide-react';
 import { useSearch } from '@/lib/context/search-context';
 import { useHeaderActions } from '@/lib/context/header-actions-context';
-import { CATEGORIES } from '@/components/library/foods-view';
+import { CATEGORIES } from '@/components/ingredients/foods-view';
 import { FOOD_DETAILS } from '@/lib/data/food-details';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -775,7 +775,7 @@ export default function FoodDetailsPage() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        onClick={() => router.push(`/dashboard/library/foods/new?edit=${food.id}`)}
+                                        onClick={() => router.push(`/dashboard/ingredients/foods/new?edit=${food.id}`)}
                                         className="h-8 w-8 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                         title="Edit Food"
                                     >
