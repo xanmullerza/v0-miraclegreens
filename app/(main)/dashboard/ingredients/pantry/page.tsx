@@ -6,6 +6,7 @@ import { Beef, ChevronRight, Plus, X } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
 import { supabase } from '@/lib/supabase';
+import { fetchFoodMeasures } from '@/lib/utils/nutrition-calculator';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -60,6 +61,22 @@ export default function PantryPage() {
         const debounce = setTimeout(searchFoods, 300);
         return () => clearTimeout(debounce);
     }, [searchQuery]);
+
+    // Fetch measures when food is selected
+    useEffect(() => {
+        const loadMeasures = async () => {
+            if (!selectedFood?.id) return;
+
+            try {
+                const measures = await fetchFoodMeasures(selectedFood.id);
+                setSelectedFood((prev: any) => prev ? { ...prev, portions: measures } : null);
+            } catch (error) {
+                console.error('Error fetching measures:', error);
+            }
+        };
+
+        loadMeasures();
+    }, [selectedFood?.id]);
 
     const handleSelectFood = (food: any) => {
         setSelectedFood(food);
