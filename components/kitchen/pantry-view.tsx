@@ -155,6 +155,14 @@ export function PantryView({
         raw: string;
     }
 
+    const pluralize = (name: string, qty: number): string => {
+        if (qty <= 1) return name;
+        if (/[^aeiou]y$/i.test(name)) return name.slice(0, -1) + 'ies';
+        if (/(s|sh|ch|x|z)$/i.test(name)) return name + 'es';
+        if (/fe?$/i.test(name)) return name.replace(/fe?$/, 'ves');
+        return name + 's';
+    };
+
     const parseQuantityEntry = (s: string): QuantityEntry => {
         // Format: "5 Large (223g)"
         const labeled = s.trim().match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
@@ -687,6 +695,7 @@ export function PantryView({
                                                 {/* Quantity breakdown accordion */}
                                                 {expandedQuantityId === food.id && (() => {
                                                     const entries = parseQuantityEntries(food.quantity).map(e => parseQuantityEntry(e));
+                                                    const foodName = food.common_name || food.name;
                                                     return (
                                                         <div className="mt-1 mb-0.5 px-4 py-3 rounded-xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/20 animate-in slide-in-from-top-2 duration-200">
                                                             <p className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-3">Stock Breakdown</p>
@@ -697,15 +706,17 @@ export function PantryView({
                                                                         <div key={i} className="flex items-center justify-between gap-4 py-1.5 border-b border-emerald-100 dark:border-emerald-900/40 last:border-0">
                                                                             <div className="flex items-center gap-2">
                                                                                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
-                                                                                <span className="text-sm font-black text-slate-800 dark:text-slate-200">
-                                                                                    {e.qty}
-                                                                                </span>
-                                                                                {e.label && (
-                                                                                    <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">{e.label}</span>
+                                                                                <span className="text-sm font-black text-slate-800 dark:text-slate-200">{e.qty}</span>
+                                                                                {e.label ? (
+                                                                                    <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">{e.label} {pluralize(foodName, e.qty)}</span>
+                                                                                ) : e.weight_g != null ? (
+                                                                                    <span className="text-sm font-semibold text-slate-400">× {e.weight_g}{e.unit} {pluralize(foodName, e.qty)}</span>
+                                                                                ) : (
+                                                                                    <span className="text-sm font-semibold text-slate-400">{pluralize(foodName, e.qty)}</span>
                                                                                 )}
                                                                             </div>
                                                                             <div className="flex items-center gap-3 text-right">
-                                                                                {e.weight_g != null && (
+                                                                                {e.label && e.weight_g != null && (
                                                                                     <span className="text-[10px] font-medium text-slate-400">{e.weight_g}{e.unit} each</span>
                                                                                 )}
                                                                                 {totalWeight != null && (
