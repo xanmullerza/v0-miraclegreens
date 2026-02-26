@@ -29,7 +29,9 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { fetchFoodMeasures } from '@/lib/utils/nutrition-calculator';
 import { cn } from '@/lib/utils';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { DailyPlan } from '@/lib/utils/meal-generator';
@@ -139,10 +141,70 @@ export function PantryView({
     const [buyMoreWeight, setBuyMoreWeight] = useState('');
     const [buyMoreUnit, setBuyMoreUnit] = useState('g');
     const [quickAddMode, setQuickAddMode] = useState<'pantry' | 'shopping'>('pantry');
+    const [buyMorePortions, setBuyMorePortions] = useState<{ label: string; weight_g: number }[]>([]);
+    const [buyMoreSelectedPortion, setBuyMoreSelectedPortion] = useState<{ label: string; weight_g: number } | null>(null);
+    const [buyMoreAdding, setBuyMoreAdding] = useState(false);
 
     useEffect(() => {
         fetchPantry();
     }, [refreshKey]);
+
+    // Fetch portions when a buyMoreItem is selected
+    useEffect(() => {
+        if (!buyMoreItem) { setBuyMorePortions([]); setBuyMoreSelectedPortion(null); return; }
+        const foodId = buyMoreItem.source_table === 'food_items' ? buyMoreItem.id : null;
+        if (!foodId) return;
+        fetchFoodMeasures(foodId)
+            .then(measures => setBuyMorePortions(measures || []))
+            .catch(() => setBuyMorePortions([]));
+    }, [buyMoreItem?.id]);
+
+    const openBuyMore = (food: FoodItem) => {
+        setBuyMoreItem(food);
+        setBuyMoreQty('1');
+        setBuyMoreWeight('');
+        setBuyMoreUnit('g');
+        setBuyMoreSelectedPortion(null);
+        setQuickAddMode('pantry');
+    };
+
+    const handleBuyMoreAdd = async () => {
+        if (!buyMoreItem) return;
+        setBuyMoreAdding(true);
+        try {
+            const finalWeight = buyMoreSelectedPortion ? buyMoreSelectedPortion.weight_g : buyMoreWeight;
+            const quantityString = finalWeight ? `${buyMoreQty} x ${finalWeight}${buyMoreSelectedPortion ? 'g' : buyMoreUnit}` : buyMoreQty;
+
+            if (quickAddMode === 'pantry') {
+                if (buyMoreItem.source_table === 'food_items') {
+                    await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', buyMoreItem.id);
+                }
+                const saved = localStorage.getItem('pantry_quantities');
+                const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
+                quantities[buyMoreItem.id] = quantityString;
+                localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+                setFoods(prev => prev.map(f => f.id === buyMoreItem.id ? { ...f, quantity: quantityString } : f));
+                toast.success(`Updated quantity for ${buyMoreItem.common_name || buyMoreItem.name}`);
+            } else {
+                const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
+                const newItem = {
+                    id: `manual-${Date.now()}`,
+                    name: buyMoreItem.common_name || buyMoreItem.name,
+                    quantity: quantityString,
+                    unit: '',
+                    checked: false,
+                    source: 'manual'
+                };
+                localStorage.setItem('vitala_shopping_manual_items', JSON.stringify([...currentList, newItem]));
+                toast.success(`Added to groceries`);
+            }
+            setBuyMoreItem(null);
+        } catch (e) {
+            toast.error('Failed to add item');
+        } finally {
+            setBuyMoreAdding(false);
+        }
+    };
 
     const toggleFavorite = async (item: FoodItem, e: React.MouseEvent) => {
         e.stopPropagation();
@@ -507,49 +569,169 @@ export function PantryView({
                                     </div>
                                     <div className="space-y-1.5">
                                         {items.map((food) => (
-                                            <div
-                                                key={food.id}
-                                                className="group flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-all cursor-pointer bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    // Could add selection state here for multi-select
-                                                }}
-                                            >
-                                                <div className="w-5 h-5 rounded-md border-2 border-emerald-500 bg-emerald-500 flex items-center justify-center shrink-0">
-                                                    <Check size={12} className="text-white" />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center gap-1.5">
-                                                        {food.is_favorite && (
-                                                            <Heart size={12} className="text-rose-500 fill-current shrink-0" />
-                                                        )}
-                                                        <span className="font-semibold text-sm text-slate-900 dark:text-white truncate">
-                                                            {food.common_name || food.name}
-                                                        </span>
+                                            <div key={food.id}>
+                                                <div
+                                                    className="group flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-all cursor-pointer bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                >
+                                                    <div className="w-5 h-5 rounded-md border-2 border-emerald-500 bg-emerald-500 flex items-center justify-center shrink-0">
+                                                        <Check size={12} className="text-white" />
                                                     </div>
-                                                    <span className="text-xs text-slate-500 dark:text-slate-400">{food.quantity || 'In Stock'}</span>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="flex items-center gap-1.5">
+                                                            {food.is_favorite && (
+                                                                <Heart size={12} className="text-rose-500 fill-current shrink-0" />
+                                                            )}
+                                                            <span className="font-semibold text-sm text-slate-900 dark:text-white truncate">
+                                                                {food.common_name || food.name}
+                                                            </span>
+                                                        </div>
+                                                        <span className="text-xs text-slate-500 dark:text-slate-400">{food.quantity || 'In Stock'}</span>
+                                                    </div>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); buyMoreItem?.id === food.id ? setBuyMoreItem(null) : openBuyMore(food); }}
+                                                        className={cn("p-1.5 rounded-lg transition-all", buyMoreItem?.id === food.id ? "bg-amber-100 dark:bg-amber-950/40 text-amber-500" : "text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500")}
+                                                        title="Update quantity / add to list"
+                                                    >
+                                                        <Plus size={14} />
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); toggleFavorite(food, e); }}
+                                                        className={cn("p-1.5 rounded-lg transition-all", food.is_favorite ? "text-rose-500" : "text-slate-300 dark:text-slate-600 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500")}
+                                                        title="Favourite"
+                                                    >
+                                                        <Heart size={14} fill={food.is_favorite ? "currentColor" : "none"} />
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); removeFromPantry(food.id, food.name, food.source_table); }}
+                                                        className="p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-300 dark:text-slate-600 hover:text-rose-500 transition-all"
+                                                        title="Remove from pantry"
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
                                                 </div>
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); setBuyMoreItem(food); }}
-                                                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-950/40 text-slate-400 hover:text-blue-500 transition-all"
-                                                    title="Add more to shopping list"
-                                                >
-                                                    <Plus size={14} />
-                                                </button>
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); toggleFavorite(food, e); }}
-                                                    className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-500 transition-all"
-                                                    title="Favorite"
-                                                >
-                                                    <Heart size={14} fill={food.is_favorite ? "currentColor" : "none"} />
-                                                </button>
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); removeFromPantry(food.id, food.name, food.source_table); }}
-                                                    className="p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-300 dark:text-slate-600 hover:text-rose-500 transition-all"
-                                                    title="Remove from pantry"
-                                                >
-                                                    <X size={14} />
-                                                </button>
+
+                                                {/* Inline quick-add panel */}
+                                                {buyMoreItem?.id === food.id && (
+                                                    <div className="mt-1 mb-0.5 p-4 rounded-xl border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-950/20 animate-in slide-in-from-top-2 duration-200">
+                                                        <div className="flex flex-wrap items-end gap-3">
+                                                            <div>
+                                                                <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Qty</Label>
+                                                                <Input
+                                                                    type="number"
+                                                                    value={buyMoreQty}
+                                                                    onChange={(e) => setBuyMoreQty(e.target.value)}
+                                                                    className="w-16 text-center h-9"
+                                                                />
+                                                            </div>
+
+                                                            {buyMorePortions.length > 0 && !buyMoreSelectedPortion ? (
+                                                                <div>
+                                                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Serving</Label>
+                                                                    <select
+                                                                        onChange={(e) => {
+                                                                            const p = buyMorePortions.find(p => p.label === e.target.value);
+                                                                            if (p) setBuyMoreSelectedPortion(p);
+                                                                        }}
+                                                                        className="px-2 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                                                    >
+                                                                        <option value="">Select serving...</option>
+                                                                        {buyMorePortions.map(p => (
+                                                                            <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
+                                                                        ))}
+                                                                    </select>
+                                                                </div>
+                                                            ) : buyMoreSelectedPortion ? (
+                                                                <div>
+                                                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Serving</Label>
+                                                                    <select
+                                                                        value={buyMoreSelectedPortion.label}
+                                                                        onChange={(e) => {
+                                                                            const p = buyMorePortions.find(p => p.label === e.target.value);
+                                                                            if (p) setBuyMoreSelectedPortion(p);
+                                                                        }}
+                                                                        className="px-2 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                                                    >
+                                                                        {buyMorePortions.map(p => (
+                                                                            <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
+                                                                        ))}
+                                                                    </select>
+                                                                </div>
+                                                            ) : (
+                                                                <>
+                                                                    <div>
+                                                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Weight</Label>
+                                                                        <Input
+                                                                            type="number"
+                                                                            value={buyMoreWeight}
+                                                                            onChange={(e) => setBuyMoreWeight(e.target.value)}
+                                                                            placeholder="e.g. 100"
+                                                                            className="w-20 text-center h-9"
+                                                                        />
+                                                                    </div>
+                                                                    <div>
+                                                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Unit</Label>
+                                                                        <select
+                                                                            value={buyMoreUnit}
+                                                                            onChange={(e) => setBuyMoreUnit(e.target.value)}
+                                                                            className="w-20 px-2 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                                                        >
+                                                                            <option value="g">g</option>
+                                                                            <option value="ml">ml</option>
+                                                                            <option value="oz">oz</option>
+                                                                            <option value="lb">lb</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </>
+                                                            )}
+
+                                                            {buyMorePortions.length > 0 && (
+                                                                <button
+                                                                    onClick={() => {
+                                                                        if (buyMoreSelectedPortion) {
+                                                                            setBuyMoreWeight(`${buyMoreSelectedPortion.weight_g}`);
+                                                                            setBuyMoreUnit('g');
+                                                                            setBuyMoreSelectedPortion(null);
+                                                                        } else {
+                                                                            setBuyMoreSelectedPortion(buyMorePortions[0]);
+                                                                        }
+                                                                    }}
+                                                                    className="text-[9px] font-black uppercase tracking-widest text-slate-500 hover:text-amber-500 transition-colors whitespace-nowrap pb-2"
+                                                                >
+                                                                    {buyMoreSelectedPortion ? 'Use Weight' : 'Use Serving'}
+                                                                </button>
+                                                            )}
+
+                                                            <div>
+                                                                <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Destination</Label>
+                                                                <select
+                                                                    value={quickAddMode}
+                                                                    onChange={(e) => setQuickAddMode(e.target.value as 'pantry' | 'shopping')}
+                                                                    className="px-3 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                                                >
+                                                                    <option value="pantry">Pantry</option>
+                                                                    <option value="shopping">Groceries</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <Button
+                                                                onClick={handleBuyMoreAdd}
+                                                                disabled={buyMoreAdding}
+                                                                className="h-9 gap-1.5 bg-amber-500 hover:bg-amber-600 text-white font-black uppercase tracking-widest text-[9px]"
+                                                            >
+                                                                <Plus size={14} />
+                                                                {buyMoreAdding ? 'Adding...' : 'Add'}
+                                                            </Button>
+
+                                                            <button
+                                                                onClick={() => setBuyMoreItem(null)}
+                                                                className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 transition-all pb-2"
+                                                            >
+                                                                <X size={14} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
