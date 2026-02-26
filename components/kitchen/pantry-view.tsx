@@ -147,6 +147,27 @@ export function PantryView({
     const [buyMoreAdding, setBuyMoreAdding] = useState(false);
     const [expandedQuantityId, setExpandedQuantityId] = useState<string | null>(null);
 
+    interface QuantityEntry {
+        qty: number;
+        label: string | null;
+        weight_g: number | null;
+        unit: string | null;
+        raw: string;
+    }
+
+    const parseQuantityEntry = (s: string): QuantityEntry => {
+        // Format: "5 Large (223g)"
+        const labeled = s.trim().match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+        if (labeled) return { qty: parseFloat(labeled[1]), label: labeled[2], weight_g: parseFloat(labeled[3]), unit: 'g', raw: s };
+        // Format: "1 x 100g"
+        const weighted = s.trim().match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(g|ml|oz|lb)$/i);
+        if (weighted) return { qty: parseFloat(weighted[1]), label: null, weight_g: parseFloat(weighted[2]), unit: weighted[3], raw: s };
+        // Plain qty
+        const plain = s.trim().match(/^(\d+(?:\.\d+)?)$/);
+        if (plain) return { qty: parseFloat(plain[1]), label: null, weight_g: null, unit: null, raw: s };
+        return { qty: 1, label: null, weight_g: null, unit: null, raw: s };
+    };
+
     const parseQuantityEntries = (quantity: string | undefined): string[] => {
         if (!quantity) return [];
         return quantity.split(/\s*\+\s*/).map(s => s.trim()).filter(Boolean);
@@ -175,21 +196,33 @@ export function PantryView({
         setQuickAddMode('pantry');
     };
 
+    const buildQuantityString = (qty: string, portion: { label: string; weight_g: number } | null, weight: string, unit: string): string => {
+        if (portion) return `${qty} ${portion.label} (${portion.weight_g}g)`;
+        if (weight) return `${qty} x ${weight}${unit}`;
+        return qty;
+    };
+
     const mergeQuantityStrings = (existing: string | undefined, incoming: string): string => {
         if (!existing) return incoming;
-        // Parse "N x descriptor" or plain "N"
-        const parse = (s: string) => {
-            const match = s.trim().match(/^(\d+(?:\.\d+)?)\s*(?:x\s*(.+))?$/i);
-            if (!match) return null;
-            return { qty: parseFloat(match[1]), descriptor: match[2]?.trim() ?? null };
-        };
-        const a = parse(existing);
-        const b = parse(incoming);
-        if (a && b && a.descriptor === b.descriptor) {
-            const total = a.qty + b.qty;
-            return a.descriptor ? `${total} x ${a.descriptor}` : `${total}`;
+        const existingEntries = existing.split(/\s*\+\s*/).map(s => s.trim()).filter(Boolean);
+        const b = parseQuantityEntry(incoming);
+        // Find a matching existing entry to sum into
+        const matchIndex = existingEntries.findIndex(e => {
+            const a = parseQuantityEntry(e);
+            return a.label === b.label && a.weight_g === b.weight_g && a.unit === b.unit;
+        });
+        if (matchIndex >= 0) {
+            const a = parseQuantityEntry(existingEntries[matchIndex]);
+            const sumQty = a.qty + b.qty;
+            if (b.label && b.weight_g) {
+                existingEntries[matchIndex] = `${sumQty} ${b.label} (${b.weight_g}g)`;
+            } else if (b.weight_g) {
+                existingEntries[matchIndex] = `${sumQty} x ${b.weight_g}${b.unit}`;
+            } else {
+                existingEntries[matchIndex] = `${sumQty}`;
+            }
+            return existingEntries.join(' + ');
         }
-        // Descriptors differ — append
         return `${existing} + ${incoming}`;
     };
 
@@ -197,8 +230,7 @@ export function PantryView({
         if (!buyMoreItem) return;
         setBuyMoreAdding(true);
         try {
-            const finalWeight = buyMoreSelectedPortion ? buyMoreSelectedPortion.weight_g : buyMoreWeight;
-            const quantityString = finalWeight ? `${buyMoreQty} x ${finalWeight}${buyMoreSelectedPortion ? 'g' : buyMoreUnit}` : buyMoreQty;
+            const quantityString = buildQuantityString(buyMoreQty, buyMoreSelectedPortion, buyMoreWeight, buyMoreUnit);
 
             if (quickAddMode === 'pantry') {
                 if (buyMoreItem.source_table === 'food_items') {
@@ -654,16 +686,39 @@ export function PantryView({
 
                                                 {/* Quantity breakdown accordion */}
                                                 {expandedQuantityId === food.id && (() => {
-                                                    const entries = parseQuantityEntries(food.quantity);
+                                                    const entries = parseQuantityEntries(food.quantity).map(e => parseQuantityEntry(e));
                                                     return (
-                                                        <div className="mt-1 mb-0.5 px-4 py-3 rounded-xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/20 animate-in slide-in-from-top-2 duration-200 space-y-1.5">
-                                                            <p className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-2">Stock Breakdown</p>
-                                                            {entries.map((entry, i) => (
-                                                                <div key={i} className="flex items-center gap-2">
-                                                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
-                                                                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">{entry}</span>
-                                                                </div>
-                                                            ))}
+                                                        <div className="mt-1 mb-0.5 px-4 py-3 rounded-xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/20 animate-in slide-in-from-top-2 duration-200">
+                                                            <p className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-3">Stock Breakdown</p>
+                                                            <div className="space-y-2">
+                                                                {entries.map((e, i) => {
+                                                                    const totalWeight = e.weight_g != null ? e.qty * e.weight_g : null;
+                                                                    return (
+                                                                        <div key={i} className="flex items-center justify-between gap-4 py-1.5 border-b border-emerald-100 dark:border-emerald-900/40 last:border-0">
+                                                                            <div className="flex items-center gap-2">
+                                                                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
+                                                                                <span className="text-sm font-black text-slate-800 dark:text-slate-200">
+                                                                                    {e.qty}
+                                                                                </span>
+                                                                                {e.label && (
+                                                                                    <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">{e.label}</span>
+                                                                                )}
+                                                                            </div>
+                                                                            <div className="flex items-center gap-3 text-right">
+                                                                                {e.weight_g != null && (
+                                                                                    <span className="text-[10px] font-medium text-slate-400">{e.weight_g}{e.unit} each</span>
+                                                                                )}
+                                                                                {totalWeight != null && (
+                                                                                    <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400">{totalWeight.toLocaleString()}{e.unit} total</span>
+                                                                                )}
+                                                                                {e.weight_g == null && (
+                                                                                    <span className="text-[10px] font-medium text-slate-400">no weight</span>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
                                                         </div>
                                                     );
                                                 })()}

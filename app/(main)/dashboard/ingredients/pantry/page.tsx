@@ -95,9 +95,11 @@ export default function PantryPage() {
 
         setIsAdding(true);
         try {
-            // If a portion is selected, use its weight; otherwise use the weight input
-            const finalWeight = selectedPortion ? selectedPortion.weight_g : quickAddWeight;
-            const quantityString = finalWeight ? `${quickAddQty} x ${finalWeight}${quickAddUnit}` : quickAddQty;
+            const quantityString = selectedPortion
+                ? `${quickAddQty} ${selectedPortion.label} (${selectedPortion.weight_g}g)`
+                : quickAddWeight
+                    ? `${quickAddQty} x ${quickAddWeight}${quickAddUnit}`
+                    : quickAddQty;
 
             if (quickAddMode === 'pantry') {
                 const { error } = await supabase
