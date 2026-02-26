@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Menu, LayoutDashboard, User, LogOut } from 'lucide-react';
+import { Menu, LayoutDashboard, User, LogOut, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { supabase } from '@/lib/supabase';
@@ -64,18 +64,9 @@ export function Header() {
 
 					{/* Logo */}
 					<Link href="/" className="flex items-center gap-2">
-					<div className="relative h-8 w-28 sm:h-10 sm:w-40">
-						<Image
-							src="/vitala-logo.png"
-							alt="Vitala Logo"
-							fill
-							className="object-contain brightness-0 invert"
-							priority
-						/>
-					</div>
+					<Leaf className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
+					<span className="hidden sm:inline font-semibold text-lg text-white">VITALA</span>
 				</Link>
-
-					{/* Right-side buttons */}
 					<div className="flex items-center gap-2">
 						{user ? (
 							<>
