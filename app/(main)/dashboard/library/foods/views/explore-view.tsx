@@ -684,66 +684,6 @@ export function ExploreView({
                                                 <span className="text-[8px] uppercase font-black text-slate-400">Protein</span>
                                                 <span className="font-black text-[11px] text-slate-900 dark:text-white">{food.protein_g.toFixed(1)}g</span>
                                             </div>
-
-                                            {/* Actions */}
-                                            <div className="shrink-0 flex items-center lg:justify-end gap-1 px-2 lg:px-0">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className={cn("h-8 w-8 rounded-xl transition-all", quickAddItem?.id === food.id ? "text-emerald-500 bg-emerald-50 dark:bg-emerald-900/10" : "text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10")}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        if (quickAddItem?.id === food.id) {
-                                                            setQuickAddItem(null);
-                                                        } else {
-                                                            setQuickAddItem(food);
-                                                            setQuickAddQty('1');
-                                                            setQuickAddWeight('');
-                                                        }
-                                                    }}
-                                                    title="Add to Pantry or Groceries"
-                                                >
-                                                    <Plus size={14} />
-                                                </Button>
-
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className={cn("h-8 w-8 rounded-xl transition-all bg-transparent", food.is_favorite ? "text-rose-500" : "text-slate-400 hover:text-rose-500")}
-                                                    onClick={(e) => toggleFavorite(food, e)}
-                                                    title="Favorite"
-                                                >
-                                                    <Heart size={14} fill={food.is_favorite ? "currentColor" : "none"} />
-                                                </Button>
-
-                                                {/* Admin Edit */}
-                                                {currentUserEmail?.toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase() && (
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            router.push(`/dashboard/library/foods/new?edit=${food.id}`);
-                                                        }}
-                                                        className="h-8 w-8 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                                                        title="Edit Food"
-                                                    >
-                                                        <Edit2 size={14} />
-                                                    </Button>
-                                                )}
-
-                                                {(food.id.startsWith('food-') || food.is_curated === false || isAdmin) && (
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={(e) => handleDelete(e, food)}
-                                                        className="h-8 w-8 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-colors"
-                                                        title="Delete Food"
-                                                    >
-                                                        <Trash2 size={14} />
-                                                    </Button>
-                                                )}
-                                            </div>
                                         </div>
 
 

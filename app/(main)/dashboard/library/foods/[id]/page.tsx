@@ -13,6 +13,8 @@ import {
     Battery,
     Activity,
     Edit2,
+    Plus,
+    Trash2,
     X,
     Loader2,
     Share2,
@@ -106,8 +108,9 @@ export default function FoodDetailsPage() {
     const [editServingText, setEditServingText] = useState('');
     const [uploading, setUploading] = useState(false);
     const [saveLoading, setSaveLoading] = useState(false);
-
-
+    const [user, setUser] = useState<any>(null);
+    const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const { nutrientDisplayMode, profile, energyUnit, dailyTargets } = useUserPreferences();
 
@@ -132,6 +135,32 @@ export default function FoodDetailsPage() {
         }
         return () => setCustomSegmentLabel(null);
     }, [food?.name, setCustomSegmentLabel]);
+
+    useEffect(() => {
+        // Get initial session
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            const u = session?.user ?? null;
+            setUser(u);
+            const email = u?.email ?? null;
+            setCurrentUserEmail(email);
+
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
+            setIsAdmin(email?.toLowerCase() === adminEmail.toLowerCase());
+        });
+
+        // Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            const u = session?.user ?? null;
+            setUser(u);
+            const email = u?.email ?? null;
+            setCurrentUserEmail(email);
+
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
+            setIsAdmin(email?.toLowerCase() === adminEmail.toLowerCase());
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
 
     useEffect(() => {
         if (id) {
@@ -241,6 +270,31 @@ export default function FoodDetailsPage() {
             toast.success(newStatus ? 'Added to favorites' : 'Removed from favorites');
         } catch (error: any) {
             toast.error('Failed to update favorite status');
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!food || !window.confirm(`Are you sure you want to delete "${food.name}"?`)) return;
+
+        try {
+            if (food.id.startsWith('food-')) {
+                // Local Deletion
+                const localData = localStorage.getItem('local_foods');
+                if (localData) {
+                    const localFoods = JSON.parse(localData).filter((f: any) => f.id !== food.id);
+                    localStorage.setItem('local_foods', JSON.stringify(localFoods));
+                }
+                toast.success('Food item removed locally');
+            } else {
+                // Cloud Deletion
+                const { error } = await supabase.from('food_items').delete().eq('id', food.id);
+                if (error) throw error;
+                toast.success('Food item deleted successfully');
+            }
+            router.back();
+        } catch (error: any) {
+            console.error('Delete error:', error);
+            toast.error(error.message || 'Failed to delete food item');
         }
     };
 
@@ -633,11 +687,50 @@ export default function FoodDetailsPage() {
                         </Card>
                     </div>
 
-                    {/* Right Side: Text Content */}
-                    <div className="flex-1 flex flex-col">
-                        <h1 className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.85] mb-2">
-                            <span className="text-emerald-500">{food.common_name || food.name}</span>
-                        </h1>
+                    {/* Right Side: Text Content + Actions */}
+                    <div className="flex-1 flex flex-col gap-4">
+                        <div className="flex items-start gap-3 justify-between">
+                            <h1 className="text-2xl lg:text-4xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.9] flex-1">
+                                <span className="text-emerald-500">{food.common_name || food.name}</span>
+                            </h1>
+                            {/* Action Buttons */}
+                            <div className="flex items-center gap-2 shrink-0">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className={cn("h-8 w-8 rounded-xl transition-all", food.is_favorite ? "text-rose-500" : "text-slate-400 hover:text-rose-500")}
+                                    onClick={toggleFavorite}
+                                    title="Favorite"
+                                >
+                                    <Heart size={16} fill={food.is_favorite ? "currentColor" : "none"} />
+                                </Button>
+
+                                {/* Admin Edit */}
+                                {currentUserEmail?.toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase() && (
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => router.push(`/dashboard/library/foods/new?edit=${food.id}`)}
+                                        className="h-8 w-8 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                        title="Edit Food"
+                                    >
+                                        <Edit2 size={16} />
+                                    </Button>
+                                )}
+
+                                {(food.id.startsWith('food-') || isAdmin) && (
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={handleDelete}
+                                        className="h-8 w-8 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-colors"
+                                        title="Delete Food"
+                                    >
+                                        <Trash2 size={16} />
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
 
                         {/* Description - Styled as Subtext */}
                         {(food.details || FOOD_DETAILS[food.id]) && (
