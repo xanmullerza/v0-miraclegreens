@@ -384,12 +384,18 @@ export function MealPlannerContent({
             // "5 Large (223g)" or "1 kilogram (1000g)"
             const labeled = entry.match(/^(\d+(?:\.\d+)?)\s+.+?\s+\((\d+(?:\.\d+)?)g\)$/);
             if (labeled) { total += parseFloat(labeled[1]) * parseFloat(labeled[2]); hasWeight = true; continue; }
-            // "1 x 100g"
-            const weighted = entry.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*g$/i);
+            // "1 x 100g" or "1 x 100ml"
+            const weighted = entry.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(g|ml)$/i);
             if (weighted) { total += parseFloat(weighted[1]) * parseFloat(weighted[2]); hasWeight = true; continue; }
             // plain grams e.g. "500g"
             const plainG = entry.match(/^(\d+(?:\.\d+)?)\s*g$/i);
             if (plainG) { total += parseFloat(plainG[1]); hasWeight = true; continue; }
+            // "10 kg" or "10 kilogram(s)"
+            const kgFmt = entry.match(/^(\d+(?:\.\d+)?)\s*kilo?g?r?a?m?s?$/i);
+            if (kgFmt) { total += parseFloat(kgFmt[1]) * 1000; hasWeight = true; continue; }
+            // "10 ml" (treat ml ≈ g for water-based items)
+            const mlFmt = entry.match(/^(\d+(?:\.\d+)?)\s*ml$/i);
+            if (mlFmt) { total += parseFloat(mlFmt[1]); hasWeight = true; continue; }
         }
         return hasWeight ? total : null;
     };

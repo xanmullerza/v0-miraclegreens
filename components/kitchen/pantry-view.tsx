@@ -262,6 +262,8 @@ export function PantryView({
             const e = parseQuantityEntry(s);
             return e.qty > 0;
         });
+        // If all existing entries were zeros, just return incoming
+        if (existingEntries.length === 0) return incoming;
         const b = parseQuantityEntry(incoming);
         // Find a matching existing entry to sum into
         const matchIndex = existingEntries.findIndex(e => {
@@ -280,7 +282,8 @@ export function PantryView({
             }
             return existingEntries.join(' + ');
         }
-        return `${existing} + ${incoming}`;
+        // No matching entry — append incoming to the non-zero filtered entries
+        return `${existingEntries.join(' + ')} + ${incoming}`;
     };
 
     const handleBuyMoreAdd = async () => {
