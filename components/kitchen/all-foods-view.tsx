@@ -22,7 +22,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { cn, formatFoodName } from '@/lib/utils';
 
 interface FoodItem {
     id: string;
@@ -279,7 +279,7 @@ export function AllFoodsView() {
                                     {/* Info */}
                                     <div className="p-3 lg:p-0">
                                         <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
-                                            {food.common_name || food.name}
+                                            {formatFoodName(food.common_name || food.name)}
                                         </h3>
                                         <div className="flex flex-wrap gap-2 mt-2">
                                             {/* Quantity badge - always visible if present */}

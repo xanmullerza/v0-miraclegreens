@@ -29,7 +29,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { cn, formatFoodName } from '@/lib/utils';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { DailyPlan } from '@/lib/utils/meal-generator';
 import { Recipe } from '@/lib/data/recipes';
@@ -308,7 +308,7 @@ export function StaplesView() {
                                                     {/* Info */}
                                                     <div className="flex-1 lg:flex-none lg:p-0">
                                                         <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize">
-                                                            {hasMultiple ? food.name : (food.common_name || food.name)}
+                                                            {hasMultiple ? formatFoodName(food.name) : formatFoodName(food.common_name || food.name)}
                                                         </h3>
                                                         <div className="flex flex-wrap gap-2 mt-2">
                                                             {/* Quantity badge - always visible if present */}

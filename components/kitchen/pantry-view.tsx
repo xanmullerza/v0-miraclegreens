@@ -33,7 +33,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { fetchFoodMeasures } from '@/lib/utils/nutrition-calculator';
-import { cn } from '@/lib/utils';
+import { cn, formatFoodName } from '@/lib/utils';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { DailyPlan } from '@/lib/utils/meal-generator';
 import { Recipe } from '@/lib/data/recipes';
@@ -650,7 +650,7 @@ export function PantryView({
                                                                 <Heart size={12} className="text-rose-500 fill-current shrink-0" />
                                                             )}
                                                             <span className="font-semibold text-sm text-slate-900 dark:text-white truncate">
-                                                                {food.common_name || food.name}
+                                                                {formatFoodName(food.common_name || food.name)}
                                                             </span>
                                                         </div>
                                                         {(() => {

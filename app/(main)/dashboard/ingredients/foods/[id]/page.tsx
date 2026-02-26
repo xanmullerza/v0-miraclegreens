@@ -48,7 +48,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
+import { cn, formatFoodName } from '@/lib/utils';
 import { toast } from 'sonner';
 import { nutrientInfo } from '@/lib/data/nutrient-info';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
@@ -771,7 +771,7 @@ export default function FoodDetailsPage() {
                     <div className="flex-1 flex flex-col gap-4">
                         <div className="flex items-start gap-3 justify-between">
                             <h1 className="text-2xl lg:text-4xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.9] flex-1">
-                                <span className="text-emerald-500">{food.common_name || food.name}</span>
+                                <span className="text-emerald-500">{formatFoodName(food.common_name || food.name)}</span>
                             </h1>
                             {/* Action Buttons */}
                             <div className="flex items-center gap-2 shrink-0">

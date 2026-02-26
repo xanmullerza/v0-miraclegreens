@@ -29,7 +29,7 @@ import {
     Library
 } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
+import { cn, formatFoodName } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -418,7 +418,7 @@ export function ExploreView({
                                                         {food.image ? <img src={food.image} className="w-full h-full object-cover" /> : <Leaf className="m-auto opacity-10 h-full w-5" />}
                                                     </div>
                                                     <div className="min-w-0">
-                                                        <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{food.common_name || food.name}</h4>
+                                                        <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{formatFoodName(food.common_name || food.name)}</h4>
                                                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
                                                             {formatEnergy(food.energy_kcal, energyUnit)} <span className="text-slate-200 dark:text-slate-700">|</span> {food.category || 'General'}
                                                         </p>
@@ -644,7 +644,7 @@ export function ExploreView({
                                             {/* Name */}
                                             <div className="flex-1 min-w-0 lg:p-0">
                                                 <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize truncate">
-                                                    {hasMultiple ? food.name : (food.common_name || food.name)}
+                                                    {hasMultiple ? formatFoodName(food.name) : formatFoodName(food.common_name || food.name)}
                                                 </h3>
                                                 <div className="flex flex-wrap gap-2 mt-1">
                                                     {/* Quantity badge - always visible if present */}

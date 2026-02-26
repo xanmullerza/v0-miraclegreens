@@ -7,6 +7,7 @@ import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
 import { supabase } from '@/lib/supabase';
 import { fetchFoodMeasures } from '@/lib/utils/nutrition-calculator';
+import { formatFoodName } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -170,7 +171,7 @@ export default function PantryPage() {
                                         {food.image ? <img src={food.image} className="w-full h-full object-cover" /> : <Beef className="m-auto opacity-10 h-full w-5" />}
                                     </div>
                                     <div className="min-w-0">
-                                        <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{food.common_name || food.name}</h4>
+                                        <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{formatFoodName(food.common_name || food.name)}</h4>
                                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
                                             {(food.energy_kcal ?? 0).toFixed(0)} kcal <span className="text-slate-200 dark:text-slate-700">|</span> 100g
                                         </p>
