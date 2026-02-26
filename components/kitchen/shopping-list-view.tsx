@@ -358,7 +358,15 @@ export function ShoppingListView() {
             return { num: parseFloat(match[1]), unit: match[2].trim() };
         };
 
-        const e = parse(existing);
+        // Strip zero-quantity segments from the existing string before merging
+        const nonZeroExisting = existing
+            .split(/\s*\+\s*/)
+            .filter(s => { const p = parse(s.trim()); return p ? p.num > 0 : !!s.trim(); })
+            .join(' + ');
+
+        if (!nonZeroExisting) return added;
+
+        const e = parse(nonZeroExisting);
         const a = parse(added);
 
         if (e && a && e.unit === a.unit) {
@@ -367,7 +375,7 @@ export function ShoppingListView() {
         }
 
         // If units mismatch or parsing fails, combine with +
-        return `${existing} + ${added}`;
+        return `${nonZeroExisting} + ${added}`;
     };
 
     const handleMatchConfirm = async (foodItemId: string | null, name: string, quantity: string) => {

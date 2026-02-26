@@ -256,7 +256,12 @@ export function PantryView({
 
     const mergeQuantityStrings = (existing: string | undefined, incoming: string): string => {
         if (!existing) return incoming;
-        const existingEntries = existing.split(/\s*\+\s*/).map(s => s.trim()).filter(Boolean);
+        // Drop zero-quantity entries before merging (e.g. '0' left after items are consumed)
+        const existingEntries = existing.split(/\s*\+\s*/).map(s => s.trim()).filter(s => {
+            if (!s) return false;
+            const e = parseQuantityEntry(s);
+            return e.qty > 0;
+        });
         const b = parseQuantityEntry(incoming);
         // Find a matching existing entry to sum into
         const matchIndex = existingEntries.findIndex(e => {
@@ -738,7 +743,7 @@ export function PantryView({
 
                                                 {/* Quantity breakdown accordion */}
                                                 {expandedQuantityId === food.id && (() => {
-                                                    const entries = parseQuantityEntries(food.quantity).map(e => parseQuantityEntry(e));
+                                                    const entries = parseQuantityEntries(food.quantity).map(e => parseQuantityEntry(e)).filter(e => e.qty > 0);
                                                     const foodName = formatFoodName(food.common_name || food.name);
                                                     return (
                                                         <div className="mt-1 mb-0.5 px-4 py-3 rounded-xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/20 animate-in slide-in-from-top-2 duration-200">
