@@ -622,7 +622,7 @@ export function ExploreView({
                                     <div
                                         key={food.id}
                                         onClick={() => router.push(`/dashboard/ingredients/foods/${food.id}`)}
-                                        className="group relative bg-transparent rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-800 hover:border-emerald-500/30 hover:shadow-lg transition-all duration-500 overflow-hidden cursor-pointer"
+                                        className="group relative bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:shadow-lg transition-all duration-500 overflow-hidden cursor-pointer"
                                     >
                                         <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px_150px] gap-3 lg:gap-4 lg:items-center lg:px-6 py-1 w-full">
                                             {/* Thumbnail */}

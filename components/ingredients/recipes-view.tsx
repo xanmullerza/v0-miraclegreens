@@ -481,8 +481,8 @@ export function RecipesView({
                                 key={recipe.id}
                                 onClick={() => router.push(`/dashboard/recipes/meals/${recipe.id}`)}
                                 className={cn(
-                                    "group relative bg-transparent rounded-2xl border border-transparent hover:border-slate-200 dark:hover:border-slate-800 transition-all duration-500 cursor-pointer overflow-hidden",
-                                    isMix ? "hover:border-indigo-500/30 hover:shadow-lg" : "hover:border-blue-500/30 hover:shadow-lg"
+                                    "group relative bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-500 cursor-pointer overflow-hidden",
+                                    isMix ? "hover:border-indigo-400/50 hover:shadow-lg" : "hover:border-blue-400/50 hover:shadow-lg"
                                 )}
                             >
                                 <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px_150px] gap-3 lg:gap-4 lg:items-center lg:px-10 py-1">
