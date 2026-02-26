@@ -20,6 +20,7 @@ export default function PantryPage() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [selectedFood, setSelectedFood] = useState<any>(null);
     const [isAdding, setIsAdding] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0);
 
     const [quickAddQty, setQuickAddQty] = useState('1');
     const [quickAddWeight, setQuickAddWeight] = useState('');
@@ -91,6 +92,7 @@ export default function PantryPage() {
                 localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
 
                 toast.success(`${selectedFood.common_name || selectedFood.name} added to pantry`);
+                setRefreshKey(prev => prev + 1);
             } else {
                 const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
                 const newItem = {
@@ -251,7 +253,7 @@ export default function PantryPage() {
                     </div>
                 )}
 
-                <PantryView />
+                <PantryView refreshKey={refreshKey} />
             </div>
         </PageContainer>
     );

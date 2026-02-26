@@ -65,6 +65,7 @@ interface PantryViewProps {
     selectedCategories?: string[];
     setSelectedCategories?: React.Dispatch<React.SetStateAction<string[]>>;
     hideControls?: boolean;
+    refreshKey?: number;
 }
 
 export function PantryView({
@@ -72,7 +73,8 @@ export function PantryView({
     setShowFavoritesOnly: externalSetShowFavoritesOnly,
     selectedCategories: externalSelectedCategories,
     setSelectedCategories: externalSetSelectedCategories,
-    hideControls = false
+    hideControls = false,
+    refreshKey = 0
 }: PantryViewProps) {
     const router = useRouter();
     const [foods, setFoods] = useState<FoodItem[]>([]);
@@ -140,7 +142,7 @@ export function PantryView({
 
     useEffect(() => {
         fetchPantry();
-    }, []);
+    }, [refreshKey]);
 
     const toggleFavorite = async (item: FoodItem, e: React.MouseEvent) => {
         e.stopPropagation();
