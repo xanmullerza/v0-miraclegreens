@@ -3,12 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-    Activity,
     Leaf,
-    ChefHat,
-    Scale,
-    ArrowRight,
-    Beaker,
     ChevronRight,
     Package,
     ShoppingCart,
@@ -20,20 +15,16 @@ import { PageContainer } from '@/components/ui/page-container';
 
 export default function IngredientsPage() {
     const { showHeroes } = useUserPreferences();
-    const [stats, setStats] = useState({ foods: 0, recipes: 0, mixes: 0, nutrients: 0 });
+    const [stats, setStats] = useState({ foods: 0, nutrients: 0 });
 
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const [foodsCount, recipesCount, mixesCount] = await Promise.all([
+                const [foodsCount] = await Promise.all([
                     supabase.from("food_items").select("id", { count: "exact", head: true }),
-                    supabase.from("recipes").select("id", { count: "exact", head: true }).eq('is_mix', false),
-                    supabase.from("recipes").select("id", { count: "exact", head: true }).eq('is_mix', true),
                 ]);
                 setStats({
                     foods: foodsCount.count || 0,
-                    recipes: recipesCount.count || 0,
-                    mixes: mixesCount.count || 0,
                     nutrients: 30
                 });
             } catch (e) {
@@ -60,7 +51,7 @@ export default function IngredientsPage() {
                                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 via-blue-500 to-purple-500 rounded-full blur-3xl" />
                             </div>
 
-                            <div className="relative z-10 grid grid-cols-3 gap-4 md:flex md:flex-wrap md:items-start md:justify-center md:gap-8 lg:gap-16">
+                            <div className="relative z-10 grid grid-cols-1 gap-4 md:flex md:flex-wrap md:items-start md:justify-center md:gap-8 lg:gap-16">
                                 <div className="flex items-center gap-3 group/stat">
                                     <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
                                         <Leaf size={16} className="text-emerald-400" />
@@ -68,26 +59,6 @@ export default function IngredientsPage() {
                                     <div>
                                         <p className="text-lg font-black text-white leading-none">{stats.foods}</p>
                                         <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Foods</p>
-                                    </div>
-                                </div>
-                                <div className="hidden sm:block w-px h-6 bg-slate-700/40" />
-                                <div className="flex items-center gap-3 group/stat">
-                                    <div className="w-9 h-9 rounded-lg bg-indigo-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
-                                        <Beaker size={16} className="text-indigo-400" />
-                                    </div>
-                                    <div>
-                                        <p className="text-lg font-black text-white leading-none">{stats.mixes}</p>
-                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Mixes</p>
-                                    </div>
-                                </div>
-                                <div className="hidden sm:block w-px h-6 bg-slate-700/40" />
-                                <div className="flex items-center gap-3 group/stat">
-                                    <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center transition-transform duration-300 group-hover/stat:scale-110">
-                                        <ChefHat size={16} className="text-amber-400" />
-                                    </div>
-                                    <div>
-                                        <p className="text-lg font-black text-white leading-none">{stats.recipes}</p>
-                                        <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mt-1">Meals</p>
                                     </div>
                                 </div>
                             </div>
@@ -99,7 +70,6 @@ export default function IngredientsPage() {
                     <div className="bg-slate-800/40 backdrop-blur-sm border border-slate-700/60 rounded-[2.5rem] p-2">
                         {heroCards.map((card, index) => {
                             const Icon = card.icon;
-                            const count = card.id === 'foods' ? stats.foods : card.id === 'mixes' ? stats.mixes : stats.recipes;
                             return (
                                 <Link
                                     key={card.id}
@@ -110,13 +80,8 @@ export default function IngredientsPage() {
                                     )}
                                 >
                                     <div className="flex items-center gap-6">
-                                        <div className="relative">
-                                            <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 shadow-lg", card.bg)}>
-                                                <Icon size={28} className={card.color} />
-                                            </div>
-                                            <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-red-500/20 border-2 border-red-500 flex items-center justify-center">
-                                                <span className="text-sm font-black text-red-400">{count}</span>
-                                            </div>
+                                        <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 shadow-lg", card.bg)}>
+                                            <Icon size={28} className={card.color} />
                                         </div>
                                         <div>
                                             <h3 className="text-xl font-black text-white tracking-tight">{card.title}</h3>
