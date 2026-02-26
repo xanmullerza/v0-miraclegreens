@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+﻿/* eslint-disable @typescript-eslint/no-explicit-any */
 // Temporary global declarations to help the TypeScript server resolve imports
 // Remove this file once the root cause (missing packages / VSCode TS config) is fixed
 

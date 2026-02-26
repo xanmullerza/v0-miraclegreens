@@ -1,4 +1,4 @@
-import { SPICE_TRANSFORMATIONS, transformPortions, findSpiceFactor } from '../lib/utils/spice-conversion';
+﻿import { SPICE_TRANSFORMATIONS, transformPortions, findSpiceFactor } from '../lib/utils/spice-conversion';
 
 async function verifyConversion() {
     console.log('--- Verifying Spice Conversion Logic ---');

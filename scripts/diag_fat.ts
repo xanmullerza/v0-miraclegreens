@@ -1,4 +1,4 @@
-
+﻿
 import { supabase } from '../lib/supabase';
 import { calculateRecipeNutrition, calculateNutrition } from '../lib/utils/nutrition-calculator';
 

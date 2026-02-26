@@ -1,4 +1,4 @@
-
+﻿
 import { FOOD_DETAILS } from '../lib/data/food-details';
 import * as fs from 'fs';
 import * as path from 'path';
