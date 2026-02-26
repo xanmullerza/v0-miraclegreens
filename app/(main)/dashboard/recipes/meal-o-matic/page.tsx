@@ -402,6 +402,9 @@ export function MealPlannerContent({
             // "10 oz" (ounces)
             const ozFmt = entry.match(/^(\d+(?:\.\d+)?)\s*(?:oz|ounces?)$/i);
             if (ozFmt) { total += parseFloat(ozFmt[1]) * 28.3495; hasWeight = true; continue; }
+            // Plain number with no unit (e.g. "300") — treat as grams
+            const plainNum = entry.match(/^(\d+(?:\.\d+)?)$/);
+            if (plainNum) { total += parseFloat(plainNum[1]); hasWeight = true; continue; }
         }
         return hasWeight ? total : null;
     };
