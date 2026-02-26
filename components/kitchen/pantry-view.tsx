@@ -155,8 +155,52 @@ export function PantryView({
         raw: string;
     }
 
+    // Terminal words that mark a food name as a mass noun (never pluralised in English)
+    const MASS_NOUN_TERMS = new Set([
+        // Grains & starches
+        'rice', 'flour', 'meal', 'starch', 'bran', 'quinoa', 'amaranth',
+        'millet', 'sorghum', 'wheat', 'oat', 'barley', 'rye', 'buckwheat', 'dahl', 'dal',
+        // Dairy & fats
+        'butter', 'margarine', 'cream', 'milk', 'ghee', 'oil', 'lard',
+        // Condiments & pantry staples
+        'honey', 'sugar', 'salt', 'vinegar', 'mustard', 'sauce', 'paste',
+        'mayonnaise', 'syrup', 'molasses', 'yeast',
+        // Liquids
+        'juice', 'water', 'broth', 'stock', 'essence',
+        // Ground spices & powders (the last word will be "powder", "cumin", etc.)
+        'powder', 'cocoa', 'cinnamon', 'turmeric', 'paprika', 'cumin', 'ginger',
+        'nutmeg', 'cardamom', 'elachi', 'mace', 'anise', 'allspice',
+        // Fresh herbs and leafy greens used as bulk ingredients
+        'kale', 'spinach', 'lettuce', 'parsley', 'basil', 'mint', 'thyme',
+        'rosemary', 'coriander', 'dhania',
+        // Brassicas used as mass ingredient
+        'broccoli', 'cauliflower',
+        // Baked & processed
+        'bread', 'extract',
+    ]);
+
     const pluralize = (name: string, qty: number): string => {
         if (qty <= 1) return name;
+        // Strip emojis and parentheticals for the mass-noun check only
+        const stripped = name
+            .replace(/\p{Emoji}/gu, '')
+            .replace(/\(.*?\)/g, '')
+            .trim()
+            .toLowerCase();
+        const words = stripped.split(/\s+/).filter(Boolean);
+        const lastWord = words[words.length - 1];
+        if (lastWord && MASS_NOUN_TERMS.has(lastWord)) return name;
+        if (words.length >= 2 && MASS_NOUN_TERMS.has(words.slice(-2).join(' '))) return name;
+        // If name ends with 🔥, pluralise the text part before it
+        const fireMatch = name.match(/^(.*?)\s*(🔥\s*)$/);
+        if (fireMatch) {
+            const base = fireMatch[1];
+            const fire = fireMatch[2];
+            if (/[^aeiou]y$/i.test(base)) return base.slice(0, -1) + 'ies ' + fire;
+            if (/(s|sh|ch|x|z)$/i.test(base)) return base + 'es ' + fire;
+            if (/fe?$/i.test(base)) return base.replace(/fe?$/, 'ves') + ' ' + fire;
+            return base + 's ' + fire;
+        }
         if (/[^aeiou]y$/i.test(name)) return name.slice(0, -1) + 'ies';
         if (/(s|sh|ch|x|z)$/i.test(name)) return name + 'es';
         if (/fe?$/i.test(name)) return name.replace(/fe?$/, 'ves');
