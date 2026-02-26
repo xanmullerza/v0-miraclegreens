@@ -613,24 +613,22 @@ export function PantryView({
                                                                 {food.common_name || food.name}
                                                             </span>
                                                         </div>
-                                                        <div className="flex items-center gap-1.5">
-                                                            {(() => {
-                                                                const entries = parseQuantityEntries(food.quantity);
-                                                                if (entries.length === 0) return <span className="text-xs text-slate-400">In Stock</span>;
-                                                                if (entries.length === 1) return <span className="text-xs text-slate-500 dark:text-slate-400">{entries[0]}</span>;
-                                                                return <span className="text-xs text-slate-500 dark:text-slate-400">{entries.length} entries</span>;
-                                                            })()}
-                                                            {parseQuantityEntries(food.quantity).length > 0 && (
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); setExpandedQuantityId(expandedQuantityId === food.id ? null : food.id); }}
-                                                                    className={cn("p-0.5 rounded transition-colors", expandedQuantityId === food.id ? "text-emerald-500" : "text-slate-300 dark:text-slate-600 hover:text-slate-500")}
-                                                                    title="View breakdown"
-                                                                >
-                                                                    <List size={12} />
-                                                                </button>
-                                                            )}
-                                                        </div>
+                                                        {(() => {
+                                                            const entries = parseQuantityEntries(food.quantity);
+                                                            if (entries.length === 0) return <span className="text-xs text-slate-400">In Stock</span>;
+                                                            if (entries.length === 1) return <span className="text-xs text-slate-500 dark:text-slate-400">{entries[0]}</span>;
+                                                            return <span className="text-xs text-slate-500 dark:text-slate-400">{entries.length} stock entries</span>;
+                                                        })()}
                                                     </div>
+                                                    {parseQuantityEntries(food.quantity).length > 0 && (
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); setExpandedQuantityId(expandedQuantityId === food.id ? null : food.id); }}
+                                                            className={cn("p-1.5 rounded-lg transition-all", expandedQuantityId === food.id ? "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-500" : "text-slate-300 dark:text-slate-600 hover:bg-emerald-100 dark:hover:bg-emerald-950/40 hover:text-emerald-500")}
+                                                            title="View stock breakdown"
+                                                        >
+                                                            <List size={14} />
+                                                        </button>
+                                                    )}
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); buyMoreItem?.id === food.id ? setBuyMoreItem(null) : openBuyMore(food); }}
                                                         className={cn("p-1.5 rounded-lg transition-all", buyMoreItem?.id === food.id ? "bg-amber-100 dark:bg-amber-950/40 text-amber-500" : "text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500")}
