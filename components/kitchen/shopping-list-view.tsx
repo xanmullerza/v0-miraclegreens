@@ -299,8 +299,41 @@ export function ShoppingListView() {
                 const saved = localStorage.getItem('pantry_quantities');
                 const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
                 const current = quantities[item.food_item_id] || '';
-                const incoming = item.quantity || '1';
-                quantities[item.food_item_id] = current ? aggregateQuantities(current, incoming) : incoming;
+
+                // Normalize incoming quantity to a standard gram-weight string so
+                // parseTotalGrams in handleMarkEaten can always deduct correctly.
+                const rawQty = item.quantity || '1';
+                const normalizeToGrams = (s: string): string => {
+                    const t = s.trim();
+                    // Already labeled, e.g. "1 kilogram (1000g)"
+                    if (/\(\d+(?:\.\d+)?g\)$/.test(t)) return t;
+                    // "1 x 100g"
+                    if (/^\d+(?:\.\d+)?\s*x\s*\d+(?:\.\d+)?\s*g$/i.test(t)) return t;
+                    // "500g"
+                    const plainG = t.match(/^(\d+(?:\.\d+)?)\s*g$/i);
+                    if (plainG) return `1 x ${plainG[1]}g`;
+                    // "10 kg" / "10kg" / "10 kilogram(s)"
+                    const kg = t.match(/^(\d+(?:\.\d+)?)\s*(?:kg|kilo(?:gram)?s?)$/i);
+                    if (kg) return `1 x ${parseFloat(kg[1]) * 1000}g`;
+                    // "10 ml"
+                    const ml = t.match(/^(\d+(?:\.\d+)?)\s*ml$/i);
+                    if (ml) return `1 x ${ml[1]}g`;
+                    // "10 lb"
+                    const lb = t.match(/^(\d+(?:\.\d+)?)\s*(?:lb|lbs|pounds?)$/i);
+                    if (lb) return `1 x ${Math.round(parseFloat(lb[1]) * 453.592)}g`;
+                    // "10 oz"
+                    const oz = t.match(/^(\d+(?:\.\d+)?)\s*(?:oz|ounces?)$/i);
+                    if (oz) return `1 x ${Math.round(parseFloat(oz[1]) * 28.3495)}g`;
+                    // Unknown — return as-is
+                    return t;
+                };
+                const incoming = normalizeToGrams(rawQty);
+
+                const currentStripped = current
+                    .split(/\s*\+\s*/)
+                    .filter(s => { const m = s.trim().match(/^(\d+(?:\.\d+)?)/); return m ? parseFloat(m[1]) > 0 : !!s.trim(); })
+                    .join(' + ');
+                quantities[item.food_item_id] = currentStripped ? `${currentStripped} + ${incoming}` : incoming;
                 localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
                 // Ensure the food item is marked as in-pantry in DB (best effort)
                 await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', item.food_item_id);
