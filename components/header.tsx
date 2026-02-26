@@ -67,11 +67,13 @@ export function Header() {
 					<div className="relative h-8 w-28 sm:h-10 sm:w-40">
 						<Image
 							src="/vitala-logo.png"
-								className="object-contain brightness-0 invert"
-								priority
-							/>
-						</div>
-					</Link>
+							alt="Vitala Logo"
+							fill
+							className="object-contain brightness-0 invert"
+							priority
+						/>
+					</div>
+				</Link>
 
 					{/* Right-side buttons */}
 					<div className="flex items-center gap-2">
