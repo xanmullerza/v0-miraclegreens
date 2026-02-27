@@ -109,18 +109,31 @@ export default function ShoppingListPage() {
 
             if (quickAddMode === 'shopping') {
                 const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-                const newItem = {
-                    id: `manual-${Date.now()}`,
-                    name: selectedFood.common_name || selectedFood.name,
-                    quantity: quantityString,
-                    unit: '',
-                    checked: false,
-                    source: 'manual',
-                    food_item_id: selectedFood.id,
-                    category: selectedFood.category,
-                };
-                localStorage.setItem('vitala_shopping_manual_items', JSON.stringify([...currentList, newItem]));
-                toast.success(`${selectedFood.common_name || selectedFood.name} added to groceries`);
+                
+                // Check if item already exists by food_item_id
+                const existingIndex = currentList.findIndex((item: any) => item.food_item_id === selectedFood.id);
+                
+                if (existingIndex !== -1) {
+                    // Update existing item's quantity
+                    currentList[existingIndex].quantity = quantityString;
+                    toast.success(`Updated ${selectedFood.common_name || selectedFood.name} quantity`);
+                } else {
+                    // Add new item
+                    const newItem = {
+                        id: `manual-${Date.now()}`,
+                        name: selectedFood.common_name || selectedFood.name,
+                        quantity: quantityString,
+                        unit: '',
+                        checked: false,
+                        source: 'manual',
+                        food_item_id: selectedFood.id,
+                        category: selectedFood.category,
+                    };
+                    currentList.push(newItem);
+                    toast.success(`${selectedFood.common_name || selectedFood.name} added to groceries`);
+                }
+                
+                localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(currentList));
                 window.dispatchEvent(new Event('storage'));
             } else {
                 // Add to pantry
