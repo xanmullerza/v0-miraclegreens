@@ -588,7 +588,7 @@ export function ExploreView({
                 <div className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 px-6 py-4">
                     <div className="flex items-center justify-between gap-4 mb-4">
                         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                            {filteredFoods.length} item{filteredFoods.length !== 1 ? 's' : ''}
+                            {foods.length} item{foods.length !== 1 ? 's' : ''}
                         </p>
                         
                         {/* Filter Dropdown */}
