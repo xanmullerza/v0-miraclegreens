@@ -40,6 +40,7 @@ import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
 import { ChevronDown as ChevronDownIcon, CheckSquare, Square, ChefHat } from 'lucide-react';
+import { FoodFormDialog } from '@/components/ingredients/food-form-dialog';
 
 const CAL_TO_KJ = 4.184;
 
@@ -75,6 +76,8 @@ interface ExploreViewProps {
     setSelectedCategories?: React.Dispatch<React.SetStateAction<string[]>>;
     hideControls?: boolean;
     showHero?: boolean;
+    showAddFood?: boolean;
+    setShowAddFood?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function ExploreView({
@@ -83,7 +86,9 @@ export function ExploreView({
     selectedCategories: externalSelectedCategories,
     setSelectedCategories: externalSetSelectedCategories,
     hideControls = false,
-    showHero = true
+    showHero = true,
+    showAddFood = false,
+    setShowAddFood
 }: ExploreViewProps) {
     const router = useRouter();
     const [foods, setFoods] = useState<FoodItem[]>([]);
@@ -184,7 +189,7 @@ export function ExploreView({
 
     useEffect(() => {
         fetchFoods(1, true);
-    }, [searchQuery, showFavoritesOnly, selectedCategories, user]);
+    }, [searchQuery, showFavoritesOnly, selectedCategories, user, showAddFood]);
 
     const fetchFoods = async (pageNum: number, isNewSearch = false) => {
         setLoading(true);
@@ -583,7 +588,7 @@ export function ExploreView({
             )}
 
             {/* List Container */}
-            <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
+            <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden relative">
                 {/* Header Section with Filter and Column Labels */}
                 <div className="border-b border-slate-200 dark:border-slate-800 px-6 py-4">
                     <div className="flex items-center justify-between gap-4 mb-4">
@@ -851,9 +856,18 @@ export function ExploreView({
                                 ))}
                             </div>
                         </div>
-                    );
+                    );  
                 })}
                 </div>
+
+                {/* Food Form Dialog - Rendered in Container */}
+                {showAddFood && setShowAddFood && (
+                    <div className="absolute inset-0 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-sm z-50 overflow-y-auto">
+                        <FoodFormDialog
+                            onClose={() => setShowAddFood(false)}
+                        />
+                    </div>
+                )}
             </div>
 
             {

@@ -274,8 +274,8 @@ Fat: ${food.fat_g || 0}g
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
-            <div className="w-full max-w-5xl bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-2xl my-8 max-h-[90vh] overflow-y-auto">
+        <div className="w-full h-full p-4 overflow-y-auto">
+            <div className="w-full max-w-5xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-2xl">
                 
                 {/* Header with Close Button */}
                 <div className="sticky top-0 z-10 bg-slate-100 dark:bg-slate-900/95 border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between rounded-t-[2rem]">

@@ -10,7 +10,6 @@ import { CompareView } from './views/compare-view';
 import { NutrientsView } from './views/nutrients-view';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
-import { FoodFormDialog } from '@/components/ingredients/food-form-dialog';
 import { supabase } from '@/lib/supabase';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
@@ -135,20 +134,13 @@ function IngredientsContent() {
 
                 {/* Dynamic Content Area */}
                 <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
-                    {activeTab === 'foods' && <ExploreView showHero={false} />}
+                    {activeTab === 'foods' && <ExploreView showHero={false} showAddFood={showAddFood} setShowAddFood={setShowAddFood} />}
                     {activeTab === 'groceries' && <ShoppingView />}
                     {activeTab === 'pantry' && <StaplesView />}
                     {activeTab === 'compare' && <CompareView />}
                     {activeTab === 'nutrients' && <NutrientsView />}
                 </div>
             </div>
-
-            {/* Food Form Dialog */}
-            {showAddFood && (
-                <FoodFormDialog
-                    onClose={() => setShowAddFood(false)}
-                />
-            )}
         </PageContainer>
     );
 }
