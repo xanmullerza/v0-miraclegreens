@@ -598,10 +598,17 @@ export function ExploreView({
                 <>
                 {/* Header Section with Filter and Column Labels */}
                 <div className="border-b border-slate-200 dark:border-slate-800 px-6 py-4">
-                    <div className="flex items-center justify-between gap-4 mb-4">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                            {foods.length} item{foods.length !== 1 ? 's' : ''}
-                        </p>
+                    {/* Column Headers with Filter */}
+                    <div className="hidden lg:flex lg:items-center lg:justify-between">
+                        <div className="flex-1 grid grid-cols-[60px_1fr_100px_80px_80px_80px_150px] gap-3 lg:gap-4">
+                            <div></div> {/* Thumbnail column */}
+                            <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Name</div>
+                            <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Energy</div>
+                            <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Carbs</div>
+                            <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Fat</div>
+                            <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Protein</div>
+                            <div></div> {/* Actions column */}
+                        </div>
                         
                         {/* Filter Dropdown */}
                         <DropdownMenu>
@@ -609,16 +616,16 @@ export function ExploreView({
                                 <Button
                                     variant="outline"
                                     className={cn(
-                                        "h-8 px-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                        "h-7 px-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shrink-0",
                                         (showFavoritesOnly || selectedCategories.length > 0)
                                             ? "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400"
                                             : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-emerald-300"
                                     )}
                                 >
-                                    <Filter size={12} className="mr-1.5" />
+                                    <Filter size={11} className="mr-1" />
                                     Filter
                                     {(selectedCategories.length > 0 || showFavoritesOnly) && (
-                                        <Badge className="ml-2 h-4 w-4 p-0 flex items-center justify-center bg-emerald-600 text-white text-[8px] rounded-full">
+                                        <Badge className="ml-1.5 h-4 w-4 p-0 flex items-center justify-center bg-emerald-600 text-white text-[7px] rounded-full">
                                             {selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
                                         </Badge>
                                     )}
@@ -676,17 +683,6 @@ export function ExploreView({
                                 </div>
                             </DropdownMenuContent>
                         </DropdownMenu>
-                    </div>
-
-                    {/* Column Headers */}
-                    <div className="hidden lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px_150px] gap-3 lg:gap-4 lg:px-6">
-                        <div></div> {/* Thumbnail column */}
-                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Name</div>
-                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Energy</div>
-                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Carbs</div>
-                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Fat</div>
-                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Protein</div>
-                        <div></div> {/* Actions column */}
                     </div>
                 </div>
 
