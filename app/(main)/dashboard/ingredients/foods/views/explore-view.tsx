@@ -597,92 +597,90 @@ export function ExploreView({
                 ) : (
                 <>
                 {/* Header Section with Filter and Column Labels */}
-                <div className="border-b border-slate-200 dark:border-slate-800 px-6 py-4">
+                <div className="border-b border-slate-200 dark:border-slate-800">
                     {/* Column Headers with Filter */}
-                    <div className="hidden lg:flex lg:items-center lg:justify-between">
-                        <div className="flex-1 grid grid-cols-[60px_1fr_100px_80px_80px_80px_150px] gap-3 lg:gap-4">
-                            <div></div> {/* Thumbnail column */}
-                            <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Name</div>
-                            <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Energy</div>
-                            <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Carbs</div>
-                            <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Fat</div>
-                            <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Protein</div>
-                            <div></div> {/* Actions column */}
-                        </div>
-                        
-                        {/* Filter Dropdown */}
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    className={cn(
-                                        "h-7 px-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all shrink-0",
-                                        (showFavoritesOnly || selectedCategories.length > 0)
-                                            ? "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400"
-                                            : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-emerald-300"
-                                    )}
-                                >
-                                    <Filter size={11} className="mr-1" />
-                                    Filter
-                                    {(selectedCategories.length > 0 || showFavoritesOnly) && (
-                                        <Badge className="ml-1.5 h-4 w-4 p-0 flex items-center justify-center bg-emerald-600 text-white text-[7px] rounded-full">
-                                            {selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
-                                        </Badge>
-                                    )}
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl p-2">
-                                <div className="px-2 py-1.5">
-                                    <div className="flex items-center justify-between py-2">
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">
-                                            Favorites Only
-                                        </span>
-                                        <Switch
-                                            checked={showFavoritesOnly}
-                                            onCheckedChange={setShowFavoritesOnly}
-                                            className="data-[state=checked]:bg-emerald-600"
-                                        />
-                                    </div>
-                                </div>
-                                <DropdownMenuSeparator className="bg-slate-200 dark:bg-slate-800" />
-                                <div className="px-2">
-                                    <div className="flex items-center justify-between py-2">
-                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 px-0">
-                                            Categories
-                                        </DropdownMenuLabel>
-                                        {selectedCategories.length > 0 && (
-                                            <button
-                                                onClick={() => setSelectedCategories([])}
-                                                className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-colors"
-                                            >
-                                                Clear
-                                            </button>
+                    <div className="hidden lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px_150px] gap-3 lg:gap-4 lg:items-center lg:px-6 py-4">
+                        <div></div> {/* Thumbnail column */}
+                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Name</div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Energy</div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Carbs</div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Fat</div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Protein</div>
+                        <div className="flex justify-end">
+                            {/* Filter Dropdown */}
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className={cn(
+                                            "h-7 px-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all",
+                                            (showFavoritesOnly || selectedCategories.length > 0)
+                                                ? "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400"
+                                                : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-emerald-300"
                                         )}
+                                    >
+                                        <Filter size={11} className="mr-1" />
+                                        Filter
+                                        {(selectedCategories.length > 0 || showFavoritesOnly) && (
+                                            <Badge className="ml-1.5 h-4 w-4 p-0 flex items-center justify-center bg-emerald-600 text-white text-[7px] rounded-full">
+                                                {selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
+                                            </Badge>
+                                        )}
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl p-2">
+                                    <div className="px-2 py-1.5">
+                                        <div className="flex items-center justify-between py-2">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">
+                                                Favorites Only
+                                            </span>
+                                            <Switch
+                                                checked={showFavoritesOnly}
+                                                onCheckedChange={setShowFavoritesOnly}
+                                                className="data-[state=checked]:bg-emerald-600"
+                                            />
+                                        </div>
                                     </div>
-                                    <div className="py-1">
-                                        {CATEGORIES.map(category => {
-                                            const isActive = selectedCategories.includes(category);
-                                            return (
-                                                <DropdownMenuCheckboxItem
-                                                    key={category}
-                                                    checked={isActive}
-                                                    onCheckedChange={(checked) => {
-                                                        if (checked) {
-                                                            setSelectedCategories(prev => [...prev, category]);
-                                                        } else {
-                                                            setSelectedCategories(prev => prev.filter(c => c !== category));
-                                                        }
-                                                    }}
-                                                    className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-emerald-50 dark:focus:bg-emerald-900/10 focus:text-emerald-600 py-2.5 cursor-pointer"
+                                    <DropdownMenuSeparator className="bg-slate-200 dark:bg-slate-800" />
+                                    <div className="px-2">
+                                        <div className="flex items-center justify-between py-2">
+                                            <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 px-0">
+                                                Categories
+                                            </DropdownMenuLabel>
+                                            {selectedCategories.length > 0 && (
+                                                <button
+                                                    onClick={() => setSelectedCategories([])}
+                                                    className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-colors"
                                                 >
-                                                    {category}
-                                                </DropdownMenuCheckboxItem>
-                                            );
-                                        })}
+                                                    Clear
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className="py-1">
+                                            {CATEGORIES.map(category => {
+                                                const isActive = selectedCategories.includes(category);
+                                                return (
+                                                    <DropdownMenuCheckboxItem
+                                                        key={category}
+                                                        checked={isActive}
+                                                        onCheckedChange={(checked) => {
+                                                            if (checked) {
+                                                                setSelectedCategories(prev => [...prev, category]);
+                                                            } else {
+                                                                setSelectedCategories(prev => prev.filter(c => c !== category));
+                                                            }
+                                                        }}
+                                                        className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-emerald-50 dark:focus:bg-emerald-900/10 focus:text-emerald-600 py-2.5 cursor-pointer"
+                                                    >
+                                                        {category}
+                                                    </DropdownMenuCheckboxItem>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
-                                </div>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
                     </div>
                 </div>
 
