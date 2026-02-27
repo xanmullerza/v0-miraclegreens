@@ -10,6 +10,7 @@ import { CompareView } from './views/compare-view';
 import { NutrientsView } from './views/nutrients-view';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
+import { FoodFormDialog } from '@/components/ingredients/food-form-dialog';
 import { supabase } from '@/lib/supabase';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 
@@ -47,6 +48,7 @@ function IngredientsContent() {
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [isSearchActive, setIsSearchActive] = useState(false);
+    const [showAddFood, setShowAddFood] = useState(false);
     const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
     const renderResult = (item: any) => (
@@ -122,7 +124,7 @@ function IngredientsContent() {
                         searchingMessage="Searching Library..."
                         powerButton={
                             <button
-                                onClick={() => router.push('/dashboard/ingredients/foods/new')}
+                                onClick={() => setShowAddFood(true)}
                                 className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:border-emerald-500 hover:bg-emerald-500/10 shrink-0"
                             >
                                 <Plus size={16} className="text-slate-900 dark:text-white" />
@@ -140,6 +142,13 @@ function IngredientsContent() {
                     {activeTab === 'nutrients' && <NutrientsView />}
                 </div>
             </div>
+
+            {/* Food Form Dialog */}
+            {showAddFood && (
+                <FoodFormDialog
+                    onClose={() => setShowAddFood(false)}
+                />
+            )}
         </PageContainer>
     );
 }
