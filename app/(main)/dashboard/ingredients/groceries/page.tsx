@@ -96,6 +96,63 @@ export default function ShoppingListPage() {
         setSelectedPortion(null);
     };
 
+    // Helper function to intelligently combine quantities
+    const combineQuantities = (existing: string, newQty: string): string => {
+        // Try to parse both quantities
+        // Format examples: "1 kilogram (1000g)", "2 x 100g", "3"
+        
+        const parseQty = (qty: string): { value: number; unit: string; full: string } | null => {
+            // Pattern: "number unit (weight)" or "number x weight-unit" or just "number"
+            const portionMatch = qty.match(/^(\d+(?:\.\d+)?)\s+([^(]+)\s*\(/);
+            if (portionMatch) {
+                return { value: parseFloat(portionMatch[1]), unit: portionMatch[2].trim(), full: qty };
+            }
+            
+            const weightMatch = qty.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)(g|ml|oz|lb)/);
+            if (weightMatch) {
+                return { value: parseFloat(weightMatch[1]), unit: `x ${weightMatch[2]}${weightMatch[3]}`, full: qty };
+            }
+            
+            const simpleMatch = qty.match(/^(\d+(?:\.\d+)?)$/);
+            if (simpleMatch) {
+                return { value: parseFloat(simpleMatch[1]), unit: '', full: qty };
+            }
+            
+            return null;
+        };
+        
+        const existingParsed = parseQty(existing);
+        const newParsed = parseQty(newQty);
+        
+        // If both parsed successfully and have the same unit, combine them
+        if (existingParsed && newParsed && existingParsed.unit === newParsed.unit) {
+            const combinedValue = existingParsed.value + newParsed.value;
+            
+            // Reconstruct the quantity string
+            if (existingParsed.unit) {
+                // Has a unit, reconstruct: "3 kilogram (1000g)" format
+                const weightMatch = existingParsed.full.match(/\((\d+(?:\.\d+)?g)\)/);
+                if (weightMatch) {
+                    const baseWeight = parseFloat(weightMatch[1]);
+                    const newWeight = baseWeight * (combinedValue / existingParsed.value);
+                    return `${combinedValue} ${existingParsed.unit} (${newWeight.toFixed(0)}g)`;
+                }
+                
+                // For "x weight-unit" format
+                const xMatch = existingParsed.unit.match(/^x\s*(\d+(?:\.\d+)?)(g|ml|oz|lb)$/);
+                if (xMatch) {
+                    return `${combinedValue} x ${xMatch[1]}${xMatch[2]}`;
+                }
+            } else {
+                // No unit, just return the number
+                return `${combinedValue}`;
+            }
+        }
+        
+        // Fall back to concatenation with " + "
+        return `${existing} + ${newQty}`;
+    };
+
     const handleQuickAdd = async () => {
         if (!selectedFood) return;
 
@@ -114,9 +171,10 @@ export default function ShoppingListPage() {
                 const existingIndex = currentList.findIndex((item: any) => item.food_item_id === selectedFood.id);
                 
                 if (existingIndex !== -1) {
-                    // Aggregate quantities by appending with " + "
+                    // Try to intelligently combine quantities
                     const existingQty = currentList[existingIndex].quantity;
-                    currentList[existingIndex].quantity = `${existingQty} + ${quantityString}`;
+                    const combined = combineQuantities(existingQty, quantityString);
+                    currentList[existingIndex].quantity = combined;
                     toast.success(`Added to ${selectedFood.common_name || selectedFood.name} total`);
                 } else {
                     // Add new item
