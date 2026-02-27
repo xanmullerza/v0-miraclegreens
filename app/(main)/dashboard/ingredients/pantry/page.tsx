@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { PantryView } from '@/components/kitchen/pantry-view';
-import { Beef, ChevronRight, Plus, X, Package } from 'lucide-react';
+import { Beef, ChevronRight, Plus, X, Package, Receipt } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
 import { supabase } from '@/lib/supabase';
@@ -242,6 +242,16 @@ export default function PantryPage() {
                         noResultsMessage="No matching items found"
                         enterMessage="Enter item name to search"
                         searchingMessage="Searching Library..."
+                        powerButton={
+                            <button
+                                onClick={() => {
+                                    // TODO: Wire up receipt scanner
+                                }}
+                                className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:border-amber-500 hover:bg-amber-500/10 shrink-0"
+                            >
+                                <Receipt size={16} className="text-slate-900 dark:text-white" />
+                            </button>
+                        }
                         renderResult={(food: any) => (
                             <>
                                 <div className="flex items-center gap-4 min-w-0">
