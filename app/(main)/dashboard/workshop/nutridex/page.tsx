@@ -6,6 +6,7 @@ import {
     Activity,
     Scale,
     ChevronDown,
+    ChevronRight,
     Gem,
     Battery,
     Sparkles,
@@ -26,6 +27,7 @@ import {
 import { cn } from '@/lib/utils';
 import { HeaderFilter } from '@/lib/context/header-actions-context';
 import { PageContainer } from '@/components/ui/page-container';
+import { HeroSearch } from '@/components/ui/hero-search';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useRDA } from '@/hooks/use-rda';
 
@@ -156,6 +158,60 @@ export default function NutrientsPage() {
     const { profile, dailyTargets, energyUnit } = useUserPreferences();
     const [selectedNutrientId, setSelectedNutrientId] = useState<string | null>(null);
 
+    // HeroSearch state for nutrient search
+    const [heroQuery, setHeroQuery] = useState('');
+    const [heroResults, setHeroResults] = useState<{ id: string; label: string; group: string }[]>([]);
+    const [isHeroSearching, setIsHeroSearching] = useState(false);
+    const [isHeroActive, setIsHeroActive] = useState(false);
+
+    // All searchable nutrients
+    const ALL_NUTRIENTS = useMemo(() => [
+        { id: 'Energy', label: 'Energy', group: 'Macros' },
+        { id: 'Protein', label: 'Protein', group: 'Macros' },
+        { id: 'Carbs', label: 'Carbs', group: 'Macros' },
+        { id: 'Fat', label: 'Fat', group: 'Macros' },
+        { id: 'Sodium', label: 'Sodium', group: 'Electrolytes' },
+        { id: 'Potassium', label: 'Potassium', group: 'Electrolytes' },
+        { id: 'Magnesium', label: 'Magnesium', group: 'Electrolytes' },
+        { id: 'Calcium', label: 'Calcium', group: 'Electrolytes' },
+        { id: 'Phosphorus', label: 'Phosphorus', group: 'Electrolytes' },
+        { id: 'Iron', label: 'Iron', group: 'Minerals' },
+        { id: 'Zinc', label: 'Zinc', group: 'Minerals' },
+        { id: 'Copper', label: 'Copper', group: 'Minerals' },
+        { id: 'Manganese', label: 'Manganese', group: 'Minerals' },
+        { id: 'Selenium', label: 'Selenium', group: 'Minerals' },
+        { id: 'Vitamin A', label: 'Vitamin A', group: 'Vitamins' },
+        { id: 'Vitamin D', label: 'Vitamin D', group: 'Vitamins' },
+        { id: 'Vitamin E', label: 'Vitamin E', group: 'Vitamins' },
+        { id: 'Vitamin K', label: 'Vitamin K', group: 'Vitamins' },
+        { id: 'B1 (Thiamine)', label: 'B1 (Thiamine)', group: 'Vitamins' },
+        { id: 'B2 (Riboflavin)', label: 'B2 (Riboflavin)', group: 'Vitamins' },
+        { id: 'B3 (Niacin)', label: 'B3 (Niacin)', group: 'Vitamins' },
+        { id: 'B5 (Pantothenic Acid)', label: 'B5 (Pantothenic Acid)', group: 'Vitamins' },
+        { id: 'B6 (Pyridoxine)', label: 'B6 (Pyridoxine)', group: 'Vitamins' },
+        { id: 'B7 (Biotin)', label: 'B7 (Biotin)', group: 'Vitamins' },
+        { id: 'B9 (Folate)', label: 'B9 (Folate)', group: 'Vitamins' },
+        { id: 'B12 (Cobalamin)', label: 'B12 (Cobalamin)', group: 'Vitamins' },
+        { id: 'Vitamin C', label: 'Vitamin C', group: 'Vitamins' },
+        { id: 'Choline', label: 'Choline', group: 'Other' },
+        { id: 'Fiber', label: 'Fiber', group: 'Other' },
+        { id: 'Omega-3', label: 'Omega-3', group: 'Other' },
+        { id: 'ALA', label: 'ALA', group: 'Other' },
+        { id: 'Sugars', label: 'Sugars', group: 'Other' },
+        { id: 'Cholesterol', label: 'Cholesterol', group: 'Other' },
+        { id: 'Water', label: 'Water', group: 'Other' },
+    ], []);
+
+    const handleHeroInput = useCallback((val: string) => {
+        setHeroQuery(val);
+        if (!val || val.length < 1) { setHeroResults([]); return; }
+        const q = val.toLowerCase();
+        const matches = ALL_NUTRIENTS.filter(n =>
+            n.label.toLowerCase().includes(q) || n.group.toLowerCase().includes(q)
+        );
+        setHeroResults(matches);
+    }, [ALL_NUTRIENTS]);
+
     // Context-aware RDAs for the profile
     const userRDAs = useRDA(
         typeof profile.age === 'number' ? profile.age : 30,
@@ -270,6 +326,41 @@ export default function NutrientsPage() {
             </HeaderFilter>
 
             <div className="space-y-10 animate-in fade-in duration-700 pb-32 pt-4">
+
+                {/* Hero Search for Nutrients */}
+                <HeroSearch
+                    searchQuery={heroQuery}
+                    onQueryChange={handleHeroInput}
+                    results={heroResults}
+                    isLoading={isHeroSearching}
+                    isActive={isHeroActive}
+                    setIsActive={setIsHeroActive}
+                    onSelect={(item) => {
+                        handleNutrientSelect(item.id);
+                        setIsHeroActive(false);
+                        setHeroQuery('');
+                    }}
+                    theme="emerald"
+                    placeholder="SEARCH NUTRIENTS..."
+                    idleIcon={<Activity size={20} className="text-emerald-500" />}
+                    idleTitle="Nutridex"
+                    idleSubtitle="Search vitamins, minerals, and macronutrients"
+                    noResultsMessage="No matching nutrients found"
+                    enterMessage="Enter nutrient name to search"
+                    searchingMessage="Searching Nutrients..."
+                    renderResult={(item: any) => (
+                        <div className="flex items-center gap-4 min-w-0 w-full">
+                            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0">
+                                <Activity size={16} className="text-emerald-500" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{item.label}</h4>
+                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">{item.group}</p>
+                            </div>
+                            <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={20} />
+                        </div>
+                    )}
+                />
 
                 {/* Section Header */}
                 <div className="flex items-center gap-4 px-2">

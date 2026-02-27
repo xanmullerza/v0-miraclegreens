@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -81,6 +81,7 @@ import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRouter } from 'next/navigation';
 import { useSearch } from '@/lib/context/search-context';
+import { HeroSearch } from '@/components/ui/hero-search';
 
 const showShop = false;
 
@@ -373,6 +374,34 @@ export function MealPlannerContent({
     const [generating, setGenerating] = useState(false);
     const [pantryItems, setPantryItems] = useState<any[]>([]);
     const [eatenMeals, setEatenMeals] = useState<Set<string>>(new Set());
+
+    // HeroSearch state
+    const [heroSearchQuery, setHeroSearchQuery] = useState('');
+    const [heroSearchResults, setHeroSearchResults] = useState<any[]>([]);
+    const [isHeroSearching, setIsHeroSearching] = useState(false);
+    const [isHeroActive, setIsHeroActive] = useState(false);
+    const heroSearchTimeout = React.useRef<NodeJS.Timeout | null>(null);
+
+    const performHeroSearch = async (query: string) => {
+        if (!query || query.length < 2) { setHeroSearchResults([]); return; }
+        setIsHeroSearching(true);
+        try {
+            const { data, error } = await supabase
+                .from('recipes')
+                .select('id, title, type, energy_kcal, image, is_mix')
+                .ilike('title', `%${query}%`)
+                .limit(8);
+            if (error) throw error;
+            setHeroSearchResults(data || []);
+        } catch (e) { console.error('Search error:', e); }
+        finally { setIsHeroSearching(false); }
+    };
+
+    const handleHeroInput = (val: string) => {
+        setHeroSearchQuery(val);
+        if (heroSearchTimeout.current) clearTimeout(heroSearchTimeout.current);
+        heroSearchTimeout.current = setTimeout(() => performHeroSearch(val), 300);
+    };
 
     // Parse a pantry quantity string to total grams (returns null if no weight info)
     const parseTotalGrams = (quantityStr: string): number | null => {
@@ -828,10 +857,45 @@ export function MealPlannerContent({
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500 text-slate-800 dark:text-slate-100 pb-20">
-            {/* Hero Section Hidden as per user request */}
-            {/* <div className="relative h-48 rounded-[2.5rem] bg-amber-600 overflow-hidden flex items-center px-12 group">
-                ... (omitted for brevity)
-            </div> */}
+            {/* Hero Search */}
+            <HeroSearch
+                searchQuery={heroSearchQuery}
+                onQueryChange={handleHeroInput}
+                results={heroSearchResults}
+                isLoading={isHeroSearching}
+                isActive={isHeroActive}
+                setIsActive={setIsHeroActive}
+                onSelect={(item) => {
+                    const base = item.is_mix ? 'mixes' : 'meals';
+                    router.push(`/dashboard/recipes/${base}/${item.id}`);
+                }}
+                theme="amber"
+                placeholder="SEARCH RECIPES..."
+                idleIcon={<Calendar size={20} className="text-amber-500" />}
+                idleTitle="Meal Planner"
+                idleSubtitle="Search recipes or generate a daily meal plan below"
+                noResultsMessage="No matching recipes found"
+                enterMessage="Enter recipe name to search"
+                searchingMessage="Searching Recipes..."
+                renderResult={(item: any) => (
+                    <div className="flex items-center gap-4 min-w-0 w-full">
+                        <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
+                            {item.image ? (
+                                <img src={item.image} className="w-full h-full object-cover" alt={item.title} />
+                            ) : (
+                                <ChefHat className="m-auto opacity-10 h-full w-5" />
+                            )}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                            <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{item.title}</h4>
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                                {formatEnergy(item.energy_kcal || 0, unit)} <span className="text-slate-200 dark:text-slate-700">|</span> {item.type || (item.is_mix ? 'Mix' : 'Meal')}
+                            </p>
+                        </div>
+                        <ChevronRight className="text-slate-200 group-hover:text-amber-500 transition-colors shrink-0" size={20} />
+                    </div>
+                )}
+            />
 
             {/* Controls Row */}
             {/* Header Actions (Refactored from Controls Row) */}
