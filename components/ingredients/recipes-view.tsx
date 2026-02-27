@@ -36,6 +36,7 @@ import { toast } from 'sonner';
 import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useDataPersistence, Recipe } from '@/lib/hooks/use-data-persistence';
+import { RecipeFormDialog } from '@/components/ingredients/recipe-form-dialog';
 
 const CAL_TO_KJ = 4.184;
 const formatEnergy = (calories: number, unit: 'kcal' | 'kJ') => {
@@ -57,6 +58,8 @@ interface RecipesViewProps {
     setIsFilterOpen?: React.Dispatch<React.SetStateAction<boolean>>;
     isMix?: boolean;
     showHero?: boolean;
+    showAddRecipe?: boolean;
+    setShowAddRecipe?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export function RecipesView({
@@ -68,7 +71,9 @@ export function RecipesView({
     isFilterOpen: externalIsFilterOpen,
     setIsFilterOpen: externalSetIsFilterOpen,
     isMix = false,
-    showHero = true
+    showHero = true,
+    showAddRecipe = false,
+    setShowAddRecipe
 }: RecipesViewProps) {
     const router = useRouter();
     const PAGE_SIZE = 20;
@@ -347,9 +352,19 @@ export function RecipesView({
                     </div>
                 </div>
             )}
+            {/* List Container */}
+            <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
+                {showAddRecipe && setShowAddRecipe ? (
+                    /* Recipe Form - replaces list when adding */
+                    <RecipeFormDialog
+                        onClose={() => setShowAddRecipe(false)}
+                        isMix={isMix}
+                    />
+                ) : (
+                <>
             {/* Controls Row */}
             {!hideControls && (
-                <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
+                <div className="flex flex-col md:flex-row gap-4 justify-between items-center px-6 py-4 border-b border-slate-200 dark:border-slate-800">
                     {/* Unified Filter Bar */}
                     <div className="flex items-center gap-2">
                         <DropdownMenu>
@@ -442,22 +457,14 @@ export function RecipesView({
                         </DropdownMenu>
                     </div>
 
-                    <Button
-                        onClick={() => router.push(`/dashboard/recipes/meals/new${isMix ? '?is_mix=true' : ''}`)}
-                        className={cn(
-                            "px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 shadow-lg h-auto",
-                            isMix
-                                ? "bg-indigo-600 text-white border-indigo-600 shadow-indigo-500/20 hover:bg-indigo-700"
-                                : "bg-blue-600 text-white border-blue-600 shadow-blue-500/20 hover:bg-blue-700"
-                        )}
-                    >
-                        <Plus size={12} />
-                        {isMix ? 'Add Mix' : 'Add Meal'}
-                    </Button>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                        {totalCount} {isMix ? 'mix' : 'meal'}{totalCount !== 1 ? 'es' : ''}
+                    </p>
                 </div>
             )}
 
             {/* Content Area */}
+            <div className="p-4 md:p-6">
             {loading ? (
                 <div className="h-96 flex flex-col items-center justify-center gap-4 bg-white/50 dark:bg-slate-900/20 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-800">
                     <Loader2 className={cn("animate-spin", isMix ? "text-indigo-500" : "text-blue-500")} size={32} />
@@ -580,6 +587,10 @@ export function RecipesView({
                     )}
                 </div>
             )}
+            </div>
+            </>
+            )}
+            </div>
         </div>
     );
 }

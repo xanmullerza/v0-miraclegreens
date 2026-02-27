@@ -2,7 +2,7 @@
 
 import React, { useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, ChefHat, ChevronRight } from 'lucide-react';
+import { Loader2, ChefHat, ChevronRight, Plus } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { RecipesView } from '@/components/ingredients/recipes-view';
 import { HeroSearch } from '@/components/ui/hero-search';
@@ -38,6 +38,7 @@ function MealsContent() {
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [isSearchActive, setIsSearchActive] = useState(false);
+    const [showAddRecipe, setShowAddRecipe] = useState(false);
     const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
     const renderResult = (item: any) => (
@@ -110,11 +111,20 @@ function MealsContent() {
                     noResultsMessage="No matching meals found"
                     enterMessage="Enter meal name to search"
                     searchingMessage="Searching Meals..."
+                    powerButton={
+                        <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setShowAddRecipe(true); }}
+                            className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:border-amber-500 hover:bg-amber-500/10 shrink-0 relative z-10"
+                        >
+                            <Plus size={16} className="text-slate-900 dark:text-white" />
+                        </button>
+                    }
                 />
 
                 {/* Dynamic Content Area */}
                 <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
-                    <RecipesView showHero={false} />
+                    <RecipesView showHero={false} showAddRecipe={showAddRecipe} setShowAddRecipe={setShowAddRecipe} />
                 </div>
             </div>
         </PageContainer>
