@@ -123,8 +123,9 @@ function IngredientsContent() {
                         searchingMessage="Searching Library..."
                         powerButton={
                             <button
-                                onClick={() => setShowAddFood(true)}
-                                className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:border-emerald-500 hover:bg-emerald-500/10 shrink-0"
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); setShowAddFood(true); }}
+                                className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:border-emerald-500 hover:bg-emerald-500/10 shrink-0 relative z-10"
                             >
                                 <Plus size={16} className="text-slate-900 dark:text-white" />
                             </button>
