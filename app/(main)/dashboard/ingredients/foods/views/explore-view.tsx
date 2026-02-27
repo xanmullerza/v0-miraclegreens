@@ -1,37 +1,17 @@
 ﻿'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import {
-    ShoppingBasket,
-    Plus,
-    Search,
     Loader2,
-    Heart,
-    ArrowRight,
-    Edit2,
     Check,
-    X,
-    Camera,
-    Info,
-    Zap,
-    Wheat,
-    Droplet,
     Beef,
-    Activity,
-    Globe,
     Filter,
     ChevronDown,
-    ChevronRight,
-    CheckCircle2,
-    Trash2,
     Leaf,
-    Library
 } from 'lucide-react';
 
 import { cn, formatFoodName } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
@@ -39,7 +19,6 @@ import { supabase } from '@/lib/supabase';
 import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
-import { ChevronDown as ChevronDownIcon, CheckSquare, Square, ChefHat } from 'lucide-react';
 import { FoodFormDialog } from '@/components/ingredients/food-form-dialog';
 
 const CAL_TO_KJ = 4.184;
@@ -136,60 +115,13 @@ export function ExploreView({
     }, []);
 
 
-    // Quick Add State (Sophisticated matching Pantry)
-    const [quickAddItem, setQuickAddItem] = useState<FoodItem | null>(null);
-    const [quickAddQty, setQuickAddQty] = useState('1');
-    const [quickAddWeight, setQuickAddWeight] = useState('');
-    const [quickAddUnit, setQuickAddUnit] = useState('g');
-    const [quickAddMode, setQuickAddMode] = useState<'pantry' | 'shopping'>('pantry');
-    const { measurementUnit, energyUnit } = useUserPreferences();
+    const { energyUnit } = useUserPreferences();
 
-    // Hero Search State
-    const [heroSearchQuery, setHeroSearchQuery] = useState('');
-    const [heroResults, setHeroResults] = useState<FoodItem[]>([]);
-    const [isHeroSearching, setIsHeroSearching] = useState(false);
-    const [isHeroActive, setIsHeroActive] = useState(false);
-    const heroSearchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
     const CATEGORIES = ["General", "Vegetables", "Grains", "Legumes", "Oils", "Proteins", "Fruit", "Nuts", "Flavour", "Supplements", "Mixes"];
-
-    // Hero Search Logic
-    const performHeroSearch = async (query: string) => {
-        if (!query || query.length < 2) {
-            setHeroResults([]);
-            return;
-        }
-        setIsHeroSearching(true);
-        try {
-            let heroQuery = supabase.from('food_items').select('*').limit(8);
-            if (user) {
-                heroQuery = heroQuery.or(`is_curated.eq.true,user_id.eq.${user.id}`);
-            } else {
-                heroQuery = heroQuery.eq('is_curated', true);
-            }
-            heroQuery = heroQuery.or(`name.ilike.%${query}%,common_name.ilike.%${query}%`);
-            heroQuery = heroQuery.order('name', { ascending: true });
-            const { data, error } = await heroQuery;
-            if (error) throw error;
-            setHeroResults((data as FoodItem[]) || []);
-        } catch (error) {
-            console.error('Hero search error:', error);
-        } finally {
-            setIsHeroSearching(false);
-        }
-    };
-
-    const handleHeroSearchInput = (val: string) => {
-        setHeroSearchQuery(val);
-        if (heroSearchTimeoutRef.current) clearTimeout(heroSearchTimeoutRef.current);
-        heroSearchTimeoutRef.current = setTimeout(() => performHeroSearch(val), 300);
-    };
 
     useEffect(() => {
         fetchFoods(1, true);
-    }, [searchQuery, showFavoritesOnly, selectedCategories, user, showAddFood]);
+    }, [showFavoritesOnly, selectedCategories, user, showAddFood]);
 
     const fetchFoods = async (pageNum: number, isNewSearch = false) => {
         setLoading(true);
@@ -289,33 +221,12 @@ export function ExploreView({
         }
     };
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchQuery(e.target.value);
-    };
-
     useEffect(() => {
         const timer = setTimeout(() => {
             fetchFoods(1, true);
         }, 500);
         return () => clearTimeout(timer);
     }, [searchQuery]);
-
-    const toggleGroup = (groupName: string, e: React.MouseEvent) => {
-        e.stopPropagation();
-        setExpandedGroups(prev => ({
-            ...prev,
-            [groupName]: !prev[groupName]
-        }));
-    };
-
-    const groupedFoods = foods.reduce((acc, food) => {
-        const key = food.common_name || food.name;
-        if (!acc[key]) acc[key] = [];
-        acc[key].push(food);
-        return acc;
-    }, {} as Record<string, FoodItem[]>);
-
-    const groupNames = Object.keys(groupedFoods).sort();
 
     const toggleFavorite = async (item: FoodItem, e: React.MouseEvent) => {
         e.stopPropagation();
@@ -356,237 +267,8 @@ export function ExploreView({
 
 
 
-    const handleQuickAdd = async () => {
-        if (!quickAddItem) return;
-
-        const quantityString = quickAddWeight ? `${quickAddQty} x ${quickAddWeight}${quickAddUnit}` : quickAddQty;
-
-        if (quickAddMode === 'pantry') {
-            try {
-                const saved = localStorage.getItem('pantry_quantities');
-                const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-                const existing = quantities[quickAddItem.id] || '';
-
-                // --- Merge with existing stock instead of overwriting ---
-                const existingEntries = existing
-                    .split(/\s*\+\s*/)
-                    .map((s: string) => s.trim())
-                    .filter((s: string) => {
-                        if (!s) return false;
-                        const m = s.match(/^(\d+(?:\.\d+)?)/);
-                        return m ? parseFloat(m[1]) > 0 : true;
-                    });
-
-                const parseEntry = (s: string) => {
-                    const labeled = s.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
-                    if (labeled) return { qty: parseFloat(labeled[1]), label: labeled[2], wg: parseFloat(labeled[3]) };
-                    const xFmt = s.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(g|ml|oz|lb)$/i);
-                    if (xFmt) return { qty: parseFloat(xFmt[1]), label: null, wg: parseFloat(xFmt[2]) };
-                    return null;
-                };
-                const isWeightOnly = (p: ReturnType<typeof parseEntry>) =>
-                    p != null && (p.label === null || /^(gram|kilogram)s?$/i.test(p.label));
-                const totalG = (p: NonNullable<ReturnType<typeof parseEntry>>) => p.qty * p.wg;
-                const fmtG = (g: number) => {
-                    if (g >= 1000) {
-                        const kg = g / 1000;
-                        const kgStr = kg % 1 === 0 ? kg.toString() : kg.toFixed(1);
-                        return `${kgStr} kilogram (1000g)`;
-                    }
-                    return `${Math.round(g)} gram (1g)`;
-                };
-
-                const incomingParsed = parseEntry(quantityString);
-                let merged = false;
-
-                if (incomingParsed && isWeightOnly(incomingParsed)) {
-                    // Consolidate weight entries
-                    let grams = totalG(incomingParsed);
-                    const nonWeight: string[] = [];
-                    for (const raw of existingEntries) {
-                        const p = parseEntry(raw);
-                        if (p && isWeightOnly(p)) grams += totalG(p);
-                        else nonWeight.push(raw);
-                    }
-                    const consolidated = fmtG(grams);
-                    quantities[quickAddItem.id] = nonWeight.length > 0 ? `${nonWeight.join(' + ')} + ${consolidated}` : consolidated;
-                    merged = true;
-                } else if (incomingParsed && incomingParsed.label) {
-                    // Match by label + weight
-                    const matchIdx = existingEntries.findIndex((raw: string) => {
-                        const m = raw.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
-                        return m && m[2] === incomingParsed.label && parseFloat(m[3]) === incomingParsed.wg;
-                    });
-                    if (matchIdx >= 0) {
-                        const m = existingEntries[matchIdx].match(/^(\d+(?:\.\d+)?)/);
-                        existingEntries[matchIdx] = `${(m ? parseFloat(m[1]) : 0) + incomingParsed.qty} ${incomingParsed.label} (${incomingParsed.wg}g)`;
-                        quantities[quickAddItem.id] = existingEntries.join(' + ');
-                        merged = true;
-                    }
-                } else if (/^\d+(?:\.\d+)?$/.test(quantityString)) {
-                    // Plain number — try to merge with the sole existing labeled entry
-                    const incQty = parseFloat(quantityString);
-                    const labeledEntries = existingEntries.filter(raw => {
-                        const m = raw.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
-                        return m && !/^(gram|kilogram)s?$/i.test(m[2]);
-                    });
-                    if (labeledEntries.length === 1) {
-                        const idx = existingEntries.indexOf(labeledEntries[0]);
-                        const m = labeledEntries[0].match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
-                        if (m && idx >= 0) {
-                            existingEntries[idx] = `${parseFloat(m[1]) + incQty} ${m[2]} (${m[3]}g)`;
-                            quantities[quickAddItem.id] = existingEntries.join(' + ');
-                            merged = true;
-                        }
-                    }
-                }
-
-                if (!merged) {
-                    quantities[quickAddItem.id] = existingEntries.length > 0
-                        ? `${existingEntries.join(' + ')} + ${quantityString}`
-                        : quantityString;
-                }
-
-                setFoods(prev => prev.map(f => f.id === quickAddItem.id ? { ...f, is_in_pantry: true, quantity: quantities[quickAddItem.id] } : f));
-                localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-
-                const { error } = await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', quickAddItem.id);
-                if (error) throw error;
-
-                toast.success(`"${quickAddItem.name}" added to pantry`);
-            } catch (error) { toast.error("Failed to update pantry"); }
-        } else {
-            const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-            const newItem = {
-                id: `manual-${Date.now()}`,
-                name: quickAddItem.name,
-                quantity: quantityString,
-                unit: '',
-                checked: false,
-                source: 'manual',
-                food_item_id: quickAddItem.id
-            };
-            localStorage.setItem('vitala_shopping_manual_items', JSON.stringify([...currentList, newItem]));
-            toast.success(`"${quickAddItem.name}" added to groceries`);
-        }
-        setQuickAddItem(null);
-    };
-
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
-            {/* Food Search Hero Workspace */}
-            {showHero && (
-                <div className="w-full md:max-w-[900px] mx-auto bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col mb-10">
-                    <div className="h-[180px] overflow-y-auto p-4 md:p-8 no-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1">
-                        {isHeroActive ? (
-                            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                                {isHeroSearching ? (
-                                    <div className="py-12 flex flex-col items-center justify-center text-slate-400 gap-4">
-                                        <div className="relative">
-                                            <Activity className="animate-spin text-emerald-500" size={32} />
-                                            <div className="absolute inset-0 animate-ping bg-emerald-500/20 rounded-full" />
-                                        </div>
-                                        <p className="text-[10px] font-black uppercase tracking-widest">Searching Foods...</p>
-                                    </div>
-                                ) : heroResults.length > 0 ? (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                        {heroResults.map(food => (
-                                            <button
-                                                key={food.id}
-                                                onClick={() => router.push(`/dashboard/ingredients/foods/${food.id}`)}
-                                                className="w-full p-4 rounded-2xl hover:bg-emerald-50 dark:hover:bg-emerald-900/10 flex items-center justify-between group transition-all border border-slate-100 dark:border-slate-800 hover:border-emerald-500/30 text-left"
-                                            >
-                                                <div className="flex items-center gap-4 min-w-0">
-                                                    <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
-                                                        {food.image ? <img src={food.image} className="w-full h-full object-cover" /> : <Leaf className="m-auto opacity-10 h-full w-5" />}
-                                                    </div>
-                                                    <div className="min-w-0">
-                                                        <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{formatFoodName(food.common_name || food.name)}</h4>
-                                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
-                                                            {formatEnergy(food.energy_kcal, energyUnit)} <span className="text-slate-200 dark:text-slate-700">|</span> {food.category || 'General'}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={20} />
-                                            </button>
-                                        ))}
-                                    </div>
-                                ) : heroSearchQuery.length > 1 ? (
-                                    <div className="py-12 text-center text-slate-400">
-                                        <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-dashed border-slate-200 dark:border-slate-700">
-                                            <Search size={24} className="opacity-20" />
-                                        </div>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">No matching foods found</p>
-                                    </div>
-                                ) : (
-                                    <div className="py-12 text-center text-slate-400">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 italic">Enter food name to explore</p>
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <div className="flex flex-col items-center justify-start pt-8 md:pt-10 text-center h-full animate-in fade-in duration-700">
-                                <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mb-4 relative">
-                                    <Library size={24} className="text-emerald-500" />
-                                    <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
-                                </div>
-                                <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase italic tracking-tight mb-1">Ready to Explore?</h3>
-                                <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest max-w-xs">
-                                    Search below to find your next ingredient
-                                </p>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="p-4 md:p-6 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3 bg-white dark:bg-slate-900 order-2 rounded-b-[2.5rem]">
-                        <div className="flex-1 relative flex items-center">
-                            <div className={cn("absolute left-5 transition-colors", isHeroActive ? "text-emerald-500/50" : "text-slate-300")}>
-                                <Search size={16} className="md:w-5 md:h-5" />
-                            </div>
-                            <input
-                                placeholder={isHeroActive ? "SEARCH FOOD LIBRARY..." : "CLICK TO SEARCH..."}
-                                className={cn(
-                                    "w-full bg-slate-50 dark:bg-slate-800/50 border-2 transition-all shadow-sm text-[10px] md:text-sm font-black uppercase tracking-widest h-12 md:h-14 rounded-[1.5rem] md:rounded-[2rem] pl-12 pr-6 text-slate-900 dark:text-white placeholder:text-slate-300",
-                                    isHeroActive
-                                        ? "border-emerald-500/30 focus:border-emerald-500/80 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white dark:focus:bg-slate-800/80"
-                                        : "border-slate-100 dark:border-slate-800 cursor-pointer hover:border-emerald-500/20"
-                                )}
-                                value={heroSearchQuery}
-                                onFocus={() => setIsHeroActive(true)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Escape') {
-                                        setIsHeroActive(false);
-                                        setHeroSearchQuery('');
-                                        setHeroResults([]);
-                                    }
-                                }}
-                                onChange={(e) => {
-                                    if (!isHeroActive) setIsHeroActive(true);
-                                    handleHeroSearchInput(e.target.value);
-                                }}
-                            />
-                        </div>
-                        {isHeroActive ? (
-                            <button
-                                onClick={() => {
-                                    setIsHeroActive(false);
-                                    setHeroSearchQuery("");
-                                    setHeroResults([]);
-                                }}
-                                className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-500 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 flex items-center justify-center transition-all active:scale-95 group/cancel shadow-sm"
-                                title="Close Search"
-                            >
-                                <X size={18} className="md:w-6 md:h-6 group-hover/cancel:rotate-90 transition-transform duration-300" />
-                            </button>
-                        ) : (
-                            <div className="w-12 h-12 md:w-14 md:h-14 flex-shrink-0 rounded-full bg-slate-50 dark:bg-slate-800/50 text-slate-300 flex items-center justify-center">
-                                <Search size={18} className="md:w-6 md:h-6" />
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
-
             {/* List Container */}
             <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl">
                 {showAddFood && setShowAddFood ? (
@@ -661,17 +343,16 @@ export function ExploreView({
                 </div>
 
                 {/* List Area */}
-                <div className="space-y-0 p-4">
-                    {groupNames.map((groupName) => {
-                    const items = groupedFoods[groupName];
-                    const isExpanded = expandedGroups[groupName] || (searchQuery.length > 0 && items.length > 0);
-                    const hasMultiple = items.length > 1;
-
-                    return (
-                        <div key={groupName} className="">
-                            {/* Items in Group */}
-                            <div className="space-y-2">
-                                {items.map((food) => (
+                <div className="space-y-2 p-4">
+                    {foods.length === 0 && !loading && (
+                        <div className="py-16 text-center">
+                            <div className="w-14 h-14 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-dashed border-slate-200 dark:border-slate-700">
+                                <Leaf size={22} className="opacity-20" />
+                            </div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">No foods match your filters</p>
+                        </div>
+                    )}
+                    {foods.map((food) => (
                                     <div
                                         key={food.id}
                                         onClick={() => router.push(`/dashboard/ingredients/foods/${food.id}`)}
@@ -697,7 +378,7 @@ export function ExploreView({
                                             {/* Name */}
                                             <div className="flex-1 min-w-0 lg:p-0">
                                                 <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize truncate">
-                                                    {hasMultiple ? formatFoodName(food.name) : formatFoodName(food.common_name || food.name)}
+                                                    {formatFoodName(food.common_name || food.name)}
                                                 </h3>
                                                 <div className="flex flex-wrap gap-2 mt-1">
                                                     {/* Quantity badge - always visible if present */}
@@ -722,137 +403,43 @@ export function ExploreView({
 
                                             {/* Stats (Desktop View) */}
                                             <div className="hidden lg:flex items-center justify-end">
-                                                <span className="font-black text-[11px] text-slate-900 dark:text-white">{formatEnergy(food.energy_kcal, energyUnit)}</span>
+                                                <span className="font-black text-[11px] text-blue-500 dark:text-blue-400">{formatEnergy(food.energy_kcal, energyUnit)}</span>
                                             </div>
                                             <div className="hidden lg:flex items-center justify-end">
-                                                <span className="font-black text-[11px] text-slate-900 dark:text-white">{food.carbs_g.toFixed(1)}g</span>
+                                                <span className="font-black text-[11px] text-amber-500 dark:text-amber-400">{food.carbs_g.toFixed(1)}g</span>
                                             </div>
                                             <div className="hidden lg:flex items-center justify-end">
-                                                <span className="font-black text-[11px] text-slate-900 dark:text-white">{food.fat_g.toFixed(1)}g</span>
+                                                <span className="font-black text-[11px] text-rose-500 dark:text-rose-400">{food.fat_g.toFixed(1)}g</span>
                                             </div>
                                             <div className="hidden lg:flex items-center justify-end">
-                                                <span className="font-black text-[11px] text-slate-900 dark:text-white">{food.protein_g.toFixed(1)}g</span>
+                                                <span className="font-black text-[11px] text-emerald-500 dark:text-emerald-400">{food.protein_g.toFixed(1)}g</span>
                                             </div>
                                         </div>
 
 
 
-                                        {/* Quick Add Advanced Slide-out */}
-                                        {quickAddItem?.id === food.id && (
-                                            <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-6 animate-in slide-in-from-top duration-300">
-                                                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center">
-                                                            <ShoppingBasket size={24} className="text-emerald-500" />
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Quick Action</p>
-                                                            <h4 className="font-black text-sm uppercase italic">Add to {quickAddMode === 'pantry' ? 'Inventory' : 'Shopping List'}</h4>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="flex flex-wrap items-center gap-3">
-                                                        <div className="flex bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-1">
-                                                            <button
-                                                                onClick={() => setQuickAddMode('pantry')}
-                                                                className={cn("px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all", quickAddMode === 'pantry' ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" : "text-slate-400")}
-                                                            >
-                                                                Pantry
-                                                            </button>
-                                                            <button
-                                                                onClick={() => setQuickAddMode('shopping')}
-                                                                className={cn("px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all", quickAddMode === 'shopping' ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20" : "text-slate-400")}
-                                                            >
-                                                                Groceries
-                                                            </button>
-                                                        </div>
-
-                                                        <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-3 h-11">
-                                                            <span className="text-[10px] font-black text-slate-400 uppercase">Qty</span>
-                                                            <input
-                                                                type="text"
-                                                                value={quickAddQty}
-                                                                onChange={(e) => setQuickAddQty(e.target.value)}
-                                                                className="w-10 bg-transparent border-none text-center font-black text-sm focus:ring-0"
-                                                            />
-                                                        </div>
-
-                                                        <div className="flex items-center gap-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-3 h-11">
-                                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Weight/Vol</span>
-                                                            <input
-                                                                type="text"
-                                                                value={quickAddWeight}
-                                                                onChange={(e) => setQuickAddWeight(e.target.value)}
-                                                                placeholder="500"
-                                                                className="w-14 bg-transparent border-none text-center font-black text-sm focus:ring-0 placeholder:text-slate-300"
-                                                            />
-                                                            <select
-                                                                value={quickAddUnit}
-                                                                onChange={(e) => setQuickAddUnit(e.target.value)}
-                                                                className="bg-transparent border-none text-[10px] font-black uppercase text-slate-500 focus:ring-0 p-0 h-full cursor-pointer w-12"
-                                                            >
-                                                                {measurementUnit === 'imperial' ? (
-                                                                    <>
-                                                                        <option value="oz">oz</option>
-                                                                        <option value="lb">lb</option>
-                                                                        <option value="fl oz">fl oz</option>
-                                                                        <option value="pt">pt</option>
-                                                                        <option value="qt">qt</option>
-                                                                        <option value="gal">gal</option>
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        <option value="g">g</option>
-                                                                        <option value="kg">kg</option>
-                                                                        <option value="ml">ml</option>
-                                                                        <option value="L">L</option>
-                                                                    </>
-                                                                )}
-                                                            </select>
-                                                        </div>
-
-                                                        <Button
-                                                            onClick={handleQuickAdd}
-                                                            className={cn("h-11 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-xl", quickAddMode === 'pantry' ? "bg-emerald-600 hover:bg-emerald-700 text-white" : "bg-rose-600 hover:bg-rose-700 text-white")}
-                                                        >
-                                                            Confirm
-                                                        </Button>
-
-                                                        <Button variant="ghost" size="icon" onClick={() => setQuickAddItem(null)} className="h-11 w-11 rounded-xl text-slate-400">
-                                                            <X size={18} />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
                                     </div>
                                 ))}
-                            </div>
-                        </div>
-                    );  
-                })}
                 </div>
                 </>
                 )}
             </div>
 
-            {
-                hasMore && (
-                    <div className="flex justify-center pt-8">
-                        <Button
-                            variant="outline"
-                            onClick={() => fetchFoods(page + 1)}
-                            className="h-16 w-16 p-0 rounded-full border border-slate-300 dark:border-slate-700 flex items-center justify-center hover:bg-transparent bg-transparent"
-                        >
-                            {loading ? (
-                                <Loader2 className="animate-spin text-slate-300 dark:text-slate-700" />
-                            ) : (
-                                <ChevronDown size={36} className="text-slate-100 dark:text-slate-100" />
-                            )}
-                        </Button>
-                    </div>
-                )
-            }
+            {hasMore && (
+                <div className="flex justify-center pt-8">
+                    <button
+                        onClick={() => fetchFoods(page + 1)}
+                        className="h-12 px-8 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:border-emerald-400 hover:text-emerald-600 transition-all"
+                    >
+                        {loading ? (
+                            <Loader2 size={14} className="animate-spin" />
+                        ) : (
+                            <ChevronDown size={14} />
+                        )}
+                        Load More
+                    </button>
+                </div>
+            )}
         </div >
     );
 }
