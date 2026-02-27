@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSearch } from '@/lib/context/search-context';
 import { toast } from 'sonner';
@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { fetchFoodMeasures } from '@/lib/utils/nutrition-calculator';
@@ -72,6 +73,14 @@ export function ShoppingListView() {
     const [matchDialogOpen, setMatchDialogOpen] = useState(false);
     const [selectedMatchItem, setSelectedMatchItem] = useState<ShoppingListItem | null>(null);
     const [scannedIdToLink, setScannedIdToLink] = useState<string | null>(null);
+
+    // Inline pantry-add panel state
+    const [pantryAddItem, setPantryAddItem] = useState<ShoppingListItem | null>(null);
+    const [pantryAddQty, setPantryAddQty] = useState('1');
+    const [pantryAddPortions, setPantryAddPortions] = useState<{ label: string; weight_g: number }[]>([]);
+    const [pantryAddSelectedPortion, setPantryAddSelectedPortion] = useState<{ label: string; weight_g: number } | null>(null);
+    const [pantryAddFoodId, setPantryAddFoodId] = useState<string | null>(null);
+    const [pantryAddLoading, setPantryAddLoading] = useState(false);
 
     // Load manual items from local storage on mount
     useEffect(() => {
@@ -293,7 +302,22 @@ export function ShoppingListView() {
         }
     };
 
-    const handleDirectAddToPantry = async (item: ShoppingListItem) => {
+    // Open the inline pantry-add panel for a grocery item
+    const openPantryAddPanel = async (item: ShoppingListItem) => {
+        // If already open for this item, close it
+        if (pantryAddItem?.id === item.id) {
+            setPantryAddItem(null);
+            return;
+        }
+
+        // Pre-fill qty from the grocery item's quantity (strip non-numeric prefixes)
+        const qtyMatch = (item.quantity || '1').match(/^(\d+(?:\.\d+)?)/);
+        setPantryAddQty(qtyMatch ? qtyMatch[1] : '1');
+        setPantryAddPortions([]);
+        setPantryAddSelectedPortion(null);
+        setPantryAddFoodId(null);
+        setPantryAddItem(item);
+
         // Resolve food_item_id if missing — look up by name
         let foodItemId = item.food_item_id || null;
         if (!foodItemId && item.name) {
@@ -309,161 +333,120 @@ export function ShoppingListView() {
             } catch (e) { /* ignore */ }
         }
 
-        // If linked to a known food item → add directly to localStorage
         if (foodItemId) {
+            setPantryAddFoodId(foodItemId);
+            // Fetch portions for the portion picker
             try {
-                const saved = localStorage.getItem('pantry_quantities');
-                const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-                const current = quantities[foodItemId] || '';
-
-                // Normalize incoming quantity to a standard gram-weight string so
-                // parseTotalGrams in handleMarkEaten can always deduct correctly.
-                const rawQty = item.quantity || '1';
-                // Helper: format grams as kg when >= 1000g
-                const fmtG = (g: number) => {
-                    if (g >= 1000) {
-                        const kg = g / 1000;
-                        const kgStr = kg % 1 === 0 ? kg.toString() : kg.toFixed(1);
-                        return `${kgStr} kilogram (1000g)`;
-                    }
-                    return `1 x ${Math.round(g)}g`;
-                };
-                const normalizeToGrams = (s: string): string => {
-                    const t = s.trim();
-                    // Already labeled, e.g. "1 kilogram (1000g)" or "3 Each (304g)"
-                    if (/\(\d+(?:\.\d+)?g\)$/.test(t)) return t;
-                    // "1 x 100g"
-                    if (/^\d+(?:\.\d+)?\s*x\s*\d+(?:\.\d+)?\s*g$/i.test(t)) return t;
-                    // "500g"
-                    const plainG = t.match(/^(\d+(?:\.\d+)?)\s*g$/i);
-                    if (plainG) return fmtG(parseFloat(plainG[1]));
-                    // "10 kg" / "10kg" / "10 kilogram(s)"
-                    const kg = t.match(/^(\d+(?:\.\d+)?)\s*(?:kg|kilo(?:gram)?s?)$/i);
-                    if (kg) return fmtG(parseFloat(kg[1]) * 1000);
-                    // "10 ml"
-                    const ml = t.match(/^(\d+(?:\.\d+)?)\s*ml$/i);
-                    if (ml) return fmtG(parseFloat(ml[1]));
-                    // "10 lb"
-                    const lb = t.match(/^(\d+(?:\.\d+)?)\s*(?:lb|lbs|pounds?)$/i);
-                    if (lb) return fmtG(Math.round(parseFloat(lb[1]) * 453.592));
-                    // "10 oz"
-                    const oz = t.match(/^(\d+(?:\.\d+)?)\s*(?:oz|ounces?)$/i);
-                    if (oz) return fmtG(Math.round(parseFloat(oz[1]) * 28.3495));
-                    // Unknown — return as-is
-                    return t;
-                };
-                let incoming = normalizeToGrams(rawQty);
-
-                // If incoming is still a plain number (e.g. "3"), try to resolve it
-                // against the food's portions so it carries weight info
-                const isPlainNumber = /^\d+(?:\.\d+)?$/.test(incoming);
-                if (isPlainNumber && foodItemId) {
-                    // First try: merge with existing labeled entry if there's exactly one
-                    const existingLabeled = current
-                        .split(/\s*\+\s*/)
-                        .map(s => s.trim())
-                        .filter(s => {
-                            const m = s.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
-                            return m && !/^(gram|kilogram)s?$/i.test(m[2]);
-                        });
-
-                    if (existingLabeled.length === 1) {
-                        // Merge plain qty into the existing labeled portion
-                        const lbl = existingLabeled[0].match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
-                        if (lbl) {
-                            incoming = `${incoming} ${lbl[2]} (${lbl[3]}g)`;
-                        }
-                    } else {
-                        // Second try: look up the food's portions from DB
-                        try {
-                            const measures = await fetchFoodMeasures(foodItemId);
-                            if (measures && measures.length > 0) {
-                                const defaultPortion = measures.find((m: any) => /each/i.test(m.label))
-                                    || measures.find((m: any) => !/^(gram|kilogram)s?$/i.test(m.label))
-                                    || null;
-                                if (defaultPortion && !/^(gram|kilogram)s?$/i.test(defaultPortion.label)) {
-                                    incoming = `${incoming} ${defaultPortion.label} (${defaultPortion.weight_g}g)`;
-                                }
-                            }
-                        } catch (e) { /* ignore, use plain number */ }
-                    }
+                const measures = await fetchFoodMeasures(foodItemId);
+                if (measures && measures.length > 0) {
+                    // Filter out gram/kilogram — those are always available implicitly
+                    const meaningful = measures.filter((m: any) => !/^(gram|kilogram)s?$/i.test(m.label));
+                    setPantryAddPortions(meaningful);
+                    // Auto-select "Each" if available, else first meaningful portion
+                    const each = meaningful.find((m: any) => /each/i.test(m.label));
+                    setPantryAddSelectedPortion(each || meaningful[0] || null);
                 }
+            } catch (e) { /* ignore */ }
+        }
+    };
 
-                // Merge with existing quantity, consolidating pure-weight entries
-                const existingEntries = current
-                    .split(/\s*\+\s*/)
-                    .map(s => s.trim())
-                    .filter(s => {
-                        if (!s) return false;
-                        const m = s.match(/^(\d+(?:\.\d+)?)/);
-                        return m ? parseFloat(m[1]) > 0 : true;
-                    });
-
-                // Parse an entry to check if it's a pure gram/kg weight
-                const parseEntry = (s: string) => {
-                    const labeled = s.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
-                    if (labeled) return { qty: parseFloat(labeled[1]), label: labeled[2], wg: parseFloat(labeled[3]) };
-                    const xFmt = s.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*g$/i);
-                    if (xFmt) return { qty: parseFloat(xFmt[1]), label: null, wg: parseFloat(xFmt[2]) };
-                    return null;
-                };
-                const isWeightOnly = (p: ReturnType<typeof parseEntry>) =>
-                    p != null && (p.label === null || /^(gram|kilogram)s?$/i.test(p.label));
-                const totalG = (p: NonNullable<ReturnType<typeof parseEntry>>) => p.qty * p.wg;
-
-                const incomingParsed = parseEntry(incoming);
-                let merged = false;
-
-                if (incomingParsed && isWeightOnly(incomingParsed)) {
-                    // Consolidate all weight entries
-                    let grams = totalG(incomingParsed);
-                    const nonWeight: string[] = [];
-                    for (const raw of existingEntries) {
-                        const p = parseEntry(raw);
-                        if (p && isWeightOnly(p)) {
-                            grams += totalG(p);
-                        } else {
-                            nonWeight.push(raw);
-                        }
-                    }
-                    const consolidated = fmtG(grams);
-                    quantities[foodItemId] = nonWeight.length > 0
-                        ? `${nonWeight.join(' + ')} + ${consolidated}`
-                        : consolidated;
-                    merged = true;
-                } else if (incomingParsed && incomingParsed.label) {
-                    // Match by label + weight (e.g. "3 Each (304g)" + "5 Each (304g)" = "8 Each (304g)")
-                    const matchIdx = existingEntries.findIndex(raw => {
-                        const m = raw.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
-                        return m && m[2] === incomingParsed.label && parseFloat(m[3]) === incomingParsed.wg;
-                    });
-                    if (matchIdx >= 0) {
-                        const m = existingEntries[matchIdx].match(/^(\d+(?:\.\d+)?)/);
-                        const sumQty = (m ? parseFloat(m[1]) : 0) + incomingParsed.qty;
-                        existingEntries[matchIdx] = `${sumQty} ${incomingParsed.label} (${incomingParsed.wg}g)`;
-                        quantities[foodItemId] = existingEntries.join(' + ');
-                        merged = true;
-                    }
-                }
-
-                if (!merged) {
-                    // Append as new entry
-                    const currentStripped = existingEntries.join(' + ');
-                    quantities[foodItemId] = currentStripped ? `${currentStripped} + ${incoming}` : incoming;
-                }
-
-                localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-                // Ensure the food item is marked as in-pantry in DB (best effort)
-                await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', foodItemId);
-                removeItem(item.id);
-                toast.success(`"${item.name}" added to pantry`);
-            } catch (e) {
-                toast.error('Failed to add to pantry');
-            }
+    // Confirm adding a grocery item to the pantry with the chosen qty + portion
+    const confirmPantryAdd = async () => {
+        if (!pantryAddItem) return;
+        const foodItemId = pantryAddFoodId;
+        if (!foodItemId) {
+            // No food resolved — fall back to match dialog
+            moveToPantry(pantryAddItem);
+            setPantryAddItem(null);
             return;
         }
-        // No food_item_id — fall back to the match dialog
-        moveToPantry(item);
+
+        setPantryAddLoading(true);
+        try {
+            // Build quantity string from the panel inputs
+            const qty = pantryAddQty || '1';
+            const quantityString = pantryAddSelectedPortion
+                ? `${qty} ${pantryAddSelectedPortion.label} (${pantryAddSelectedPortion.weight_g}g)`
+                : qty;
+
+            const saved = localStorage.getItem('pantry_quantities');
+            const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
+            const current = quantities[foodItemId] || '';
+
+            // Helper: format grams as kg when >= 1000g
+            const fmtG = (g: number) => {
+                if (g >= 1000) {
+                    const kg = g / 1000;
+                    const kgStr = kg % 1 === 0 ? kg.toString() : kg.toFixed(1);
+                    return `${kgStr} kilogram (1000g)`;
+                }
+                return `${Math.round(g)} gram (1g)`;
+            };
+
+            // Merge with existing stock
+            const existingEntries = current
+                .split(/\s*\+\s*/)
+                .map((s: string) => s.trim())
+                .filter((s: string) => {
+                    if (!s) return false;
+                    const m = s.match(/^(\d+(?:\.\d+)?)/);
+                    return m ? parseFloat(m[1]) > 0 : true;
+                });
+
+            const parseEntry = (s: string) => {
+                const labeled = s.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+                if (labeled) return { qty: parseFloat(labeled[1]), label: labeled[2], wg: parseFloat(labeled[3]) };
+                const xFmt = s.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*g$/i);
+                if (xFmt) return { qty: parseFloat(xFmt[1]), label: null, wg: parseFloat(xFmt[2]) };
+                return null;
+            };
+            const isWeightOnly = (p: ReturnType<typeof parseEntry>) =>
+                p != null && (p.label === null || /^(gram|kilogram)s?$/i.test(p.label));
+            const totalG = (p: NonNullable<ReturnType<typeof parseEntry>>) => p.qty * p.wg;
+
+            const incomingParsed = parseEntry(quantityString);
+            let merged = false;
+
+            if (incomingParsed && isWeightOnly(incomingParsed)) {
+                let grams = totalG(incomingParsed);
+                const nonWeight: string[] = [];
+                for (const raw of existingEntries) {
+                    const p = parseEntry(raw);
+                    if (p && isWeightOnly(p)) grams += totalG(p);
+                    else nonWeight.push(raw);
+                }
+                const consolidated = fmtG(grams);
+                quantities[foodItemId] = nonWeight.length > 0 ? `${nonWeight.join(' + ')} + ${consolidated}` : consolidated;
+                merged = true;
+            } else if (incomingParsed && incomingParsed.label) {
+                const matchIdx = existingEntries.findIndex((raw: string) => {
+                    const m = raw.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+                    return m && m[2] === incomingParsed.label && parseFloat(m[3]) === incomingParsed.wg;
+                });
+                if (matchIdx >= 0) {
+                    const m = existingEntries[matchIdx].match(/^(\d+(?:\.\d+)?)/);
+                    existingEntries[matchIdx] = `${(m ? parseFloat(m[1]) : 0) + incomingParsed.qty} ${incomingParsed.label} (${incomingParsed.wg}g)`;
+                    quantities[foodItemId] = existingEntries.join(' + ');
+                    merged = true;
+                }
+            }
+
+            if (!merged) {
+                quantities[foodItemId] = existingEntries.length > 0
+                    ? `${existingEntries.join(' + ')} + ${quantityString}`
+                    : quantityString;
+            }
+
+            localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+            await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', foodItemId);
+            removeItem(pantryAddItem.id);
+            toast.success(`"${pantryAddItem.name}" added to pantry: ${quantityString}`);
+            setPantryAddItem(null);
+        } catch (e) {
+            toast.error('Failed to add to pantry');
+        } finally {
+            setPantryAddLoading(false);
+        }
     };
 
     const moveToPantry = async (item: ShoppingListItem) => {
@@ -938,8 +921,8 @@ export function ShoppingListView() {
                                             </div>
                                             <div className="space-y-1.5">
                                                 {items.map((item) => (
+                                                    <Fragment key={item.id}>
                                                     <div
-                                                        key={item.id}
                                                         className={cn(
                                                             "flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-all cursor-pointer group",
                                                             item.is_miracle_product
@@ -976,7 +959,7 @@ export function ShoppingListView() {
                                                             </span>
                                                         )}
                                                         <button
-                                                            onClick={(e) => { e.stopPropagation(); handleDirectAddToPantry(item); }}
+                                                            onClick={(e) => { e.stopPropagation(); openPantryAddPanel(item); }}
                                                             className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-all"
                                                             title="Add to pantry"
                                                         >
@@ -989,6 +972,71 @@ export function ShoppingListView() {
                                                             <X size={14} />
                                                         </button>
                                                     </div>
+
+                                                    {/* Inline pantry-add panel */}
+                                                    {pantryAddItem?.id === item.id && (
+                                                        <div className="mb-0.5 p-4 rounded-xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/20 animate-in slide-in-from-top-2 duration-200">
+                                                            <div className="flex flex-wrap items-end gap-3">
+                                                                <div>
+                                                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Qty</Label>
+                                                                    <Input
+                                                                        type="number"
+                                                                        min="0.1"
+                                                                        step="1"
+                                                                        value={pantryAddQty}
+                                                                        onChange={(e) => setPantryAddQty(e.target.value)}
+                                                                        onClick={(e) => e.stopPropagation()}
+                                                                        className="w-16 text-center h-9"
+                                                                    />
+                                                                </div>
+
+                                                                {pantryAddPortions.length > 0 ? (
+                                                                    <div>
+                                                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Serving</Label>
+                                                                        <select
+                                                                            value={pantryAddSelectedPortion?.label || ''}
+                                                                            onChange={(e) => {
+                                                                                const p = pantryAddPortions.find(p => p.label === e.target.value);
+                                                                                if (p) setPantryAddSelectedPortion(p);
+                                                                            }}
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                            className="px-2 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                                                        >
+                                                                            {pantryAddPortions.map(p => (
+                                                                                <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
+                                                                            ))}
+                                                                        </select>
+                                                                    </div>
+                                                                ) : (
+                                                                    <span className="text-xs text-slate-400 pb-2">No portions found</span>
+                                                                )}
+
+                                                                <Button
+                                                                    size="sm"
+                                                                    onClick={(e) => { e.stopPropagation(); confirmPantryAdd(); }}
+                                                                    disabled={pantryAddLoading || !pantryAddSelectedPortion}
+                                                                    className="h-9 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                                                                >
+                                                                    {pantryAddLoading ? <Loader2 size={14} className="animate-spin" /> : <Package size={14} className="mr-1" />}
+                                                                    Add to Pantry
+                                                                </Button>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="ghost"
+                                                                    onClick={(e) => { e.stopPropagation(); setPantryAddItem(null); }}
+                                                                    className="h-9 px-3 text-slate-500"
+                                                                >
+                                                                    Cancel
+                                                                </Button>
+                                                            </div>
+                                                            {pantryAddSelectedPortion && (
+                                                                <p className="text-[10px] text-slate-400 mt-2">
+                                                                    Total: {Math.round(parseFloat(pantryAddQty || '0') * pantryAddSelectedPortion.weight_g)}g
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                    </Fragment>
                                                 ))}
                                             </div>
                                         </div>
@@ -1029,7 +1077,7 @@ export function ShoppingListView() {
                                         <Button
                                             size="sm"
                                             variant="ghost"
-                                            onClick={(e) => { e.stopPropagation(); handleDirectAddToPantry(item); }}
+                                            onClick={(e) => { e.stopPropagation(); openPantryAddPanel(item); }}
                                             className="opacity-0 group-hover:opacity-100 h-6 px-2 text-[8px] font-black uppercase tracking-tight text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
                                         >
                                             <Package size={10} className="mr-0.5" /> Add to Pantry
