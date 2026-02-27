@@ -598,16 +598,10 @@ export function ExploreView({
                 <>
                 {/* Header Section with Filter and Column Labels */}
                 <div className="border-b border-slate-200 dark:border-slate-800">
-                    {/* Column Headers with Filter */}
-                    <div className="hidden lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px] gap-3 lg:gap-4 lg:items-center lg:px-6 py-4">
-                        <div></div> {/* Thumbnail column */}
-                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Name</div>
-                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Energy</div>
-                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Carbs</div>
-                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Fat</div>
-                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Protein</div>
-                        <div className="flex justify-end items-center">
-                            {/* Filter Dropdown */}
+                    {/* Column Headers with Filter — same grid as food items */}
+                    <div className="hidden lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px] gap-3 lg:gap-4 lg:items-center lg:px-6 py-3">
+                        {/* Filter in thumbnail slot */}
+                        <div className="flex items-center justify-center">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button
@@ -628,7 +622,7 @@ export function ExploreView({
                                         )}
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl p-2">
+                                <DropdownMenuContent align="start" className="w-56 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl p-2">
                                     <div className="px-2 py-1.5">
                                         <div className="flex items-center justify-between py-2">
                                             <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">
@@ -681,6 +675,11 @@ export function ExploreView({
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Name</div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Energy</div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Carbs</div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Fat</div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Protein</div>
                     </div>
                 </div>
 
