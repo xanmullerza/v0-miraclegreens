@@ -598,7 +598,7 @@ export function ExploreView({
                 <>
                 {/* Header Section — literally same grid classes as food item rows */}
                 <div className="border-b border-slate-200 dark:border-slate-800">
-                    <div className="hidden lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px] gap-3 lg:gap-4 lg:items-center lg:px-6 py-1 w-full">
+                    <div className="hidden lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px] gap-3 lg:gap-4 lg:items-center lg:px-10 py-1 w-full">
                         {/* Filter icon in thumbnail slot */}
                         <div className="flex items-center justify-center">
                             <DropdownMenu>
