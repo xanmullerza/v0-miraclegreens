@@ -1,8 +1,9 @@
 ﻿'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, Check, Beef, Filter, ChevronDown, Leaf } from 'lucide-react';
+import type { User } from '@supabase/supabase-js';
 
 import { cn, formatFoodName } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +24,11 @@ function formatEnergy(calories: number, unit: 'kcal' | 'kJ') {
     return `${Math.round(calories).toLocaleString()} kC`;
 }
 
+function truncateQuantity(qty: string): string {
+    const first = qty.split('+')[0].trim();
+    return first.length > 14 ? first.slice(0, 14) + '…' : first;
+}
+
 interface FoodItem {
     id: string;
     name: string;
@@ -40,24 +46,12 @@ interface FoodItem {
     is_curated?: boolean;
 }
 
-
 interface ExploreViewProps {
-    showFavoritesOnly?: boolean;
-    setShowFavoritesOnly?: React.Dispatch<React.SetStateAction<boolean>>;
-    selectedCategories?: string[];
-    setSelectedCategories?: React.Dispatch<React.SetStateAction<string[]>>;
     showAddFood?: boolean;
     setShowAddFood?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export function ExploreView({
-    showFavoritesOnly: externalShowFavoritesOnly,
-    setShowFavoritesOnly: externalSetShowFavoritesOnly,
-    selectedCategories: externalSelectedCategories,
-    setSelectedCategories: externalSetSelectedCategories,
-    showAddFood = false,
-    setShowAddFood,
-}: ExploreViewProps) {
+export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreViewProps) {
     const router = useRouter();
     const { energyUnit } = useUserPreferences();
     const { searchQuery } = useSearch();
@@ -65,63 +59,48 @@ export function ExploreView({
     const [foods, setFoods] = useState<FoodItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
-    const [totalCount, setTotalCount] = useState(0);
-    const [user, setUser] = useState<any>(null);
+    const [hasMore, setHasMore] = useState(false);
+    const [user, setUser] = useState<User | null>(null);
+    const [authReady, setAuthReady] = useState(false);
 
-    // Allow controlled or uncontrolled filter state
-    const [localShowFavoritesOnly, setLocalShowFavoritesOnly] = useState(false);
-    const showFavoritesOnly = externalShowFavoritesOnly !== undefined ? externalShowFavoritesOnly : localShowFavoritesOnly;
-    const setShowFavoritesOnly = externalSetShowFavoritesOnly ?? setLocalShowFavoritesOnly;
+    const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
-    const [localSelectedCategories, setLocalSelectedCategories] = useState<string[]>([]);
-    const selectedCategories = externalSelectedCategories !== undefined ? externalSelectedCategories : localSelectedCategories;
-    const setSelectedCategories = externalSetSelectedCategories ?? setLocalSelectedCategories;
-
-    const hasMore = foods.length < totalCount;
-
-    // Auth
+    // Auth — sets authReady once session is known, preventing premature fetches
     useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => setUser(session?.user ?? null));
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => setUser(session?.user ?? null));
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setUser(session?.user ?? null);
+            setAuthReady(true);
+        });
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+            setUser(session?.user ?? null);
+        });
         return () => subscription.unsubscribe();
     }, []);
 
-    // Fetch on filter/user change (immediate)
-    useEffect(() => {
-        fetchFoods(1, true);
-    }, [showFavoritesOnly, selectedCategories, user]);
-
-    // Fetch on search change (debounced)
-    const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
-    useEffect(() => {
-        if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
-        searchTimerRef.current = setTimeout(() => fetchFoods(1, true), 400);
-        return () => { if (searchTimerRef.current) clearTimeout(searchTimerRef.current); };
-    }, [searchQuery]);
-
-    const fetchFoods = async (pageNum: number, isNewSearch = false) => {
+    // Single fetch function — explicit params avoid stale closure issues
+    const fetchFoods = useCallback(async (
+        pageNum: number,
+        opts: { q: string; favOnly: boolean; cats: string[]; currentUser: User | null },
+        isNewSearch = false,
+    ) => {
         setLoading(true);
         try {
             let query = supabase.from('food_items').select('*', { count: 'exact' });
 
-            // 1. Scoping: Curated OR User's own
-            if (user) {
-                query = query.or(`is_curated.eq.true,user_id.eq.${user.id}`);
+            if (opts.currentUser) {
+                query = query.or(`is_curated.eq.true,user_id.eq.${opts.currentUser.id}`);
             } else {
                 query = query.eq('is_curated', true);
             }
-
-            // 2. Filtering
-            if (searchQuery) {
-                query = query.or(`name.ilike.%${searchQuery}%,common_name.ilike.%${searchQuery}%`);
+            if (opts.q) {
+                query = query.or(`name.ilike.%${opts.q}%,common_name.ilike.%${opts.q}%`);
             }
-
-            if (showFavoritesOnly) {
+            if (opts.favOnly) {
                 query = query.eq('is_favorite', true);
             }
-
-            if (selectedCategories.length > 0 && selectedCategories.length < CATEGORIES.length) {
-                query = query.in('category', selectedCategories);
+            if (opts.cats.length > 0 && opts.cats.length < CATEGORIES.length) {
+                query = query.in('category', opts.cats);
             }
 
             const from = (pageNum - 1) * PAGE_SIZE;
@@ -131,24 +110,25 @@ export function ExploreView({
             if (error) throw error;
 
             let fetchedItems = (data as FoodItem[]) || [];
+            const dbTotal = count ?? 0;
 
-            // Merge local (guest) foods
-            if (!user) {
+            // Prepend local (guest) foods — these are always fully loaded, no pagination
+            if (!opts.currentUser) {
                 try {
                     const raw = localStorage.getItem('local_foods');
                     if (raw) {
                         let localFoods: FoodItem[] = JSON.parse(raw);
-                        if (searchQuery.trim()) {
+                        if (opts.q.trim()) {
                             localFoods = localFoods.filter(f =>
-                                f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                (f.common_name && f.common_name.toLowerCase().includes(searchQuery.toLowerCase()))
+                                f.name.toLowerCase().includes(opts.q.toLowerCase()) ||
+                                (f.common_name && f.common_name.toLowerCase().includes(opts.q.toLowerCase()))
                             );
                         }
-                        if (showFavoritesOnly) localFoods = localFoods.filter(f => f.is_favorite);
-                        if (selectedCategories.length > 0 && selectedCategories.length < CATEGORIES.length) {
-                            localFoods = localFoods.filter(f => f.category && selectedCategories.includes(f.category));
+                        if (opts.favOnly) localFoods = localFoods.filter(f => f.is_favorite);
+                        if (opts.cats.length > 0 && opts.cats.length < CATEGORIES.length) {
+                            localFoods = localFoods.filter(f => f.category && opts.cats.includes(f.category));
                         }
-                        fetchedItems = [...localFoods, ...fetchedItems];
+                        if (isNewSearch) fetchedItems = [...localFoods, ...fetchedItems];
                     }
                 } catch { /* ignore */ }
             }
@@ -177,14 +157,32 @@ export function ExploreView({
                 });
                 setPage(pageNum);
             }
-            setTotalCount(count ?? 0);
+            // hasMore is based on DB pagination only (local foods are always fully loaded)
+            setHasMore(from + fetchedItems.length < dbTotal);
         } catch (error) {
             console.error(error);
             toast.error('Failed to load foods');
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
+
+    // Fetch immediately when filters or user changes (but only after auth is ready)
+    useEffect(() => {
+        if (!authReady) return;
+        fetchFoods(1, { q: searchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user }, true);
+    }, [authReady, showFavoritesOnly, selectedCategories, user]);
+
+    // Debounced fetch on search change
+    const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
+    useEffect(() => {
+        if (!authReady) return;
+        if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+        searchTimerRef.current = setTimeout(() => {
+            fetchFoods(1, { q: searchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user }, true);
+        }, 400);
+        return () => { if (searchTimerRef.current) clearTimeout(searchTimerRef.current); };
+    }, [searchQuery, authReady]);
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
@@ -304,7 +302,7 @@ export function ExploreView({
                                             </h3>
                                             {food.quantity && (
                                                 <Badge className="mt-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[9px] border-none uppercase font-black tracking-tight">
-                                                    {food.quantity}
+                                                    {truncateQuantity(food.quantity)}
                                                 </Badge>
                                             )}
                                             <div className="flex lg:hidden items-center gap-2 mt-1.5 text-[9px] font-black">
@@ -343,7 +341,7 @@ export function ExploreView({
             {hasMore && (
                 <div className="flex justify-center pt-4 pb-8">
                     <button
-                        onClick={() => fetchFoods(page + 1)}
+                        onClick={() => fetchFoods(page + 1, { q: searchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user })}
                         disabled={loading}
                         className="h-12 px-8 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:border-emerald-400 hover:text-emerald-600 transition-all disabled:opacity-40"
                     >
