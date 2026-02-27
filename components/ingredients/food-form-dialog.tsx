@@ -274,21 +274,20 @@ Fat: ${food.fat_g || 0}g
     };
 
     return (
-        <div className="w-full h-full p-4 overflow-y-auto">
-            <div className="w-full max-w-5xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-2xl">
-                
-                {/* Header with Close Button */}
-                <div className="sticky top-0 z-10 bg-slate-100 dark:bg-slate-900/95 border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between rounded-t-[2rem]">
-                    <h2 className="text-[12px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">
-                        {editingFoodId ? 'Edit Food Item' : 'Add New Food'}
-                    </h2>
-                    <button
-                        onClick={onClose}
-                        className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 hover:bg-rose-100 dark:hover:bg-rose-900/30 border border-slate-300 dark:border-slate-700 hover:border-rose-300 dark:hover:border-rose-700 flex items-center justify-center transition-all"
-                    >
-                        <X size={16} className="text-slate-600 dark:text-slate-400" />
-                    </button>
-                </div>
+        <div className="w-full">
+            {/* Header with Close Button */}
+            <div className="border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between">
+                <h2 className="text-[12px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">
+                    {editingFoodId ? 'Edit Food Item' : 'Add New Food'}
+                </h2>
+                <button
+                    type="button"
+                    onClick={onClose}
+                    className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-800 hover:bg-rose-100 dark:hover:bg-rose-900/30 border border-slate-300 dark:border-slate-700 hover:border-rose-300 dark:hover:border-rose-700 flex items-center justify-center transition-all"
+                >
+                    <X size={16} className="text-slate-600 dark:text-slate-400" />
+                </button>
+            </div>
 
                 {/* Form Content */}
                 <div className="p-6 space-y-6">
@@ -457,6 +456,5 @@ Fat: ${food.fat_g || 0}g
                     </div>
                 </div>
             </div>
-        </div>
     );
 }
