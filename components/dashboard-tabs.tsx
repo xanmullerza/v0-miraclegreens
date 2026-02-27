@@ -137,7 +137,7 @@ export function DashboardTabs() {
                             className={cn(
                                 'group flex items-center gap-1.5 px-4 py-2 rounded-full transition-all duration-300 text-xs font-bold uppercase tracking-widest',
                                 isSubActive
-                                    ? 'bg-white/[0.07] text-white border border-white/10 shadow-sm'
+                                    ? cn(currentTab.activeBg, 'shadow-sm')
                                     : 'text-slate-500 hover:text-slate-300 hover:bg-white/[0.03] border border-transparent'
                             )}
                         >
