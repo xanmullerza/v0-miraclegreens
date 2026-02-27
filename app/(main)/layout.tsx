@@ -13,9 +13,9 @@ import { cn } from '@/lib/utils';
 import { Header } from '@/components/header';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { HeaderActionsProvider, useHeaderActions } from '@/lib/context/header-actions-context';
-import { SearchProvider, useSearch } from '@/lib/context/search-context';
+import { SearchProvider } from '@/lib/context/search-context';
 import { supabase } from '@/lib/supabase';
-import { BreadcrumbPillbox } from '@/components/ui/breadcrumb-pillbox';
+import { HeaderLogo } from '@/components/ui/header-logo';
 
 
 
@@ -31,7 +31,6 @@ function DashboardLayoutContent({
     const router = useRouter();
     const { profile, showRDADrawer } = useUserPreferences();
     const { actions } = useHeaderActions();
-    const { searchQuery, setSearchQuery } = useSearch();
     const [user, setUser] = useState<any>(null);
     const [isDesktop, setIsDesktop] = useState(false);
 
@@ -58,25 +57,14 @@ function DashboardLayoutContent({
 
                 {/* Main Content */}
                 <main className="dashboard-main flex-1 overflow-y-auto relative bg-slate-50 dark:bg-[#020617] custom-scrollbar flex flex-col">
-                    {/* Main Header (BreadcrumbPillbox) */}
+                    {/* Main Header (Logo & Subtext) */}
                     <div className={cn(
                         "z-40 px-2 sm:px-4 w-full flex justify-center pointer-events-none transition-all duration-500 ease-in-out",
                         "sticky top-0",
                         showRDADrawer && isDesktop && "lg:translate-x-[192px]"
                     )}>
                         <div className="pointer-events-auto w-full max-w-[900px]">
-                            <BreadcrumbPillbox
-                                searchQuery={searchQuery}
-                                setSearchQuery={setSearchQuery}
-
-                                userStatus={
-                                    user ? 'cloud' :
-                                        (profile.name || profile.nickname) ? 'local' :
-                                            'anonymous'
-                                }
-                                userAvatarUrl={user?.user_metadata?.avatar_url}
-                                isAdmin={(user?.email || user?.user_metadata?.email || '').toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase()}
-                            />
+                            <HeaderLogo showSubtext={true} />
                         </div>
                     </div>
 
