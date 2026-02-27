@@ -294,12 +294,27 @@ export function ShoppingListView() {
     };
 
     const handleDirectAddToPantry = async (item: ShoppingListItem) => {
-        // If linked to a known food item → add directly to localStorage, no dialog
-        if (item.food_item_id) {
+        // Resolve food_item_id if missing — look up by name
+        let foodItemId = item.food_item_id || null;
+        if (!foodItemId && item.name) {
+            try {
+                const normalize = (s: string) => s.replace(/\(.*?\)/g, '').replace(/[^a-zA-Z0-9 ]/g, '').trim();
+                const { data } = await supabase
+                    .from('food_items')
+                    .select('id')
+                    .ilike('common_name', `%${normalize(item.name)}%`)
+                    .limit(1)
+                    .maybeSingle();
+                if (data) foodItemId = data.id;
+            } catch (e) { /* ignore */ }
+        }
+
+        // If linked to a known food item → add directly to localStorage
+        if (foodItemId) {
             try {
                 const saved = localStorage.getItem('pantry_quantities');
                 const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-                const current = quantities[item.food_item_id] || '';
+                const current = quantities[foodItemId] || '';
 
                 // Normalize incoming quantity to a standard gram-weight string so
                 // parseTotalGrams in handleMarkEaten can always deduct correctly.
@@ -342,7 +357,7 @@ export function ShoppingListView() {
                 // If incoming is still a plain number (e.g. "3"), try to resolve it
                 // against the food's portions so it carries weight info
                 const isPlainNumber = /^\d+(?:\.\d+)?$/.test(incoming);
-                if (isPlainNumber && item.food_item_id) {
+                if (isPlainNumber && foodItemId) {
                     // First try: merge with existing labeled entry if there's exactly one
                     const existingLabeled = current
                         .split(/\s*\+\s*/)
@@ -361,7 +376,7 @@ export function ShoppingListView() {
                     } else {
                         // Second try: look up the food's portions from DB
                         try {
-                            const measures = await fetchFoodMeasures(item.food_item_id);
+                            const measures = await fetchFoodMeasures(foodItemId);
                             if (measures && measures.length > 0) {
                                 const defaultPortion = measures.find((m: any) => /each/i.test(m.label))
                                     || measures.find((m: any) => !/^(gram|kilogram)s?$/i.test(m.label))
@@ -412,7 +427,7 @@ export function ShoppingListView() {
                         }
                     }
                     const consolidated = fmtG(grams);
-                    quantities[item.food_item_id] = nonWeight.length > 0
+                    quantities[foodItemId] = nonWeight.length > 0
                         ? `${nonWeight.join(' + ')} + ${consolidated}`
                         : consolidated;
                     merged = true;
@@ -426,7 +441,7 @@ export function ShoppingListView() {
                         const m = existingEntries[matchIdx].match(/^(\d+(?:\.\d+)?)/);
                         const sumQty = (m ? parseFloat(m[1]) : 0) + incomingParsed.qty;
                         existingEntries[matchIdx] = `${sumQty} ${incomingParsed.label} (${incomingParsed.wg}g)`;
-                        quantities[item.food_item_id] = existingEntries.join(' + ');
+                        quantities[foodItemId] = existingEntries.join(' + ');
                         merged = true;
                     }
                 }
@@ -434,12 +449,12 @@ export function ShoppingListView() {
                 if (!merged) {
                     // Append as new entry
                     const currentStripped = existingEntries.join(' + ');
-                    quantities[item.food_item_id] = currentStripped ? `${currentStripped} + ${incoming}` : incoming;
+                    quantities[foodItemId] = currentStripped ? `${currentStripped} + ${incoming}` : incoming;
                 }
 
                 localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
                 // Ensure the food item is marked as in-pantry in DB (best effort)
-                await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', item.food_item_id);
+                await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', foodItemId);
                 removeItem(item.id);
                 toast.success(`"${item.name}" added to pantry`);
             } catch (e) {
