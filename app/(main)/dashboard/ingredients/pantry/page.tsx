@@ -110,9 +110,85 @@ export default function PantryPage() {
                 
                 if (error) throw error;
 
+                // Merge with existing stock instead of overwriting
                 const saved = localStorage.getItem('pantry_quantities');
                 const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-                quantities[selectedFood.id] = quantityString;
+                const existing = quantities[selectedFood.id] || '';
+
+                const existingEntries = existing
+                    .split(/\s*\+\s*/)
+                    .map((s: string) => s.trim())
+                    .filter((s: string) => {
+                        if (!s) return false;
+                        const m = s.match(/^(\d+(?:\.\d+)?)/);
+                        return m ? parseFloat(m[1]) > 0 : true;
+                    });
+
+                const incomingLabeled = quantityString.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+                const incomingX = quantityString.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(g|ml|oz|lb)$/i);
+                let merged = false;
+                const fmtG = (g: number) => {
+                    if (g >= 1000) {
+                        const kg = g / 1000;
+                        return `${kg % 1 === 0 ? kg.toString() : kg.toFixed(1)} kilogram (1000g)`;
+                    }
+                    return `${Math.round(g)} gram (1g)`;
+                };
+
+                if (incomingLabeled) {
+                    const incQty = parseFloat(incomingLabeled[1]);
+                    const incLabel = incomingLabeled[2];
+                    const incWeight = incomingLabeled[3];
+                    const isIncWeight = /^(gram|kilogram)s?$/i.test(incLabel);
+                    if (isIncWeight) {
+                        let totalGrams = incQty * parseFloat(incWeight);
+                        const nonWeight: string[] = [];
+                        for (const raw of existingEntries) {
+                            const lbl = raw.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+                            const xFmt = raw.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*g$/i);
+                            if (lbl && /^(gram|kilogram)s?$/i.test(lbl[2])) {
+                                totalGrams += parseFloat(lbl[1]) * parseFloat(lbl[3]);
+                            } else if (xFmt) {
+                                totalGrams += parseFloat(xFmt[1]) * parseFloat(xFmt[2]);
+                            } else { nonWeight.push(raw); }
+                        }
+                        const consolidated = fmtG(totalGrams);
+                        quantities[selectedFood.id] = nonWeight.length > 0 ? `${nonWeight.join(' + ')} + ${consolidated}` : consolidated;
+                        merged = true;
+                    } else {
+                        const matchIdx = existingEntries.findIndex((raw: string) => {
+                            const m = raw.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+                            return m && m[2] === incLabel && m[3] === incWeight;
+                        });
+                        if (matchIdx >= 0) {
+                            const m = existingEntries[matchIdx].match(/^(\d+(?:\.\d+)?)/);
+                            existingEntries[matchIdx] = `${(m ? parseFloat(m[1]) : 0) + incQty} ${incLabel} (${incWeight}g)`;
+                            quantities[selectedFood.id] = existingEntries.join(' + ');
+                            merged = true;
+                        }
+                    }
+                } else if (incomingX) {
+                    let totalGrams = parseFloat(incomingX[1]) * parseFloat(incomingX[2]);
+                    const nonWeight: string[] = [];
+                    for (const raw of existingEntries) {
+                        const lbl = raw.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+                        const xFmt = raw.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*g$/i);
+                        if (lbl && /^(gram|kilogram)s?$/i.test(lbl[2])) {
+                            totalGrams += parseFloat(lbl[1]) * parseFloat(lbl[3]);
+                        } else if (xFmt) {
+                            totalGrams += parseFloat(xFmt[1]) * parseFloat(xFmt[2]);
+                        } else { nonWeight.push(raw); }
+                    }
+                    const consolidated = fmtG(totalGrams);
+                    quantities[selectedFood.id] = nonWeight.length > 0 ? `${nonWeight.join(' + ')} + ${consolidated}` : consolidated;
+                    merged = true;
+                }
+
+                if (!merged) {
+                    quantities[selectedFood.id] = existingEntries.length > 0
+                        ? `${existingEntries.join(' + ')} + ${quantityString}`
+                        : quantityString;
+                }
                 localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
 
                 toast.success(`${selectedFood.common_name || selectedFood.name} added to pantry`);
@@ -125,7 +201,8 @@ export default function PantryPage() {
                     quantity: quantityString,
                     unit: '',
                     checked: false,
-                    source: 'manual'
+                    source: 'manual',
+                    food_item_id: selectedFood.id
                 };
                 localStorage.setItem('vitala_shopping_manual_items', JSON.stringify([...currentList, newItem]));
                 toast.success(`${selectedFood.common_name || selectedFood.name} added to groceries`);

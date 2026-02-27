@@ -358,20 +358,97 @@ export function ExploreView({
 
         if (quickAddMode === 'pantry') {
             try {
-                // Update UI immediately
-                setFoods(prev => prev.map(f => f.id === quickAddItem.id ? { ...f, is_in_pantry: true, quantity: quantityString } : f));
-
-                // Persist to localStorage
                 const saved = localStorage.getItem('pantry_quantities');
                 const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-                quantities[quickAddItem.id] = quantityString;
+                const existing = quantities[quickAddItem.id] || '';
+
+                // --- Merge with existing stock instead of overwriting ---
+                const existingEntries = existing
+                    .split(/\s*\+\s*/)
+                    .map((s: string) => s.trim())
+                    .filter((s: string) => {
+                        if (!s) return false;
+                        const m = s.match(/^(\d+(?:\.\d+)?)/);
+                        return m ? parseFloat(m[1]) > 0 : true;
+                    });
+
+                const parseEntry = (s: string) => {
+                    const labeled = s.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+                    if (labeled) return { qty: parseFloat(labeled[1]), label: labeled[2], wg: parseFloat(labeled[3]) };
+                    const xFmt = s.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(g|ml|oz|lb)$/i);
+                    if (xFmt) return { qty: parseFloat(xFmt[1]), label: null, wg: parseFloat(xFmt[2]) };
+                    return null;
+                };
+                const isWeightOnly = (p: ReturnType<typeof parseEntry>) =>
+                    p != null && (p.label === null || /^(gram|kilogram)s?$/i.test(p.label));
+                const totalG = (p: NonNullable<ReturnType<typeof parseEntry>>) => p.qty * p.wg;
+                const fmtG = (g: number) => {
+                    if (g >= 1000) {
+                        const kg = g / 1000;
+                        const kgStr = kg % 1 === 0 ? kg.toString() : kg.toFixed(1);
+                        return `${kgStr} kilogram (1000g)`;
+                    }
+                    return `${Math.round(g)} gram (1g)`;
+                };
+
+                const incomingParsed = parseEntry(quantityString);
+                let merged = false;
+
+                if (incomingParsed && isWeightOnly(incomingParsed)) {
+                    // Consolidate weight entries
+                    let grams = totalG(incomingParsed);
+                    const nonWeight: string[] = [];
+                    for (const raw of existingEntries) {
+                        const p = parseEntry(raw);
+                        if (p && isWeightOnly(p)) grams += totalG(p);
+                        else nonWeight.push(raw);
+                    }
+                    const consolidated = fmtG(grams);
+                    quantities[quickAddItem.id] = nonWeight.length > 0 ? `${nonWeight.join(' + ')} + ${consolidated}` : consolidated;
+                    merged = true;
+                } else if (incomingParsed && incomingParsed.label) {
+                    // Match by label + weight
+                    const matchIdx = existingEntries.findIndex((raw: string) => {
+                        const m = raw.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+                        return m && m[2] === incomingParsed.label && parseFloat(m[3]) === incomingParsed.wg;
+                    });
+                    if (matchIdx >= 0) {
+                        const m = existingEntries[matchIdx].match(/^(\d+(?:\.\d+)?)/);
+                        existingEntries[matchIdx] = `${(m ? parseFloat(m[1]) : 0) + incomingParsed.qty} ${incomingParsed.label} (${incomingParsed.wg}g)`;
+                        quantities[quickAddItem.id] = existingEntries.join(' + ');
+                        merged = true;
+                    }
+                } else if (/^\d+(?:\.\d+)?$/.test(quantityString)) {
+                    // Plain number — try to merge with the sole existing labeled entry
+                    const incQty = parseFloat(quantityString);
+                    const labeledEntries = existingEntries.filter(raw => {
+                        const m = raw.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+                        return m && !/^(gram|kilogram)s?$/i.test(m[2]);
+                    });
+                    if (labeledEntries.length === 1) {
+                        const idx = existingEntries.indexOf(labeledEntries[0]);
+                        const m = labeledEntries[0].match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+                        if (m && idx >= 0) {
+                            existingEntries[idx] = `${parseFloat(m[1]) + incQty} ${m[2]} (${m[3]}g)`;
+                            quantities[quickAddItem.id] = existingEntries.join(' + ');
+                            merged = true;
+                        }
+                    }
+                }
+
+                if (!merged) {
+                    quantities[quickAddItem.id] = existingEntries.length > 0
+                        ? `${existingEntries.join(' + ')} + ${quantityString}`
+                        : quantityString;
+                }
+
+                setFoods(prev => prev.map(f => f.id === quickAddItem.id ? { ...f, is_in_pantry: true, quantity: quantities[quickAddItem.id] } : f));
                 localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
 
-                // Update DB
                 const { error } = await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', quickAddItem.id);
                 if (error) throw error;
 
-                toast.success(`"${quickAddItem.name}" added to pantry with ${quantityString}`);
+                toast.success(`"${quickAddItem.name}" added to pantry`);
             } catch (error) { toast.error("Failed to update pantry"); }
         } else {
             const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
@@ -381,7 +458,8 @@ export function ExploreView({
                 quantity: quantityString,
                 unit: '',
                 checked: false,
-                source: 'manual'
+                source: 'manual',
+                food_item_id: quickAddItem.id
             };
             localStorage.setItem('vitala_shopping_manual_items', JSON.stringify([...currentList, newItem]));
             toast.success(`"${quickAddItem.name}" added to groceries`);

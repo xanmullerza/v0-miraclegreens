@@ -488,6 +488,16 @@ export function PantryView({
 
             if (error) throw error;
 
+            // Clear localStorage quantity so the deleted item doesn't haunt other views
+            try {
+                const saved = localStorage.getItem('pantry_quantities');
+                if (saved) {
+                    const quantities: Record<string, string> = JSON.parse(saved);
+                    delete quantities[id];
+                    localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+                }
+            } catch (e) { /* ignore */ }
+
             setFoods(prev => prev.filter(f => f.id !== id));
             toast.success(`${name} removed from pantry`);
         } catch (error) {

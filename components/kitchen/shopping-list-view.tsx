@@ -24,6 +24,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { fetchFoodMeasures } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { generateShoppingList, ShoppingItem, DailyPlan } from '@/lib/utils/meal-generator';
 import { BarcodeScanner } from './barcode-scanner';
@@ -314,7 +315,7 @@ export function ShoppingListView() {
                 };
                 const normalizeToGrams = (s: string): string => {
                     const t = s.trim();
-                    // Already labeled, e.g. "1 kilogram (1000g)"
+                    // Already labeled, e.g. "1 kilogram (1000g)" or "3 Each (304g)"
                     if (/\(\d+(?:\.\d+)?g\)$/.test(t)) return t;
                     // "1 x 100g"
                     if (/^\d+(?:\.\d+)?\s*x\s*\d+(?:\.\d+)?\s*g$/i.test(t)) return t;
@@ -336,7 +337,42 @@ export function ShoppingListView() {
                     // Unknown — return as-is
                     return t;
                 };
-                const incoming = normalizeToGrams(rawQty);
+                let incoming = normalizeToGrams(rawQty);
+
+                // If incoming is still a plain number (e.g. "3"), try to resolve it
+                // against the food's portions so it carries weight info
+                const isPlainNumber = /^\d+(?:\.\d+)?$/.test(incoming);
+                if (isPlainNumber && item.food_item_id) {
+                    // First try: merge with existing labeled entry if there's exactly one
+                    const existingLabeled = current
+                        .split(/\s*\+\s*/)
+                        .map(s => s.trim())
+                        .filter(s => {
+                            const m = s.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+                            return m && !/^(gram|kilogram)s?$/i.test(m[2]);
+                        });
+
+                    if (existingLabeled.length === 1) {
+                        // Merge plain qty into the existing labeled portion
+                        const lbl = existingLabeled[0].match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+                        if (lbl) {
+                            incoming = `${incoming} ${lbl[2]} (${lbl[3]}g)`;
+                        }
+                    } else {
+                        // Second try: look up the food's portions from DB
+                        try {
+                            const measures = await fetchFoodMeasures(item.food_item_id);
+                            if (measures && measures.length > 0) {
+                                const defaultPortion = measures.find((m: any) => /each/i.test(m.label))
+                                    || measures.find((m: any) => !/^(gram|kilogram)s?$/i.test(m.label))
+                                    || null;
+                                if (defaultPortion && !/^(gram|kilogram)s?$/i.test(defaultPortion.label)) {
+                                    incoming = `${incoming} ${defaultPortion.label} (${defaultPortion.weight_g}g)`;
+                                }
+                            }
+                        } catch (e) { /* ignore, use plain number */ }
+                    }
+                }
 
                 // Merge with existing quantity, consolidating pure-weight entries
                 const existingEntries = current
@@ -361,6 +397,8 @@ export function ShoppingListView() {
                 const totalG = (p: NonNullable<ReturnType<typeof parseEntry>>) => p.qty * p.wg;
 
                 const incomingParsed = parseEntry(incoming);
+                let merged = false;
+
                 if (incomingParsed && isWeightOnly(incomingParsed)) {
                     // Consolidate all weight entries
                     let grams = totalG(incomingParsed);
@@ -377,11 +415,28 @@ export function ShoppingListView() {
                     quantities[item.food_item_id] = nonWeight.length > 0
                         ? `${nonWeight.join(' + ')} + ${consolidated}`
                         : consolidated;
-                } else {
-                    // Non-weight entry — append as before
+                    merged = true;
+                } else if (incomingParsed && incomingParsed.label) {
+                    // Match by label + weight (e.g. "3 Each (304g)" + "5 Each (304g)" = "8 Each (304g)")
+                    const matchIdx = existingEntries.findIndex(raw => {
+                        const m = raw.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+                        return m && m[2] === incomingParsed.label && parseFloat(m[3]) === incomingParsed.wg;
+                    });
+                    if (matchIdx >= 0) {
+                        const m = existingEntries[matchIdx].match(/^(\d+(?:\.\d+)?)/);
+                        const sumQty = (m ? parseFloat(m[1]) : 0) + incomingParsed.qty;
+                        existingEntries[matchIdx] = `${sumQty} ${incomingParsed.label} (${incomingParsed.wg}g)`;
+                        quantities[item.food_item_id] = existingEntries.join(' + ');
+                        merged = true;
+                    }
+                }
+
+                if (!merged) {
+                    // Append as new entry
                     const currentStripped = existingEntries.join(' + ');
                     quantities[item.food_item_id] = currentStripped ? `${currentStripped} + ${incoming}` : incoming;
                 }
+
                 localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
                 // Ensure the food item is marked as in-pantry in DB (best effort)
                 await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', item.food_item_id);
