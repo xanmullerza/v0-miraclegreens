@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, Fragment, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSearch } from '@/lib/context/search-context';
 import { toast } from 'sonner';
@@ -155,10 +155,18 @@ export function ShoppingListView() {
         setItems(combined);
     }, [dailyPlan, pantryItems, manualItems]);
 
+    // Memoize items signature to prevent unnecessary enrichment runs
+    const itemsSignature = useMemo(
+        () => items.map(i => `${i.id}-${i.category || 'none'}`).join(','),
+        [items]
+    );
+
     // Enrich items that are missing a category by batch-looking up from food_items
     useEffect(() => {
         const needCategory = items.filter(i => !i.category);
         if (needCategory.length === 0) return;
+
+        let isCancelled = false;
 
         const enrich = async () => {
             // Collect food_item_ids and names for lookup
@@ -173,7 +181,7 @@ export function ShoppingListView() {
                     .from('food_items')
                     .select('id, category')
                     .in('id', ids);
-                if (data) {
+                if (data && !isCancelled) {
                     const idToCat = new Map(data.map((d: any) => [d.id, d.category]));
                     for (const item of needCategory) {
                         if (item.food_item_id && idToCat.has(item.food_item_id)) {
@@ -184,16 +192,16 @@ export function ShoppingListView() {
             }
 
             // Batch lookup by name for items without food_item_id
-            if (namesWithoutId.length > 0) {
+            if (namesWithoutId.length > 0 && !isCancelled) {
                 for (const item of needCategory.filter(i => !i.food_item_id && !categoryMap.has(i.id))) {
                     const normalize = (s: string) => s.replace(/\(.*?\)/g, '').replace(/[^a-zA-Z0-9 ]/g, '').trim();
                     const { data } = await supabase
                         .from('food_items')
                         .select('id, category')
-                        .ilike('common_name', `%${normalize(item.name)}%`)
+                        .or(`name.ilike.%${normalize(item.name)}%,common_name.ilike.%${normalize(item.name)}%`)
                         .limit(1)
                         .maybeSingle();
-                    if (data?.category) {
+                    if (data?.category && !isCancelled) {
                         categoryMap.set(item.id, data.category);
                         // Also attach food_item_id for the pantry-add panel
                         if (data.id) {
@@ -203,7 +211,7 @@ export function ShoppingListView() {
                 }
             }
 
-            if (categoryMap.size > 0) {
+            if (categoryMap.size > 0 && !isCancelled) {
                 setItems(prev => prev.map(item =>
                     categoryMap.has(item.id) ? { ...item, category: categoryMap.get(item.id) } : item
                 ));
@@ -211,7 +219,11 @@ export function ShoppingListView() {
         };
 
         enrich();
-    }, [items.length]); // only re-run when item count changes, not on every category enrichment
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [itemsSignature]);
 
     const fetchData = async () => {
         setLoading(true);
