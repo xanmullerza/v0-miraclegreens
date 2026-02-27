@@ -79,17 +79,25 @@ export function ShoppingListView() {
     const [pantryAddFoodId, setPantryAddFoodId] = useState<string | null>(null);
     const [pantryAddLoading, setPantryAddLoading] = useState(false);
 
-    // Load manual items from local storage on mount
+    // Load manual items from local storage on mount and when storage changes
     useEffect(() => {
-        const saved = localStorage.getItem('vitala_shopping_manual_items');
-        if (saved) {
-            try {
-                setManualItems(JSON.parse(saved));
-            } catch (e) {
-                console.error('Failed to load shopping list', e);
+        const loadManualItems = () => {
+            const saved = localStorage.getItem('vitala_shopping_manual_items');
+            if (saved) {
+                try {
+                    setManualItems(JSON.parse(saved));
+                } catch (e) {
+                    console.error('Failed to load shopping list', e);
+                }
             }
-        }
+        };
+
+        loadManualItems();
         fetchData();
+
+        // Listen for storage events from other components
+        window.addEventListener('storage', loadManualItems);
+        return () => window.removeEventListener('storage', loadManualItems);
     }, []);
 
     // Save manual items to local storage whenever they change
