@@ -345,12 +345,10 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
             try {
                 const measures = await fetchFoodMeasures(foodItemId);
                 if (measures && measures.length > 0) {
-                    // Filter out gram/kilogram — those are always available implicitly
-                    const meaningful = measures.filter((m: any) => !/^(gram|kilogram)s?$/i.test(m.label));
-                    setPantryAddPortions(meaningful);
-                    // Auto-select "Each" if available, else first meaningful portion
-                    const each = meaningful.find((m: any) => /each/i.test(m.label));
-                    setPantryAddSelectedPortion(each || meaningful[0] || null);
+                    setPantryAddPortions(measures);
+                    // Auto-select "Each" if available, else first portion
+                    const each = measures.find((m: any) => /each/i.test(m.label));
+                    setPantryAddSelectedPortion(each || measures[0] || null);
                 }
             } catch (e) { /* ignore */ }
         }
