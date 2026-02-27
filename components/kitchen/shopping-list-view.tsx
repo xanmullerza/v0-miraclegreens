@@ -155,6 +155,64 @@ export function ShoppingListView() {
         setItems(combined);
     }, [dailyPlan, pantryItems, manualItems]);
 
+    // Enrich items that are missing a category by batch-looking up from food_items
+    useEffect(() => {
+        const needCategory = items.filter(i => !i.category);
+        if (needCategory.length === 0) return;
+
+        const enrich = async () => {
+            // Collect food_item_ids and names for lookup
+            const ids = needCategory.map(i => i.food_item_id).filter(Boolean) as string[];
+            const namesWithoutId = needCategory.filter(i => !i.food_item_id).map(i => i.name);
+
+            const categoryMap = new Map<string, string>(); // item.id → category
+
+            // Batch lookup by food_item_id
+            if (ids.length > 0) {
+                const { data } = await supabase
+                    .from('food_items')
+                    .select('id, category')
+                    .in('id', ids);
+                if (data) {
+                    const idToCat = new Map(data.map((d: any) => [d.id, d.category]));
+                    for (const item of needCategory) {
+                        if (item.food_item_id && idToCat.has(item.food_item_id)) {
+                            categoryMap.set(item.id, idToCat.get(item.food_item_id)!);
+                        }
+                    }
+                }
+            }
+
+            // Batch lookup by name for items without food_item_id
+            if (namesWithoutId.length > 0) {
+                for (const item of needCategory.filter(i => !i.food_item_id && !categoryMap.has(i.id))) {
+                    const normalize = (s: string) => s.replace(/\(.*?\)/g, '').replace(/[^a-zA-Z0-9 ]/g, '').trim();
+                    const { data } = await supabase
+                        .from('food_items')
+                        .select('id, category')
+                        .ilike('common_name', `%${normalize(item.name)}%`)
+                        .limit(1)
+                        .maybeSingle();
+                    if (data?.category) {
+                        categoryMap.set(item.id, data.category);
+                        // Also attach food_item_id for the pantry-add panel
+                        if (data.id) {
+                            item.food_item_id = data.id;
+                        }
+                    }
+                }
+            }
+
+            if (categoryMap.size > 0) {
+                setItems(prev => prev.map(item =>
+                    categoryMap.has(item.id) ? { ...item, category: categoryMap.get(item.id) } : item
+                ));
+            }
+        };
+
+        enrich();
+    }, [items.length]); // only re-run when item count changes, not on every category enrichment
+
     const fetchData = async () => {
         setLoading(true);
         try {
