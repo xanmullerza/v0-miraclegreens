@@ -583,7 +583,7 @@ export function ExploreView({
             )}
 
             {/* List Container */}
-            <div className="w-full max-w-6xl mx-auto bg-slate-50/50 dark:bg-slate-950/50 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
+            <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
                 {/* Header Section with Filter and Column Labels */}
                 <div className="border-b border-slate-200 dark:border-slate-800 px-6 py-4">
                     <div className="flex items-center justify-between gap-4 mb-4">
