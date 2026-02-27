@@ -2,13 +2,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Leaf, ChevronRight, ShoppingCart } from 'lucide-react';
+import { Leaf, ChevronRight, ShoppingCart, Plus, X } from 'lucide-react';
 import { ShoppingListView } from '@/components/kitchen/shopping-list-view';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { supabase } from '@/lib/supabase';
+import { fetchFoodMeasures } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { formatFoodName } from '@/lib/utils';
+import { toast } from 'sonner';
 
 const CAL_TO_KJ = 4.184;
 
@@ -25,6 +30,32 @@ export default function ShoppingListPage() {
     const [isSearching, setIsSearching] = useState(false);
     const [isSearchActive, setIsSearchActive] = useState(false);
     const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [selectedFood, setSelectedFood] = useState<any>(null);
+    const [isAdding, setIsAdding] = useState(false);
+
+    const [quickAddQty, setQuickAddQty] = useState('1');
+    const [quickAddWeight, setQuickAddWeight] = useState('');
+    const [quickAddUnit, setQuickAddUnit] = useState('g');
+    const [quickAddMode, setQuickAddMode] = useState<'pantry' | 'shopping'>('shopping');
+    const [selectedPortion, setSelectedPortion] = useState<{ label: string; weight_g: number } | null>(null);
+
+    // Fetch measures when food is selected
+    useEffect(() => {
+        const loadMeasures = async () => {
+            if (!selectedFood?.id) return;
+
+            try {
+                const measures = await fetchFoodMeasures(selectedFood.id);
+                setSelectedFood((prev: any) => prev ? { ...prev, portions: measures } : null);
+            } catch (error) {
+                console.error('Error fetching measures:', error);
+            }
+        };
+
+        loadMeasures();
+    }, [selectedFood?.id]);
 
     const performSearch = async (query: string) => {
         if (!query || query.length < 2) {
@@ -54,25 +85,71 @@ export default function ShoppingListPage() {
     };
 
     const handleSelectFood = (food: any) => {
-        // Add to shopping list via localStorage (same mechanism as other pages)
-        const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-        const newItem = {
-            id: `manual-${Date.now()}`,
-            name: food.common_name || food.name,
-            quantity: '1',
-            unit: '',
-            checked: false,
-            source: 'manual',
-            food_item_id: food.id,
-            category: food.category,
-        };
-        localStorage.setItem('vitala_shopping_manual_items', JSON.stringify([...currentList, newItem]));
+        setSelectedFood(food);
+        setShowAddModal(true);
         setIsSearchActive(false);
         setSearchQuery('');
-        // Trigger a storage event so ShoppingListView picks up the change
-        window.dispatchEvent(new Event('storage'));
-        // Force reload by navigating to same page
-        router.refresh();
+        setQuickAddQty('1');
+        setQuickAddWeight('');
+        setQuickAddUnit('g');
+        setQuickAddMode('shopping');
+        setSelectedPortion(null);
+    };
+
+    const handleQuickAdd = async () => {
+        if (!selectedFood) return;
+
+        setIsAdding(true);
+        try {
+            const quantityString = selectedPortion
+                ? `${quickAddQty} ${selectedPortion.label} (${selectedPortion.weight_g}g)`
+                : quickAddWeight
+                    ? `${quickAddQty} x ${quickAddWeight}${quickAddUnit}`
+                    : quickAddQty;
+
+            if (quickAddMode === 'shopping') {
+                const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
+                const newItem = {
+                    id: `manual-${Date.now()}`,
+                    name: selectedFood.common_name || selectedFood.name,
+                    quantity: quantityString,
+                    unit: '',
+                    checked: false,
+                    source: 'manual',
+                    food_item_id: selectedFood.id,
+                    category: selectedFood.category,
+                };
+                localStorage.setItem('vitala_shopping_manual_items', JSON.stringify([...currentList, newItem]));
+                toast.success(`${selectedFood.common_name || selectedFood.name} added to groceries`);
+                window.dispatchEvent(new Event('storage'));
+            } else {
+                // Add to pantry
+                const { error } = await supabase
+                    .from('food_items')
+                    .update({ is_in_pantry: true } as any)
+                    .eq('id', selectedFood.id);
+
+                if (error) throw error;
+
+                const saved = localStorage.getItem('pantry_quantities');
+                const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
+                quantities[selectedFood.id] = quantityString;
+                localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+
+                toast.success(`${selectedFood.common_name || selectedFood.name} added to pantry`);
+            }
+
+            setShowAddModal(false);
+            setSelectedFood(null);
+            setQuickAddQty('1');
+            setQuickAddWeight('');
+            setSelectedPortion(null);
+        } catch (error) {
+            console.error('Error adding item:', error);
+            toast.error('Failed to add item');
+        } finally {
+            setIsAdding(false);
+        }
     };
 
     return (
@@ -115,6 +192,162 @@ export default function ShoppingListPage() {
                         </div>
                     )}
                 />
+
+                {/* Quick Add Panel */}
+                {showAddModal && selectedFood && (
+                    <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-6 animate-in slide-in-from-top duration-300 rounded-2xl mb-6">
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div className="flex items-center gap-4 flex-1">
+                                <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden">
+                                    {selectedFood.image ? (
+                                        <img src={selectedFood.image} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <ShoppingCart size={24} className="text-emerald-500" />
+                                    )}
+                                </div>
+                                <div className="flex-1">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Quick Action</p>
+                                    <p className="text-sm font-black text-slate-900 dark:text-white">{selectedFood.common_name || selectedFood.name}</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-4 w-full md:w-auto">
+                                <div className="flex-1 md:flex-none">
+                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Quantity</Label>
+                                    <Input
+                                        type="number"
+                                        value={quickAddQty}
+                                        onChange={(e) => setQuickAddQty(e.target.value)}
+                                        className="w-20 text-center"
+                                    />
+                                </div>
+
+                                {selectedFood.portions && selectedFood.portions.length > 0 && !selectedPortion ? (
+                                    <div className="flex-1 md:flex-none">
+                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Serving</Label>
+                                        <select
+                                            onChange={(e) => {
+                                                const portion = selectedFood.portions?.find((p: any) => p.label === e.target.value);
+                                                if (portion) {
+                                                    setSelectedPortion(portion);
+                                                }
+                                            }}
+                                            className="w-auto px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                        >
+                                            <option value="">Select a serving...</option>
+                                            {selectedFood.portions?.map((p: any) => (
+                                                <option key={p.label} value={p.label}>
+                                                    {p.label} ({p.weight_g}g)
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                ) : selectedPortion ? (
+                                    <div className="flex-1 md:flex-none">
+                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Serving</Label>
+                                        <select
+                                            value={selectedPortion.label}
+                                            onChange={(e) => {
+                                                const portion = selectedFood.portions?.find((p: any) => p.label === e.target.value);
+                                                if (portion) {
+                                                    setSelectedPortion(portion);
+                                                }
+                                            }}
+                                            className="w-auto px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                        >
+                                            {selectedFood.portions?.map((p: any) => (
+                                                <option key={p.label} value={p.label}>
+                                                    {p.label} ({p.weight_g}g)
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <div className="flex-1 md:flex-none">
+                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Weight</Label>
+                                            <Input
+                                                type="number"
+                                                value={quickAddWeight}
+                                                onChange={(e) => setQuickAddWeight(e.target.value)}
+                                                placeholder="e.g. 100"
+                                                className="w-20 text-center"
+                                            />
+                                        </div>
+
+                                        <div className="flex-1 md:flex-none">
+                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Unit</Label>
+                                            <select
+                                                value={quickAddUnit}
+                                                onChange={(e) => setQuickAddUnit(e.target.value)}
+                                                className="w-20 px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                            >
+                                                <option value="g">g</option>
+                                                <option value="ml">ml</option>
+                                                <option value="oz">oz</option>
+                                                <option value="lb">lb</option>
+                                            </select>
+                                        </div>
+                                    </>
+                                )}
+                                {selectedFood.portions && selectedFood.portions.length > 0 && (
+                                    <button
+                                        onClick={() => {
+                                            if (selectedPortion) {
+                                                setSelectedPortion(null);
+                                                setQuickAddWeight(`${selectedPortion.weight_g}`);
+                                                setQuickAddUnit('g');
+                                            } else {
+                                                setSelectedPortion(selectedFood.portions[0]);
+                                            }
+                                        }}
+                                        className="text-[9px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-500 transition-colors whitespace-nowrap self-end mb-0.5"
+                                    >
+                                        {selectedPortion ? 'Use Weight' : 'Use Serving'}
+                                    </button>
+                                )}
+
+                                <div className="flex-1 md:flex-none">
+                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Destination</Label>
+                                    <select
+                                        value={quickAddMode}
+                                        onChange={(e) => setQuickAddMode(e.target.value as 'pantry' | 'shopping')}
+                                        className="w-auto px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                    >
+                                        <option value="shopping">Groceries</option>
+                                        <option value="pantry">Pantry</option>
+                                    </select>
+                                </div>
+
+                                <Button
+                                    onClick={handleQuickAdd}
+                                    className="gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest text-[9px] h-10"
+                                    disabled={isAdding}
+                                >
+                                    {isAdding ? (
+                                        <>Loading...</>
+                                    ) : (
+                                        <>
+                                            <Plus size={16} />
+                                            Add
+                                        </>
+                                    )}
+                                </Button>
+
+                                <button
+                                    onClick={() => {
+                                        setShowAddModal(false);
+                                        setSelectedFood(null);
+                                    }}
+                                    className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                                >
+                                    <X size={20} className="text-slate-500" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 <ShoppingListView />
             </div>
         </PageContainer>
