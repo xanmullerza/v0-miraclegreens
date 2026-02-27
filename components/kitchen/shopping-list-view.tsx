@@ -332,7 +332,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                 const { data } = await supabase
                     .from('food_items')
                     .select('id')
-                    .ilike('common_name', `%${normalize(item.name)}%`)
+                    .or(`name.ilike.%${normalize(item.name)}%,common_name.ilike.%${normalize(item.name)}%`)
                     .limit(1)
                     .maybeSingle();
                 if (data) foodItemId = data.id;
