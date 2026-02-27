@@ -56,8 +56,6 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
     const [manualItems, setManualItems] = useState<ShoppingListItem[]>([]);
     const [loading, setLoading] = useState(true);
     const { searchQuery } = useSearch();
-    const [newItemName, setNewItemName] = useState('');
-    const [newItemQty, setNewItemQty] = useState('');
     const { dailyPlan } = useUserPreferences();
     const [pantryItems, setPantryItems] = useState<any[]>([]);
 
@@ -169,66 +167,31 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         setItems(combined);
     }, [dailyPlan, pantryItems, manualItems]);
 
-    // Memoize items signature to prevent unnecessary enrichment runs
-    const itemsSignature = useMemo(
-        () => items.map(i => `${i.id}-${i.category || 'none'}`).join(','),
-        [items]
-    );
-
-    // Enrich items that are missing a category by batch-looking up from food_items
+    // Category enrichment for meal plan items that don't have categories
+    // Manual items added via HeroSearch already have categories from DB
     useEffect(() => {
-        const needCategory = items.filter(i => !i.category);
+        const needCategory = items.filter(i => !i.category && i.food_item_id);
         if (needCategory.length === 0) return;
 
         let isCancelled = false;
 
         const enrich = async () => {
-            // Collect food_item_ids and names for lookup
             const ids = needCategory.map(i => i.food_item_id).filter(Boolean) as string[];
-            const namesWithoutId = needCategory.filter(i => !i.food_item_id).map(i => i.name);
+            if (ids.length === 0) return;
 
-            const categoryMap = new Map<string, string>(); // item.id → category
-
-            // Batch lookup by food_item_id
-            if (ids.length > 0) {
-                const { data } = await supabase
-                    .from('food_items')
-                    .select('id, category')
-                    .in('id', ids);
-                if (data && !isCancelled) {
-                    const idToCat = new Map(data.map((d: any) => [d.id, d.category]));
-                    for (const item of needCategory) {
-                        if (item.food_item_id && idToCat.has(item.food_item_id)) {
-                            categoryMap.set(item.id, idToCat.get(item.food_item_id)!);
-                        }
+            const { data } = await supabase
+                .from('food_items')
+                .select('id, category')
+                .in('id', ids);
+                
+            if (data && !isCancelled) {
+                const idToCat = new Map(data.map((d: any) => [d.id, d.category]));
+                setItems(prev => prev.map(item => {
+                    if (item.food_item_id && idToCat.has(item.food_item_id) && !item.category) {
+                        return { ...item, category: idToCat.get(item.food_item_id) };
                     }
-                }
-            }
-
-            // Batch lookup by name for items without food_item_id
-            if (namesWithoutId.length > 0 && !isCancelled) {
-                for (const item of needCategory.filter(i => !i.food_item_id && !categoryMap.has(i.id))) {
-                    const normalize = (s: string) => s.replace(/\(.*?\)/g, '').replace(/[^a-zA-Z0-9 ]/g, '').trim();
-                    const { data } = await supabase
-                        .from('food_items')
-                        .select('id, category')
-                        .or(`name.ilike.%${normalize(item.name)}%,common_name.ilike.%${normalize(item.name)}%`)
-                        .limit(1)
-                        .maybeSingle();
-                    if (data?.category && !isCancelled) {
-                        categoryMap.set(item.id, data.category);
-                        // Also attach food_item_id for the pantry-add panel
-                        if (data.id) {
-                            item.food_item_id = data.id;
-                        }
-                    }
-                }
-            }
-
-            if (categoryMap.size > 0 && !isCancelled) {
-                setItems(prev => prev.map(item =>
-                    categoryMap.has(item.id) ? { ...item, category: categoryMap.get(item.id) } : item
-                ));
+                    return item;
+                }));
             }
         };
 
@@ -237,7 +200,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         return () => {
             isCancelled = true;
         };
-    }, [itemsSignature]);
+    }, [items.length]);
 
     const fetchData = async () => {
         setLoading(true);
@@ -281,22 +244,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         }
     };
 
-    const addManualItem = () => {
-        if (!newItemName.trim()) return;
 
-        const newItem: ShoppingListItem = {
-            id: `manual-${Date.now()}`,
-            name: newItemName.trim(),
-            quantity: newItemQty.trim() || '1',
-            unit: '',
-            source: 'manual'
-        };
-
-        setManualItems(prev => [...prev, newItem]);
-        setNewItemName('');
-        setNewItemQty('');
-        toast.success(`Added "${newItemName}" to shopping list`);
-    };
 
     // Barcode scanner handlers
     const handleBarcodeScan = (barcode: string) => {
@@ -778,35 +726,6 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                     quantity: selectedMatchItem.quantity
                 } : undefined}
             />
-
-            {/* Add Item Bar */}
-            <div className="flex flex-col sm:flex-row gap-4 p-6 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl">
-                <div className="flex-1 flex gap-3">
-                    <Input
-                        placeholder="Item name..."
-                        value={newItemName}
-                        onChange={(e) => setNewItemName(e.target.value)}
-                        className="flex-1 h-14 rounded-2xl border-slate-200 dark:border-slate-700"
-                        onKeyDown={(e) => e.key === 'Enter' && addManualItem()}
-                    />
-                    <Input
-                        placeholder="Qty"
-                        value={newItemQty}
-                        onChange={(e) => setNewItemQty(e.target.value)}
-                        className="w-24 h-14 rounded-2xl border-slate-200 dark:border-slate-700 text-center"
-                        onKeyDown={(e) => e.key === 'Enter' && addManualItem()}
-                    />
-                </div>
-                <Button
-                    onClick={addManualItem}
-                    disabled={!newItemName.trim()}
-                    className="h-14 px-6 rounded-2xl bg-emerald-600 text-white hover:bg-emerald-700 font-black uppercase tracking-widest"
-                >
-                    <Plus size={20} className="mr-2" />
-                    Add
-                </Button>
-            </div>
-
 
             {/* Filters Row */}
             <div className="flex flex-wrap items-center gap-2 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
