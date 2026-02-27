@@ -37,6 +37,7 @@ interface HeroSearchProps<T = any> {
     searchingMessage?: string;
 
     theme?: HeroTheme;
+    powerButton?: React.ReactNode; // Button rendered to the left of search input
 }
 
 const themeStyles: Record<HeroTheme, { ring: string; border: string; accent: string; accentBg: string; iconColor: string }> = {
@@ -139,6 +140,7 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
                 </div>
                 {/* Footer */}
                 <div className="p-2 md:p-4 flex items-center gap-2 bg-transparent dark:bg-transparent order-2 rounded-b-[2.5rem]">
+                    {props.powerButton}
                     <div className="flex-1 relative flex items-center">
                         <div className={cn("absolute left-4 transition-colors", isActive ? style.accent : 'text-slate-300')}>
                             <Search size={16} className="md:w-5 md:h-5" />

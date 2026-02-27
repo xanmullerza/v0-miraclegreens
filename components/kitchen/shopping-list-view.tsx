@@ -45,8 +45,12 @@ interface ShoppingListItem {
     food_item_id?: string;
 }
 
+interface ShoppingListViewProps {
+    scannerOpen?: boolean;
+    onScannerOpenChange?: (open: boolean) => void;
+}
 
-export function ShoppingListView() {
+export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOpenChange }: ShoppingListViewProps = {}) {
     const router = useRouter();
     const [items, setItems] = useState<ShoppingListItem[]>([]);
     const [manualItems, setManualItems] = useState<ShoppingListItem[]>([]);
@@ -62,7 +66,9 @@ export function ShoppingListView() {
     const [showManualOnly, setShowManualOnly] = useState(false);
 
     // Barcode scanner state
-    const [scannerOpen, setScannerOpen] = useState(false);
+    const [internalScannerOpen, setInternalScannerOpen] = useState(false);
+    const scannerOpen = externalScannerOpen !== undefined ? externalScannerOpen : internalScannerOpen;
+    const setScannerOpen = onScannerOpenChange || setInternalScannerOpen;
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
     const [scannedBarcode, setScannedBarcode] = useState('');
 
@@ -791,24 +797,14 @@ export function ShoppingListView() {
                         onKeyDown={(e) => e.key === 'Enter' && addManualItem()}
                     />
                 </div>
-                <div className="flex gap-3">
-                    <Button
-                        onClick={() => setScannerOpen(true)}
-                        variant="outline"
-                        className="h-14 px-6 rounded-2xl border-amber-300 dark:border-amber-700 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30 font-black uppercase tracking-widest"
-                    >
-                        <ScanLine size={20} className="mr-2" />
-                        Scan
-                    </Button>
-                    <Button
-                        onClick={addManualItem}
-                        disabled={!newItemName.trim()}
-                        className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20 hover:bg-emerald-700 h-auto"
-                    >
-                        <Plus size={14} />
-                        Add
-                    </Button>
-                </div>
+                <Button
+                    onClick={addManualItem}
+                    disabled={!newItemName.trim()}
+                    className="h-14 px-6 rounded-2xl bg-emerald-600 text-white hover:bg-emerald-700 font-black uppercase tracking-widest"
+                >
+                    <Plus size={20} className="mr-2" />
+                    Add
+                </Button>
             </div>
 
 

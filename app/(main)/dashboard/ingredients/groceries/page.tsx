@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Leaf, ChevronRight, ShoppingCart, Plus, X } from 'lucide-react';
+import { Leaf, ChevronRight, ShoppingCart, Plus, X, ScanLine } from 'lucide-react';
 import { ShoppingListView } from '@/components/kitchen/shopping-list-view';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
@@ -40,6 +40,9 @@ export default function ShoppingListPage() {
     const [quickAddUnit, setQuickAddUnit] = useState('g');
     const [quickAddMode, setQuickAddMode] = useState<'pantry' | 'shopping'>('shopping');
     const [selectedPortion, setSelectedPortion] = useState<{ label: string; weight_g: number } | null>(null);
+
+    // Scanner state
+    const [scannerOpen, setScannerOpen] = useState(false);
 
     // Fetch measures when food is selected
     useEffect(() => {
@@ -242,8 +245,14 @@ export default function ShoppingListPage() {
                     idleSubtitle="Search foods to add to your shopping list"
                     noResultsMessage="No matching foods found"
                     enterMessage="Enter food name to search"
-                    searchingMessage="Searching Foods..."
-                    renderResult={(food: any) => (
+                    searchingMessage="Searching Foods..."                    powerButton={
+                        <button
+                            onClick={() => setScannerOpen(true)}
+                            className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:border-emerald-500 hover:bg-emerald-500/10 shrink-0"
+                        >
+                            <ScanLine size={16} className="text-slate-900 dark:text-white" />
+                        </button>
+                    }                    renderResult={(food: any) => (
                         <div className="flex items-center gap-4 min-w-0 w-full">
                             <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
                                 {food.image ? (
@@ -420,7 +429,10 @@ export default function ShoppingListPage() {
                     </div>
                 )}
 
-                <ShoppingListView />
+                <ShoppingListView
+                    scannerOpen={scannerOpen}
+                    onScannerOpenChange={setScannerOpen}
+                />
             </div>
         </PageContainer>
     );
