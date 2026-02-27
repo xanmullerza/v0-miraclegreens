@@ -424,8 +424,9 @@ export default function SurvivalModePage() {
                                 onSelect={addIngredient}
                                 theme="emerald"
                                 placeholder="SEARCH FOOD LIBRARY..."
-                                idleTitle="Ready to Search?"
-                                idleSubtitle="Search below to add items to inventory"
+                                idleIcon={<Wallet size={20} className="text-emerald-500" />}
+                                idleTitle="Life Guard"
+                                idleSubtitle="Add foods to simulate a survival scenario"
                                 noResultsMessage="No matching items found"
                                 enterMessage="Enter item name to compare"
                                 searchingMessage="Searching Library..."

@@ -104,8 +104,9 @@ function MealsContent() {
                     renderResult={renderResult}
                     theme="amber"
                     placeholder="SEARCH MEALS..."
-                    idleTitle="Ready to Discover?"
-                    idleSubtitle="Search for nutritious meal ideas"
+                    idleIcon={<ChefHat size={20} className="text-amber-500" />}
+                    idleTitle="Meal Recipes"
+                    idleSubtitle="Discover meals with full nutrition breakdowns"
                     noResultsMessage="No matching meals found"
                     enterMessage="Enter meal name to search"
                     searchingMessage="Searching Meals..."

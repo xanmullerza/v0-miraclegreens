@@ -2,7 +2,7 @@
 
 import React, { useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, ChefHat, ChevronRight } from 'lucide-react';
+import { Loader2, ChefHat, ChevronRight, Beaker } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { RecipesView } from '@/components/ingredients/recipes-view';
 import { HeroSearch } from '@/components/ui/hero-search';
@@ -104,8 +104,9 @@ function MixesContent() {
                     renderResult={renderResult}
                     theme="emerald"
                     placeholder="SEARCH MIXES..."
-                    idleTitle="Ready to Browse?"
-                    idleSubtitle="Search for custom ingredient blends"
+                    idleIcon={<Beaker size={20} className="text-emerald-500" />}
+                    idleTitle="Ingredient Mixes"
+                    idleSubtitle="Browse and search custom blends and bases"
                     noResultsMessage="No matching mixes found"
                     enterMessage="Enter mix name to search"
                     searchingMessage="Searching Mixes..."

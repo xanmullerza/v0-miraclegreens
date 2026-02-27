@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { PantryView } from '@/components/kitchen/pantry-view';
-import { Beef, ChevronRight, Plus, X } from 'lucide-react';
+import { Beef, ChevronRight, Plus, X, Package } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
 import { supabase } from '@/lib/supabase';
@@ -236,8 +236,9 @@ export default function PantryPage() {
                         onSelect={handleSelectFood}
                         theme="amber"
                         placeholder="SEARCH FOOD LIBRARY..."
-                        idleTitle="Manage Your Pantry"
-                        idleSubtitle="Search below to add items to your pantry inventory"
+                        idleIcon={<Package size={20} className="text-amber-500" />}
+                        idleTitle="Pantry Inventory"
+                        idleSubtitle="Search foods to stock your personal pantry"
                         noResultsMessage="No matching items found"
                         enterMessage="Enter item name to search"
                         searchingMessage="Searching Library..."

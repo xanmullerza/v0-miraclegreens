@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Loader2, Leaf, ChevronRight } from 'lucide-react';
+import { Loader2, Leaf, ChevronRight, Search } from 'lucide-react';
 import { ExploreView } from './views/explore-view';
 import { ShoppingView } from './views/shopping-view';
 import { StaplesView } from '@/components/ingredients/staples-view';
@@ -114,8 +114,9 @@ function IngredientsContent() {
                         renderResult={renderResult}
                         theme="emerald"
                         placeholder="SEARCH FOOD LIBRARY..."
-                        idleTitle="Ready to Explore?"
-                        idleSubtitle="Search for nutritious foods and ingredients"
+                        idleIcon={<Leaf size={20} className="text-emerald-500" />}
+                        idleTitle="Food Library"
+                        idleSubtitle="Explore whole food profiles with full nutrition data"
                         noResultsMessage="No matching foods found"
                         enterMessage="Enter food name to search"
                         searchingMessage="Searching Library..."
