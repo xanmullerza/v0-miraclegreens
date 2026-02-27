@@ -588,7 +588,7 @@ export function ExploreView({
             )}
 
             {/* List Container */}
-            <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
+            <div className="w-full max-w-6xl mx-auto bg-slate-100 dark:bg-slate-900/80 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl">
                 {showAddFood && setShowAddFood ? (
                     /* Food Form - replaces list when adding */
                     <FoodFormDialog
@@ -597,7 +597,7 @@ export function ExploreView({
                 ) : (
                 <>
                 {/* Header Section — literally same grid classes as food item rows */}
-                <div className="border-b border-slate-200 dark:border-slate-800">
+                <div className="border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10 bg-slate-100 dark:bg-slate-900/80 rounded-t-[2rem]">
                     <div className="hidden lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px] gap-3 lg:gap-4 lg:items-center lg:px-10 py-1 w-full">
                         {/* Filter icon in thumbnail slot */}
                         <div className="flex items-center justify-center">
@@ -721,20 +721,16 @@ export function ExploreView({
                                             </div>
 
                                             {/* Stats (Desktop View) */}
-                                            <div className="hidden lg:flex flex-col items-end">
+                                            <div className="hidden lg:flex items-center justify-end">
                                                 <span className="font-black text-[11px] text-slate-900 dark:text-white">{formatEnergy(food.energy_kcal, energyUnit)}</span>
-                                                <span className="text-[8px] uppercase font-black text-slate-400">E</span>
                                             </div>
-                                            <div className="hidden lg:flex flex-col items-end">
-                                                <span className="text-[8px] uppercase font-black text-slate-400">Carbs</span>
+                                            <div className="hidden lg:flex items-center justify-end">
                                                 <span className="font-black text-[11px] text-slate-900 dark:text-white">{food.carbs_g.toFixed(1)}g</span>
                                             </div>
-                                            <div className="hidden lg:flex flex-col items-end">
-                                                <span className="text-[8px] uppercase font-black text-slate-400">Fat</span>
+                                            <div className="hidden lg:flex items-center justify-end">
                                                 <span className="font-black text-[11px] text-slate-900 dark:text-white">{food.fat_g.toFixed(1)}g</span>
                                             </div>
-                                            <div className="hidden lg:flex flex-col items-end">
-                                                <span className="text-[8px] uppercase font-black text-slate-400">Protein</span>
+                                            <div className="hidden lg:flex items-center justify-end">
                                                 <span className="font-black text-[11px] text-slate-900 dark:text-white">{food.protein_g.toFixed(1)}g</span>
                                             </div>
                                         </div>
