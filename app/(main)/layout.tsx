@@ -64,7 +64,15 @@ function DashboardLayoutContent({
                         showRDADrawer && isDesktop && "lg:translate-x-[192px]"
                     )}>
                         <div className="pointer-events-auto w-full max-w-[900px]">
-                            <HeaderLogo showSubtext={true} />
+                            <HeaderLogo 
+                                showSubtext={true}
+                                userStatus={
+                                    user ? 'cloud' :
+                                        (profile.name || profile.nickname) ? 'local' :
+                                            'anonymous'
+                                }
+                                userAvatarUrl={user?.user_metadata?.avatar_url}
+                            />
                         </div>
                     </div>
 
