@@ -599,14 +599,14 @@ export function ExploreView({
                 {/* Header Section with Filter and Column Labels */}
                 <div className="border-b border-slate-200 dark:border-slate-800">
                     {/* Column Headers with Filter */}
-                    <div className="hidden lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px_150px] gap-3 lg:gap-4 lg:items-center lg:px-6 py-4">
+                    <div className="hidden lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px] gap-3 lg:gap-4 lg:items-center lg:px-6 py-4">
                         <div></div> {/* Thumbnail column */}
                         <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Name</div>
                         <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Energy</div>
                         <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Carbs</div>
                         <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Fat</div>
                         <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Protein</div>
-                        <div className="flex justify-end">
+                        <div className="flex justify-end items-center">
                             {/* Filter Dropdown */}
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -701,7 +701,7 @@ export function ExploreView({
                                         onClick={() => router.push(`/dashboard/ingredients/foods/${food.id}`)}
                                         className="group relative bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:shadow-lg transition-all duration-500 overflow-hidden cursor-pointer"
                                     >
-                                        <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px_150px] gap-3 lg:gap-4 lg:items-center lg:px-6 py-1 w-full">
+                                        <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px] gap-3 lg:gap-4 lg:items-center lg:px-6 py-1 w-full">
                                             {/* Thumbnail */}
                                             <div className="aspect-square w-16 lg:w-12 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-500">
                                                 {food.image ? (
