@@ -64,6 +64,7 @@ export default function ShoppingListPage() {
             checked: false,
             source: 'manual',
             food_item_id: food.id,
+            category: food.category,
         };
         localStorage.setItem('vitala_shopping_manual_items', JSON.stringify([...currentList, newItem]));
         setIsSearchActive(false);
