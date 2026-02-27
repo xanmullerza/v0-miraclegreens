@@ -27,10 +27,11 @@ Card.displayName = "Card";
 
 interface RecipeFormDialogProps {
     onClose: () => void;
+    onSave?: () => void;
     isMix?: boolean;
 }
 
-export function RecipeFormDialog({ onClose, isMix: initialIsMix = false }: RecipeFormDialogProps) {
+export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false }: RecipeFormDialogProps) {
     const router = useRouter();
     const { user, saveRecipe, loading: authLoading } = useDataPersistence();
 
@@ -149,7 +150,7 @@ export function RecipeFormDialog({ onClose, isMix: initialIsMix = false }: Recip
             await saveRecipe(recipeData, ingredients, instructions);
             toast.success(`${isMix ? 'Mix' : 'Meal'} saved successfully!`);
             onClose();
-            router.refresh();
+            onSave?.();
         } catch (error: any) {
             toast.error(`Failed to save: ${error.message}`);
         } finally {

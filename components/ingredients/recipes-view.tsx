@@ -358,6 +358,7 @@ export function RecipesView({
                     /* Recipe Form - replaces list when adding */
                     <RecipeFormDialog
                         onClose={() => setShowAddRecipe(false)}
+                        onSave={() => fetchRecipes(0, true)}
                         isMix={isMix}
                     />
                 ) : (
