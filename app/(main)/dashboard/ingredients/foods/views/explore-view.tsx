@@ -604,23 +604,21 @@ export function ExploreView({
                         <div className="flex items-center justify-center">
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button
-                                        variant="outline"
+                                    <button
                                         className={cn(
-                                            "h-7 px-2.5 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all",
+                                            "w-8 h-8 rounded-lg flex items-center justify-center transition-all border relative",
                                             (showFavoritesOnly || selectedCategories.length > 0)
-                                                ? "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400"
-                                                : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-emerald-300"
+                                                ? "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400"
+                                                : "border-slate-200 dark:border-slate-700 text-slate-400 hover:border-emerald-300 hover:text-emerald-600"
                                         )}
                                     >
-                                        <Filter size={11} className="mr-1" />
-                                        Filter
+                                        <Filter size={13} />
                                         {(selectedCategories.length > 0 || showFavoritesOnly) && (
-                                            <Badge className="ml-1.5 h-4 w-4 p-0 flex items-center justify-center bg-emerald-600 text-white text-[7px] rounded-full">
+                                            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 flex items-center justify-center bg-emerald-600 text-white text-[7px] font-black rounded-full">
                                                 {selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
-                                            </Badge>
+                                            </span>
                                         )}
-                                    </Button>
+                                    </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="start" className="w-56 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl p-2">
                                     <div className="px-2 py-1.5">
