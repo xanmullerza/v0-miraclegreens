@@ -10,8 +10,6 @@ import {
     ShoppingBasket,
     Loader2,
     Search,
-    Trash2,
-    Check,
     ChevronRight,
     Sparkles,
     ChefHat,
@@ -38,7 +36,6 @@ interface ShoppingListItem {
     name: string;
     quantity: string;
     unit: string;
-    checked: boolean;
     category?: string;
     is_miracle_product?: boolean;
     source?: 'manual' | 'mealplan' | 'scanned';
@@ -143,7 +140,6 @@ export function ShoppingListView() {
                     name: item.name,
                     quantity: item.amounts.join(' + '),
                     unit: '',
-                    checked: false,
                     is_miracle_product: item.isMiracleProduct,
                     source: 'mealplan' as const,
                     food_item_id: (item as any).food_item_id
@@ -209,7 +205,6 @@ export function ShoppingListView() {
             name: newItemName.trim(),
             quantity: newItemQty.trim() || '1',
             unit: '',
-            checked: false,
             source: 'manual'
         };
 
@@ -244,7 +239,6 @@ export function ShoppingListView() {
             name: product.name,
             quantity: `${product.quantity} ${product.unit}`,
             unit: product.unit,
-            checked: false,
             source: 'scanned',
             barcode: product.barcode,
             price: product.price,
@@ -271,26 +265,6 @@ export function ShoppingListView() {
         toast.success(`Added "${product.name}" to shopping list`);
     };
 
-    const toggleItem = (id: string) => {
-        // We need to update either manual items OR rely on local state override for meal plan items?
-        // Simpler: Just update persisted manual items if it's manual, OR local state if it's meal plan?
-        // Actually, for check-off functionality to persist properly for meal plan items, we might need a separate 'checkedItems' persistence.
-        // For now, let's just toggling in the derived view 'items' won't persist well for meal plan items on refresh.
-        // Let's implement better toggling:
-
-        if (id.startsWith('manual-') || id.startsWith('scanned-')) {
-            setManualItems(prev => prev.map(item =>
-                item.id === id ? { ...item, checked: !item.checked } : item
-            ));
-        } else {
-            // For meal plan items, since they are regenerated, handling persistence is trickier.
-            // We'll update the local state 'items' for immediate UI feedback, 
-            // but strictly speaking this state is transient for meal plan items.
-            setItems(prev => prev.map(item =>
-                item.id === id ? { ...item, checked: !item.checked } : item
-            ));
-        }
-    };
 
     const removeItem = (id: string) => {
         if (id.startsWith('manual-') || id.startsWith('scanned-')) {
@@ -631,29 +605,7 @@ export function ShoppingListView() {
         }
     };
 
-    const clearCheckedItems = () => {
-        const checked = items.filter(i => i.checked);
 
-        // Record purchases for items with price info
-        checked.forEach(item => {
-            if (item.price) {
-                recordPurchase({
-                    product_name: item.name,
-                    barcode: item.barcode,
-                    quantity: parseFloat(item.quantity) || 1,
-                    unit: item.unit || 'item',
-                    price: item.price
-                });
-            }
-        });
-
-        // Persist removal for manual items
-        setManualItems(prev => prev.filter(item => !item.checked));
-        // Update local view immediately
-        setItems(prev => prev.filter(item => !item.checked));
-
-        toast.success(`Cleared ${checked.length} checked items`);
-    };
 
     // Category mapping for better store organization
     const getCategoryGroup = (category?: string) => {
@@ -703,11 +655,8 @@ export function ShoppingListView() {
         return matchesSearch && matchesSource;
     });
 
-    const uncheckedItems = filteredItems.filter(i => !i.checked);
-    const checkedItems = filteredItems.filter(i => i.checked);
-
-    // Group unchecked items by category
-    const groupedUnchecked = uncheckedItems.reduce((acc, item) => {
+    // Group items by category
+    const groupedItems = filteredItems.reduce((acc, item) => {
         const group = getCategoryGroup(item.category);
         if (!acc[group]) acc[group] = [];
         acc[group].push(item);
@@ -715,7 +664,7 @@ export function ShoppingListView() {
     }, {} as Record<string, ShoppingListItem[]>);
 
     // Calculate total price of items with prices
-    const totalPrice = uncheckedItems
+    const totalPrice = filteredItems
         .filter(i => i.price)
         .reduce((sum, i) => sum + (i.price || 0), 0);
 
@@ -853,20 +802,7 @@ export function ShoppingListView() {
                 )}
             </div>
 
-            {/* Stats Row */}
-            <div className="flex flex-wrap gap-4">
-                {checkedItems.length > 0 && (
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={clearCheckedItems}
-                        className="text-xs font-black uppercase tracking-widest text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20"
-                    >
-                        <Trash2 size={14} className="mr-1" />
-                        Clear {checkedItems.length} Checked
-                    </Button>
-                )}
-            </div>
+
 
             {/* Loading State */}
             {loading ? (
@@ -895,8 +831,8 @@ export function ShoppingListView() {
             ) : (
                 /* Items List */
                 <div className="space-y-4">
-                    {/* Unchecked Items - Grouped by Category */}
-                    {uncheckedItems.length > 0 && (
+                    {/* Items - Grouped by Category */}
+                    {filteredItems.length > 0 && (
                         <div className="space-y-2">
                             <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/50">
                                 <div className="flex items-center gap-2">
@@ -905,10 +841,10 @@ export function ShoppingListView() {
                                         Need to Buy
                                     </span>
                                 </div>
-                                <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">{uncheckedItems.length}</span>
+                                <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">{filteredItems.length}</span>
                             </div>
                             <div className="space-y-3">
-                                {Object.entries(groupedUnchecked).map(([group, items]) => {
+                                {Object.entries(groupedItems).map(([group, items]) => {
                                     const colors = getCategoryColor(group);
                                     return (
                                         <div key={group} className={cn("rounded-xl border p-4", colors.bg, colors.border)}>
@@ -929,14 +865,7 @@ export function ShoppingListView() {
                                                                 ? "bg-amber-50/70 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/40 hover:border-amber-300"
                                                                 : "bg-slate-50/50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800/50"
                                                         )}
-                                                        onClick={() => toggleItem(item.id)}
                                                     >
-                                                        <div className={cn(
-                                                            "w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all",
-                                                            "border-slate-300 dark:border-slate-600 group-hover:border-emerald-500"
-                                                        )}>
-                                                            {/* Empty checkbox */}
-                                                        </div>
                                                         <div className="flex-1 min-w-0">
                                                             <div className="flex items-center gap-1.5">
                                                                 {item.is_miracle_product && (
@@ -1042,48 +971,6 @@ export function ShoppingListView() {
                                         </div>
                                     );
                                 })}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Checked Items */}
-                    {checkedItems.length > 0 && (
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/50">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                                    <span className="text-xs font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
-                                        Completed
-                                    </span>
-                                </div>
-                                <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">{checkedItems.length}</span>
-                            </div>
-                            <div className="space-y-1.5">
-                                {checkedItems.map((item) => (
-                                    <div
-                                        key={item.id}
-                                        className="flex items-center gap-3 px-4 py-2.5 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40 opacity-70 cursor-pointer group hover:opacity-100 transition-all"
-                                        onClick={() => toggleItem(item.id)}
-                                    >
-                                        <div className="w-5 h-5 rounded-md border-2 border-emerald-500 bg-emerald-500 flex items-center justify-center shrink-0">
-                                            <Check size={12} className="text-white" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <span className="font-semibold text-sm text-slate-500 dark:text-slate-400 line-through truncate block">
-                                                {item.name}
-                                            </span>
-                                            <span className="text-xs text-slate-400 dark:text-slate-500">{item.quantity}</span>
-                                        </div>
-                                        <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={(e) => { e.stopPropagation(); openPantryAddPanel(item); }}
-                                            className="opacity-0 group-hover:opacity-100 h-6 px-2 text-[8px] font-black uppercase tracking-tight text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
-                                        >
-                                            <Package size={10} className="mr-0.5" /> Add to Pantry
-                                        </Button>
-                                    </div>
-                                ))}
                             </div>
                         </div>
                     )}
