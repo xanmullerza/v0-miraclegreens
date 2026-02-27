@@ -227,7 +227,7 @@ export function ShoppingListView() {
             // Fetch personal pantry items if user is logged in
             const { data: personalData } = user ? await supabase
                 .from('pantry_items')
-                .select('*, scanned_products(name, common_name, category), food_items(name, common_name, category)')
+                .select('*, scanned_products(name, brand, image_url), food_items(name, common_name, category)')
                 .eq('user_id', user.id)
                 : { data: [] };
 
@@ -241,8 +241,8 @@ export function ShoppingListView() {
                     combinedPantry.push({
                         id: item.id,
                         name: foodItem?.name || scannedProduct?.name || item.custom_name || item.name,
-                        common_name: foodItem?.common_name || scannedProduct?.common_name || foodItem?.name || scannedProduct?.name || item.custom_name || item.name,
-                        category: foodItem?.category || scannedProduct?.category || 'General'
+                        common_name: foodItem?.common_name || foodItem?.name || scannedProduct?.name || item.custom_name || item.name,
+                        category: foodItem?.category || 'General'
                     });
                 });
             }

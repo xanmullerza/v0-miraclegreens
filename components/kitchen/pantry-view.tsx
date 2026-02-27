@@ -413,7 +413,7 @@ export function PantryView({
                 const nutrition = sp?.nutrition || {};
 
                 // Try to extract category from notes if not linked to food_item
-                let category = fi?.category || sp?.category || 'General';
+                let category = fi?.category || 'General';
                 if (category === 'General' && item.notes) {
                     const categoryMatch = item.notes.match(/Category:\s*(\w+)/);
                     if (categoryMatch) {
@@ -424,7 +424,7 @@ export function PantryView({
                 return {
                     id: item.id,
                     name: sp?.name || fi?.name || item.custom_name || 'Personal Item',
-                    common_name: fi?.common_name || sp?.common_name || sp?.name || fi?.name || item.custom_name || 'Personal Item',
+                    common_name: fi?.common_name || sp?.name || fi?.name || item.custom_name || 'Personal Item',
                     energy_kcal: nutrition.energy || fi?.energy_kcal || 0,
                     protein_g: nutrition.protein || fi?.protein_g || 0,
                     carbs_g: nutrition.carbs || fi?.carbs_g || 0,

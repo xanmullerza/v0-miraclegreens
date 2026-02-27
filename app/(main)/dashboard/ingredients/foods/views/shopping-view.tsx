@@ -129,7 +129,7 @@ export function ShoppingView() {
                     .select('*')
                     .eq('is_in_pantry', true),
                 user ? supabase.from('pantry_items')
-                    .select('*, scanned_products(name, common_name), food_items(*)')
+                    .select('*, scanned_products(name), food_items(*)')
                     .eq('user_id', user.id)
                     : { data: [] }
             ]);
@@ -143,7 +143,7 @@ export function ShoppingView() {
                     return {
                         id: item.food_item_id || item.id,
                         name: sp?.name || fi?.name || item.custom_name,
-                        common_name: fi?.common_name || sp?.common_name || sp?.name || fi?.name || item.custom_name,
+                        common_name: fi?.common_name || sp?.name || fi?.name || item.custom_name,
                         is_in_pantry: true,
                     };
                 });
