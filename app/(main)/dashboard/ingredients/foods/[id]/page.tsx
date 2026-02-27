@@ -339,24 +339,114 @@ export default function FoodDetailsPage() {
     const handleQuickAdd = async () => {
         if (!food) return;
 
-        const quantityString = quickAddWeight ? `${quickAddQty} x ${quickAddWeight}${quickAddUnit}` : quickAddQty;
+        // Build quantity string — use portion label if a portion is selected
+        const quantityString = selectedPortion
+            ? `${quickAddQty} ${selectedPortion.label} (${selectedPortion.weight_g}g)`
+            : quickAddWeight
+                ? `${quickAddQty} x ${quickAddWeight}${quickAddUnit}`
+                : quickAddQty;
 
         if (quickAddMode === 'pantry') {
             try {
-                // Update UI
-                setFood(prev => prev ? { ...prev, is_in_pantry: true, quantity: quantityString } : null);
-
-                // Persist to localStorage
+                // Merge with existing stock instead of overwriting
                 const saved = localStorage.getItem('pantry_quantities');
                 const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-                quantities[food.id] = quantityString;
+                const existing = quantities[food.id] || food.quantity || '';
+
+                // Simple merge: append with " + " separator, stripping zero entries
+                const existingEntries = existing
+                    .split(/\s*\+\s*/)
+                    .map((s: string) => s.trim())
+                    .filter((s: string) => {
+                        if (!s) return false;
+                        const m = s.match(/^(\d+(?:\.\d+)?)/);
+                        return m ? parseFloat(m[1]) > 0 : true;
+                    });
+
+                // Check if incoming matches an existing entry (same label + weight)
+                const incomingLabeled = quantityString.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+                const incomingX = quantityString.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(g|ml|oz|lb)$/i);
+
+                let merged = false;
+                if (incomingLabeled) {
+                    const incQty = parseFloat(incomingLabeled[1]);
+                    const incLabel = incomingLabeled[2];
+                    const incWeight = incomingLabeled[3];
+                    // Check for gram/kilogram entries that should consolidate by total weight
+                    const isIncWeight = /^(gram|kilogram)s?$/i.test(incLabel);
+                    if (isIncWeight) {
+                        let totalGrams = incQty * parseFloat(incWeight);
+                        const nonWeight: string[] = [];
+                        for (const raw of existingEntries) {
+                            const lbl = raw.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+                            const xFmt = raw.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*g$/i);
+                            if (lbl && /^(gram|kilogram)s?$/i.test(lbl[2])) {
+                                totalGrams += parseFloat(lbl[1]) * parseFloat(lbl[3]);
+                            } else if (xFmt) {
+                                totalGrams += parseFloat(xFmt[1]) * parseFloat(xFmt[2]);
+                            } else {
+                                nonWeight.push(raw);
+                            }
+                        }
+                        const fmtEntry = totalGrams >= 1000
+                            ? `${(totalGrams / 1000) % 1 === 0 ? (totalGrams / 1000).toString() : (totalGrams / 1000).toFixed(1)} kilogram (1000g)`
+                            : `${Math.round(totalGrams)} gram (1g)`;
+                        const result = nonWeight.length > 0 ? `${nonWeight.join(' + ')} + ${fmtEntry}` : fmtEntry;
+                        quantities[food.id] = result;
+                        merged = true;
+                    } else {
+                        // Match by label + weight (e.g. "6 Each (304g)" + "3 Each (304g)" = "9 Each (304g)")
+                        const matchIdx = existingEntries.findIndex((raw: string) => {
+                            const m = raw.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+                            return m && m[2] === incLabel && m[3] === incWeight;
+                        });
+                        if (matchIdx >= 0) {
+                            const m = existingEntries[matchIdx].match(/^(\d+(?:\.\d+)?)/);
+                            const sumQty = (m ? parseFloat(m[1]) : 0) + incQty;
+                            existingEntries[matchIdx] = `${sumQty} ${incLabel} (${incWeight}g)`;
+                            quantities[food.id] = existingEntries.join(' + ');
+                            merged = true;
+                        }
+                    }
+                } else if (incomingX) {
+                    // "N x Wg" format — consolidate with existing weight entries
+                    let totalGrams = parseFloat(incomingX[1]) * parseFloat(incomingX[2]);
+                    const nonWeight: string[] = [];
+                    for (const raw of existingEntries) {
+                        const lbl = raw.match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+                        const xFmt = raw.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*g$/i);
+                        if (lbl && /^(gram|kilogram)s?$/i.test(lbl[2])) {
+                            totalGrams += parseFloat(lbl[1]) * parseFloat(lbl[3]);
+                        } else if (xFmt) {
+                            totalGrams += parseFloat(xFmt[1]) * parseFloat(xFmt[2]);
+                        } else {
+                            nonWeight.push(raw);
+                        }
+                    }
+                    const fmtEntry = totalGrams >= 1000
+                        ? `${(totalGrams / 1000) % 1 === 0 ? (totalGrams / 1000).toString() : (totalGrams / 1000).toFixed(1)} kilogram (1000g)`
+                        : `${Math.round(totalGrams)} gram (1g)`;
+                    const result = nonWeight.length > 0 ? `${nonWeight.join(' + ')} + ${fmtEntry}` : fmtEntry;
+                    quantities[food.id] = result;
+                    merged = true;
+                }
+
+                if (!merged) {
+                    // Fallback: append
+                    quantities[food.id] = existingEntries.length > 0
+                        ? `${existingEntries.join(' + ')} + ${quantityString}`
+                        : quantityString;
+                }
+
+                // Update UI
+                setFood(prev => prev ? { ...prev, is_in_pantry: true, quantity: quantities[food.id] } : null);
                 localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
 
                 // Update DB
                 const { error } = await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', food.id);
                 if (error) throw error;
 
-                toast.success(`Added to pantry with ${quantityString}`);
+                toast.success(`Added to pantry: ${quantityString}`);
             } catch (error) {
                 toast.error('Failed to update pantry');
             }
@@ -368,7 +458,8 @@ export default function FoodDetailsPage() {
                 quantity: quantityString,
                 unit: '',
                 checked: false,
-                source: 'manual'
+                source: 'manual',
+                food_item_id: food.id
             };
             localStorage.setItem('vitala_shopping_manual_items', JSON.stringify([...currentList, newItem]));
             toast.success(`Added to groceries`);
