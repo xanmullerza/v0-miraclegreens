@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Loader2, Leaf, ChevronRight, Search } from 'lucide-react';
+import { Loader2, Leaf, ChevronRight, Search, Plus } from 'lucide-react';
 import { ExploreView } from './views/explore-view';
 import { ShoppingView } from './views/shopping-view';
 import { StaplesView } from '@/components/ingredients/staples-view';
@@ -120,6 +120,14 @@ function IngredientsContent() {
                         noResultsMessage="No matching foods found"
                         enterMessage="Enter food name to search"
                         searchingMessage="Searching Library..."
+                        powerButton={
+                            <button
+                                onClick={() => router.push('/dashboard/ingredients/foods/new')}
+                                className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:border-emerald-500 hover:bg-emerald-500/10 shrink-0"
+                            >
+                                <Plus size={16} className="text-slate-900 dark:text-white" />
+                            </button>
+                        }
                     />
                 )}
 

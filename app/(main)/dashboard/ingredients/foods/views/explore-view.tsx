@@ -674,14 +674,6 @@ export function ExploreView({
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-
-                    <Button
-                        onClick={() => router.push('/dashboard/ingredients/foods/new')}
-                        className="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20 hover:bg-emerald-700 h-auto"
-                    >
-                        <Plus size={12} />
-                        Add Food
-                    </Button>
                 </div>
             )}
 
