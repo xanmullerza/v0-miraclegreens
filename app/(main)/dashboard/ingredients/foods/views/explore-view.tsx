@@ -581,73 +581,64 @@ export function ExploreView({
                     </div>
                 </div>
             )}
-            {/* Filter Section Below Header */}
-            {!hideControls && (
-                <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-4 justify-between items-center px-4 md:px-0">
-                    <div className="flex items-center gap-2">
+
+            {/* List Container */}
+            <div className="w-full max-w-6xl mx-auto bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden">
+                {/* Header Section with Filter and Column Labels */}
+                <div className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 px-6 py-4">
+                    <div className="flex items-center justify-between gap-4 mb-4">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            {filteredFoods.length} item{filteredFoods.length !== 1 ? 's' : ''}
+                        </p>
+                        
+                        {/* Filter Dropdown */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <button className={cn(
-                                    "px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
-                                    (showFavoritesOnly || (selectedCategories.length > 0 && selectedCategories.length < CATEGORIES.length))
-                                        ? "bg-emerald-600 text-white border-emerald-600 shadow-lg shadow-emerald-500/20"
-                                        : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-emerald-200 hover:text-emerald-600"
-                                )}>
-                                    <Filter size={12} />
-                                    <span className="hidden sm:inline">
-                                        {showFavoritesOnly ? "Favorites" :
-                                            (selectedCategories.length === 0 || selectedCategories.length === CATEGORIES.length ? "FILTER" :
-                                                `${selectedCategories.length} Groups`)}
-                                    </span>
-                                    <ChevronDown size={10} className="opacity-50" />
-                                </button>
+                                <Button
+                                    variant="outline"
+                                    className={cn(
+                                        "h-8 px-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                        (showFavoritesOnly || selectedCategories.length > 0)
+                                            ? "bg-emerald-100 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400"
+                                            : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-emerald-300"
+                                    )}
+                                >
+                                    <Filter size={12} className="mr-1.5" />
+                                    Filter
+                                    {(selectedCategories.length > 0 || showFavoritesOnly) && (
+                                        <Badge className="ml-2 h-4 w-4 p-0 flex items-center justify-center bg-emerald-600 text-white text-[8px] rounded-full">
+                                            {selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
+                                        </Badge>
+                                    )}
+                                </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                side="bottom"
-                                align="start"
-                                sideOffset={8}
-                                collisionPadding={20}
-                                className="w-56 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 z-[100] flex flex-col max-h-[var(--radix-dropdown-menu-content-available-height)]"
-                            >
-                                <div className="p-2 overflow-y-auto no-scrollbar">
-                                    {/* Scope Section */}
-                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Scope</DropdownMenuLabel>
-                                    <DropdownMenuCheckboxItem
-                                        checked={showFavoritesOnly}
-                                        onCheckedChange={setShowFavoritesOnly}
-                                        className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-rose-50 dark:focus:bg-rose-900/10 focus:text-rose-600 py-2.5 cursor-pointer"
-                                    >
-                                        <Heart size={12} className={cn("mr-2 transition-transform", showFavoritesOnly && "fill-current scale-110")} />
-                                        Favorites Only
-                                    </DropdownMenuCheckboxItem>
-
-                                    <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
-
-                                    {/* Category Section */}
-                                    <div className="flex items-center justify-between pr-2">
-                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Groups</DropdownMenuLabel>
-                                        <div className="flex items-center gap-1">
+                            <DropdownMenuContent align="end" className="w-56 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl p-2">
+                                <div className="px-2 py-1.5">
+                                    <div className="flex items-center justify-between py-2">
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">
+                                            Favorites Only
+                                        </span>
+                                        <Switch
+                                            checked={showFavoritesOnly}
+                                            onCheckedChange={setShowFavoritesOnly}
+                                            className="data-[state=checked]:bg-emerald-600"
+                                        />
+                                    </div>
+                                </div>
+                                <DropdownMenuSeparator className="bg-slate-200 dark:bg-slate-800" />
+                                <div className="px-2">
+                                    <div className="flex items-center justify-between py-2">
+                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 px-0">
+                                            Categories
+                                        </DropdownMenuLabel>
+                                        {selectedCategories.length > 0 && (
                                             <button
-                                                onClick={(e) => {
-                                                    e.preventDefault(); e.stopPropagation();
-                                                    setSelectedCategories(CATEGORIES);
-                                                }}
-                                                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-emerald-500 transition-colors"
-                                                title="Select All"
+                                                onClick={() => setSelectedCategories([])}
+                                                className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-colors"
                                             >
-                                                <CheckSquare size={14} />
+                                                Clear
                                             </button>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.preventDefault(); e.stopPropagation();
-                                                    setSelectedCategories([]);
-                                                }}
-                                                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
-                                                title="Select None"
-                                            >
-                                                <Square size={14} />
-                                            </button>
-                                        </div>
+                                        )}
                                     </div>
                                     <div className="py-1">
                                         {CATEGORIES.map(category => {
@@ -674,12 +665,22 @@ export function ExploreView({
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-                </div>
-            )}
 
-            {/* List Area */}
-            <div className="space-y-0 w-full max-w-6xl mx-auto">
-                {groupNames.map((groupName) => {
+                    {/* Column Headers */}
+                    <div className="hidden lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px_150px] gap-3 lg:gap-4 lg:px-6">
+                        <div></div> {/* Thumbnail column */}
+                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Name</div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Energy</div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Carbs</div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Fat</div>
+                        <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Protein</div>
+                        <div></div> {/* Actions column */}
+                    </div>
+                </div>
+
+                {/* List Area */}
+                <div className="space-y-0 p-4">
+                    {groupNames.map((groupName) => {
                     const items = groupedFoods[groupName];
                     const isExpanded = expandedGroups[groupName] || (searchQuery.length > 0 && items.length > 0);
                     const hasMultiple = items.length > 1;
@@ -852,6 +853,7 @@ export function ExploreView({
                         </div>
                     );
                 })}
+                </div>
             </div>
 
             {
