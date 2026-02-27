@@ -114,9 +114,10 @@ export default function ShoppingListPage() {
                 const existingIndex = currentList.findIndex((item: any) => item.food_item_id === selectedFood.id);
                 
                 if (existingIndex !== -1) {
-                    // Update existing item's quantity
-                    currentList[existingIndex].quantity = quantityString;
-                    toast.success(`Updated ${selectedFood.common_name || selectedFood.name} quantity`);
+                    // Aggregate quantities by appending with " + "
+                    const existingQty = currentList[existingIndex].quantity;
+                    currentList[existingIndex].quantity = `${existingQty} + ${quantityString}`;
+                    toast.success(`Added to ${selectedFood.common_name || selectedFood.name} total`);
                 } else {
                     // Add new item
                     const newItem = {
