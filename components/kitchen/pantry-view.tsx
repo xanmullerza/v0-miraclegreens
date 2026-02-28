@@ -987,7 +987,7 @@ export function PantryView({
                                         {items.map((food) => (
                                             <div key={food.id}>
                                                 <div
-                                                    className="group flex items-center gap-3 px-3 py-2 rounded-xl border transition-all bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800"
+                                                    className="group flex flex-col md:flex-row md:items-center gap-2 md:gap-3 px-3 py-2 rounded-xl border transition-all bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800"
                                                     style={parseQuantityEntries(food.quantity).length > 1 ? { cursor: 'pointer' } : { cursor: 'default' }}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
@@ -996,82 +996,88 @@ export function PantryView({
                                                         }
                                                     }}
                                                 >
-                                                    {/* Food Image */}
-                                                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 shrink-0 flex items-center justify-center">
-                                                        {food.image ? (
-                                                            <img src={food.image} alt={food.common_name || food.name} className="w-full h-full object-cover" />
-                                                        ) : (
-                                                            <Beef size={20} className="text-slate-400 dark:text-slate-500" />
-                                                        )}
-                                                    </div>
+                                                    {/* Top row: Food Image + Name + Weight */}
+                                                    <div className="flex items-center gap-3 flex-1">
+                                                        {/* Food Image */}
+                                                        <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 shrink-0 flex items-center justify-center">
+                                                            {food.image ? (
+                                                                <img src={food.image} alt={food.common_name || food.name} className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <Beef size={20} className="text-slate-400 dark:text-slate-500" />
+                                                            )}
+                                                        </div>
 
-                                                    <div className="flex-1 min-w-0">
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="font-black text-xs uppercase tracking-wide text-slate-900 dark:text-white truncate">
-                                                                {formatFoodName(food.common_name || food.name)}
-                                                            </span>
-                                                            {(() => {
-                                                                const rawEntries = parseQuantityEntries(food.quantity);
-                                                                if (rawEntries.length === 0) return <span className="text-[10px] font-bold text-slate-300 dark:text-slate-600 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800">In Stock</span>;
-                                                                // Consolidate pure-weight entries for display
-                                                                let weightGramsTotal = 0;
-                                                                const nonWeightStrs: string[] = [];
-                                                                for (const raw of rawEntries) {
-                                                                    const parsed = parseQuantityEntry(raw);
-                                                                    if (parsed.qty > 0 && isWeightOnlyEntry(parsed)) {
-                                                                        weightGramsTotal += entryTotalGrams(parsed);
-                                                                    } else if (parsed.qty > 0) {
-                                                                        nonWeightStrs.push(raw);
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
+                                                                <span className="font-black text-xs uppercase tracking-wide text-slate-900 dark:text-white truncate">
+                                                                    {formatFoodName(food.common_name || food.name)}
+                                                                </span>
+                                                                {(() => {
+                                                                    const rawEntries = parseQuantityEntries(food.quantity);
+                                                                    if (rawEntries.length === 0) return <span className="text-[10px] font-bold text-slate-300 dark:text-slate-600 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800">In Stock</span>;
+                                                                    // Consolidate pure-weight entries for display
+                                                                    let weightGramsTotal = 0;
+                                                                    const nonWeightStrs: string[] = [];
+                                                                    for (const raw of rawEntries) {
+                                                                        const parsed = parseQuantityEntry(raw);
+                                                                        if (parsed.qty > 0 && isWeightOnlyEntry(parsed)) {
+                                                                            weightGramsTotal += entryTotalGrams(parsed);
+                                                                        } else if (parsed.qty > 0) {
+                                                                            nonWeightStrs.push(raw);
+                                                                        }
                                                                     }
-                                                                }
-                                                                const consolidated: string[] = [...nonWeightStrs];
-                                                                if (weightGramsTotal >= 0) consolidated.push(formatGramsEntry(weightGramsTotal));
-                                                                if (consolidated.length === 0) return <span className="text-[10px] font-bold text-slate-300 dark:text-slate-600 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800">In Stock</span>;
-                                                                // Always show aggregate weight total
-                                                                let totalGramsAll = weightGramsTotal;
-                                                                for (const raw of nonWeightStrs) {
-                                                                    const p = parseQuantityEntry(raw);
-                                                                    if (p.weight_g != null) totalGramsAll += p.qty * p.weight_g;
-                                                                }
-                                                                if (totalGramsAll > 0) return <span className="text-xs font-black text-white bg-emerald-900 px-3 py-1 rounded-md whitespace-nowrap">{formatGramsEntry(totalGramsAll)}</span>;
-                                                                // Fallback: show raw entry text if no weight info
-                                                                return <span className="text-xs font-black text-white bg-emerald-900 px-3 py-1 rounded-md whitespace-nowrap">{consolidated[0]}</span>;
-                                                            })()}
+                                                                    const consolidated: string[] = [...nonWeightStrs];
+                                                                    if (weightGramsTotal >= 0) consolidated.push(formatGramsEntry(weightGramsTotal));
+                                                                    if (consolidated.length === 0) return <span className="text-[10px] font-bold text-slate-300 dark:text-slate-600 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800">In Stock</span>;
+                                                                    // Always show aggregate weight total
+                                                                    let totalGramsAll = weightGramsTotal;
+                                                                    for (const raw of nonWeightStrs) {
+                                                                        const p = parseQuantityEntry(raw);
+                                                                        if (p.weight_g != null) totalGramsAll += p.qty * p.weight_g;
+                                                                    }
+                                                                    if (totalGramsAll > 0) return <span className="text-xs font-black text-white bg-emerald-900 px-3 py-1 rounded-md whitespace-nowrap">{formatGramsEntry(totalGramsAll)}</span>;
+                                                                    // Fallback: show raw entry text if no weight info
+                                                                    return <span className="text-xs font-black text-white bg-emerald-900 px-3 py-1 rounded-md whitespace-nowrap">{consolidated[0]}</span>;
+                                                                })()}
+                                                            </div>
                                                         </div>
                                                     </div>
 
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); setExpandedQuantityId(expandedQuantityId === food.id ? null : food.id); }}
-                                                        className={cn("p-1.5 rounded-lg transition-all flex-shrink-0", expandedQuantityId === food.id ? "text-emerald-500 bg-emerald-100 dark:bg-emerald-950/40" : "text-slate-400 hover:bg-emerald-100 dark:hover:bg-emerald-950/40 hover:text-emerald-500")}
-                                                        title="Expand stock breakdown"
-                                                    >
-                                                        <ChevronDown size={14} className={cn("transition-transform", expandedQuantityId === food.id && "rotate-180")} />
-                                                    </button>
+                                                    {/* Bottom row on mobile, inline on desktop: Control buttons */}
+                                                    <div className="flex items-center gap-1 justify-end">
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); setExpandedQuantityId(expandedQuantityId === food.id ? null : food.id); }}
+                                                            className={cn("p-1.5 rounded-lg transition-all flex-shrink-0", expandedQuantityId === food.id ? "text-emerald-500 bg-emerald-100 dark:bg-emerald-950/40" : "text-slate-400 hover:bg-emerald-100 dark:hover:bg-emerald-950/40 hover:text-emerald-500")}
+                                                            title="Expand stock breakdown"
+                                                        >
+                                                            <ChevronDown size={14} className={cn("transition-transform", expandedQuantityId === food.id && "rotate-180")} />
+                                                        </button>
 
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); buyMoreItem?.id === food.id ? setBuyMoreItem(null) : openBuyMore(food); }}
-                                                        className={cn("p-1.5 rounded-lg transition-all flex-shrink-0", buyMoreItem?.id === food.id ? "bg-amber-100 dark:bg-amber-950/40 text-amber-500" : "text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500")}
-                                                        title="Update quantity / add to list"
-                                                    >
-                                                        <Plus size={14} />
-                                                    </button>
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); removeItem?.id === food.id ? setRemoveItem(null) : openRemove(food); }}
-                                                        className={cn("p-1.5 rounded-lg transition-all flex-shrink-0", removeItem?.id === food.id ? "bg-rose-100 dark:bg-rose-950/40 text-rose-500" : "text-slate-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500")}
-                                                        title="Remove/discard quantity"
-                                                    >
-                                                        <Minus size={14} />
-                                                    </button>
-                                                    <button
-                                                        onClick={(e) => { 
-                                                            e.stopPropagation(); 
-                                                            confirmDelete(food.id, food.name, food.common_name || '', food.source_table || 'food_items');
-                                                        }}
-                                                        className="p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-300 dark:text-slate-600 hover:text-rose-500 transition-all flex-shrink-0"
-                                                        title="Remove from pantry"
-                                                    >
-                                                        <X size={14} />
-                                                    </button>
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); buyMoreItem?.id === food.id ? setBuyMoreItem(null) : openBuyMore(food); }}
+                                                            className={cn("p-1.5 rounded-lg transition-all flex-shrink-0", buyMoreItem?.id === food.id ? "bg-amber-100 dark:bg-amber-950/40 text-amber-500" : "text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500")}
+                                                            title="Update quantity / add to list"
+                                                        >
+                                                            <Plus size={14} />
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); removeItem?.id === food.id ? setRemoveItem(null) : openRemove(food); }}
+                                                            className={cn("p-1.5 rounded-lg transition-all flex-shrink-0", removeItem?.id === food.id ? "bg-rose-100 dark:bg-rose-950/40 text-rose-500" : "text-slate-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500")}
+                                                            title="Remove/discard quantity"
+                                                        >
+                                                            <Minus size={14} />
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => { 
+                                                                e.stopPropagation(); 
+                                                                confirmDelete(food.id, food.name, food.common_name || '', food.source_table || 'food_items');
+                                                            }}
+                                                            className="p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-300 dark:text-slate-600 hover:text-rose-500 transition-all flex-shrink-0"
+                                                            title="Remove from pantry"
+                                                        >
+                                                            <X size={14} />
+                                                        </button>
+                                                    </div>
                                                 </div>
 
                                                 {/* Quantity breakdown accordion */}
