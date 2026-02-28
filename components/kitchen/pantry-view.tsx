@@ -146,8 +146,10 @@ export function PantryView({
     const [removeSelectedPortion, setRemoveSelectedPortion] = useState<{ label: string; weight_g: number } | null>(null);
     const [removeRemoving, setRemoveRemoving] = useState(false);
     
-    const [expandedQuantityId, setExpandedQuantityId] = useState<string | null>(null);
+    // Delete confirmation state
     const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string; source: string } | null>(null);
+    
+    const [expandedQuantityId, setExpandedQuantityId] = useState<string | null>(null);
 
     interface QuantityEntry {
         qty: number;
@@ -626,9 +628,45 @@ export function PantryView({
         }
     };
 
+    const confirmDelete = (id: string, name: string, source: string = 'food_items') => {
+        setDeleteConfirm({ id, name, source });
+        
+        toast.custom(
+            (t) => (
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 shadow-lg max-w-sm">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">
+                        Remove <span className="font-black text-rose-600 dark:text-rose-400">{name}</span> from pantry?
+                    </p>
+                    <div className="flex gap-2 justify-end">
+                        <button
+                            onClick={() => {
+                                toast.dismiss(t);
+                                setDeleteConfirm(null);
+                            }}
+                            className="px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => {
+                                toast.dismiss(t);
+                                removeFromPantry(id, name, source);
+                            }}
+                            className="px-3 py-1.5 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 dark:bg-rose-700 dark:hover:bg-rose-800 rounded transition-colors"
+                        >
+                            Remove
+                        </button>
+                    </div>
+                </div>
+            ),
+            { duration: Infinity }
+        );
+    };
+
     const removeFromPantry = async (id: string, name: string, source: string = 'food_items') => {
         try {
             console.log('[removeFromPantry]', name, { id, source });
+            
             let error;
 
             if (source === 'pantry_items') {
@@ -655,6 +693,7 @@ export function PantryView({
             } catch (e) { /* ignore */ }
 
             setFoods(prev => prev.filter(f => f.id !== id));
+            setDeleteConfirm(null);
             toast.success(`${name} removed from pantry`);
         } catch (error) {
             console.error('Error removing from pantry:', error);
@@ -1023,7 +1062,10 @@ export function PantryView({
                                                         <Minus size={14} />
                                                     </button>
                                                     <button
-                                                        onClick={(e) => { e.stopPropagation(); setDeleteConfirm({ id: food.id, name: food.name, source: food.source_table || 'food_items' }); }}
+                                                        onClick={(e) => { 
+                                                            e.stopPropagation(); 
+                                                            confirmDelete(food.id, food.name, food.source_table || 'food_items');
+                                                        }}
                                                         className="p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-300 dark:text-slate-600 hover:text-rose-500 transition-all flex-shrink-0"
                                                         title="Remove from pantry"
                                                     >
@@ -1348,35 +1390,6 @@ export function PantryView({
                     </div>
                 </div>
             )}
-
-        {/* Delete confirmation dialog */}
-        {deleteConfirm && (
-            <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-8 pointer-events-none">
-                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 max-w-sm w-full mx-4 animate-in fade-in scale-in duration-200 pointer-events-auto shadow-lg">
-                    <h2 className="text-lg font-black uppercase tracking-wide text-slate-900 dark:text-white mb-2">Remove Item?</h2>
-                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
-                        Are you sure you want to remove <span className="font-semibold">{deleteConfirm.name}</span> from your pantry?
-                    </p>
-                    <div className="flex gap-3 justify-end">
-                        <button
-                            onClick={() => setDeleteConfirm(null)}
-                            className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-semibold text-sm"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={() => {
-                                removeFromPantry(deleteConfirm.id, deleteConfirm.name, deleteConfirm.source);
-                                setDeleteConfirm(null);
-                            }}
-                            className="px-4 py-2 rounded-lg bg-rose-500 hover:bg-rose-600 text-white transition-all font-semibold text-sm"
-                        >
-                            Remove
-                        </button>
-                    </div>
-                </div>
-            </div>
-        )}
         </div>
     );
 }
