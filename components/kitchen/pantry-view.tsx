@@ -733,10 +733,11 @@ export function PantryView({
                                         {items.map((food) => (
                                             <div key={food.id}>
                                                 <div
-                                                    className="group flex items-center gap-3 px-3 py-2 rounded-xl border transition-all cursor-pointer bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800"
+                                                    className="group flex items-center gap-3 px-3 py-2 rounded-xl border transition-all bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800"
+                                                    style={parseQuantityEntries(food.quantity).length > 1 ? { cursor: 'pointer' } : { cursor: 'default' }}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        if (parseQuantityEntries(food.quantity).length > 0) {
+                                                        if (parseQuantityEntries(food.quantity).length > 1) {
                                                             setExpandedQuantityId(expandedQuantityId === food.id ? null : food.id);
                                                         }
                                                     }}
@@ -843,7 +844,7 @@ export function PantryView({
                                                                                     <span className="text-[10px] font-medium text-slate-400">{e.weight_g}{e.unit} each</span>
                                                                                 )}
                                                                                 {totalWeight != null && (
-                                                                                    <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400">{totalWeight.toLocaleString()}{e.unit} total</span>
+                                                                                    <span className="text-[11px] font-black text-white bg-emerald-500 px-2 py-1 rounded-md">{totalWeight.toLocaleString()}{e.unit} total</span>
                                                                                 )}
                                                                                 {e.weight_g == null && (
                                                                                     <span className="text-[10px] font-medium text-slate-400">no weight</span>
