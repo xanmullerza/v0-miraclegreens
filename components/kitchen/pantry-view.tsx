@@ -338,7 +338,11 @@ export function PantryView({
                 const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
                 const currentQty = quantities[buyMoreItem.id] || buyMoreItem.quantity;
                 const merged = mergeQuantityStrings(currentQty, quantityString);
-                console.log('[handleBuyMoreAdd]', buyMoreItem.common_name || buyMoreItem.name, { currentQty, quantityString, merged: merged });
+                if (buyMoreItem.common_name?.toLowerCase().includes('potato')) {
+                    console.log('🥔 [handleBuyMoreAdd]', buyMoreItem.common_name || buyMoreItem.name, { currentQty, quantityString, merged: merged, itemId: buyMoreItem.id });
+                } else {
+                    console.log('[handleBuyMoreAdd]', buyMoreItem.common_name || buyMoreItem.name, { currentQty, quantityString, merged: merged });
+                }
                 quantities[buyMoreItem.id] = merged;
                 localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
                 setFoods(prev => prev.map(f => f.id === buyMoreItem.id ? { ...f, quantity: merged } : f));
@@ -451,7 +455,11 @@ export function PantryView({
                     const quantities: Record<string, string> = JSON.parse(savedQuantities);
                     combined.forEach(item => {
                         if (quantities[item.id] !== undefined) {
-                            console.log('[pantry-view] Applying localStorage quantity for', item.name || item.common_name, ':', quantities[item.id], '(was:', item.quantity, ')');
+                            if (item.common_name?.toLowerCase().includes('potato')) {
+                                console.log('🥔 [pantry-view] Applying localStorage quantity for', item.name || item.common_name, ':', quantities[item.id], '(was:', item.quantity, ') itemId:', item.id);
+                            } else {
+                                console.log('[pantry-view] Applying localStorage quantity for', item.name || item.common_name, ':', quantities[item.id], '(was:', item.quantity, ')');
+                            }
                             item.quantity = quantities[item.id];
                         }
                     });
