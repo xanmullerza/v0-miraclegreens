@@ -205,10 +205,10 @@ export function PantryView({
         // Format: "1 x 100g"
         const weighted = s.trim().match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(g|ml|oz|lb)$/i);
         if (weighted) return { qty: parseFloat(weighted[1]), label: null, weight_g: parseFloat(weighted[2]), unit: weighted[3], raw: s };
-        // Plain qty
+        // Plain qty - treat as kilograms (1000g)
         const plain = s.trim().match(/^(\d+(?:\.\d+)?)$/);
-        if (plain) return { qty: parseFloat(plain[1]), label: null, weight_g: null, unit: null, raw: s };
-        return { qty: 1, label: null, weight_g: null, unit: null, raw: s };
+        if (plain) return { qty: parseFloat(plain[1]), label: null, weight_g: 1000, unit: 'g', raw: s };
+        return { qty: 1, label: null, weight_g: 1000, unit: 'g', raw: s };
     };
 
     const parseQuantityEntries = (quantity: string | undefined): string[] => {
