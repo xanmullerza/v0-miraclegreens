@@ -11,6 +11,7 @@ import { supabase } from '@/lib/supabase';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useSearch } from '@/lib/context/search-context';
 import { formatEnergy } from '@/lib/utils';
+import { toast } from 'sonner';
 
 /** Narrow shape — only what the hero dropdown actually fetches and displays. */
 interface FoodItemPreview {
@@ -49,20 +50,25 @@ export default function IngredientsPage() {
             setSearchResults((data ?? []) as FoodItemPreview[]);
         } catch (err) {
             console.error('Search error:', err);
+            toast.error('Search failed — please try again');
         } finally {
             setIsSearching(false);
         }
     }, []);
 
-    // Single timer: updates the shared context (→ ExploreView list) and fires the
-    // hero dropdown query together, avoiding two overlapping DB round-trips.
+    // setSearchQuery immediately (controls the visible input) — only the DB queries are debounced.
     const handleSearchInput = useCallback((val: string) => {
+        setSearchQuery(val);   // instant — keeps the input responsive
         if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
         searchTimeoutRef.current = setTimeout(() => {
-            setSearchQuery(val);   // ExploreView's effect reads this from context
-            performSearch(val);    // hero dropdown query
+            performSearch(val);    // hero dropdown query (debounced)
+            // ExploreView's own effect debounces on searchQuery from context
         }, 300);
     }, [setSearchQuery, performSearch]);
+
+    const handleSelect = useCallback((item: FoodItemPreview) => {
+        router.push(`/dashboard/ingredients/foods/${item.id}`);
+    }, [router]);
 
     const renderResult = useCallback((item: FoodItemPreview) => (
         <div className="flex items-center gap-4 min-w-0 w-full">
@@ -95,7 +101,7 @@ export default function IngredientsPage() {
                     isLoading={isSearching}
                     isActive={isSearchActive}
                     setIsActive={setIsSearchActive}
-                    onSelect={(item) => router.push(`/dashboard/ingredients/foods/${item.id}`)}
+                    onSelect={handleSelect}
                     renderResult={renderResult}
                     theme="emerald"
                     placeholder="SEARCH FOOD LIBRARY..."
