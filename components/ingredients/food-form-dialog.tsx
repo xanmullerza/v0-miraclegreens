@@ -444,7 +444,7 @@ Fat: ${food.fat_g || 0}g
                             className="flex-1 h-14 rounded-[18px] text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-rose-500 hover:bg-rose-500/5 gap-2"
                         >
                             <Trash2 size={16} />
-                            Clear Form
+                            Clear
                         </Button>
                         <Button
                             onClick={handleSave}
@@ -457,7 +457,7 @@ Fat: ${food.fat_g || 0}g
                             )}
                         >
                             {loading ? <Loader2 className="animate-spin h-4 w-4" /> : <Save size={16} />}
-                            Save to My Foods
+                            Save
                         </Button>
                     </div>
                 </div>

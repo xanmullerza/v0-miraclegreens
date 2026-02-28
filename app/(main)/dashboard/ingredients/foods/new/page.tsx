@@ -660,7 +660,7 @@ Fat: ${item.fat_g || 0}g
                         )}
                     >
                         {loading ? <Loader2 className="animate-spin h-4 w-4" /> : <Save size={16} />}
-                        Save to My Foods
+                        Save
                     </Button>
                 </div>
             )}
