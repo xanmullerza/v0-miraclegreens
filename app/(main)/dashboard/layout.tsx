@@ -10,7 +10,7 @@ export default function DashboardLayout({
 }) {
     return (
         <div className="flex flex-col w-full">
-            <div className="py-4 pb-6">
+            <div className="px-3 py-2">
                 <DashboardTabs />
             </div>
             {children}
