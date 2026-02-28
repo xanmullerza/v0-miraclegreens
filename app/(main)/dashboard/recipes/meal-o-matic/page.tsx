@@ -515,9 +515,9 @@ export function MealPlannerContent({
                 if (ingBase && ingBase.split(/[,\s]/)[0] === pFirstWord) return true;
                 if (ingName && ingName.split(/[,\s]/)[0] === pFirstWord) return true;
                 // 5. Word-set match: handles "Rice, White" <-> "White Rice" (USDA name reversal)
-                const pWords = new Set(pName.replace(/,/g, '').split(/\s+/).filter(Boolean));
-                const ingBaseWords = ingBase ? new Set(ingBase.replace(/,/g, '').split(/\s+/).filter(Boolean)) : null;
-                const ingNameWords = ingName ? new Set(ingName.replace(/,/g, '').split(/\s+/).filter(Boolean)) : null;
+                const pWords = new Set<string>(pName.replace(/,/g, '').split(/\s+/).filter((s): s is string => Boolean(s)));
+                const ingBaseWords = ingBase ? new Set<string>(ingBase.replace(/,/g, '').split(/\s+/).filter((s): s is string => Boolean(s))) : null;
+                const ingNameWords = ingName ? new Set<string>(ingName.replace(/,/g, '').split(/\s+/).filter((s): s is string => Boolean(s))) : null;
                 const setsEqual = (a: Set<string>, b: Set<string>) => a.size === b.size && [...a].every(w => b.has(w));
                 if (ingBaseWords && setsEqual(ingBaseWords, pWords)) return true;
                 if (ingNameWords && setsEqual(ingNameWords, pWords)) return true;
