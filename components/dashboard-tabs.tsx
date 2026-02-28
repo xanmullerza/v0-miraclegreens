@@ -91,33 +91,25 @@ export function DashboardTabs() {
 
     return (
         <div className="w-full animate-in fade-in duration-300">
-            {/* Compact Bar with Dividers */}
-            <div className="flex items-center justify-center px-2 py-2 bg-slate-900/30 rounded-lg border border-slate-800/50 overflow-x-auto scrollbar-hide">
+            {/* Compact Bar with Dividers - Labels Only */}
+            <div className="flex items-center justify-center px-2 py-1.5 bg-slate-900/30 rounded-lg border border-slate-800/50 overflow-x-auto scrollbar-hide">
                 {TAB_CONFIG.map((tab, idx) => {
-                    const Icon = tab.icon;
                     const isActive = currentTab.id === tab.id;
                     
                     return (
-                        <div key={tab.id} className="flex items-center gap-0">
-                            {/* Main Tab */}
+                        <div key={tab.id} className="flex items-center gap-0 flex-shrink-0">
+                            {/* Main Tab - Labels Only */}
                             <Link
                                 href={tab.defaultHref}
                                 className={cn(
-                                    'group flex items-center gap-1.5 px-3 py-1.5 rounded transition-all duration-300 text-xs font-bold uppercase tracking-wide whitespace-nowrap',
+                                    'px-2.5 py-1 rounded transition-all duration-300 text-[11px] font-semibold uppercase tracking-wide whitespace-nowrap',
                                     isActive
-                                        ? cn(tab.activeBg, 'shadow-sm')
+                                        ? cn(tab.activeBg)
                                         : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'
                                 )}
                             >
-                                <Icon
-                                    size={14}
-                                    className={cn(
-                                        'transition-colors duration-300',
-                                        isActive ? tab.activeColor : 'text-slate-600 group-hover:text-slate-400'
-                                    )}
-                                />
                                 <span className={cn(
-                                    'transition-colors duration-300 hidden sm:inline',
+                                    'transition-colors duration-300',
                                     isActive ? tab.activeColor : ''
                                 )}>
                                     {tab.label}
@@ -126,14 +118,14 @@ export function DashboardTabs() {
 
                             {/* Divider - except after last item */}
                             {idx < TAB_CONFIG.length - 1 && (
-                                <div className="h-4 w-px bg-slate-700/50 mx-1" />
+                                <div className="h-3 w-px bg-slate-700/50 mx-0.5" />
                             )}
                         </div>
                     );
                 })}
             </div>
 
-            {/* Sub Tabs - appear below main bar */}
+            {/* Sub Tabs - appear below main bar with icons and labels */}
             <div className="flex items-center justify-center flex-wrap gap-1 mt-2">
                 {currentTab.subtabs.map((sub) => {
                     const SubIcon = sub.icon;
@@ -143,7 +135,7 @@ export function DashboardTabs() {
                             key={sub.id}
                             href={sub.href}
                             className={cn(
-                                'group flex items-center gap-1.5 px-3 py-1.5 rounded transition-all duration-300 text-xs font-bold uppercase tracking-widest whitespace-nowrap',
+                                'group flex items-center gap-1 px-2.5 py-1.5 rounded transition-all duration-300 text-xs font-semibold uppercase tracking-wide whitespace-nowrap',
                                 isSubActive
                                     ? cn(currentTab.activeBg, 'shadow-sm')
                                     : 'text-slate-500 hover:text-slate-300 hover:bg-white/[0.03] border border-transparent'
@@ -152,11 +144,11 @@ export function DashboardTabs() {
                             <SubIcon
                                 size={12}
                                 className={cn(
-                                    'transition-all duration-300',
+                                    'transition-all duration-300 flex-shrink-0',
                                     isSubActive ? currentTab.activeColor : 'text-slate-600 group-hover:text-slate-400'
                                 )}
                             />
-                            <span className="hidden sm:inline">{sub.label}</span>
+                            <span>{sub.label}</span>
                         </Link>
                     );
                 })}
