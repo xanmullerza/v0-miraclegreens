@@ -729,18 +729,29 @@ export function PantryView({
                                         {items.map((food) => (
                                             <div key={food.id}>
                                                 <div
-                                                    className="group flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-all cursor-pointer bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800"
-                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="group flex items-center gap-3 px-3 py-2 rounded-xl border transition-all cursor-pointer bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        if (parseQuantityEntries(food.quantity).length > 0) {
+                                                            setExpandedQuantityId(expandedQuantityId === food.id ? null : food.id);
+                                                        }
+                                                    }}
                                                 >
-                                                    <div className="w-5 h-5 rounded-md border-2 border-emerald-500 bg-emerald-500 flex items-center justify-center shrink-0">
-                                                        <Check size={12} className="text-white" />
+                                                    {/* Food Image */}
+                                                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 shrink-0 flex items-center justify-center">
+                                                        {food.image ? (
+                                                            <img src={food.image} alt={food.common_name || food.name} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <Beef size={20} className="text-slate-400 dark:text-slate-500" />
+                                                        )}
                                                     </div>
+
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-1.5">
                                                             {food.is_favorite && (
                                                                 <Heart size={12} className="text-rose-500 fill-current shrink-0" />
                                                             )}
-                                                            <span className="font-semibold text-sm text-slate-900 dark:text-white truncate">
+                                                            <span className="font-black text-xs uppercase tracking-wide text-slate-900 dark:text-white truncate">
                                                                 {formatFoodName(food.common_name || food.name)}
                                                             </span>
                                                         </div>
@@ -765,32 +776,24 @@ export function PantryView({
                                                             return <span className="text-xs text-slate-500 dark:text-slate-400">{consolidated.length} stock entries</span>;
                                                         })()}
                                                     </div>
-                                                    {parseQuantityEntries(food.quantity).length > 0 && (
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); setExpandedQuantityId(expandedQuantityId === food.id ? null : food.id); }}
-                                                            className={cn("p-1.5 rounded-lg transition-all", expandedQuantityId === food.id ? "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-500" : "text-slate-300 dark:text-slate-600 hover:bg-emerald-100 dark:hover:bg-emerald-950/40 hover:text-emerald-500")}
-                                                            title="View stock breakdown"
-                                                        >
-                                                            <List size={14} />
-                                                        </button>
-                                                    )}
+
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); buyMoreItem?.id === food.id ? setBuyMoreItem(null) : openBuyMore(food); }}
-                                                        className={cn("p-1.5 rounded-lg transition-all", buyMoreItem?.id === food.id ? "bg-amber-100 dark:bg-amber-950/40 text-amber-500" : "text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500")}
+                                                        className={cn("p-1.5 rounded-lg transition-all flex-shrink-0", buyMoreItem?.id === food.id ? "bg-amber-100 dark:bg-amber-950/40 text-amber-500" : "text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500")}
                                                         title="Update quantity / add to list"
                                                     >
                                                         <Plus size={14} />
                                                     </button>
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); toggleFavorite(food, e); }}
-                                                        className={cn("p-1.5 rounded-lg transition-all", food.is_favorite ? "text-rose-500" : "text-slate-300 dark:text-slate-600 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500")}
+                                                        className={cn("p-1.5 rounded-lg transition-all flex-shrink-0", food.is_favorite ? "text-rose-500" : "text-slate-300 dark:text-slate-600 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500")}
                                                         title="Favourite"
                                                     >
                                                         <Heart size={14} fill={food.is_favorite ? "currentColor" : "none"} />
                                                     </button>
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); removeFromPantry(food.id, food.name, food.source_table); }}
-                                                        className="p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-300 dark:text-slate-600 hover:text-rose-500 transition-all"
+                                                        className="p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-300 dark:text-slate-600 hover:text-rose-500 transition-all flex-shrink-0"
                                                         title="Remove from pantry"
                                                     >
                                                         <X size={14} />
