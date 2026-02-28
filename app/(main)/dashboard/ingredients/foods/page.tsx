@@ -1,43 +1,70 @@
 ﻿'use client';
 
-import { useState, useRef, useCallback, Suspense } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Loader2, Leaf, ChevronRight, Plus } from 'lucide-react';
+import { Leaf, ChevronRight, Plus } from 'lucide-react';
 import { ExploreView } from './views/explore-view';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
 import { supabase } from '@/lib/supabase';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { useSearch } from '@/lib/context/search-context';
-import { formatEnergy, type FoodItem } from '@/lib/utils';
+import { formatEnergy } from '@/lib/utils';
 
-export default function IngredientsHub() {
-    return (
-        <Suspense fallback={
-            <div className="h-96 flex flex-col items-center justify-center gap-4">
-                <Loader2 className="animate-spin text-emerald-500" size={48} />
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Loading Ingredients Hub...</p>
-            </div>
-        }>
-            <IngredientsContent />
-        </Suspense>
-    );
+/** Narrow shape — only what the hero dropdown actually fetches and displays. */
+interface FoodItemPreview {
+    id: string;
+    name: string;
+    common_name: string;
+    energy_kcal: number;
+    category?: string;
+    image: string | null;
 }
 
-function IngredientsContent() {
+export default function IngredientsPage() {
     const router = useRouter();
     const { energyUnit } = useUserPreferences();
-    // Wired to the same context ExploreView reads — typing in the hero filters the list below
     const { searchQuery, setSearchQuery } = useSearch();
 
-    const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
+    const [searchResults, setSearchResults] = useState<FoodItemPreview[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [isSearchActive, setIsSearchActive] = useState(false);
     const [showAddFood, setShowAddFood] = useState(false);
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    const renderResult = useCallback((item: FoodItem) => (
+    const performSearch = useCallback(async (query: string) => {
+        if (!query || query.length < 2) {
+            setSearchResults([]);
+            return;
+        }
+        setIsSearching(true);
+        try {
+            const { data, error } = await supabase
+                .from('food_items')
+                .select('id, name, common_name, energy_kcal, category, image')
+                .or(`name.ilike.%${query}%,common_name.ilike.%${query}%`)
+                .limit(8);
+            if (error) throw error;
+            setSearchResults((data ?? []) as FoodItemPreview[]);
+        } catch (err) {
+            console.error('Search error:', err);
+        } finally {
+            setIsSearching(false);
+        }
+    }, []);
+
+    // Single timer: updates the shared context (→ ExploreView list) and fires the
+    // hero dropdown query together, avoiding two overlapping DB round-trips.
+    const handleSearchInput = useCallback((val: string) => {
+        if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+        searchTimeoutRef.current = setTimeout(() => {
+            setSearchQuery(val);   // ExploreView's effect reads this from context
+            performSearch(val);    // hero dropdown query
+        }, 300);
+    }, [setSearchQuery, performSearch]);
+
+    const renderResult = useCallback((item: FoodItemPreview) => (
         <div className="flex items-center gap-4 min-w-0 w-full">
             <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800 relative">
                 {item.image ? (
@@ -57,33 +84,6 @@ function IngredientsContent() {
             <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={20} />
         </div>
     ), [energyUnit]);
-
-    const performSearch = async (query: string) => {
-        if (!query || query.length < 2) {
-            setSearchResults([]);
-            return;
-        }
-        setIsSearching(true);
-        try {
-            const { data, error } = await supabase
-                .from('food_items')
-                .select('id, name, common_name, energy_kcal, category, image')
-                .or(`name.ilike.%${query}%,common_name.ilike.%${query}%`)
-                .limit(8);
-            if (error) throw error;
-            setSearchResults((data ?? []) as FoodItem[]);
-        } catch (error) {
-            console.error('Search error:', error);
-        } finally {
-            setIsSearching(false);
-        }
-    };
-
-    const handleSearchInput = (val: string) => {
-        setSearchQuery(val); // updates context → ExploreView debounce picks this up
-        if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-        searchTimeoutRef.current = setTimeout(() => performSearch(val), 300);
-    };
 
     return (
         <PageContainer maxWidth="max-w-7xl">
