@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, type Dispatch, type SetStateAction } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Loader2, Check, Beef, Filter, ChevronDown, Leaf } from 'lucide-react';
+import { Loader2, Check, Beef, Filter, ChevronDown, Leaf, X } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 
 import { cn, formatFoodName } from '@/lib/utils';
@@ -67,8 +67,13 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
-    // Auth — onAuthStateChange fires immediately with INITIAL_SESSION, so no getSession needed
+    // Auth — getSession bootstraps authReady for SSR/HttpOnly-cookie configs where
+    // onAuthStateChange may not fire INITIAL_SESSION. onAuthStateChange handles live changes.
     useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setUser(session?.user ?? null);
+            setAuthReady(true);
+        });
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
             setUser(session?.user ?? null);
             setAuthReady(true);
@@ -127,22 +132,22 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                         if (opts.cats.length > 0 && opts.cats.length < CATEGORIES.length) {
                             localFoods = localFoods.filter(f => f.category && opts.cats.includes(f.category));
                         }
+                        // Guard: only prepend on new searches — on Load More they're already in state
                         if (isNewSearch) fetchedItems = [...localFoods, ...fetchedItems];
                     }
                 } catch { /* ignore */ }
             }
 
-            // Merge locally-stored pantry quantities
+            // Merge locally-stored pantry quantities — use map+spread to avoid mutating DB objects
             try {
                 const raw = localStorage.getItem('pantry_quantities');
                 if (raw) {
                     const quantities: Record<string, string> = JSON.parse(raw);
-                    fetchedItems.forEach(item => {
-                        if (quantities[item.id]) {
-                            item.quantity = quantities[item.id];
-                            item.is_in_pantry = true;
-                        }
-                    });
+                    fetchedItems = fetchedItems.map(item =>
+                        quantities[item.id]
+                            ? { ...item, quantity: quantities[item.id], is_in_pantry: true }
+                            : item
+                    );
                 }
             } catch { /* ignore */ }
 
@@ -225,8 +230,11 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                                         Clear all
                                                     </button>
                                                 )}
-                                                <SheetClose className="w-7 h-7 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
-                                                    ✕
+                                                <SheetClose
+                                                    aria-label="Close filter sheet"
+                                                    className="w-7 h-7 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors"
+                                                >
+                                                    <X size={12} />
                                                 </SheetClose>
                                             </div>
                                         </div>
@@ -321,7 +329,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                     </DropdownMenu>
                                 </div>
                                 <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Name</div>
-                                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Energy</div>
+                                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">{energyUnit}</div>
                                 <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Carbs</div>
                                 <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Fat</div>
                                 <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Protein</div>
