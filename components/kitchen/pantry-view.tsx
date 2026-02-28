@@ -989,7 +989,6 @@ export function PantryView({
                     </div>
                 </div>
             )}
-        </div>
 
         {/* Delete confirmation dialog */}
         {deleteConfirm && (
@@ -1019,6 +1018,6 @@ export function PantryView({
                 </div>
             </div>
         )}
+        </div>
     );
 }
-
