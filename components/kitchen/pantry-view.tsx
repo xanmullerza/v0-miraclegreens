@@ -757,6 +757,9 @@ export function PantryView({
                                                             </span>
                                                             {(() => {
                                                                 const rawEntries = parseQuantityEntries(food.quantity);
+                                                                if (food.common_name?.toLowerCase().includes('potato')) {
+                                                                    console.log('[DEBUG] Potatoes badge:', { quantity: food.quantity, rawEntries, parsed: rawEntries.map(r => parseQuantityEntry(r)) });
+                                                                }
                                                                 if (rawEntries.length === 0) return <span className="text-[10px] font-bold text-slate-300 dark:text-slate-600 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800">In Stock</span>;
                                                                 // Consolidate pure-weight entries for display
                                                                 let weightGramsTotal = 0;
