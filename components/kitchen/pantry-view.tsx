@@ -748,9 +748,6 @@ export function PantryView({
 
                                                     <div className="flex-1 min-w-0">
                                                         <div className="flex items-center gap-1.5">
-                                                            {food.is_favorite && (
-                                                                <Heart size={12} className="text-rose-500 fill-current shrink-0" />
-                                                            )}
                                                             <span className="font-black text-xs uppercase tracking-wide text-slate-900 dark:text-white truncate">
                                                                 {formatFoodName(food.common_name || food.name)}
                                                             </span>
@@ -783,13 +780,6 @@ export function PantryView({
                                                         title="Update quantity / add to list"
                                                     >
                                                         <Plus size={14} />
-                                                    </button>
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); toggleFavorite(food, e); }}
-                                                        className={cn("p-1.5 rounded-lg transition-all flex-shrink-0", food.is_favorite ? "text-rose-500" : "text-slate-300 dark:text-slate-600 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500")}
-                                                        title="Favourite"
-                                                    >
-                                                        <Heart size={14} fill={food.is_favorite ? "currentColor" : "none"} />
                                                     </button>
                                                     <button
                                                         onClick={(e) => { e.stopPropagation(); removeFromPantry(food.id, food.name, food.source_table); }}
