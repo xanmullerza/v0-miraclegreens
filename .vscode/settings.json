@@ -2,6 +2,14 @@
     "chat.tools.terminal.autoApprove": {
         "npx tsc": true,
         "Test-Path": true,
-        "New-Object": true
+        "New-Object": true,
+        "/^cd \"c:\\\\Users\\\\FamilyPC\\\\Documents\\\\miraclegreens\\\\v0-miraclegreens\\\\v0-miraclegreens\" ; powershell -Command \"\n`\\$file = 'app\\\\\\(main\\)\\\\dashboard\\\\recipes\\\\meal-o-matic\\\\page\\.tsx'\n`\\$content = Get-Content `\\$file -Raw\n# Replace the toast message and add reload logic\n`\\$content = `\\$content -replace 'if \\\\\\(subtracted > 0\\\\\\) \\\\\\{\\\\s\\*toast\\\\\\.success\\\\\\(`Marked as eaten\\[\\^`\\]\\*\\?updated`\\\\\\);\\\\s\\*\\\\\\}', 'if \\(subtracted > 0\\) \\{\n            toast\\.success\\(`Marked as eaten\\. `\\$\\{subtracted\\} pantry item`\\$\\{subtracted !== 1 \\? '\\\\''s'\\\\'' : '\\\\'''\\\\''\\} updated`\\);\n            setTimeout\\(\\(\\) => \\{\n                window\\.location\\.reload\\(\\);\n            \\}, 1000\\);\n        \\}'\nSet-Content `\\$file `\\$content\nWrite-Host 'File updated successfully'\n\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd \"c:\\\\Users\\\\FamilyPC\\\\Documents\\\\miraclegreens\\\\v0-miraclegreens\\\\v0-miraclegreens\" ; node -e \"\nconst fs = require\\('fs'\\);\nconst content = fs\\.readFileSync\\('app/\\(main\\)/dashboard/recipes/meal-o-matic/page\\.tsx', 'utf8'\\);\nconst updated = content\\.replace\\(\n    /if \\\\\\(subtracted > 0\\\\\\) \\\\\\{\\\\s\\*toast\\\\\\.success\\\\\\(\\\\`Marked as eaten\\.\\+\\?updated\\\\`\\\\\\);\\\\s\\*\\\\\\} else \\\\\\{/,\n    'if \\(subtracted > 0\\) \\{\\\\n            toast\\.success\\(\\\\`Marked as eaten\\. \\\\\\$\\{subtracted\\} pantry item\\\\\\$\\{subtracted !== 1 \\? \\\\'s\\\\' : \\\\'\\\\'\\} updated\\\\`\\);\\\\n            setTimeout\\(\\(\\) => \\{\\\\n                window\\.location\\.reload\\(\\);\\\\n            \\}, 1000\\);\\\\n        \\} else \\{'\n\\);\nfs\\.writeFileSync\\('app/\\(main\\)/dashboard/recipes/meal-o-matic/page\\.tsx', updated\\);\nconsole\\.log\\('Updated successfully'\\);\n\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
     }
 }

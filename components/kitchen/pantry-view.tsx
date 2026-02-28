@@ -205,6 +205,17 @@ export function PantryView({
         // Format: "1 x 100g"
         const weighted = s.trim().match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(g|ml|oz|lb)$/i);
         if (weighted) return { qty: parseFloat(weighted[1]), label: null, weight_g: parseFloat(weighted[2]), unit: weighted[3], raw: s };
+        // Format: "0.7 kilograms" or "1 kilogram" or "300 grams" or "1 gram"
+        const textbased = s.trim().match(/^(\d+(?:\.\d+)?)\s+(kilogram|kilograms|gram|grams|g)$/i);
+        if (textbased) {
+            const qty = parseFloat(textbased[1]);
+            const unit = textbased[2].toLowerCase();
+            if (unit === 'kilogram' || unit === 'kilograms') {
+                return { qty: 1, label: null, weight_g: qty * 1000, unit: 'g', raw: s };
+            } else {
+                return { qty: 1, label: null, weight_g: qty, unit: 'g', raw: s };
+            }
+        }
         // Plain qty - treat as kilograms (1000g)
         const plain = s.trim().match(/^(\d+(?:\.\d+)?)$/);
         if (plain) return { qty: parseFloat(plain[1]), label: null, weight_g: 1000, unit: 'g', raw: s };
