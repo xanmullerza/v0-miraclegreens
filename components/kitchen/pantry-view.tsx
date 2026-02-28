@@ -149,6 +149,10 @@ export function PantryView({
     // Delete confirmation state
     const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string; source: string } | null>(null);
     
+    // Drawer state for mobile slideout
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [drawerType, setDrawerType] = useState<'add' | 'remove' | null>(null);
+    
     const [expandedQuantityId, setExpandedQuantityId] = useState<string | null>(null);
 
     interface QuantityEntry {
@@ -252,6 +256,8 @@ export function PantryView({
         setBuyMoreUnit('g');
         setBuyMoreSelectedPortion(null);
         setQuickAddMode('pantry');
+        setDrawerType('add');
+        setDrawerOpen(true);
     };
 
     const openRemove = (food: FoodItem) => {
@@ -260,6 +266,8 @@ export function PantryView({
         setRemoveWeight('');
         setRemoveUnit('g');
         setRemoveSelectedPortion(null);
+        setDrawerType('remove');
+        setDrawerOpen(true);
     };
 
     const buildQuantityString = (qty: string, portion: { label: string; weight_g: number } | null, weight: string, unit: string): string => {
@@ -986,83 +994,76 @@ export function PantryView({
                                     <div className="space-y-1.5">
                                         {items.map((food) => (
                                             <div key={food.id}>
+                                                {/* Main food item card - always visible */}
                                                 <div
-                                                    className="group flex flex-col md:flex-row md:items-center gap-2 md:gap-3 px-3 py-2 rounded-xl border transition-all bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800"
-                                                    style={parseQuantityEntries(food.quantity).length > 1 ? { cursor: 'pointer' } : { cursor: 'default' }}
+                                                    className="flex items-center gap-3 px-3 py-2 rounded-xl border transition-all bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800 cursor-pointer"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        if (parseQuantityEntries(food.quantity).length > 1) {
-                                                            setExpandedQuantityId(expandedQuantityId === food.id ? null : food.id);
-                                                        }
+                                                        setExpandedQuantityId(expandedQuantityId === food.id ? null : food.id);
                                                     }}
                                                 >
-                                                    {/* Top row: Food Image + Name + Weight */}
-                                                    <div className="flex items-center gap-3 flex-1">
-                                                        {/* Food Image */}
-                                                        <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 shrink-0 flex items-center justify-center">
-                                                            {food.image ? (
-                                                                <img src={food.image} alt={food.common_name || food.name} className="w-full h-full object-cover" />
-                                                            ) : (
-                                                                <Beef size={20} className="text-slate-400 dark:text-slate-500" />
-                                                            )}
-                                                        </div>
-
-                                                        <div className="flex-1 min-w-0">
-                                                            <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
-                                                                <span className="font-black text-xs uppercase tracking-wide text-slate-900 dark:text-white truncate">
-                                                                    {formatFoodName(food.common_name || food.name)}
-                                                                </span>
-                                                                {(() => {
-                                                                    const rawEntries = parseQuantityEntries(food.quantity);
-                                                                    if (rawEntries.length === 0) return <span className="text-[10px] font-bold text-slate-300 dark:text-slate-600 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800">In Stock</span>;
-                                                                    // Consolidate pure-weight entries for display
-                                                                    let weightGramsTotal = 0;
-                                                                    const nonWeightStrs: string[] = [];
-                                                                    for (const raw of rawEntries) {
-                                                                        const parsed = parseQuantityEntry(raw);
-                                                                        if (parsed.qty > 0 && isWeightOnlyEntry(parsed)) {
-                                                                            weightGramsTotal += entryTotalGrams(parsed);
-                                                                        } else if (parsed.qty > 0) {
-                                                                            nonWeightStrs.push(raw);
-                                                                        }
-                                                                    }
-                                                                    const consolidated: string[] = [...nonWeightStrs];
-                                                                    if (weightGramsTotal >= 0) consolidated.push(formatGramsEntry(weightGramsTotal));
-                                                                    if (consolidated.length === 0) return <span className="text-[10px] font-bold text-slate-300 dark:text-slate-600 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800">In Stock</span>;
-                                                                    // Always show aggregate weight total
-                                                                    let totalGramsAll = weightGramsTotal;
-                                                                    for (const raw of nonWeightStrs) {
-                                                                        const p = parseQuantityEntry(raw);
-                                                                        if (p.weight_g != null) totalGramsAll += p.qty * p.weight_g;
-                                                                    }
-                                                                    if (totalGramsAll > 0) return <span className="text-xs font-black text-white bg-emerald-900 px-3 py-1 rounded-md whitespace-nowrap">{formatGramsEntry(totalGramsAll)}</span>;
-                                                                    // Fallback: show raw entry text if no weight info
-                                                                    return <span className="text-xs font-black text-white bg-emerald-900 px-3 py-1 rounded-md whitespace-nowrap">{consolidated[0]}</span>;
-                                                                })()}
-                                                            </div>
-                                                        </div>
+                                                    {/* Food Image */}
+                                                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 shrink-0 flex items-center justify-center">
+                                                        {food.image ? (
+                                                            <img src={food.image} alt={food.common_name || food.name} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <Beef size={20} className="text-slate-400 dark:text-slate-500" />
+                                                        )}
                                                     </div>
 
-                                                    {/* Bottom row on mobile, inline on desktop: Control buttons */}
-                                                    <div className="flex items-center gap-1 justify-end">
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); setExpandedQuantityId(expandedQuantityId === food.id ? null : food.id); }}
-                                                            className={cn("p-1.5 rounded-lg transition-all flex-shrink-0", expandedQuantityId === food.id ? "text-emerald-500 bg-emerald-100 dark:bg-emerald-950/40" : "text-slate-400 hover:bg-emerald-100 dark:hover:bg-emerald-950/40 hover:text-emerald-500")}
-                                                            title="Expand stock breakdown"
-                                                        >
-                                                            <ChevronDown size={14} className={cn("transition-transform", expandedQuantityId === food.id && "rotate-180")} />
-                                                        </button>
+                                                    {/* Name - flex grow to take available space */}
+                                                    <div className="flex-1 min-w-0">
+                                                        <span className="font-black text-xs uppercase tracking-wide text-slate-900 dark:text-white truncate block">
+                                                            {formatFoodName(food.common_name || food.name)}
+                                                        </span>
+                                                    </div>
 
+                                                    {/* Weight badge */}
+                                                    {(() => {
+                                                        const rawEntries = parseQuantityEntries(food.quantity);
+                                                        if (rawEntries.length === 0) return <span className="text-[10px] font-bold text-slate-300 dark:text-slate-600 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 shrink-0">In Stock</span>;
+                                                        let weightGramsTotal = 0;
+                                                        const nonWeightStrs: string[] = [];
+                                                        for (const raw of rawEntries) {
+                                                            const parsed = parseQuantityEntry(raw);
+                                                            if (parsed.qty > 0 && isWeightOnlyEntry(parsed)) {
+                                                                weightGramsTotal += entryTotalGrams(parsed);
+                                                            } else if (parsed.qty > 0) {
+                                                                nonWeightStrs.push(raw);
+                                                            }
+                                                        }
+                                                        let totalGramsAll = weightGramsTotal;
+                                                        for (const raw of nonWeightStrs) {
+                                                            const p = parseQuantityEntry(raw);
+                                                            if (p.weight_g != null) totalGramsAll += p.qty * p.weight_g;
+                                                        }
+                                                        if (totalGramsAll > 0) return <span className="text-xs font-black text-white bg-emerald-900 px-3 py-1 rounded-md whitespace-nowrap shrink-0">{formatGramsEntry(totalGramsAll)}</span>;
+                                                        return null;
+                                                    })()}
+
+                                                    {/* Expand/collapse chevron */}
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); setExpandedQuantityId(expandedQuantityId === food.id ? null : food.id); }}
+                                                        className={cn("p-1.5 rounded-lg transition-all flex-shrink-0", expandedQuantityId === food.id ? "text-emerald-500 bg-emerald-100 dark:bg-emerald-950/40" : "text-slate-400 hover:bg-emerald-100 dark:hover:bg-emerald-950/40 hover:text-emerald-500")}
+                                                        title="Expand actions"
+                                                    >
+                                                        <ChevronDown size={14} className={cn("transition-transform", expandedQuantityId === food.id && "rotate-180")} />
+                                                    </button>
+                                                </div>
+
+                                                {/* Expanded action buttons - shown when expanded */}
+                                                {expandedQuantityId === food.id && (
+                                                    <div className="flex items-center gap-1 justify-end px-3 py-2 bg-slate-50 dark:bg-slate-900/30 border border-t-0 border-slate-200 dark:border-slate-700 rounded-b-xl">
                                                         <button
-                                                            onClick={(e) => { e.stopPropagation(); buyMoreItem?.id === food.id ? setBuyMoreItem(null) : openBuyMore(food); }}
-                                                            className={cn("p-1.5 rounded-lg transition-all flex-shrink-0", buyMoreItem?.id === food.id ? "bg-amber-100 dark:bg-amber-950/40 text-amber-500" : "text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500")}
+                                                            onClick={(e) => { e.stopPropagation(); openBuyMore(food); }}
+                                                            className="p-1.5 rounded-lg transition-all flex-shrink-0 text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500"
                                                             title="Update quantity / add to list"
                                                         >
                                                             <Plus size={14} />
                                                         </button>
                                                         <button
-                                                            onClick={(e) => { e.stopPropagation(); removeItem?.id === food.id ? setRemoveItem(null) : openRemove(food); }}
-                                                            className={cn("p-1.5 rounded-lg transition-all flex-shrink-0", removeItem?.id === food.id ? "bg-rose-100 dark:bg-rose-950/40 text-rose-500" : "text-slate-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500")}
+                                                            onClick={(e) => { e.stopPropagation(); openRemove(food); }}
+                                                            className="p-1.5 rounded-lg transition-all flex-shrink-0 text-slate-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500"
                                                             title="Remove/discard quantity"
                                                         >
                                                             <Minus size={14} />
@@ -1078,7 +1079,7 @@ export function PantryView({
                                                             <X size={14} />
                                                         </button>
                                                     </div>
-                                                </div>
+                                                )}
 
                                                 {/* Quantity breakdown accordion */}
                                                 {expandedQuantityId === food.id && (() => {
@@ -1156,238 +1157,6 @@ export function PantryView({
                                                         </div>
                                                     );
                                                 })()}
-
-                                                {/* Inline quick-add panel */}
-                                                {buyMoreItem?.id === food.id && (
-                                                    <div className="mt-1 mb-0.5 p-4 rounded-xl border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-950/20 animate-in slide-in-from-top-2 duration-200">
-                                                        <div className="flex flex-wrap items-end gap-3">
-                                                            <div>
-                                                                <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Qty</Label>
-                                                                <Input
-                                                                    type="number"
-                                                                    value={buyMoreQty}
-                                                                    onChange={(e) => setBuyMoreQty(e.target.value)}
-                                                                    className="w-16 text-center h-9"
-                                                                />
-                                                            </div>
-
-                                                            {buyMorePortions.length > 0 && !buyMoreSelectedPortion ? (
-                                                                <div>
-                                                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Serving</Label>
-                                                                    <select
-                                                                        onChange={(e) => {
-                                                                            const p = buyMorePortions.find(p => p.label === e.target.value);
-                                                                            if (p) setBuyMoreSelectedPortion(p);
-                                                                        }}
-                                                                        className="px-2 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                                                    >
-                                                                        <option value="">Select serving...</option>
-                                                                        {buyMorePortions.map(p => (
-                                                                            <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
-                                                                        ))}
-                                                                    </select>
-                                                                </div>
-                                                            ) : buyMoreSelectedPortion ? (
-                                                                <div>
-                                                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Serving</Label>
-                                                                    <select
-                                                                        value={buyMoreSelectedPortion.label}
-                                                                        onChange={(e) => {
-                                                                            const p = buyMorePortions.find(p => p.label === e.target.value);
-                                                                            if (p) setBuyMoreSelectedPortion(p);
-                                                                        }}
-                                                                        className="px-2 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                                                    >
-                                                                        {buyMorePortions.map(p => (
-                                                                            <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
-                                                                        ))}
-                                                                    </select>
-                                                                </div>
-                                                            ) : (
-                                                                <>
-                                                                    <div>
-                                                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Weight</Label>
-                                                                        <Input
-                                                                            type="number"
-                                                                            value={buyMoreWeight}
-                                                                            onChange={(e) => setBuyMoreWeight(e.target.value)}
-                                                                            placeholder="e.g. 100"
-                                                                            className="w-20 text-center h-9"
-                                                                        />
-                                                                    </div>
-                                                                    <div>
-                                                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Unit</Label>
-                                                                        <select
-                                                                            value={buyMoreUnit}
-                                                                            onChange={(e) => setBuyMoreUnit(e.target.value)}
-                                                                            className="w-20 px-2 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                                                        >
-                                                                            <option value="g">g</option>
-                                                                            <option value="ml">ml</option>
-                                                                            <option value="oz">oz</option>
-                                                                            <option value="lb">lb</option>
-                                                                        </select>
-                                                                    </div>
-                                                                </>
-                                                            )}
-
-                                                            {buyMorePortions.length > 0 && (
-                                                                <button
-                                                                    onClick={() => {
-                                                                        if (buyMoreSelectedPortion) {
-                                                                            setBuyMoreWeight(`${buyMoreSelectedPortion.weight_g}`);
-                                                                            setBuyMoreUnit('g');
-                                                                            setBuyMoreSelectedPortion(null);
-                                                                        } else {
-                                                                            setBuyMoreSelectedPortion(buyMorePortions[0]);
-                                                                        }
-                                                                    }}
-                                                                    className="text-[9px] font-black uppercase tracking-widest text-slate-500 hover:text-amber-500 transition-colors whitespace-nowrap pb-2"
-                                                                >
-                                                                    {buyMoreSelectedPortion ? 'Use Weight' : 'Use Serving'}
-                                                                </button>
-                                                            )}
-
-                                                            <div>
-                                                                <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Destination</Label>
-                                                                <select
-                                                                    value={quickAddMode}
-                                                                    onChange={(e) => setQuickAddMode(e.target.value as 'pantry' | 'shopping')}
-                                                                    className="px-3 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                                                >
-                                                                    <option value="pantry">Pantry</option>
-                                                                    <option value="shopping">Groceries</option>
-                                                                </select>
-                                                            </div>
-
-                                                            <Button
-                                                                onClick={handleBuyMoreAdd}
-                                                                disabled={buyMoreAdding}
-                                                                className="h-9 gap-1.5 bg-amber-500 hover:bg-amber-600 text-white font-black uppercase tracking-widest text-[9px]"
-                                                            >
-                                                                <Plus size={14} />
-                                                                {buyMoreAdding ? 'Adding...' : 'Add'}
-                                                            </Button>
-
-                                                            <button
-                                                                onClick={() => setBuyMoreItem(null)}
-                                                                className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 transition-all pb-2"
-                                                            >
-                                                                <X size={14} />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                {/* Remove quantity panel */}
-                                                {removeItem?.id === food.id && (
-                                                    <div className="mt-1 mb-0.5 p-4 rounded-xl border border-rose-200 dark:border-rose-800/50 bg-rose-50 dark:bg-rose-950/20 animate-in slide-in-from-top-2 duration-200">
-                                                        <div className="flex flex-wrap items-end gap-3">
-                                                            <div>
-                                                                <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Qty</Label>
-                                                                <Input
-                                                                    type="number"
-                                                                    value={removeQty}
-                                                                    onChange={(e) => setRemoveQty(e.target.value)}
-                                                                    className="w-16 text-center h-9"
-                                                                />
-                                                            </div>
-
-                                                            {removePortions.length > 0 && !removeSelectedPortion ? (
-                                                                <div>
-                                                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Serving</Label>
-                                                                    <select
-                                                                        onChange={(e) => {
-                                                                            const p = removePortions.find(p => p.label === e.target.value);
-                                                                            if (p) setRemoveSelectedPortion(p);
-                                                                        }}
-                                                                        className="px-2 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                                                    >
-                                                                        <option value="">Select serving...</option>
-                                                                        {removePortions.map(p => (
-                                                                            <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
-                                                                        ))}
-                                                                    </select>
-                                                                </div>
-                                                            ) : removeSelectedPortion ? (
-                                                                <div>
-                                                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Serving</Label>
-                                                                    <select
-                                                                        value={removeSelectedPortion.label}
-                                                                        onChange={(e) => {
-                                                                            const p = removePortions.find(p => p.label === e.target.value);
-                                                                            if (p) setRemoveSelectedPortion(p);
-                                                                        }}
-                                                                        className="px-2 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                                                    >
-                                                                        {removePortions.map(p => (
-                                                                            <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
-                                                                        ))}
-                                                                    </select>
-                                                                </div>
-                                                            ) : (
-                                                                <>
-                                                                    <div>
-                                                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Weight</Label>
-                                                                        <Input
-                                                                            type="number"
-                                                                            value={removeWeight}
-                                                                            onChange={(e) => setRemoveWeight(e.target.value)}
-                                                                            placeholder="e.g. 100"
-                                                                            className="w-20 text-center h-9"
-                                                                        />
-                                                                    </div>
-                                                                    <div>
-                                                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Unit</Label>
-                                                                        <select
-                                                                            value={removeUnit}
-                                                                            onChange={(e) => setRemoveUnit(e.target.value)}
-                                                                            className="w-20 px-2 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                                                        >
-                                                                            <option value="g">g</option>
-                                                                            <option value="ml">ml</option>
-                                                                            <option value="oz">oz</option>
-                                                                            <option value="lb">lb</option>
-                                                                        </select>
-                                                                    </div>
-                                                                </>
-                                                            )}
-
-                                                            {removePortions.length > 0 && (
-                                                                <button
-                                                                    onClick={() => {
-                                                                        if (removeSelectedPortion) {
-                                                                            setRemoveWeight(`${removeSelectedPortion.weight_g}`);
-                                                                            setRemoveUnit('g');
-                                                                            setRemoveSelectedPortion(null);
-                                                                        } else {
-                                                                            setRemoveSelectedPortion(removePortions[0]);
-                                                                        }
-                                                                    }}
-                                                                    className="text-[9px] font-black uppercase tracking-widest text-slate-500 hover:text-rose-500 transition-colors whitespace-nowrap pb-2"
-                                                                >
-                                                                    {removeSelectedPortion ? 'Use Weight' : 'Use Serving'}
-                                                                </button>
-                                                            )}
-
-                                                            <Button
-                                                                onClick={handleRemove}
-                                                                disabled={removeRemoving}
-                                                                className="h-9 gap-1.5 bg-rose-500 hover:bg-rose-600 text-white font-black uppercase tracking-widest text-[9px]"
-                                                            >
-                                                                <Minus size={14} />
-                                                                {removeRemoving ? 'Removing...' : 'Remove'}
-                                                            </Button>
-
-                                                            <button
-                                                                onClick={() => setRemoveItem(null)}
-                                                                className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 transition-all pb-2"
-                                                            >
-                                                                <X size={14} />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                )}
                                             </div>
                                         ))}
                                     </div>
@@ -1397,6 +1166,259 @@ export function PantryView({
                     </div>
                 </div>
             )}
+
+            {/* Mobile Drawer for Add/Remove Actions */}
+            {drawerOpen && (
+                <div className="fixed inset-0 bg-black/30 z-40 md:hidden" onClick={() => setDrawerOpen(false)} />
+            )}
+            <div className={cn(
+                "fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 rounded-t-2xl border-t border-slate-200 dark:border-slate-800 transition-transform duration-300 md:hidden",
+                drawerOpen ? "translate-y-0" : "translate-y-full"
+            )}>
+                {drawerOpen && (
+                    <>
+                        {/* Handle bar */}
+                        <div className="flex justify-center pt-2 pb-4">
+                            <div className="w-12 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+                        </div>
+
+                        {/* Drawer content */}
+                        <div className="px-4 pb-8 max-h-[70vh] overflow-auto">
+                            {drawerType === 'add' && buyMoreItem && (
+                                <div>
+                                    <h3 className="text-lg font-black uppercase tracking-widest text-slate-900 dark:text-white mb-4">
+                                        Add to {buyMoreItem.common_name || buyMoreItem.name}
+                                    </h3>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Qty</Label>
+                                            <Input
+                                                type="number"
+                                                value={buyMoreQty}
+                                                onChange={(e) => setBuyMoreQty(e.target.value)}
+                                                className="w-full h-10"
+                                            />
+                                        </div>
+
+                                        {buyMorePortions.length > 0 && !buyMoreSelectedPortion ? (
+                                            <div>
+                                                <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Serving</Label>
+                                                <select
+                                                    onChange={(e) => {
+                                                        const p = buyMorePortions.find(p => p.label === e.target.value);
+                                                        if (p) setBuyMoreSelectedPortion(p);
+                                                    }}
+                                                    className="w-full px-3 py-2 h-10 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                                >
+                                                    <option value="">Select serving...</option>
+                                                    {buyMorePortions.map(p => (
+                                                        <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        ) : buyMoreSelectedPortion ? (
+                                            <div>
+                                                <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Serving</Label>
+                                                <select
+                                                    value={buyMoreSelectedPortion.label}
+                                                    onChange={(e) => {
+                                                        const p = buyMorePortions.find(p => p.label === e.target.value);
+                                                        if (p) setBuyMoreSelectedPortion(p);
+                                                    }}
+                                                    className="w-full px-3 py-2 h-10 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                                >
+                                                    {buyMorePortions.map(p => (
+                                                        <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div className="flex gap-2">
+                                                    <div className="flex-1">
+                                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Weight</Label>
+                                                        <Input
+                                                            type="number"
+                                                            value={buyMoreWeight}
+                                                            onChange={(e) => setBuyMoreWeight(e.target.value)}
+                                                            placeholder="e.g. 100"
+                                                            className="w-full h-10"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Unit</Label>
+                                                        <select
+                                                            value={buyMoreUnit}
+                                                            onChange={(e) => setBuyMoreUnit(e.target.value)}
+                                                            className="w-20 px-2 py-2 h-10 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                                        >
+                                                            <option value="g">g</option>
+                                                            <option value="ml">ml</option>
+                                                            <option value="oz">oz</option>
+                                                            <option value="lb">lb</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
+
+                                        {buyMorePortions.length > 0 && (
+                                            <button
+                                                onClick={() => {
+                                                    if (buyMoreSelectedPortion) {
+                                                        setBuyMoreWeight(`${buyMoreSelectedPortion.weight_g}`);
+                                                        setBuyMoreUnit('g');
+                                                        setBuyMoreSelectedPortion(null);
+                                                    } else {
+                                                        setBuyMoreSelectedPortion(buyMorePortions[0]);
+                                                    }
+                                                }}
+                                                className="text-xs font-black uppercase tracking-widest text-amber-500 hover:text-amber-600 transition-colors"
+                                            >
+                                                {buyMoreSelectedPortion ? 'Use Weight' : 'Use Serving'}
+                                            </button>
+                                        )}
+
+                                        <div>
+                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Destination</Label>
+                                            <select
+                                                value={quickAddMode}
+                                                onChange={(e) => setQuickAddMode(e.target.value as 'pantry' | 'shopping')}
+                                                className="w-full px-3 py-2 h-10 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                            >
+                                                <option value="pantry">Pantry</option>
+                                                <option value="shopping">Groceries</option>
+                                            </select>
+                                        </div>
+
+                                        <Button
+                                            onClick={() => {
+                                                handleBuyMoreAdd();
+                                                setDrawerOpen(false);
+                                            }}
+                                            disabled={buyMoreAdding}
+                                            className="w-full h-12 gap-2 bg-amber-500 hover:bg-amber-600 text-white font-black uppercase tracking-widest"
+                                        >
+                                            <Plus size={18} />
+                                            {buyMoreAdding ? 'Adding...' : 'Add'}
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {drawerType === 'remove' && removeItem && (
+                                <div>
+                                    <h3 className="text-lg font-black uppercase tracking-widest text-slate-900 dark:text-white mb-4">
+                                        Remove from {removeItem.common_name || removeItem.name}
+                                    </h3>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Qty</Label>
+                                            <Input
+                                                type="number"
+                                                value={removeQty}
+                                                onChange={(e) => setRemoveQty(e.target.value)}
+                                                className="w-full h-10"
+                                            />
+                                        </div>
+
+                                        {removePortions.length > 0 && !removeSelectedPortion ? (
+                                            <div>
+                                                <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Serving</Label>
+                                                <select
+                                                    onChange={(e) => {
+                                                        const p = removePortions.find(p => p.label === e.target.value);
+                                                        if (p) setRemoveSelectedPortion(p);
+                                                    }}
+                                                    className="w-full px-3 py-2 h-10 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                                >
+                                                    <option value="">Select serving...</option>
+                                                    {removePortions.map(p => (
+                                                        <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        ) : removeSelectedPortion ? (
+                                            <div>
+                                                <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Serving</Label>
+                                                <select
+                                                    value={removeSelectedPortion.label}
+                                                    onChange={(e) => {
+                                                        const p = removePortions.find(p => p.label === e.target.value);
+                                                        if (p) setRemoveSelectedPortion(p);
+                                                    }}
+                                                    className="w-full px-3 py-2 h-10 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                                >
+                                                    {removePortions.map(p => (
+                                                        <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div className="flex gap-2">
+                                                    <div className="flex-1">
+                                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Weight</Label>
+                                                        <Input
+                                                            type="number"
+                                                            value={removeWeight}
+                                                            onChange={(e) => setRemoveWeight(e.target.value)}
+                                                            placeholder="e.g. 100"
+                                                            className="w-full h-10"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Unit</Label>
+                                                        <select
+                                                            value={removeUnit}
+                                                            onChange={(e) => setRemoveUnit(e.target.value)}
+                                                            className="w-20 px-2 py-2 h-10 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                                        >
+                                                            <option value="g">g</option>
+                                                            <option value="ml">ml</option>
+                                                            <option value="oz">oz</option>
+                                                            <option value="lb">lb</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
+
+                                        {removePortions.length > 0 && (
+                                            <button
+                                                onClick={() => {
+                                                    if (removeSelectedPortion) {
+                                                        setRemoveWeight(`${removeSelectedPortion.weight_g}`);
+                                                        setRemoveUnit('g');
+                                                        setRemoveSelectedPortion(null);
+                                                    } else {
+                                                        setRemoveSelectedPortion(removePortions[0]);
+                                                    }
+                                                }}
+                                                className="text-xs font-black uppercase tracking-widest text-rose-500 hover:text-rose-600 transition-colors"
+                                            >
+                                                {removeSelectedPortion ? 'Use Weight' : 'Use Serving'}
+                                            </button>
+                                        )}
+
+                                        <Button
+                                            onClick={() => {
+                                                handleRemove();
+                                                setDrawerOpen(false);
+                                            }}
+                                            disabled={removeRemoving}
+                                            className="w-full h-12 gap-2 bg-rose-500 hover:bg-rose-600 text-white font-black uppercase tracking-widest"
+                                        >
+                                            <Minus size={18} />
+                                            {removeRemoving ? 'Removing...' : 'Remove'}
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </>
+                )}
+            </div>
         </div>
     );
 }
