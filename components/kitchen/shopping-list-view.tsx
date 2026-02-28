@@ -15,8 +15,7 @@ import {
     ChefHat,
     Package,
     X,
-    ScanLine,
-    DollarSign
+    ScanLine
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -58,10 +57,6 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
     const { searchQuery } = useSearch();
     const { dailyPlan } = useUserPreferences();
     const [pantryItems, setPantryItems] = useState<any[]>([]);
-
-    // Filter state
-    const [showMealPlanOnly, setShowMealPlanOnly] = useState(false);
-    const [showManualOnly, setShowManualOnly] = useState(false);
 
     // Barcode scanner state
     const [internalScannerOpen, setInternalScannerOpen] = useState(false);
@@ -667,13 +662,9 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         }
     };
 
-    const filteredItems = items.filter(item => {
-        // Search filter
-        const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
-        // Source filter
-        const matchesSource = !((showMealPlanOnly && item.source !== 'mealplan') || (showManualOnly && item.source !== 'manual'));
-        return matchesSearch && matchesSource;
-    });
+    const filteredItems = items.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     // Group items by category
     const groupedItems = filteredItems.reduce((acc, item) => {
@@ -682,11 +673,6 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         acc[group].push(item);
         return acc;
     }, {} as Record<string, ShoppingListItem[]>);
-
-    // Calculate total price of items with prices
-    const totalPrice = filteredItems
-        .filter(i => i.price)
-        .reduce((sum, i) => sum + (i.price || 0), 0);
 
     return (
         <div className="space-y-8">
@@ -725,63 +711,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                 } : undefined}
             />
 
-            {/* Filters Row */}
-            <div className="flex flex-wrap items-center gap-2 p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
-                <span className="text-xs font-black uppercase tracking-widest text-slate-500 px-2">Filter:</span>
-                <Button
-                    size="sm"
-                    variant={showMealPlanOnly ? "default" : "outline"}
-                    onClick={() => {
-                        setShowMealPlanOnly(!showMealPlanOnly);
-                        if (showManualOnly) setShowManualOnly(false);
-                    }}
-                    className={cn(
-                        "h-8 text-xs font-black uppercase tracking-widest rounded-xl",
-                        showMealPlanOnly
-                            ? "bg-blue-600 text-white hover:bg-blue-700"
-                            : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-blue-300"
-                    )}
-                >
-                    <ChefHat size={12} className="mr-1" /> Meal Plan
-                </Button>
-                <Button
-                    size="sm"
-                    variant={showManualOnly ? "default" : "outline"}
-                    onClick={() => {
-                        setShowManualOnly(!showManualOnly);
-                        if (showMealPlanOnly) setShowMealPlanOnly(false);
-                    }}
-                    className={cn(
-                        "h-8 text-xs font-black uppercase tracking-widest rounded-xl",
-                        showManualOnly
-                            ? "bg-emerald-600 text-white hover:bg-emerald-700"
-                            : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-emerald-300"
-                    )}
-                >
-                    <Plus size={12} className="mr-1" /> Manual
-                </Button>
-                {(showMealPlanOnly || showManualOnly) && (
-                    <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                            setShowMealPlanOnly(false);
-                            setShowManualOnly(false);
-                        }}
-                        className="h-8 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                    >
-                        <X size={12} className="mr-1" /> Reset
-                    </Button>
-                )}
-                {totalPrice > 0 && (
-                    <div className="ml-auto px-3 py-1.5 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                        <span className="text-xs font-black text-slate-600 dark:text-slate-300">
-                            <DollarSign size={12} className="inline mr-1" />
-                            Total: ${totalPrice.toFixed(2)}
-                        </span>
-                    </div>
-                )}
-            </div>
+
 
 
 
@@ -815,15 +745,6 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                     {/* Items - Grouped by Category */}
                     {filteredItems.length > 0 && (
                         <div className="space-y-2">
-                            <div className="flex items-center justify-between px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/50">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                    <span className="text-xs font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
-                                        Need to Buy
-                                    </span>
-                                </div>
-                                <span className="text-xs font-black text-emerald-600 dark:text-emerald-400">{filteredItems.length}</span>
-                            </div>
                             <div className="space-y-3">
                                 {Object.entries(groupedItems)
                                     .sort(([a], [b]) => {
