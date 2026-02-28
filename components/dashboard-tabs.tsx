@@ -126,7 +126,7 @@ export function DashboardTabs() {
             </div>
 
             {/* Sub Tabs - appear below main bar with icons and labels */}
-            <div className="flex items-center justify-center flex-wrap gap-1 mt-2">
+            <div className="flex items-center justify-center gap-1 mt-2 overflow-x-auto scrollbar-hide">
                 {currentTab.subtabs.map((sub) => {
                     const SubIcon = sub.icon;
                     const isSubActive = pathname === sub.href || pathname.startsWith(sub.href + '/');
@@ -135,7 +135,7 @@ export function DashboardTabs() {
                             key={sub.id}
                             href={sub.href}
                             className={cn(
-                                'group flex items-center gap-1 px-2.5 py-1.5 rounded transition-all duration-300 text-xs font-semibold uppercase tracking-wide whitespace-nowrap',
+                                'group flex items-center gap-1 px-2.5 py-1 rounded transition-all duration-300 text-[11px] font-semibold uppercase tracking-wide whitespace-nowrap flex-shrink-0',
                                 isSubActive
                                     ? cn(currentTab.activeBg, 'shadow-sm')
                                     : 'text-slate-500 hover:text-slate-300 hover:bg-white/[0.03] border border-transparent'
