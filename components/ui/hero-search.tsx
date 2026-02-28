@@ -38,6 +38,11 @@ interface HeroSearchProps<T = any> {
 
     theme?: HeroTheme;
     powerButton?: React.ReactNode; // Button rendered to the left of search input
+    /**
+     * When true the results panel is suppressed — the idle view is always shown.
+     * Use this when another component (e.g. ExploreView) handles the search display.
+     */
+    hideResults?: boolean;
 }
 
 const themeStyles: Record<HeroTheme, { ring: string; border: string; accent: string; accentBg: string; iconColor: string }> = {
@@ -74,7 +79,8 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
         noResultsMessage = 'No matching items found',
         enterMessage = 'Enter item name to search',
         searchingMessage = 'Searching Library...',
-        theme = 'emerald'
+        theme = 'emerald',
+        hideResults = false,
     } = props;
 
     const style = themeStyles[theme];
@@ -89,7 +95,7 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
             >
                 {/* Dynamic content */}
                 <div className="overflow-y-auto flex-1 p-3 md:p-6 custom-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1 rounded-[2.5rem]">
-                    {isActive ? (
+                    {isActive && !hideResults ? (
                         <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                             {isLoading ? (
                                 <div className="py-12 flex flex-col items-center justify-center text-slate-400 gap-4">
