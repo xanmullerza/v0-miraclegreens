@@ -248,19 +248,15 @@ export function PantryView({
         return entry.qty * (entry.weight_g ?? 0);
     };
 
-    // Format a gram total into the standard labeled format (kg when >= 1000g)
+    // Format a gram total into shortform (kg/g)
     const formatGramsEntry = (grams: number): string => {
         if (grams >= 1000) {
             const kg = grams / 1000;
             // Use up to 3 decimal places, stripping trailing zeros
             const kgStr = parseFloat(kg.toFixed(3)).toString();
-            const kgNum = parseFloat(kgStr);
-            const unit = kgNum === 1 ? 'kilogram' : 'kilograms';
-            return `${kgStr} ${unit}`;
+            return `${kgStr} kg`;
         }
-        const gramsNum = Math.round(grams);
-        const unit = gramsNum === 1 ? 'gram' : 'grams';
-        return `${gramsNum} ${unit}`;
+        return `${Math.round(grams)} g`;
     };
 
     const mergeQuantityStrings = (existing: string | undefined, incoming: string): string => {
@@ -770,14 +766,14 @@ export function PantryView({
                                                                 const consolidated: string[] = [...nonWeightStrs];
                                                                 if (weightGramsTotal > 0) consolidated.push(formatGramsEntry(weightGramsTotal));
                                                                 if (consolidated.length === 0) return <span className="text-[10px] font-bold text-slate-300 dark:text-slate-600 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800">In Stock</span>;
-                                                                if (consolidated.length === 1) return <span className="text-[10px] font-bold text-white bg-emerald-700 px-2.5 py-1 rounded-md whitespace-nowrap">{consolidated[0]}</span>;
+                                                                if (consolidated.length === 1) return <span className="text-xs font-black text-white bg-emerald-900 px-3 py-1 rounded-md whitespace-nowrap">{consolidated[0]}</span>;
                                                                 // Multiple entries: show sum of all grams
                                                                 let totalGramsAll = weightGramsTotal;
                                                                 for (const raw of nonWeightStrs) {
                                                                     const p = parseQuantityEntry(raw);
                                                                     if (p.weight_g != null) totalGramsAll += p.qty * p.weight_g;
                                                                 }
-                                                                return <span className="text-[10px] font-bold text-white bg-emerald-700 px-2.5 py-1 rounded-md whitespace-nowrap">{formatGramsEntry(totalGramsAll)}</span>;
+                                                                return <span className="text-xs font-black text-white bg-emerald-900 px-3 py-1 rounded-md whitespace-nowrap">{formatGramsEntry(totalGramsAll)}</span>;
                                                             })()}
                                                         </div>
                                                     </div>
