@@ -1,8 +1,9 @@
 ﻿'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { Loader2, Leaf, ChevronRight, Search, Plus } from 'lucide-react';
+import { useState, useRef, Suspense } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { Loader2, Leaf, ChevronRight, Plus } from 'lucide-react';
 import { ExploreView } from './views/explore-view';
 import { ShoppingView } from './views/shopping-view';
 import { StaplesView } from '@/components/ingredients/staples-view';
@@ -12,15 +13,7 @@ import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
 import { supabase } from '@/lib/supabase';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
-
-const CAL_TO_KJ = 4.184;
-
-function formatEnergy(calories: number, unit: 'kcal' | 'kJ') {
-    if (unit === 'kJ') {
-        return `${Math.round(calories * CAL_TO_KJ).toLocaleString()} kJ`;
-    }
-    return `${Math.round(calories).toLocaleString()} kC`;
-}
+import { formatEnergy, type FoodItem } from '@/lib/utils';
 
 export default function IngredientsHub() {
     return (
@@ -41,20 +34,19 @@ function IngredientsContent() {
 
     const router = useRouter();
     const { energyUnit } = useUserPreferences();
-    const searchParams = useSearchParams();
     const [activeTab, setActiveTab] = useState<FoodTab>('foods');
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState<any[]>([]);
+    const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [isSearchActive, setIsSearchActive] = useState(false);
     const [showAddFood, setShowAddFood] = useState(false);
-    const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+    const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    const renderResult = (item: any) => (
+    const renderResult = (item: FoodItem) => (
         <div className="flex items-center gap-4 min-w-0 w-full">
-            <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
+            <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800 relative">
                 {item.image ? (
-                    <img src={item.image} className="w-full h-full object-cover" alt={item.common_name || item.name} />
+                    <Image src={item.image} fill className="object-cover" alt={item.common_name || item.name} />
                 ) : (
                     <Leaf className="m-auto opacity-10 h-full w-5" />
                 )}

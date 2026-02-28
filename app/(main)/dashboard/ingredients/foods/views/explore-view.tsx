@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Loader2, Check, Beef, Filter, ChevronDown, Leaf, X } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 
-import { cn, formatFoodName } from '@/lib/utils';
+import { cn, formatFoodName, formatEnergy, type FoodItem } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
@@ -17,35 +17,12 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLab
 import { Sheet, SheetTrigger, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { FoodFormDialog } from '@/components/ingredients/food-form-dialog';
 
-const CAL_TO_KJ = 4.184;
 const CATEGORIES = ['General', 'Vegetables', 'Grains', 'Legumes', 'Oils', 'Proteins', 'Fruit', 'Nuts', 'Flavour', 'Supplements', 'Mixes'];
 const PAGE_SIZE = 20;
-
-function formatEnergy(calories: number, unit: 'kcal' | 'kJ') {
-    if (unit === 'kJ') return `${Math.round(calories * CAL_TO_KJ).toLocaleString()} kJ`;
-    return `${Math.round(calories).toLocaleString()} kcal`;
-}
 
 function truncateQuantity(qty: string): string {
     const first = qty.split('+')[0].trim();
     return first.length > 14 ? first.slice(0, 14) + '…' : first;
-}
-
-interface FoodItem {
-    id: string;
-    name: string;
-    common_name: string;
-    energy_kcal: number;
-    protein_g: number;
-    carbs_g: number;
-    fat_g: number;
-    image: string | null;
-    is_favorite: boolean;
-    is_in_pantry: boolean;
-    category?: string;
-    quantity?: string;
-    user_id?: string | null;
-    is_curated?: boolean;
 }
 
 interface ExploreViewProps {
