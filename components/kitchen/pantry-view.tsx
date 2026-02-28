@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
 import {
     Plus,
+    Minus,
     ShoppingBasket,
     ShoppingCart,
     Loader2,
@@ -135,6 +136,16 @@ export function PantryView({
     const [buyMorePortions, setBuyMorePortions] = useState<{ label: string; weight_g: number }[]>([]);
     const [buyMoreSelectedPortion, setBuyMoreSelectedPortion] = useState<{ label: string; weight_g: number } | null>(null);
     const [buyMoreAdding, setBuyMoreAdding] = useState(false);
+    
+    // Remove quantity state
+    const [removeItem, setRemoveItem] = useState<FoodItem | null>(null);
+    const [removeQty, setRemoveQty] = useState('1');
+    const [removeWeight, setRemoveWeight] = useState('');
+    const [removeUnit, setRemoveUnit] = useState('g');
+    const [removePortions, setRemovePortions] = useState<{ label: string; weight_g: number }[]>([]);
+    const [removeSelectedPortion, setRemoveSelectedPortion] = useState<{ label: string; weight_g: number } | null>(null);
+    const [removeRemoving, setRemoveRemoving] = useState(false);
+    
     const [expandedQuantityId, setExpandedQuantityId] = useState<string | null>(null);
     const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; name: string; source: string } | null>(null);
 
@@ -223,6 +234,15 @@ export function PantryView({
             .catch(() => setBuyMorePortions([]));
     }, [buyMoreItem?.id]);
 
+    // Fetch portions when a removeItem is selected
+    useEffect(() => {
+        if (!removeItem) { setRemovePortions([]); setRemoveSelectedPortion(null); return; }
+        const foodId = removeItem.source_table === 'food_items' ? removeItem.id : null;
+        if (!foodId) return;
+        fetchFoodMeasures(foodId)
+            .then(measures => setRemovePortions(measures || []))
+            .catch(() => setRemovePortions([]));
+    }, [removeItem?.id]);
     const openBuyMore = (food: FoodItem) => {
         setBuyMoreItem(food);
         setBuyMoreQty('1');
@@ -230,6 +250,14 @@ export function PantryView({
         setBuyMoreUnit('g');
         setBuyMoreSelectedPortion(null);
         setQuickAddMode('pantry');
+    };
+
+    const openRemove = (food: FoodItem) => {
+        setRemoveItem(food);
+        setRemoveQty('1');
+        setRemoveWeight('');
+        setRemoveUnit('g');
+        setRemoveSelectedPortion(null);
     };
 
     const buildQuantityString = (qty: string, portion: { label: string; weight_g: number } | null, weight: string, unit: string): string => {
@@ -407,6 +435,81 @@ export function PantryView({
             toast.error('Failed to add item');
         } finally {
             setBuyMoreAdding(false);
+        }
+    };
+
+    const handleRemove = async () => {
+        if (!removeItem) return;
+        setRemoveRemoving(true);
+        try {
+            const quantityString = buildQuantityString(removeQty, removeSelectedPortion, removeWeight, removeUnit);
+            
+            const saved = localStorage.getItem('pantry_quantities');
+            const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
+            const currentQty = quantities[removeItem.id] || removeItem.quantity || '0';
+            
+            // Parse current and remove quantities to get grams
+            const currentRaw = currentQty.split(/\s*\+\s*/).map(s => s.trim()).filter(Boolean);
+            let currentGrams = 0;
+            for (const entry of currentRaw) {
+                const parsed = parseQuantityEntry(entry);
+                currentGrams += (parsed.qty || 0) * (parsed.weight_g || 0);
+            }
+            
+            // Calculate grams to remove
+            const removeEntry = parseQuantityEntry(quantityString);
+            const removeGrams = (removeEntry.qty || 0) * (removeEntry.weight_g || 0);
+            
+            const remainingGrams = Math.max(0, currentGrams - removeGrams);
+            console.log('[handleRemove]', removeItem.common_name || removeItem.name, { currentGrams, removeGrams, remainingGrams });
+            
+            if (remainingGrams === 0 || currentGrams === 0) {
+                // Remove from pantry and add to shopping list
+                console.log('[handleRemove] Item depleted, moving to shopping list:', removeItem.common_name || removeItem.name);
+                
+                const shoppingList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
+                shoppingList.push({
+                    id: `replenish-${Date.now()}-${removeItem.id}`,
+                    name: `Replenish: ${removeItem.common_name || removeItem.name}`,
+                    quantity: 'As needed',
+                    unit: '',
+                    checked: false,
+                    source: 'auto-replenish'
+                });
+                localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(shoppingList));
+                
+                delete quantities[removeItem.id];
+                localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+                
+                if (removeItem.source_table === 'food_items') {
+                    await supabase
+                        .from('food_items')
+                        .update({ is_in_pantry: false } as any)
+                        .eq('id', removeItem.id);
+                } else if (removeItem.source_table === 'pantry_items') {
+                    await supabase
+                        .from('pantry_items')
+                        .delete()
+                        .eq('id', removeItem.id);
+                }
+                
+                setFoods(prev => prev.filter(f => f.id !== removeItem.id));
+                toast.success(`${removeItem.common_name || removeItem.name} depleted and moved to shopping list`);
+                window.dispatchEvent(new CustomEvent('shopping-list-updated'));
+            } else {
+                const remainingStr = formatGramsEntry(remainingGrams);
+                quantities[removeItem.id] = remainingStr;
+                localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+                setFoods(prev => prev.map(f => f.id === removeItem.id ? { ...f, quantity: remainingStr } : f));
+                toast.success(`Removed ${quantityString} from ${removeItem.common_name || removeItem.name}`);
+            }
+            
+            setRemoveItem(null);
+        } catch (e) {
+            console.error('[handleRemove] Error:', e);
+            toast.error('Failed to remove quantity');
+        } finally {
+            setRemoveRemoving(false);
         }
     };
 
@@ -913,6 +1016,13 @@ export function PantryView({
                                                         <Plus size={14} />
                                                     </button>
                                                     <button
+                                                        onClick={(e) => { e.stopPropagation(); removeItem?.id === food.id ? setRemoveItem(null) : openRemove(food); }}
+                                                        className={cn("p-1.5 rounded-lg transition-all flex-shrink-0", removeItem?.id === food.id ? "bg-rose-100 dark:bg-rose-950/40 text-rose-500" : "text-slate-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500")}
+                                                        title="Remove/discard quantity"
+                                                    >
+                                                        <Minus size={14} />
+                                                    </button>
+                                                    <button
                                                         onClick={(e) => { e.stopPropagation(); setDeleteConfirm({ id: food.id, name: food.name, source: food.source_table || 'food_items' }); }}
                                                         className="p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-300 dark:text-slate-600 hover:text-rose-500 transition-all flex-shrink-0"
                                                         title="Remove from pantry"
@@ -1112,6 +1222,116 @@ export function PantryView({
 
                                                             <button
                                                                 onClick={() => setBuyMoreItem(null)}
+                                                                className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 transition-all pb-2"
+                                                            >
+                                                                <X size={14} />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Remove quantity panel */}
+                                                {removeItem?.id === food.id && (
+                                                    <div className="mt-1 mb-0.5 p-4 rounded-xl border border-rose-200 dark:border-rose-800/50 bg-rose-50 dark:bg-rose-950/20 animate-in slide-in-from-top-2 duration-200">
+                                                        <div className="flex flex-wrap items-end gap-3">
+                                                            <div>
+                                                                <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Qty</Label>
+                                                                <Input
+                                                                    type="number"
+                                                                    value={removeQty}
+                                                                    onChange={(e) => setRemoveQty(e.target.value)}
+                                                                    className="w-16 text-center h-9"
+                                                                />
+                                                            </div>
+
+                                                            {removePortions.length > 0 && !removeSelectedPortion ? (
+                                                                <div>
+                                                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Serving</Label>
+                                                                    <select
+                                                                        onChange={(e) => {
+                                                                            const p = removePortions.find(p => p.label === e.target.value);
+                                                                            if (p) setRemoveSelectedPortion(p);
+                                                                        }}
+                                                                        className="px-2 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                                                    >
+                                                                        <option value="">Select serving...</option>
+                                                                        {removePortions.map(p => (
+                                                                            <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
+                                                                        ))}
+                                                                    </select>
+                                                                </div>
+                                                            ) : removeSelectedPortion ? (
+                                                                <div>
+                                                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Serving</Label>
+                                                                    <select
+                                                                        value={removeSelectedPortion.label}
+                                                                        onChange={(e) => {
+                                                                            const p = removePortions.find(p => p.label === e.target.value);
+                                                                            if (p) setRemoveSelectedPortion(p);
+                                                                        }}
+                                                                        className="px-2 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                                                    >
+                                                                        {removePortions.map(p => (
+                                                                            <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
+                                                                        ))}
+                                                                    </select>
+                                                                </div>
+                                                            ) : (
+                                                                <>
+                                                                    <div>
+                                                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Weight</Label>
+                                                                        <Input
+                                                                            type="number"
+                                                                            value={removeWeight}
+                                                                            onChange={(e) => setRemoveWeight(e.target.value)}
+                                                                            placeholder="e.g. 100"
+                                                                            className="w-20 text-center h-9"
+                                                                        />
+                                                                    </div>
+                                                                    <div>
+                                                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Unit</Label>
+                                                                        <select
+                                                                            value={removeUnit}
+                                                                            onChange={(e) => setRemoveUnit(e.target.value)}
+                                                                            className="w-20 px-2 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                                                        >
+                                                                            <option value="g">g</option>
+                                                                            <option value="ml">ml</option>
+                                                                            <option value="oz">oz</option>
+                                                                            <option value="lb">lb</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </>
+                                                            )}
+
+                                                            {removePortions.length > 0 && (
+                                                                <button
+                                                                    onClick={() => {
+                                                                        if (removeSelectedPortion) {
+                                                                            setRemoveWeight(`${removeSelectedPortion.weight_g}`);
+                                                                            setRemoveUnit('g');
+                                                                            setRemoveSelectedPortion(null);
+                                                                        } else {
+                                                                            setRemoveSelectedPortion(removePortions[0]);
+                                                                        }
+                                                                    }}
+                                                                    className="text-[9px] font-black uppercase tracking-widest text-slate-500 hover:text-rose-500 transition-colors whitespace-nowrap pb-2"
+                                                                >
+                                                                    {removeSelectedPortion ? 'Use Weight' : 'Use Serving'}
+                                                                </button>
+                                                            )}
+
+                                                            <Button
+                                                                onClick={handleRemove}
+                                                                disabled={removeRemoving}
+                                                                className="h-9 gap-1.5 bg-rose-500 hover:bg-rose-600 text-white font-black uppercase tracking-widest text-[9px]"
+                                                            >
+                                                                <Minus size={14} />
+                                                                {removeRemoving ? 'Removing...' : 'Remove'}
+                                                            </Button>
+
+                                                            <button
+                                                                onClick={() => setRemoveItem(null)}
                                                                 className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 transition-all pb-2"
                                                             >
                                                                 <X size={14} />
