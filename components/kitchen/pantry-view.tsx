@@ -628,14 +628,15 @@ export function PantryView({
         }
     };
 
-    const confirmDelete = (id: string, name: string, source: string = 'food_items') => {
+    const confirmDelete = (id: string, name: string, commonName: string = '', source: string = 'food_items') => {
+        const displayName = commonName || name;
         setDeleteConfirm({ id, name, source });
         
         toast.custom(
             (t) => (
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 shadow-lg max-w-sm">
                     <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">
-                        Remove <span className="font-black text-rose-600 dark:text-rose-400">{name}</span> from pantry?
+                        Remove <span className="font-black text-rose-600 dark:text-rose-400">{displayName}</span> from pantry?
                     </p>
                     <div className="flex gap-2 justify-end">
                         <button
@@ -1064,7 +1065,7 @@ export function PantryView({
                                                     <button
                                                         onClick={(e) => { 
                                                             e.stopPropagation(); 
-                                                            confirmDelete(food.id, food.name, food.source_table || 'food_items');
+                                                            confirmDelete(food.id, food.name, food.common_name || '', food.source_table || 'food_items');
                                                         }}
                                                         className="p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-300 dark:text-slate-600 hover:text-rose-500 transition-all flex-shrink-0"
                                                         title="Remove from pantry"
