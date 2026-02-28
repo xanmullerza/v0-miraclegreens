@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, type Dispatch, type SetStateAction } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loader2, Check, Beef, Filter, ChevronDown, Leaf } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
@@ -21,7 +21,7 @@ const PAGE_SIZE = 20;
 
 function formatEnergy(calories: number, unit: 'kcal' | 'kJ') {
     if (unit === 'kJ') return `${Math.round(calories * CAL_TO_KJ).toLocaleString()} kJ`;
-    return `${Math.round(calories).toLocaleString()} kC`;
+    return `${Math.round(calories).toLocaleString()} kcal`;
 }
 
 function truncateQuantity(qty: string): string {
@@ -48,7 +48,7 @@ interface FoodItem {
 
 interface ExploreViewProps {
     showAddFood?: boolean;
-    setShowAddFood?: React.Dispatch<React.SetStateAction<boolean>>;
+    setShowAddFood?: Dispatch<SetStateAction<boolean>>;
 }
 
 export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreViewProps) {
@@ -111,6 +111,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
 
             let fetchedItems = (data as FoodItem[]) || [];
             const dbTotal = count ?? 0;
+            const dbFetched = fetchedItems.length; // snapshot before local foods are prepended
 
             // Prepend local (guest) foods — these are always fully loaded, no pagination
             if (!opts.currentUser) {
@@ -158,7 +159,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                 setPage(pageNum);
             }
             // hasMore is based on DB pagination only (local foods are always fully loaded)
-            setHasMore(from + fetchedItems.length < dbTotal);
+            setHasMore(from + dbFetched < dbTotal);
         } catch (error) {
             console.error(error);
             toast.error('Failed to load foods');
@@ -171,7 +172,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
     useEffect(() => {
         if (!authReady) return;
         fetchFoods(1, { q: searchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user }, true);
-    }, [authReady, showFavoritesOnly, selectedCategories, user]);
+    }, [authReady, showFavoritesOnly, selectedCategories, user, fetchFoods]);
 
     // Debounced fetch on search change
     const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -182,7 +183,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
             fetchFoods(1, { q: searchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user }, true);
         }, 400);
         return () => { if (searchTimerRef.current) clearTimeout(searchTimerRef.current); };
-    }, [searchQuery, authReady]);
+    }, [searchQuery, authReady, fetchFoods]);
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
