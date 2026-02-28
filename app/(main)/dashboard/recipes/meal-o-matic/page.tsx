@@ -433,7 +433,7 @@ export function MealPlannerContent({
             if (ozFmt) { total += parseFloat(ozFmt[1]) * 28.3495; hasWeight = true; continue; }
             // Plain number with no unit (e.g. "300") � treat as grams
             const plainNum = entry.match(/^(\d+(?:\.\d+)?)$/);
-            if (plainNum) { total += parseFloat(plainNum[1]); hasWeight = true; continue; }
+            if (plainNum) { total += parseFloat(plainNum[1]) * 1000; hasWeight = true; continue; }
         }
         return hasWeight ? total : null;
     };
@@ -501,7 +501,8 @@ export function MealPlannerContent({
         setEatenMeals(prev => new Set([...prev, mealType]));
 
         if (subtracted > 0) {
-            toast.success(`Marked as eaten � ${subtracted} pantry item${subtracted !== 1 ? 's' : ''} updated`);
+            toast.success(`Marked as eaten. ${subtracted} pantry item${subtracted !== 1 ? 's' : ''} updated`);
+            window.location.reload();
         } else {
             toast.success(`${recipe.title} marked as eaten`);
         }
