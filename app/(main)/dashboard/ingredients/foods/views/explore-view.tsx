@@ -7,7 +7,6 @@ import { Loader2, Check, Beef, Filter, ChevronDown, Leaf, X } from 'lucide-react
 import type { User } from '@supabase/supabase-js';
 
 import { cn, formatFoodName, formatEnergy, type FoodItem } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
@@ -19,11 +18,6 @@ import { FoodFormDialog } from '@/components/ingredients/food-form-dialog';
 
 const CATEGORIES = ['General', 'Vegetables', 'Grains', 'Legumes', 'Oils', 'Proteins', 'Fruit', 'Nuts', 'Flavour', 'Supplements', 'Mixes'];
 const PAGE_SIZE = 20;
-
-function truncateQuantity(qty: string): string {
-    const first = qty.split('+')[0].trim();
-    return first.length > 14 ? first.slice(0, 14) + '…' : first;
-}
 
 interface ExploreViewProps {
     showAddFood?: boolean;
@@ -311,7 +305,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                     </DropdownMenu>
                                 </div>
                                 <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Name</div>
-                                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">{energyUnit}</div>
+                                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Energy</div>
                                 <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Carbs</div>
                                 <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Fat</div>
                                 <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Protein</div>
@@ -368,11 +362,6 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                             <h3 className="font-bold text-sm tracking-tight text-slate-900 dark:text-white leading-tight capitalize truncate">
                                                 {formatFoodName(food.common_name || food.name)}
                                             </h3>
-                                            {food.quantity && (
-                                                <Badge className="mt-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[9px] border-none uppercase font-black tracking-tight">
-                                                    {truncateQuantity(food.quantity)}
-                                                </Badge>
-                                            )}
                                             <div className="flex lg:hidden items-center gap-2 mt-1.5 text-[9px] font-black">
                                                 <span className="text-blue-500">{formatEnergy(food.energy_kcal, energyUnit)}</span>
                                                 <span className="text-slate-300 text-[8px]">•</span>
