@@ -5,6 +5,9 @@ const nextConfig = {
   },
   images: {
     unoptimized: false,
+    remotePatterns: [
+      { protocol: 'https', hostname: '*.supabase.co' },
+    ],
   },
   async redirects() {
     return [

@@ -1,7 +1,8 @@
 ﻿'use client';
 
 import { useState, useEffect, useRef, useCallback, type Dispatch, type SetStateAction } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Image from 'next/image';
 import { Loader2, Check, Beef, Filter, ChevronDown, Leaf } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 
@@ -53,7 +54,6 @@ interface ExploreViewProps {
 }
 
 export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreViewProps) {
-    const router = useRouter();
     const { energyUnit } = useUserPreferences();
     const { searchQuery } = useSearch();
 
@@ -67,14 +67,11 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
     const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
-    // Auth — sets authReady once session is known, preventing premature fetches
+    // Auth — onAuthStateChange fires immediately with INITIAL_SESSION, so no getSession needed
     useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setUser(session?.user ?? null);
-            setAuthReady(true);
-        });
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
             setUser(session?.user ?? null);
+            setAuthReady(true);
         });
         return () => subscription.unsubscribe();
     }, []);
@@ -170,6 +167,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
     }, []);
 
     // Fetch immediately when filters or user changes (but only after auth is ready)
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- searchQuery intentionally omitted; the search effect owns it
     useEffect(() => {
         if (!authReady) return;
         fetchFoods(1, { q: searchQuery, favOnly: showFavoritesOnly, cats: selectedCategories, currentUser: user }, true);
@@ -291,7 +289,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                         <DropdownMenuContent align="start" className="w-56 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl p-2">
                                             <div className="px-2 py-1.5">
                                                 <div className="flex items-center justify-between py-2">
-                                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Favorites Only</span>
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Favourites Only</span>
                                                     <Switch checked={showFavoritesOnly} onCheckedChange={setShowFavoritesOnly} className="data-[state=checked]:bg-emerald-600" />
                                                 </div>
                                             </div>
@@ -349,16 +347,16 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                             )}
 
                             {foods.map((food) => (
-                                <div
+                                <Link
                                     key={food.id}
-                                    onClick={() => router.push(`/dashboard/ingredients/foods/${food.id}`)}
-                                    className="group bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer"
+                                    href={`/dashboard/ingredients/foods/${food.id}`}
+                                    className="group block bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:shadow-lg transition-all duration-300 overflow-hidden"
                                 >
                                     <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px] gap-3 lg:gap-4 lg:items-center lg:px-6 py-1 w-full">
                                         {/* Thumbnail */}
                                         <div className="aspect-square w-16 lg:w-12 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-300">
                                             {food.image ? (
-                                                <img src={food.image} alt={food.name} className="w-full h-full object-cover" />
+                                                <Image src={food.image} alt={food.name} fill className="object-cover" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-slate-300">
                                                     <Beef size={24} className="opacity-10" />
@@ -406,7 +404,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                             <span className="font-black text-[11px] text-emerald-500 dark:text-emerald-400">{food.protein_g.toFixed(1)}g</span>
                                         </div>
                                     </div>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     </>
