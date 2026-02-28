@@ -800,7 +800,10 @@ export function PantryView({
                                                                             <div className="flex items-center gap-2">
                                                                                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
                                                                                 {isBulkWeight ? (
-                                                                                    <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">{foodName}</span>
+                                                                                    <>
+                                                                                        <span className="text-sm font-black text-slate-800 dark:text-slate-200">{totalWeight != null ? formatGramsEntry(totalWeight) : ''}</span>
+                                                                                        <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">{foodName}</span>
+                                                                                    </>
                                                                                 ) : (
                                                                                     <>
                                                                                         <span className="text-sm font-black text-slate-800 dark:text-slate-200">{e.qty}</span>
@@ -818,7 +821,7 @@ export function PantryView({
                                                                                 {!isBulkWeight && e.label && e.weight_g != null && (
                                                                                     <span className="text-[10px] font-medium text-slate-400">{e.weight_g}{e.unit} each</span>
                                                                                 )}
-                                                                                {totalWeight != null && (
+                                                                                {!isBulkWeight && totalWeight != null && (
                                                                                     <span className="text-[11px] font-black text-white bg-emerald-500 px-2 py-1 rounded-md">{totalWeight.toLocaleString()}{e.unit} total</span>
                                                                                 )}
                                                                                 {e.weight_g == null && (
