@@ -992,8 +992,8 @@ export function PantryView({
 
         {/* Delete confirmation dialog */}
         {deleteConfirm && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 animate-in fade-in">
-                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 max-w-sm w-full mx-4 animate-in scale-in duration-200">
+            <div className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-8 pointer-events-none">
+                <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 max-w-sm w-full mx-4 animate-in fade-in scale-in duration-200 pointer-events-auto shadow-lg">
                     <h2 className="text-lg font-black uppercase tracking-wide text-slate-900 dark:text-white mb-2">Remove Item?</h2>
                     <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
                         Are you sure you want to remove <span className="font-semibold">{deleteConfirm.name}</span> from your pantry?
