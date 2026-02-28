@@ -192,6 +192,27 @@ export function PantryView({
         fetchPantry();
     }, [refreshKey]);
 
+    // Re-apply localStorage quantities when another component (e.g. mark-as-eaten) updates them
+    useEffect(() => {
+        const handleQuantitiesUpdated = () => {
+            try {
+                const savedQuantities = localStorage.getItem('pantry_quantities');
+                if (!savedQuantities) return;
+                const quantities: Record<string, string> = JSON.parse(savedQuantities);
+                setFoods(prev => prev.map(item => {
+                    if (quantities[item.id] !== undefined) {
+                        return { ...item, quantity: quantities[item.id] };
+                    }
+                    return item;
+                }));
+            } catch (e) {
+                console.error('Failed to re-apply pantry quantities', e);
+            }
+        };
+        window.addEventListener('pantry-quantities-updated', handleQuantitiesUpdated);
+        return () => window.removeEventListener('pantry-quantities-updated', handleQuantitiesUpdated);
+    }, []);
+
     // Fetch portions when a buyMoreItem is selected
     useEffect(() => {
         if (!buyMoreItem) { setBuyMorePortions([]); setBuyMoreSelectedPortion(null); return; }

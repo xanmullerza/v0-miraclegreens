@@ -514,6 +514,13 @@ export function MealPlannerContent({
                 const pFirstWord = pName.split(/[,\s]/)[0];
                 if (ingBase && ingBase.split(/[,\s]/)[0] === pFirstWord) return true;
                 if (ingName && ingName.split(/[,\s]/)[0] === pFirstWord) return true;
+                // 5. Word-set match: handles "Rice, White" <-> "White Rice" (USDA name reversal)
+                const pWords = new Set(pName.replace(/,/g, '').split(/\s+/).filter(Boolean));
+                const ingBaseWords = ingBase ? new Set(ingBase.replace(/,/g, '').split(/\s+/).filter(Boolean)) : null;
+                const ingNameWords = ingName ? new Set(ingName.replace(/,/g, '').split(/\s+/).filter(Boolean)) : null;
+                const setsEqual = (a: Set<string>, b: Set<string>) => a.size === b.size && [...a].every(w => b.has(w));
+                if (ingBaseWords && setsEqual(ingBaseWords, pWords)) return true;
+                if (ingNameWords && setsEqual(ingNameWords, pWords)) return true;
                 return false;
             });
             if (!matchItem) {
@@ -555,6 +562,8 @@ export function MealPlannerContent({
         console.log('[markEaten] Final quantities to save:', quantities);
         console.log('[markEaten] Total subtracted:', subtracted);
         localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+        // Notify any mounted pantry views to re-apply the updated quantities
+        window.dispatchEvent(new CustomEvent('pantry-quantities-updated'));
         setEatenMeals(prev => new Set([...prev, mealType]));
 
         if (subtracted > 0) {
