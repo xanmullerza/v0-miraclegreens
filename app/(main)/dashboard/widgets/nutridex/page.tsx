@@ -62,7 +62,7 @@ const NutrientItem = ({
         <div className="space-y-0.5">
             <div className="flex items-baseline gap-1">
                 <span className="text-xl font-black italic tracking-tighter text-slate-900 dark:text-white">
-                    {rda > 0 ? (rda >= 100 ? Math.round(rda) : parseFloat(rda.toFixed(1))) : '—'}
+                    {rda > 0 ? (rda >= 100 ? Math.round(rda) : parseFloat(rda.toFixed(1))) : 'ï¿½'}
                 </span>
                 <span className="text-[10px] font-bold text-muted-foreground">{unitStr}</span>
             </div>
@@ -121,7 +121,7 @@ const NutrientGrid = ({
                     let unitStr = (label === 'Energy') ? energyUnit :
                         (label === 'Protein' || label === 'Carbs' || label === 'Fat' || label === 'Fiber' || label === 'Sugars' || label === 'ALA' || label === 'Water') ? 'g' :
                             (label === 'Vitamin D') ? 'IU' :
-                                (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg')) ? 'µg' : 'mg';
+                                (label.includes('Folate') || label.includes('B12') || label.includes('Biotin') || label.includes('Selenium') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('ï¿½g')) ? 'ï¿½g' : 'mg';
 
                     const macroRDAs: Record<string, number> = {
                         'Energy': energyUnit === 'kJ' ? dailyTargets.energy * 4.184 : dailyTargets.energy,
