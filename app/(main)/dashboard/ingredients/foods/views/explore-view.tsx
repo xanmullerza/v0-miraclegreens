@@ -68,13 +68,18 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
     // Auth — getSession bootstraps authReady for SSR/HttpOnly-cookie configs where
-    // onAuthStateChange may not fire INITIAL_SESSION. onAuthStateChange handles live changes.
+    // onAuthStateChange may not fire INITIAL_SESSION. A resolved flag prevents the
+    // onAuthStateChange INITIAL_SESSION from triggering a redundant second setUser.
     useEffect(() => {
+        let resolvedViaGetSession = false;
         supabase.auth.getSession().then(({ data: { session } }) => {
+            resolvedViaGetSession = true;
             setUser(session?.user ?? null);
             setAuthReady(true);
         });
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            // Skip INITIAL_SESSION if getSession already handled it
+            if (event === 'INITIAL_SESSION' && resolvedViaGetSession) return;
             setUser(session?.user ?? null);
             setAuthReady(true);
         });
@@ -112,7 +117,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
             const { data, error, count } = await query;
             if (error) throw error;
 
-            let fetchedItems = (data as FoodItem[]) || [];
+            let fetchedItems = (data ?? []) as FoodItem[];
             const dbTotal = count ?? 0;
             const dbFetched = fetchedItems.length; // snapshot before local foods are prepended
 
@@ -350,7 +355,11 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                     <div className="w-14 h-14 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-dashed border-slate-200 dark:border-slate-700">
                                         <Leaf size={22} className="opacity-20" />
                                     </div>
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">No foods match your filters</p>
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                        {(showFavoritesOnly || selectedCategories.length > 0 || searchQuery)
+                                            ? 'No foods match your filters'
+                                            : 'No foods found'}
+                                    </p>
                                 </div>
                             )}
 
@@ -390,11 +399,11 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                             <div className="flex lg:hidden items-center gap-2 mt-1.5 text-[9px] font-black">
                                                 <span className="text-blue-500">{formatEnergy(food.energy_kcal, energyUnit)}</span>
                                                 <span className="text-slate-300 text-[8px]">•</span>
-                                                <span className="text-emerald-500">{food.protein_g.toFixed(0)}g P</span>
-                                                <span className="text-slate-300 text-[8px]">•</span>
                                                 <span className="text-amber-500">{food.carbs_g.toFixed(0)}g C</span>
                                                 <span className="text-slate-300 text-[8px]">•</span>
                                                 <span className="text-rose-500">{food.fat_g.toFixed(0)}g F</span>
+                                                <span className="text-slate-300 text-[8px]">•</span>
+                                                <span className="text-emerald-500">{food.protein_g.toFixed(0)}g P</span>
                                             </div>
                                         </div>
 
