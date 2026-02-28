@@ -239,46 +239,37 @@ Fat: ${food.fat_g || 0}g
         const file = e.target.files?.[0];
         if (!file) return;
 
+        if (!user) {
+            toast.error('You must be signed in to upload an image');
+            return;
+        }
+
         setUploading(true);
         try {
             const fileExt = file.name.split('.').pop();
             const fileName = `food-${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExt}`;
-            const filePath = fileName;
+            // Prefix with user ID — required by storage RLS policy
+            const filePath = `${user.id}/${fileName}`;
 
-            const { data, error: uploadError } = await supabase.storage
+            const { error: uploadError } = await supabase.storage
                 .from('food-items')
                 .upload(filePath, file, {
                     cacheControl: '3600',
-                    upsert: false
+                    upsert: true
                 });
 
-            if (uploadError) {
-                if (uploadError.message.includes('bucket not found')) {
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        setImage(reader.result as string);
-                        setUploading(false);
-                    };
-                    reader.readAsDataURL(file);
-                    return;
-                }
-                throw uploadError;
-            }
+            if (uploadError) throw uploadError;
 
             const { data: { publicUrl } } = supabase.storage
                 .from('food-items')
                 .getPublicUrl(filePath);
 
             setImage(publicUrl);
-            setUploading(false);
         } catch (err: any) {
-            console.error("Upload error:", err);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImage(reader.result as string);
-                setUploading(false);
-            };
-            reader.readAsDataURL(file);
+            console.error('Upload error:', err);
+            toast.error('Image upload failed — please try again');
+        } finally {
+            setUploading(false);
         }
     };
 
