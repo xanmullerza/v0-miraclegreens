@@ -766,31 +766,31 @@ export function PantryView({
                                                     </div>
 
                                                     <div className="flex-1 min-w-0">
-                                                        <div className="flex items-center gap-1.5">
+                                                        <div className="flex items-center gap-2">
                                                             <span className="font-black text-xs uppercase tracking-wide text-slate-900 dark:text-white truncate">
                                                                 {formatFoodName(food.common_name || food.name)}
                                                             </span>
-                                                        </div>
-                                                        {(() => {
-                                                            const rawEntries = parseQuantityEntries(food.quantity);
-                                                            if (rawEntries.length === 0) return <span className="text-xs text-slate-400">In Stock</span>;
-                                                            // Consolidate pure-weight entries for display
-                                                            let weightGramsTotal = 0;
-                                                            const nonWeightStrs: string[] = [];
-                                                            for (const raw of rawEntries) {
-                                                                const parsed = parseQuantityEntry(raw);
-                                                                if (parsed.qty > 0 && isWeightOnlyEntry(parsed)) {
-                                                                    weightGramsTotal += entryTotalGrams(parsed);
-                                                                } else if (parsed.qty > 0) {
-                                                                    nonWeightStrs.push(raw);
+                                                            {(() => {
+                                                                const rawEntries = parseQuantityEntries(food.quantity);
+                                                                if (rawEntries.length === 0) return <span className="text-[10px] font-bold text-slate-300 dark:text-slate-600 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800">In Stock</span>;
+                                                                // Consolidate pure-weight entries for display
+                                                                let weightGramsTotal = 0;
+                                                                const nonWeightStrs: string[] = [];
+                                                                for (const raw of rawEntries) {
+                                                                    const parsed = parseQuantityEntry(raw);
+                                                                    if (parsed.qty > 0 && isWeightOnlyEntry(parsed)) {
+                                                                        weightGramsTotal += entryTotalGrams(parsed);
+                                                                    } else if (parsed.qty > 0) {
+                                                                        nonWeightStrs.push(raw);
+                                                                    }
                                                                 }
-                                                            }
-                                                            const consolidated: string[] = [...nonWeightStrs];
-                                                            if (weightGramsTotal > 0) consolidated.push(formatGramsEntry(weightGramsTotal));
-                                                            if (consolidated.length === 0) return <span className="text-xs text-slate-400">In Stock</span>;
-                                                            if (consolidated.length === 1) return <span className="text-xs text-slate-500 dark:text-slate-400">{consolidated[0]}</span>;
-                                                            return <span className="text-xs text-slate-500 dark:text-slate-400">{consolidated.length} stock entries</span>;
-                                                        })()}
+                                                                const consolidated: string[] = [...nonWeightStrs];
+                                                                if (weightGramsTotal > 0) consolidated.push(formatGramsEntry(weightGramsTotal));
+                                                                if (consolidated.length === 0) return <span className="text-[10px] font-bold text-slate-300 dark:text-slate-600 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800">In Stock</span>;
+                                                                if (consolidated.length === 1) return <span className="text-[10px] font-bold text-white bg-emerald-500 px-2.5 py-1 rounded-md whitespace-nowrap">{consolidated[0]}</span>;
+                                                                return <span className="text-[10px] font-bold text-white bg-emerald-500 px-2.5 py-1 rounded-md whitespace-nowrap">{consolidated.length} entries</span>;
+                                                            })()}
+                                                        </div>
                                                     </div>
 
                                                     <button
