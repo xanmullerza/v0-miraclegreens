@@ -757,9 +757,6 @@ export function PantryView({
                                                             </span>
                                                             {(() => {
                                                                 const rawEntries = parseQuantityEntries(food.quantity);
-                                                                if (food.common_name?.toLowerCase().includes('potato')) {
-                                                                    console.log('[DEBUG] Potatoes badge:', { quantity: food.quantity, rawEntries, parsed: rawEntries.map(r => parseQuantityEntry(r)) });
-                                                                }
                                                                 if (rawEntries.length === 0) return <span className="text-[10px] font-bold text-slate-300 dark:text-slate-600 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800">In Stock</span>;
                                                                 // Consolidate pure-weight entries for display
                                                                 let weightGramsTotal = 0;
@@ -773,7 +770,7 @@ export function PantryView({
                                                                     }
                                                                 }
                                                                 const consolidated: string[] = [...nonWeightStrs];
-                                                                if (weightGramsTotal > 0) consolidated.push(formatGramsEntry(weightGramsTotal));
+                                                                if (weightGramsTotal >= 0) consolidated.push(formatGramsEntry(weightGramsTotal));
                                                                 if (consolidated.length === 0) return <span className="text-[10px] font-bold text-slate-300 dark:text-slate-600 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800">In Stock</span>;
                                                                 // Always show aggregate weight total
                                                                 let totalGramsAll = weightGramsTotal;
@@ -837,7 +834,7 @@ export function PantryView({
                                                         }
                                                     }
                                                     const entries = [...nonWeightEntries];
-                                                    if (weightGramsTotal > 0) {
+                                                    if (weightGramsTotal >= 0) {
                                                         entries.push(parseQuantityEntry(formatGramsEntry(weightGramsTotal)));
                                                     }
                                                     const foodName = formatFoodName(food.common_name || food.name);
