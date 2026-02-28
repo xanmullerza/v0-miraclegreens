@@ -787,8 +787,8 @@ export function PantryView({
                                                                 const consolidated: string[] = [...nonWeightStrs];
                                                                 if (weightGramsTotal > 0) consolidated.push(formatGramsEntry(weightGramsTotal));
                                                                 if (consolidated.length === 0) return <span className="text-[10px] font-bold text-slate-300 dark:text-slate-600 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800">In Stock</span>;
-                                                                if (consolidated.length === 1) return <span className="text-[10px] font-bold text-white bg-emerald-500 px-2.5 py-1 rounded-md whitespace-nowrap">{consolidated[0]}</span>;
-                                                                return <span className="text-[10px] font-bold text-white bg-emerald-500 px-2.5 py-1 rounded-md whitespace-nowrap">{consolidated.length} entries</span>;
+                                                                if (consolidated.length === 1) return <span className="text-[10px] font-bold text-white bg-emerald-700 px-2.5 py-1 rounded-md whitespace-nowrap">{consolidated[0]}</span>;
+                                                                return <span className="text-[10px] font-bold text-white bg-emerald-700 px-2.5 py-1 rounded-md whitespace-nowrap">{consolidated.length} entries</span>;
                                                             })()}
                                                         </div>
                                                     </div>
