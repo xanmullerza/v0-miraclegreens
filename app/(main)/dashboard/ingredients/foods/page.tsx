@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Leaf, Plus } from 'lucide-react';
 import { ExploreView } from './views/explore-view';
 import { PageContainer } from '@/components/ui/page-container';
@@ -14,6 +14,10 @@ export default function IngredientsPage() {
     const { searchQuery, setSearchQuery } = useSearch();
     const [isSearchActive, setIsSearchActive] = useState(false);
     const [showAddFood, setShowAddFood] = useState(false);
+
+    // Clear the shared search query when leaving this page so other pages
+    // (pantry, groceries) are not filtered by a food-page search term.
+    useEffect(() => () => setSearchQuery(''), [setSearchQuery]);
 
     return (
         <PageContainer maxWidth="max-w-7xl">
