@@ -289,10 +289,16 @@ export function PantryView({
                 : consolidated;
         }
 
-        // For non-weight entries (e.g. "5 Large (223g)"), match by label + weight_g as before
+        // For non-weight entries (e.g. "5 Large (223g)"), match by label (case-insensitive) + approximate weight_g
         const matchIndex = existingEntries.findIndex(e => {
             const a = parseQuantityEntry(e);
-            return a.label === b.label && a.weight_g === b.weight_g && a.unit === b.unit;
+            if (!b.label || !a.label) return a.label === b.label && a.weight_g === b.weight_g && a.unit === b.unit;
+            // Case-insensitive label match + weight within 1g tolerance (handles DB float precision)
+            const labelMatch = a.label.toLowerCase() === b.label.toLowerCase();
+            const weightClose = a.weight_g != null && b.weight_g != null
+                ? Math.abs(a.weight_g - b.weight_g) < 1
+                : a.weight_g === b.weight_g;
+            return labelMatch && weightClose;
         });
         if (matchIndex >= 0) {
             const a = parseQuantityEntry(existingEntries[matchIndex]);
@@ -804,7 +810,18 @@ export function PantryView({
                                                         if (isWeightOnlyEntry(e)) {
                                                             weightGramsTotal += entryTotalGrams(e);
                                                         } else {
-                                                            nonWeightEntries.push(e);
+                                                            // Consolidate non-weight entries with same label (e.g. merge multiple "1 Cup (21g)" into "3 Cup (21g)")
+                                                            const existing = nonWeightEntries.find(n =>
+                                                                n.label && e.label &&
+                                                                n.label.toLowerCase() === e.label.toLowerCase() &&
+                                                                n.weight_g != null && e.weight_g != null &&
+                                                                Math.abs(n.weight_g - e.weight_g) < 1
+                                                            );
+                                                            if (existing) {
+                                                                existing.qty += e.qty;
+                                                            } else {
+                                                                nonWeightEntries.push({ ...e });
+                                                            }
                                                         }
                                                     }
                                                     const entries = [...nonWeightEntries];
