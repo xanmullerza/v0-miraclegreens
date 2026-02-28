@@ -1053,30 +1053,30 @@ export function PantryView({
 
                                                 {/* Expanded action buttons - shown when expanded */}
                                                 {expandedQuantityId === food.id && (
-                                                    <div className="flex items-center gap-1 justify-end px-3 py-2 bg-slate-50 dark:bg-slate-900/30 border border-t-0 border-slate-200 dark:border-slate-700 rounded-b-xl">
+                                                    <div className="flex items-center gap-2 justify-center px-3 py-3 bg-slate-50 dark:bg-slate-900/30 border border-t-0 border-slate-200 dark:border-slate-700 rounded-b-xl">
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); openBuyMore(food); }}
-                                                            className="p-1.5 rounded-lg transition-all flex-shrink-0 text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500"
+                                                            className="p-2.5 rounded-lg transition-all flex-shrink-0 text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500"
                                                             title="Update quantity / add to list"
                                                         >
-                                                            <Plus size={14} />
+                                                            <Plus size={18} />
                                                         </button>
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); openRemove(food); }}
-                                                            className="p-1.5 rounded-lg transition-all flex-shrink-0 text-slate-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500"
+                                                            className="p-2.5 rounded-lg transition-all flex-shrink-0 text-slate-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500"
                                                             title="Remove/discard quantity"
                                                         >
-                                                            <Minus size={14} />
+                                                            <Minus size={18} />
                                                         </button>
                                                         <button
                                                             onClick={(e) => { 
                                                                 e.stopPropagation(); 
                                                                 confirmDelete(food.id, food.name, food.common_name || '', food.source_table || 'food_items');
                                                             }}
-                                                            className="p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-300 dark:text-slate-600 hover:text-rose-500 transition-all flex-shrink-0"
+                                                            className="p-2.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-300 dark:text-slate-600 hover:text-rose-500 transition-all flex-shrink-0"
                                                             title="Remove from pantry"
                                                         >
-                                                            <X size={14} />
+                                                            <X size={18} />
                                                         </button>
                                                     </div>
                                                 )}
