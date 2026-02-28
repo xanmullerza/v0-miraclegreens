@@ -577,6 +577,14 @@ export function MealPlannerContent({
 
         console.log('[markEaten] Final quantities to save:', quantities);
         console.log('[markEaten] Total subtracted:', subtracted);
+        
+        // Log if any item is being set to 0
+        Object.entries(quantities).forEach(([id, qty]) => {
+            if (qty === '0 grams' || qty === '0 g' || qty === '0') {
+                console.warn('[markEaten] ⚠️ Item zeroed out!', { id, quantity: qty, recipe: recipe.title });
+            }
+        });
+        
         localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
         // Notify any mounted pantry views to re-apply the updated quantities
         window.dispatchEvent(new CustomEvent('pantry-quantities-updated'));

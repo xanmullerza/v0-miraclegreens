@@ -260,7 +260,12 @@ export function PantryView({
     };
 
     const mergeQuantityStrings = (existing: string | undefined, incoming: string): string => {
-        if (!existing) return incoming;
+        if (!existing) {
+            if (existing === '' || existing === '0' || existing === '0 grams') {
+                console.log('[pantry-view] mergeQuantityStrings: existing was zero/empty, returning incoming', { existing, incoming });
+            }
+            return incoming;
+        }
         // Drop zero-quantity entries before merging (e.g. '0' left after items are consumed)
         const existingEntries = existing.split(/\s*\+\s*/).map(s => s.trim()).filter(s => {
             if (!s) return false;
@@ -268,7 +273,10 @@ export function PantryView({
             return e.qty > 0;
         });
         // If all existing entries were zeros, just return incoming
-        if (existingEntries.length === 0) return incoming;
+        if (existingEntries.length === 0) {
+            console.log('[pantry-view] mergeQuantityStrings: all existing entries were zero, returning incoming', { existing, incoming });
+            return incoming;
+        }
         const b = parseQuantityEntry(incoming);
 
         // If incoming is a pure weight entry, consolidate with ALL existing weight entries
@@ -330,6 +338,7 @@ export function PantryView({
                 const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
                 const currentQty = quantities[buyMoreItem.id] || buyMoreItem.quantity;
                 const merged = mergeQuantityStrings(currentQty, quantityString);
+                console.log('[handleBuyMoreAdd]', buyMoreItem.common_name || buyMoreItem.name, { currentQty, quantityString, merged: merged });
                 quantities[buyMoreItem.id] = merged;
                 localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
                 setFoods(prev => prev.map(f => f.id === buyMoreItem.id ? { ...f, quantity: merged } : f));
@@ -466,6 +475,7 @@ export function PantryView({
 
     const removeFromPantry = async (id: string, name: string, source: string = 'food_items') => {
         try {
+            console.log('[removeFromPantry]', name, { id, source });
             let error;
 
             if (source === 'pantry_items') {
@@ -538,6 +548,7 @@ export function PantryView({
         // Update UI immediately
         setFoods(prev => prev.map(f => f.id === item.id ? { ...f, quantity: quantityString } : f));
         setBuyMoreItem(null);
+        console.log('[updatePantryQuantity]', item.common_name || item.name, { quantityString });
         toast.success(`Updated quantity for "${item.name}"`);
 
         // Persist to localStorage (works without login)
