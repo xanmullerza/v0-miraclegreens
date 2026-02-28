@@ -1262,35 +1262,6 @@ export function PantryView({
                                             </>
                                         )}
 
-                                        {buyMorePortions.length > 0 && (
-                                            <button
-                                                onClick={() => {
-                                                    if (buyMoreSelectedPortion) {
-                                                        setBuyMoreWeight(`${buyMoreSelectedPortion.weight_g}`);
-                                                        setBuyMoreUnit('g');
-                                                        setBuyMoreSelectedPortion(null);
-                                                    } else {
-                                                        setBuyMoreSelectedPortion(buyMorePortions[0]);
-                                                    }
-                                                }}
-                                                className="text-xs font-black uppercase tracking-widest text-amber-500 hover:text-amber-600 transition-colors"
-                                            >
-                                                {buyMoreSelectedPortion ? 'Use Weight' : 'Use Serving'}
-                                            </button>
-                                        )}
-
-                                        <div>
-                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Destination</Label>
-                                            <select
-                                                value={quickAddMode}
-                                                onChange={(e) => setQuickAddMode(e.target.value as 'pantry' | 'shopping')}
-                                                className="w-full px-3 py-2 h-10 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                            >
-                                                <option value="pantry">Pantry</option>
-                                                <option value="shopping">Groceries</option>
-                                            </select>
-                                        </div>
-
                                         <Button
                                             onClick={() => {
                                                 handleBuyMoreAdd();
@@ -1382,23 +1353,6 @@ export function PantryView({
                                                     </div>
                                                 </div>
                                             </>
-                                        )}
-
-                                        {removePortions.length > 0 && (
-                                            <button
-                                                onClick={() => {
-                                                    if (removeSelectedPortion) {
-                                                        setRemoveWeight(`${removeSelectedPortion.weight_g}`);
-                                                        setRemoveUnit('g');
-                                                        setRemoveSelectedPortion(null);
-                                                    } else {
-                                                        setRemoveSelectedPortion(removePortions[0]);
-                                                    }
-                                                }}
-                                                className="text-xs font-black uppercase tracking-widest text-rose-500 hover:text-rose-600 transition-colors"
-                                            >
-                                                {removeSelectedPortion ? 'Use Weight' : 'Use Serving'}
-                                            </button>
                                         )}
 
                                         <Button
