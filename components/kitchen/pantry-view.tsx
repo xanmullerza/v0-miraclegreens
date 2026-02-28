@@ -452,13 +452,16 @@ export function PantryView({
             // Merge in locally-stored quantities (persists without login)
             try {
                 const savedQuantities = localStorage.getItem('pantry_quantities');
+                console.log('[pantry-view] localStorage pantry_quantities:', savedQuantities);
                 if (savedQuantities) {
                     const quantities: Record<string, string> = JSON.parse(savedQuantities);
                     combined.forEach(item => {
-                        if (quantities[item.id]) {
+                        if (quantities[item.id] !== undefined) {
+                            console.log('[pantry-view] Applying localStorage quantity for', item.name || item.common_name, ':', quantities[item.id], '(was:', item.quantity, ')');
                             item.quantity = quantities[item.id];
                         }
                     });
+                }
                 }
             } catch (e) {
                 console.error('Failed to load saved quantities', e);

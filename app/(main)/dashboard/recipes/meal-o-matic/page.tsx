@@ -416,6 +416,27 @@ export function MealPlannerContent({
             // "1 x 100g" or "1 x 100ml"
             const weighted = entry.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(g|ml)$/i);
             if (weighted) { total += parseFloat(weighted[1]) * parseFloat(weighted[2]); hasWeight = true; continue; }
+            // "1 kilogram" or "0.7 kilograms" or "10 kg" or "10kg"
+            const kgFmt = entry.match(/^(\d+(?:\.\d+)?)\s*(?:kg|kilograms?|kilogrammes?)$/i);
+            if (kgFmt) { total += parseFloat(kgFmt[1]) * 1000; hasWeight = true; continue; }
+            // "300 grams" or "1 gram" or "500g" or "500 g"
+            const gramFmt = entry.match(/^(\d+(?:\.\d+)?)\s*(?:g|grams?|grammes?)$/i);
+            if (gramFmt) { total += parseFloat(gramFmt[1]); hasWeight = true; continue; }
+            // "10 ml" (treat ml as g for water-based items)
+            const mlFmt = entry.match(/^(\d+(?:\.\d+)?)\s*(?:ml|millilitres?|milliliters?)$/i);
+            if (mlFmt) { total += parseFloat(mlFmt[1]); hasWeight = true; continue; }
+            // "10 lb" (pounds)
+            const lbFmt = entry.match(/^(\d+(?:\.\d+)?)\s*(?:lb|lbs|pounds?)$/i);
+            if (lbFmt) { total += parseFloat(lbFmt[1]) * 453.592; hasWeight = true; continue; }
+            // "10 oz" (ounces)
+            const ozFmt = entry.match(/^(\d+(?:\.\d+)?)\s*(?:oz|ounces?)$/i);
+            if (ozFmt) { total += parseFloat(ozFmt[1]) * 28.3495; hasWeight = true; continue; }
+            // Plain number with no unit (e.g. "1") - treat as kilograms
+            const plainNum = entry.match(/^(\d+(?:\.\d+)?)$/);
+            if (plainNum) { total += parseFloat(plainNum[1]) * 1000; hasWeight = true; continue; }
+        }
+        return hasWeight ? total : null;
+    };
             // plain grams e.g. "500g" or "500 g"
             const plainG = entry.match(/^(\d+(?:\.\d+)?)\s*g$/i);
             if (plainG) { total += parseFloat(plainG[1]); hasWeight = true; continue; }
@@ -462,9 +483,17 @@ export function MealPlannerContent({
 
         let subtracted = 0;
 
+        console.log('[markEaten] Recipe:', recipe.title, 'Servings:', servings);
+        console.log('[markEaten] Ingredients:', ingredients.map(i => ({ item: i.item, baseIngredient: i.baseIngredient, food_item_id: i.food_item_id, weightG: i.weightG })));
+        console.log('[markEaten] Pantry items:', pantryItems.map(p => ({ id: p.id, name: p.name, common_name: p.common_name })));
+        console.log('[markEaten] Current localStorage quantities:', quantities);
+
         for (const ing of ingredients) {
             const weightToSubtract = (ing.weightG ?? 0) * servings;
-            if (!weightToSubtract) continue;
+            if (!weightToSubtract) {
+                console.log('[markEaten] Skipping (no weightG):', ing.item, 'weightG:', ing.weightG);
+                continue;
+            }
 
             // Find matching pantry item by food_item_id or name
             const matchItem = pantryItems.find(p =>
@@ -472,13 +501,23 @@ export function MealPlannerContent({
                 (ing.baseIngredient && (p.common_name || p.name)?.toLowerCase().trim() === ing.baseIngredient.toLowerCase().trim()) ||
                 (ing.item && (p.common_name || p.name)?.toLowerCase().trim() === ing.item.toLowerCase().trim())
             );
-            if (!matchItem) continue;
+            if (!matchItem) {
+                console.log('[markEaten] No pantry match for:', ing.item, 'baseIngredient:', ing.baseIngredient, 'food_item_id:', ing.food_item_id);
+                continue;
+            }
+
+            console.log('[markEaten] Matched:', ing.item, '->', matchItem.name, '(id:', matchItem.id, ')');
 
             const currentQtyStr = quantities[matchItem.id] || matchItem.quantity || '';
             const totalG = parseTotalGrams(currentQtyStr);
-            if (totalG === null) continue;
+            console.log('[markEaten] currentQtyStr:', JSON.stringify(currentQtyStr), '-> totalG:', totalG, '- weightToSubtract:', weightToSubtract);
+            if (totalG === null) {
+                console.log('[markEaten] parseTotalGrams returned null, skipping');
+                continue;
+            }
 
             const remaining = Math.max(0, totalG - weightToSubtract);
+            console.log('[markEaten] remaining:', remaining, '= totalG:', totalG, '- subtract:', weightToSubtract);
             if (remaining > 0) {
                 if (remaining >= 1000) {
                     const kg = remaining / 1000;
@@ -494,15 +533,20 @@ export function MealPlannerContent({
             } else {
                 quantities[matchItem.id] = '0';
             }
+            console.log('[markEaten] New quantity for', matchItem.name, ':', quantities[matchItem.id]);
             subtracted++;
         }
 
+        console.log('[markEaten] Final quantities to save:', quantities);
+        console.log('[markEaten] Total subtracted:', subtracted);
         localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
         setEatenMeals(prev => new Set([...prev, mealType]));
 
         if (subtracted > 0) {
+            // Verify the save worked
+            const verify = localStorage.getItem('pantry_quantities');
+            console.log('[markEaten] VERIFIED localStorage after save:', verify);
             toast.success(`Marked as eaten. ${subtracted} pantry item${subtracted !== 1 ? 's' : ''} updated`);
-            window.location.reload();
         } else {
             toast.success(`${recipe.title} marked as eaten`);
         }
