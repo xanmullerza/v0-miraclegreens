@@ -443,7 +443,8 @@ export function MealPlannerContent({
     const formatWeightStr = (grams: number): string => {
         if (grams >= 1000) {
             const kg = grams / 1000;
-            const kgStr = kg % 1 === 0 ? kg.toString() : kg.toFixed(1);
+            // Use up to 3 decimal places, stripping trailing zeros
+            const kgStr = parseFloat(kg.toFixed(3)).toString();
             const kgNum = parseFloat(kgStr);
             const unit = kgNum === 1 ? 'kilogram' : 'kilograms';
             return `${kgStr} ${unit}`;
@@ -486,8 +487,8 @@ export function MealPlannerContent({
 
         console.log('[markEaten] Recipe:', recipe.title, 'Servings:', servings);
         console.log('[markEaten] Ingredients:', ingredients.map(i => ({ item: i.item, baseIngredient: i.baseIngredient, food_item_id: i.food_item_id, weightG: i.weightG })));
-        console.log('[markEaten] Pantry items:', pantryItems.map(p => ({ id: p.id, name: p.name, common_name: p.common_name })));
-        console.log('[markEaten] Current localStorage quantities:', quantities);
+        console.log('[markEaten] Pantry items:', pantryItems.length, pantryItems.map(p => ({ id: p.id, name: p.name, common_name: p.common_name })));
+        console.log('[markEaten] Current localStorage quantities:', JSON.stringify(quantities));
 
         for (const ing of ingredients) {
             const weightToSubtract = (ing.weightG ?? 0) * servings;
@@ -496,67 +497,81 @@ export function MealPlannerContent({
                 continue;
             }
 
-            // Find matching pantry item by food_item_id or name (exact, then partial/fuzzy)
-            const ingName = (ing.item || '').toLowerCase().trim();
-            const ingBase = (ing.baseIngredient || '').toLowerCase().trim();
-            const matchItem = pantryItems.find(p => {
-                // 1. Match by food_item_id
-                if (ing.food_item_id && p.id === ing.food_item_id) return true;
-                const pName = (p.common_name || p.name || '').toLowerCase().trim();
-                // 2. Exact match on name or baseIngredient
-                if (ingBase && pName === ingBase) return true;
-                if (ingName && pName === ingName) return true;
-                // 3. Partial match: pantry name starts with ingredient name, or ingredient name starts with pantry name
-                //    e.g. "Blueberries" matches "Blueberries, Fresh", "Peach" matches "Peach, Fresh"
-                if (ingBase && (pName.startsWith(ingBase) || ingBase.startsWith(pName))) return true;
-                if (ingName && (pName.startsWith(ingName) || ingName.startsWith(pName))) return true;
-                // 4. Check if the first word matches (e.g. "Blueberries" in "Blueberries, Fresh")
-                const pFirstWord = pName.split(/[,\s]/)[0];
-                if (ingBase && ingBase.split(/[,\s]/)[0] === pFirstWord) return true;
-                if (ingName && ingName.split(/[,\s]/)[0] === pFirstWord) return true;
-                // 5. Word-set match: handles "Rice, White" <-> "White Rice" (USDA name reversal)
-                const splitWords = (str: string): Set<string> => new Set<string>(str.replace(/,/g, '').split(/\s+/).filter((s: string) => s.length > 0));
-                const pWords = splitWords(pName);
-                const ingBaseWords = ingBase ? splitWords(ingBase) : null;
-                const ingNameWords = ingName ? splitWords(ingName) : null;
-                const setsEqual = (a: Set<string>, b: Set<string>) => a.size === b.size && [...a].every(w => b.has(w));
-                if (ingBaseWords && setsEqual(ingBaseWords, pWords)) return true;
-                if (ingNameWords && setsEqual(ingNameWords, pWords)) return true;
-                return false;
-            });
-            if (!matchItem) {
-                console.log('[markEaten] No pantry match for:', ing.item, 'baseIngredient:', ing.baseIngredient, 'food_item_id:', ing.food_item_id);
+            // Strategy: find the pantry item ID for this ingredient
+            // 1. Direct food_item_id lookup — most reliable (bypasses pantryItems state)
+            let itemId: string | null = null;
+            if (ing.food_item_id && quantities[ing.food_item_id] !== undefined) {
+                itemId = ing.food_item_id;
+                console.log('[markEaten] Direct food_item_id match in localStorage:', ing.item, '->', itemId);
+            }
+
+            // 2. food_item_id exists but not in localStorage yet — check pantryItems for the ID
+            if (!itemId && ing.food_item_id) {
+                const pantryMatch = pantryItems.find(p => p.id === ing.food_item_id);
+                if (pantryMatch) {
+                    itemId = pantryMatch.id;
+                    console.log('[markEaten] food_item_id matched pantry item:', ing.item, '->', pantryMatch.name || pantryMatch.common_name);
+                }
+            }
+
+            // 3. Fuzzy name matching against pantryItems
+            if (!itemId) {
+                const ingName = (ing.item || '').toLowerCase().trim();
+                const ingBase = (ing.baseIngredient || '').toLowerCase().trim();
+                const matchItem = pantryItems.find(p => {
+                    const pName = (p.common_name || p.name || '').toLowerCase().trim();
+                    // Exact match
+                    if (ingBase && pName === ingBase) return true;
+                    if (ingName && pName === ingName) return true;
+                    // Partial match
+                    if (ingBase && (pName.startsWith(ingBase) || ingBase.startsWith(pName))) return true;
+                    if (ingName && (pName.startsWith(ingName) || ingName.startsWith(pName))) return true;
+                    // First word match
+                    const pFirstWord = pName.split(/[,\s]/)[0];
+                    if (ingBase && ingBase.split(/[,\s]/)[0] === pFirstWord) return true;
+                    if (ingName && ingName.split(/[,\s]/)[0] === pFirstWord) return true;
+                    // Word-set match (handles "Rice, White" <-> "White Rice")
+                    const splitWords = (str: string): Set<string> => new Set<string>(str.replace(/,/g, '').split(/\s+/).filter((s: string) => s.length > 0));
+                    const pWords = splitWords(pName);
+                    const ingBaseWords = ingBase ? splitWords(ingBase) : null;
+                    const ingNameWords = ingName ? splitWords(ingName) : null;
+                    const setsEqual = (a: Set<string>, b: Set<string>) => a.size === b.size && [...a].every(w => b.has(w));
+                    if (ingBaseWords && setsEqual(ingBaseWords, pWords)) return true;
+                    if (ingNameWords && setsEqual(ingNameWords, pWords)) return true;
+                    return false;
+                });
+                if (matchItem) {
+                    itemId = matchItem.id;
+                    console.log('[markEaten] Name-matched:', ing.item, '->', matchItem.name || matchItem.common_name, '(id:', matchItem.id, ')');
+                }
+            }
+
+            // 4. Last resort: scan ALL localStorage quantity keys against food_items by food_item_id
+            //    (catches cases where pantryItems didn't load yet)
+            if (!itemId && ing.food_item_id) {
+                if (ing.food_item_id in quantities) {
+                    itemId = ing.food_item_id;
+                    console.log('[markEaten] Found food_item_id in localStorage keys as fallback:', itemId);
+                }
+            }
+
+            if (!itemId) {
+                console.log('[markEaten] No match for:', ing.item, 'baseIngredient:', ing.baseIngredient, 'food_item_id:', ing.food_item_id);
                 continue;
             }
 
-            console.log('[markEaten] Matched:', ing.item, '->', matchItem.name, '(id:', matchItem.id, ')');
-
-            const currentQtyStr = quantities[matchItem.id] || matchItem.quantity || '';
+            const currentQtyStr = quantities[itemId] || '';
             const totalG = parseTotalGrams(currentQtyStr);
-            console.log('[markEaten] currentQtyStr:', JSON.stringify(currentQtyStr), '-> totalG:', totalG, '- weightToSubtract:', weightToSubtract);
-            if (totalG === null) {
-                console.log('[markEaten] parseTotalGrams returned null, skipping');
+            console.log('[markEaten] itemId:', itemId, 'currentQtyStr:', JSON.stringify(currentQtyStr), '-> totalG:', totalG, '- weightToSubtract:', weightToSubtract);
+            if (totalG === null || totalG === 0) {
+                console.log('[markEaten] No parseable quantity, skipping');
                 continue;
             }
 
             const remaining = Math.max(0, totalG - weightToSubtract);
             console.log('[markEaten] remaining:', remaining, '= totalG:', totalG, '- subtract:', weightToSubtract);
-            if (remaining > 0) {
-                if (remaining >= 1000) {
-                    const kg = remaining / 1000;
-                    const kgStr = kg % 1 === 0 ? kg.toString() : kg.toFixed(1);
-                    const kgNum = parseFloat(kgStr);
-                    const unit = kgNum === 1 ? 'kilogram' : 'kilograms';
-                    quantities[matchItem.id] = `${kgStr} ${unit}`;
-                } else {
-                    const gramsNum = Math.round(remaining);
-                    const unit = gramsNum === 1 ? 'gram' : 'grams';
-                    quantities[matchItem.id] = `${gramsNum} ${unit}`;
-                }
-            } else {
-                quantities[matchItem.id] = '0';
-            }
-            console.log('[markEaten] New quantity for', matchItem.name, ':', quantities[matchItem.id]);
+            quantities[itemId] = formatWeightStr(remaining);
+            console.log('[markEaten] New quantity for', itemId, ':', quantities[itemId]);
             subtracted++;
         }
 
@@ -573,7 +588,9 @@ export function MealPlannerContent({
             console.log('[markEaten] VERIFIED localStorage after save:', verify);
             toast.success(`Marked as eaten. ${subtracted} pantry item${subtracted !== 1 ? 's' : ''} updated`);
         } else {
-            toast.success(`${recipe.title} marked as eaten`);
+            const unmatched = ingredients.filter(i => (i.weightG ?? 0) > 0).map(i => i.item).join(', ');
+            console.log('[markEaten] No items subtracted. Unmatched ingredients:', unmatched);
+            toast.success(`${recipe.title} marked as eaten (no pantry items matched: ${unmatched || 'none had weight'})`);
         }
     };
 
