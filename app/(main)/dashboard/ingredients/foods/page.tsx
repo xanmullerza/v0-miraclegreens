@@ -8,6 +8,7 @@ import { HeroSearch } from '@/components/ui/hero-search';
 import { useSearch } from '@/lib/context/search-context';
 
 const noop = () => {};
+const EMPTY: never[] = [];
 
 export default function IngredientsPage() {
     const { searchQuery, setSearchQuery } = useSearch();
@@ -20,7 +21,7 @@ export default function IngredientsPage() {
                 <HeroSearch
                     searchQuery={searchQuery}
                     onQueryChange={setSearchQuery}
-                    results={[]}
+                    results={EMPTY}
                     isLoading={false}
                     isActive={isSearchActive}
                     setIsActive={setIsSearchActive}
