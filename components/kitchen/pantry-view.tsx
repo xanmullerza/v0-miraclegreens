@@ -343,10 +343,52 @@ export function PantryView({
                 } else {
                     console.log('[handleBuyMoreAdd]', buyMoreItem.common_name || buyMoreItem.name, { currentQty, quantityString, merged: merged });
                 }
-                quantities[buyMoreItem.id] = merged;
-                localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-                setFoods(prev => prev.map(f => f.id === buyMoreItem.id ? { ...f, quantity: merged } : f));
-                toast.success(`Updated quantity for ${buyMoreItem.common_name || buyMoreItem.name}`);
+                
+                // Check if merged result is 0 - if so, move to shopping list
+                const parseTest = parseQuantityEntry(merged);
+                const totalGrams = (parseTest.qty || 0) * (parseTest.weight_g || 0);
+                const isZero = totalGrams === 0 || merged === '0' || merged === '';
+                
+                if (isZero) {
+                    console.log('[handleBuyMoreAdd] Merged quantity is 0, moving to shopping list:', buyMoreItem.common_name || buyMoreItem.name);
+                    
+                    // Add to shopping list
+                    const shoppingList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
+                    shoppingList.push({
+                        id: `replenish-${Date.now()}-${buyMoreItem.id}`,
+                        name: `Replenish: ${buyMoreItem.common_name || buyMoreItem.name}`,
+                        quantity: 'As needed',
+                        unit: '',
+                        checked: false,
+                        source: 'auto-replenish'
+                    });
+                    localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(shoppingList));
+                    
+                    // Remove from pantry
+                    delete quantities[buyMoreItem.id];
+                    localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+                    
+                    if (buyMoreItem.source_table === 'food_items') {
+                        await supabase
+                            .from('food_items')
+                            .update({ is_in_pantry: false } as any)
+                            .eq('id', buyMoreItem.id);
+                    } else if (buyMoreItem.source_table === 'pantry_items') {
+                        await supabase
+                            .from('pantry_items')
+                            .delete()
+                            .eq('id', buyMoreItem.id);
+                    }
+                    
+                    setFoods(prev => prev.filter(f => f.id !== buyMoreItem.id));
+                    toast.success(`${buyMoreItem.common_name || buyMoreItem.name} moved to shopping list`);
+                    window.dispatchEvent(new CustomEvent('shopping-list-updated'));
+                } else {
+                    quantities[buyMoreItem.id] = merged;
+                    localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+                    setFoods(prev => prev.map(f => f.id === buyMoreItem.id ? { ...f, quantity: merged } : f));
+                    toast.success(`Updated quantity for ${buyMoreItem.common_name || buyMoreItem.name}`);
+                }
             } else {
                 const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
                 const newItem = {
@@ -552,6 +594,57 @@ export function PantryView({
 
     const updatePantryQuantity = async (item: FoodItem, newQty: string, newWeight: string, newUnit: string) => {
         const quantityString = newWeight ? `${newQty} x ${newWeight}${newUnit}` : newQty;
+
+        // Check if this is being set to 0
+        const parseTest = parseQuantityEntry(quantityString);
+        const totalGrams = (parseTest.qty || 0) * (parseTest.weight_g || 0);
+        const isZero = totalGrams === 0 || quantityString === '0' || quantityString === '';
+        
+        if (isZero) {
+            // Move to shopping list instead of keeping in pantry
+            console.log('[updatePantryQuantity] Item set to 0, moving to shopping list:', item.common_name || item.name);
+            
+            // Add to shopping list
+            const saved = localStorage.getItem('vitala_shopping_manual_items');
+            const manualItems = saved ? JSON.parse(saved) : [];
+            manualItems.push({
+                id: `replenish-${Date.now()}-${item.id}`,
+                name: `Replenish: ${item.common_name || item.name}`,
+                quantity: 'As needed',
+                unit: '',
+                checked: false,
+                source: 'auto-replenish'
+            });
+            localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(manualItems));
+            
+            // Remove from pantry
+            try {
+                const saved = localStorage.getItem('pantry_quantities');
+                const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
+                delete quantities[item.id];
+                localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+                
+                // Also update DB
+                if (item.source_table === 'food_items') {
+                    await supabase
+                        .from('food_items')
+                        .update({ is_in_pantry: false } as any)
+                        .eq('id', item.id);
+                } else if (item.source_table === 'pantry_items') {
+                    await supabase
+                        .from('pantry_items')
+                        .delete()
+                        .eq('id', item.id);
+                }
+            } catch (e) {
+                console.error('[updatePantryQuantity] Failed to remove', item.name, 'from pantry:', e);
+            }
+            
+            setFoods(prev => prev.filter(f => f.id !== item.id));
+            toast.success(`${item.common_name || item.name} moved to shopping list`);
+            window.dispatchEvent(new CustomEvent('shopping-list-updated'));
+            return;
+        }
 
         // Update UI immediately
         setFoods(prev => prev.map(f => f.id === item.id ? { ...f, quantity: quantityString } : f));

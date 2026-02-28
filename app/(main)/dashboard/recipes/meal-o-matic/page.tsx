@@ -578,16 +578,58 @@ export function MealPlannerContent({
         console.log('[markEaten] Final quantities to save:', quantities);
         console.log('[markEaten] Total subtracted:', subtracted);
         
-        // Log if any item is being set to 0
+        // Log if any item is being set to 0 and move to shopping list
         const savedBefore = localStorage.getItem('pantry_quantities');
         const beforeObj = savedBefore ? JSON.parse(savedBefore) : {};
+        const itemsToReplenish: { id: string; name: string }[] = [];
+        
         Object.entries(quantities).forEach(([id, qty]) => {
             if ((qty === '0 grams' || qty === '0 g' || qty === '0') && beforeObj[id] !== qty) {
                 console.warn('🥔 [markEaten] ⚠️ ITEM ZEROED OUT!', { id, wasBefore: beforeObj[id], nowIs: qty, recipe: recipe.title });
+                // Find the item name from pantryItems
+                const item = pantryItems.find(p => p.id === id);
+                if (item) {
+                    itemsToReplenish.push({ id, name: item.common_name || item.name });
+                }
             }
         });
         
         localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+        
+        // Move zeroed items to shopping list and remove from pantry
+        if (itemsToReplenish.length > 0) {
+            try {
+                // Add to shopping list
+                const shoppingList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
+                for (const item of itemsToReplenish) {
+                    shoppingList.push({
+                        id: `replenish-${Date.now()}-${item.id}`,
+                        name: `Replenish: ${item.name}`,
+                        quantity: 'As needed',
+                        unit: '',
+                        checked: false,
+                        source: 'auto-replenish'
+                    });
+                    
+                    // Remove from pantry
+                    const foodItemUpdate = await supabase
+                        .from('food_items')
+                        .update({ is_in_pantry: false } as any)
+                        .eq('id', item.id);
+                    
+                    if (foodItemUpdate.error) {
+                        console.warn('[markEaten] Failed to remove', item.name, 'from pantry:', foodItemUpdate.error);
+                    } else {
+                        console.log('[markEaten] Auto-removed', item.name, 'from pantry and added to shopping list');
+                    }
+                }
+                localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(shoppingList));
+                window.dispatchEvent(new CustomEvent('shopping-list-updated'));
+            } catch (e) {
+                console.error('[markEaten] Failed to auto-replenish items:', e);
+            }
+        }
+        
         // Notify any mounted pantry views to re-apply the updated quantities
         window.dispatchEvent(new CustomEvent('pantry-quantities-updated'));
         setEatenMeals(prev => new Set([...prev, mealType]));
