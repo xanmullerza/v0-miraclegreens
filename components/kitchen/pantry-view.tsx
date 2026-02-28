@@ -146,56 +146,17 @@ export function PantryView({
         raw: string;
     }
 
-    // Terminal words that mark a food name as a mass noun (never pluralised in English)
-    const MASS_NOUN_TERMS = new Set([
-        // Grains & starches
-        'rice', 'flour', 'meal', 'starch', 'bran', 'quinoa', 'amaranth',
-        'millet', 'sorghum', 'wheat', 'oat', 'barley', 'rye', 'buckwheat', 'dahl', 'dal',
-        // Dairy & fats
-        'butter', 'margarine', 'cream', 'milk', 'ghee', 'oil', 'lard',
-        // Condiments & pantry staples
-        'honey', 'sugar', 'salt', 'vinegar', 'mustard', 'sauce', 'paste',
-        'mayonnaise', 'syrup', 'molasses', 'yeast',
-        // Liquids
-        'juice', 'water', 'broth', 'stock', 'essence',
-        // Ground spices & powders (the last word will be "powder", "cumin", etc.)
-        'powder', 'cocoa', 'cinnamon', 'turmeric', 'paprika', 'cumin', 'ginger',
-        'nutmeg', 'cardamom', 'elachi', 'mace', 'anise', 'allspice',
-        // Fresh herbs and leafy greens used as bulk ingredients
-        'kale', 'spinach', 'lettuce', 'parsley', 'basil', 'mint', 'thyme',
-        'rosemary', 'coriander', 'dhania',
-        // Brassicas used as mass ingredient
-        'broccoli', 'cauliflower',
-        // Baked & processed
-        'bread', 'extract',
-    ]);
-
-    const pluralize = (name: string, qty: number): string => {
-        if (qty <= 1) return name;
-        // Strip emojis and parentheticals for the mass-noun check only
-        const stripped = name
-            .replace(/\p{Emoji}/gu, '')
-            .replace(/\(.*?\)/g, '')
-            .trim()
-            .toLowerCase();
-        const words = stripped.split(/\s+/).filter(Boolean);
-        const lastWord = words[words.length - 1];
-        if (lastWord && MASS_NOUN_TERMS.has(lastWord)) return name;
-        if (words.length >= 2 && MASS_NOUN_TERMS.has(words.slice(-2).join(' '))) return name;
-        // If name ends with 🔥, pluralise the text part before it
-        const fireMatch = name.match(/^(.*?)\s*(🔥\s*)$/);
-        if (fireMatch) {
-            const base = fireMatch[1];
-            const fire = fireMatch[2];
-            if (/[^aeiou]y$/i.test(base)) return base.slice(0, -1) + 'ies ' + fire;
-            if (/(s|sh|ch|x|z)$/i.test(base)) return base + 'es ' + fire;
-            if (/fe?$/i.test(base)) return base.replace(/fe?$/, 'ves') + ' ' + fire;
-            return base + 's ' + fire;
-        }
-        if (/[^aeiou]y$/i.test(name)) return name.slice(0, -1) + 'ies';
-        if (/(s|sh|ch|x|z)$/i.test(name)) return name + 'es';
-        if (/fe?$/i.test(name)) return name.replace(/fe?$/, 'ves');
-        return name + 's';
+    // Pluralize only the measurement unit label (e.g. "Cup" → "Cups", "Tbsp" stays "Tbsp")
+    const pluralizeUnit = (label: string, qty: number): string => {
+        if (qty <= 1) return label;
+        const l = label.toLowerCase().trim();
+        // Units that already look plural or are abbreviations — leave unchanged
+        const unchanged = ['tbsp', 'tsp', 'ml', 'g', 'kg', 'oz', 'lb', 'lbs'];
+        if (unchanged.includes(l)) return label;
+        if (/[^aeiou]y$/i.test(label)) return label.slice(0, -1) + 'ies'; // rarely needed
+        if (/(s|sh|ch|x|z)$/i.test(label)) return label + 'es'; // Inch → Inches
+        if (/s$/i.test(label)) return label; // already plural
+        return label + 's'; // Cup → Cups, Slice → Slices, Piece → Pieces
     };
 
     const parseQuantityEntry = (s: string): QuantityEntry => {
@@ -839,16 +800,16 @@ export function PantryView({
                                                                             <div className="flex items-center gap-2">
                                                                                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
                                                                                 {isBulkWeight ? (
-                                                                                    <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">{pluralize(foodName, e.qty)}</span>
+                                                                                    <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">{foodName}</span>
                                                                                 ) : (
                                                                                     <>
                                                                                         <span className="text-sm font-black text-slate-800 dark:text-slate-200">{e.qty}</span>
                                                                                         {e.label ? (
-                                                                                            <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">{e.label} {pluralize(foodName, e.qty)}</span>
+                                                                                            <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">{pluralizeUnit(e.label, e.qty)} {foodName}</span>
                                                                                         ) : e.weight_g != null ? (
-                                                                                            <span className="text-sm font-semibold text-slate-400">× {e.weight_g}{e.unit} {pluralize(foodName, e.qty)}</span>
+                                                                                            <span className="text-sm font-semibold text-slate-400">× {e.weight_g}{e.unit} {foodName}</span>
                                                                                         ) : (
-                                                                                            <span className="text-sm font-semibold text-slate-400">{pluralize(foodName, e.qty)}</span>
+                                                                                            <span className="text-sm font-semibold text-slate-400">{foodName}</span>
                                                                                         )}
                                                                                     </>
                                                                                 )}
