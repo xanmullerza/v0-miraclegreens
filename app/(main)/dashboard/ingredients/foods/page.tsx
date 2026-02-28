@@ -1,18 +1,15 @@
 ﻿'use client';
 
-import { useState, useRef, Suspense } from 'react';
+import { useState, useRef, useCallback, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Loader2, Leaf, ChevronRight, Plus } from 'lucide-react';
 import { ExploreView } from './views/explore-view';
-import { ShoppingView } from './views/shopping-view';
-import { StaplesView } from '@/components/ingredients/staples-view';
-import { CompareView } from './views/compare-view';
-import { NutrientsView } from './views/nutrients-view';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
 import { supabase } from '@/lib/supabase';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
+import { useSearch } from '@/lib/context/search-context';
 import { formatEnergy, type FoodItem } from '@/lib/utils';
 
 export default function IngredientsHub() {
@@ -28,21 +25,19 @@ export default function IngredientsHub() {
     );
 }
 
-type FoodTab = 'foods' | 'groceries' | 'pantry' | 'compare' | 'nutrients';
-
 function IngredientsContent() {
-
     const router = useRouter();
     const { energyUnit } = useUserPreferences();
-    const [activeTab, setActiveTab] = useState<FoodTab>('foods');
-    const [searchQuery, setSearchQuery] = useState('');
+    // Wired to the same context ExploreView reads — typing in the hero filters the list below
+    const { searchQuery, setSearchQuery } = useSearch();
+
     const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [isSearchActive, setIsSearchActive] = useState(false);
     const [showAddFood, setShowAddFood] = useState(false);
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-    const renderResult = (item: FoodItem) => (
+    const renderResult = useCallback((item: FoodItem) => (
         <div className="flex items-center gap-4 min-w-0 w-full">
             <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800 relative">
                 {item.image ? (
@@ -61,8 +56,7 @@ function IngredientsContent() {
             </div>
             <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={20} />
         </div>
-    );
-
+    ), [energyUnit]);
 
     const performSearch = async (query: string) => {
         if (!query || query.length < 2) {
@@ -73,11 +67,11 @@ function IngredientsContent() {
         try {
             const { data, error } = await supabase
                 .from('food_items')
-                .select('*')
+                .select('id, name, common_name, energy_kcal, category, image')
                 .or(`name.ilike.%${query}%,common_name.ilike.%${query}%`)
                 .limit(8);
             if (error) throw error;
-            setSearchResults(data || []);
+            setSearchResults((data ?? []) as FoodItem[]);
         } catch (error) {
             console.error('Search error:', error);
         } finally {
@@ -86,7 +80,7 @@ function IngredientsContent() {
     };
 
     const handleSearchInput = (val: string) => {
-        setSearchQuery(val);
+        setSearchQuery(val); // updates context → ExploreView debounce picks this up
         if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
         searchTimeoutRef.current = setTimeout(() => performSearch(val), 300);
     };
@@ -94,44 +88,36 @@ function IngredientsContent() {
     return (
         <PageContainer maxWidth="max-w-7xl">
             <div className="space-y-12 animate-in fade-in duration-500">
-                {/* Search Hero */}
-                {activeTab === 'foods' && (
-                    <HeroSearch
-                        searchQuery={searchQuery}
-                        onQueryChange={handleSearchInput}
-                        results={searchResults}
-                        isLoading={isSearching}
-                        isActive={isSearchActive}
-                        setIsActive={setIsSearchActive}
-                        onSelect={(item) => router.push(`/dashboard/ingredients/foods/${item.id}`)}
-                        renderResult={renderResult}
-                        theme="emerald"
-                        placeholder="SEARCH FOOD LIBRARY..."
-                        idleIcon={<Leaf size={20} className="text-emerald-500" />}
-                        idleTitle="Food Library"
-                        idleSubtitle="Explore whole food profiles with full nutrition data"
-                        noResultsMessage="No matching foods found"
-                        enterMessage="Enter food name to search"
-                        searchingMessage="Searching Library..."
-                        powerButton={
-                            <button
-                                type="button"
-                                onClick={(e) => { e.stopPropagation(); setShowAddFood(true); }}
-                                className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:border-emerald-500 hover:bg-emerald-500/10 shrink-0 relative z-10"
-                            >
-                                <Plus size={16} className="text-slate-900 dark:text-white" />
-                            </button>
-                        }
-                    />
-                )}
+                <HeroSearch
+                    searchQuery={searchQuery}
+                    onQueryChange={handleSearchInput}
+                    results={searchResults}
+                    isLoading={isSearching}
+                    isActive={isSearchActive}
+                    setIsActive={setIsSearchActive}
+                    onSelect={(item) => router.push(`/dashboard/ingredients/foods/${item.id}`)}
+                    renderResult={renderResult}
+                    theme="emerald"
+                    placeholder="SEARCH FOOD LIBRARY..."
+                    idleIcon={<Leaf size={20} className="text-emerald-500" />}
+                    idleTitle="Food Library"
+                    idleSubtitle="Explore whole food profiles with full nutrition data"
+                    noResultsMessage="No matching foods found"
+                    enterMessage="Enter food name to search"
+                    searchingMessage="Searching Library..."
+                    powerButton={
+                        <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); setShowAddFood(true); }}
+                            className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:border-emerald-500 hover:bg-emerald-500/10 shrink-0 relative z-10"
+                        >
+                            <Plus size={16} className="text-slate-900 dark:text-white" />
+                        </button>
+                    }
+                />
 
-                {/* Dynamic Content Area */}
                 <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
-                    {activeTab === 'foods' && <ExploreView showAddFood={showAddFood} setShowAddFood={setShowAddFood} />}
-                    {activeTab === 'groceries' && <ShoppingView />}
-                    {activeTab === 'pantry' && <StaplesView />}
-                    {activeTab === 'compare' && <CompareView />}
-                    {activeTab === 'nutrients' && <NutrientsView />}
+                    <ExploreView showAddFood={showAddFood} setShowAddFood={setShowAddFood} />
                 </div>
             </div>
         </PageContainer>
