@@ -18,6 +18,10 @@
         "/^python fix_reload\\.py$/": {
             "approve": true,
             "matchCommandLine": true
+        },
+        "/^python fix_duplicate\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
         }
     }
 }

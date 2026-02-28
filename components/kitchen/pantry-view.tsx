@@ -462,7 +462,6 @@ export function PantryView({
                         }
                     });
                 }
-                }
             } catch (e) {
                 console.error('Failed to load saved quantities', e);
             }
