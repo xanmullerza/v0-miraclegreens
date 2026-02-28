@@ -772,14 +772,15 @@ export function PantryView({
                                                                 const consolidated: string[] = [...nonWeightStrs];
                                                                 if (weightGramsTotal > 0) consolidated.push(formatGramsEntry(weightGramsTotal));
                                                                 if (consolidated.length === 0) return <span className="text-[10px] font-bold text-slate-300 dark:text-slate-600 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800">In Stock</span>;
-                                                                if (consolidated.length === 1) return <span className="text-xs font-black text-white bg-emerald-900 px-3 py-1 rounded-md whitespace-nowrap">{consolidated[0]}</span>;
-                                                                // Multiple entries: show sum of all grams
+                                                                // Always show aggregate weight total
                                                                 let totalGramsAll = weightGramsTotal;
                                                                 for (const raw of nonWeightStrs) {
                                                                     const p = parseQuantityEntry(raw);
                                                                     if (p.weight_g != null) totalGramsAll += p.qty * p.weight_g;
                                                                 }
-                                                                return <span className="text-xs font-black text-white bg-emerald-900 px-3 py-1 rounded-md whitespace-nowrap">{formatGramsEntry(totalGramsAll)}</span>;
+                                                                if (totalGramsAll > 0) return <span className="text-xs font-black text-white bg-emerald-900 px-3 py-1 rounded-md whitespace-nowrap">{formatGramsEntry(totalGramsAll)}</span>;
+                                                                // Fallback: show raw entry text if no weight info
+                                                                return <span className="text-xs font-black text-white bg-emerald-900 px-3 py-1 rounded-md whitespace-nowrap">{consolidated[0]}</span>;
                                                             })()}
                                                         </div>
                                                     </div>
