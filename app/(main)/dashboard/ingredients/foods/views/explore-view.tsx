@@ -13,6 +13,7 @@ import { supabase } from '@/lib/supabase';
 import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
+import { Sheet, SheetTrigger, SheetContent, SheetClose } from '@/components/ui/sheet';
 import { FoodFormDialog } from '@/components/ingredients/food-form-dialog';
 
 const CAL_TO_KJ = 4.184;
@@ -195,6 +196,80 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                     <>
                         {/* Sticky Header */}
                         <div className="border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10 bg-slate-100 dark:bg-slate-900/80 rounded-t-[2rem]">
+                            {/* Mobile filter bar */}
+                            <div className="flex lg:hidden items-center justify-between px-4 py-2">
+                                <Sheet>
+                                    <SheetTrigger asChild>
+                                        <button className={cn(
+                                            'flex items-center gap-2 h-8 px-3 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all relative',
+                                            (showFavoritesOnly || selectedCategories.length > 0)
+                                                ? 'bg-emerald-100 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400'
+                                                : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:border-emerald-300 hover:text-emerald-600'
+                                        )}>
+                                            <Filter size={11} />
+                                            Filter
+                                            {(showFavoritesOnly || selectedCategories.length > 0) && (
+                                                <span className="w-4 h-4 flex items-center justify-center bg-emerald-600 text-white text-[8px] font-black rounded-full">
+                                                    {selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
+                                                </span>
+                                            )}
+                                        </button>
+                                    </SheetTrigger>
+                                    <SheetContent side="bottom" className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-t-3xl px-6 pt-6 pb-10">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <span className="text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">Filter Foods</span>
+                                            <div className="flex items-center gap-3">
+                                                {(showFavoritesOnly || selectedCategories.length > 0) && (
+                                                    <button
+                                                        onClick={() => { setShowFavoritesOnly(false); setSelectedCategories([]); }}
+                                                        className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-colors"
+                                                    >
+                                                        Clear all
+                                                    </button>
+                                                )}
+                                                <SheetClose className="w-7 h-7 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
+                                                    ✕
+                                                </SheetClose>
+                                            </div>
+                                        </div>
+
+                                        {/* Favourites toggle */}
+                                        <div className="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-800">
+                                            <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Favourites only</span>
+                                            <Switch checked={showFavoritesOnly} onCheckedChange={setShowFavoritesOnly} className="data-[state=checked]:bg-emerald-600" />
+                                        </div>
+
+                                        {/* Category grid */}
+                                        <div className="mt-4">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 block">Category</span>
+                                            <div className="flex flex-wrap gap-2">
+                                                {CATEGORIES.map(cat => {
+                                                    const active = selectedCategories.includes(cat);
+                                                    return (
+                                                        <button
+                                                            key={cat}
+                                                            onClick={() => {
+                                                                if (active) setSelectedCategories(prev => prev.filter(c => c !== cat));
+                                                                else setSelectedCategories(prev => [...prev, cat]);
+                                                            }}
+                                                            className={cn(
+                                                                'h-8 px-3 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all',
+                                                                active
+                                                                    ? 'bg-emerald-500 border-emerald-500 text-white'
+                                                                    : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600'
+                                                            )}
+                                                        >
+                                                            {cat}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </SheetContent>
+                                </Sheet>
+                            </div>
+
+                            {/* Desktop header row */}
                             <div className="hidden lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px] gap-3 lg:gap-4 lg:items-center lg:px-10 py-1 w-full">
                                 <div className="flex items-center justify-center">
                                     <DropdownMenu>
