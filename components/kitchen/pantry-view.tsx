@@ -27,7 +27,8 @@ import {
     Activity,
     Heart,
     X,
-    List
+    List,
+    Slash
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -154,6 +155,7 @@ export function PantryView({
     const [drawerType, setDrawerType] = useState<'add' | 'remove' | null>(null);
     
     const [expandedQuantityId, setExpandedQuantityId] = useState<string | null>(null);
+    const [expandedStockBreakdownId, setExpandedStockBreakdownId] = useState<string | null>(null);
 
     interface QuantityEntry {
         qty: number;
@@ -1049,6 +1051,15 @@ export function PantryView({
                                                     >
                                                         <ChevronDown size={14} className={cn("transition-transform", expandedQuantityId === food.id && "rotate-180")} />
                                                     </button>
+
+                                                    {/* Stock breakdown divide button */}
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); setExpandedStockBreakdownId(expandedStockBreakdownId === food.id ? null : food.id); }}
+                                                        className={cn("p-1.5 rounded-lg transition-all flex-shrink-0", expandedStockBreakdownId === food.id ? "text-amber-500 bg-amber-100 dark:bg-amber-950/40" : "text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500")}
+                                                        title="View stock breakdown"
+                                                    >
+                                                        <Slash size={14} />
+                                                    </button>
                                                 </div>
 
                                                 {/* Expanded action buttons - shown when expanded */}
@@ -1082,7 +1093,7 @@ export function PantryView({
                                                 )}
 
                                                 {/* Quantity breakdown accordion */}
-                                                {expandedQuantityId === food.id && (() => {
+                                                {expandedStockBreakdownId === food.id && (() => {
                                                     const rawEntries = parseQuantityEntries(food.quantity).map(e => parseQuantityEntry(e)).filter(e => e.qty > 0);
                                                     // Consolidate pure-weight entries (gram, kilogram, "1 x Ng") into one line
                                                     let weightGramsTotal = 0;
