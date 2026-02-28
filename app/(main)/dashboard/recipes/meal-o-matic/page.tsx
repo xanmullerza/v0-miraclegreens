@@ -455,7 +455,29 @@ export function MealPlannerContent({
 
     const handleMarkEaten = async (recipe: Recipe, mealType: string) => {
         const servings = recipe.servings || 1;
-        const ingredients = recipe.ingredients || [];
+
+        // Always fetch latest ingredients from DB (the plan snapshot may be stale if user edited the recipe)
+        let ingredients = recipe.ingredients || [];
+        try {
+            const { data: freshIngs } = await supabase
+                .from('ingredients')
+                .select('*, food_items(*)')
+                .eq('recipe_id', recipe.id);
+            if (freshIngs && freshIngs.length > 0) {
+                ingredients = freshIngs.map((i: any) => ({
+                    item: i.item,
+                    amount: i.amount,
+                    isMiracleProduct: i.is_miracle_product,
+                    baseIngredient: i.base_ingredient,
+                    food_item_id: i.food_item_id,
+                    weightG: i.weight_g,
+                    measureLabel: i.measure_label
+                }));
+                console.log('[markEaten] Fetched fresh ingredients from DB:', ingredients.length);
+            }
+        } catch (e) {
+            console.log('[markEaten] Failed to fetch fresh ingredients, using plan snapshot');
+        }
 
         const saved = localStorage.getItem('pantry_quantities');
         const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
@@ -474,12 +496,26 @@ export function MealPlannerContent({
                 continue;
             }
 
-            // Find matching pantry item by food_item_id or name
-            const matchItem = pantryItems.find(p =>
-                (ing.food_item_id && p.id === ing.food_item_id) ||
-                (ing.baseIngredient && (p.common_name || p.name)?.toLowerCase().trim() === ing.baseIngredient.toLowerCase().trim()) ||
-                (ing.item && (p.common_name || p.name)?.toLowerCase().trim() === ing.item.toLowerCase().trim())
-            );
+            // Find matching pantry item by food_item_id or name (exact, then partial/fuzzy)
+            const ingName = (ing.item || '').toLowerCase().trim();
+            const ingBase = (ing.baseIngredient || '').toLowerCase().trim();
+            const matchItem = pantryItems.find(p => {
+                // 1. Match by food_item_id
+                if (ing.food_item_id && p.id === ing.food_item_id) return true;
+                const pName = (p.common_name || p.name || '').toLowerCase().trim();
+                // 2. Exact match on name or baseIngredient
+                if (ingBase && pName === ingBase) return true;
+                if (ingName && pName === ingName) return true;
+                // 3. Partial match: pantry name starts with ingredient name, or ingredient name starts with pantry name
+                //    e.g. "Blueberries" matches "Blueberries, Fresh", "Peach" matches "Peach, Fresh"
+                if (ingBase && (pName.startsWith(ingBase) || ingBase.startsWith(pName))) return true;
+                if (ingName && (pName.startsWith(ingName) || ingName.startsWith(pName))) return true;
+                // 4. Check if the first word matches (e.g. "Blueberries" in "Blueberries, Fresh")
+                const pFirstWord = pName.split(/[,\s]/)[0];
+                if (ingBase && ingBase.split(/[,\s]/)[0] === pFirstWord) return true;
+                if (ingName && ingName.split(/[,\s]/)[0] === pFirstWord) return true;
+                return false;
+            });
             if (!matchItem) {
                 console.log('[markEaten] No pantry match for:', ing.item, 'baseIngredient:', ing.baseIngredient, 'food_item_id:', ing.food_item_id);
                 continue;
