@@ -259,9 +259,13 @@ export function PantryView({
         if (grams >= 1000) {
             const kg = grams / 1000;
             const kgStr = kg % 1 === 0 ? kg.toString() : kg.toFixed(1);
-            return `${kgStr} kilogram (1000g)`;
+            const kgNum = parseFloat(kgStr);
+            const unit = kgNum === 1 ? 'kilogram' : 'kilograms';
+            return `${kgStr} ${unit}`;
         }
-        return `${Math.round(grams)} gram (1g)`;
+        const gramsNum = Math.round(grams);
+        const unit = gramsNum === 1 ? 'gram' : 'grams';
+        return `${gramsNum} ${unit}`;
     };
 
     const mergeQuantityStrings = (existing: string | undefined, incoming: string): string => {

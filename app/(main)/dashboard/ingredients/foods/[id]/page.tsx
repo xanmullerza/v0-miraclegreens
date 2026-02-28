@@ -388,9 +388,17 @@ export default function FoodDetailsPage() {
                                 nonWeight.push(raw);
                             }
                         }
+                        const kgValue = totalGrams / 1000;
+                        const kgStr = kgValue % 1 === 0 ? kgValue.toString() : kgValue.toFixed(1);
+                        const kgNum = parseFloat(kgStr);
+                        const kgUnit = kgNum === 1 ? 'kilogram' : 'kilograms';
+                        
+                        const gramsNum = Math.round(totalGrams);
+                        const gramsUnit = gramsNum === 1 ? 'gram' : 'grams';
+                        
                         const fmtEntry = totalGrams >= 1000
-                            ? `${(totalGrams / 1000) % 1 === 0 ? (totalGrams / 1000).toString() : (totalGrams / 1000).toFixed(1)} kilogram (1000g)`
-                            : `${Math.round(totalGrams)} gram (1g)`;
+                            ? `${kgStr} ${kgUnit}`
+                            : `${gramsNum} ${gramsUnit}`;
                         const result = nonWeight.length > 0 ? `${nonWeight.join(' + ')} + ${fmtEntry}` : fmtEntry;
                         quantities[food.id] = result;
                         merged = true;

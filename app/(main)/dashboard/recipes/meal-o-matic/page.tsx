@@ -439,14 +439,18 @@ export function MealPlannerContent({
     };
 
     // Format a gram value as a readable weight string: kg when >= 1000g, g otherwise
-    // Uses labeled portion format: "{qty} kilogram (1000g)" where (1000g) is the per-unit weight
+    // Uses labeled portion format: "{qty} kilograms / grams" with proper pluralization
     const formatWeightStr = (grams: number): string => {
         if (grams >= 1000) {
             const kg = grams / 1000;
             const kgStr = kg % 1 === 0 ? kg.toString() : kg.toFixed(1);
-            return `${kgStr} kilogram (1000g)`;
+            const kgNum = parseFloat(kgStr);
+            const unit = kgNum === 1 ? 'kilogram' : 'kilograms';
+            return `${kgStr} ${unit}`;
         }
-        return `1 x ${Math.round(grams)}g`;
+        const gramsNum = Math.round(grams);
+        const unit = gramsNum === 1 ? 'gram' : 'grams';
+        return `${gramsNum} ${unit}`;
     };
 
     const handleMarkEaten = async (recipe: Recipe, mealType: string) => {
@@ -479,9 +483,13 @@ export function MealPlannerContent({
                 if (remaining >= 1000) {
                     const kg = remaining / 1000;
                     const kgStr = kg % 1 === 0 ? kg.toString() : kg.toFixed(1);
-                    quantities[matchItem.id] = `${kgStr} kilogram (1000g)`;
+                    const kgNum = parseFloat(kgStr);
+                    const unit = kgNum === 1 ? 'kilogram' : 'kilograms';
+                    quantities[matchItem.id] = `${kgStr} ${unit}`;
                 } else {
-                    quantities[matchItem.id] = `1 x ${Math.round(remaining)}g`;
+                    const gramsNum = Math.round(remaining);
+                    const unit = gramsNum === 1 ? 'gram' : 'grams';
+                    quantities[matchItem.id] = `${gramsNum} ${unit}`;
                 }
             } else {
                 quantities[matchItem.id] = '0';

@@ -130,9 +130,14 @@ export default function PantryPage() {
                 const fmtG = (g: number) => {
                     if (g >= 1000) {
                         const kg = g / 1000;
-                        return `${kg % 1 === 0 ? kg.toString() : kg.toFixed(1)} kilogram (1000g)`;
+                        const kgStr = kg % 1 === 0 ? kg.toString() : kg.toFixed(1);
+                        const kgNum = parseFloat(kgStr);
+                        const unit = kgNum === 1 ? 'kilogram' : 'kilograms';
+                        return `${kgStr} ${unit}`;
                     }
-                    return `${Math.round(g)} gram (1g)`;
+                    const gramsNum = Math.round(g);
+                    const unit = gramsNum === 1 ? 'gram' : 'grams';
+                    return `${gramsNum} ${unit}`;
                 };
 
                 if (incomingLabeled) {

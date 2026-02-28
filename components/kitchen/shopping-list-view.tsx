@@ -377,9 +377,13 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                 if (g >= 1000) {
                     const kg = g / 1000;
                     const kgStr = kg % 1 === 0 ? kg.toString() : kg.toFixed(1);
-                    return `${kgStr} kilogram (1000g)`;
+                    const kgNum = parseFloat(kgStr);
+                    const unit = kgNum === 1 ? 'kilogram' : 'kilograms';
+                    return `${kgStr} ${unit}`;
                 }
-                return `${Math.round(g)} gram (1g)`;
+                const gramsNum = Math.round(g);
+                const unit = gramsNum === 1 ? 'gram' : 'grams';
+                return `${gramsNum} ${unit}`;
             };
 
             // Merge with existing stock
