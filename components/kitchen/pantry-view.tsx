@@ -786,6 +786,14 @@ export function PantryView({
                                                     </div>
 
                                                     <button
+                                                        onClick={(e) => { e.stopPropagation(); setExpandedQuantityId(expandedQuantityId === food.id ? null : food.id); }}
+                                                        className={cn("p-1.5 rounded-lg transition-all flex-shrink-0", expandedQuantityId === food.id ? "text-emerald-500 bg-emerald-100 dark:bg-emerald-950/40" : "text-slate-400 hover:bg-emerald-100 dark:hover:bg-emerald-950/40 hover:text-emerald-500")}
+                                                        title="Expand stock breakdown"
+                                                    >
+                                                        <ChevronDown size={14} className={cn("transition-transform", expandedQuantityId === food.id && "rotate-180")} />
+                                                    </button>
+
+                                                    <button
                                                         onClick={(e) => { e.stopPropagation(); buyMoreItem?.id === food.id ? setBuyMoreItem(null) : openBuyMore(food); }}
                                                         className={cn("p-1.5 rounded-lg transition-all flex-shrink-0", buyMoreItem?.id === food.id ? "bg-amber-100 dark:bg-amber-950/40 text-amber-500" : "text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500")}
                                                         title="Update quantity / add to list"
