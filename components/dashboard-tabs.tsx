@@ -94,20 +94,28 @@ export function DashboardTabs() {
             {/* Compact Bar with Dividers - Labels Only */}
             <div className="flex items-center justify-center px-2 py-1.5 bg-slate-900/30 rounded-lg border border-slate-800/50 overflow-x-auto scrollbar-hide">
                 {TAB_CONFIG.map((tab, idx) => {
+                    const Icon = tab.icon;
                     const isActive = currentTab.id === tab.id;
                     
                     return (
                         <div key={tab.id} className="flex items-center gap-0 flex-shrink-0">
-                            {/* Main Tab - Labels Only */}
+                            {/* Main Tab - Labels with desktop icons */}
                             <Link
                                 href={tab.defaultHref}
                                 className={cn(
-                                    'px-2.5 py-1 rounded transition-all duration-300 text-[11px] font-semibold uppercase tracking-wide whitespace-nowrap',
+                                    'flex items-center gap-1.5 px-2.5 py-1 rounded transition-all duration-300 text-[11px] font-semibold uppercase tracking-wide whitespace-nowrap',
                                     isActive
                                         ? cn(tab.activeBg)
                                         : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'
                                 )}
                             >
+                                <Icon
+                                    size={14}
+                                    className={cn(
+                                        'transition-colors duration-300 hidden md:inline flex-shrink-0',
+                                        isActive ? tab.activeColor : 'text-slate-600 group-hover:text-slate-400'
+                                    )}
+                                />
                                 <span className={cn(
                                     'transition-colors duration-300',
                                     isActive ? tab.activeColor : ''
