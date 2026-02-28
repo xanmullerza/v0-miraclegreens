@@ -1,4 +1,4 @@
-ï»¿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
@@ -422,7 +422,7 @@ export function MealPlannerContent({
             // "10 kg" or "10kg" or "10 kilogram" or "10 kilograms"
             const kgFmt = entry.match(/^(\d+(?:\.\d+)?)\s*(?:kg|kilo(?:gram)?s?)$/i);
             if (kgFmt) { total += parseFloat(kgFmt[1]) * 1000; hasWeight = true; continue; }
-            // "10 ml" (treat ml â‰ˆ g for water-based items)
+            // "10 ml" (treat ml ˜ g for water-based items)
             const mlFmt = entry.match(/^(\d+(?:\.\d+)?)\s*ml$/i);
             if (mlFmt) { total += parseFloat(mlFmt[1]); hasWeight = true; continue; }
             // "10 lb" (pounds)
@@ -431,7 +431,7 @@ export function MealPlannerContent({
             // "10 oz" (ounces)
             const ozFmt = entry.match(/^(\d+(?:\.\d+)?)\s*(?:oz|ounces?)$/i);
             if (ozFmt) { total += parseFloat(ozFmt[1]) * 28.3495; hasWeight = true; continue; }
-            // Plain number with no unit (e.g. "300") â€” treat as grams
+            // Plain number with no unit (e.g. "300") — treat as grams
             const plainNum = entry.match(/^(\d+(?:\.\d+)?)$/);
             if (plainNum) { total += parseFloat(plainNum[1]); hasWeight = true; continue; }
         }
@@ -493,7 +493,7 @@ export function MealPlannerContent({
         setEatenMeals(prev => new Set([...prev, mealType]));
 
         if (subtracted > 0) {
-            toast.success(`Marked as eaten â€” ${subtracted} pantry item${subtracted !== 1 ? 's' : ''} updated`);
+            toast.success(`Marked as eaten — ${subtracted} pantry item${subtracted !== 1 ? 's' : ''} updated`);
         } else {
             toast.success(`${recipe.title} marked as eaten`);
         }
@@ -584,12 +584,12 @@ export function MealPlannerContent({
     // Nutrient breakdown definitions
     const NUTRIENT_BREAKDOWNS: Record<string, { label: string, keys: string[], unit: string, isEssential?: boolean, hiddenByDefault?: boolean, isExpandable?: boolean }[]> = {
         'Vitamin A': [
-            { label: 'Retinol', keys: ['Retinol', 'retinol_ug'], unit: 'Âµg' },
-            { label: 'Alpha-carotene', keys: ['Alpha-carotene', 'alpha_carotene_ug'], unit: 'Âµg' },
-            { label: 'Beta-carotene', keys: ['Beta-carotene', 'beta_carotene_ug'], unit: 'Âµg' },
-            { label: 'Beta-cryptoxanthin', keys: ['Beta-cryptoxanthin', 'beta_cryptoxanthin_ug'], unit: 'Âµg' },
-            { label: 'Lutein+Zeaxanthin', keys: ['Lutein+Zeaxanthin', 'lutein_zeaxanthin_ug'], unit: 'Âµg' },
-            { label: 'Lycopene', keys: ['Lycopene', 'lycopene_ug'], unit: 'Âµg' },
+            { label: 'Retinol', keys: ['Retinol', 'retinol_ug'], unit: 'µg' },
+            { label: 'Alpha-carotene', keys: ['Alpha-carotene', 'alpha_carotene_ug'], unit: 'µg' },
+            { label: 'Beta-carotene', keys: ['Beta-carotene', 'beta_carotene_ug'], unit: 'µg' },
+            { label: 'Beta-cryptoxanthin', keys: ['Beta-cryptoxanthin', 'beta_cryptoxanthin_ug'], unit: 'µg' },
+            { label: 'Lutein+Zeaxanthin', keys: ['Lutein+Zeaxanthin', 'lutein_zeaxanthin_ug'], unit: 'µg' },
+            { label: 'Lycopene', keys: ['Lycopene', 'lycopene_ug'], unit: 'µg' },
         ],
         'Vitamin E': [
             { label: 'Alpha-tocopherol', keys: ['Vitamin E', 'vitamin_e_mg', 'alpha_tocopherol_mg'], unit: 'mg' },
@@ -1009,7 +1009,7 @@ export function MealPlannerContent({
                         <div className="grid grid-cols-2 gap-4">
                             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                                 <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-1">Metrics</p>
-                                <p className="font-bold">{profile.age}y â€¢ {profile.weight}{measurementUnit === 'metric' ? 'kg' : 'lb'} â€¢ {profile.height}{measurementUnit === 'metric' ? 'cm' : 'ft'}</p>
+                                <p className="font-bold">{profile.age}y • {profile.weight}{measurementUnit === 'metric' ? 'kg' : 'lb'} • {profile.height}{measurementUnit === 'metric' ? 'cm' : 'ft'}</p>
                             </div>
                             <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
                                 <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-1">Dietary Goal</p>
@@ -1335,7 +1335,7 @@ export function MealPlannerContent({
                                                                 unitStr = (label === 'Energy') ? unit :
                                                                     (label === 'Protein' || label === 'Carbs' || label === 'Fat' || label === 'Fiber' || label === 'Sugars') ? 'g' :
                                                                         (label === 'Vitamin D') ? 'IU' :
-                                                                            (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('Âµg')) ? 'Âµg' : 'mg';
+                                                                            (label.includes('Folate') || label.includes('Selenium') || label.includes('Iodine') || label.includes('B12') || label === 'Vitamin A' || label === 'Vitamin K' || label.includes('µg')) ? 'µg' : 'mg';
                                                             }
 
                                                             const pct = rda ? Math.round((val / rda) * 100) : null;
@@ -1374,7 +1374,7 @@ export function MealPlannerContent({
                                                             const hasBreakdown = breakdownLabels.includes(label);
 
                                                             return (
-                                                                <div key={label} onClick={() => router.push(`/dashboard/workshop/nutridex/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, (pct !== null || title === 'Biological Ratios') ? `${styles.borderLight} ${styles.fade}` : "")}>
+                                                                <div key={label} onClick={() => router.push(`/dashboard/widgets/nutridex/${encodeURIComponent(label)}`)} className={cn("p-4 rounded-2xl border bg-white dark:bg-slate-950 cursor-pointer hover:shadow-md transition-all relative group", t.itemBorder, (pct !== null || title === 'Biological Ratios') ? `${styles.borderLight} ${styles.fade}` : "")}>
                                                                     <p className={cn("text-[8px] uppercase font-black truncate mb-1 flex items-center gap-0.5 whitespace-nowrap overflow-hidden")}>
                                                                         {title === 'Biological Ratios' && label.includes(':') ? (
                                                                             <>
@@ -1416,7 +1416,7 @@ export function MealPlannerContent({
                                                                             <>
                                                                                 <div className="flex items-baseline gap-1">
                                                                                     <span className={cn("text-lg font-bold", title === 'Biological Ratios' ? styles.text : "")}>{val.toFixed(2)}</span>
-                                                                                    <span className={cn("text-[10px] font-bold", (unitStr === 'Âµg') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unitStr}</span>
+                                                                                    <span className={cn("text-[10px] font-bold", (unitStr === 'µg') ? "text-blue-600 dark:text-blue-400" : "text-muted-foreground")}>{unitStr}</span>
                                                                                 </div>
                                                                                 {rda && (
                                                                                     <p className="text-[9px] font-bold text-slate-400 mt-0.5">

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -172,7 +172,7 @@ export function NutrientsView() {
                         return (
                             <div
                                 key={name}
-                                onClick={() => router.push(`/dashboard/workshop/nutridex/${encodeURIComponent(name)}`)}
+                                onClick={() => router.push(`/dashboard/widgets/nutridex/${encodeURIComponent(name)}`)}
                                 className="group bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-blue-500/30 hover:shadow-lg transition-all cursor-pointer overflow-hidden p-4"
                             >
                                 <div className="flex items-center gap-6">

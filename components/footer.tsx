@@ -7,7 +7,7 @@ export function Footer() {
   const pathname = usePathname();
 
   // Hide footer on foods page and comparator page
-  if (pathname === '/dashboard/ingredients/foods' || pathname === '/dashboard/workshop/comparator') {
+  if (pathname === '/dashboard/ingredients/foods' || pathname === '/dashboard/widgets/comparator') {
     return null;
   }
 

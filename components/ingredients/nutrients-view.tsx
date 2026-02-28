@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -69,7 +69,7 @@ const SHORTHAND_MAP: Record<string, string> = {
     'Fat': 'FAT',
     'Fiber': 'FIB',
     'Sugar': 'SUG',
-    'Omega-3': 'Ω3',
+    'Omega-3': 'O3',
     'Cholesterol': 'CHL',
     'welcome': 'W'
 };
@@ -193,7 +193,7 @@ export function NutrientsView(props: NutrientsViewProps = {}) {
                     return (
                         <div
                             key={name}
-                            onClick={() => router.push(`/dashboard/workshop/nutridex/${encodeURIComponent(name)}`)}
+                            onClick={() => router.push(`/dashboard/widgets/nutridex/${encodeURIComponent(name)}`)}
                             className="group bg-white dark:bg-slate-900/50 rounded-3xl border border-slate-200 dark:border-slate-800 hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/5 transition-all duration-500 cursor-pointer overflow-hidden"
                         >
                             <div className="lg:grid lg:grid-cols-[100px_1fr_120px_120px_120px_140px] gap-6 lg:items-center">

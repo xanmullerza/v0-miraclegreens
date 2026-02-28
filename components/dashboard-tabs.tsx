@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-    Library, ChefHat, Wrench,
+    Library, ChefHat, LayoutGrid,
     Leaf, Package, ShoppingCart,
     Calendar, Beaker,
     Scale, Activity, Wallet,
@@ -59,17 +59,17 @@ const TAB_CONFIG: TopTab[] = [
         ],
     },
     {
-        id: 'workshop',
-        label: 'Workshop',
-        icon: Wrench,
+        id: 'widgets',
+        label: 'Widgets',
+        icon: LayoutGrid,
         color: 'text-slate-400',
         activeColor: 'text-purple-400',
         activeBg: 'bg-purple-500/10 border-purple-500/30',
-        defaultHref: '/dashboard/workshop/comparator',
+        defaultHref: '/dashboard/widgets/comparator',
         subtabs: [
-            { id: 'comparator', label: 'Comparator', href: '/dashboard/workshop/comparator', icon: Scale },
-            { id: 'nutridex', label: 'Nutridex', href: '/dashboard/workshop/nutridex', icon: Activity },
-            { id: 'lifeguard', label: 'Life Guard', href: '/dashboard/workshop/lifeguard', icon: Wallet },
+            { id: 'comparator', label: 'Comparator', href: '/dashboard/widgets/comparator', icon: Scale },
+            { id: 'nutridex', label: 'Nutridex', href: '/dashboard/widgets/nutridex', icon: Activity },
+            { id: 'lifeguard', label: 'Life Guard', href: '/dashboard/widgets/lifeguard', icon: Wallet },
         ],
     },
 ];
