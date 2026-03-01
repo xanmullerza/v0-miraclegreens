@@ -342,7 +342,7 @@ export default function ShoppingListPage() {
                                     ) : (
                                         <>
                                             <Plus size={16} />
-                                            Add
+                                            Add to Groceries
                                         </>
                                     )}
                                 </Button>
