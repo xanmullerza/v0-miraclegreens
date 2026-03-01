@@ -388,7 +388,8 @@ export function MealPlannerContent({
         try {
             const { data, error } = await supabase
                 .from('recipes')
-                .select('id, title, type, energy_kcal, image, is_mix')
+                .select('*')
+                .eq('is_mix', false)
                 .ilike('title', `%${query}%`)
                 .limit(8);
             if (error) throw error;
