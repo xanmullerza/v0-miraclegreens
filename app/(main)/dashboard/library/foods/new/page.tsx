@@ -528,15 +528,6 @@ Fat: ${item.fat_g || 0}g
                                         value={servingText}
                                         onChange={(e) => setServingText(e.target.value)}
                                     />
-                                    <Button
-                                        size="sm"
-                                        variant="outline"
-                                        className="w-full h-9 text-xs font-bold"
-                                        onClick={() => toast.info('Manual serving add coming soon')}
-                                    >
-                                        <Plus size={14} className="mr-1" />
-                                        Manual Add
-                                    </Button>
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Nutrient List</Label>
@@ -546,15 +537,6 @@ Fat: ${item.fat_g || 0}g
                                         value={nutrientText}
                                         onChange={(e) => setNutrientText(e.target.value)}
                                     />
-                                    <Button
-                                        size="sm"
-                                        variant="outline"
-                                        className="w-full h-9 text-xs font-bold"
-                                        onClick={() => toast.info('Manual nutrient add coming soon')}
-                                    >
-                                        <Plus size={14} className="mr-1" />
-                                        Manual Add
-                                    </Button>
                                 </div>
                             </div>
 
@@ -608,6 +590,32 @@ Fat: ${item.fat_g || 0}g
                     </div>
                 </Card>
             </div>
+
+            {/* Manual Add Buttons - Always Visible */}
+            <Card className="p-8 w-full">
+                <div className="flex items-center gap-3 mb-6">
+                    <Plus size={20} className="text-emerald-500" />
+                    <h3 className="font-black text-sm uppercase tracking-widest">Manual Entry</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Button
+                        size="sm"
+                        className="h-10 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg"
+                        onClick={() => toast.info('Manual serving add coming soon')}
+                    >
+                        <Plus size={16} className="mr-2" />
+                        Add Serving Size
+                    </Button>
+                    <Button
+                        size="sm"
+                        className="h-10 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg"
+                        onClick={() => toast.info('Manual nutrient add coming soon')}
+                    >
+                        <Plus size={16} className="mr-2" />
+                        Add Nutrient
+                    </Button>
+                </div>
+            </Card>
 
             {/* Photo Section - Full Width */}
             <Card className="p-8 w-full">
