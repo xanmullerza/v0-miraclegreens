@@ -68,6 +68,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
     const [items, setItems] = useState<ShoppingListItem[]>([]);
     const [manualItems, setManualItems] = useState<ShoppingListItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [enriching, setEnriching] = useState(false);
     const { searchQuery } = useSearch();
     const { dailyPlan } = useUserPreferences();
     const [pantryItems, setPantryItems] = useState<any[]>([]);
@@ -120,137 +121,130 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         }
     }, [manualItems, loading]);
 
-    // Combine manual items with meal plan items
+    // Combine manual items with meal plan items, then enrich before setting state
     useEffect(() => {
-        let combined = [...manualItems];
-
-        if (dailyPlan) {
-            const mealPlanItems = generateShoppingList(dailyPlan);
-
-            // Build sets for filtering pantry items
-            // For food_item_id matching (most reliable)
-            const pantryFoodIds = new Set(
-                pantryItems
-                    .filter((f: any) => f.food_item_id)  // Only items with food_item_id
-                    .map((f: any) => f.food_item_id)
-            );
-
-            // Fallback to name matching for items without food_item_id
-            const normalize = (s?: string) =>
-                (s || '')
-                    .toLowerCase()
-                    .replace(/\(.*?\)/g, '')
-                    .replace(/[^a-z0-9]/g, ' ')
-                    .replace(/\s+/g, ' ')
-                    .trim()
-                    .replace(/s$/, '');
-            const pantryNames = new Set(pantryItems.map(f => normalize(f.common_name || f.name)));
-
-            // Convert to our format and filter out pantry items
-            const convertedItems: ShoppingListItem[] = mealPlanItems
-                .filter(item => {
-                    // If item has food_item_id, use ID matching
-                    if (item.food_item_id) {
-                        return !pantryFoodIds.has(item.food_item_id);
-                    }
-                    // Otherwise use name matching
-                    return !pantryNames.has(normalize(item.name));
-                })
-                .map((item, idx) => ({
-                    id: `mealplan-${idx}`,
-                    name: item.name,
-                    quantity: item.amounts.join(' + '),
-                    unit: '',
-                    is_miracle_product: item.isMiracleProduct,
-                    source: 'mealplan' as const,
-                    food_item_id: item.food_item_id
-                }));
-
-            // Deduplicate: If item exists in manual/scanned list, don't show from meal plan
-            const manualNames = new Set(manualItems.map(i => normalize(i.name)));
-            const newMealPlanItems = convertedItems.filter(i => !manualNames.has(normalize(i.name)));
-
-            combined = [...manualItems, ...newMealPlanItems];
-        }
-
-        setItems(combined);
-    }, [dailyPlan, pantryItems, manualItems]);
-
-    // Enrichment for items missing category, image, or common_name
-    // Enrichment: fetch category, image, common_name for items from DB
-    useEffect(() => {
-        const needEnrichById = items.filter(i => i.food_item_id && (!i.category || !i.image));
-        const needEnrichByName = items.filter(i => !i.food_item_id && !i.category);
-        if (needEnrichById.length === 0 && needEnrichByName.length === 0) return;
-
         let isCancelled = false;
 
-        const enrich = async () => {
-            // Phase 1: Enrich by food_item_id
-            const idToData = new Map<string, any>();
-            if (needEnrichById.length > 0) {
-                const ids = needEnrichById.map(i => i.food_item_id).filter(Boolean) as string[];
-                if (ids.length > 0) {
-                    const { data } = await supabase
-                        .from('food_items')
-                        .select('id, category, image, common_name')
-                        .in('id', ids);
-                    if (data) data.forEach((d: any) => idToData.set(d.id, d));
-                }
+        const combineAndEnrich = async () => {
+            let combined = [...manualItems];
+
+            if (dailyPlan) {
+                const mealPlanItems = generateShoppingList(dailyPlan);
+
+                // Build sets for filtering pantry items
+                const pantryFoodIds = new Set(
+                    pantryItems
+                        .filter((f: any) => f.food_item_id)
+                        .map((f: any) => f.food_item_id)
+                );
+
+                const normalize = (s?: string) =>
+                    (s || '')
+                        .toLowerCase()
+                        .replace(/\(.*?\)/g, '')
+                        .replace(/[^a-z0-9]/g, ' ')
+                        .replace(/\s+/g, ' ')
+                        .trim()
+                        .replace(/s$/, '');
+                const pantryNames = new Set(pantryItems.map(f => normalize(f.common_name || f.name)));
+
+                const convertedItems: ShoppingListItem[] = mealPlanItems
+                    .filter(item => {
+                        if (item.food_item_id) {
+                            return !pantryFoodIds.has(item.food_item_id);
+                        }
+                        return !pantryNames.has(normalize(item.name));
+                    })
+                    .map((item, idx) => ({
+                        id: `mealplan-${idx}`,
+                        name: item.name,
+                        quantity: item.amounts.join(' + '),
+                        unit: '',
+                        is_miracle_product: item.isMiracleProduct,
+                        source: 'mealplan' as const,
+                        food_item_id: item.food_item_id
+                    }));
+
+                const manualNames = new Set(manualItems.map(i => normalize(i.name)));
+                const newMealPlanItems = convertedItems.filter(i => !manualNames.has(normalize(i.name)));
+
+                combined = [...manualItems, ...newMealPlanItems];
             }
 
-            // Phase 2: Enrich by name lookup for items without food_item_id
-            const nameToData = new Map<string, any>();
-            if (needEnrichByName.length > 0) {
-                // Search for each name in DB
-                const names = needEnrichByName.map(i => i.name);
-                for (const name of names) {
-                    if (isCancelled) break;
-                    if (nameToData.has(name.toLowerCase())) continue;
-                    const { data } = await supabase
-                        .from('food_items')
-                        .select('id, category, image, common_name')
-                        .or(`name.ilike.%${name}%,common_name.ilike.%${name}%`)
-                        .limit(1);
-                    if (data && data.length > 0) {
-                        nameToData.set(name.toLowerCase(), data[0]);
+            // Enrich items before setting state to avoid the "Other" flash
+            const needEnrichById = combined.filter(i => i.food_item_id && (!i.category || !i.image));
+            const needEnrichByName = combined.filter(i => !i.food_item_id && !i.category);
+
+            if (needEnrichById.length > 0 || needEnrichByName.length > 0) {
+                setEnriching(true);
+
+                // Phase 1: Enrich by food_item_id
+                const idToData = new Map<string, any>();
+                if (needEnrichById.length > 0) {
+                    const ids = needEnrichById.map(i => i.food_item_id).filter(Boolean) as string[];
+                    if (ids.length > 0) {
+                        const { data } = await supabase
+                            .from('food_items')
+                            .select('id, category, image, common_name')
+                            .in('id', ids);
+                        if (data) data.forEach((d: any) => idToData.set(d.id, d));
                     }
                 }
+
+                // Phase 2: Enrich by name lookup for items without food_item_id
+                const nameToData = new Map<string, any>();
+                if (needEnrichByName.length > 0) {
+                    const names = [...new Set(needEnrichByName.map(i => i.name.toLowerCase()))];
+                    for (const name of names) {
+                        if (isCancelled) break;
+                        const { data } = await supabase
+                            .from('food_items')
+                            .select('id, category, image, common_name')
+                            .or(`name.ilike.%${name}%,common_name.ilike.%${name}%`)
+                            .limit(1);
+                        if (data && data.length > 0) {
+                            nameToData.set(name, data[0]);
+                        }
+                    }
+                }
+
+                if (!isCancelled) {
+                    combined = combined.map(item => {
+                        if (item.food_item_id && idToData.has(item.food_item_id)) {
+                            const d = idToData.get(item.food_item_id);
+                            const updated = { ...item };
+                            if (!item.category && d.category) updated.category = d.category;
+                            if (!item.image && d.image) updated.image = d.image;
+                            if (!item.common_name && d.common_name) updated.common_name = d.common_name;
+                            return updated;
+                        }
+                        if (!item.category && nameToData.has(item.name.toLowerCase())) {
+                            const d = nameToData.get(item.name.toLowerCase());
+                            const updated = { ...item };
+                            if (d.category) updated.category = d.category;
+                            if (d.image) updated.image = d.image;
+                            if (d.common_name) updated.common_name = d.common_name;
+                            if (d.id) updated.food_item_id = d.id;
+                            return updated;
+                        }
+                        return item;
+                    });
+                }
+
+                setEnriching(false);
             }
 
-            if (!isCancelled && (idToData.size > 0 || nameToData.size > 0)) {
-                setItems(prev => prev.map(item => {
-                    // Try ID-based enrichment first
-                    if (item.food_item_id && idToData.has(item.food_item_id)) {
-                        const d = idToData.get(item.food_item_id);
-                        const updated = { ...item };
-                        if (!item.category && d.category) updated.category = d.category;
-                        if (!item.image && d.image) updated.image = d.image;
-                        if (!item.common_name && d.common_name) updated.common_name = d.common_name;
-                        if (!item.food_item_id && d.id) updated.food_item_id = d.id;
-                        return updated;
-                    }
-                    // Try name-based enrichment
-                    if (!item.category && nameToData.has(item.name.toLowerCase())) {
-                        const d = nameToData.get(item.name.toLowerCase());
-                        const updated = { ...item };
-                        if (d.category) updated.category = d.category;
-                        if (d.image) updated.image = d.image;
-                        if (d.common_name) updated.common_name = d.common_name;
-                        if (d.id) updated.food_item_id = d.id;
-                        return updated;
-                    }
-                    return item;
-                }));
+            if (!isCancelled) {
+                setItems(combined);
             }
         };
 
-        enrich();
+        combineAndEnrich();
 
         return () => {
             isCancelled = true;
         };
-    }, [items.length]);
+    }, [dailyPlan, pantryItems, manualItems]);
 
     const fetchData = async () => {
         setLoading(true);
@@ -800,7 +794,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
 
 
             {/* Loading State */}
-            {loading ? (
+            {(loading || enriching) ? (
                 <div className="flex flex-col items-center justify-center py-24 gap-4">
                     <Loader2 className="animate-spin text-emerald-500" size={40} />
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Loading your list...</p>
