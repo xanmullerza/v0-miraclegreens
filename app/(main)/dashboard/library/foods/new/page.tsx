@@ -140,6 +140,33 @@ function FoodItemCreatorContent() {
     const [showParser, setShowParser] = useState(true);
     const [showImportPicker, setShowImportPicker] = useState(false);
 
+    // Panel modes: null = show buttons, 'paste' = show textarea, 'add' = show manual form
+    const [servingPanel, setServingPanel] = useState<'paste' | 'add' | null>(null);
+    const [nutrientPanel, setNutrientPanel] = useState<'paste' | 'add' | null>(null);
+
+    // Manual serving entries: array of { name, weight_g }
+    const [manualServings, setManualServings] = useState<{ name: string; weight_g: string }[]>([{ name: '', weight_g: '' }]);
+
+    // Manual nutrient entries: array of { nutrient, value }
+    const [manualNutrients, setManualNutrients] = useState<{ nutrient: string; value: string }[]>([{ nutrient: '', value: '' }]);
+
+    // Sync manual entries into text strings for the existing parser
+    const syncManualToText = () => {
+        // Build serving text from manual entries
+        const manualServingLines = manualServings
+            .filter(s => s.name.trim() && s.weight_g.trim())
+            .map(s => `1 ${s.name.trim()} = ${s.weight_g.trim()}g`);
+        const combinedServingText = [servingText, ...manualServingLines].filter(Boolean).join('\n');
+
+        // Build nutrient text from manual entries
+        const manualNutrientLines = manualNutrients
+            .filter(n => n.nutrient.trim() && n.value.trim())
+            .map(n => `${n.nutrient} ${n.value}`);
+        const combinedNutrientText = [nutrientText, ...manualNutrientLines].filter(Boolean).join('\n');
+
+        return { combinedServingText, combinedNutrientText };
+    };
+
 
     const integrity = useMemo(() => {
         const present = ALL_CLINICAL_MARKERS.filter((m: string) => {
@@ -281,12 +308,15 @@ Fat: ${food.fat_g || 0}g
 
         setLoading(true);
         try {
+            // Merge manual entries with pasted text before parsing
+            const { combinedServingText, combinedNutrientText } = syncManualToText();
+
             // Parse nutrition text inline before saving
-            const combinedText = `${servingText}\n${nutrientText}`.trim();
+            const combinedText = `${combinedServingText}\n${combinedNutrientText}`.trim();
             const parsed = combinedText ? parseNutritionText(combinedText) : { micronutrients: {} };
 
             // Parse portions
-            const parsedPortions = servingText ? parseMeasures(servingText) : [];
+            const parsedPortions = combinedServingText ? parseMeasures(combinedServingText) : [];
 
             // Use parsed values, falling back to any manually entered values
             const finalEnergyKcal = parsed.energy_kcal || parseFloat(energyKcal) || null;
@@ -519,42 +549,196 @@ Fat: ${item.fat_g || 0}g
                                 <h3 className="font-black text-sm uppercase tracking-widest">Nutrients & Servings</h3>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Servings & Sizes</Label>
+                            {/* Action Buttons */}
+                            <div className="grid grid-cols-2 gap-3 mb-6">
+                                <button
+                                    type="button"
+                                    onClick={() => setServingPanel(servingPanel === 'add' ? null : 'add')}
+                                    className={cn(
+                                        "h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
+                                        servingPanel === 'add'
+                                            ? "bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
+                                            : "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-950/50"
+                                    )}
+                                >
+                                    <Plus size={16} />
+                                    Add Servings
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setServingPanel(servingPanel === 'paste' ? null : 'paste')}
+                                    className={cn(
+                                        "h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
+                                        servingPanel === 'paste'
+                                            ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                                            : "bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-950/50"
+                                    )}
+                                >
+                                    <Scale size={16} />
+                                    Paste Servings
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setNutrientPanel(nutrientPanel === 'add' ? null : 'add')}
+                                    className={cn(
+                                        "h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
+                                        nutrientPanel === 'add'
+                                            ? "bg-emerald-600 text-white shadow-lg shadow-emerald-500/20"
+                                            : "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-950/50"
+                                    )}
+                                >
+                                    <Plus size={16} />
+                                    Add Nutrients
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setNutrientPanel(nutrientPanel === 'paste' ? null : 'paste')}
+                                    className={cn(
+                                        "h-12 flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest rounded-xl transition-all",
+                                        nutrientPanel === 'paste'
+                                            ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                                            : "bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-950/50"
+                                    )}
+                                >
+                                    <Activity size={16} />
+                                    Paste Nutrients
+                                </button>
+                            </div>
+
+                            {/* Serving Paste Panel */}
+                            {servingPanel === 'paste' && (
+                                <div className="mb-6 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-blue-600 ml-1">Paste Servings & Sizes</Label>
                                     <Textarea
                                         placeholder="Paste things like '1 cup = 240g' or serving info here..."
-                                        className="min-h-[180px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
+                                        className="min-h-[160px] bg-white dark:bg-slate-950 border-blue-500/20 text-xs focus:ring-blue-500/20 rounded-2xl font-mono p-4"
                                         value={servingText}
                                         onChange={(e) => setServingText(e.target.value)}
                                     />
+                                </div>
+                            )}
+
+                            {/* Serving Add Panel */}
+                            {servingPanel === 'add' && (
+                                <div className="mb-6 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Add Serving Sizes</Label>
+                                    <div className="space-y-2">
+                                        {manualServings.map((s, i) => (
+                                            <div key={i} className="flex items-center gap-2">
+                                                <Input
+                                                    placeholder="e.g. cup, tablespoon, slice"
+                                                    className="flex-1 h-9 text-sm rounded-lg bg-white dark:bg-slate-950"
+                                                    value={s.name}
+                                                    onChange={(e) => {
+                                                        const updated = [...manualServings];
+                                                        updated[i] = { ...updated[i], name: e.target.value };
+                                                        setManualServings(updated);
+                                                    }}
+                                                />
+                                                <Input
+                                                    placeholder="g"
+                                                    type="number"
+                                                    className="w-20 h-9 text-sm text-center rounded-lg bg-white dark:bg-slate-950"
+                                                    value={s.weight_g}
+                                                    onChange={(e) => {
+                                                        const updated = [...manualServings];
+                                                        updated[i] = { ...updated[i], weight_g: e.target.value };
+                                                        setManualServings(updated);
+                                                    }}
+                                                />
+                                                {manualServings.length > 1 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setManualServings(manualServings.filter((_, idx) => idx !== i))}
+                                                        className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
                                     <button
                                         type="button"
-                                        onClick={() => toast.info('Manual serving add coming soon')}
-                                        className="w-full h-9 flex items-center justify-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
+                                        onClick={() => setManualServings([...manualServings, { name: '', weight_g: '' }])}
+                                        className="w-full h-8 flex items-center justify-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-dashed border-emerald-300 dark:border-emerald-800 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
                                     >
-                                        <Plus size={14} />
-                                        Manual Add
+                                        <Plus size={12} />
+                                        Add More
                                     </button>
                                 </div>
-                                <div className="space-y-3">
-                                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Nutrient List</Label>
+                            )}
+
+                            {/* Nutrient Paste Panel */}
+                            {nutrientPanel === 'paste' && (
+                                <div className="mb-6 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-blue-600 ml-1">Paste Nutrient List</Label>
                                     <Textarea
                                         placeholder="Paste the list of calories, vitamins, and minerals here..."
-                                        className="min-h-[180px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
+                                        className="min-h-[160px] bg-white dark:bg-slate-950 border-blue-500/20 text-xs focus:ring-blue-500/20 rounded-2xl font-mono p-4"
                                         value={nutrientText}
                                         onChange={(e) => setNutrientText(e.target.value)}
                                     />
+                                </div>
+                            )}
+
+                            {/* Nutrient Add Panel */}
+                            {nutrientPanel === 'add' && (
+                                <div className="mb-6 space-y-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                                    <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Add Nutrients</Label>
+                                    <div className="space-y-2">
+                                        {manualNutrients.map((n, i) => (
+                                            <div key={i} className="flex items-center gap-2">
+                                                <select
+                                                    value={n.nutrient}
+                                                    onChange={(e) => {
+                                                        const updated = [...manualNutrients];
+                                                        updated[i] = { ...updated[i], nutrient: e.target.value };
+                                                        setManualNutrients(updated);
+                                                    }}
+                                                    className="flex-1 h-9 px-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white font-medium"
+                                                >
+                                                    <option value="">Select nutrient...</option>
+                                                    {Object.entries(CATEGORIZED_MARKERS).map(([group, markers]) => (
+                                                        <optgroup key={group} label={group}>
+                                                            {markers.map(m => (
+                                                                <option key={m} value={m}>{m}</option>
+                                                            ))}
+                                                        </optgroup>
+                                                    ))}
+                                                </select>
+                                                <Input
+                                                    placeholder="Value"
+                                                    className="w-24 h-9 text-sm text-center rounded-lg bg-white dark:bg-slate-950"
+                                                    value={n.value}
+                                                    onChange={(e) => {
+                                                        const updated = [...manualNutrients];
+                                                        updated[i] = { ...updated[i], value: e.target.value };
+                                                        setManualNutrients(updated);
+                                                    }}
+                                                />
+                                                {manualNutrients.length > 1 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setManualNutrients(manualNutrients.filter((_, idx) => idx !== i))}
+                                                        className="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
                                     <button
                                         type="button"
-                                        onClick={() => toast.info('Manual nutrient add coming soon')}
-                                        className="w-full h-9 flex items-center justify-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
+                                        onClick={() => setManualNutrients([...manualNutrients, { nutrient: '', value: '' }])}
+                                        className="w-full h-8 flex items-center justify-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-dashed border-emerald-300 dark:border-emerald-800 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
                                     >
-                                        <Plus size={14} />
-                                        Manual Add
+                                        <Plus size={12} />
+                                        Add More
                                     </button>
                                 </div>
-                            </div>
+                            )}
 
                         </Card>
                     </div>
@@ -667,10 +851,10 @@ Fat: ${item.fat_g || 0}g
                     </Button>
                     <Button
                         onClick={handleSave}
-                        disabled={loading || !name.trim() || !servingText.trim() || !nutrientText.trim()}
+                        disabled={loading || !name.trim() || (!servingText.trim() && !manualServings.some(s => s.name.trim() && s.weight_g.trim())) || (!nutrientText.trim() && !manualNutrients.some(n => n.nutrient.trim() && n.value.trim()))}
                         className={cn(
                             "flex-1 h-14 rounded-[18px] text-white shadow-xl text-[10px] font-black uppercase tracking-widest gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300",
-                            (name.trim() && servingText.trim() && nutrientText.trim())
+                            (name.trim() && (servingText.trim() || manualServings.some(s => s.name.trim() && s.weight_g.trim())) && (nutrientText.trim() || manualNutrients.some(n => n.nutrient.trim() && n.value.trim())))
                                 ? "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20 transform scale-[1.02]"
                                 : "bg-slate-950 hover:bg-slate-900 shadow-slate-950/20"
                         )}
