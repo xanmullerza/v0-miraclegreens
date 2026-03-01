@@ -53,10 +53,10 @@ const TAB_CONFIG: TopTab[] = [
         color: 'text-slate-400',
         activeColor: 'text-amber-400',
         activeBg: 'bg-amber-500/10 border-amber-500/30',
-        defaultHref: '/dashboard/recipes/meal-o-matic',
-        matchPaths: ['/dashboard/recipes/meal-o-matic', '/dashboard/ingredients/pantry', '/dashboard/ingredients/groceries'],
+        defaultHref: '/dashboard/recipes/planner',
+        matchPaths: ['/dashboard/recipes/planner', '/dashboard/ingredients/pantry', '/dashboard/ingredients/groceries'],
         subtabs: [
-            { id: 'meal-o-matic', label: 'Mealomatic', href: '/dashboard/recipes/meal-o-matic', icon: Calendar },
+            { id: 'planner', label: 'Planner', href: '/dashboard/recipes/planner', icon: Calendar },
             { id: 'pantry', label: 'Pantry', href: '/dashboard/ingredients/pantry', icon: Package },
             { id: 'groceries', label: 'Groceries', href: '/dashboard/ingredients/groceries', icon: ShoppingCart },
         ],
