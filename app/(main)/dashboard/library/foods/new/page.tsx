@@ -528,6 +528,15 @@ Fat: ${item.fat_g || 0}g
                                         value={servingText}
                                         onChange={(e) => setServingText(e.target.value)}
                                     />
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="w-full h-9 text-xs font-bold"
+                                        onClick={() => toast.info('Manual serving add coming soon')}
+                                    >
+                                        <Plus size={14} className="mr-1" />
+                                        Manual Add
+                                    </Button>
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Nutrient List</Label>
@@ -537,6 +546,15 @@ Fat: ${item.fat_g || 0}g
                                         value={nutrientText}
                                         onChange={(e) => setNutrientText(e.target.value)}
                                     />
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="w-full h-9 text-xs font-bold"
+                                        onClick={() => toast.info('Manual nutrient add coming soon')}
+                                    >
+                                        <Plus size={14} className="mr-1" />
+                                        Manual Add
+                                    </Button>
                                 </div>
                             </div>
 
