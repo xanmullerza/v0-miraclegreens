@@ -1051,15 +1051,6 @@ export function PantryView({
                                                     >
                                                         <ChevronDown size={14} className={cn("transition-transform", expandedQuantityId === food.id && "rotate-180")} />
                                                     </button>
-
-                                                    {/* Stock breakdown divide button */}
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); setExpandedStockBreakdownId(expandedStockBreakdownId === food.id ? null : food.id); }}
-                                                        className={cn("p-1.5 rounded-lg transition-all flex-shrink-0", expandedStockBreakdownId === food.id ? "text-amber-500 bg-amber-100 dark:bg-amber-950/40" : "text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500")}
-                                                        title="View stock breakdown"
-                                                    >
-                                                        <Slash size={14} />
-                                                    </button>
                                                 </div>
 
                                                 {/* Expanded action buttons - shown when expanded */}
@@ -1088,6 +1079,13 @@ export function PantryView({
                                                             title="Remove from pantry"
                                                         >
                                                             <X size={18} />
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); setExpandedStockBreakdownId(expandedStockBreakdownId === food.id ? null : food.id); }}
+                                                            className={cn("p-2.5 rounded-lg transition-all flex-shrink-0", expandedStockBreakdownId === food.id ? "text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-950/40" : "text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500")}
+                                                            title="View stock breakdown"
+                                                        >
+                                                            <Slash size={18} />
                                                         </button>
                                                     </div>
                                                 )}
