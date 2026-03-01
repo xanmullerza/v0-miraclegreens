@@ -399,6 +399,7 @@ export interface ShoppingItem {
     amounts: string[];
     isMiracleProduct: boolean;
     food_item_id?: string;
+    totalWeightG: number;
 }
 
 export const generateShoppingList = (plan: DailyPlan): ShoppingItem[] => {
@@ -427,10 +428,13 @@ export const generateShoppingList = (plan: DailyPlan): ShoppingItem[] => {
 
     allIngredients.forEach(ing => {
         const shoppingName = ing.baseIngredient || ing.item;
+        const factor = 1; // already scaled above
+        const ingWeightG = (ing.weightG || 0);
 
         const existing = itemMap.get(shoppingName);
         if (existing) {
             existing.amounts.push(ing.amount);
+            existing.totalWeightG += ingWeightG;
             // Keep the first food_item_id we find
             if (!existing.food_item_id && ing.food_item_id) {
                 existing.food_item_id = ing.food_item_id;
@@ -440,7 +444,8 @@ export const generateShoppingList = (plan: DailyPlan): ShoppingItem[] => {
                 name: shoppingName,
                 amounts: [ing.amount],
                 isMiracleProduct: ing.isMiracleProduct || false,
-                food_item_id: ing.food_item_id
+                food_item_id: ing.food_item_id,
+                totalWeightG: ingWeightG
             });
         }
     });

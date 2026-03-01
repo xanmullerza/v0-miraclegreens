@@ -134,12 +134,17 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
             if (dailyPlan) {
                 const mealPlanItems = generateShoppingList(dailyPlan);
 
-                // Build sets for filtering pantry items
-                const pantryFoodIds = new Set(
-                    pantryItems
-                        .filter((f: any) => f.food_item_id)
-                        .map((f: any) => f.food_item_id)
-                );
+                // Load pantry quantities from localStorage for quantity-aware filtering
+                let pantryQuantities: Record<string, string> = {};
+                try {
+                    const saved = localStorage.getItem('pantry_quantities');
+                    if (saved) pantryQuantities = JSON.parse(saved);
+                } catch (e) { /* ignore */ }
+
+                // Build map of pantry stock in grams: food_item_id -> grams
+                const pantryStockGrams = new Map<string, number>();
+                // Also build name -> grams for fallback matching
+                const pantryStockByName = new Map<string, number>();
 
                 const normalize = (s?: string) =>
                     (s || '')
@@ -149,24 +154,88 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                         .replace(/\s+/g, ' ')
                         .trim()
                         .replace(/s$/, '');
-                const pantryNames = new Set(pantryItems.map(f => normalize(f.common_name || f.name)));
 
-                const convertedItems: ShoppingListItem[] = mealPlanItems
-                    .filter(item => {
-                        if (item.food_item_id) {
-                            return !pantryFoodIds.has(item.food_item_id);
+                // Helper to parse a pantry quantity string into total grams
+                const parsePantryGrams = (qtyStr: string): number => {
+                    let total = 0;
+                    const entries = qtyStr.split(/\s*\+\s*/);
+                    for (const entry of entries) {
+                        const trimmed = entry.trim();
+                        if (!trimmed) continue;
+                        // "5 Large (223g)" or "1 kilogram (1000g)"
+                        const labeled = trimmed.match(/^(\d+(?:\.\d+)?)\s+.+?\s+\((\d+(?:\.\d+)?)g\)$/);
+                        if (labeled) { total += parseFloat(labeled[1]) * parseFloat(labeled[2]); continue; }
+                        // "2 x 100g"
+                        const weighted = trimmed.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(g|kg)$/i);
+                        if (weighted) { const w = weighted[3].toLowerCase() === 'kg' ? parseFloat(weighted[2]) * 1000 : parseFloat(weighted[2]); total += parseFloat(weighted[1]) * w; continue; }
+                        // "1.5 kg" or "300 grams" or "1 kilogram"
+                        const textUnit = trimmed.match(/^(\d+(?:\.\d+)?)\s*(kg|kilograms?|grams?|g)$/i);
+                        if (textUnit) { const val = parseFloat(textUnit[1]); const unit = textUnit[2].toLowerCase(); total += (unit === 'kg' || unit.startsWith('kilogram')) ? val * 1000 : val; continue; }
+                        // Plain number — treat as quantity (assume ~1000g per unit for rough check)
+                        const plain = trimmed.match(/^(\d+(?:\.\d+)?)$/);
+                        if (plain) { total += parseFloat(plain[1]) * 1000; continue; }
+                    }
+                    return total;
+                };
+
+                for (const pantryItem of pantryItems) {
+                    const qtyStr = pantryQuantities[pantryItem.id] || pantryItem.quantity || '';
+                    const grams = parsePantryGrams(qtyStr);
+                    const itemId = pantryItem.food_item_id || pantryItem.id;
+                    pantryStockGrams.set(itemId, (pantryStockGrams.get(itemId) || 0) + grams);
+                    const nameKey = normalize(pantryItem.common_name || pantryItem.name);
+                    if (nameKey) {
+                        pantryStockByName.set(nameKey, (pantryStockByName.get(nameKey) || 0) + grams);
+                    }
+                }
+
+                // Quantity-aware filtering: only show items where pantry doesn't have enough
+                const convertedItems: ShoppingListItem[] = [];
+                let idx = 0;
+                for (const item of mealPlanItems) {
+                    const neededG = item.totalWeightG || 0;
+
+                    // Find pantry stock for this item
+                    let pantryG = 0;
+                    if (item.food_item_id && pantryStockGrams.has(item.food_item_id)) {
+                        pantryG = pantryStockGrams.get(item.food_item_id)!;
+                    } else {
+                        const nameKey = normalize(item.name);
+                        if (pantryStockByName.has(nameKey)) {
+                            pantryG = pantryStockByName.get(nameKey)!;
                         }
-                        return !pantryNames.has(normalize(item.name));
-                    })
-                    .map((item, idx) => ({
+                    }
+
+                    if (neededG > 0 && pantryG >= neededG) {
+                        // Pantry fully covers this item — skip it
+                        idx++;
+                        continue;
+                    }
+
+                    // If pantry has 0 or no weight info — show full amount
+                    // If pantry has partial — show deficit
+                    let quantity = item.amounts.join(' + ');
+                    if (neededG > 0 && pantryG > 0 && pantryG < neededG) {
+                        const deficitG = neededG - pantryG;
+                        // Show the deficit as the needed quantity
+                        if (deficitG >= 1000) {
+                            quantity = `${parseFloat((deficitG / 1000).toFixed(1))} kg`;
+                        } else {
+                            quantity = `${Math.round(deficitG)} g`;
+                        }
+                    }
+
+                    convertedItems.push({
                         id: `mealplan-${idx}`,
                         name: item.name,
-                        quantity: item.amounts.join(' + '),
+                        quantity,
                         unit: '',
                         is_miracle_product: item.isMiracleProduct,
                         source: 'mealplan' as const,
                         food_item_id: item.food_item_id
-                    }));
+                    });
+                    idx++;
+                }
 
                 const manualNames = new Set(manualItems.map(i => normalize(i.name)));
                 const newMealPlanItems = convertedItems.filter(i => !manualNames.has(normalize(i.name)));
