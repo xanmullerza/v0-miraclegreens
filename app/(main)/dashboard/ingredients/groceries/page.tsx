@@ -44,15 +44,19 @@ export default function ShoppingListPage() {
     // Scanner state
     const [scannerOpen, setScannerOpen] = useState(false);
 
-    // Cleanup old "Replenish: " format items on first load
+    // Cleanup old "Replenish: " format items and auto-replenish entries on first load
     useEffect(() => {
         try {
             const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-            const hasOldReplenish = currentList.some((item: any) => item.name?.startsWith('Replenish: '));
+            const needsCleanup = currentList.some((item: any) => 
+                item.name?.startsWith('Replenish: ') || item.source === 'auto-replenish'
+            );
             
-            if (hasOldReplenish) {
-                // Remove old replenish format items
-                const cleaned = currentList.filter((item: any) => !item.name?.startsWith('Replenish: '));
+            if (needsCleanup) {
+                // Remove old replenish format items and auto-replenish entries
+                const cleaned = currentList.filter((item: any) => 
+                    !item.name?.startsWith('Replenish: ') && item.source !== 'auto-replenish'
+                );
                 localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(cleaned));
                 window.dispatchEvent(new Event('storage'));
             }
