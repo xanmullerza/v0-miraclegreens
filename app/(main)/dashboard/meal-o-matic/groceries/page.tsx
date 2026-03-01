@@ -281,72 +281,73 @@ export default function ShoppingListPage() {
                                     )}
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Quick Action</p>
-                                    <p className="text-sm font-black text-slate-900 dark:text-white">{selectedFood.common_name || selectedFood.name}</p>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">{selectedFood.common_name || selectedFood.name}</p>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-4 w-full">
-                                <div className="flex-1 md:flex-none">
-                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Quantity</Label>
-                                    <Input
-                                        type="number"
-                                        value={quickAddQty}
-                                        onChange={(e) => setQuickAddQty(e.target.value)}
-                                        className="w-20 text-center"
-                                    />
-                                </div>
-
-                                {selectedFood.portions && selectedFood.portions.length > 0 && (
-                                    <div className="flex-1 md:flex-none">
-                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Serving</Label>
-                                        <select
-                                            value={selectedPortion?.label || ''}
-                                            onChange={(e) => {
-                                                const portion = selectedFood.portions?.find((p: any) => p.label === e.target.value);
-                                                if (portion) {
-                                                    setSelectedPortion(portion);
-                                                }
-                                            }}
-                                            className="w-auto px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                        >
-                                            <option value="">Select a serving...</option>
-                                            {selectedFood.portions?.map((p: any) => (
-                                                <option key={p.label} value={p.label}>
-                                                    {p.label} ({p.weight_g}g)
-                                                </option>
-                                            ))}
-                                        </select>
+                            <div className="border-t border-slate-200 dark:border-slate-700 pt-4 mt-4">
+                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-4 block">Add to Groceries</p>
+                                
+                                <div className="space-y-3">
+                                    <div>
+                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">QTY</Label>
+                                        <Input
+                                            type="number"
+                                            value={quickAddQty}
+                                            onChange={(e) => setQuickAddQty(e.target.value)}
+                                            className="w-full"
+                                        />
                                     </div>
-                                )}
-                            </div>
 
-                            <div className="flex items-center gap-2 w-full pt-3">
-                                <Button
-                                    onClick={handleQuickAdd}
-                                    className="gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest text-[9px] h-10"
-                                    disabled={isAdding}
-                                >
-                                    {isAdding ? (
-                                        <>Loading...</>
-                                    ) : (
-                                        <>
-                                            <Plus size={16} />
-                                            Add
-                                        </>
+                                    {selectedFood.portions && selectedFood.portions.length > 0 && (
+                                        <div>
+                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">SERVING</Label>
+                                            <select
+                                                value={selectedPortion?.label || ''}
+                                                onChange={(e) => {
+                                                    const portion = selectedFood.portions?.find((p: any) => p.label === e.target.value);
+                                                    if (portion) {
+                                                        setSelectedPortion(portion);
+                                                    }
+                                                }}
+                                                className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                            >
+                                                <option value="">Select a serving...</option>
+                                                {selectedFood.portions?.map((p: any) => (
+                                                    <option key={p.label} value={p.label}>
+                                                        {p.label} ({p.weight_g}g)
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
                                     )}
-                                </Button>
 
-                                <button
-                                    onClick={() => {
-                                        setShowAddModal(false);
-                                        setSelectedFood(null);
-                                    }}
-                                    className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                                >
-                                    <X size={20} className="text-slate-500" />
-                                </button>
+                                    <Button
+                                        onClick={handleQuickAdd}
+                                        className="w-full gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest text-[9px] h-10"
+                                        disabled={isAdding}
+                                    >
+                                        {isAdding ? (
+                                            <>Loading...</>
+                                        ) : (
+                                            <>
+                                                <Plus size={16} />
+                                                Add
+                                            </>
+                                        )}
+                                    </Button>
+                                </div>
                             </div>
+
+                            <button
+                                onClick={() => {
+                                    setShowAddModal(false);
+                                    setSelectedFood(null);
+                                }}
+                                className="absolute top-4 right-4 p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                            >
+                                <X size={20} className="text-slate-500" />
+                            </button>
                         </div>
                     </div>
                 )}
