@@ -398,6 +398,7 @@ export interface ShoppingItem {
     name: string;
     amounts: string[];
     isMiracleProduct: boolean;
+    food_item_id?: string;
 }
 
 export const generateShoppingList = (plan: DailyPlan): ShoppingItem[] => {
@@ -430,11 +431,16 @@ export const generateShoppingList = (plan: DailyPlan): ShoppingItem[] => {
         const existing = itemMap.get(shoppingName);
         if (existing) {
             existing.amounts.push(ing.amount);
+            // Keep the first food_item_id we find
+            if (!existing.food_item_id && ing.food_item_id) {
+                existing.food_item_id = ing.food_item_id;
+            }
         } else {
             itemMap.set(shoppingName, {
                 name: shoppingName,
                 amounts: [ing.amount],
-                isMiracleProduct: ing.isMiracleProduct || false
+                isMiracleProduct: ing.isMiracleProduct || false,
+                food_item_id: ing.food_item_id
             });
         }
     });
