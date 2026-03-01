@@ -994,22 +994,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                     {formatFoodName(item.common_name || item.name)}
                                                                 </span>
                                                             </div>
-                                                            {item.source === 'mealplan' && (
-                                                                <span className="text-[9px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-wider">Meal Plan</span>
-                                                            )}
                                                         </div>
-
-                                                        {/* Weight badge */}
-                                                        {(() => {
-                                                            const grams = parseQuantityToGrams(item.quantity);
-                                                            if (grams > 0) {
-                                                                return <span className="text-xs font-black text-white bg-emerald-900 px-3 py-1 rounded-md whitespace-nowrap shrink-0">{formatGramsShort(grams)}</span>;
-                                                            }
-                                                            if (item.quantity) {
-                                                                return <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 shrink-0 whitespace-nowrap">{item.quantity}</span>;
-                                                            }
-                                                            return null;
-                                                        })()}
 
                                                         {/* Expand chevron */}
                                                         <button
