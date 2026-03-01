@@ -7,7 +7,7 @@ export default function DashboardOverview() {
     const router = useRouter();
 
     useEffect(() => {
-        router.replace('/dashboard/library/foods');
+        router.replace('/dashboard/meal-o-matic/planner');
     }, [router]);
 
     return null;
