@@ -175,10 +175,10 @@ export default function RecipeBuilderPage() {
 
             const parseAmount = (amountStr: string) => {
                 const unicodeFractions: Record<string, number> = {
-                    '�': 0.25, '�': 0.5, '�': 0.75, '?': 0.125, '?': 0.375, '?': 0.625, '?': 0.875
+                    '¼': 0.25, '½': 0.5, '¾': 0.75, '⅛': 0.125, '⅜': 0.375, '⅝': 0.625, '⅞': 0.875
                 };
                 const rawAmount = amountStr.trim();
-                const qtyRegex = /^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?|[���????]))/;
+                const qtyRegex = /^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?|[¼½¾⅛⅜⅝⅞]))/;
                 const qtyMatch = rawAmount.match(qtyRegex);
 
                 let quantity = 1;
