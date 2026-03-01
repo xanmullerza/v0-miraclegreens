@@ -320,6 +320,20 @@ export function PantryView({
         return `${Math.round(grams)} g`;
     };
 
+    // Strip zero-valued entries from a "+" separated quantity string
+    const stripZeroEntries = (qtyStr: string): string => {
+        const entries = qtyStr.split(/\s*\+\s*/).map(s => s.trim()).filter(s => {
+            if (!s) return false;
+            const parsed = parseQuantityEntry(s);
+            const totalG = (parsed.qty || 0) * (parsed.weight_g || 0);
+            // Keep entries that have qty > 0 AND either have meaningful weight or are label-only (e.g. "3 Large")
+            if (parsed.qty <= 0) return false;
+            if (parsed.weight_g != null && totalG <= 0) return false;
+            return true;
+        });
+        return entries.join(' + ');
+    };
+
     const mergeQuantityStrings = (existing: string | undefined, incoming: string): string => {
         if (!existing) {
             if (existing === '' || existing === '0' || existing === '0 grams') {
@@ -447,9 +461,10 @@ export function PantryView({
                     toast.success(`${buyMoreItem.common_name || buyMoreItem.name} moved to shopping list`);
                     window.dispatchEvent(new CustomEvent('shopping-list-updated'));
                 } else {
-                    quantities[buyMoreItem.id] = merged;
+                    const cleaned = stripZeroEntries(merged);
+                    quantities[buyMoreItem.id] = cleaned;
                     localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-                    setFoods(prev => prev.map(f => f.id === buyMoreItem.id ? { ...f, quantity: merged } : f));
+                    setFoods(prev => prev.map(f => f.id === buyMoreItem.id ? { ...f, quantity: cleaned } : f));
                     toast.success(`Updated quantity for ${buyMoreItem.common_name || buyMoreItem.name}`);
                 }
             } else {
@@ -535,10 +550,36 @@ export function PantryView({
                 toast.success(`${removeItem.common_name || removeItem.name} depleted and moved to shopping list`);
                 window.dispatchEvent(new CustomEvent('shopping-list-updated'));
             } else {
-                const remainingStr = formatGramsEntry(remainingGrams);
-                quantities[removeItem.id] = remainingStr;
+                // Subtract grams proportionally from each entry, then strip zeros
+                let gramsToRemove = removeGrams;
+                const updatedEntries: string[] = [];
+                for (const entry of currentRaw) {
+                    const parsed = parseQuantityEntry(entry);
+                    const entryG = (parsed.qty || 0) * (parsed.weight_g || 0);
+                    if (entryG <= 0) continue; // skip already-zero entries
+                    if (gramsToRemove >= entryG) {
+                        // This entry is fully consumed — skip it
+                        gramsToRemove -= entryG;
+                    } else if (gramsToRemove > 0 && parsed.weight_g && parsed.weight_g > 0) {
+                        // Partially consume this entry
+                        const remainingEntryG = entryG - gramsToRemove;
+                        gramsToRemove = 0;
+                        if (parsed.label && !isWeightOnlyEntry(parsed)) {
+                            // For labeled entries (e.g. "2 Cups (224.99g)"), reduce qty
+                            const newQty = Math.max(0, Math.round((remainingEntryG / parsed.weight_g) * 100) / 100);
+                            if (newQty > 0) updatedEntries.push(`${newQty} ${parsed.label} (${parsed.weight_g}g)`);
+                        } else {
+                            updatedEntries.push(formatGramsEntry(remainingEntryG));
+                        }
+                    } else {
+                        updatedEntries.push(entry); // untouched
+                    }
+                }
+                const remainingStr = updatedEntries.length > 0 ? updatedEntries.join(' + ') : formatGramsEntry(remainingGrams);
+                const cleaned = stripZeroEntries(remainingStr);
+                quantities[removeItem.id] = cleaned;
                 localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-                setFoods(prev => prev.map(f => f.id === removeItem.id ? { ...f, quantity: remainingStr } : f));
+                setFoods(prev => prev.map(f => f.id === removeItem.id ? { ...f, quantity: cleaned } : f));
                 toast.success(`Removed ${quantityString} from ${removeItem.common_name || removeItem.name}`);
             }
             
@@ -1401,7 +1442,7 @@ export function PantryView({
                                                         }
                                                     }
                                                     const entries = [...nonWeightEntries];
-                                                    if (weightGramsTotal >= 0) {
+                                                    if (weightGramsTotal > 0) {
                                                         entries.push(parseQuantityEntry(formatGramsEntry(weightGramsTotal)));
                                                     }
                                                     const foodName = formatFoodName(food.common_name || food.name);
