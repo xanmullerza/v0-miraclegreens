@@ -1015,7 +1015,7 @@ export function MealPlannerContent({
                 setIsActive={setIsHeroActive}
                 onSelect={(item) => {
                     const base = item.is_mix ? 'mixes' : 'meals';
-                    router.push(`/dashboard/meal-o-matic/${base}/${item.id}`);
+                    router.push(`/dashboard/library/${base}/${item.id}`);
                 }}
                 theme="amber"
                 placeholder="SEARCH RECIPES..."
