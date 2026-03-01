@@ -16,7 +16,10 @@ import {
     Camera,
     Upload,
     Loader2,
-    X
+    X,
+    Plus,
+    ClipboardPaste,
+    ListPlus
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
@@ -42,6 +45,17 @@ const ALL_CLINICAL_MARKERS = [
     'Proline', 'Serine', 'Threonine', 'Tryptophan', 'Tyrosine', 'Valine', 'Oxalate', 'Omega-3',
     'Omega-6', 'Caffeine', 'Lycopene', 'Phytosterol', 'Beta-Hydroxybutyrate', 'Lutein + Zeaxanthin'
 ];
+
+const CATEGORIZED_MARKERS: Record<string, string[]> = {
+    'Macros': ['Protein', 'Fat', 'Carbs', 'Fiber', 'Sugars', 'Starch', 'Alcohol', 'Water', 'Ash'],
+    'Fats': ['Saturated Fat', 'Monounsaturated Fat', 'Polyunsaturated Fat', 'Trans Fat', 'Cholesterol', 'Omega-3', 'Omega-6'],
+    'Vitamins': ['Vitamin A', 'Vitamin C', 'Vitamin D', 'Vitamin E', 'Vitamin K', 'B1 (Thiamine)', 'B2 (Riboflavin)', 'B3 (Niacin)', 'B5 (Pantothenic Acid)', 'B6 (Pyridoxine)', 'B9 (Folate)', 'B12 (Cobalamin)', 'Choline'],
+    'Carotenoids': ['Retinol', 'Beta-carotene', 'Alpha-carotene', 'Beta-cryptoxanthin', 'Lycopene', 'Lutein + Zeaxanthin'],
+    'Tocopherols': ['Alpha-tocopherol', 'Beta-tocopherol', 'Delta-tocopherol', 'Gamma-tocopherol'],
+    'Minerals': ['Calcium', 'Iron', 'Magnesium', 'Phosphorus', 'Potassium', 'Sodium', 'Zinc', 'Copper', 'Manganese', 'Selenium', 'Iodine', 'Chromium', 'Fluoride', 'Molybdenum'],
+    'Amino Acids': ['Alanine', 'Arginine', 'Aspartic acid', 'Glutamic acid', 'Glycine', 'Histidine', 'Isoleucine', 'Leucine', 'Lysine', 'Methionine', 'Phenylalanine', 'Proline', 'Serine', 'Threonine', 'Tryptophan', 'Tyrosine', 'Valine'],
+    'Other': ['Oxalate', 'Caffeine', 'Phytosterol', 'Beta-Hydroxybutyrate', 'Sugar Alcohol', 'Allulose', 'Glucose', 'Fructose', 'Sucrose', 'Lactose', 'Maltose', 'Galactose']
+};
 
 interface FoodFormDialogProps {
     onClose: () => void;
@@ -82,6 +96,31 @@ export function FoodFormDialog({ onClose, foodIdToEdit }: FoodFormDialogProps) {
 
     const [servingText, setServingText] = useState('');
     const [nutrientText, setNutrientText] = useState('');
+
+    // Panel mode: 'none' | 'manual' | 'paste'
+    const [servingPanel, setServingPanel] = useState<'none' | 'manual' | 'paste'>('none');
+    const [nutrientPanel, setNutrientPanel] = useState<'none' | 'manual' | 'paste'>('none');
+    const [manualServings, setManualServings] = useState<{name: string; weight_g: string}[]>([{name: '', weight_g: ''}]);
+    const [manualNutrients, setManualNutrients] = useState<{marker: string; value: string}[]>([{marker: '', value: ''}]);
+
+    // Sync manual entries into the text fields used by the parser
+    const syncManualToText = () => {
+        const sLines = manualServings
+            .filter(s => s.name && s.weight_g)
+            .map(s => `1 ${s.name} = ${s.weight_g}g`);
+        if (sLines.length) setServingText(prev => (prev ? prev + '\n' : '') + sLines.join('\n'));
+
+        const nLines = manualNutrients
+            .filter(n => n.marker && n.value)
+            .map(n => `${n.marker}: ${n.value}`);
+        if (nLines.length) setNutrientText(prev => (prev ? prev + '\n' : '') + nLines.join('\n'));
+
+        // Reset manual entries after syncing
+        setManualServings([{name: '', weight_g: ''}]);
+        setManualNutrients([{marker: '', value: ''}]);
+        setServingPanel('none');
+        setNutrientPanel('none');
+    };
 
     const [category, setCategory] = useState('General');
 
@@ -314,26 +353,194 @@ Fat: ${food.fat_g || 0}g
                                     <h3 className="font-black text-sm uppercase tracking-widest">Nutrients & Servings</h3>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                    <div className="space-y-2">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Servings & Sizes</Label>
+                                {/* 4-Button Action Grid */}
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                                    <button
+                                        type="button"
+                                        onClick={() => setServingPanel(servingPanel === 'manual' ? 'none' : 'manual')}
+                                        className={cn(
+                                            "flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all text-center",
+                                            servingPanel === 'manual'
+                                                ? "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                                                : "border-slate-200 dark:border-slate-700 hover:border-emerald-500/50 text-slate-600 dark:text-slate-400"
+                                        )}
+                                    >
+                                        <Plus size={20} />
+                                        <span className="text-[10px] font-black uppercase tracking-widest">Add Servings</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setServingPanel(servingPanel === 'paste' ? 'none' : 'paste')}
+                                        className={cn(
+                                            "flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all text-center",
+                                            servingPanel === 'paste'
+                                                ? "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                                                : "border-slate-200 dark:border-slate-700 hover:border-emerald-500/50 text-slate-600 dark:text-slate-400"
+                                        )}
+                                    >
+                                        <ClipboardPaste size={20} />
+                                        <span className="text-[10px] font-black uppercase tracking-widest">Paste Servings</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setNutrientPanel(nutrientPanel === 'manual' ? 'none' : 'manual')}
+                                        className={cn(
+                                            "flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all text-center",
+                                            nutrientPanel === 'manual'
+                                                ? "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                                                : "border-slate-200 dark:border-slate-700 hover:border-emerald-500/50 text-slate-600 dark:text-slate-400"
+                                        )}
+                                    >
+                                        <ListPlus size={20} />
+                                        <span className="text-[10px] font-black uppercase tracking-widest">Add Nutrients</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setNutrientPanel(nutrientPanel === 'paste' ? 'none' : 'paste')}
+                                        className={cn(
+                                            "flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all text-center",
+                                            nutrientPanel === 'paste'
+                                                ? "border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                                                : "border-slate-200 dark:border-slate-700 hover:border-emerald-500/50 text-slate-600 dark:text-slate-400"
+                                        )}
+                                    >
+                                        <ClipboardPaste size={20} />
+                                        <span className="text-[10px] font-black uppercase tracking-widest">Paste Nutrients</span>
+                                    </button>
+                                </div>
+
+                                {/* Serving – Manual Form */}
+                                {servingPanel === 'manual' && (
+                                    <div className="mb-6 p-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.03] space-y-3">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Add Servings Manually</Label>
+                                        {manualServings.map((s, i) => (
+                                            <div key={i} className="flex gap-2 items-center">
+                                                <Input
+                                                    placeholder="e.g. cup, tbsp, slice"
+                                                    className="flex-1 h-10 text-sm rounded-xl bg-white dark:bg-slate-950"
+                                                    value={s.name}
+                                                    onChange={e => {
+                                                        const copy = [...manualServings];
+                                                        copy[i] = { ...copy[i], name: e.target.value };
+                                                        setManualServings(copy);
+                                                    }}
+                                                />
+                                                <Input
+                                                    placeholder="weight (g)"
+                                                    type="number"
+                                                    className="w-28 h-10 text-sm rounded-xl bg-white dark:bg-slate-950"
+                                                    value={s.weight_g}
+                                                    onChange={e => {
+                                                        const copy = [...manualServings];
+                                                        copy[i] = { ...copy[i], weight_g: e.target.value };
+                                                        setManualServings(copy);
+                                                    }}
+                                                />
+                                                {manualServings.length > 1 && (
+                                                    <button type="button" onClick={() => setManualServings(manualServings.filter((_, j) => j !== i))} className="text-rose-400 hover:text-rose-600">
+                                                        <X size={16} />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                        <div className="flex gap-2">
+                                            <Button type="button" variant="outline" size="sm" className="gap-1 text-[10px] uppercase font-black tracking-widest rounded-xl" onClick={() => setManualServings([...manualServings, { name: '', weight_g: '' }])}>
+                                                <Plus size={14} /> Add More
+                                            </Button>
+                                            <Button type="button" size="sm" className="gap-1 text-[10px] uppercase font-black tracking-widest rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white" onClick={syncManualToText}>
+                                                <Save size={14} /> Done
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Serving – Paste Textarea */}
+                                {servingPanel === 'paste' && (
+                                    <div className="mb-6 space-y-2">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Paste Servings & Sizes</Label>
                                         <Textarea
                                             placeholder="Paste things like '1 cup = 240g' or serving info here..."
-                                            className="min-h-[180px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
+                                            className="min-h-[140px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
                                             value={servingText}
                                             onChange={(e) => setServingText(e.target.value)}
                                         />
                                     </div>
-                                    <div className="space-y-2">
-                                        <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Nutrient List</Label>
+                                )}
+
+                                {/* Nutrient – Manual Form */}
+                                {nutrientPanel === 'manual' && (
+                                    <div className="mb-6 p-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.03] space-y-3">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Add Nutrients Manually</Label>
+                                        {manualNutrients.map((n, i) => (
+                                            <div key={i} className="flex gap-2 items-center">
+                                                <div className="relative flex-1">
+                                                    <select
+                                                        value={n.marker}
+                                                        onChange={e => {
+                                                            const copy = [...manualNutrients];
+                                                            copy[i] = { ...copy[i], marker: e.target.value };
+                                                            setManualNutrients(copy);
+                                                        }}
+                                                        className="flex h-10 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 text-sm appearance-none pr-8"
+                                                    >
+                                                        <option value="">Select nutrient...</option>
+                                                        {Object.entries(CATEGORIZED_MARKERS).map(([group, markers]) => (
+                                                            <optgroup key={group} label={group}>
+                                                                {markers.map(m => <option key={m} value={m}>{m}</option>)}
+                                                            </optgroup>
+                                                        ))}
+                                                    </select>
+                                                    <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={14} />
+                                                </div>
+                                                <Input
+                                                    placeholder="value (e.g. 12mg)"
+                                                    className="w-32 h-10 text-sm rounded-xl bg-white dark:bg-slate-950"
+                                                    value={n.value}
+                                                    onChange={e => {
+                                                        const copy = [...manualNutrients];
+                                                        copy[i] = { ...copy[i], value: e.target.value };
+                                                        setManualNutrients(copy);
+                                                    }}
+                                                />
+                                                {manualNutrients.length > 1 && (
+                                                    <button type="button" onClick={() => setManualNutrients(manualNutrients.filter((_, j) => j !== i))} className="text-rose-400 hover:text-rose-600">
+                                                        <X size={16} />
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                        <div className="flex gap-2">
+                                            <Button type="button" variant="outline" size="sm" className="gap-1 text-[10px] uppercase font-black tracking-widest rounded-xl" onClick={() => setManualNutrients([...manualNutrients, { marker: '', value: '' }])}>
+                                                <Plus size={14} /> Add More
+                                            </Button>
+                                            <Button type="button" size="sm" className="gap-1 text-[10px] uppercase font-black tracking-widest rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white" onClick={syncManualToText}>
+                                                <Save size={14} /> Done
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Nutrient – Paste Textarea */}
+                                {nutrientPanel === 'paste' && (
+                                    <div className="mb-6 space-y-2">
+                                        <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Paste Nutrient List</Label>
                                         <Textarea
                                             placeholder="Paste the list of calories, vitamins, and minerals here..."
-                                            className="min-h-[180px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
+                                            className="min-h-[140px] bg-white dark:bg-slate-950 border-emerald-500/10 text-xs focus:ring-emerald-500/20 rounded-2xl font-mono p-4"
                                             value={nutrientText}
                                             onChange={(e) => setNutrientText(e.target.value)}
                                         />
                                     </div>
-                                </div>
+                                )}
+
+                                {/* Show accumulated text preview */}
+                                {(servingText || nutrientText) && (
+                                    <div className="mb-6 p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700">
+                                        <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">Parsed Data Preview</p>
+                                        {servingText && <p className="text-[10px] text-slate-500 font-mono truncate">Servings: {servingText.split('\n').filter(Boolean).length} entries</p>}
+                                        {nutrientText && <p className="text-[10px] text-slate-500 font-mono truncate">Nutrients: {nutrientText.split('\n').filter(Boolean).length} entries</p>}
+                                    </div>
+                                )}
                             </Card>
                         </div>
 
@@ -448,10 +655,10 @@ Fat: ${food.fat_g || 0}g
                         </Button>
                         <Button
                             onClick={handleSave}
-                            disabled={loading || !name.trim() || !servingText.trim() || !nutrientText.trim()}
+                            disabled={loading || !name.trim()}
                             className={cn(
                                 "flex-1 h-14 rounded-[18px] text-white shadow-xl text-[10px] font-black uppercase tracking-widest gap-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300",
-                                (name.trim() && servingText.trim() && nutrientText.trim())
+                                name.trim()
                                     ? "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-500/20 transform scale-[1.02]"
                                     : "bg-slate-950 hover:bg-slate-900 shadow-slate-950/20"
                             )}
