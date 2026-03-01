@@ -395,11 +395,13 @@ export function PantryView({
                     const shoppingList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
                     shoppingList.push({
                         id: `replenish-${Date.now()}-${buyMoreItem.id}`,
-                        name: `Replenish: ${buyMoreItem.common_name || buyMoreItem.name}`,
+                        name: buyMoreItem.common_name || buyMoreItem.name,
                         quantity: 'As needed',
                         unit: '',
                         checked: false,
-                        source: 'auto-replenish'
+                        source: 'auto-replenish',
+                        food_item_id: buyMoreItem.id,
+                        category: buyMoreItem.category
                     });
                     localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(shoppingList));
                     
@@ -481,11 +483,13 @@ export function PantryView({
                 const shoppingList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
                 shoppingList.push({
                     id: `replenish-${Date.now()}-${removeItem.id}`,
-                    name: `Replenish: ${removeItem.common_name || removeItem.name}`,
+                    name: removeItem.common_name || removeItem.name,
                     quantity: 'As needed',
                     unit: '',
                     checked: false,
-                    source: 'auto-replenish'
+                    source: 'auto-replenish',
+                    food_item_id: removeItem.id,
+                    category: removeItem.category
                 });
                 localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(shoppingList));
                 
