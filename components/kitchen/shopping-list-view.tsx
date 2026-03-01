@@ -550,12 +550,68 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         );
     };
 
+    // Add item to groceries (shopping list) with aggregation
+    const confirmAddToGroceries = () => {
+        if (!pantryAddItem) return;
+
+        const qty = pantryAddQty || '1';
+        const quantityString = pantryAddSelectedPortion
+            ? `${qty} ${pantryAddSelectedPortion.label}`
+            : qty;
+
+        // Check if item already exists by name
+        const normalize = (s: string) => s.toLowerCase().trim();
+        const existingIndex = manualItems.findIndex(
+            item => normalize(item.name) === normalize(pantryAddItem.name)
+        );
+
+        if (existingIndex >= 0) {
+            // Item exists - aggregate quantities
+            const existing = manualItems[existingIndex];
+            const existingQty = existing.quantity || '1';
+            const currentQty = parseFloat(qty) || 1;
+            const existingQtyNum = parseFloat(existingQty) || 1;
+            const newQty = currentQty + existingQtyNum;
+
+            const updatedItem = {
+                ...existing,
+                quantity: newQty.toString(),
+            };
+
+            const updated = [...manualItems];
+            updated[existingIndex] = updatedItem;
+            setManualItems(updated);
+            toast.success(`Updated ${pantryAddItem.name} (now ${newQty} total)`);
+        } else {
+            // New item
+            const newItem: ShoppingListItem = {
+                id: `manual-${Date.now()}`,
+                name: pantryAddItem.name,
+                quantity: qty,
+                unit: pantryAddSelectedPortion?.label || 'each',
+                source: 'manual',
+                image_url: pantryAddItem.image_url,
+                food_item_id: pantryAddItem.food_item_id,
+            };
+
+            setManualItems(prev => [...prev, newItem]);
+            toast.success(`Added ${pantryAddItem.name} to groceries`);
+        }
+
+        // Close the form and reset
+        setPantryAddItem(null);
+        setPantryAddQty('1');
+        setPantryAddPortions([]);
+        setPantryAddSelectedPortion(null);
+        setPantryAddFoodId(null);
+    };
+
     // Confirm adding a grocery item to the pantry with the chosen qty + portion
     const confirmPantryAdd = async () => {
         if (!pantryAddItem) return;
         const foodItemId = pantryAddFoodId;
         if (!foodItemId) {
-            // No food resolved � fall back to match dialog
+            // No food resolved – fall back to match dialog
             moveToPantry(pantryAddItem);
             setPantryAddItem(null);
             return;
@@ -1190,7 +1246,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
 
                                                                 <Button
                                                                     size="sm"
-                                                                    onClick={(e) => { e.stopPropagation(); setPantryAddItem(null); }}
+                                                                    onClick={(e) => { e.stopPropagation(); confirmAddToGroceries(); }}
                                                                     disabled={pantryAddLoading}
                                                                     className="h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold"
                                                                 >
