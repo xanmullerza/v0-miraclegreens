@@ -270,23 +270,36 @@ export default function ShoppingListPage() {
 
                 {/* Quick Add Panel */}
                 {showAddModal && selectedFood && (
-                    <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-6 animate-in slide-in-from-top duration-300 rounded-2xl mb-6">
-                        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                            <div className="flex items-center gap-4 flex-1">
-                                <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center overflow-hidden">
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-6 w-full max-w-sm animate-in scale-in duration-300 relative">
+                            {/* Close Button */}
+                            <button
+                                onClick={() => {
+                                    setShowAddModal(false);
+                                    setSelectedFood(null);
+                                }}
+                                className="absolute top-4 right-4 p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                            >
+                                <X size={20} className="text-slate-500" />
+                            </button>
+
+                            {/* Food Header */}
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="w-16 h-16 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center overflow-hidden flex-shrink-0">
                                     {selectedFood.image ? (
                                         <img src={selectedFood.image} className="w-full h-full object-cover" />
                                     ) : (
-                                        <ShoppingCart size={24} className="text-emerald-500" />
+                                        <ShoppingCart size={28} className="text-emerald-500" />
                                     )}
                                 </div>
                                 <div className="flex-1">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">{selectedFood.common_name || selectedFood.name}</p>
+                                    <p className="text-sm font-black text-slate-900 dark:text-white">{selectedFood.common_name || selectedFood.name}</p>
                                 </div>
                             </div>
 
-                            <div className="border-t border-slate-200 dark:border-slate-700 pt-4 mt-4">
-                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-4 block">Add to Groceries</p>
+                            {/* Add to Groceries Section */}
+                            <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+                                <p className="text-[9px] font-black uppercase tracking-widest bg-emerald-500 text-white px-3 py-2 rounded-lg mb-4 inline-block">Add to Groceries</p>
                                 
                                 <div className="space-y-3">
                                     <div>
@@ -338,16 +351,6 @@ export default function ShoppingListPage() {
                                     </Button>
                                 </div>
                             </div>
-
-                            <button
-                                onClick={() => {
-                                    setShowAddModal(false);
-                                    setSelectedFood(null);
-                                }}
-                                className="absolute top-4 right-4 p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                            >
-                                <X size={20} className="text-slate-500" />
-                            </button>
                         </div>
                     </div>
                 )}
