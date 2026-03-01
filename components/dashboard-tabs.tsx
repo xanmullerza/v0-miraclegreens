@@ -27,35 +27,38 @@ interface TopTab {
     activeBg: string;
     defaultHref: string;
     subtabs: SubTab[];
+    matchPaths: string[];
 }
 
 const TAB_CONFIG: TopTab[] = [
     {
-        id: 'ingredients',
-        label: 'Ingredients',
+        id: 'library',
+        label: 'Library',
         icon: Library,
         color: 'text-slate-400',
         activeColor: 'text-emerald-400',
         activeBg: 'bg-emerald-500/10 border-emerald-500/30',
         defaultHref: '/dashboard/ingredients/foods',
+        matchPaths: ['/dashboard/ingredients/foods', '/dashboard/recipes/meals', '/dashboard/recipes/mixes'],
         subtabs: [
             { id: 'foods', label: 'Foods', href: '/dashboard/ingredients/foods', icon: Leaf },
-            { id: 'pantry', label: 'Pantry', href: '/dashboard/ingredients/pantry', icon: Package },
-            { id: 'groceries', label: 'Groceries', href: '/dashboard/ingredients/groceries', icon: ShoppingCart },
+            { id: 'meals', label: 'Meals', href: '/dashboard/recipes/meals', icon: ChefHat },
+            { id: 'mixes', label: 'Mixes', href: '/dashboard/recipes/mixes', icon: Beaker },
         ],
     },
     {
-        id: 'recipes',
-        label: 'Recipes',
-        icon: ChefHat,
+        id: 'mealomatic',
+        label: 'Mealomatic',
+        icon: Calendar,
         color: 'text-slate-400',
         activeColor: 'text-amber-400',
         activeBg: 'bg-amber-500/10 border-amber-500/30',
-        defaultHref: '/dashboard/recipes/meals',
+        defaultHref: '/dashboard/recipes/meal-o-matic',
+        matchPaths: ['/dashboard/recipes/meal-o-matic', '/dashboard/ingredients/pantry', '/dashboard/ingredients/groceries'],
         subtabs: [
-            { id: 'meals', label: 'Meals', href: '/dashboard/recipes/meals', icon: ChefHat },
-            { id: 'mixes', label: 'Mixes', href: '/dashboard/recipes/mixes', icon: Beaker },
             { id: 'meal-o-matic', label: 'Mealomatic', href: '/dashboard/recipes/meal-o-matic', icon: Calendar },
+            { id: 'pantry', label: 'Pantry', href: '/dashboard/ingredients/pantry', icon: Package },
+            { id: 'groceries', label: 'Groceries', href: '/dashboard/ingredients/groceries', icon: ShoppingCart },
         ],
     },
     {
@@ -66,6 +69,7 @@ const TAB_CONFIG: TopTab[] = [
         activeColor: 'text-purple-400',
         activeBg: 'bg-purple-500/10 border-purple-500/30',
         defaultHref: '/dashboard/widgets/comparator',
+        matchPaths: ['/dashboard/widgets'],
         subtabs: [
             { id: 'comparator', label: 'Comparator', href: '/dashboard/widgets/comparator', icon: Scale },
             { id: 'nutridex', label: 'Nutridex', href: '/dashboard/widgets/nutridex', icon: Activity },
@@ -77,9 +81,9 @@ const TAB_CONFIG: TopTab[] = [
 export function DashboardTabs() {
     const pathname = usePathname();
 
-    // Determine active top tab from pathname
+    // Determine active top tab from pathname using matchPaths
     const activeTopTab = TAB_CONFIG.find((tab) =>
-        pathname.startsWith(`/dashboard/${tab.id}`)
+        tab.matchPaths.some(p => pathname.startsWith(p))
     );
 
     // If we're on a detail page (more than 3 segments after /dashboard/section/subsection),
