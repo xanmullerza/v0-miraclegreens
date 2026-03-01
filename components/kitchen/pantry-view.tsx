@@ -1266,11 +1266,11 @@ export function PantryView({
 
             {/* Mobile Drawer for Add/Remove Actions */}
             {drawerOpen && (
-                <div className="fixed inset-0 bg-black/30 z-40 md:hidden" onClick={() => setDrawerOpen(false)} />
+                <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setDrawerOpen(false)} />
             )}
             <div className={cn(
-                "fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 rounded-t-2xl border-t border-slate-200 dark:border-slate-800 transition-transform duration-300 md:hidden",
-                drawerOpen ? "translate-y-0" : "translate-y-full"
+                "fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-slate-900 rounded-t-2xl border-t border-slate-200 dark:border-slate-800 transition-transform duration-300 md:left-1/2 md:-translate-x-1/2 md:max-w-lg md:rounded-2xl md:border md:bottom-auto md:top-1/2 md:-translate-y-1/2",
+                drawerOpen ? "translate-y-0 md:translate-y-[-50%]" : "translate-y-full md:translate-y-[100vh]"
             )}>
                 {drawerOpen && (
                     <>
