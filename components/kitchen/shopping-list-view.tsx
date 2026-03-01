@@ -27,7 +27,9 @@ import {
     Flame,
     Leaf,
     Pill,
-    Box
+    Box,
+    Minus,
+    List
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -95,6 +97,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
     const [pantryAddSelectedPortion, setPantryAddSelectedPortion] = useState<{ label: string; weight_g: number } | null>(null);
     const [pantryAddFoodId, setPantryAddFoodId] = useState<string | null>(null);
     const [pantryAddLoading, setPantryAddLoading] = useState(false);
+    const [expandedActionId, setExpandedActionId] = useState<string | null>(null);
 
     // Load manual items from local storage on mount and when storage changes
     useEffect(() => {
@@ -998,18 +1001,52 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
 
                                                         {/* Expand chevron */}
                                                         <button
-                                                            onClick={(e) => { e.stopPropagation(); openPantryAddPanel(item); }}
+                                                            onClick={(e) => { e.stopPropagation(); setExpandedActionId(expandedActionId === item.id ? null : item.id); }}
                                                             className={cn(
                                                                 "p-1.5 rounded-lg transition-all flex-shrink-0",
-                                                                pantryAddItem?.id === item.id
+                                                                expandedActionId === item.id
                                                                     ? "text-emerald-500 bg-emerald-100 dark:bg-emerald-950/40"
                                                                     : "text-slate-400 hover:bg-emerald-100 dark:hover:bg-emerald-950/40 hover:text-emerald-500"
                                                             )}
                                                             title="Actions"
                                                         >
-                                                            <ChevronDown size={14} className={cn("transition-transform", pantryAddItem?.id === item.id && "rotate-180")} />
+                                                            <ChevronDown size={14} className={cn("transition-transform", expandedActionId === item.id && "rotate-180")} />
                                                         </button>
                                                     </div>
+
+                                                    {/* Action buttons menu - shown when expanded */}
+                                                    {expandedActionId === item.id && (
+                                                        <div className="flex items-center gap-2 justify-center px-3 py-3 bg-slate-50 dark:bg-slate-900/30 border border-t-0 border-slate-200 dark:border-slate-700 rounded-b-xl">
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); openPantryAddPanel(item); }}
+                                                                className="p-2.5 rounded-lg transition-all flex-shrink-0 text-slate-400 hover:bg-emerald-100 dark:hover:bg-emerald-950/40 hover:text-emerald-500"
+                                                                title="Add to pantry"
+                                                            >
+                                                                <Plus size={18} />
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); toast.info('Remove functionality coming soon'); }}
+                                                                className="p-2.5 rounded-lg transition-all flex-shrink-0 text-slate-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500"
+                                                                title="Remove items"
+                                                            >
+                                                                <Minus size={18} />
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); toast.info('Measures coming soon'); }}
+                                                                className="p-2.5 rounded-lg transition-all flex-shrink-0 text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500"
+                                                                title="View package sizes"
+                                                            >
+                                                                <List size={18} />
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); removeItem(item.id); setExpandedActionId(null); }}
+                                                                className="p-2.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-300 dark:text-slate-600 hover:text-rose-500 transition-all flex-shrink-0"
+                                                                title="Remove from list"
+                                                            >
+                                                                <Trash2 size={18} />
+                                                            </button>
+                                                        </div>
+                                                    )}
 
                                                     {/* Inline pantry-add panel */}
                                                     {pantryAddItem?.id === item.id && (
