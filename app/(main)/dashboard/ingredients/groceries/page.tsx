@@ -226,6 +226,14 @@ export default function ShoppingListPage() {
                 quantities[selectedFood.id] = quantityString;
                 localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
 
+                // Remove auto-replenish entries for this item from shopping list
+                const shoppingList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
+                const filtered = shoppingList.filter((item: any) => 
+                    !(item.food_item_id === selectedFood.id && item.source === 'auto-replenish')
+                );
+                localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(filtered));
+                window.dispatchEvent(new Event('storage'));
+
                 toast.success(`${selectedFood.common_name || selectedFood.name} added to pantry`);
             }
 
