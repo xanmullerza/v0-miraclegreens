@@ -1139,16 +1139,12 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                     {/* Inline breakdown panel */}
                                                     {expandedBreakdownId === item.id && (
                                                         <div className="mb-0.5 p-4 rounded-xl border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-950/20 animate-in slide-in-from-top-2 duration-200">
-                                                            <p className="text-sm font-bold text-slate-900 dark:text-white mb-3">Package Sizes for {item.name}</p>
+                                                            <p className="text-sm font-bold text-slate-900 dark:text-white mb-3">Package Details for {item.name}</p>
                                                             <div className="space-y-2">
-                                                                {item.portion_size ? (
-                                                                    <div className="flex justify-between items-center p-2 bg-white dark:bg-slate-800/40 rounded border border-slate-200 dark:border-slate-700">
-                                                                        <span className="text-sm text-slate-600 dark:text-slate-300">{item.portion_size}</span>
-                                                                        <span className="text-sm font-bold text-slate-900 dark:text-white">× {item.quantity || 1}</span>
-                                                                    </div>
-                                                                ) : (
-                                                                    <div className="text-xs text-slate-500 py-2 px-2">No package size information available</div>
-                                                                )}
+                                                                <div className="flex justify-between items-center p-2 bg-white dark:bg-slate-800/40 rounded border border-slate-200 dark:border-slate-700">
+                                                                    <span className="text-sm text-slate-600 dark:text-slate-300">{item.quantity} {item.unit}</span>
+                                                                    <span className="text-xs text-slate-400">Qty in list</span>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     )}
