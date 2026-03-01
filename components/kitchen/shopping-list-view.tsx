@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 import {
     Plus,
     ShoppingBasket,
+    ShoppingCart,
     Loader2,
     Search,
     ChevronRight,
@@ -1187,6 +1188,15 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                     <span className="text-xs text-slate-400 pb-2">No portions found</span>
                                                                 )}
 
+                                                                <Button
+                                                                    size="sm"
+                                                                    onClick={(e) => { e.stopPropagation(); setPantryAddItem(null); }}
+                                                                    disabled={pantryAddLoading}
+                                                                    className="h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold"
+                                                                >
+                                                                    {pantryAddLoading ? <Loader2 size={14} className="animate-spin" /> : <ShoppingCart size={14} className="mr-1" />}
+                                                                    Add to Groceries
+                                                                </Button>
                                                                 <Button
                                                                     size="sm"
                                                                     onClick={(e) => { e.stopPropagation(); confirmPantryAdd(); }}
