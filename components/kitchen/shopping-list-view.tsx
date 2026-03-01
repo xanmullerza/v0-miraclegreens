@@ -11,17 +11,29 @@ import {
     Loader2,
     Search,
     ChevronRight,
+    ChevronDown,
     Sparkles,
     ChefHat,
     Package,
     X,
-    ScanLine
+    ScanLine,
+    Trash2,
+    Apple,
+    Carrot,
+    Beef,
+    Bean,
+    Wheat,
+    Droplet,
+    Flame,
+    Leaf,
+    Pill,
+    Box
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { cn, formatFoodName } from '@/lib/utils';
 import { fetchFoodMeasures } from '@/lib/utils/nutrition-calculator';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { generateShoppingList, ShoppingItem, DailyPlan } from '@/lib/utils/meal-generator';
@@ -41,6 +53,8 @@ interface ShoppingListItem {
     barcode?: string;
     price?: number;
     image_url?: string;
+    image?: string;
+    common_name?: string;
     food_item_id?: string;
 }
 
@@ -162,28 +176,32 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         setItems(combined);
     }, [dailyPlan, pantryItems, manualItems]);
 
-    // Category enrichment for meal plan items that don't have categories
-    // Manual items added via HeroSearch already have categories from DB
+    // Enrichment for items missing category, image, or common_name
     useEffect(() => {
-        const needCategory = items.filter(i => !i.category && i.food_item_id);
-        if (needCategory.length === 0) return;
+        const needEnrich = items.filter(i => i.food_item_id && (!i.category || !i.image));
+        if (needEnrich.length === 0) return;
 
         let isCancelled = false;
 
         const enrich = async () => {
-            const ids = needCategory.map(i => i.food_item_id).filter(Boolean) as string[];
+            const ids = needEnrich.map(i => i.food_item_id).filter(Boolean) as string[];
             if (ids.length === 0) return;
 
             const { data } = await supabase
                 .from('food_items')
-                .select('id, category')
+                .select('id, category, image, common_name')
                 .in('id', ids);
                 
             if (data && !isCancelled) {
-                const idToCat = new Map(data.map((d: any) => [d.id, d.category]));
+                const idToData = new Map(data.map((d: any) => [d.id, d]));
                 setItems(prev => prev.map(item => {
-                    if (item.food_item_id && idToCat.has(item.food_item_id) && !item.category) {
-                        return { ...item, category: idToCat.get(item.food_item_id) };
+                    if (item.food_item_id && idToData.has(item.food_item_id)) {
+                        const d = idToData.get(item.food_item_id);
+                        const updated = { ...item };
+                        if (!item.category && d.category) updated.category = d.category;
+                        if (!item.image && d.image) updated.image = d.image;
+                        if (!item.common_name && d.common_name) updated.common_name = d.common_name;
+                        return updated;
                     }
                     return item;
                 }));
@@ -643,26 +661,51 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         return category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
     };
 
+    // Quantity parsing helpers for weight badge display
+    const parseQuantityToGrams = (quantity: string): number => {
+        let totalGrams = 0;
+        const entries = quantity.split(/\s*\+\s*/);
+        for (const entry of entries) {
+            const trimmed = entry.trim();
+            if (!trimmed) continue;
+            const labeled = trimmed.match(/^(\d+(?:\.\d+)?)\s+.+?\s+\((\d+(?:\.\d+)?)g\)$/);
+            if (labeled) { totalGrams += parseFloat(labeled[1]) * parseFloat(labeled[2]); continue; }
+            const weighted = trimmed.match(/^(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)\s*(g|kg)$/i);
+            if (weighted) { const w = weighted[3].toLowerCase() === 'kg' ? parseFloat(weighted[2]) * 1000 : parseFloat(weighted[2]); totalGrams += parseFloat(weighted[1]) * w; continue; }
+            const textUnit = trimmed.match(/^(\d+(?:\.\d+)?)\s*(kg|kilograms?|grams?|g)$/i);
+            if (textUnit) { const val = parseFloat(textUnit[1]); const unit = textUnit[2].toLowerCase(); totalGrams += (unit === 'kg' || unit.startsWith('kilogram')) ? val * 1000 : val; continue; }
+        }
+        return totalGrams;
+    };
+
+    const formatGramsShort = (grams: number): string => {
+        if (grams >= 1000) { const kg = grams / 1000; return `${parseFloat(kg.toFixed(1))} kg`; }
+        return `${Math.round(grams)} g`;
+    };
+
     const getCategoryColor = (group: string) => {
         const normalized = group.toLowerCase();
         switch (normalized) {
             case 'fruit':
+                return { bg: 'bg-slate-50 dark:bg-slate-800/30', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-400', icon: Apple };
             case 'vegetables':
-                return { bg: 'bg-green-50 dark:bg-green-950/20', border: 'border-green-200 dark:border-green-800/50', text: 'text-green-700 dark:text-green-400', icon: '🍎' };
+                return { bg: 'bg-slate-50 dark:bg-slate-800/30', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-400', icon: Carrot };
             case 'proteins':
+                return { bg: 'bg-slate-50 dark:bg-slate-800/30', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-400', icon: Beef };
             case 'legumes':
-                return { bg: 'bg-red-50 dark:bg-red-950/20', border: 'border-red-200 dark:border-red-800/50', text: 'text-red-700 dark:text-red-400', icon: '🥩' };
+                return { bg: 'bg-slate-50 dark:bg-slate-800/30', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-400', icon: Bean };
             case 'grains':
-                return { bg: 'bg-amber-50 dark:bg-amber-950/20', border: 'border-amber-200 dark:border-amber-800/50', text: 'text-amber-700 dark:text-amber-400', icon: '🌾' };
+                return { bg: 'bg-slate-50 dark:bg-slate-800/30', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-400', icon: Wheat };
             case 'oils':
+                return { bg: 'bg-slate-50 dark:bg-slate-800/30', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-400', icon: Droplet };
             case 'flavour':
-                return { bg: 'bg-orange-50 dark:bg-orange-950/20', border: 'border-orange-200 dark:border-orange-800/50', text: 'text-orange-700 dark:text-orange-400', icon: '🫙' };
+                return { bg: 'bg-slate-50 dark:bg-slate-800/30', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-400', icon: Flame };
             case 'nuts':
-                return { bg: 'bg-purple-50 dark:bg-purple-950/20', border: 'border-purple-200 dark:border-purple-800/50', text: 'text-purple-700 dark:text-purple-400', icon: '🥜' };
+                return { bg: 'bg-slate-50 dark:bg-slate-800/30', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-400', icon: Leaf };
             case 'supplements':
-                return { bg: 'bg-teal-50 dark:bg-teal-950/20', border: 'border-teal-200 dark:border-teal-800/50', text: 'text-teal-700 dark:text-teal-400', icon: '💊' };
+                return { bg: 'bg-slate-50 dark:bg-slate-800/30', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-400', icon: Pill };
             default:
-                return { bg: 'bg-slate-50 dark:bg-slate-800/30', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-400', icon: '📦' };
+                return { bg: 'bg-slate-50 dark:bg-slate-800/30', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-400', icon: Box };
         }
     };
 
@@ -746,73 +789,108 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
             ) : (
                 /* Items List */
                 <div className="space-y-4">
+                    {/* Toolbar */}
+                    <div className="flex items-center justify-between">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                            {filteredItems.length} item{filteredItems.length !== 1 ? 's' : ''}
+                        </p>
+                        <button
+                            onClick={() => {
+                                if (!confirm('Clear all items from your grocery list?')) return;
+                                setManualItems([]);
+                                setItems([]);
+                                localStorage.setItem('vitala_shopping_manual_items', JSON.stringify([]));
+                                toast.success('Grocery list cleared');
+                            }}
+                            className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-rose-500 transition-colors flex items-center gap-1.5"
+                        >
+                            <Trash2 size={12} />
+                            Clear All
+                        </button>
+                    </div>
                     {/* Items - Grouped by Category */}
                     {filteredItems.length > 0 && (
-                        <div className="space-y-2">
-                            <div className="space-y-3">
+                        <div className="space-y-3">
                                 {Object.entries(groupedItems)
                                     .sort(([a], [b]) => {
-                                        // Sort categories - use actual DB category names
                                         const categoryOrder = ['Fruit', 'Vegetables', 'Grains', 'Legumes', 'Proteins', 'Nuts', 'Oils', 'Flavour', 'Supplements', 'Other'];
                                         const indexA = categoryOrder.indexOf(a);
                                         const indexB = categoryOrder.indexOf(b);
                                         return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
                                     })
-                                    .map(([group, items]) => {
+                                    .map(([group, groupItems]) => {
                                     const colors = getCategoryColor(group);
                                     return (
                                         <div key={group} className={cn("rounded-xl border p-4", colors.bg, colors.border)}>
-                                            <div className={cn("text-sm font-black uppercase tracking-widest mb-3 flex items-center gap-2", colors.text)}>
-                                                <span className="text-lg">{colors.icon}</span>
+                                            <div className={cn("text-sm font-black uppercase tracking-widest mb-3 flex items-center gap-2 text-slate-700 dark:text-slate-400")}>
+                                                <colors.icon size={18} className="text-slate-600 dark:text-slate-500" />
                                                 {group}
-                                                <Badge className="ml-auto text-[9px] bg-white/50 dark:bg-slate-900/50 border-none text-slate-700 dark:text-slate-300">
-                                                    {items.length}
-                                                </Badge>
+                                                <button
+                                                    onClick={() => {
+                                                        groupItems.forEach(item => removeItem(item.id));
+                                                        toast.success(`${group} category cleared`);
+                                                    }}
+                                                    className="ml-auto p-1.5 rounded-lg text-slate-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500 transition-colors flex-shrink-0"
+                                                    title="Delete all items in this category"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
                                             </div>
                                             <div className="space-y-1.5">
-                                                {items.map((item) => (
+                                                {groupItems.map((item) => (
                                                     <Fragment key={item.id}>
                                                     <div
-                                                        className={cn(
-                                                            "flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-all cursor-pointer group",
-                                                            item.is_miracle_product
-                                                                ? "bg-amber-50/70 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/40 hover:border-amber-300"
-                                                                : "bg-slate-50/50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800/50"
-                                                        )}
+                                                        className="flex items-center gap-3 px-3 py-2 rounded-xl border transition-all bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800 cursor-pointer group"
+                                                        onClick={(e) => { e.stopPropagation(); openPantryAddPanel(item); }}
                                                     >
+                                                        {/* Food Image */}
+                                                        <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 shrink-0 flex items-center justify-center">
+                                                            {(item.image || item.image_url) ? (
+                                                                <img src={item.image || item.image_url} alt={item.common_name || item.name} className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <Beef size={20} className="text-slate-400 dark:text-slate-500" />
+                                                            )}
+                                                        </div>
+
+                                                        {/* Name */}
                                                         <div className="flex-1 min-w-0">
                                                             <div className="flex items-center gap-1.5">
                                                                 {item.is_miracle_product && (
                                                                     <Sparkles size={12} className="text-amber-500 shrink-0" />
                                                                 )}
-                                                                <span className="font-semibold text-sm text-slate-900 dark:text-white truncate">
-                                                                    {item.name}
+                                                                <span className="font-black text-xs uppercase tracking-wide text-slate-900 dark:text-white truncate block">
+                                                                    {formatFoodName(item.common_name || item.name)}
                                                                 </span>
                                                             </div>
-                                                            <span className="text-xs text-slate-500 dark:text-slate-400">{item.quantity}</span>
+                                                            {item.source === 'mealplan' && (
+                                                                <span className="text-[9px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-wider">Meal Plan</span>
+                                                            )}
                                                         </div>
-                                                        {item.source === 'mealplan' && (
-                                                            <Badge className="text-[7px] bg-blue-500/10 text-blue-600 dark:text-blue-400 border-none shrink-0 h-5 px-1.5 flex items-center">
-                                                                <ChefHat size={9} className="mr-0.5" /> Meal
-                                                            </Badge>
-                                                        )}
-                                                        {item.price && (
-                                                            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 shrink-0">
-                                                                ${item.price.toFixed(2)}
-                                                            </span>
-                                                        )}
+
+                                                        {/* Weight badge */}
+                                                        {(() => {
+                                                            const grams = parseQuantityToGrams(item.quantity);
+                                                            if (grams > 0) {
+                                                                return <span className="text-xs font-black text-white bg-emerald-900 px-3 py-1 rounded-md whitespace-nowrap shrink-0">{formatGramsShort(grams)}</span>;
+                                                            }
+                                                            if (item.quantity) {
+                                                                return <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 shrink-0 whitespace-nowrap">{item.quantity}</span>;
+                                                            }
+                                                            return null;
+                                                        })()}
+
+                                                        {/* Expand chevron */}
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); openPantryAddPanel(item); }}
-                                                            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-all"
-                                                            title="Add to pantry"
+                                                            className={cn(
+                                                                "p-1.5 rounded-lg transition-all flex-shrink-0",
+                                                                pantryAddItem?.id === item.id
+                                                                    ? "text-emerald-500 bg-emerald-100 dark:bg-emerald-950/40"
+                                                                    : "text-slate-400 hover:bg-emerald-100 dark:hover:bg-emerald-950/40 hover:text-emerald-500"
+                                                            )}
+                                                            title="Actions"
                                                         >
-                                                            <Package size={14} />
-                                                        </button>
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); removeItem(item.id); }}
-                                                            className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-500 transition-all"
-                                                        >
-                                                            <X size={14} />
+                                                            <ChevronDown size={14} className={cn("transition-transform", pantryAddItem?.id === item.id && "rotate-180")} />
                                                         </button>
                                                     </div>
 
@@ -871,6 +949,14 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                 >
                                                                     Cancel
                                                                 </Button>
+
+                                                                <button
+                                                                    onClick={(e) => { e.stopPropagation(); removeItem(item.id); setPantryAddItem(null); }}
+                                                                    className="p-2 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-300 dark:text-slate-600 hover:text-rose-500 transition-all flex-shrink-0 ml-auto"
+                                                                    title="Remove from list"
+                                                                >
+                                                                    <Trash2 size={16} />
+                                                                </button>
                                                             </div>
                                                             {pantryAddSelectedPortion && (
                                                                 <p className="text-[10px] text-slate-400 mt-2">
@@ -885,7 +971,6 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                         </div>
                                     );
                                 })}
-                            </div>
                         </div>
                     )}
                 </div>

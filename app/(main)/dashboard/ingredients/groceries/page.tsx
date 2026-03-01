@@ -209,6 +209,7 @@ export default function ShoppingListPage() {
                         source: 'manual',
                         food_item_id: selectedFood.id,
                         category: selectedFood.category,
+                        image: selectedFood.image,
                     };
                     currentList.push(newItem);
                     toast.success(`${selectedFood.common_name || selectedFood.name} added to groceries`);
