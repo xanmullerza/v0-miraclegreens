@@ -63,6 +63,9 @@ interface ShoppingListViewProps {
     onScannerOpenChange?: (open: boolean) => void;
 }
 
+// Module-level cache for enrichment data to avoid re-fetching on re-renders
+const enrichmentCache = new Map<string, { id: string; category: string; image: string; common_name: string }>();
+
 export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOpenChange }: ShoppingListViewProps = {}) {
     const router = useRouter();
     const [items, setItems] = useState<ShoppingListItem[]>([]);
@@ -172,13 +175,28 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
             }
 
             // Enrich items before setting state to avoid the "Other" flash
+            // Apply cached enrichment data first
+            combined = combined.map(item => {
+                const cacheKey = item.food_item_id || item.name.toLowerCase();
+                const cached = enrichmentCache.get(cacheKey);
+                if (cached) {
+                    const updated = { ...item };
+                    if (!item.category && cached.category) updated.category = cached.category;
+                    if (!item.image && cached.image) updated.image = cached.image;
+                    if (!item.common_name && cached.common_name) updated.common_name = cached.common_name;
+                    if (!item.food_item_id && cached.id) updated.food_item_id = cached.id;
+                    return updated;
+                }
+                return item;
+            });
+
             const needEnrichById = combined.filter(i => i.food_item_id && (!i.category || !i.image));
             const needEnrichByName = combined.filter(i => !i.food_item_id && !i.category);
 
             if (needEnrichById.length > 0 || needEnrichByName.length > 0) {
                 setEnriching(true);
 
-                // Phase 1: Enrich by food_item_id
+                // Phase 1: Enrich by food_item_id (single batch query)
                 const idToData = new Map<string, any>();
                 if (needEnrichById.length > 0) {
                     const ids = needEnrichById.map(i => i.food_item_id).filter(Boolean) as string[];
@@ -187,23 +205,37 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                             .from('food_items')
                             .select('id, category, image, common_name')
                             .in('id', ids);
-                        if (data) data.forEach((d: any) => idToData.set(d.id, d));
+                        if (data) data.forEach((d: any) => {
+                            idToData.set(d.id, d);
+                            enrichmentCache.set(d.id, d);
+                        });
                     }
                 }
 
-                // Phase 2: Enrich by name lookup for items without food_item_id
+                // Phase 2: Enrich by name (single batch query using OR conditions)
                 const nameToData = new Map<string, any>();
-                if (needEnrichByName.length > 0) {
-                    const names = [...new Set(needEnrichByName.map(i => i.name.toLowerCase()))];
-                    for (const name of names) {
-                        if (isCancelled) break;
-                        const { data } = await supabase
-                            .from('food_items')
-                            .select('id, category, image, common_name')
-                            .or(`name.ilike.%${name}%,common_name.ilike.%${name}%`)
-                            .limit(1);
-                        if (data && data.length > 0) {
-                            nameToData.set(name, data[0]);
+                if (needEnrichByName.length > 0 && !isCancelled) {
+                    const uniqueNames = [...new Set(needEnrichByName.map(i => i.name.toLowerCase()))];
+                    // Build a single query that matches all names at once
+                    const orConditions = uniqueNames
+                        .map(name => `name.ilike.%${name}%,common_name.ilike.%${name}%`)
+                        .join(',');
+                    const { data } = await supabase
+                        .from('food_items')
+                        .select('id, name, common_name, category, image')
+                        .or(orConditions)
+                        .limit(uniqueNames.length * 2);
+                    if (data) {
+                        // Match each result back to the original names
+                        for (const d of data) {
+                            const matchedName = uniqueNames.find(n =>
+                                (d.name || '').toLowerCase().includes(n) ||
+                                (d.common_name || '').toLowerCase().includes(n)
+                            );
+                            if (matchedName && !nameToData.has(matchedName)) {
+                                nameToData.set(matchedName, d);
+                                enrichmentCache.set(matchedName, d);
+                            }
                         }
                     }
                 }
