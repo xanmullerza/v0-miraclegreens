@@ -99,7 +99,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
     const [pantryAddLoading, setPantryAddLoading] = useState(false);
     const [expandedActionId, setExpandedActionId] = useState<string | null>(null);
     const [expandedRemoveId, setExpandedRemoveId] = useState<string | null>(null);
-    const [removeItem, setRemoveItem] = useState<ShoppingListItem | null>(null);
+    const [selectedRemoveItem, setSelectedRemoveItem] = useState<ShoppingListItem | null>(null);
     const [expandedBreakdownId, setExpandedBreakdownId] = useState<string | null>(null);
 
     // Load manual items from local storage on mount and when storage changes
@@ -509,10 +509,10 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
     const openRemovePanel = (item: ShoppingListItem) => {
         if (expandedRemoveId === item.id) {
             setExpandedRemoveId(null);
-            setRemoveItem(null);
+            setSelectedRemoveItem(null);
             return;
         }
-        setRemoveItem(item);
+        setSelectedRemoveItem(item);
         setExpandedRemoveId(item.id);
     };
 
@@ -1116,7 +1116,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                                 setManualItems(manualItems);
                                                                             }
                                                                             setExpandedRemoveId(null);
-                                                                            setRemoveItem(null);
+                                                                            setSelectedRemoveItem(null);
                                                                         }
                                                                     }}
                                                                     className="h-9 px-3"
@@ -1126,7 +1126,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                 <Button
                                                                     size="sm"
                                                                     variant="ghost"
-                                                                    onClick={(e) => { e.stopPropagation(); setExpandedRemoveId(null); setRemoveItem(null); }}
+                                                                    onClick={(e) => { e.stopPropagation(); setExpandedRemoveId(null); setSelectedRemoveItem(null); }}
                                                                     className="h-9 px-3 text-slate-500"
                                                                 >
                                                                     Cancel
