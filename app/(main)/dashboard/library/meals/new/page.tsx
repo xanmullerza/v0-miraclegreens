@@ -285,7 +285,7 @@ function UserRecipeBuilder() {
 
             await saveRecipe(recipeData, ingredients, instructions);
             toast.success(`${isMix ? 'Mix' : 'Protocol'} saved successfully!`);
-            router.push(`/dashboard/ingredients/${isMix ? 'mixes' : 'recipes'}`);
+            router.push(`/dashboard/library/${isMix ? 'mixes' : 'recipes'}`);
         } catch (error: any) {
             toast.error(`Failed to save: ${error.message}`);
         } finally {

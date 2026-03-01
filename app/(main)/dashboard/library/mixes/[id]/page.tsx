@@ -471,7 +471,7 @@ export default function RecipeDetailsPage() {
     useEffect(() => {
         if (dietaryConflicts.length > 0) {
             const items = dietaryConflicts.map(c => c.exclusion).join(', ');
-            toast.warning(`Dietary Warning: This meal contains ${items}, which you've excluded from your profile.`, {
+            toast.warning(`Dietary Warning: This mix contains ${items}, which you've excluded from your profile.`, {
                 duration: 6000,
                 position: 'top-center'
             });
@@ -594,8 +594,8 @@ export default function RecipeDetailsPage() {
             }
         } catch (error) {
             console.error('Error fetching recipe:', error);
-            toast.error('Failed to load meal details');
-            router.push('/dashboard/meal-o-matic/meals');
+            toast.error('Failed to load mix details');
+            router.push('/dashboard/library/mixes');
         } finally {
             setLoading(false);
         }
@@ -916,9 +916,9 @@ export default function RecipeDetailsPage() {
         }
 
         // 2. SPICE LOGIC (Existing)
-        const isSpice = food?.category === 'Flavour' || findSpiceFactor(food?.name || '').name !== 'Generic';
+        const isSpiceItem = food?.category === 'Flavour' || findSpiceFactor(food?.name || '').name !== 'Generic';
 
-        if (isSpice && (newState === 'ground' || newState === 'whole')) {
+        if (isSpiceItem && (newState === 'ground' || newState === 'whole')) {
             const factor = findSpiceFactor(food.name);
             const currentUnit = ing.measure_label || 'g';
             const isVolume = ['tsp', 'teaspoon', 'tbsp', 'tablespoon', 'cup'].some(unit => currentUnit.toLowerCase().includes(unit));
@@ -1290,20 +1290,20 @@ export default function RecipeDetailsPage() {
 
     const handleDelete = async () => {
         if (!recipe) return;
-        if (confirm("Are you sure you want to delete this recipe? This action cannot be undone.")) {
+        if (confirm("Are you sure you want to delete this mix? This action cannot be undone.")) {
             try {
                 await deleteRecipe(recipe.id);
-                toast.success("Recipe deleted successfully");
-                router.push('/dashboard/meal-o-matic/meals');
+                toast.success("Mix deleted successfully");
+                router.push('/dashboard/library/mixes');
             } catch (error) {
-                toast.error("Failed to delete recipe");
+                toast.error("Failed to delete mix");
             }
         }
     };
 
     const handleEdit = () => {
         if (!recipe) return;
-        router.push(`/dashboard/meal-o-matic/meals/new?edit=${recipe.id}`);
+        router.push(`/dashboard/library/mixes/new?edit=${recipe.id}`);
     };
 
     if (loading) {
@@ -1312,7 +1312,7 @@ export default function RecipeDetailsPage() {
                 <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 flex items-center justify-center">
                     <Loader2 className="animate-spin text-emerald-500" size={32} />
                 </div>
-                <p className="text-xs font-black uppercase tracking-widest text-slate-400 animate-pulse">Accessing Meal Databank...</p>
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400 animate-pulse">Accessing Mix Databank...</p>
             </div>
         );
     }
@@ -1455,7 +1455,7 @@ export default function RecipeDetailsPage() {
 
                                 {ingredients.length === 0 ? (
                                     <div className="text-center py-8 text-slate-400">
-                                        <p className="text-sm font-bold">No ingredients in this recipe</p>
+                                        <p className="text-sm font-bold">No ingredients in this mix</p>
                                     </div>
                                 ) : (
                                     <div className="space-y-2 max-h-[600px] overflow-y-auto custom-scrollbar">
@@ -1522,7 +1522,7 @@ export default function RecipeDetailsPage() {
                                                 <ChefHat size={16} />
                                             </div>
                                             <div>
-                                                <h3 className="font-black text-[10px] uppercase italic text-slate-900 dark:text-white leading-none mb-1">Related Meals</h3>
+                                                <h3 className="font-black text-[10px] uppercase italic text-slate-900 dark:text-white leading-none mb-1">Related Mixes</h3>
                                                 <p className="text-[8px] font-black text-indigo-500 uppercase tracking-widest leading-none">Shared items</p>
                                             </div>
                                         </div>
@@ -1539,7 +1539,7 @@ export default function RecipeDetailsPage() {
                                             {relatedRecipes.map((meal) => (
                                                 <a
                                                     key={meal.id}
-                                                    href={`/dashboard/meal-o-matic/meals/${meal.id}`}
+                                                    href={`/dashboard/library/mixes/${meal.id}`}
                                                     className="group relative flex flex-col items-center text-center gap-2 p-3 rounded-[1.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-indigo-500/30 transition-all duration-500 shadow-sm shadow-slate-200/50 dark:shadow-none hover:-translate-y-1"
                                                 >
                                                     <div className="w-full aspect-square rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 group-hover:scale-110 transition-transform duration-700 relative">
@@ -1575,7 +1575,7 @@ export default function RecipeDetailsPage() {
                                 <Activity size={18} />
                                 Nutritional Profile
                             </h3>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Comprehensive biological analysis of this meal</p>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Comprehensive biological analysis of this mix</p>
                         </div>
 
                         <NutrientGrid title="Macronutrients" icon={Zap} theme="orange" subtitle="Detailed breakdown of energy and macro density" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{

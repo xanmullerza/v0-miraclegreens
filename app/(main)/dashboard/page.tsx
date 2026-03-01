@@ -7,7 +7,7 @@ export default function DashboardOverview() {
     const router = useRouter();
 
     useEffect(() => {
-        router.replace('/dashboard/ingredients/foods');
+        router.replace('/dashboard/library/foods');
     }, [router]);
 
     return null;

@@ -140,7 +140,7 @@ const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onRegenerate }: {
     const [imageError, setImageError] = useState(false);
     return (
         <div className="group relative bg-card rounded-2xl border border-border overflow-hidden hover:shadow-lg transition-all animate-in fade-in zoom-in-95 duration-500 flex flex-col h-full">
-            <Link href={`/dashboard/meal-o-matic/meals/${recipe.id}`} className="absolute inset-x-0 top-0 bottom-[140px] z-10" />
+            <Link href={`/dashboard/library/meals/${recipe.id}`} className="absolute inset-x-0 top-0 bottom-[140px] z-10" />
             <div className="aspect-video relative overflow-hidden bg-muted flex-shrink-0">
                 <div className="absolute inset-0 bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-muted-foreground">
                     {recipe.image && !imageError ? (
@@ -162,7 +162,7 @@ const RecipeCard = ({ recipe, mealLabel, unit = 'kJ', onRegenerate }: {
                     <span className="flex items-center gap-1"><Droplet className="h-4 w-4 text-yellow-500" />{Number(recipe.fat * (recipe.servings || 1)).toFixed(1)}g</span>
                     <span className="flex items-center gap-1"><Wheat className="h-4 w-4 text-amber-600" />{Number(recipe.carbs * (recipe.servings || 1)).toFixed(1)}g</span>
                 </div>
-                <Link href={`/dashboard/meal-o-matic/meals/${recipe.id}`} className="mt-auto block w-full">
+                <Link href={`/dashboard/library/meals/${recipe.id}`} className="mt-auto block w-full">
                     <button className="w-full py-2 px-4 bg-primary text-primary-foreground rounded-lg text-sm font-bold shadow-sm hover:bg-primary/90 transition-all flex items-center justify-center gap-2 group/btn">
                         View Full Recipe <ChevronRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-0.5" />
                     </button>
@@ -226,7 +226,7 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
     const uniqueMissing = Array.from(new Set(missingIngredients));
     return (
         <div
-            onClick={() => router.push(`/dashboard/meal-o-matic/meals/${recipe.id}`)}
+            onClick={() => router.push(`/dashboard/library/meals/${recipe.id}`)}
             className={cn(
                 "group relative rounded-2xl border hover:shadow-lg transition-all cursor-pointer overflow-hidden p-2 lg:p-0",
                 isEaten
@@ -1220,7 +1220,7 @@ export function MealPlannerContent({
                         <div className="grid grid-cols-1 md:grid-cols-2 w-full gap-4">
                             <Button
                                 size="lg"
-                                onClick={() => router.push('/dashboard/meal-o-matic/meals')}
+                                onClick={() => router.push('/dashboard/library/meals')}
                                 className="h-16 text-lg font-black uppercase tracking-widest rounded-2xl border-2 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-slate-400 hover:text-emerald-600 hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all"
                             >
                                 <ChefHat className="mr-2 h-5 w-5" /> View Meals

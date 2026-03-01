@@ -907,7 +907,7 @@ export default function FoodDetailsPage() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        onClick={() => router.push(`/dashboard/ingredients/foods/new?edit=${food.id}`)}
+                                        onClick={() => router.push(`/dashboard/library/foods/new?edit=${food.id}`)}
                                         className="h-8 w-8 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                         title="Edit Food"
                                     >

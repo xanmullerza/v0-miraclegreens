@@ -2,7 +2,7 @@
 
 import React, { useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, ChefHat, ChevronRight, Plus } from 'lucide-react';
+import { Loader2, ChefHat, ChevronRight, Beaker, Plus } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { RecipesView } from '@/components/ingredients/recipes-view';
 import { HeroSearch } from '@/components/ui/hero-search';
@@ -18,20 +18,20 @@ function formatEnergy(calories: number, unit: 'kcal' | 'kJ') {
     return `${Math.round(calories).toLocaleString()} kC`;
 }
 
-export default function MealsPage() {
+export default function MixesPage() {
     return (
         <Suspense fallback={
             <div className="h-96 flex flex-col items-center justify-center gap-4">
-                <Loader2 className="animate-spin text-emerald-500" size={48} />
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Loading Meals...</p>
+                <Loader2 className="animate-spin text-indigo-500" size={48} />
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Loading Mixes...</p>
             </div>
         }>
-            <MealsContent />
+            <MixesContent />
         </Suspense>
     );
 }
 
-function MealsContent() {
+function MixesContent() {
     const router = useRouter();
     const { energyUnit } = useUserPreferences();
     const [searchQuery, setSearchQuery] = useState('');
@@ -58,7 +58,7 @@ function MealsContent() {
                     {formatEnergy(item.calories, energyUnit)} <span className="text-slate-200 dark:text-slate-700">|</span> {item.type}
                 </p>
             </div>
-            <ChevronRight className="text-slate-200 group-hover:text-amber-500 transition-colors shrink-0" size={20} />
+            <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={20} />
         </div>
     );
 
@@ -72,7 +72,7 @@ function MealsContent() {
             const { data, error } = await supabase
                 .from('recipes')
                 .select('*')
-                .eq('is_mix', false)
+                .eq('is_mix', true)
                 .ilike('title', `%${query}%`)
                 .limit(8);
             if (error) throw error;
@@ -101,21 +101,21 @@ function MealsContent() {
                     isLoading={isSearching}
                     isActive={isSearchActive}
                     setIsActive={setIsSearchActive}
-                    onSelect={(item) => router.push(`/dashboard/meal-o-matic/meals/${item.id}`)}
+                    onSelect={(item) => router.push(`/dashboard/library/mixes/${item.id}`)}
                     renderResult={renderResult}
-                    theme="amber"
-                    placeholder="SEARCH MEALS..."
-                    idleIcon={<ChefHat size={20} className="text-amber-500" />}
-                    idleTitle="Meal Recipes"
-                    idleSubtitle="Discover meals with full nutrition breakdowns"
-                    noResultsMessage="No matching meals found"
-                    enterMessage="Enter meal name to search"
-                    searchingMessage="Searching Meals..."
+                    theme="emerald"
+                    placeholder="SEARCH MIXES..."
+                    idleIcon={<Beaker size={20} className="text-emerald-500" />}
+                    idleTitle="Ingredient Mixes"
+                    idleSubtitle="Browse and search custom blends and bases"
+                    noResultsMessage="No matching mixes found"
+                    enterMessage="Enter mix name to search"
+                    searchingMessage="Searching Mixes..."
                     powerButton={
                         <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); setShowAddRecipe(true); }}
-                            className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:border-amber-500 hover:bg-amber-500/10 shrink-0 relative z-10"
+                            className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800/50 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all hover:border-emerald-500 hover:bg-emerald-500/10 shrink-0 relative z-10"
                         >
                             <Plus size={16} className="text-slate-900 dark:text-white" />
                         </button>
@@ -124,7 +124,7 @@ function MealsContent() {
 
                 {/* Dynamic Content Area */}
                 <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
-                    <RecipesView showHero={false} showAddRecipe={showAddRecipe} setShowAddRecipe={setShowAddRecipe} />
+                    <RecipesView showHero={false} isMix={true} showAddRecipe={showAddRecipe} setShowAddRecipe={setShowAddRecipe} />
                 </div>
             </div>
         </PageContainer>

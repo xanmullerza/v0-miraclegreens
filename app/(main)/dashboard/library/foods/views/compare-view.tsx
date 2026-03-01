@@ -79,7 +79,7 @@ const NUTRIENT_GROUPS = [
             { label: 'Phosphorus', key: 'Phosphorus', unit: 'mg' },
             { label: 'Iron', key: 'Iron', unit: 'mg' },
             { label: 'Zinc', key: 'Zinc', unit: 'mg' },
-            { label: 'Selenium', key: 'Selenium', unit: 'µg' },
+            { label: 'Selenium', key: 'Selenium', unit: 'ï¿½g' },
             { label: 'Copper', key: 'Copper', unit: 'mg' },
             { label: 'Manganese', key: 'Manganese', unit: 'mg' }
         ]
@@ -89,18 +89,18 @@ const NUTRIENT_GROUPS = [
         icon: Battery,
         theme: "emerald",
         keys: [
-            { label: 'Vitamin A', key: 'Vitamin A', unit: 'µg' },
+            { label: 'Vitamin A', key: 'Vitamin A', unit: 'ï¿½g' },
             { label: 'Vitamin C', key: 'Vitamin C', unit: 'mg' },
-            { label: 'Vitamin D', key: 'Vitamin D', unit: 'µg' },
+            { label: 'Vitamin D', key: 'Vitamin D', unit: 'ï¿½g' },
             { label: 'Vitamin E', key: 'Vitamin E', unit: 'mg' },
-            { label: 'Vitamin K', key: 'Vitamin K', unit: 'µg' },
+            { label: 'Vitamin K', key: 'Vitamin K', unit: 'ï¿½g' },
             { label: 'Vitamin B1', key: 'B1 (Thiamine)', unit: 'mg' },
             { label: 'Vitamin B2', key: 'B2 (Riboflavin)', unit: 'mg' },
             { label: 'Vitamin B3', key: 'B3 (Niacin)', unit: 'mg' },
             { label: 'Vitamin B5', key: 'B5 (Pantothenic Acid)', unit: 'mg' },
             { label: 'Vitamin B6', key: 'B6 (Pyridoxine)', unit: 'mg' },
-            { label: 'Vitamin B9', key: 'B9 (Folate)', unit: 'µg' },
-            { label: 'Vitamin B12', key: 'B12 (Cobalamin)', unit: 'µg' },
+            { label: 'Vitamin B9', key: 'B9 (Folate)', unit: 'ï¿½g' },
+            { label: 'Vitamin B12', key: 'B12 (Cobalamin)', unit: 'ï¿½g' },
             { label: 'Choline', key: 'Choline', unit: 'mg' }
         ]
     }
@@ -631,7 +631,7 @@ export function CompareView({ showStats = false, stats }: CompareViewProps) {
                             {relatedMeals.map((meal) => (
                                 <a
                                     key={meal.id}
-                                    href={`/dashboard/meal-o-matic/meals/${meal.id}`}
+                                    href={`/dashboard/library/meals/${meal.id}`}
                                     className="group relative flex flex-col items-center text-center gap-3 p-4 rounded-[2rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-indigo-500/30 transition-all duration-500 shadow-xl shadow-slate-200/50 dark:shadow-none hover:-translate-y-1"
                                 >
                                     <div className="w-full aspect-square rounded-2xl overflow-hidden bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 group-hover:scale-105 transition-transform duration-700">

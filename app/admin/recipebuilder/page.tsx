@@ -175,10 +175,10 @@ export default function RecipeBuilderPage() {
 
             const parseAmount = (amountStr: string) => {
                 const unicodeFractions: Record<string, number> = {
-                    '¼': 0.25, '½': 0.5, '¾': 0.75, '?': 0.125, '?': 0.375, '?': 0.625, '?': 0.875
+                    'ï¿½': 0.25, 'ï¿½': 0.5, 'ï¿½': 0.75, '?': 0.125, '?': 0.375, '?': 0.625, '?': 0.875
                 };
                 const rawAmount = amountStr.trim();
-                const qtyRegex = /^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?|[¼½¾????]))/;
+                const qtyRegex = /^((?:\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?|[ï¿½ï¿½ï¿½????]))/;
                 const qtyMatch = rawAmount.match(qtyRegex);
 
                 let quantity = 1;
@@ -501,7 +501,7 @@ export default function RecipeBuilderPage() {
             if (instructionsError) throw instructionsError;
 
             alert('Recipe created successfully!');
-            router.push('/dashboard/meal-o-matic/meals');
+            router.push('/dashboard/library/meals');
         } catch (error: any) {
             console.error('Error creating recipe:', error);
             alert(`Failed: ${error.message}`);

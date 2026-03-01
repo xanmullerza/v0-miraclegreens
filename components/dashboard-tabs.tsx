@@ -38,12 +38,12 @@ const TAB_CONFIG: TopTab[] = [
         color: 'text-slate-400',
         activeColor: 'text-emerald-400',
         activeBg: 'bg-emerald-500/10 border-emerald-500/30',
-        defaultHref: '/dashboard/ingredients/foods',
-        matchPaths: ['/dashboard/ingredients/foods', '/dashboard/meal-o-matic/meals', '/dashboard/meal-o-matic/mixes'],
+        defaultHref: '/dashboard/library/foods',
+        matchPaths: ['/dashboard/library/foods', '/dashboard/library/meals', '/dashboard/library/mixes'],
         subtabs: [
-            { id: 'foods', label: 'Foods', href: '/dashboard/ingredients/foods', icon: Leaf },
-            { id: 'meals', label: 'Meals', href: '/dashboard/meal-o-matic/meals', icon: ChefHat },
-            { id: 'mixes', label: 'Mixes', href: '/dashboard/meal-o-matic/mixes', icon: Beaker },
+            { id: 'foods', label: 'Foods', href: '/dashboard/library/foods', icon: Leaf },
+            { id: 'meals', label: 'Meals', href: '/dashboard/library/meals', icon: ChefHat },
+            { id: 'mixes', label: 'Mixes', href: '/dashboard/library/mixes', icon: Beaker },
         ],
     },
     {
@@ -54,11 +54,11 @@ const TAB_CONFIG: TopTab[] = [
         activeColor: 'text-amber-400',
         activeBg: 'bg-amber-500/10 border-amber-500/30',
         defaultHref: '/dashboard/meal-o-matic/planner',
-        matchPaths: ['/dashboard/meal-o-matic/planner', '/dashboard/ingredients/pantry', '/dashboard/ingredients/groceries'],
+        matchPaths: ['/dashboard/meal-o-matic/planner', '/dashboard/meal-o-matic/pantry', '/dashboard/meal-o-matic/groceries'],
         subtabs: [
             { id: 'planner', label: 'Planner', href: '/dashboard/meal-o-matic/planner', icon: Calendar },
-            { id: 'pantry', label: 'Pantry', href: '/dashboard/ingredients/pantry', icon: Package },
-            { id: 'groceries', label: 'Groceries', href: '/dashboard/ingredients/groceries', icon: ShoppingCart },
+            { id: 'pantry', label: 'Pantry', href: '/dashboard/meal-o-matic/pantry', icon: Package },
+            { id: 'groceries', label: 'Groceries', href: '/dashboard/meal-o-matic/groceries', icon: ShoppingCart },
         ],
     },
     {

@@ -23,6 +23,14 @@
             "approve": true,
             "matchCommandLine": true
         },
-        "ForEach-Object": true
+        "ForEach-Object": true,
+        "/^node -e \"const fs=require\\('fs'\\),path=require\\('path'\\); function walk\\(d\\)\\{const r=\\[\\];for\\(const f of fs\\.readdirSync\\(d\\)\\)\\{const p=path\\.join\\(d,f\\);fs\\.statSync\\(p\\)\\.isDirectory\\(\\)\\?r\\.push\\(\\.\\.\\.walk\\(p\\)\\):\\(/\\\\\\.tsx\\?\\$/\\.test\\(f\\)\\)&&r\\.push\\(p\\)\\}return r\\} const files=\\[\\.\\.\\.walk\\('app'\\),\\.\\.\\.walk\\('components'\\)\\]; let n=0; for\\(const f of files\\)\\{const c=fs\\.readFileSync\\(f,'utf8'\\); if\\(c\\.includes\\('dashboard/ingredients'\\)\\)\\{const u=c\\.replace\\(/dashboard\\\\/ingredients/g,'dashboard/library'\\); fs\\.writeFileSync\\(f,u,'utf8'\\); n\\+\\+; console\\.log\\('Updated:',f\\)\\}\\} console\\.log\\('Total:',n\\)\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node -e \"const fs=require\\('fs'\\),path=require\\('path'\\); function walk\\(d\\)\\{const r=\\[\\];for\\(const f of fs\\.readdirSync\\(d\\)\\)\\{const p=path\\.join\\(d,f\\);fs\\.statSync\\(p\\)\\.isDirectory\\(\\)\\?r\\.push\\(\\.\\.\\.walk\\(p\\)\\):\\(/\\\\\\.tsx\\?\\$/\\.test\\(f\\)\\)&&r\\.push\\(p\\)\\}return r\\} const files=\\[\\.\\.\\.walk\\('app'\\),\\.\\.\\.walk\\('components'\\)\\]; let n=0; for\\(const f of files\\)\\{const c=fs\\.readFileSync\\(f,'utf8'\\); if\\(c\\.includes\\('meal-o-matic/meals'\\)\\|\\|c\\.includes\\('meal-o-matic/mixes'\\)\\)\\{const u=c\\.replace\\(/meal-o-matic\\\\/meals/g,'library/meals'\\)\\.replace\\(/meal-o-matic\\\\/mixes/g,'library/mixes'\\); fs\\.writeFileSync\\(f,u,'utf8'\\); n\\+\\+; console\\.log\\('Updated:',f\\)\\}\\} console\\.log\\('Total:',n\\)\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
     }
 }

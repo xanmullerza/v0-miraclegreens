@@ -337,7 +337,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                             {foods.map((food) => (
                                 <Link
                                     key={food.id}
-                                    href={`/dashboard/ingredients/foods/${food.id}`}
+                                    href={`/dashboard/library/foods/${food.id}`}
                                     className="group block bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:shadow-lg transition-all duration-300 overflow-hidden"
                                 >
                                     <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px] gap-3 lg:gap-4 lg:items-center lg:px-6 py-1 w-full">

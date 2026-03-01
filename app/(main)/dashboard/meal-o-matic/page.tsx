@@ -7,7 +7,7 @@ export default function RecipesPage() {
     const router = useRouter();
 
     useEffect(() => {
-        router.replace("/dashboard/meal-o-matic/meals");
+        router.replace("/dashboard/library/meals");
     }, [router]);
 
     return null;
