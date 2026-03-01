@@ -520,7 +520,7 @@ Fat: ${item.fat_g || 0}g
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Servings & Sizes</Label>
                                     <Textarea
                                         placeholder="Paste things like '1 cup = 240g' or serving info here..."
@@ -528,8 +528,16 @@ Fat: ${item.fat_g || 0}g
                                         value={servingText}
                                         onChange={(e) => setServingText(e.target.value)}
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => toast.info('Manual serving add coming soon')}
+                                        className="w-full h-9 flex items-center justify-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
+                                    >
+                                        <Plus size={14} />
+                                        Manual Add
+                                    </button>
                                 </div>
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                     <Label className="text-[10px] font-black uppercase tracking-widest text-emerald-700 ml-1">Nutrient List</Label>
                                     <Textarea
                                         placeholder="Paste the list of calories, vitamins, and minerals here..."
@@ -537,6 +545,14 @@ Fat: ${item.fat_g || 0}g
                                         value={nutrientText}
                                         onChange={(e) => setNutrientText(e.target.value)}
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => toast.info('Manual nutrient add coming soon')}
+                                        className="w-full h-9 flex items-center justify-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 rounded-xl hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors"
+                                    >
+                                        <Plus size={14} />
+                                        Manual Add
+                                    </button>
                                 </div>
                             </div>
 
@@ -589,19 +605,6 @@ Fat: ${item.fat_g || 0}g
                         </div>
                     </div>
                 </Card>
-            </div>
-
-            {/* Manual Add Buttons - Test Section */}
-            <div className="w-full bg-red-500 p-8 rounded-2xl">
-                <h2 className="text-white text-2xl font-bold mb-4">TEST: Manual Entry Buttons</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Button className="bg-blue-600 text-white">
-                        Add Serving Size
-                    </Button>
-                    <Button className="bg-blue-600 text-white">
-                        Add Nutrient
-                    </Button>
-                </div>
             </div>
 
             {/* Photo Section - Full Width */}
