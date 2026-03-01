@@ -336,9 +336,7 @@ export function PantryView({
 
     const mergeQuantityStrings = (existing: string | undefined, incoming: string): string => {
         if (!existing) {
-            if (existing === '' || existing === '0' || existing === '0 grams') {
-                console.log('[pantry-view] mergeQuantityStrings: existing was zero/empty, returning incoming', { existing, incoming });
-            }
+            if (existing === '' || existing === '0' || existing === '0 grams') {            }
             return incoming;
         }
         // Drop zero-quantity entries before merging (e.g. '0' left after items are consumed)
@@ -348,9 +346,7 @@ export function PantryView({
             return e.qty > 0;
         });
         // If all existing entries were zeros, just return incoming
-        if (existingEntries.length === 0) {
-            console.log('[pantry-view] mergeQuantityStrings: all existing entries were zero, returning incoming', { existing, incoming });
-            return incoming;
+        if (existingEntries.length === 0) {            return incoming;
         }
         const b = parseQuantityEntry(incoming);
 
@@ -413,10 +409,7 @@ export function PantryView({
                 const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
                 const currentQty = quantities[buyMoreItem.id] || buyMoreItem.quantity;
                 const merged = mergeQuantityStrings(currentQty, quantityString);
-                if (buyMoreItem.common_name?.toLowerCase().includes('potato')) {
-                    console.log('🥔 [handleBuyMoreAdd]', buyMoreItem.common_name || buyMoreItem.name, { currentQty, quantityString, merged: merged, itemId: buyMoreItem.id });
-                } else {
-                    console.log('[handleBuyMoreAdd]', buyMoreItem.common_name || buyMoreItem.name, { currentQty, quantityString, merged: merged });
+                if (buyMoreItem.common_name?.toLowerCase().includes('potato')) {                } else {
                 }
                 
                 // Check if merged result is 0 - if so, move to shopping list
@@ -425,8 +418,6 @@ export function PantryView({
                 const isZero = totalGrams === 0 || merged === '0' || merged === '';
                 
                 if (isZero) {
-                    console.log('[handleBuyMoreAdd] Merged quantity is 0, moving to shopping list:', buyMoreItem.common_name || buyMoreItem.name);
-                    
                     // Add to shopping list
                     const shoppingList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
                     shoppingList.push({
@@ -512,12 +503,8 @@ export function PantryView({
             const removeGrams = (removeEntry.qty || 0) * (removeEntry.weight_g || 0);
             
             const remainingGrams = Math.max(0, currentGrams - removeGrams);
-            console.log('[handleRemove]', removeItem.common_name || removeItem.name, { currentGrams, removeGrams, remainingGrams });
-            
             if (remainingGrams === 0 || currentGrams === 0) {
                 // Remove from pantry and add to shopping list
-                console.log('[handleRemove] Item depleted, moving to shopping list:', removeItem.common_name || removeItem.name);
-                
                 const shoppingList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
                 shoppingList.push({
                     id: `replenish-${Date.now()}-${removeItem.id}`,
@@ -674,16 +661,12 @@ export function PantryView({
 
             // Merge in locally-stored quantities (persists without login)
             try {
-                const savedQuantities = localStorage.getItem('pantry_quantities');
-                console.log('[pantry-view] localStorage pantry_quantities:', savedQuantities);
-                if (savedQuantities) {
+                const savedQuantities = localStorage.getItem('pantry_quantities');                if (savedQuantities) {
                     const quantities: Record<string, string> = JSON.parse(savedQuantities);
                     combined.forEach(item => {
                         if (quantities[item.id] !== undefined) {
                             if (item.common_name?.toLowerCase().includes('potato')) {
-                                console.log('🥔 [pantry-view] Applying localStorage quantity for', item.name || item.common_name, ':', quantities[item.id], '(was:', item.quantity, ') itemId:', item.id);
                             } else {
-                                console.log('[pantry-view] Applying localStorage quantity for', item.name || item.common_name, ':', quantities[item.id], '(was:', item.quantity, ')');
                             }
                             item.quantity = quantities[item.id];
                         }
@@ -778,8 +761,6 @@ export function PantryView({
 
     const deleteCategory = async (categoryName: string, items: FoodItem[]) => {
         try {
-            console.log('[deleteCategory]', categoryName, { itemCount: items.length });
-            
             for (const food of items) {
                 const source = food.source_table || 'food_items';
                 
@@ -814,10 +795,7 @@ export function PantryView({
     };
 
     const removeFromPantry = async (id: string, name: string, source: string = 'food_items') => {
-        try {
-            console.log('[removeFromPantry]', name, { id, source });
-            
-            let error;
+        try {            let error;
 
             if (source === 'pantry_items') {
                 const res = await supabase.from('pantry_items').delete().eq('id', id);
@@ -893,10 +871,7 @@ export function PantryView({
         const isZero = totalGrams === 0 || quantityString === '0' || quantityString === '';
         
         if (isZero) {
-            // Move to shopping list instead of keeping in pantry
-            console.log('[updatePantryQuantity] Item set to 0, moving to shopping list:', item.common_name || item.name);
-            
-            // Add to shopping list
+            // Move to shopping list instead of keeping in pantry            // Add to shopping list
             const saved = localStorage.getItem('vitala_shopping_manual_items');
             const manualItems = saved ? JSON.parse(saved) : [];
             manualItems.push({
@@ -940,9 +915,7 @@ export function PantryView({
 
         // Update UI immediately
         setFoods(prev => prev.map(f => f.id === item.id ? { ...f, quantity: quantityString } : f));
-        setBuyMoreItem(null);
-        console.log('[updatePantryQuantity]', item.common_name || item.name, { quantityString });
-        toast.success(`Updated quantity for "${item.name}"`);
+        setBuyMoreItem(null);        toast.success(`Updated quantity for "${item.name}"`);
 
         // Persist to localStorage (works without login)
         try {
