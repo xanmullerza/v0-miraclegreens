@@ -27,8 +27,7 @@ import {
     Activity,
     Heart,
     X,
-    List,
-    Slash
+    List
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -1071,6 +1070,13 @@ export function PantryView({
                                                             <Minus size={18} />
                                                         </button>
                                                         <button
+                                                            onClick={(e) => { e.stopPropagation(); setExpandedStockBreakdownId(expandedStockBreakdownId === food.id ? null : food.id); }}
+                                                            className={cn("p-2.5 rounded-lg transition-all flex-shrink-0", expandedStockBreakdownId === food.id ? "text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-950/40" : "text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500")}
+                                                            title="View stock breakdown"
+                                                        >
+                                                            <List size={18} />
+                                                        </button>
+                                                        <button
                                                             onClick={(e) => { 
                                                                 e.stopPropagation(); 
                                                                 confirmDelete(food.id, food.name, food.common_name || '', food.source_table || 'food_items');
@@ -1078,14 +1084,7 @@ export function PantryView({
                                                             className="p-2.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-300 dark:text-slate-600 hover:text-rose-500 transition-all flex-shrink-0"
                                                             title="Remove from pantry"
                                                         >
-                                                            <X size={18} />
-                                                        </button>
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); setExpandedStockBreakdownId(expandedStockBreakdownId === food.id ? null : food.id); }}
-                                                            className={cn("p-2.5 rounded-lg transition-all flex-shrink-0", expandedStockBreakdownId === food.id ? "text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-950/40" : "text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500")}
-                                                            title="View stock breakdown"
-                                                        >
-                                                            <Slash size={18} />
+                                                            <Trash2 size={18} />
                                                         </button>
                                                     </div>
                                                 )}
