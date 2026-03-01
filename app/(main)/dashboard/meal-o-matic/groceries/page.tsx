@@ -292,13 +292,12 @@ export default function ShoppingListPage() {
                             </div>
                             <div className="flex-1">
                                 <p className="text-sm font-black text-slate-900 dark:text-white">{selectedFood.common_name || selectedFood.name}</p>
+                                <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mt-1">Manually Added</p>
                             </div>
                         </div>
 
                         {/* Add to Groceries Section */}
                         <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
-                            <p className="text-[9px] font-black uppercase tracking-widest bg-emerald-500 text-white px-3 py-2 rounded-lg mb-4 inline-block">Add to Groceries</p>
-                            
                             <div className="space-y-3">
                                 <div>
                                     <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">QTY</Label>
