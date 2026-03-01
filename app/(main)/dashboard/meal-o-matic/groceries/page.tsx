@@ -36,9 +36,6 @@ export default function ShoppingListPage() {
     const [isAdding, setIsAdding] = useState(false);
 
     const [quickAddQty, setQuickAddQty] = useState('1');
-    const [quickAddWeight, setQuickAddWeight] = useState('');
-    const [quickAddUnit, setQuickAddUnit] = useState('g');
-    const [quickAddMode, setQuickAddMode] = useState<'pantry' | 'shopping'>('shopping');
     const [selectedPortion, setSelectedPortion] = useState<{ label: string; weight_g: number } | null>(null);
 
     // Scanner state
@@ -105,16 +102,12 @@ export default function ShoppingListPage() {
         if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
         searchTimeoutRef.current = setTimeout(() => performSearch(val), 300);
     };
-
     const handleSelectFood = (food: any) => {
         setSelectedFood(food);
         setShowAddModal(true);
         setIsSearchActive(false);
         setSearchQuery('');
         setQuickAddQty('1');
-        setQuickAddWeight('');
-        setQuickAddUnit('g');
-        setQuickAddMode('shopping');
         setSelectedPortion(null);
     };
 
@@ -182,70 +175,42 @@ export default function ShoppingListPage() {
         try {
             const quantityString = selectedPortion
                 ? `${quickAddQty} ${selectedPortion.label} (${selectedPortion.weight_g}g)`
-                : quickAddWeight
-                    ? `${quickAddQty} x ${quickAddWeight}${quickAddUnit}`
-                    : quickAddQty;
+                : quickAddQty;
 
-            if (quickAddMode === 'shopping') {
-                const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-                
-                // Check if item already exists by food_item_id
-                const existingIndex = currentList.findIndex((item: any) => item.food_item_id === selectedFood.id);
-                
-                if (existingIndex !== -1) {
-                    // Try to intelligently combine quantities
-                    const existingQty = currentList[existingIndex].quantity;
-                    const combined = combineQuantities(existingQty, quantityString);
-                    currentList[existingIndex].quantity = combined;
-                    toast.success(`Added to ${selectedFood.common_name || selectedFood.name} total`);
-                } else {
-                    // Add new item
-                    const newItem = {
-                        id: `manual-${Date.now()}`,
-                        name: selectedFood.common_name || selectedFood.name,
-                        quantity: quantityString,
-                        unit: '',
-                        checked: false,
-                        source: 'manual',
-                        food_item_id: selectedFood.id,
-                        category: selectedFood.category,
-                        image: selectedFood.image,
-                    };
-                    currentList.push(newItem);
-                    toast.success(`${selectedFood.common_name || selectedFood.name} added to groceries`);
-                }
-                
-                localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(currentList));
-                window.dispatchEvent(new Event('storage'));
+            const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
+            
+            // Check if item already exists by food_item_id
+            const existingIndex = currentList.findIndex((item: any) => item.food_item_id === selectedFood.id);
+            
+            if (existingIndex !== -1) {
+                // Try to intelligently combine quantities
+                const existingQty = currentList[existingIndex].quantity;
+                const combined = combineQuantities(existingQty, quantityString);
+                currentList[existingIndex].quantity = combined;
+                toast.success(`Added to ${selectedFood.common_name || selectedFood.name} total`);
             } else {
-                // Add to pantry
-                const { error } = await supabase
-                    .from('food_items')
-                    .update({ is_in_pantry: true } as any)
-                    .eq('id', selectedFood.id);
-
-                if (error) throw error;
-
-                const saved = localStorage.getItem('pantry_quantities');
-                const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
-                quantities[selectedFood.id] = quantityString;
-                localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-
-                // Remove auto-replenish entries for this item from shopping list
-                const shoppingList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-                const filtered = shoppingList.filter((item: any) => 
-                    !(item.food_item_id === selectedFood.id && item.source === 'auto-replenish')
-                );
-                localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(filtered));
-                window.dispatchEvent(new Event('storage'));
-
-                toast.success(`${selectedFood.common_name || selectedFood.name} added to pantry`);
+                // Add new item
+                const newItem = {
+                    id: `manual-${Date.now()}`,
+                    name: selectedFood.common_name || selectedFood.name,
+                    quantity: quantityString,
+                    unit: '',
+                    checked: false,
+                    source: 'manual',
+                    food_item_id: selectedFood.id,
+                    category: selectedFood.category,
+                    image: selectedFood.image,
+                };
+                currentList.push(newItem);
+                toast.success(`${selectedFood.common_name || selectedFood.name} added to groceries`);
             }
+            
+            localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(currentList));
+            window.dispatchEvent(new Event('storage'));
 
             setShowAddModal(false);
             setSelectedFood(null);
             setQuickAddQty('1');
-            setQuickAddWeight('');
             setSelectedPortion(null);
         } catch (error) {
             console.error('Error adding item:', error);
@@ -254,6 +219,7 @@ export default function ShoppingListPage() {
             setIsAdding(false);
         }
     };
+
 
     return (
         <PageContainer>
@@ -331,10 +297,11 @@ export default function ShoppingListPage() {
                                     />
                                 </div>
 
-                                {selectedFood.portions && selectedFood.portions.length > 0 && !selectedPortion ? (
+                                {selectedFood.portions && selectedFood.portions.length > 0 && (
                                     <div className="flex-1 md:flex-none">
                                         <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Serving</Label>
                                         <select
+                                            value={selectedPortion?.label || ''}
                                             onChange={(e) => {
                                                 const portion = selectedFood.portions?.find((p: any) => p.label === e.target.value);
                                                 if (portion) {
@@ -351,82 +318,7 @@ export default function ShoppingListPage() {
                                             ))}
                                         </select>
                                     </div>
-                                ) : selectedPortion ? (
-                                    <div className="flex-1 md:flex-none">
-                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Serving</Label>
-                                        <select
-                                            value={selectedPortion.label}
-                                            onChange={(e) => {
-                                                const portion = selectedFood.portions?.find((p: any) => p.label === e.target.value);
-                                                if (portion) {
-                                                    setSelectedPortion(portion);
-                                                }
-                                            }}
-                                            className="w-auto px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                        >
-                                            {selectedFood.portions?.map((p: any) => (
-                                                <option key={p.label} value={p.label}>
-                                                    {p.label} ({p.weight_g}g)
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <div className="flex-1 md:flex-none">
-                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Weight</Label>
-                                            <Input
-                                                type="number"
-                                                value={quickAddWeight}
-                                                onChange={(e) => setQuickAddWeight(e.target.value)}
-                                                placeholder="e.g. 100"
-                                                className="w-20 text-center"
-                                            />
-                                        </div>
-
-                                        <div className="flex-1 md:flex-none">
-                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Unit</Label>
-                                            <select
-                                                value={quickAddUnit}
-                                                onChange={(e) => setQuickAddUnit(e.target.value)}
-                                                className="w-20 px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                            >
-                                                <option value="g">g</option>
-                                                <option value="ml">ml</option>
-                                                <option value="oz">oz</option>
-                                                <option value="lb">lb</option>
-                                            </select>
-                                        </div>
-                                    </>
                                 )}
-                                {selectedFood.portions && selectedFood.portions.length > 0 && (
-                                    <button
-                                        onClick={() => {
-                                            if (selectedPortion) {
-                                                setSelectedPortion(null);
-                                                setQuickAddWeight(`${selectedPortion.weight_g}`);
-                                                setQuickAddUnit('g');
-                                            } else {
-                                                setSelectedPortion(selectedFood.portions[0]);
-                                            }
-                                        }}
-                                        className="text-[9px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-500 transition-colors whitespace-nowrap self-end mb-0.5"
-                                    >
-                                        {selectedPortion ? 'Use Weight' : 'Use Serving'}
-                                    </button>
-                                )}
-
-                                <div className="flex-1 md:flex-none">
-                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Destination</Label>
-                                    <select
-                                        value={quickAddMode}
-                                        onChange={(e) => setQuickAddMode(e.target.value as 'pantry' | 'shopping')}
-                                        className="w-auto px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                    >
-                                        <option value="shopping">Groceries</option>
-                                        <option value="pantry">Pantry</option>
-                                    </select>
-                                </div>
 
                                 <Button
                                     onClick={handleQuickAdd}
