@@ -1105,11 +1105,12 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                     variant="outline"
                                                                     onClick={(e) => { 
                                                                         e.stopPropagation(); 
-                                                                        if (item.quantity && item.quantity > 1) {
-                                                                            const updatedItem = { ...item, quantity: item.quantity - 1 };
+                                                                        const qty = parseInt(item.quantity);
+                                                                        if (qty && qty > 1) {
+                                                                            const updatedItem = { ...item, quantity: String(qty - 1) };
                                                                             removeItem(item.id);
                                                                             // Re-add with reduced quantity if > 1
-                                                                            if (updatedItem.quantity > 1) {
+                                                                            if (parseInt(updatedItem.quantity) > 0) {
                                                                                 const manualItems = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
                                                                                 manualItems.push(updatedItem);
                                                                                 localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(manualItems));
