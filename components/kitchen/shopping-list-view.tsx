@@ -98,6 +98,9 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
     const [pantryAddFoodId, setPantryAddFoodId] = useState<string | null>(null);
     const [pantryAddLoading, setPantryAddLoading] = useState(false);
     const [expandedActionId, setExpandedActionId] = useState<string | null>(null);
+    const [expandedRemoveId, setExpandedRemoveId] = useState<string | null>(null);
+    const [removeItem, setRemoveItem] = useState<ShoppingListItem | null>(null);
+    const [expandedBreakdownId, setExpandedBreakdownId] = useState<string | null>(null);
 
     // Load manual items from local storage on mount and when storage changes
     useEffect(() => {
@@ -500,6 +503,50 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                 }
             } catch (e) { /* ignore */ }
         }
+    };
+
+    // Open remove panel for an item
+    const openRemovePanel = (item: ShoppingListItem) => {
+        if (expandedRemoveId === item.id) {
+            setExpandedRemoveId(null);
+            setRemoveItem(null);
+            return;
+        }
+        setRemoveItem(item);
+        setExpandedRemoveId(item.id);
+    };
+
+    // Confirm delete with toast dialog
+    const confirmDelete = (item: ShoppingListItem) => {
+        const displayName = item.common_name || item.name;
+        toast.custom(
+            (t) => (
+                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 shadow-lg max-w-sm">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white mb-3">
+                        Remove <span className="font-black text-rose-600 dark:text-rose-400">{displayName}</span> from list?
+                    </p>
+                    <div className="flex gap-2 justify-end">
+                        <button
+                            onClick={() => toast.dismiss(t)}
+                            className="px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={() => {
+                                toast.dismiss(t);
+                                removeItem(item.id);
+                                setExpandedActionId(null);
+                            }}
+                            className="px-3 py-1.5 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 dark:bg-rose-700 dark:hover:bg-rose-800 rounded transition-colors"
+                        >
+                            Remove
+                        </button>
+                    </div>
+                </div>
+            ),
+            { duration: Infinity }
+        );
     };
 
     // Confirm adding a grocery item to the pantry with the chosen qty + portion
@@ -1025,26 +1072,83 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                 <Plus size={18} />
                                                             </button>
                                                             <button
-                                                                onClick={(e) => { e.stopPropagation(); toast.info('Remove functionality coming soon'); }}
+                                                                onClick={(e) => { e.stopPropagation(); openRemovePanel(item); }}
                                                                 className="p-2.5 rounded-lg transition-all flex-shrink-0 text-slate-400 hover:bg-rose-100 dark:hover:bg-rose-950/40 hover:text-rose-500"
                                                                 title="Remove items"
                                                             >
                                                                 <Minus size={18} />
                                                             </button>
                                                             <button
-                                                                onClick={(e) => { e.stopPropagation(); toast.info('Measures coming soon'); }}
+                                                                onClick={(e) => { e.stopPropagation(); setExpandedBreakdownId(expandedBreakdownId === item.id ? null : item.id); }}
                                                                 className="p-2.5 rounded-lg transition-all flex-shrink-0 text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500"
                                                                 title="View package sizes"
                                                             >
                                                                 <List size={18} />
                                                             </button>
                                                             <button
-                                                                onClick={(e) => { e.stopPropagation(); removeItem(item.id); setExpandedActionId(null); }}
+                                                                onClick={(e) => { e.stopPropagation(); confirmDelete(item); }}
                                                                 className="p-2.5 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-300 dark:text-slate-600 hover:text-rose-500 transition-all flex-shrink-0"
                                                                 title="Remove from list"
                                                             >
                                                                 <Trash2 size={18} />
                                                             </button>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Inline remove panel */}
+                                                    {expandedRemoveId === item.id && (
+                                                        <div className="mb-0.5 p-4 rounded-xl border border-rose-200 dark:border-rose-800/50 bg-rose-50 dark:bg-rose-950/20 animate-in slide-in-from-top-2 duration-200">
+                                                            <p className="text-sm font-bold text-slate-900 dark:text-white mb-3">Remove from {item.name}</p>
+                                                            <div className="flex items-center gap-3">
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="outline"
+                                                                    onClick={(e) => { 
+                                                                        e.stopPropagation(); 
+                                                                        if (item.quantity && item.quantity > 1) {
+                                                                            const updatedItem = { ...item, quantity: item.quantity - 1 };
+                                                                            removeItem(item.id);
+                                                                            // Re-add with reduced quantity if > 1
+                                                                            if (updatedItem.quantity > 1) {
+                                                                                const manualItems = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
+                                                                                manualItems.push(updatedItem);
+                                                                                localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(manualItems));
+                                                                                setManualItems(manualItems);
+                                                                            }
+                                                                            setExpandedRemoveId(null);
+                                                                            setRemoveItem(null);
+                                                                        }
+                                                                    }}
+                                                                    className="h-9 px-3"
+                                                                >
+                                                                    Remove 1
+                                                                </Button>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="ghost"
+                                                                    onClick={(e) => { e.stopPropagation(); setExpandedRemoveId(null); setRemoveItem(null); }}
+                                                                    className="h-9 px-3 text-slate-500"
+                                                                >
+                                                                    Cancel
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Inline breakdown panel */}
+                                                    {expandedBreakdownId === item.id && (
+                                                        <div className="mb-0.5 p-4 rounded-xl border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-950/20 animate-in slide-in-from-top-2 duration-200">
+                                                            <p className="text-sm font-bold text-slate-900 dark:text-white mb-3">Package Sizes for {item.name}</p>
+                                                            <div className="space-y-2">
+                                                                {item.portion_size ? (
+                                                                    <div className="flex justify-between items-center p-2 bg-white dark:bg-slate-800/40 rounded border border-slate-200 dark:border-slate-700">
+                                                                        <span className="text-sm text-slate-600 dark:text-slate-300">{item.portion_size}</span>
+                                                                        <span className="text-sm font-bold text-slate-900 dark:text-white">× {item.quantity || 1}</span>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="text-xs text-slate-500 py-2 px-2">No package size information available</div>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     )}
 
