@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -71,10 +71,10 @@ export function MixLabView() {
 
     // Sample categories for Mix Lab
     const mixCategories = [
-        { name: 'Spice Blends', icon: '🌶️', description: 'Garam masala, curry powder, za\'atar...', action: 'spicelab' },
-        { name: 'Condiments', icon: '🫙', description: 'Homemade mayo, margarine, mustard...' },
-        { name: 'Sauces', icon: '🥫', description: 'Pasta sauce, BBQ sauce, hot sauce...' },
-        { name: 'Dressings', icon: '🥗', description: 'Vinaigrettes, ranch, tahini...' },
+        { name: 'Spice Blends', icon: '???', description: 'Garam masala, curry powder, za\'atar...', action: 'spicelab' },
+        { name: 'Condiments', icon: '??', description: 'Homemade mayo, margarine, mustard...' },
+        { name: 'Sauces', icon: '??', description: 'Pasta sauce, BBQ sauce, hot sauce...' },
+        { name: 'Dressings', icon: '??', description: 'Vinaigrettes, ranch, tahini...' },
     ];
 
     const handleCategoryClick = (cat: typeof mixCategories[0]) => {
@@ -197,7 +197,7 @@ export function MixLabView() {
                     {filteredMixes.map((mix) => (
                         <div
                             key={mix.id}
-                            onClick={() => router.push(`/dashboard/recipes/meals/${mix.id}`)}
+                            onClick={() => router.push(`/dashboard/meal-o-matic/meals/${mix.id}`)}
                             className="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-purple-500/30 hover:shadow-xl transition-all cursor-pointer overflow-hidden"
                         >
                             <div className="aspect-video bg-gradient-to-br from-purple-100 to-fuchsia-100 dark:from-purple-900/30 dark:to-fuchsia-900/30 flex items-center justify-center">

@@ -1,4 +1,4 @@
-ï»¿'use client';
+'use client';
 
 import { useState, useEffect, Fragment, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
@@ -171,7 +171,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                         // "1.5 kg" or "300 grams" or "1 kilogram"
                         const textUnit = trimmed.match(/^(\d+(?:\.\d+)?)\s*(kg|kilograms?|grams?|g)$/i);
                         if (textUnit) { const val = parseFloat(textUnit[1]); const unit = textUnit[2].toLowerCase(); total += (unit === 'kg' || unit.startsWith('kilogram')) ? val * 1000 : val; continue; }
-                        // Plain number â€” treat as quantity (assume ~1000g per unit for rough check)
+                        // Plain number — treat as quantity (assume ~1000g per unit for rough check)
                         const plain = trimmed.match(/^(\d+(?:\.\d+)?)$/);
                         if (plain) { total += parseFloat(plain[1]) * 1000; continue; }
                     }
@@ -207,13 +207,13 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                     }
 
                     if (neededG > 0 && pantryG >= neededG) {
-                        // Pantry fully covers this item â€” skip it
+                        // Pantry fully covers this item — skip it
                         idx++;
                         continue;
                     }
 
-                    // If pantry has 0 or no weight info â€” show full amount
-                    // If pantry has partial â€” show deficit
+                    // If pantry has 0 or no weight info — show full amount
+                    // If pantry has partial — show deficit
                     let quantity = item.amounts.join(' + ');
                     if (neededG > 0 && pantryG > 0 && pantryG < neededG) {
                         const deficitG = neededG - pantryG;
@@ -469,7 +469,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         setPantryAddFoodId(null);
         setPantryAddItem(item);
 
-        // Resolve food_item_id if missing â€” look up by name
+        // Resolve food_item_id if missing — look up by name
         let foodItemId = item.food_item_id || null;
         if (!foodItemId && item.name) {
             try {
@@ -504,7 +504,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         if (!pantryAddItem) return;
         const foodItemId = pantryAddFoodId;
         if (!foodItemId) {
-            // No food resolved â€” fall back to match dialog
+            // No food resolved — fall back to match dialog
             moveToPantry(pantryAddItem);
             setPantryAddItem(null);
             return;
@@ -911,7 +911,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                         Add items manually above, or generate a meal plan to automatically create a shopping list.
                     </p>
                     <Button
-                        onClick={() => router.push('/dashboard/recipes/meals?tab=mealplanner')}
+                        onClick={() => router.push('/dashboard/meal-o-matic/meals?tab=mealplanner')}
                         className="rounded-xl px-10 h-14 font-black uppercase tracking-widest text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white shadow-xl shadow-emerald-500/20"
                     >
                         <ChefHat size={18} className="mr-2" />

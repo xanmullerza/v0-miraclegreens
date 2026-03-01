@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -144,7 +144,7 @@ export function AllMealsView() {
                     {filteredRecipes.map((recipe) => (
                         <div
                             key={recipe.id}
-                            onClick={() => router.push(`/dashboard/recipes/meals/${recipe.id}`)}
+                            onClick={() => router.push(`/dashboard/meal-o-matic/meals/${recipe.id}`)}
                             className="group bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-orange-500/30 hover:shadow-xl transition-all cursor-pointer overflow-hidden"
                         >
                             {/* Image */}

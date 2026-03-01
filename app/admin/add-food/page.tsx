@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, Suspense, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
@@ -364,7 +364,7 @@ Fat: ${item.fat_g || 0}g
                             Add Food
                         </Button>
                         <Button
-                            onClick={() => router.push('/dashboard/recipes/meals')}
+                            onClick={() => router.push('/dashboard/meal-o-matic/meals')}
                             className="bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md shadow-xl gap-2 px-4 h-11 rounded-xl font-black uppercase tracking-widest group/btn transition-all text-[10px]"
                         >
                             <ChefHat size={14} className="group-hover/btn:scale-110 transition-transform" />

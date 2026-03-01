@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
@@ -101,7 +101,7 @@ function MixesContent() {
                     isLoading={isSearching}
                     isActive={isSearchActive}
                     setIsActive={setIsSearchActive}
-                    onSelect={(item) => router.push(`/dashboard/recipes/mixes/${item.id}`)}
+                    onSelect={(item) => router.push(`/dashboard/meal-o-matic/mixes/${item.id}`)}
                     renderResult={renderResult}
                     theme="emerald"
                     placeholder="SEARCH MIXES..."

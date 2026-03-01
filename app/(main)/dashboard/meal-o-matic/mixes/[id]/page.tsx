@@ -595,7 +595,7 @@ export default function RecipeDetailsPage() {
         } catch (error) {
             console.error('Error fetching recipe:', error);
             toast.error('Failed to load mix details');
-            router.push('/dashboard/recipes/mixes');
+            router.push('/dashboard/meal-o-matic/mixes');
         } finally {
             setLoading(false);
         }
@@ -1294,7 +1294,7 @@ export default function RecipeDetailsPage() {
             try {
                 await deleteRecipe(recipe.id);
                 toast.success("Mix deleted successfully");
-                router.push('/dashboard/recipes/mixes');
+                router.push('/dashboard/meal-o-matic/mixes');
             } catch (error) {
                 toast.error("Failed to delete mix");
             }
@@ -1303,7 +1303,7 @@ export default function RecipeDetailsPage() {
 
     const handleEdit = () => {
         if (!recipe) return;
-        router.push(`/dashboard/recipes/mixes/new?edit=${recipe.id}`);
+        router.push(`/dashboard/meal-o-matic/mixes/new?edit=${recipe.id}`);
     };
 
     if (loading) {
@@ -1539,7 +1539,7 @@ export default function RecipeDetailsPage() {
                                             {relatedRecipes.map((meal) => (
                                                 <a
                                                     key={meal.id}
-                                                    href={`/dashboard/recipes/mixes/${meal.id}`}
+                                                    href={`/dashboard/meal-o-matic/mixes/${meal.id}`}
                                                     className="group relative flex flex-col items-center text-center gap-2 p-3 rounded-[1.5rem] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 hover:border-indigo-500/30 transition-all duration-500 shadow-sm shadow-slate-200/50 dark:shadow-none hover:-translate-y-1"
                                                 >
                                                     <div className="w-full aspect-square rounded-xl overflow-hidden bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800 group-hover:scale-110 transition-transform duration-700 relative">

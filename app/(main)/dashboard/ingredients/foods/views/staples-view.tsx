@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -195,7 +195,7 @@ export function StaplesView() {
 
                 <div className="flex items-center gap-3">
                     <Button
-                        onClick={() => router.push('/dashboard/recipes/planner')}
+                        onClick={() => router.push('/dashboard/meal-o-matic/planner')}
                         className="bg-slate-900 border border-slate-800 text-slate-100 px-6 h-12 rounded-xl font-black uppercase tracking-widest shadow-xl flex items-center gap-2 group transition-all hover:bg-black"
                     >
                         <Sparkles size={16} className="text-amber-400 group-hover:scale-125 transition-transform" />

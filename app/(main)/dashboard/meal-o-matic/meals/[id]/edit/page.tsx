@@ -173,7 +173,7 @@ export default function EditRecipePage() {
         } catch (error: any) {
             console.error('Error fetching recipe:', error);
             toast.error(`Failed to load recipe: ${error.message}`);
-            router.push('/dashboard/recipes/meals');
+            router.push('/dashboard/meal-o-matic/meals');
         } finally {
             setLoading(false);
         }
@@ -579,7 +579,7 @@ export default function EditRecipePage() {
             if (instructionsError) throw instructionsError;
 
             toast.success('Recipe updated successfully!');
-            router.push(`/dashboard/recipes/meals/${recipeId}`);
+            router.push(`/dashboard/meal-o-matic/meals/${recipeId}`);
         } catch (error: any) {
             console.error('Error updating recipe:', error);
             toast.error(`Failed: ${error.message}`);

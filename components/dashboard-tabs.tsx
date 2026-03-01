@@ -39,11 +39,11 @@ const TAB_CONFIG: TopTab[] = [
         activeColor: 'text-emerald-400',
         activeBg: 'bg-emerald-500/10 border-emerald-500/30',
         defaultHref: '/dashboard/ingredients/foods',
-        matchPaths: ['/dashboard/ingredients/foods', '/dashboard/recipes/meals', '/dashboard/recipes/mixes'],
+        matchPaths: ['/dashboard/ingredients/foods', '/dashboard/meal-o-matic/meals', '/dashboard/meal-o-matic/mixes'],
         subtabs: [
             { id: 'foods', label: 'Foods', href: '/dashboard/ingredients/foods', icon: Leaf },
-            { id: 'meals', label: 'Meals', href: '/dashboard/recipes/meals', icon: ChefHat },
-            { id: 'mixes', label: 'Mixes', href: '/dashboard/recipes/mixes', icon: Beaker },
+            { id: 'meals', label: 'Meals', href: '/dashboard/meal-o-matic/meals', icon: ChefHat },
+            { id: 'mixes', label: 'Mixes', href: '/dashboard/meal-o-matic/mixes', icon: Beaker },
         ],
     },
     {
@@ -53,10 +53,10 @@ const TAB_CONFIG: TopTab[] = [
         color: 'text-slate-400',
         activeColor: 'text-amber-400',
         activeBg: 'bg-amber-500/10 border-amber-500/30',
-        defaultHref: '/dashboard/recipes/planner',
-        matchPaths: ['/dashboard/recipes/planner', '/dashboard/ingredients/pantry', '/dashboard/ingredients/groceries'],
+        defaultHref: '/dashboard/meal-o-matic/planner',
+        matchPaths: ['/dashboard/meal-o-matic/planner', '/dashboard/ingredients/pantry', '/dashboard/ingredients/groceries'],
         subtabs: [
-            { id: 'planner', label: 'Planner', href: '/dashboard/recipes/planner', icon: Calendar },
+            { id: 'planner', label: 'Planner', href: '/dashboard/meal-o-matic/planner', icon: Calendar },
             { id: 'pantry', label: 'Pantry', href: '/dashboard/ingredients/pantry', icon: Package },
             { id: 'groceries', label: 'Groceries', href: '/dashboard/ingredients/groceries', icon: ShoppingCart },
         ],

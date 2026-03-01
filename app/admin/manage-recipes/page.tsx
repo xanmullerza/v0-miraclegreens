@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
@@ -210,7 +210,7 @@ export default function ManageRecipesPage() {
 
                             <div className="flex gap-2 mt-auto">
                                 <Button
-                                    onClick={() => router.push(`/dashboard/recipes/meals/${recipe.id}/edit`)}
+                                    onClick={() => router.push(`/dashboard/meal-o-matic/meals/${recipe.id}/edit`)}
                                     className="flex-1 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-black uppercase tracking-widest text-[10px] h-10 gap-2"
                                 >
                                     <Edit2 size={12} />
@@ -218,7 +218,7 @@ export default function ManageRecipesPage() {
                                 </Button>
                                 <Button
                                     variant="outline"
-                                    onClick={() => router.push(`/dashboard/recipes/meals/${recipe.id}`)}
+                                    onClick={() => router.push(`/dashboard/meal-o-matic/meals/${recipe.id}`)}
                                     className="w-10 h-10 rounded-xl border-slate-200 dark:border-slate-800 text-slate-400 hover:text-violet-600 hover:bg-violet-50 p-0"
                                 >
                                     <ExternalLink size={14} />
