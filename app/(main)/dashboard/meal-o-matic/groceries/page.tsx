@@ -286,7 +286,7 @@ export default function ShoppingListPage() {
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-4 w-full md:w-auto">
+                            <div className="flex items-center gap-4 w-full">
                                 <div className="flex-1 md:flex-none">
                                     <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Quantity</Label>
                                     <Input
@@ -319,7 +319,9 @@ export default function ShoppingListPage() {
                                         </select>
                                     </div>
                                 )}
+                            </div>
 
+                            <div className="flex items-center gap-2 w-full pt-3">
                                 <Button
                                     onClick={handleQuickAdd}
                                     className="gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest text-[9px] h-10"
