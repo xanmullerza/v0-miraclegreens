@@ -976,7 +976,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                     <Fragment key={item.id}>
                                                     <div
                                                         className="flex items-center gap-3 px-3 py-2 rounded-xl border transition-all bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800 cursor-pointer group"
-                                                        onClick={(e) => { e.stopPropagation(); openPantryAddPanel(item); }}
+                                                        onClick={(e) => { e.stopPropagation(); setExpandedActionId(expandedActionId === item.id ? null : item.id); }}
                                                     >
                                                         {/* Food Image */}
                                                         <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 shrink-0 flex items-center justify-center">
