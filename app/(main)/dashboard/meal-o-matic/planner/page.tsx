@@ -969,6 +969,22 @@ export function MealPlannerContent({
         } catch (error) { console.error(error); } finally { setGenerating(false); }
     };
 
+    const handleShuffleAll = async () => {
+        setEatenMeals(new Set());
+        setGenerating(true);
+        try {
+            const newPlan = await generateDailyPlan({
+                targetCalories: calories,
+                diet,
+                numMeals: 3,
+                favoritesOnly: showFavoritesOnly,
+                pantryItems,
+                searchQuery,
+            });
+            setPlan(newPlan);
+        } catch (error) { console.error(error); } finally { setGenerating(false); }
+    };
+
     const handleNextStep = () => {
         const w = Number(weight) || 70; const h = Number(height) || 170; const a = Number(age) || 30;
         let bmr = (10 * w) + (6.25 * h) - (5 * a);
@@ -1347,7 +1363,7 @@ export function MealPlannerContent({
                         {/* Action Buttons */}
                         <div className="grid grid-cols-3 gap-3 pt-2">
                             <button
-                                onClick={handleGenerate}
+                                onClick={handleShuffleAll}
                                 className="flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all"
                             >
                                 <RotateCcw size={16} />
@@ -1370,7 +1386,7 @@ export function MealPlannerContent({
                                 className="flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-slate-400 dark:text-slate-600 opacity-60 cursor-not-allowed transition-all"
                             >
                                 <CalendarDays size={16} />
-                                <span className="text-[9px] font-black uppercase tracking-widest">Weekly Plan</span>
+                                <span className="text-[9px] font-black uppercase tracking-widest">7 Day Plan</span>
                             </button>
                         </div>
 
