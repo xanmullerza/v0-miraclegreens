@@ -34,7 +34,7 @@ export default function IngredientsPage() {
                     placeholder="SEARCH FOOD LIBRARY..."
                     idleIcon={<Leaf size={20} className="text-emerald-500" />}
                     idleTitle="Food Library"
-                    idleSubtitle="Explore whole food profiles with full nutrition data"
+                    idleSubtitle="Browse and search our foods library"
                 />
 
                 <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
