@@ -182,8 +182,8 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                         <button className={cn(
                                             'flex items-center gap-2 h-8 px-3 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all relative',
                                             (showFavoritesOnly || selectedCategories.length > 0)
-                                                ? 'bg-emerald-100 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400'
-                                                : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:border-emerald-300 hover:text-emerald-600'
+                                                ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                                                : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-emerald-300 hover:text-emerald-600'
                                         )}>
                                             <Filter size={11} />
                                             Filter
@@ -252,8 +252,8 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                             <button className={cn(
                                                 'w-8 h-8 rounded-lg flex items-center justify-center transition-all border relative',
                                                 (showFavoritesOnly || selectedCategories.length > 0)
-                                                    ? 'bg-emerald-100 dark:bg-emerald-900/30 border-emerald-300 dark:border-emerald-700 text-emerald-600 dark:text-emerald-400'
-                                                    : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:border-emerald-300 hover:text-emerald-600'
+                                                    ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                                                    : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-emerald-300 hover:text-emerald-600'
                                             )}>
                                                 <Filter size={13} />
                                                 {(selectedCategories.length > 0 || showFavoritesOnly) && (
