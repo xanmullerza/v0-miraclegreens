@@ -609,32 +609,6 @@ export function RecipesView({
                                         <span className="text-[8px] uppercase font-black text-slate-400">Protein</span>
                                         <span className="font-black text-[11px] text-slate-900 dark:text-white">{recipe.protein.toFixed(1)}g</span>
                                     </div>
-
-                                    {/* Actions */}
-                                    <div className="shrink-0 flex items-center lg:justify-end gap-1 px-2 lg:px-0">
-                                        {(String(recipe.id).startsWith('local-') || recipe.is_curated === false || isAdmin) && (
-                                            <>
-                                                <button
-                                                    onClick={(e) => handleEdit(e, recipe.id)}
-                                                    className={cn(
-                                                        "w-8 h-8 rounded-full flex items-center justify-center transition-all border",
-                                                        isMix ? "hover:text-indigo-500 bg-slate-50 dark:bg-slate-800 text-slate-400 border-slate-100 dark:border-slate-700" : "hover:text-blue-500 bg-slate-50 dark:bg-slate-800 text-slate-400 border-slate-100 dark:border-slate-700"
-                                                    )}
-                                                    title="Edit Recipe"
-                                                >
-                                                    <Pencil size={14} />
-                                                </button>
-                                                <button
-                                                    onClick={(e) => handleDelete(e, recipe)}
-                                                    className="w-8 h-8 rounded-full flex items-center justify-center transition-all border bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 border-slate-100 dark:border-slate-700"
-                                                    title="Delete Recipe"
-                                                >
-                                                    <Trash2 size={14} />
-                                                </button>
-                                            </>
-                                        )}
-
-                                    </div>
                                 </div>
                             </div>
                         ))}

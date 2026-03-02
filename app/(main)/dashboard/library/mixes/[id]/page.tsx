@@ -1353,9 +1353,29 @@ export default function RecipeDetailsPage() {
 
                         {/* Right Side: Text Content */}
                         <div className="flex-1 flex flex-col pt-1 w-full">
-                            <h1 className="text-2xl sm:text-3xl font-black tracking-tighter uppercase italic leading-tight mb-4">
-                                <span className="text-emerald-500">{recipe.title}</span>
-                            </h1>
+                            <div className="flex items-center justify-between gap-4 mb-4">
+                                <h1 className="text-2xl sm:text-3xl font-black tracking-tighter uppercase italic leading-tight">
+                                    <span className="text-emerald-500">{recipe.title}</span>
+                                </h1>
+                                {(String(recipe.id).startsWith('local-') || recipe.is_curated === false) && (
+                                    <div className="flex items-center gap-2 shrink-0">
+                                        <button
+                                            onClick={handleEdit}
+                                            className="w-10 h-10 rounded-full flex items-center justify-center transition-all border bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-indigo-500 border-slate-100 dark:border-slate-700"
+                                            title="Edit Mix"
+                                        >
+                                            <Pencil size={16} />
+                                        </button>
+                                        <button
+                                            onClick={handleDelete}
+                                            className="w-10 h-10 rounded-full flex items-center justify-center transition-all border bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 border-slate-100 dark:border-slate-700"
+                                            title="Delete Mix"
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                             <div className="flex items-center gap-4 flex-wrap">
                                 {recipe.source && (
                                     <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Source: {recipe.source}</span>
