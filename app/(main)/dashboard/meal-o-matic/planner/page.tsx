@@ -1575,32 +1575,6 @@ export function MealPlannerContent({
                                                     </h3>
                                                 </div>
 
-                                                {(() => {
-                                                    // Build source map: phytonutrient -> { description, sources (recipe titles) }
-                                                    const allRecipes = [plan.breakfast, plan.lunch, plan.dinner, ...plan.snacks];
-                                                    const phytoSourceMap: Record<string, { description: string; sources: string[] }> = {};
-                                                    allRecipes.forEach(r => {
-                                                        const phytos = plan.recipePhytonutrients?.[r.id];
-                                                        if (phytos) {
-                                                            Object.entries(phytos).forEach(([name, desc]) => {
-                                                                if (!phytoSourceMap[name]) {
-                                                                    phytoSourceMap[name] = { description: desc, sources: [] };
-                                                                }
-                                                                if (!phytoSourceMap[name].sources.includes(r.title)) {
-                                                                    phytoSourceMap[name].sources.push(r.title);
-                                                                }
-                                                            });
-                                                        }
-                                                    });
-                                                    if (Object.keys(phytoSourceMap).length === 0) return null;
-                                                    return (
-                                                        <DidYouKnow
-                                                            phytonutrientsWithSources={phytoSourceMap}
-                                                            className="mb-8"
-                                                        />
-                                                    );
-                                                })()}
-
                                                 <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Caloric & Macro Breakdown" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
                                                     'Energy': ['calories'],
                                                     'Protein': ['protein'],
@@ -1644,6 +1618,30 @@ export function MealPlannerContent({
                                                     'Oxalate': ['Oxalate', 'oxalate_mg'],
                                                     'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
                                                 }} />
+                                                {(() => {
+                                                    const allRecipes = [plan.breakfast, plan.lunch, plan.dinner, ...plan.snacks];
+                                                    const phytoSourceMap: Record<string, { description: string; sources: string[] }> = {};
+                                                    allRecipes.forEach(r => {
+                                                        const phytos = plan.recipePhytonutrients?.[r.id];
+                                                        if (phytos) {
+                                                            Object.entries(phytos).forEach(([name, desc]) => {
+                                                                if (!phytoSourceMap[name]) {
+                                                                    phytoSourceMap[name] = { description: desc, sources: [] };
+                                                                }
+                                                                if (!phytoSourceMap[name].sources.includes(r.title)) {
+                                                                    phytoSourceMap[name].sources.push(r.title);
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+                                                    if (Object.keys(phytoSourceMap).length === 0) return null;
+                                                    return (
+                                                        <DidYouKnow
+                                                            phytonutrientsWithSources={phytoSourceMap}
+                                                            className="mb-2"
+                                                        />
+                                                    );
+                                                })()}
                                                 <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Key nutrient balances for your overall wellbeing" items={{
                                                     'Sodium:Potassium': ['Sodium', 'Potassium'],
                                                     'Zinc:Copper': ['Zinc', 'Copper'],
