@@ -1240,7 +1240,7 @@ export function PantryView({
                                                                         onClick={(e) => e.stopPropagation()}
                                                                         className="w-full px-3 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
                                                                     >
-                                                                        <option value="">Select serving...</option>
+                                                                        <option value="">Weight...</option>
                                                                         {buyMorePortions.filter(p => /gram|kilogram/i.test(p.label)).map(p => (
                                                                             <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
                                                                         ))}
@@ -1332,7 +1332,7 @@ export function PantryView({
                                                                         onClick={(e) => e.stopPropagation()}
                                                                         className="w-full px-3 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
                                                                     >
-                                                                        <option value="">Select serving...</option>
+                                                                        <option value="">Weight...</option>
                                                                         {removePortions.filter(p => /gram|kilogram/i.test(p.label)).map(p => (
                                                                             <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
                                                                         ))}
