@@ -498,9 +498,10 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                 const measures = await fetchFoodMeasures(foodItemId);
                 if (measures && measures.length > 0) {
                     setPantryAddPortions(measures);
-                    // Auto-select "Each" if available, else first portion
-                    const each = measures.find((m: any) => /each/i.test(m.label));
-                    setPantryAddSelectedPortion(each || measures[0] || null);
+                    // Auto-select from shopping-friendly measures only
+                    const filtered = measures.filter((m: any) => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon/i.test(m.label));
+                    const each = filtered.find((m: any) => /each/i.test(m.label));
+                    setPantryAddSelectedPortion(each || filtered[0] || null);
                 }
             } catch (e) { /* ignore */ }
         }
@@ -1235,7 +1236,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                             onClick={(e) => e.stopPropagation()}
                                                                             className="px-2 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
                                                                         >
-                                                                            {pantryAddPortions.map(p => (
+                                                                            {pantryAddPortions.filter(p => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon/i.test(p.label)).map(p => (
                                                                                 <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
                                                                             ))}
                                                                         </select>
