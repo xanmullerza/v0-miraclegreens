@@ -235,7 +235,7 @@ export function RecipesView({
 
     const handleEdit = (e: React.MouseEvent, recipeId: string) => {
         e.stopPropagation();
-        router.push(`/dashboard/library/meals/new?edit=${recipeId}`);
+        router.push(`/dashboard/library/${isMix ? 'mixes' : 'meals'}/new?edit=${recipeId}`);
     };
 
     return (
@@ -259,7 +259,7 @@ export function RecipesView({
                                         {heroResults.map(recipe => (
                                             <button
                                                 key={recipe.id}
-                                                onClick={() => router.push(`/dashboard/library/meals/${recipe.id}`)}
+                                                onClick={() => router.push(`/dashboard/library/${isMix ? 'mixes' : 'meals'}/${recipe.id}`)}
                                                 className="w-full p-4 rounded-2xl hover:bg-blue-50 dark:hover:bg-blue-900/10 flex items-center justify-between group transition-all border border-slate-100 dark:border-slate-800 hover:border-blue-500/30 text-left"
                                             >
                                                 <div className="flex items-center gap-4 min-w-0">
@@ -487,7 +487,7 @@ export function RecipesView({
                         {recipes.map((recipe) => (
                             <div
                                 key={recipe.id}
-                                onClick={() => router.push(`/dashboard/library/meals/${recipe.id}`)}
+                                onClick={() => router.push(`/dashboard/library/${isMix ? 'mixes' : 'meals'}/${recipe.id}`)}
                                 className={cn(
                                     "group relative bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 transition-all duration-500 cursor-pointer overflow-hidden",
                                     isMix ? "hover:border-indigo-400/50 hover:shadow-lg" : "hover:border-blue-400/50 hover:shadow-lg"
