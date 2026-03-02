@@ -282,7 +282,7 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                         };
                         const c = colors[tier];
                         return (
-                    <div className="mt-3 grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-1.5">
+                    <div className="mt-3 grid grid-cols-2 gap-2 lg:hidden">
                         <Link
                             href="/dashboard/meal-o-matic/pantry"
                             onClick={(e: React.MouseEvent) => e.stopPropagation()}
@@ -345,6 +345,59 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                     <span className="text-[9px] uppercase font-black text-slate-400">Protein</span>
                     <span className="font-black text-sm text-slate-900 dark:text-white">{recipe.protein.toFixed(1)}g</span>
                 </div>
+
+                {/* Action Grid (Desktop only — last column) */}
+                {(() => {
+                    const tier = matchScore === 1 ? 'green' : matchScore >= 0.5 ? 'blue' : 'orange';
+                    const colors = {
+                        green:  { btn: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500' },
+                        blue:   { btn: 'border-blue-500/30 bg-blue-500/10 text-blue-500 hover:bg-blue-500' },
+                        orange: { btn: 'border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500' },
+                    };
+                    const c = colors[tier];
+                    return (
+                        <div className="hidden lg:grid grid-cols-2 gap-1.5">
+                            <Link
+                                href="/dashboard/meal-o-matic/pantry"
+                                onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                                className={cn("text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-full border hover:text-white transition-all flex items-center justify-center gap-1", c.btn)}
+                            >
+                                <ShoppingBasket size={9} />
+                                {matchCount}/{recipeIngs.length} Stocked
+                            </Link>
+                            {uniqueMissing.length > 0 ? (
+                                <Link
+                                    href="/dashboard/meal-o-matic/groceries"
+                                    onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                                    className="text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-1"
+                                >
+                                    <ShoppingBasket size={9} />
+                                    {uniqueMissing.length}/{recipeIngs.length} To Buy
+                                </Link>
+                            ) : (
+                                <div className="text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 flex items-center justify-center gap-1">
+                                    <Sparkles size={9} /> Stocked
+                                </div>
+                            )}
+                            {onMarkEaten && !isEaten ? (
+                                <button
+                                    onClick={(e: React.MouseEvent) => { e.stopPropagation(); onMarkEaten(); }}
+                                    className="text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all flex items-center justify-center gap-1"
+                                >
+                                    <Check size={9} /> Eaten
+                                </button>
+                            ) : <div />}
+                            {onRegenerate && !isEaten ? (
+                                <button
+                                    onClick={(e: React.MouseEvent) => { e.stopPropagation(); onRegenerate(); }}
+                                    className="text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-full border border-slate-500/30 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white transition-all flex items-center justify-center gap-1"
+                                >
+                                    <RotateCcw size={9} /> Shuffle
+                                </button>
+                            ) : <div />}
+                        </div>
+                    );
+                })()}
             </div>
         </div>
     );
