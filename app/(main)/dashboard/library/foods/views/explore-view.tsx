@@ -195,9 +195,9 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                         </button>
                                     </SheetTrigger>
                                     <SheetContent side="bottom" className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-t-3xl px-6 pt-6 pb-10">
-                                        <SheetHeader className="flex flex-row items-center justify-between mb-4">
-                                            <SheetTitle className="text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">Filter Foods</SheetTitle>
-                                            <div className="flex items-center gap-3">
+                                        <SheetHeader className="mb-4">
+                                            <div className="flex items-center justify-between">
+                                                <SheetTitle className="text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">Filter Foods</SheetTitle>
                                                 {(showFavoritesOnly || selectedCategories.length > 0) && (
                                                     <button
                                                         onClick={() => { setShowFavoritesOnly(false); setSelectedCategories([]); }}
@@ -206,12 +206,6 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                                         Clear all
                                                     </button>
                                                 )}
-                                                <SheetClose
-                                                    aria-label="Close filter sheet"
-                                                    className="w-7 h-7 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors"
-                                                >
-                                                    <X size={12} />
-                                                </SheetClose>
                                             </div>
                                         </SheetHeader>
 
