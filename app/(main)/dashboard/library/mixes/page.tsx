@@ -38,7 +38,7 @@ export default function MixesPage() {
                         placeholder="SEARCH MIX LIBRARY..."
                         idleIcon={<Beaker size={20} className="text-emerald-500" />}
                         idleTitle="Mix Library"
-                        idleSubtitle="Browse and search your saved mixes"
+                        idleSubtitle="Browse and search our mixes library"
                     />
 
                     <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">

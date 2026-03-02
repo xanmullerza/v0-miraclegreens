@@ -38,7 +38,7 @@ export default function MealsPage() {
                         placeholder="SEARCH MEAL LIBRARY..."
                         idleIcon={<ChefHat size={20} className="text-emerald-500" />}
                         idleTitle="Meal Library"
-                        idleSubtitle="Browse and search your saved meals"
+                        idleSubtitle="Browse and search our meals library"
                     />
 
                     <div className="min-h-[600px] animate-in slide-in-from-bottom-4 duration-700">
