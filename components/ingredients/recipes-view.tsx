@@ -583,12 +583,12 @@ export function RecipesView({
                                         {/* Mobile-only stats row */}
                                         <div className="flex lg:hidden items-center gap-2 mt-1.5 text-[9px] font-black">
                                             <span className={isMix ? "text-indigo-500" : "text-blue-500"}>{formatEnergy(recipe.calories, energyUnit)}</span>
-                                            <span className="text-slate-300 text-[8px]">�</span>
-                                            <span className="text-emerald-500">{recipe.protein.toFixed(0)}g P</span>
-                                            <span className="text-slate-300 text-[8px]">�</span>
+                                            <span className="text-slate-300 text-[8px]">•</span>
                                             <span className="text-amber-500">{recipe.carbs.toFixed(0)}g C</span>
-                                            <span className="text-slate-300 text-[8px]">�</span>
+                                            <span className="text-slate-300 text-[8px]">•</span>
                                             <span className="text-rose-500">{recipe.fat.toFixed(0)}g F</span>
+                                            <span className="text-slate-300 text-[8px]">•</span>
+                                            <span className="text-emerald-500">{recipe.protein.toFixed(0)}g P</span>
                                         </div>
                                     </div>
 
