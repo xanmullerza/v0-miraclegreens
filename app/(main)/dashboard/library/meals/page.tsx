@@ -35,9 +35,9 @@ export default function MealsPage() {
                         onSelect={noop}
                         hideResults
                         theme="emerald"
-                        placeholder="SEARCH MEAL LIBRARY..."
+                        placeholder="SEARCH MEALS LIBRARY..."
                         idleIcon={<ChefHat size={20} className="text-emerald-500" />}
-                        idleTitle="Meal Library"
+                        idleTitle="Meals Library"
                         idleSubtitle="Browse and search our meals library"
                     />
 

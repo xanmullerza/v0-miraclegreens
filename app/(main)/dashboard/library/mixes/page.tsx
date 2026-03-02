@@ -35,9 +35,9 @@ export default function MixesPage() {
                         onSelect={noop}
                         hideResults
                         theme="emerald"
-                        placeholder="SEARCH MIX LIBRARY..."
+                        placeholder="SEARCH MIXES LIBRARY..."
                         idleIcon={<Beaker size={20} className="text-emerald-500" />}
-                        idleTitle="Mix Library"
+                        idleTitle="Mixes Library"
                         idleSubtitle="Browse and search our mixes library"
                     />
 
