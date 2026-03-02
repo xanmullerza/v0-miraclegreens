@@ -315,50 +315,20 @@ export default function PantryPage() {
 
                             {selectedFood.portions && selectedFood.portions.length > 0 ? (
                                 <div>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400">Serving</Label>
-                                        <button
-                                            onClick={() => {
-                                                if (selectedPortion) {
-                                                    setSelectedPortion(null);
-                                                    setQuickAddWeight(`${selectedPortion.weight_g}`);
-                                                    setQuickAddUnit('g');
-                                                } else {
-                                                    setSelectedPortion(selectedFood.portions[0]);
-                                                }
-                                            }}
-                                            className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-amber-500 transition-colors"
-                                        >
-                                            {selectedPortion ? 'Use Weight ↓' : 'Use Serving ↓'}
-                                        </button>
-                                    </div>
-                                    {selectedPortion ? (
-                                        <select
-                                            value={selectedPortion.label}
-                                            onChange={(e) => {
-                                                const portion = selectedFood.portions?.find((p: any) => p.label === e.target.value);
-                                                if (portion) setSelectedPortion(portion);
-                                            }}
-                                            className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                        >
-                                            {selectedFood.portions?.map((p: any) => (
-                                                <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <select
-                                            onChange={(e) => {
-                                                const portion = selectedFood.portions?.find((p: any) => p.label === e.target.value);
-                                                if (portion) setSelectedPortion(portion);
-                                            }}
-                                            className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                        >
-                                            <option value="">Select a serving...</option>
-                                            {selectedFood.portions?.map((p: any) => (
-                                                <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
-                                            ))}
-                                        </select>
-                                    )}
+                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Serving</Label>
+                                    <select
+                                        value={selectedPortion?.label || ''}
+                                        onChange={(e) => {
+                                            const portion = selectedFood.portions?.find((p: any) => p.label === e.target.value);
+                                            setSelectedPortion(portion || null);
+                                        }}
+                                        className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                    >
+                                        <option value="">Select a serving...</option>
+                                        {selectedFood.portions?.map((p: any) => (
+                                            <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
+                                        ))}
+                                    </select>
                                 </div>
                             ) : (
                                 <div className="flex gap-2">
@@ -388,24 +358,12 @@ export default function PantryPage() {
                                 </div>
                             )}
 
-                            <div>
-                                <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Destination</Label>
-                                <select
-                                    value={quickAddMode}
-                                    onChange={(e) => setQuickAddMode(e.target.value as 'pantry' | 'shopping')}
-                                    className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                >
-                                    <option value="pantry">Pantry</option>
-                                    <option value="shopping">Groceries</option>
-                                </select>
-                            </div>
-
                             <Button
                                 onClick={handleQuickAdd}
                                 className="w-full gap-2 bg-amber-500 hover:bg-amber-600 text-white font-black uppercase tracking-widest text-[9px] h-10"
                                 disabled={isAdding}
                             >
-                                {isAdding ? <>Loading...</> : <><Plus size={16} />Add to {quickAddMode === 'pantry' ? 'Pantry' : 'Shopping'}</>}
+                                {isAdding ? <>Loading...</> : <><Plus size={16} />Add to Pantry</>}
                             </Button>
                         </div>
                     </div>
