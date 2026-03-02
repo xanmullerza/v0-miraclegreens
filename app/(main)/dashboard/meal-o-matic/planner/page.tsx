@@ -371,7 +371,6 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                                     onClick={(e: React.MouseEvent) => e.stopPropagation()}
                                     className="text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-1"
                                 >
-                                    <ShoppingBasket size={9} />
                                     {uniqueMissing.length}/{recipeIngs.length} To Buy
                                 </Link>
                             ) : (
