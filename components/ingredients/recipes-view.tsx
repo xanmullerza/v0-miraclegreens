@@ -533,10 +533,6 @@ export function RecipesView({
                             </DropdownMenu>
                         </div>
                     </div>
-
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                        {totalCount} {isMix ? 'mix' : 'meal'}{totalCount !== 1 ? 'es' : ''}
-                    </p>
                 </div>
             )}
 
