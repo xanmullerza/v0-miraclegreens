@@ -777,6 +777,7 @@ export function MealPlannerContent({
     const [recipeMoringaGrams, setRecipeMoringaGrams] = useState(0);
     const [moringaGrams, setMoringaGrams] = useState(0);
     const [showDailyNutrients, setShowDailyNutrients] = useState(false);
+    const [nutrientsView, setNutrientView] = useState<'closed' | 'essential' | 'advanced'>('closed');
     const [dailyMoringaGrams, setDailyMoringaGrams] = useState(0);
     const [activeBoostContext, setActiveBoostContext] = useState<'daily' | 'recipe' | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
@@ -1370,10 +1371,10 @@ export function MealPlannerContent({
                                 <span className="text-[9px] font-black uppercase tracking-widest">Shuffle All</span>
                             </button>
                             <button
-                                onClick={() => setShowDailyNutrients(v => !v)}
+                                onClick={() => setNutrientView(nutrientsView === 'closed' ? 'essential' : 'closed')}
                                 className={cn(
                                     "flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl border transition-all",
-                                    showDailyNutrients
+                                    nutrientsView !== 'closed'
                                         ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-900/10 text-emerald-600"
                                         : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/10"
                                 )}
@@ -1392,7 +1393,7 @@ export function MealPlannerContent({
 
                         <div className="space-y-4 pt-4 border-t">
 
-                            {showDailyNutrients && (
+                            {nutrientsView !== 'closed' && (
                                 <div className="space-y-6 animate-in slide-in-from-top-4">
                                     {/* Summaries categorized by health focus */}
                                     {(() => {
@@ -1568,87 +1569,119 @@ export function MealPlannerContent({
 
                                         return (
                                             <div className="space-y-6">
-                                                <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6">
-                                                    <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
-                                                        <Activity size={18} />
-                                                        Essential Nutrients
-                                                    </h3>
-                                                </div>
+                                                {/* ESSENTIAL NUTRIENTS CARD */}
+                                                {nutrientsView === 'essential' && (
+                                                    <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-6 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm animate-in fade-in slide-in-from-top-4">
+                                                        <div className="pt-2 pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
+                                                            <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
+                                                                <Activity size={18} />
+                                                                Essential Nutrients
+                                                            </h3>
+                                                        </div>
 
-                                                <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Caloric & Macro Breakdown" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
-                                                    'Energy': ['calories'],
-                                                    'Protein': ['protein'],
-                                                    'Carbs': ['carbs'],
-                                                    'Fat': ['fat']
-                                                }} />
-                                                <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Hydration & Mineral Balance" items={{
-                                                    'Sodium': ['Sodium', 'sodium_mg'],
-                                                    'Potassium': ['Potassium', 'potassium_mg'],
-                                                    'Magnesium': ['Magnesium', 'magnesium_mg'],
-                                                    'Calcium': ['Calcium', 'calcium_mg'],
-                                                    'Phosphorus': ['Phosphorus', 'phosphorus_mg']
-                                                }} />
-                                                <NutrientGrid title="Trace Minerals" icon={Gem} theme="rose" subtitle="Essential micro-minerals" items={{
-                                                    'Iron': ['Iron', 'iron_mg'],
-                                                    'Zinc': ['Zinc', 'zinc_mg'],
-                                                    'Copper': ['Copper', 'copper_mg'],
-                                                    'Manganese': ['Manganese', 'manganese_mg'],
-                                                    'Selenium': ['Selenium', 'selenium_ug']
-                                                }} />
-                                                <NutrientGrid title="Daily Vitamins" icon={Droplet} theme="blue" subtitle="Water-soluble vitamins (B-Complex & C)" items={{
-                                                    'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
-                                                    'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
-                                                    'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
-                                                    'B5 (Pantothenic Acid)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
-                                                    'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
-                                                    'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
-                                                    'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
-                                                    'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
-                                                    'Choline': ['Choline', 'choline_mg'],
-                                                }} />
-                                                <NutrientGrid title="Stored Vitamins" icon={Battery} theme="emerald" subtitle="Fat-soluble storage (A, D, E, K)" breakdownLabels={['Vitamin A', 'Vitamin E']} items={{
-                                                    'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
-                                                    'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
-                                                    'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
-                                                    'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
-                                                }} />
-                                                <NutrientGrid title="Extra Markers" icon={Activity} theme="amber" subtitle="Extra health markers worth tracking" forceRaw={true} items={{
-                                                    'Fiber': ['Fiber', 'fiber_g'],
-                                                    'Sugars': ['Sugars', 'sugars_g'],
-                                                    'Oxalate': ['Oxalate', 'oxalate_mg'],
-                                                    'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
-                                                }} />
-                                                {(() => {
-                                                    const allRecipes = [plan.breakfast, plan.lunch, plan.dinner, ...plan.snacks];
-                                                    const phytoSourceMap: Record<string, { description: string; sources: string[] }> = {};
-                                                    allRecipes.forEach(r => {
-                                                        const phytos = plan.recipePhytonutrients?.[r.id];
-                                                        if (phytos) {
-                                                            Object.entries(phytos).forEach(([name, desc]) => {
-                                                                if (!phytoSourceMap[name]) {
-                                                                    phytoSourceMap[name] = { description: desc, sources: [] };
-                                                                }
-                                                                if (!phytoSourceMap[name].sources.includes(r.title)) {
-                                                                    phytoSourceMap[name].sources.push(r.title);
+                                                        <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Caloric & Macro Breakdown" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
+                                                            'Energy': ['calories'],
+                                                            'Protein': ['protein'],
+                                                            'Carbs': ['carbs'],
+                                                            'Fat': ['fat']
+                                                        }} />
+                                                        <NutrientGrid title="Electrolytes" icon={Zap} theme="indigo" subtitle="Hydration & Mineral Balance" items={{
+                                                            'Sodium': ['Sodium', 'sodium_mg'],
+                                                            'Potassium': ['Potassium', 'potassium_mg'],
+                                                            'Magnesium': ['Magnesium', 'magnesium_mg'],
+                                                            'Calcium': ['Calcium', 'calcium_mg'],
+                                                            'Phosphorus': ['Phosphorus', 'phosphorus_mg']
+                                                        }} />
+                                                        <NutrientGrid title="Trace Minerals" icon={Gem} theme="rose" subtitle="Essential micro-minerals" items={{
+                                                            'Iron': ['Iron', 'iron_mg'],
+                                                            'Zinc': ['Zinc', 'zinc_mg'],
+                                                            'Copper': ['Copper', 'copper_mg'],
+                                                            'Manganese': ['Manganese', 'manganese_mg'],
+                                                            'Selenium': ['Selenium', 'selenium_ug']
+                                                        }} />
+                                                        <NutrientGrid title="Daily Vitamins" icon={Droplet} theme="blue" subtitle="Water-soluble vitamins (B-Complex & C)" items={{
+                                                            'B1 (Thiamine)': ['B1 (Thiamine)', 'thiamine_mg'],
+                                                            'B2 (Riboflavin)': ['B2 (Riboflavin)', 'riboflavin_mg'],
+                                                            'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
+                                                            'B5 (Pantothenic Acid)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
+                                                            'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
+                                                            'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
+                                                            'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
+                                                            'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
+                                                            'Choline': ['Choline', 'choline_mg'],
+                                                        }} />
+                                                        <NutrientGrid title="Stored Vitamins" icon={Battery} theme="emerald" subtitle="Fat-soluble storage (A, D, E, K)" breakdownLabels={['Vitamin A', 'Vitamin E']} items={{
+                                                            'Vitamin A': ['Vitamin A', 'vitamin_a_ug'],
+                                                            'Vitamin D': ['Vitamin D', 'vitamin_d_iu', 'vitamin_d_ug'],
+                                                            'Vitamin E': ['Vitamin E', 'vitamin_e_mg'],
+                                                            'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
+                                                        }} />
+
+                                                        <button
+                                                            onClick={() => setNutrientView('advanced')}
+                                                            className="w-full mt-6 px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-foreground font-semibold text-sm transition-colors"
+                                                        >
+                                                            Advanced Nutrition →
+                                                        </button>
+                                                    </div>
+                                                )}
+
+                                                {/* ADVANCED ANALYSIS CARD */}
+                                                {nutrientsView === 'advanced' && (
+                                                    <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-6 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm animate-in fade-in slide-in-from-top-4">
+                                                        <div className="pt-2 pb-4 border-b border-slate-100 dark:border-slate-800 mb-6">
+                                                            <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
+                                                                <Activity size={18} />
+                                                                Advanced Analysis
+                                                            </h3>
+                                                        </div>
+
+                                                        <NutrientGrid title="Extra Markers" icon={Activity} theme="amber" subtitle="Extra health markers worth tracking" forceRaw={true} items={{
+                                                            'Fiber': ['Fiber', 'fiber_g'],
+                                                            'Sugars': ['Sugars', 'sugars_g'],
+                                                            'Oxalate': ['Oxalate', 'oxalate_mg'],
+                                                            'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
+                                                        }} />
+                                                        {(() => {
+                                                            const allRecipes = [plan.breakfast, plan.lunch, plan.dinner, ...plan.snacks];
+                                                            const phytoSourceMap: Record<string, { description: string; sources: string[] }> = {};
+                                                            allRecipes.forEach(r => {
+                                                                const phytos = plan.recipePhytonutrients?.[r.id];
+                                                                if (phytos) {
+                                                                    Object.entries(phytos).forEach(([name, desc]) => {
+                                                                        if (!phytoSourceMap[name]) {
+                                                                            phytoSourceMap[name] = { description: desc, sources: [] };
+                                                                        }
+                                                                        if (!phytoSourceMap[name].sources.includes(r.title)) {
+                                                                            phytoSourceMap[name].sources.push(r.title);
+                                                                        }
+                                                                    });
                                                                 }
                                                             });
-                                                        }
-                                                    });
-                                                    if (Object.keys(phytoSourceMap).length === 0) return null;
-                                                    return (
-                                                        <DidYouKnow
-                                                            phytonutrientsWithSources={phytoSourceMap}
-                                                            className="mb-2"
-                                                        />
-                                                    );
-                                                })()}
-                                                <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Key nutrient balances for your overall wellbeing" items={{
-                                                    'Sodium:Potassium': ['Sodium', 'Potassium'],
-                                                    'Zinc:Copper': ['Zinc', 'Copper'],
-                                                    'Omega 6:3 Ratio': ['Omega-6', 'Omega-3'],
-                                                    'Calcium:Magnesium': ['Calcium', 'Magnesium'],
-                                                    'Calcium:Phosphorus': ['Calcium', 'Phosphorus'],
-                                                }} />
+                                                            if (Object.keys(phytoSourceMap).length === 0) return null;
+                                                            return (
+                                                                <DidYouKnow
+                                                                    phytonutrientsWithSources={phytoSourceMap}
+                                                                    className="mb-2"
+                                                                />
+                                                            );
+                                                        })()}
+                                                        <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Key nutrient balances for your overall wellbeing" items={{
+                                                            'Sodium:Potassium': ['Sodium', 'Potassium'],
+                                                            'Zinc:Copper': ['Zinc', 'Copper'],
+                                                            'Omega 6:3 Ratio': ['Omega-6', 'Omega-3'],
+                                                            'Calcium:Magnesium': ['Calcium', 'Magnesium'],
+                                                            'Calcium:Phosphorus': ['Calcium', 'Phosphorus'],
+                                                        }} />
+
+                                                        <button
+                                                            onClick={() => setNutrientView('essential')}
+                                                            className="w-full mt-6 px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-foreground font-semibold text-sm transition-colors"
+                                                        >
+                                                            ← Back to Essential
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
                                         );
                                     })()}
