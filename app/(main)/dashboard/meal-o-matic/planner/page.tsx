@@ -1601,14 +1601,6 @@ export function MealPlannerContent({
                                                     );
                                                 })()}
 
-                                                <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Key nutrient balances for your overall wellbeing" items={{
-                                                    'Sodium:Potassium': ['Sodium', 'Potassium'],
-                                                    'Zinc:Copper': ['Zinc', 'Copper'],
-                                                    'Omega 6:3 Ratio': ['Omega-6', 'Omega-3'],
-                                                    'Calcium:Magnesium': ['Calcium', 'Magnesium'],
-                                                    'Calcium:Phosphorus': ['Calcium', 'Phosphorus'],
-                                                }} />
-
                                                 <NutrientGrid title="Core Macronutrients" icon={Zap} theme="orange" subtitle="Caloric & Macro Breakdown" breakdownLabels={['Protein', 'Carbs', 'Fat']} items={{
                                                     'Energy': ['calories'],
                                                     'Protein': ['protein'],
@@ -1651,6 +1643,13 @@ export function MealPlannerContent({
                                                     'Sugars': ['Sugars', 'sugars_g'],
                                                     'Oxalate': ['Oxalate', 'oxalate_mg'],
                                                     'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
+                                                }} />
+                                                <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Key nutrient balances for your overall wellbeing" items={{
+                                                    'Sodium:Potassium': ['Sodium', 'Potassium'],
+                                                    'Zinc:Copper': ['Zinc', 'Copper'],
+                                                    'Omega 6:3 Ratio': ['Omega-6', 'Omega-3'],
+                                                    'Calcium:Magnesium': ['Calcium', 'Magnesium'],
+                                                    'Calcium:Phosphorus': ['Calcium', 'Phosphorus'],
                                                 }} />
                                             </div>
                                         );
