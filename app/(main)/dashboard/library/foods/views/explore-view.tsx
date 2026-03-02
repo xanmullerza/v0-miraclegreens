@@ -183,7 +183,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                             'flex items-center gap-2 h-8 px-3 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all relative',
                                             (showFavoritesOnly || selectedCategories.length > 0)
                                                 ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                                                : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-emerald-300 hover:text-emerald-600'
+                                                : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600 shadow-sm'
                                         )}>
                                             <Filter size={11} />
                                             Filter
@@ -250,14 +250,14 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
                                             <button className={cn(
-                                                'w-8 h-8 rounded-lg flex items-center justify-center transition-all border relative',
+                                                'w-8 h-8 rounded-lg flex items-center justify-center transition-all border relative shadow-sm',
                                                 (showFavoritesOnly || selectedCategories.length > 0)
                                                     ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                                                    : 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-emerald-300 hover:text-emerald-600'
+                                                    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-emerald-300 hover:text-emerald-600'
                                             )}>
                                                 <Filter size={13} />
                                                 {(selectedCategories.length > 0 || showFavoritesOnly) && (
-                                                    <span className="absolute -top-1 -right-1 w-3.5 h-3.5 flex items-center justify-center bg-emerald-600 text-white text-[7px] font-black rounded-full">
+                                                    <span className="absolute -top-1 -right-1 w-3.5 h-3.5 flex items-center justify-center bg-emerald-600 text-white text-[7px] font-black rounded-full border border-white dark:border-slate-900">
                                                         {selectedCategories.length + (showFavoritesOnly ? 1 : 0)}
                                                     </span>
                                                 )}
