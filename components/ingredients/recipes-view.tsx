@@ -235,7 +235,7 @@ export function RecipesView({
 
     const handleEdit = (e: React.MouseEvent, recipeId: string) => {
         e.stopPropagation();
-        router.push(`/dashboard/library/${isMix ? 'mixes' : 'meals'}/new?edit=${recipeId}`);
+        router.push(`/dashboard/library/${isMix ? 'mixes' : 'meals'}/${recipeId}`);
     };
 
     return (

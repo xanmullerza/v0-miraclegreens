@@ -487,6 +487,11 @@ export default function RecipeDetailsPage() {
         try {
             const recipeIdStr = String(id);
 
+            // Guard against invalid IDs
+            if (!recipeIdStr || recipeIdStr === 'undefined' || recipeIdStr === 'null') {
+                throw new Error('Invalid recipe ID');
+            }
+
             if (recipeIdStr.startsWith('local-')) {
                 // LOAD FROM LOCAL STORAGE
                 const localData = localStorage.getItem('local_recipes');
