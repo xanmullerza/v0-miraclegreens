@@ -277,14 +277,18 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                             <Link
                                 href="/dashboard/meal-o-matic/pantry"
                                 onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                                className={cn(
-                                    "text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg flex items-center gap-1.5 transition-colors hover:opacity-80",
-                                    matchScore === 1 ? "bg-emerald-500/10 text-emerald-600" : "bg-slate-100 dark:bg-slate-800 text-slate-500"
-                                )}
+                                className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all flex items-center gap-1.5"
                             >
+                                <ShoppingBasket size={10} />
+                                Pantry
+                            </Link>
+                            <div className={cn(
+                                "text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg flex items-center gap-1.5",
+                                matchScore === 1 ? "bg-emerald-500/10 text-emerald-600" : "bg-slate-100 dark:bg-slate-800 text-slate-500"
+                            )}>
                                 <ShoppingBasket size={12} />
                                 {matchCount} / {recipeIngs.length} Possessed
-                            </Link>
+                            </div>
                             {matchScore === 1 && (
                                 <div className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg bg-emerald-500 text-white flex items-center gap-1">
                                     <Sparkles size={10} /> Fully Stocked
@@ -292,14 +296,16 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                             )}
                         </div>
                         {uniqueMissing.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5">
+                            <div className="flex flex-wrap items-center gap-1.5">
                                 <Link
                                     href="/dashboard/meal-o-matic/groceries"
                                     onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                                    className="text-[9px] font-black uppercase tracking-widest text-rose-500/60 mt-1 hover:text-rose-500 transition-colors"
+                                    className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border border-rose-500/30 bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all flex items-center gap-1.5"
                                 >
-                                    Missing:
+                                    <ShoppingBasket size={10} />
+                                    Groceries
                                 </Link>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-rose-500/60">Missing:</span>
                                 {uniqueMissing.map((ing, idx) => (
                                     <span key={idx} className="text-[9px] font-bold text-rose-500 dark:text-rose-400 bg-rose-500/5 px-1.5 py-0.5 rounded-md border border-rose-500/10">
                                         {ing}
