@@ -28,6 +28,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuCheckboxItem
 } from '@/components/ui/dropdown-menu';
+import { Sheet, SheetTrigger, SheetContent, SheetClose, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -366,96 +367,171 @@ export function RecipesView({
             {/* Controls Row */}
             {!hideControls && (
                 <div className="flex flex-col md:flex-row gap-4 justify-between items-center px-6 py-4 border-b border-slate-200 dark:border-slate-800">
-                    {/* Unified Filter Bar */}
-                    <div className="flex items-center gap-2">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <button className={cn(
-                                    "px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
-                                    (showFavoritesOnly || (selectedTypes.length > 0 && selectedTypes.length < MEAL_TYPES.length))
-                                        ? isMix ? "bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-500/20" : "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20"
-                                        : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-blue-200 hover:text-blue-600"
-                                )}>
-                                    <Filter size={12} />
-                                    <span className="hidden sm:inline">
-                                        {showFavoritesOnly ? "Favorites" :
-                                            (selectedTypes.length === 0 || selectedTypes.length === MEAL_TYPES.length ? "FILTER" :
-                                                `${selectedTypes.length} Types`)}
-                                    </span>
-                                    <ChevronDown size={10} className="opacity-50" />
-                                </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                                side="bottom"
-                                align="start"
-                                sideOffset={8}
-                                collisionPadding={20}
-                                className="w-56 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 z-[100] flex flex-col max-h-[var(--radix-dropdown-menu-content-available-height)]"
-                            >
-                                <div className="p-2 overflow-y-auto no-scrollbar">
-                                    {/* Scope Section */}
-                                    <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Scope</DropdownMenuLabel>
-                                    <DropdownMenuCheckboxItem
-                                        checked={showFavoritesOnly}
-                                        onCheckedChange={setShowFavoritesOnly}
-                                        className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-rose-50 dark:focus:bg-rose-900/10 focus:text-rose-600 py-2.5 cursor-pointer"
-                                    >
-                                        <Heart size={12} className={cn("mr-2 transition-transform", showFavoritesOnly && "fill-current scale-110")} />
-                                        Favorites Only
-                                    </DropdownMenuCheckboxItem>
+                    {/* Filter Controls */}
+                    <div className="flex items-center gap-2 w-full md:w-auto">
+                        {/* Mobile Drawer Filter */}
+                        <div className="flex md:hidden">
+                            <Sheet>
+                                <SheetTrigger asChild>
+                                    <button className={cn(
+                                        'flex items-center gap-2 h-8 px-3 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all relative',
+                                        (showFavoritesOnly || (selectedTypes.length > 0 && selectedTypes.length < MEAL_TYPES.length))
+                                            ? isMix ? 'bg-indigo-100 dark:bg-indigo-900/30 border-indigo-300 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400' : 'bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700 text-blue-600 dark:text-blue-400'
+                                            : 'border-slate-200 dark:border-slate-700 text-slate-400 hover:border-slate-300 hover:text-slate-600'
+                                    )}>
+                                        <Filter size={11} />
+                                        Filter
+                                        {(showFavoritesOnly || (selectedTypes.length > 0 && selectedTypes.length < MEAL_TYPES.length)) && (
+                                            <span className={cn("w-4 h-4 flex items-center justify-center text-white text-[8px] font-black rounded-full", isMix ? "bg-indigo-600" : "bg-blue-600")}>
+                                                {(selectedTypes.length > 0 && selectedTypes.length < MEAL_TYPES.length ? selectedTypes.length : 0) + (showFavoritesOnly ? 1 : 0)}
+                                            </span>
+                                        )}
+                                    </button>
+                                </SheetTrigger>
+                                <SheetContent side="bottom" className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-t-3xl px-6 pt-6 pb-10">
+                                    <SheetHeader className="mb-4">
+                                        <div className="flex items-center justify-between">
+                                            <SheetTitle className="text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">
+                                                Filter {isMix ? 'Mixes' : 'Meals'}
+                                            </SheetTitle>
+                                            {(showFavoritesOnly || (selectedTypes.length > 0 && selectedTypes.length < MEAL_TYPES.length)) && (
+                                                <button
+                                                    onClick={() => { setShowFavoritesOnly(false); setSelectedTypes(MEAL_TYPES); }}
+                                                    className="text-[9px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors"
+                                                >
+                                                    Clear all
+                                                </button>
+                                            )}
+                                        </div>
+                                    </SheetHeader>
 
-                                    <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
+                                    {/* Favorites Toggle */}
+                                    <div className="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-800">
+                                        <span className="text-[11px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400">Favorites only</span>
+                                        <Switch checked={showFavoritesOnly} onCheckedChange={setShowFavoritesOnly} className={isMix ? "data-[state=checked]:bg-indigo-600" : "data-[state=checked]:bg-blue-600"} />
+                                    </div>
 
-                                    {/* Meal Type Section */}
-                                    <div className="flex items-center justify-between pr-2">
-                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Types</DropdownMenuLabel>
-                                        <div className="flex items-center gap-1">
-                                            <button
-                                                onClick={(e) => {
-                                                    e.preventDefault(); e.stopPropagation();
-                                                    setSelectedTypes(MEAL_TYPES);
-                                                }}
-                                                className={cn("w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors", isMix ? "text-indigo-500" : "text-blue-500")}
-                                                title="Select All"
-                                            >
-                                                <CheckSquare size={14} />
-                                            </button>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.preventDefault(); e.stopPropagation();
-                                                    setSelectedTypes([]);
-                                                }}
-                                                className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
-                                                title="Select None"
-                                            >
-                                                <Square size={14} />
-                                            </button>
+                                    {/* Meal Types */}
+                                    <div className="mt-4">
+                                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3 block">Types</span>
+                                        <div className="flex flex-wrap gap-2">
+                                            {MEAL_TYPES.map(type => {
+                                                const active = selectedTypes.includes(type);
+                                                return (
+                                                    <button
+                                                        key={type}
+                                                        onClick={() => {
+                                                            if (active) setSelectedTypes(prev => prev.filter(t => t !== type));
+                                                            else setSelectedTypes(prev => [...prev, type]);
+                                                        }}
+                                                        className={cn(
+                                                            'h-8 px-3 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all',
+                                                            active
+                                                                ? isMix ? 'bg-indigo-500 border-indigo-500 text-white' : 'bg-blue-500 border-blue-500 text-white'
+                                                                : 'border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:border-blue-300 hover:text-blue-600'
+                                                        )}
+                                                    >
+                                                        {type}
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
                                     </div>
-                                    <div className="py-1">
-                                        {MEAL_TYPES.map(type => {
-                                            const isActive = selectedTypes.includes(type);
-                                            return (
-                                                <DropdownMenuCheckboxItem
-                                                    key={type}
-                                                    checked={isActive}
-                                                    onCheckedChange={(checked) => {
-                                                        if (checked) {
-                                                            setSelectedTypes(prev => [...prev, type]);
-                                                        } else {
-                                                            setSelectedTypes(prev => prev.filter(t => t !== type));
-                                                        }
+                                </SheetContent>
+                            </Sheet>
+                        </div>
+
+                        {/* Desktop Dropdown Filter */}
+                        <div className="hidden md:block">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <button className={cn(
+                                        "px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 flex items-center gap-2 shrink-0 border shadow-sm outline-none",
+                                        (showFavoritesOnly || (selectedTypes.length > 0 && selectedTypes.length < MEAL_TYPES.length))
+                                            ? isMix ? "bg-indigo-600 text-white border-indigo-600 shadow-lg shadow-indigo-500/20" : "bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20"
+                                            : "bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-blue-200 hover:text-blue-600"
+                                    )}>
+                                        <Filter size={12} />
+                                        <span className="hidden sm:inline">
+                                            {showFavoritesOnly ? "Favorites" :
+                                                (selectedTypes.length === 0 || selectedTypes.length === MEAL_TYPES.length ? "FILTER" :
+                                                    `${selectedTypes.length} Types`)}
+                                        </span>
+                                        <ChevronDown size={10} className="opacity-50" />
+                                    </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                    side="bottom"
+                                    align="start"
+                                    sideOffset={8}
+                                    collisionPadding={20}
+                                    className="w-56 rounded-2xl border-slate-200 dark:border-slate-800 shadow-2xl bg-white dark:bg-slate-950 z-[100] flex flex-col max-h-[var(--radix-dropdown-menu-content-available-height)]"
+                                >
+                                    <div className="p-2 overflow-y-auto no-scrollbar">
+                                        {/* Scope Section */}
+                                        <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Scope</DropdownMenuLabel>
+                                        <DropdownMenuCheckboxItem
+                                            checked={showFavoritesOnly}
+                                            onCheckedChange={setShowFavoritesOnly}
+                                            className="rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 focus:bg-rose-50 dark:focus:bg-rose-900/10 focus:text-rose-600 py-2.5 cursor-pointer"
+                                        >
+                                            <Heart size={12} className={cn("mr-2 transition-transform", showFavoritesOnly && "fill-current scale-110")} />
+                                            Favorites Only
+                                        </DropdownMenuCheckboxItem>
+
+                                        <DropdownMenuSeparator className="bg-slate-100 dark:bg-slate-800 mx-2" />
+
+                                        {/* Meal Type Section */}
+                                        <div className="flex items-center justify-between pr-2">
+                                            <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-3 py-2">Types</DropdownMenuLabel>
+                                            <div className="flex items-center gap-1">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.preventDefault(); e.stopPropagation();
+                                                        setSelectedTypes(MEAL_TYPES);
                                                     }}
-                                                    className={cn("rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 py-2.5 cursor-pointer", isMix ? "focus:bg-indigo-50 dark:focus:bg-indigo-900/10 focus:text-indigo-600" : "focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600")}
+                                                    className={cn("w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors", isMix ? "text-indigo-500" : "text-blue-500")}
+                                                    title="Select All"
                                                 >
-                                                    {type}
-                                                </DropdownMenuCheckboxItem>
-                                            );
-                                        })}
+                                                    <CheckSquare size={14} />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.preventDefault(); e.stopPropagation();
+                                                        setSelectedTypes([]);
+                                                    }}
+                                                    className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 transition-colors"
+                                                    title="Select None"
+                                                >
+                                                    <Square size={14} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="py-1">
+                                            {MEAL_TYPES.map(type => {
+                                                const isActive = selectedTypes.includes(type);
+                                                return (
+                                                    <DropdownMenuCheckboxItem
+                                                        key={type}
+                                                        checked={isActive}
+                                                        onCheckedChange={(checked) => {
+                                                            if (checked) {
+                                                                setSelectedTypes(prev => [...prev, type]);
+                                                            } else {
+                                                                setSelectedTypes(prev => prev.filter(t => t !== type));
+                                                            }
+                                                        }}
+                                                        className={cn("rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 py-2.5 cursor-pointer", isMix ? "focus:bg-indigo-50 dark:focus:bg-indigo-900/10 focus:text-indigo-600" : "focus:bg-blue-50 dark:focus:bg-blue-900/10 focus:text-blue-600")}
+                                                    >
+                                                        {type}
+                                                    </DropdownMenuCheckboxItem>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
-                                </div>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
                     </div>
 
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
