@@ -294,7 +294,7 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                         </Link>
                         {uniqueMissing.length > 0 ? (
                             <Link
-                                href="/dashboard/meal-o-matic/groceries"
+                                href="/dashboard/meal-o-matic/shopping"
                                 onClick={(e: React.MouseEvent) => e.stopPropagation()}
                                 className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-1.5"
                             >
@@ -373,7 +373,7 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                             </Link>
                             {uniqueMissing.length > 0 ? (
                                 <Link
-                                    href="/dashboard/meal-o-matic/groceries"
+                                    href="/dashboard/meal-o-matic/shopping"
                                     onClick={(e: React.MouseEvent) => e.stopPropagation()}
                                     className="text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-1"
                                 >

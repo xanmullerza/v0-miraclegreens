@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Leaf, ChevronRight, ShoppingCart, Plus, X, ScanLine } from 'lucide-react';
+import { Leaf, ChevronRight, ShoppingBag, ShoppingCart, Plus, X, ScanLine } from 'lucide-react';
 import { ShoppingListView } from '@/components/kitchen/shopping-list-view';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
@@ -202,7 +202,7 @@ export default function ShoppingListPage() {
                     image: selectedFood.image,
                 };
                 currentList.push(newItem);
-                toast.success(`${selectedFood.common_name || selectedFood.name} added to groceries`);
+                toast.success(`${selectedFood.common_name || selectedFood.name} added to shopping list`);
             }
             
             localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(currentList));
@@ -234,8 +234,8 @@ export default function ShoppingListPage() {
                     onSelect={handleSelectFood}
                     theme="emerald"
                     placeholder="SEARCH FOODS TO ADD..."
-                    idleIcon={<ShoppingCart size={20} className="text-emerald-500" />}
-                    idleTitle="Grocery List"
+                    idleIcon={<ShoppingBag size={20} className="text-emerald-500" />}
+                    idleTitle="Shopping List"
                     idleSubtitle="Search foods to add to your shopping list"
                     noResultsMessage="No matching foods found"
                     enterMessage="Enter food name to search"
@@ -296,7 +296,7 @@ export default function ShoppingListPage() {
                             </div>
                         </div>
 
-                        {/* Add to Groceries Section */}
+                        {/* Add to Shopping List Section */}}
                         <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
                             <div className="space-y-3">
                                 <div>
@@ -342,7 +342,7 @@ export default function ShoppingListPage() {
                                     ) : (
                                         <>
                                             <Plus size={16} />
-                                            Add to Groceries
+                                            Add to Shopping List
                                         </>
                                     )}
                                 </Button>

@@ -41,6 +41,7 @@
             "matchCommandLine": true
         },
         "cp": true,
-        "get_errors": true
+        "get_errors": true,
+        "Rename-Item": true
     }
 }

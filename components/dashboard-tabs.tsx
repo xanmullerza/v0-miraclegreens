@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
     Library, ChefHat, LayoutGrid,
-    Leaf, Package, ShoppingCart,
+    Leaf, Package, ShoppingBag,
     Calendar, Beaker, Plus,
     Scale, Activity, Wallet,
 } from 'lucide-react';
@@ -56,7 +56,7 @@ const TAB_CONFIG: TopTab[] = [
         defaultHref: '/dashboard/meal-o-matic/planner',
         matchPaths: ['/dashboard/meal-o-matic'],
         subtabs: [
-            { id: 'groceries', label: 'Groceries', href: '/dashboard/meal-o-matic/groceries', icon: ShoppingCart },
+            { id: 'shopping', label: 'Shopping', href: '/dashboard/meal-o-matic/shopping', icon: ShoppingBag },
             { id: 'pantry', label: 'Pantry', href: '/dashboard/meal-o-matic/pantry', icon: Package },
             { id: 'planner', label: 'Planner', href: '/dashboard/meal-o-matic/planner', icon: Calendar },
             { id: 'maker', label: 'Maker', href: '/dashboard/meal-o-matic/maker', icon: Plus },
