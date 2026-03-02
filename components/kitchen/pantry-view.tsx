@@ -336,7 +336,8 @@ export function PantryView({
 
     const mergeQuantityStrings = (existing: string | undefined, incoming: string): string => {
         if (!existing) {
-            if (existing === '' || existing === '0' || existing === '0 grams') {            }
+            if (existing === '' || existing === '0' || existing === '0 grams') {
+            }
             return incoming;
         }
         // Drop zero-quantity entries before merging (e.g. '0' left after items are consumed)
@@ -346,7 +347,8 @@ export function PantryView({
             return e.qty > 0;
         });
         // If all existing entries were zeros, just return incoming
-        if (existingEntries.length === 0) {            return incoming;
+        if (existingEntries.length === 0) {
+            return incoming;
         }
         const b = parseQuantityEntry(incoming);
 
@@ -409,7 +411,8 @@ export function PantryView({
                 const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
                 const currentQty = quantities[buyMoreItem.id] || buyMoreItem.quantity;
                 const merged = mergeQuantityStrings(currentQty, quantityString);
-                if (buyMoreItem.common_name?.toLowerCase().includes('potato')) {                } else {
+                if (buyMoreItem.common_name?.toLowerCase().includes('potato')) {
+                } else {
                 }
                 
                 // Check if merged result is 0 - if so, move to shopping list
@@ -661,7 +664,8 @@ export function PantryView({
 
             // Merge in locally-stored quantities (persists without login)
             try {
-                const savedQuantities = localStorage.getItem('pantry_quantities');                if (savedQuantities) {
+                const savedQuantities = localStorage.getItem('pantry_quantities');
+                if (savedQuantities) {
                     const quantities: Record<string, string> = JSON.parse(savedQuantities);
                     combined.forEach(item => {
                         if (quantities[item.id] !== undefined) {
@@ -795,7 +799,8 @@ export function PantryView({
     };
 
     const removeFromPantry = async (id: string, name: string, source: string = 'food_items') => {
-        try {            let error;
+        try {
+            let error;
 
             if (source === 'pantry_items') {
                 const res = await supabase.from('pantry_items').delete().eq('id', id);
@@ -871,7 +876,8 @@ export function PantryView({
         const isZero = totalGrams === 0 || quantityString === '0' || quantityString === '';
         
         if (isZero) {
-            // Move to shopping list instead of keeping in pantry            // Add to shopping list
+            // Move to shopping list instead of keeping in pantry
+            // Add to shopping list
             const saved = localStorage.getItem('vitala_shopping_manual_items');
             const manualItems = saved ? JSON.parse(saved) : [];
             manualItems.push({
@@ -915,7 +921,8 @@ export function PantryView({
 
         // Update UI immediately
         setFoods(prev => prev.map(f => f.id === item.id ? { ...f, quantity: quantityString } : f));
-        setBuyMoreItem(null);        toast.success(`Updated quantity for "${item.name}"`);
+        setBuyMoreItem(null);
+        toast.success(`Updated quantity for "${item.name}"`);
 
         // Persist to localStorage (works without login)
         try {
@@ -1234,7 +1241,7 @@ export function PantryView({
                                                                         className="w-full px-3 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
                                                                     >
                                                                         <option value="">Select serving...</option>
-                                                                        {buyMorePortions.map(p => (
+                                                                        {buyMorePortions.filter(p => /gram|kilogram/i.test(p.label)).map(p => (
                                                                             <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
                                                                         ))}
                                                                     </select>
@@ -1251,7 +1258,7 @@ export function PantryView({
                                                                         onClick={(e) => e.stopPropagation()}
                                                                         className="w-full px-3 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
                                                                     >
-                                                                        {buyMorePortions.map(p => (
+                                                                        {buyMorePortions.filter(p => /gram|kilogram/i.test(p.label)).map(p => (
                                                                             <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
                                                                         ))}
                                                                     </select>
