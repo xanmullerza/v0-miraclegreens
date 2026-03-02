@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import {
     Library, ChefHat, LayoutGrid,
     Leaf, Package, ShoppingCart,
-    Calendar, Beaker,
+    Calendar, Beaker, Plus,
     Scale, Activity, Wallet,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -54,8 +54,9 @@ const TAB_CONFIG: TopTab[] = [
         activeColor: 'text-amber-400',
         activeBg: 'bg-amber-500/10 border-amber-500/30',
         defaultHref: '/dashboard/meal-o-matic/planner',
-        matchPaths: ['/dashboard/meal-o-matic/planner', '/dashboard/meal-o-matic/pantry', '/dashboard/meal-o-matic/groceries'],
+        matchPaths: ['/dashboard/meal-o-matic'],
         subtabs: [
+            { id: 'maker', label: 'Maker', href: '/dashboard/meal-o-matic/maker', icon: Plus },
             { id: 'groceries', label: 'Groceries', href: '/dashboard/meal-o-matic/groceries', icon: ShoppingCart },
             { id: 'planner', label: 'Planner', href: '/dashboard/meal-o-matic/planner', icon: Calendar },
             { id: 'pantry', label: 'Pantry', href: '/dashboard/meal-o-matic/pantry', icon: Package },
