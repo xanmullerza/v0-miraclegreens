@@ -13,7 +13,7 @@ import { supabase } from '@/lib/supabase';
 import { useSearch } from '@/lib/context/search-context';
 import { useUserPreferences } from '@/lib/context/user-preferences-context';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuCheckboxItem } from '@/components/ui/dropdown-menu';
-import { Sheet, SheetTrigger, SheetContent, SheetClose } from '@/components/ui/sheet';
+import { Sheet, SheetTrigger, SheetContent, SheetClose, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { FoodFormDialog } from '@/components/ingredients/food-form-dialog';
 
 const CATEGORIES = ['General', 'Vegetables', 'Grains', 'Legumes', 'Oils', 'Proteins', 'Fruit', 'Nuts', 'Flavour', 'Supplements', 'Mixes'];
@@ -195,8 +195,8 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                         </button>
                                     </SheetTrigger>
                                     <SheetContent side="bottom" className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-t-3xl px-6 pt-6 pb-10">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <span className="text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">Filter Foods</span>
+                                        <SheetHeader className="flex flex-row items-center justify-between mb-4">
+                                            <SheetTitle className="text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">Filter Foods</SheetTitle>
                                             <div className="flex items-center gap-3">
                                                 {(showFavoritesOnly || selectedCategories.length > 0) && (
                                                     <button
@@ -213,7 +213,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                                     <X size={12} />
                                                 </SheetClose>
                                             </div>
-                                        </div>
+                                        </SheetHeader>
 
                                         {/* Favourites toggle */}
                                         <div className="flex items-center justify-between py-3 border-b border-slate-100 dark:border-slate-800">
