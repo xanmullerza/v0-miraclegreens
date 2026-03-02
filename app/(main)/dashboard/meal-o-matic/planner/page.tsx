@@ -305,13 +305,18 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                                 <Sparkles size={10} /> Fully Stocked
                             </div>
                         )}
-                        {onMarkEaten && !isEaten && (
+                        {onMarkEaten && (
                             <button
-                                onClick={(e: React.MouseEvent) => { e.stopPropagation(); onMarkEaten(); }}
-                                className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all flex items-center justify-center gap-1.5"
+                                onClick={(e: React.MouseEvent) => { e.stopPropagation(); if (!isEaten) onMarkEaten(); }}
+                                className={cn(
+                                    "text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border transition-all flex items-center justify-center gap-1.5",
+                                    isEaten
+                                        ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 cursor-default"
+                                        : "border-slate-500/30 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white"
+                                )}
                             >
-                                <Check size={10} />
-                                Eaten
+                                {isEaten && <Check size={10} />}
+                                {isEaten ? "Eaten" : "Eaten?"}
                             </button>
                         )}
                         {onRegenerate && !isEaten && (
@@ -378,12 +383,18 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                                     <Sparkles size={9} /> Stocked
                                 </div>
                             )}
-                            {onMarkEaten && !isEaten ? (
+                            {onMarkEaten ? (
                                 <button
-                                    onClick={(e: React.MouseEvent) => { e.stopPropagation(); onMarkEaten(); }}
-                                    className="text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all flex items-center justify-center gap-1"
+                                    onClick={(e: React.MouseEvent) => { e.stopPropagation(); if (!isEaten) onMarkEaten(); }}
+                                    className={cn(
+                                        "text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg border transition-all flex items-center justify-center gap-1",
+                                        isEaten
+                                            ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 cursor-default"
+                                            : "border-slate-500/30 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white"
+                                    )}
                                 >
-                                    <Check size={9} /> Eaten
+                                    {isEaten && <Check size={9} />}
+                                    {isEaten ? "Eaten" : "Eaten?"}
                                 </button>
                             ) : <div />}
                             {onRegenerate && !isEaten ? (
