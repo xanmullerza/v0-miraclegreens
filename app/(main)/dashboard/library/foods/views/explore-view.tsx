@@ -197,7 +197,6 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                     <SheetContent side="bottom" className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-t-3xl px-6 pt-6 pb-10">
                                         <SheetHeader className="mb-4">
                                             <div className="flex items-center justify-between">
-                                                <SheetTitle className="text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">Filter Foods</SheetTitle>
                                                 {(showFavoritesOnly || selectedCategories.length > 0) && (
                                                     <button
                                                         onClick={() => { setShowFavoritesOnly(false); setSelectedCategories([]); }}

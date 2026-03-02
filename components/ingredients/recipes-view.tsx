@@ -391,9 +391,6 @@ export function RecipesView({
                                 <SheetContent side="bottom" className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-t-3xl px-6 pt-6 pb-10">
                                     <SheetHeader className="mb-4">
                                         <div className="flex items-center justify-between">
-                                            <SheetTitle className="text-[11px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">
-                                                Filter {isMix ? 'Mixes' : 'Meals'}
-                                            </SheetTitle>
                                             {(showFavoritesOnly || (selectedTypes.length > 0 && selectedTypes.length < MEAL_TYPES.length)) && (
                                                 <button
                                                     onClick={() => { setShowFavoritesOnly(false); setSelectedTypes(MEAL_TYPES); }}
