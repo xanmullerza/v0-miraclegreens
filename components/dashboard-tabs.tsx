@@ -56,10 +56,10 @@ const TAB_CONFIG: TopTab[] = [
         defaultHref: '/dashboard/meal-o-matic/planner',
         matchPaths: ['/dashboard/meal-o-matic'],
         subtabs: [
-            { id: 'maker', label: 'Maker', href: '/dashboard/meal-o-matic/maker', icon: Plus },
             { id: 'groceries', label: 'Groceries', href: '/dashboard/meal-o-matic/groceries', icon: ShoppingCart },
-            { id: 'planner', label: 'Planner', href: '/dashboard/meal-o-matic/planner', icon: Calendar },
             { id: 'pantry', label: 'Pantry', href: '/dashboard/meal-o-matic/pantry', icon: Package },
+            { id: 'planner', label: 'Planner', href: '/dashboard/meal-o-matic/planner', icon: Calendar },
+            { id: 'maker', label: 'Maker', href: '/dashboard/meal-o-matic/maker', icon: Plus },
         ],
     },
     {
