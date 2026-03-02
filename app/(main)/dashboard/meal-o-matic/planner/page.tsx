@@ -50,7 +50,8 @@ import {
     Heart,
     Users,
     Camera,
-    Database
+    Database,
+    CalendarDays
 } from 'lucide-react';
 import {
     Sheet,
@@ -775,7 +776,7 @@ export function MealPlannerContent({
     const [showRecipeNutrients, setShowRecipeNutrients] = useState(false);
     const [recipeMoringaGrams, setRecipeMoringaGrams] = useState(0);
     const [moringaGrams, setMoringaGrams] = useState(0);
-    const [showDailyNutrients, setShowDailyNutrients] = useState(true);
+    const [showDailyNutrients, setShowDailyNutrients] = useState(false);
     const [dailyMoringaGrams, setDailyMoringaGrams] = useState(0);
     const [activeBoostContext, setActiveBoostContext] = useState<'daily' | 'recipe' | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
@@ -1343,7 +1344,37 @@ export function MealPlannerContent({
                             )}
                         </div>
 
-                        <div className="space-y-4 pt-10 border-t">
+                        {/* Action Buttons */}
+                        <div className="grid grid-cols-3 gap-3 pt-2">
+                            <button
+                                onClick={handleGenerate}
+                                className="flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all"
+                            >
+                                <RotateCcw size={16} />
+                                <span className="text-[9px] font-black uppercase tracking-widest">Shuffle All</span>
+                            </button>
+                            <button
+                                onClick={() => setShowDailyNutrients(v => !v)}
+                                className={cn(
+                                    "flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl border transition-all",
+                                    showDailyNutrients
+                                        ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-900/10 text-emerald-600"
+                                        : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 hover:border-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/10"
+                                )}
+                            >
+                                <Activity size={16} />
+                                <span className="text-[9px] font-black uppercase tracking-widest">Nutrients</span>
+                            </button>
+                            <button
+                                disabled
+                                className="flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 text-slate-400 dark:text-slate-600 opacity-60 cursor-not-allowed transition-all"
+                            >
+                                <CalendarDays size={16} />
+                                <span className="text-[9px] font-black uppercase tracking-widest">Weekly Plan</span>
+                            </button>
+                        </div>
+
+                        <div className="space-y-4 pt-4 border-t">
 
                             {showDailyNutrients && (
                                 <div className="space-y-6 animate-in slide-in-from-top-4">
