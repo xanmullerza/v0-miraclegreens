@@ -245,7 +245,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                             </div>
 
                             {/* Desktop header row */}
-                            <div className="hidden md:grid md:grid-cols-[60px_1fr_100px_80px_80px_80px] gap-3 md:gap-4 md:items-center md:px-10 py-1 w-full">
+                            <div className="hidden md:grid md:grid-cols-[60px_1fr_auto] gap-3 md:gap-4 md:items-center md:px-10 py-1 w-full">
                                 <div className="flex items-center justify-center">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
@@ -298,10 +298,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                     </DropdownMenu>
                                 </div>
                                 <div className="text-[9px] font-black uppercase tracking-widest text-slate-400">Name</div>
-                                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Energy</div>
-                                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Carbs</div>
-                                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Fat</div>
-                                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Protein</div>
+                                <div className="text-[9px] font-black uppercase tracking-widest text-slate-400 text-right">Nutrition</div>
                             </div>
                         </div>
 
@@ -333,7 +330,7 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                     href={`/dashboard/library/foods/${food.id}`}
                                     className="group block bg-white dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:shadow-lg transition-all duration-300 overflow-hidden"
                                 >
-                                    <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px] gap-3 lg:gap-4 lg:items-center lg:px-6 py-1 w-full">
+                                    <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_auto] gap-3 lg:gap-4 lg:items-center lg:px-6 py-1 w-full">
                                         {/* Thumbnail */}
                                         <div className="aspect-square w-16 lg:w-12 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-300">
                                             {food.image ? (
@@ -366,17 +363,14 @@ export function ExploreView({ showAddFood = false, setShowAddFood }: ExploreView
                                             </div>
                                         </div>
 
-                                        {/* Desktop stats */}
-                                        <div className="hidden lg:flex items-center justify-end">
+                                        {/* Desktop stats - Inline with dividers */}
+                                        <div className="hidden lg:flex items-center justify-end gap-3">
                                             <span className="font-black text-[11px] text-blue-500 dark:text-blue-400">{formatEnergy(food.energy_kcal, energyUnit)}</span>
-                                        </div>
-                                        <div className="hidden lg:flex items-center justify-end">
+                                            <span className="text-slate-300 text-[8px]">•</span>
                                             <span className="font-black text-[11px] text-amber-500 dark:text-amber-400">{food.carbs_g.toFixed(1)}g</span>
-                                        </div>
-                                        <div className="hidden lg:flex items-center justify-end">
+                                            <span className="text-slate-300 text-[8px]">•</span>
                                             <span className="font-black text-[11px] text-rose-500 dark:text-rose-400">{food.fat_g.toFixed(1)}g</span>
-                                        </div>
-                                        <div className="hidden lg:flex items-center justify-end">
+                                            <span className="text-slate-300 text-[8px]">•</span>
                                             <span className="font-black text-[11px] text-emerald-500 dark:text-emerald-400">{food.protein_g.toFixed(1)}g</span>
                                         </div>
                                     </div>

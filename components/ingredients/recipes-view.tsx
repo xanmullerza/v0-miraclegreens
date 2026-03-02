@@ -562,7 +562,7 @@ export function RecipesView({
                                     isMix ? "hover:border-indigo-400/50 hover:shadow-lg" : "hover:border-blue-400/50 hover:shadow-lg"
                                 )}
                             >
-                                <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_100px_80px_80px_80px_150px] gap-3 lg:gap-4 lg:items-center lg:px-10 py-1">
+                                <div className="flex flex-row lg:grid lg:grid-cols-[60px_1fr_auto] gap-3 lg:gap-4 lg:items-center lg:px-10 py-1">
                                     {/* Thumbnail */}
                                     <div className="aspect-square w-16 lg:w-12 shrink-0 rounded-xl bg-slate-100 dark:bg-slate-950/50 overflow-hidden relative group-hover:scale-105 transition-transform duration-500">
                                         {recipe.image ? (
@@ -592,22 +592,15 @@ export function RecipesView({
                                         </div>
                                     </div>
 
-                                    {/* Stats (Desktop View) */}
-                                    <div className="hidden lg:flex flex-col items-end">
-                                        <span className="text-[8px] uppercase font-black text-slate-400">Energy</span>
-                                        <span className="font-black text-[11px] text-slate-900 dark:text-white">{formatEnergy(recipe.calories, energyUnit)}</span>
-                                    </div>
-                                    <div className="hidden lg:flex flex-col items-end">
-                                        <span className="text-[8px] uppercase font-black text-slate-400">Carbs</span>
-                                        <span className="font-black text-[11px] text-slate-900 dark:text-white">{recipe.carbs.toFixed(1)}g</span>
-                                    </div>
-                                    <div className="hidden lg:flex flex-col items-end">
-                                        <span className="text-[8px] uppercase font-black text-slate-400">Fat</span>
-                                        <span className="font-black text-[11px] text-slate-900 dark:text-white">{recipe.fat.toFixed(1)}g</span>
-                                    </div>
-                                    <div className="hidden lg:flex flex-col items-end">
-                                        <span className="text-[8px] uppercase font-black text-slate-400">Protein</span>
-                                        <span className="font-black text-[11px] text-slate-900 dark:text-white">{recipe.protein.toFixed(1)}g</span>
+                                    {/* Stats (Desktop View) - Inline with dividers */}
+                                    <div className="hidden lg:flex items-center justify-end gap-3">
+                                        <span className={cn("font-black text-[11px]", isMix ? "text-indigo-500 dark:text-indigo-400" : "text-blue-500 dark:text-blue-400")}>{formatEnergy(recipe.calories, energyUnit)}</span>
+                                        <span className="text-slate-300 text-[8px]">•</span>
+                                        <span className="font-black text-[11px] text-amber-500 dark:text-amber-400">{recipe.carbs.toFixed(1)}g</span>
+                                        <span className="text-slate-300 text-[8px]">•</span>
+                                        <span className="font-black text-[11px] text-rose-500 dark:text-rose-400">{recipe.fat.toFixed(1)}g</span>
+                                        <span className="text-slate-300 text-[8px]">•</span>
+                                        <span className="font-black text-[11px] text-emerald-500 dark:text-emerald-400">{recipe.protein.toFixed(1)}g</span>
                                     </div>
                                 </div>
                             </div>
