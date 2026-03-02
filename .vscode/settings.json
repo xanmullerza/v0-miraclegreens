@@ -39,6 +39,7 @@
         "/^node -e \"const fs=require\\('fs'\\); const f='components/kitchen/pantry-view\\.tsx'; let c=fs\\.readFileSync\\(f,'utf8'\\); const before=c\\.length; c=c\\.replace\\(/\\^\\[ \\\\t\\]\\*console\\\\\\.log\\\\\\(\\[\\^\\\\n\\]\\*\\\\\\);\\\\s\\*\\\\n/gm,''\\); fs\\.writeFileSync\\(f,c,'utf8'\\); console\\.log\\('Removed',before-c\\.length,'chars'\\)\"$/": {
             "approve": true,
             "matchCommandLine": true
-        }
+        },
+        "cp": true
     }
 }
