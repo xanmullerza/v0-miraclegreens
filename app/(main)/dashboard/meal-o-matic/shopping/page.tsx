@@ -296,7 +296,7 @@ export default function ShoppingListPage() {
                             </div>
                         </div>
 
-                        {/* Add to Shopping List Section */}}
+                        {/* Add to Shopping List Section */}
                         <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
                             <div className="space-y-3">
                                 <div>
