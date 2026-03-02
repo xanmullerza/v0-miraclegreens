@@ -326,7 +326,7 @@ export default function PantryPage() {
                                     >
                                         <option value="">Select a serving...</option>
                                         {selectedFood.portions
-                                            ?.filter((p: any) => /gram|kilogram/i.test(p.label))
+                                            ?.filter((p: any) => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon/i.test(p.label))
                                             .map((p: any) => (
                                             <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
                                         ))}

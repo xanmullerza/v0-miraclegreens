@@ -323,7 +323,7 @@ export default function ShoppingListPage() {
                                             className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
                                         >
                                             <option value="">Select a package size...</option>
-                                            {selectedFood.portions?.map((p: any) => (
+                                            {selectedFood.portions?.filter((p: any) => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon/i.test(p.label)).map((p: any) => (
                                                 <option key={p.label} value={p.label}>
                                                     {p.label} ({p.weight_g}g)
                                                 </option>
