@@ -282,7 +282,7 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                         };
                         const c = colors[tier];
                         return (
-                    <div className="mt-3 grid grid-cols-2 gap-2">
+                    <div className="mt-3 grid grid-cols-2 lg:grid-cols-4 gap-2 lg:gap-1.5">
                         <Link
                             href="/dashboard/meal-o-matic/pantry"
                             onClick={(e: React.MouseEvent) => e.stopPropagation()}
