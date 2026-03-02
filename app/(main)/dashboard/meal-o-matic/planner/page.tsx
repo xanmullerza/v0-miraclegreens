@@ -271,43 +271,58 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                         </Badge>
                     </div>
 
-                    {/* Pantry Match UI */}
+                    {/* Action Grid */}
                     {(() => {
                         // orange = <50% possessed, blue = 50-99%, green = 100%
                         const tier = matchScore === 1 ? 'green' : matchScore >= 0.5 ? 'blue' : 'orange';
                         const colors = {
-                            green:  { btn: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500', badge: 'bg-emerald-500/10 text-emerald-600', pill: 'bg-emerald-500 text-white', toBuy: 'border-amber-500/30 bg-amber-500/10 text-amber-600' },
-                            blue:   { btn: 'border-blue-500/30 bg-blue-500/10 text-blue-500 hover:bg-blue-500', badge: 'bg-blue-500/10 text-blue-600', pill: 'bg-blue-500 text-white', toBuy: 'border-amber-500/30 bg-amber-500/10 text-amber-600' },
-                            orange: { btn: 'border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500', badge: 'bg-amber-500/10 text-amber-600', pill: 'bg-amber-500 text-white', toBuy: 'border-amber-500/30 bg-amber-500/10 text-amber-600' },
+                            green:  { btn: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500' },
+                            blue:   { btn: 'border-blue-500/30 bg-blue-500/10 text-blue-500 hover:bg-blue-500' },
+                            orange: { btn: 'border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500' },
                         };
                         const c = colors[tier];
                         return (
-                    <div className="mt-3">
-                        <div className="flex items-center gap-2 flex-wrap">
+                    <div className="mt-3 grid grid-cols-2 gap-2">
+                        <Link
+                            href="/dashboard/meal-o-matic/pantry"
+                            onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                            className={cn("text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-full border hover:text-white transition-all flex items-center justify-center gap-1.5", c.btn)}
+                        >
+                            <ShoppingBasket size={10} />
+                            {matchCount} / {recipeIngs.length} Stocked
+                        </Link>
+                        {uniqueMissing.length > 0 ? (
                             <Link
-                                href="/dashboard/meal-o-matic/pantry"
+                                href="/dashboard/meal-o-matic/groceries"
                                 onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                                className={cn("text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border hover:text-white transition-all flex items-center gap-1.5", c.btn)}
+                                className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-1.5"
                             >
                                 <ShoppingBasket size={10} />
-                                {matchCount} / {recipeIngs.length} Stocked
+                                {uniqueMissing.length} / {recipeIngs.length} To Buy
                             </Link>
-                            {matchScore === 1 && (
-                                <div className={cn("text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg flex items-center gap-1", c.pill)}>
-                                    <Sparkles size={10} /> Fully Stocked
-                                </div>
-                            )}
-                            {uniqueMissing.length > 0 && (
-                                <Link
-                                    href="/dashboard/meal-o-matic/groceries"
-                                    onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                                    className={cn("text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border hover:text-white transition-all flex items-center gap-1.5", 'border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500')}
-                                >
-                                    <ShoppingBasket size={10} />
-                                    {uniqueMissing.length} / {recipeIngs.length} To Buy
-                                </Link>
-                            )}
-                        </div>
+                        ) : (
+                            <div className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 flex items-center justify-center gap-1.5">
+                                <Sparkles size={10} /> Fully Stocked
+                            </div>
+                        )}
+                        {onMarkEaten && !isEaten && (
+                            <button
+                                onClick={(e: React.MouseEvent) => { e.stopPropagation(); onMarkEaten(); }}
+                                className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500 hover:text-white transition-all flex items-center justify-center gap-1.5"
+                            >
+                                <Check size={10} />
+                                Eaten
+                            </button>
+                        )}
+                        {onRegenerate && !isEaten && (
+                            <button
+                                onClick={(e: React.MouseEvent) => { e.stopPropagation(); onRegenerate(); }}
+                                className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-full border border-slate-500/30 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white transition-all flex items-center justify-center gap-1.5"
+                            >
+                                <RotateCcw size={10} />
+                                Shuffle
+                            </button>
+                        )}
                     </div>
                         );
                     })()}
@@ -329,32 +344,6 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                 <div className="hidden lg:flex flex-col items-end">
                     <span className="text-[9px] uppercase font-black text-slate-400">Protein</span>
                     <span className="font-black text-sm text-slate-900 dark:text-white">{recipe.protein.toFixed(1)}g</span>
-                </div>
-
-                {/* Actions */}
-                <div className="p-3 lg:p-0 flex justify-end gap-2">
-                    {onMarkEaten && !isEaten && (
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => { e.stopPropagation(); onMarkEaten(); }}
-                            className="h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-50 dark:hover:bg-emerald-900/30 text-emerald-500 hover:text-emerald-700 transition-all gap-2"
-                        >
-                            <Check size={14} />
-                            Eaten
-                        </Button>
-                    )}
-                    {onRegenerate && !isEaten && (
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => { e.stopPropagation(); onRegenerate(); }}
-                            className="h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-50 dark:hover:bg-emerald-900/30 text-slate-400 hover:text-emerald-600 transition-all gap-2"
-                        >
-                            <RotateCcw size={14} />
-                            Shuffle
-                        </Button>
-                    )}
                 </div>
             </div>
         </div>
