@@ -86,11 +86,6 @@ export function DashboardTabs() {
         tab.matchPaths.some(p => pathname.startsWith(p))
     );
 
-    // If we're on a detail page (more than 3 segments after /dashboard/section/subsection),
-    // don't render tabs to keep detail pages clean
-    const segments = pathname.replace('/dashboard/', '').split('/').filter(Boolean);
-    if (segments.length > 2) return null;
-
     const currentTab = activeTopTab || TAB_CONFIG[0];
 
     return (
