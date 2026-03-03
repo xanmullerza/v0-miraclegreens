@@ -118,6 +118,7 @@ export default function FoodDetailsPage() {
     const [quickAddWeight, setQuickAddWeight] = useState('');
     const [quickAddUnit, setQuickAddUnit] = useState('g');
     const [quickAddMode, setQuickAddMode] = useState<'pantry' | 'shopping'>('pantry');
+    const [showNutrients, setShowNutrients] = useState(false);
 
     const { nutrientDisplayMode, profile, energyUnit, dailyTargets } = useUserPreferences();
 
@@ -1062,7 +1063,89 @@ export default function FoodDetailsPage() {
                     </div>
                 )}
 
+                {/* Know Your Food Section */}
+                {
+                    (food.details || FOOD_DETAILS[food.id]) && (() => {
+                        const details = food.details || FOOD_DETAILS[food.id];
+                        return (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                                <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-8 font-display">
+                                    <h3 className="text-sm font-black uppercase tracking-[0.3em] text-purple-500 italic flex items-center gap-2">
+                                        <Search size={18} />
+                                        Know Your Food
+                                    </h3>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Producers */}
+                                    <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
+                                        <div className="flex items-center gap-2 text-slate-400 font-black uppercase tracking-widest text-[10px]">
+                                            <ShoppingBasket size={14} /> Top Producers
+                                        </div>
+                                        <p className="text-lg font-bold text-slate-900 dark:text-white leading-snug">
+                                            {details.producers}
+                                        </p>
+                                    </Card>
+
+                                    {/* Facts */}
+                                    <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
+                                        <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-black uppercase tracking-widest text-[10px]">
+                                            <Lightbulb size={14} /> Culinary Facts & Uses
+                                        </div>
+                                        <ul className="space-y-3">
+                                            {details.facts.map((fact: string, i: number) => (
+                                                <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
+                                                    <span className="text-purple-500 font-bold mt-1">✨</span>
+                                                    <span className="leading-snug font-medium italic">{fact}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </Card>
+
+                                    {/* History */}
+                                    <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
+                                        <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-black uppercase tracking-widest text-[10px]">
+                                            <Globe size={14} /> Origin & History
+                                        </div>
+                                        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                                            {details.history}
+                                        </p>
+                                    </Card>
+
+                                    {/* Benefits */}
+                                    <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
+                                        <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-black uppercase tracking-widest text-[10px]">
+                                            <ShieldCheck size={14} /> Key Benefits
+                                        </div>
+                                        <ul className="space-y-3">
+                                            {details.benefits.map((benefit: string, i: number) => (
+                                                <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
+                                                    <span className="text-blue-500 font-bold mt-1">•</span>
+                                                    <span className="leading-snug font-medium">{benefit}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </Card>
+                                </div>
+
+                                {/* Nutritional Information toggle */}
+                                <button
+                                    onClick={() => setShowNutrients(v => !v)}
+                                    className="w-full flex items-center justify-between px-6 py-4 rounded-2xl border border-emerald-500/30 bg-emerald-50/30 dark:bg-emerald-900/10 hover:bg-emerald-50/60 dark:hover:bg-emerald-900/20 transition-all group"
+                                >
+                                    <span className="flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.25em] text-emerald-600 dark:text-emerald-400">
+                                        <Activity size={14} />
+                                        Nutritional Information
+                                    </span>
+                                    <ChevronDown className={cn("w-4 h-4 text-emerald-500 transition-transform duration-300", showNutrients && "rotate-180")} />
+                                </button>
+                            </div>
+                        );
+                    })()
+                }
+
                 {/* Nutrient Grids - Removed Hero Wrapper */}
+                {(showNutrients || !(food.details || FOOD_DETAILS[food.id])) && (
                 <div className="space-y-6">
                     <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6 flex items-center justify-between gap-4">
                         <h3 className="text-sm font-black uppercase tracking-[0.3em] text-emerald-500 italic flex items-center gap-2 shrink-0">
@@ -1206,75 +1289,7 @@ export default function FoodDetailsPage() {
                     />
 
                 </div>
-
-                {/* Know Your Food Section */}
-                {
-                    (food.details || FOOD_DETAILS[food.id]) && (() => {
-                        const details = food.details || FOOD_DETAILS[food.id];
-                        return (
-                            <div className="space-y-6 pt-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-                                <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-8 font-display">
-                                    <h3 className="text-sm font-black uppercase tracking-[0.3em] text-purple-500 italic flex items-center gap-2">
-                                        <Search size={18} />
-                                        Know Your Food
-                                    </h3>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* Producers */}
-                                    <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
-                                        <div className="flex items-center gap-2 text-slate-400 font-black uppercase tracking-widest text-[10px]">
-                                            <ShoppingBasket size={14} /> Top Producers
-                                        </div>
-                                        <p className="text-lg font-bold text-slate-900 dark:text-white leading-snug">
-                                            {details.producers}
-                                        </p>
-                                    </Card>
-
-                                    {/* Facts */}
-                                    <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
-                                        <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400 font-black uppercase tracking-widest text-[10px]">
-                                            <Lightbulb size={14} /> Culinary Facts & Uses
-                                        </div>
-                                        <ul className="space-y-3">
-                                            {details.facts.map((fact: string, i: number) => (
-                                                <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
-                                                    <span className="text-purple-500 font-bold mt-1">✨</span>
-                                                    <span className="leading-snug font-medium italic">{fact}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </Card>
-
-                                    {/* History */}
-                                    <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
-                                        <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-black uppercase tracking-widest text-[10px]">
-                                            <Globe size={14} /> Origin & History
-                                        </div>
-                                        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                                            {details.history}
-                                        </p>
-                                    </Card>
-
-                                    {/* Benefits */}
-                                    <Card className="p-8 bg-slate-50/80 dark:bg-slate-900/50 border-slate-100 dark:border-slate-800 flex flex-col gap-4">
-                                        <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-black uppercase tracking-widest text-[10px]">
-                                            <ShieldCheck size={14} /> Key Benefits
-                                        </div>
-                                        <ul className="space-y-3">
-                                            {details.benefits.map((benefit: string, i: number) => (
-                                                <li key={i} className="flex gap-3 text-sm text-slate-600 dark:text-slate-400">
-                                                    <span className="text-blue-500 font-bold mt-1">•</span>
-                                                    <span className="leading-snug font-medium">{benefit}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </Card>
-                                </div>
-                            </div>
-                        );
-                    })()
-                }
+                )}
 
                 {/* NUTRIENT BREAKDOWN MODAL */}
                 {
