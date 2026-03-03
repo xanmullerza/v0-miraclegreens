@@ -209,6 +209,7 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
     const recipeIngs = recipe.ingredients || [];
 
     let matchCount = 0;
+    const matchedIngredients: string[] = [];
     const missingIngredients: string[] = [];
 
     recipeIngs.forEach(ing => {
@@ -218,13 +219,16 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
 
         if (isMatch) {
             matchCount++;
+            matchedIngredients.push(ing.baseIngredient || ing.item);
         } else {
             missingIngredients.push(ing.baseIngredient || ing.item);
         }
     });
 
     const matchScore = recipeIngs.length > 0 ? matchCount / recipeIngs.length : 0;
+    const uniqueMatched = Array.from(new Set(matchedIngredients));
     const uniqueMissing = Array.from(new Set(missingIngredients));
+    const [activePanel, setActivePanel] = useState<'stocked' | 'toBuy' | null>(null);
     return (
         <div
             onClick={() => router.push(`/dashboard/library/meals/${recipe.id}`)}
@@ -284,23 +288,21 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                         const c = colors[tier];
                         return (
                     <div className="mt-3 grid grid-cols-2 gap-2 lg:hidden">
-                        <Link
-                            href="/dashboard/meal-o-matic/pantry"
-                            onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                            className={cn("text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border hover:text-white transition-all flex items-center justify-center gap-1.5", c.btn)}
+                        <button
+                            onClick={(e: React.MouseEvent) => { e.stopPropagation(); setActivePanel(activePanel === 'stocked' ? null : 'stocked'); }}
+                            className={cn("text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border hover:text-white transition-all flex items-center justify-center gap-1.5", c.btn, activePanel === 'stocked' && "ring-2 ring-offset-1 ring-current")}
                         >
                             <ShoppingBasket size={10} />
                             {matchCount} / {recipeIngs.length} Stocked
-                        </Link>
+                        </button>
                         {uniqueMissing.length > 0 ? (
-                            <Link
-                                href="/dashboard/meal-o-matic/shopping"
-                                onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                                className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-1.5"
+                            <button
+                                onClick={(e: React.MouseEvent) => { e.stopPropagation(); setActivePanel(activePanel === 'toBuy' ? null : 'toBuy'); }}
+                                className={cn("text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-1.5", activePanel === 'toBuy' && "ring-2 ring-offset-1 ring-amber-500")}
                             >
                                 <ShoppingBasket size={10} />
                                 {uniqueMissing.length} / {recipeIngs.length} To Buy
-                            </Link>
+                            </button>
                         ) : (
                             <div className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 flex items-center justify-center gap-1.5">
                                 <Sparkles size={10} /> Fully Stocked
@@ -363,22 +365,20 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                     const c = colors[tier];
                     return (
                         <div className="hidden lg:grid grid-cols-2 gap-1.5">
-                            <Link
-                                href="/dashboard/meal-o-matic/pantry"
-                                onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                                className={cn("text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg border hover:text-white transition-all flex items-center justify-center gap-1", c.btn)}
+                            <button
+                                onClick={(e: React.MouseEvent) => { e.stopPropagation(); setActivePanel(activePanel === 'stocked' ? null : 'stocked'); }}
+                                className={cn("text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg border hover:text-white transition-all flex items-center justify-center gap-1", c.btn, activePanel === 'stocked' && "ring-2 ring-offset-1 ring-current")}
                             >
                                 <ShoppingBasket size={9} />
                                 {matchCount}/{recipeIngs.length} Stocked
-                            </Link>
+                            </button>
                             {uniqueMissing.length > 0 ? (
-                                <Link
-                                    href="/dashboard/meal-o-matic/shopping"
-                                    onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                                    className="text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-1"
+                                <button
+                                    onClick={(e: React.MouseEvent) => { e.stopPropagation(); setActivePanel(activePanel === 'toBuy' ? null : 'toBuy'); }}
+                                    className={cn("text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-1", activePanel === 'toBuy' && "ring-2 ring-offset-1 ring-amber-500")}
                                 >
                                     {uniqueMissing.length}/{recipeIngs.length} To Buy
-                                </Link>
+                                </button>
                             ) : (
                                 <div className="text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 flex items-center justify-center gap-1">
                                     <Sparkles size={9} /> Stocked
@@ -410,6 +410,86 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                     );
                 })()}
             </div>
+
+            {/* Inline ingredient panel */}
+            {activePanel && (
+                <div
+                    onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                    className="border-t border-slate-200 dark:border-slate-800 px-4 py-3 animate-in slide-in-from-top-2 duration-200"
+                >
+                    <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                            {activePanel === 'stocked' ? (
+                                <span className="flex items-center gap-1.5">
+                                    <Check size={10} className="text-emerald-500" />
+                                    In Your Pantry ({uniqueMatched.length})
+                                </span>
+                            ) : (
+                                <span className="flex items-center gap-1.5">
+                                    <ShoppingBasket size={10} className="text-amber-500" />
+                                    Need to Buy ({uniqueMissing.length})
+                                </span>
+                            )}
+                        </h4>
+                        <button
+                            onClick={() => setActivePanel(null)}
+                            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+                        >
+                            <X size={14} />
+                        </button>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                        {(activePanel === 'stocked' ? uniqueMatched : uniqueMissing).map((name, i) => (
+                            <span
+                                key={i}
+                                className={cn(
+                                    "text-[10px] font-bold px-2 py-1 rounded-md capitalize",
+                                    activePanel === 'stocked'
+                                        ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800"
+                                        : "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800"
+                                )}
+                            >
+                                {name}
+                            </span>
+                        ))}
+                        {(activePanel === 'stocked' ? uniqueMatched : uniqueMissing).length === 0 && (
+                            <span className="text-[10px] text-slate-400 italic">
+                                {activePanel === 'stocked' ? 'No ingredients in pantry yet' : 'All ingredients stocked!'}
+                            </span>
+                        )}
+                    </div>
+                    {activePanel === 'toBuy' && uniqueMissing.length > 0 && (
+                        <button
+                            onClick={() => {
+                                const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
+                                let addedCount = 0;
+                                for (const name of uniqueMissing) {
+                                    const exists = currentList.some((item: any) =>
+                                        (item.name || '').toLowerCase().trim() === name.toLowerCase().trim()
+                                    );
+                                    if (!exists) {
+                                        currentList.push({
+                                            id: `plan-${Date.now()}-${addedCount}`,
+                                            name,
+                                            quantity: 'As needed',
+                                            unit: '',
+                                            checked: false,
+                                            source: 'mealplan'
+                                        });
+                                        addedCount++;
+                                    }
+                                }
+                                localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(currentList));
+                                window.dispatchEvent(new CustomEvent('shopping-list-updated'));
+                                toast.success(`${addedCount > 0 ? `${addedCount} item${addedCount !== 1 ? 's' : ''} added` : 'Already on your list'}`);
+                            }}
+                            className="mt-2.5 w-full text-[10px] font-black uppercase tracking-widest py-2 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-1.5"
+                        >
+                            <Plus size={10} /> Add All to Shopping List
+                        </button>
+                    )}
+                </div>
+            )}
         </div>
     );
 };
