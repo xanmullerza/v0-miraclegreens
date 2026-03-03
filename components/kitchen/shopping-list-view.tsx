@@ -351,13 +351,15 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
 
 
     const removeItem = (id: string) => {
-        if (id.startsWith('manual-') || id.startsWith('scanned-')) {
-            setManualItems(prev => prev.filter(item => item.id !== id));
-        } else {
-            // For meal plan items, we can't 'remove' them permanently unless we ignore them.
-            // UI-wise just remove from current view
-            setItems(prev => prev.filter(item => item.id !== id));
-        }
+        // Always remove from both states — plan-* items live only in manualItems
+        setManualItems(prev => prev.filter(item => item.id !== id));
+        setItems(prev => prev.filter(item => item.id !== id));
+        // Also persist the removal immediately so refresh doesn't bring them back
+        try {
+            const saved = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
+            const updated = saved.filter((item: ShoppingListItem) => item.id !== id);
+            localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(updated));
+        } catch { /* ignore */ }
     };
 
     // Tick button: directly add item to pantry using its existing shopping-list quantity
@@ -378,7 +380,8 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                 if (data) foodItemId = data.id;
             }
             if (!foodItemId) {
-                // Fall back to match dialog if still unresolved
+                // No DB match — still remove from shopping list, then open match dialog
+                removeItem(item.id);
                 moveToPantry(item);
                 return;
             }
