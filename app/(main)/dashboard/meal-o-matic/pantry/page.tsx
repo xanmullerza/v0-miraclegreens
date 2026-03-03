@@ -91,6 +91,17 @@ export default function PantryPage() {
         setSelectedPortion(null);
     };
 
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        const checkAdmin = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+            setIsAdmin(!!(user?.email && adminEmail && user.email === adminEmail));
+        };
+        checkAdmin();
+    }, []);
+
     const handleQuickAdd = async () => {
         if (!selectedFood) return;
 
@@ -103,12 +114,35 @@ export default function PantryPage() {
                     : quickAddQty;
 
             if (quickAddMode === 'pantry') {
-                const { error } = await supabase
-                    .from('food_items')
-                    .update({ is_in_pantry: true } as any)
-                    .eq('id', selectedFood.id);
-                
-                if (error) throw error;
+                if (isAdmin) {
+                    // Admin: update global curated flag
+                    const { error } = await supabase
+                        .from('food_items')
+                        .update({ is_in_pantry: true } as any)
+                        .eq('id', selectedFood.id);
+                    if (error) throw error;
+                } else {
+                    // Non-admin: insert into per-user pantry_items
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (user) {
+                        // Check if already in pantry_items
+                        const { data: existing } = await supabase
+                            .from('pantry_items')
+                            .select('id, quantity')
+                            .eq('user_id', user.id)
+                            .eq('food_item_id', selectedFood.id)
+                            .maybeSingle();
+                        
+                        if (!existing) {
+                            await supabase.from('pantry_items').insert({
+                                user_id: user.id,
+                                name: selectedFood.common_name || selectedFood.name,
+                                quantity: quantityString,
+                                food_item_id: selectedFood.id
+                            });
+                        }
+                    }
+                }
 
                 // Merge with existing stock instead of overwriting
                 const saved = localStorage.getItem('pantry_quantities');

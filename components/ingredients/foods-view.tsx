@@ -217,13 +217,40 @@ export function FoodsView({
     const togglePantry = async (item: FoodItem, e?: React.MouseEvent) => {
         e?.stopPropagation();
         try {
+            const { data: { user } } = await supabase.auth.getUser();
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+            const admin = !!(user?.email && adminEmail && user.email === adminEmail);
             const newStatus = !item.is_in_pantry;
-            const { error } = await supabase
-                .from('food_items')
-                .update({ is_in_pantry: newStatus } as any)
-                .eq('id', item.id);
 
-            if (error) throw error;
+            if (admin) {
+                const { error } = await supabase
+                    .from('food_items')
+                    .update({ is_in_pantry: newStatus } as any)
+                    .eq('id', item.id);
+                if (error) throw error;
+            } else if (user) {
+                if (newStatus) {
+                    // Add to per-user pantry_items
+                    const { data: existing } = await supabase
+                        .from('pantry_items')
+                        .select('id')
+                        .eq('user_id', user.id)
+                        .eq('food_item_id', item.id)
+                        .maybeSingle();
+                    if (!existing) {
+                        await supabase.from('pantry_items').insert({
+                            user_id: user.id,
+                            name: item.common_name || item.name,
+                            quantity: '1',
+                            food_item_id: item.id
+                        });
+                    }
+                } else {
+                    // Remove from per-user pantry_items
+                    await supabase.from('pantry_items').delete().eq('user_id', user.id).eq('food_item_id', item.id);
+                }
+            }
+
             setFoods(prev => prev.map(f => f.id === item.id ? { ...f, is_in_pantry: newStatus } : f));
             toast.success(newStatus ? 'Added to My Pantry' : 'Removed from My Pantry');
         } catch (error: any) {

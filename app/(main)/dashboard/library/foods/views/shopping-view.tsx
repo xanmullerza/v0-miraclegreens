@@ -123,11 +123,15 @@ export function ShoppingView() {
         setLoading(true);
         try {
             const { data: { user } } = await supabase.auth.getUser();
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+            const admin = !!(user?.email && adminEmail && user.email === adminEmail);
 
             const [foodItemsRes, pantryItemsRes] = await Promise.all([
-                supabase.from('food_items')
-                    .select('*')
-                    .eq('is_in_pantry', true),
+                admin
+                    ? supabase.from('food_items')
+                        .select('*')
+                        .eq('is_in_pantry', true)
+                    : Promise.resolve({ data: [], error: null }),
                 user ? supabase.from('pantry_items')
                     .select('*, scanned_products(name), food_items(*)')
                     .eq('user_id', user.id)

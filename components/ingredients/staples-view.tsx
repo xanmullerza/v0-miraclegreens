@@ -78,14 +78,31 @@ export function StaplesView() {
     const fetchPantry = async () => {
         setLoading(true);
         try {
-            const { data, error } = await supabase
-                .from('food_items')
-                .select('*')
-                .eq('is_in_pantry', true)
-                .order('common_name', { ascending: true });
+            const { data: { user } } = await supabase.auth.getUser();
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+            const admin = !!(user?.email && adminEmail && user.email === adminEmail);
 
-            if (error) throw error;
-            const fetchedItems = data || [];
+            let fetchedItems: any[] = [];
+
+            if (admin) {
+                const { data, error } = await supabase
+                    .from('food_items')
+                    .select('*')
+                    .eq('is_in_pantry', true)
+                    .order('common_name', { ascending: true });
+                if (error) throw error;
+                fetchedItems = data || [];
+            } else if (user) {
+                const { data, error } = await supabase
+                    .from('pantry_items')
+                    .select('*, food_items(*)')
+                    .eq('user_id', user.id);
+                if (error) throw error;
+                fetchedItems = (data || []).map((item: any) => {
+                    const fi = item.food_items;
+                    return fi ? { ...fi, source_table: 'pantry_items', pantry_item_id: item.id } : null;
+                }).filter(Boolean);
+            }
 
             // Merge in locally-stored quantities (persists without login)
             try {
@@ -117,12 +134,19 @@ export function StaplesView() {
 
     const removeFromPantry = async (id: string, name: string) => {
         try {
-            const { error } = await supabase
-                .from('food_items')
-                .update({ is_in_pantry: false } as any)
-                .eq('id', id);
+            const { data: { user } } = await supabase.auth.getUser();
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+            const admin = !!(user?.email && adminEmail && user.email === adminEmail);
 
-            if (error) throw error;
+            if (admin) {
+                const { error } = await supabase
+                    .from('food_items')
+                    .update({ is_in_pantry: false } as any)
+                    .eq('id', id);
+                if (error) throw error;
+            } else if (user) {
+                await supabase.from('pantry_items').delete().eq('user_id', user.id).eq('food_item_id', id);
+            }
 
             setFoods(prev => prev.filter(f => f.id !== id));
             toast.success(`${name} removed from staples`);

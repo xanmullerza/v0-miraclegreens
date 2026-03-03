@@ -678,16 +678,25 @@ export function MealPlannerContent({
                         source: 'auto-replenish'
                     });
                     
-                    // Remove from pantry
-                    const foodItemUpdate = await supabase
-                        .from('food_items')
-                        .update({ is_in_pantry: false } as any)
-                        .eq('id', item.id);
+                    // Remove from pantry (only admin modifies global flag)
+                    const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+                    const { data: { user: currentUser } } = await supabase.auth.getUser();
+                    const admin = !!(currentUser?.email && adminEmail && currentUser.email === adminEmail);
                     
-                    if (foodItemUpdate.error) {
-                        console.warn('[markEaten] Failed to remove', item.name, 'from pantry:', foodItemUpdate.error);
-                    } else {
-                        console.log('[markEaten] Auto-removed', item.name, 'from pantry and added to shopping list');
+                    if (admin) {
+                        const foodItemUpdate = await supabase
+                            .from('food_items')
+                            .update({ is_in_pantry: false } as any)
+                            .eq('id', item.id);
+                        
+                        if (foodItemUpdate.error) {
+                            console.warn('[markEaten] Failed to remove', item.name, 'from pantry:', foodItemUpdate.error);
+                        } else {
+                            console.log('[markEaten] Auto-removed', item.name, 'from pantry and added to shopping list');
+                        }
+                    } else if (currentUser) {
+                        // Non-admin: delete from per-user pantry_items
+                        await supabase.from('pantry_items').delete().eq('user_id', currentUser.id).eq('food_item_id', item.id);
                     }
                 }
                 localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(shoppingList));
@@ -717,11 +726,15 @@ export function MealPlannerContent({
         const fetchPantry = async () => {
             try {
                 const { data: { user } } = await supabase.auth.getUser();
+                const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+                const admin = !!(user?.email && adminEmail && user.email === adminEmail);
 
                 const [foodItemsRes, pantryItemsRes] = await Promise.all([
-                    supabase.from('food_items')
-                        .select('*')
-                        .eq('is_in_pantry', true),
+                    admin
+                        ? supabase.from('food_items')
+                            .select('*')
+                            .eq('is_in_pantry', true)
+                        : Promise.resolve({ data: [], error: null }),
                     user ? supabase.from('pantry_items')
                         .select('*, scanned_products(name, nutrition, image_url), food_items(*)')
                         .eq('user_id', user.id)

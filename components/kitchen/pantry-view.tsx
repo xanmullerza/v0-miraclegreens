@@ -103,6 +103,7 @@ export function PantryView({
     const setSelectedCategories = externalSetSelectedCategories !== undefined ? externalSetSelectedCategories : setLocalSelectedCategories;
 
     const [user, setUser] = useState<any>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     // Category grouping for pantry - use actual DB categories
     const getCategoryGroup = (category?: string) => {
@@ -404,7 +405,7 @@ export function PantryView({
             const quantityString = buildQuantityString(buyMoreQty, buyMoreSelectedPortion, buyMoreWeight, buyMoreUnit);
 
             if (quickAddMode === 'pantry') {
-                if (buyMoreItem.source_table === 'food_items') {
+                if (buyMoreItem.source_table === 'food_items' && isAdmin) {
                     await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', buyMoreItem.id);
                 }
                 const saved = localStorage.getItem('pantry_quantities');
@@ -439,7 +440,7 @@ export function PantryView({
                     delete quantities[buyMoreItem.id];
                     localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
                     
-                    if (buyMoreItem.source_table === 'food_items') {
+                    if (buyMoreItem.source_table === 'food_items' && isAdmin) {
                         await supabase
                             .from('food_items')
                             .update({ is_in_pantry: false } as any)
@@ -524,7 +525,7 @@ export function PantryView({
                 delete quantities[removeItem.id];
                 localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
                 
-                if (removeItem.source_table === 'food_items') {
+                if (removeItem.source_table === 'food_items' && isAdmin) {
                     await supabase
                         .from('food_items')
                         .update({ is_in_pantry: false } as any)
@@ -611,11 +612,18 @@ export function PantryView({
             const { data: { user } } = await supabase.auth.getUser();
             setUser(user);
 
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+            const admin = !!(user?.email && adminEmail && user.email === adminEmail);
+            setIsAdmin(admin);
+
             const [foodItemsRes, pantryItemsRes] = await Promise.all([
-                supabase.from('food_items')
-                    .select('*')
-                    .eq('is_in_pantry', true)
-                    .order('common_name', { ascending: true }),
+                // Only admins see the global curated pantry from food_items
+                admin
+                    ? supabase.from('food_items')
+                        .select('*')
+                        .eq('is_in_pantry', true)
+                        .order('common_name', { ascending: true })
+                    : Promise.resolve({ data: [], error: null }),
                 user ? supabase.from('pantry_items')
                     .select('*, scanned_products(nutrition, image_url, default_unit), food_items(*)')
                     .eq('user_id', user.id)
@@ -771,7 +779,7 @@ export function PantryView({
                 if (source === 'pantry_items') {
                     const res = await supabase.from('pantry_items').delete().eq('id', food.id);
                     if (res.error) throw res.error;
-                } else {
+                } else if (isAdmin) {
                     const res = await supabase
                         .from('food_items')
                         .update({ is_in_pantry: false } as any)
@@ -805,7 +813,7 @@ export function PantryView({
             if (source === 'pantry_items') {
                 const res = await supabase.from('pantry_items').delete().eq('id', id);
                 error = res.error;
-            } else {
+            } else if (isAdmin) {
                 const res = await supabase
                     .from('food_items')
                     .update({ is_in_pantry: false } as any)
@@ -840,7 +848,7 @@ export function PantryView({
             const foodItemIds = foods.filter(f => f.source_table === 'food_items').map(f => f.id);
             const pantryItemIds = foods.filter(f => f.source_table === 'pantry_items').map(f => f.id);
 
-            if (foodItemIds.length > 0) {
+            if (foodItemIds.length > 0 && isAdmin) {
                 const { error } = await supabase.from('food_items').update({ is_in_pantry: false } as any).in('id', foodItemIds);
                 if (error) throw error;
             }
@@ -898,7 +906,7 @@ export function PantryView({
                 localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
                 
                 // Also update DB
-                if (item.source_table === 'food_items') {
+                if (item.source_table === 'food_items' && isAdmin) {
                     await supabase
                         .from('food_items')
                         .update({ is_in_pantry: false } as any)

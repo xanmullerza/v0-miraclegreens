@@ -480,9 +480,31 @@ export default function FoodDetailsPage() {
                 setFood(prev => prev ? { ...prev, is_in_pantry: true, quantity: quantities[food.id] } : null);
                 localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
 
-                // Update DB
-                const { error } = await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', food.id);
-                if (error) throw error;
+                // Update DB — only admin modifies global flag; non-admins use pantry_items
+                const { data: { user: currentUser } } = await supabase.auth.getUser();
+                const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+                const userIsAdmin = !!(currentUser?.email && adminEmail && currentUser.email === adminEmail);
+                
+                if (userIsAdmin) {
+                    const { error } = await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', food.id);
+                    if (error) throw error;
+                } else if (currentUser) {
+                    const { data: existing } = await supabase
+                        .from('pantry_items')
+                        .select('id')
+                        .eq('user_id', currentUser.id)
+                        .eq('food_item_id', food.id)
+                        .maybeSingle();
+                    if (!existing) {
+                        const { error } = await supabase.from('pantry_items').insert({
+                            user_id: currentUser.id,
+                            name: food.common_name || food.name,
+                            quantity: quantities[food.id],
+                            food_item_id: food.id
+                        });
+                        if (error) throw error;
+                    }
+                }
 
                 toast.success(`Added to pantry: ${quantityString}`);
             } catch (error) {

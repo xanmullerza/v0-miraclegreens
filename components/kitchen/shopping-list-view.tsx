@@ -402,12 +402,16 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         setLoading(true);
         try {
             const { data: { user } } = await supabase.auth.getUser();
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+            const admin = !!(user?.email && adminEmail && user.email === adminEmail);
 
-            // Fetch curated pantry items (food_items where is_in_pantry = true)
-            const { data: curatedData } = await supabase
-                .from('food_items')
-                .select('*')
-                .eq('is_in_pantry', true);
+            // Fetch curated pantry items only for admins (global flag)
+            const { data: curatedData } = admin
+                ? await supabase
+                    .from('food_items')
+                    .select('*')
+                    .eq('is_in_pantry', true)
+                : { data: [] };
 
             // Fetch personal pantry items if user is logged in
             const { data: personalData } = user ? await supabase
@@ -786,7 +790,32 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
             }
 
             localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-            await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', foodItemId);
+            
+            // Only admins modify the global is_in_pantry flag; non-admins use pantry_items
+            const { data: { user: currentUser } } = await supabase.auth.getUser();
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+            const userIsAdmin = !!(currentUser?.email && adminEmail && currentUser.email === adminEmail);
+            
+            if (userIsAdmin) {
+                await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', foodItemId);
+            } else if (currentUser) {
+                // Insert into pantry_items for per-user storage
+                const { data: existing } = await supabase
+                    .from('pantry_items')
+                    .select('id')
+                    .eq('user_id', currentUser.id)
+                    .eq('food_item_id', foodItemId)
+                    .maybeSingle();
+                if (!existing) {
+                    await supabase.from('pantry_items').insert({
+                        user_id: currentUser.id,
+                        name: pantryAddItem.name,
+                        quantity: quantities[foodItemId],
+                        food_item_id: foodItemId
+                    });
+                }
+            }
+            
             removeItem(pantryAddItem.id);
             toast.success(`"${pantryAddItem.name}" added to pantry: ${quantityString}`);
             setPantryAddItem(null);
