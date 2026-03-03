@@ -114,6 +114,7 @@ export default function FoodDetailsPage() {
     const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
     const [activeSection, setActiveSection] = useState<'facts' | 'nutrition' | 'recipes' | 'management' | null>('recipes');
+    const [showAdvancedNutrition, setShowAdvancedNutrition] = useState(false);
     const [quickAddQty, setQuickAddQty] = useState('1');
     const [quickAddWeight, setQuickAddWeight] = useState('');
     const [quickAddUnit, setQuickAddUnit] = useState('g');
@@ -1274,7 +1275,6 @@ export default function FoodDetailsPage() {
                         'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
                         'B5 (Pantothenic Acid)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
                         'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
-                        'B7 (Biotin)': ['Biotin', 'biotin_ug'],
                         'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
                         'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
                         'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
@@ -1288,33 +1288,42 @@ export default function FoodDetailsPage() {
                         'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
                     }} />
 
-                    <div className="pt-12 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6">
-                        <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
-                            <Dna size={18} />
+                    {/* Advanced Nutrition Toggle Button */}
+                    <button
+                        onClick={() => setShowAdvancedNutrition(v => !v)}
+                        className="w-full flex items-center justify-between px-4 py-3 rounded-2xl border border-amber-200 dark:border-amber-800/50 bg-amber-50/50 dark:bg-amber-900/10 hover:bg-amber-100/60 dark:hover:bg-amber-900/20 transition-all group"
+                    >
+                        <span className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-amber-600 dark:text-amber-400">
+                            <Dna size={14} />
                             Advanced Nutrition
-                        </h3>
-                    </div>
+                        </span>
+                        <ChevronDown className={`w-4 h-4 text-amber-500 transition-transform duration-200 ${showAdvancedNutrition ? 'rotate-180' : ''}`} />
+                    </button>
 
-                    <NutrientGrid title="Extra Markers" icon={Activity} theme="amber" subtitle="Extra health markers worth tracking" forceRaw={true} items={{
-                        'Fiber': ['Fiber', 'fiber_g'],
-                        'Sugars': ['Sugars', 'sugars_g'],
-                        'Oxalate': ['Oxalate', 'oxalate_mg'],
-                        'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
-                    }} />
+                    {showAdvancedNutrition && (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                            <NutrientGrid title="Extra Markers" icon={Activity} theme="amber" subtitle="Extra health markers worth tracking" forceRaw={true} items={{
+                                'Fiber': ['Fiber', 'fiber_g'],
+                                'Sugars': ['Sugars', 'sugars_g'],
+                                'Oxalate': ['Oxalate', 'oxalate_mg'],
+                                'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
+                            }} />
 
-                    <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Key nutrient balances for a healthy body" items={{
-                        'Sodium & Potassium': ['Sodium', 'Potassium'],
-                        'Zinc & Copper': ['Zinc', 'Copper'],
-                        'Omega 3 to 6 ratio': ['Omega-6', 'Omega-3'],
-                        'Calcium & Magnesium': ['Calcium', 'Magnesium'],
-                        'Calcium & Phosphorus': ['Calcium', 'Phosphorus'],
-                    }} />
+                            <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Key nutrient balances for a healthy body" items={{
+                                'Sodium & Potassium': ['Sodium', 'Potassium'],
+                                'Zinc & Copper': ['Zinc', 'Copper'],
+                                'Omega 3 to 6 ratio': ['Omega-6', 'Omega-3'],
+                                'Calcium & Magnesium': ['Calcium', 'Magnesium'],
+                                'Calcium & Phosphorus': ['Calcium', 'Phosphorus'],
+                            }} />
 
-                    <DidYouKnow
-                        phytonutrients={food.phytonutrients}
-                        foodName={food.common_name || food.name}
-                        className="py-4"
-                    />
+                            <DidYouKnow
+                                phytonutrients={food.phytonutrients}
+                                foodName={food.common_name || food.name}
+                                className="py-4"
+                            />
+                        </div>
+                    )}
 
                 </div>
                 )}
