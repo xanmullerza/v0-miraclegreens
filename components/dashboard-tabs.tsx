@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -8,14 +8,17 @@ import {
     Leaf, Package, ShoppingBag,
     Calendar, Beaker, Plus,
     Scale, Activity, Wallet,
+    Lock,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/lib/supabase';
 
 interface SubTab {
     id: string;
     label: string;
     href: string;
     icon: React.ComponentType<{ size?: number; className?: string }>;
+    adminOnly?: boolean;
 }
 
 interface TopTab {
@@ -28,6 +31,7 @@ interface TopTab {
     defaultHref: string;
     subtabs: SubTab[];
     matchPaths: string[];
+    adminOnly?: boolean;
 }
 
 const TAB_CONFIG: TopTab[] = [
@@ -59,7 +63,7 @@ const TAB_CONFIG: TopTab[] = [
             { id: 'shopping', label: 'Shopping', href: '/dashboard/meal-o-matic/shopping', icon: ShoppingBag },
             { id: 'pantry', label: 'Pantry', href: '/dashboard/meal-o-matic/pantry', icon: Package },
             { id: 'planner', label: 'Planner', href: '/dashboard/meal-o-matic/planner', icon: Calendar },
-            { id: 'maker', label: 'Maker', href: '/dashboard/meal-o-matic/maker', icon: Plus },
+            { id: 'maker', label: 'Maker', href: '/dashboard/meal-o-matic/maker', icon: Plus, adminOnly: true },
         ],
     },
     {
@@ -71,6 +75,7 @@ const TAB_CONFIG: TopTab[] = [
         activeBg: 'bg-purple-500/10 border-purple-500/30',
         defaultHref: '/dashboard/widgets/comparator',
         matchPaths: ['/dashboard/widgets'],
+        adminOnly: true,
         subtabs: [
             { id: 'comparator', label: 'Comparator', href: '/dashboard/widgets/comparator', icon: Scale },
             { id: 'nutridex', label: 'Nutridex', href: '/dashboard/widgets/nutridex', icon: Activity },
@@ -81,6 +86,19 @@ const TAB_CONFIG: TopTab[] = [
 
 export function DashboardTabs() {
     const pathname = usePathname();
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        const checkAdmin = async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || '';
+                const userEmail = (user?.email || '').toLowerCase();
+                setIsAdmin(userEmail === adminEmail.toLowerCase() && adminEmail !== '');
+            } catch { /* not logged in */ }
+        };
+        checkAdmin();
+    }, []);
 
     // Determine active top tab from pathname using matchPaths
     const activeTopTab = TAB_CONFIG.find((tab) =>
@@ -96,7 +114,10 @@ export function DashboardTabs() {
                 {TAB_CONFIG.map((tab, idx) => {
                     const Icon = tab.icon;
                     const isActive = currentTab.id === tab.id;
+                    const isDisabled = tab.adminOnly && !isAdmin;
                     
+                    if (isDisabled) return null;
+
                     return (
                         <div key={tab.id} className="flex items-center gap-0 flex-shrink-0">
                             {/* Main Tab - Labels with desktop icons */}
@@ -137,6 +158,10 @@ export function DashboardTabs() {
             <div className="flex items-center justify-center gap-1 mt-2 overflow-x-auto scrollbar-hide">
                 {currentTab.subtabs.map((sub) => {
                     const isSubActive = pathname === sub.href || pathname.startsWith(sub.href + '/');
+                    const isSubDisabled = sub.adminOnly && !isAdmin;
+
+                    if (isSubDisabled) return null;
+
                     return (
                         <Link
                             key={sub.id}
