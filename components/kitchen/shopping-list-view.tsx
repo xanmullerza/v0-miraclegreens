@@ -218,7 +218,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                     }
                 }
 
-                // Phase 2: Enrich by name (single batch query using OR conditions)
+                // Phase 2: Enrich by name (prefer exact matches over fuzzy)
                 const nameToData = new Map<string, any>();
                 if (needEnrichByName.length > 0 && !isCancelled) {
                     const uniqueNames = [...new Set(needEnrichByName.map(i => i.name.toLowerCase()))];
@@ -230,17 +230,34 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                         .from('food_items')
                         .select('id, name, common_name, category, image')
                         .or(orConditions)
-                        .limit(uniqueNames.length * 2);
+                        .limit(uniqueNames.length * 5);
                     if (data) {
-                        // Match each result back to the original names
-                        for (const d of data) {
-                            const matchedName = uniqueNames.find(n =>
-                                (d.name || '').toLowerCase().includes(n) ||
-                                (d.common_name || '').toLowerCase().includes(n)
-                            );
-                            if (matchedName && !nameToData.has(matchedName)) {
-                                nameToData.set(matchedName, d);
-                                enrichmentCache.set(matchedName, d);
+                        // Score each result against each search name — exact > starts-with > contains
+                        for (const searchName of uniqueNames) {
+                            if (nameToData.has(searchName)) continue;
+                            let bestMatch: any = null;
+                            let bestScore = 0;
+                            for (const d of data) {
+                                const dbName = (d.name || '').toLowerCase();
+                                const dbCommon = (d.common_name || '').toLowerCase();
+                                let score = 0;
+                                // Exact match on name or common_name (highest priority)
+                                if (dbName === searchName || dbCommon === searchName) score = 4;
+                                // Starts with the search term
+                                else if (dbName.startsWith(searchName) || dbCommon.startsWith(searchName)) score = 3;
+                                // Search term starts with db name (e.g. "salt (iodized)" starts with "salt")
+                                else if (searchName.startsWith(dbName) || searchName.startsWith(dbCommon)) score = 2;
+                                // Contains (lowest priority — this is the old fuzzy match)
+                                else if (dbName.includes(searchName) || dbCommon.includes(searchName)) score = 1;
+
+                                if (score > bestScore) {
+                                    bestScore = score;
+                                    bestMatch = d;
+                                }
+                            }
+                            if (bestMatch) {
+                                nameToData.set(searchName, bestMatch);
+                                enrichmentCache.set(searchName, bestMatch);
                             }
                         }
                     }

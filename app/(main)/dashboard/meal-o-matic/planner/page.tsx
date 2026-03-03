@@ -196,7 +196,7 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
         let cancelled = false;
         supabase
             .from('ingredients')
-            .select('item, base_ingredient, food_item_id, weight_g, amount, measure_label, is_miracle_product')
+            .select('item, base_ingredient, food_item_id, weight_g, amount, measure_label, is_miracle_product, food_items(name, common_name)')
             .eq('recipe_id', recipe.id)
             .then(({ data }) => {
                 if (cancelled || !data || data.length === 0) return;
@@ -208,6 +208,8 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                     food_item_id: i.food_item_id,
                     weightG: i.weight_g,
                     measureLabel: i.measure_label,
+                    // Use the food_items table name instead of the stale ingredient name
+                    foodName: i.food_items?.common_name || i.food_items?.name || null,
                 })));
             });
         return () => { cancelled = true; };
@@ -233,33 +235,47 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
     const recipeIngs = liveIngs;
 
     let matchCount = 0;
-    const matchedIngredients: string[] = [];
-    const missingIngredients: string[] = [];
+    const matchedIngredients: { name: string; food_item_id?: string }[] = [];
+    const missingIngredients: { name: string; food_item_id?: string }[] = [];
 
     recipeIngs.forEach(ing => {
+        const displayName = ing.foodName || ing.baseIngredient || ing.item;
         const isMatch = (ing.food_item_id && pantryIds.has(ing.food_item_id)) ||
             (ing.baseIngredient && pantryNames.has(ing.baseIngredient.toLowerCase().trim())) ||
             (ing.item && pantryNames.has(ing.item.toLowerCase().trim()));
 
         if (isMatch) {
             matchCount++;
-            matchedIngredients.push(ing.baseIngredient || ing.item);
+            matchedIngredients.push({ name: displayName, food_item_id: ing.food_item_id });
         } else {
-            missingIngredients.push(ing.baseIngredient || ing.item);
+            missingIngredients.push({ name: displayName, food_item_id: ing.food_item_id });
         }
     });
 
     const matchScore = recipeIngs.length > 0 ? matchCount / recipeIngs.length : 0;
-    const uniqueMatched = Array.from(new Set(matchedIngredients));
-    const uniqueMissing = Array.from(new Set(missingIngredients));
+    // Deduplicate by food_item_id when available, otherwise by name
+    const dedup = (arr: { name: string; food_item_id?: string }[]) => {
+        const seen = new Set<string>();
+        return arr.filter(item => {
+            const key = item.food_item_id || item.name.toLowerCase().trim();
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+    };
+    const uniqueMatched = dedup(matchedIngredients);
+    const uniqueMissing = dedup(missingIngredients);
     const [activePanel, setActivePanel] = useState<'stocked' | 'toBuy' | null>(null);
     // Initialise from localStorage so the disabled state survives a page refresh
     const [addedToList, setAddedToList] = useState(() => {
         if (typeof window === 'undefined') return false;
         try {
             const list = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-            return uniqueMissing.length > 0 && uniqueMissing.every((name: string) =>
-                list.some((item: any) => (item.name || '').toLowerCase().trim() === name.toLowerCase().trim())
+            return uniqueMissing.length > 0 && uniqueMissing.every(m =>
+                list.some((item: any) =>
+                    (item.food_item_id && m.food_item_id && item.food_item_id === m.food_item_id) ||
+                    (item.name || '').toLowerCase().trim() === m.name.toLowerCase().trim()
+                )
             );
         } catch { return false; }
     });
@@ -272,8 +288,11 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
         if (typeof window === 'undefined' || addedToList) return;
         try {
             const list = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
-            if (uniqueMissing.length > 0 && uniqueMissing.every((name: string) =>
-                list.some((item: any) => (item.name || '').toLowerCase().trim() === name.toLowerCase().trim())
+            if (uniqueMissing.length > 0 && uniqueMissing.every(m =>
+                list.some((item: any) =>
+                    (item.food_item_id && m.food_item_id && item.food_item_id === m.food_item_id) ||
+                    (item.name || '').toLowerCase().trim() === m.name.toLowerCase().trim()
+                )
             )) setAddedToList(true);
         } catch { /* ignore */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -505,9 +524,9 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                         </button>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
-                        {(activePanel === 'stocked' ? uniqueMatched : uniqueMissing).map((name, i) => (
+                        {(activePanel === 'stocked' ? uniqueMatched : uniqueMissing).map((entry, i) => (
                             <span
-                                key={i}
+                                key={entry.food_item_id || i}
                                 className={cn(
                                     "text-[10px] font-bold px-2 py-1 rounded-md capitalize",
                                     activePanel === 'stocked'
@@ -515,7 +534,7 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                                         : "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800"
                                 )}
                             >
-                                {name}
+                                {entry.name}
                             </span>
                         ))}
                         {(activePanel === 'stocked' ? uniqueMatched : uniqueMissing).length === 0 && (
@@ -529,14 +548,16 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                             onClick={() => {
                                 const currentList = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
                                 let addedCount = 0;
-                                for (const name of uniqueMissing) {
+                                for (const entry of uniqueMissing) {
                                     const exists = currentList.some((item: any) =>
-                                        (item.name || '').toLowerCase().trim() === name.toLowerCase().trim()
+                                        (item.food_item_id && entry.food_item_id && item.food_item_id === entry.food_item_id) ||
+                                        (item.name || '').toLowerCase().trim() === entry.name.toLowerCase().trim()
                                     );
                                     if (!exists) {
                                         currentList.push({
                                             id: `plan-${Date.now()}-${addedCount}`,
-                                            name,
+                                            name: entry.name,
+                                            food_item_id: entry.food_item_id || null,
                                             quantity: 'As needed',
                                             unit: '',
                                             checked: false,
