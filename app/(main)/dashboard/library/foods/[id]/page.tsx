@@ -907,7 +907,7 @@ export default function FoodDetailsPage() {
                         {/* 2x2 Action Grid */}
                         <div className="grid grid-cols-2 gap-1.5">
                             {[
-                                { key: 'facts' as const, label: 'Fast Facts', icon: Lightbulb, color: 'text-purple-500', activeBg: 'bg-purple-500/10 border-purple-500/30', hidden: !(food.details || FOOD_DETAILS[food.id]) },
+                                { key: 'facts' as const, label: 'About', icon: Lightbulb, color: 'text-purple-500', activeBg: 'bg-purple-500/10 border-purple-500/30', hidden: !(food.details || FOOD_DETAILS[food.id]) },
                                 { key: 'nutrition' as const, label: 'Nutrition', icon: Activity, color: 'text-emerald-500', activeBg: 'bg-emerald-500/10 border-emerald-500/30' },
                                 { key: 'recipes' as const, label: 'Recipes', icon: UtensilsCrossed, color: 'text-amber-500', activeBg: 'bg-amber-500/10 border-amber-500/30' },
                                 { key: 'management' as const, label: 'Management', icon: ShoppingBasket, color: 'text-blue-500', activeBg: 'bg-blue-500/10 border-blue-500/30' },
