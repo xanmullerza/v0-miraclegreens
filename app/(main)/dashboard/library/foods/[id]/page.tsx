@@ -873,7 +873,7 @@ export default function FoodDetailsPage() {
                 {/* NEW Main Header Section */}
                 <div className="space-y-3 animate-in slide-in-from-top-4 duration-700 pt-4">
                     {/* Full-width title */}
-                    <h1 className="text-xl font-black tracking-tighter uppercase italic leading-tight mb-3">
+                    <h1 className="text-xl font-black tracking-tighter uppercase italic leading-tight mb-3 text-center">
                         <span className="text-emerald-500">{formatFoodName(food.common_name || food.name)}</span>
                     </h1>
 
@@ -1136,7 +1136,7 @@ export default function FoodDetailsPage() {
                         <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800">
                             <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
                                 <UtensilsCrossed size={18} />
-                                Recipes with {formatFoodName(food.common_name || food.name)}
+                                Recipes
                             </h3>
                         </div>
                         {recipesLoading ? (
