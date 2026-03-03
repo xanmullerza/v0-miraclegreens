@@ -903,10 +903,7 @@ export default function FoodDetailsPage() {
 
                         {/* In Stock + 2x2 Grid */}
                         <div className="flex-1 flex flex-col gap-2">
-                            {food.quantity && (
-                                <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500">In Stock: {food.quantity}</span>
-                            )}
-                            {/* 2x2 Action Grid */}
+                        {/* 2x2 Action Grid */}
                             <div className="grid grid-cols-2 gap-1.5">
                                 {[
                                     { key: 'facts' as const, label: 'About', icon: Lightbulb, color: 'text-purple-500', activeBg: 'bg-purple-500/10 border-purple-500/30', hidden: !(food.details || FOOD_DETAILS[food.id]) },
