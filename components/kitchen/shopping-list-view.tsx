@@ -1212,8 +1212,8 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
 
                                                     {/* Inline pantry-add panel */}
                                                     {pantryAddItem?.id === item.id && (
-                                                        <div className="mt-1 mb-0.5 px-4 py-3 rounded-xl border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-950/20 animate-in slide-in-from-top-2 duration-200">
-                                                            <p className="text-[9px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-3">Add Stock</p>
+                                                        <div className="mt-1 mb-0.5 px-4 py-3 rounded-xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/20 animate-in slide-in-from-top-2 duration-200">
+                                                            <p className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400 mb-3">Add to List</p>
                                                             <div className="space-y-3">
                                                                 <div>
                                                                     <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Qty</Label>
@@ -1279,9 +1279,9 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                 )}
 
                                                                 <Button
-                                                                    onClick={(e) => { e.stopPropagation(); confirmPantryAdd(); }}
-                                                                    disabled={pantryAddLoading || !pantryAddSelectedPortion}
-                                                                    className="w-full h-10 gap-2 bg-amber-500 hover:bg-amber-600 text-white font-black uppercase tracking-widest text-xs"
+                                                                    onClick={(e) => { e.stopPropagation(); confirmAddToGroceries(); }}
+                                                                    disabled={pantryAddLoading}
+                                                                    className="w-full h-10 gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest text-xs"
                                                                 >
                                                                     <Plus size={16} />
                                                                     {pantryAddLoading ? 'Adding...' : 'Add'}
