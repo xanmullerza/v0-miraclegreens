@@ -1018,7 +1018,7 @@ export default function FoodDetailsPage() {
                         )}
                     </div>
                     );
-                })()
+                })()}
 
                 {/* Know Your Food Section */}
                 {
