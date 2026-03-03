@@ -183,10 +183,10 @@ export default function FoodDetailsPage() {
             setRecipesLoading(true);
             try {
                 const { data: ingRows } = await supabase
-                    .from('recipe_ingredients')
+                    .from('ingredients')
                     .select('recipe_id')
                     .eq('food_item_id', food.id);
-                const recipeIds = [...new Set((ingRows || []).map((r: any) => r.recipe_id))];
+                const recipeIds = [...new Set((ingRows || []).map((r: any) => r.recipe_id))].filter(Boolean);
                 if (recipeIds.length === 0) { setFoodRecipes([]); return; }
                 const { data: recipes } = await supabase
                     .from('recipes')
