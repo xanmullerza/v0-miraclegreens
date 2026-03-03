@@ -252,7 +252,27 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
     const uniqueMatched = Array.from(new Set(matchedIngredients));
     const uniqueMissing = Array.from(new Set(missingIngredients));
     const [activePanel, setActivePanel] = useState<'stocked' | 'toBuy' | null>(null);
-    const [addedToList, setAddedToList] = useState(false);
+    // Initialise from localStorage so the disabled state survives a page refresh
+    const [addedToList, setAddedToList] = useState(() => {
+        if (typeof window === 'undefined') return false;
+        try {
+            const list = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
+            return uniqueMissing.length > 0 && uniqueMissing.every((name: string) =>
+                list.some((item: any) => (item.name || '').toLowerCase().trim() === name.toLowerCase().trim())
+            );
+        } catch { return false; }
+    });
+    // Re-check when live DB ingredients load in (uniqueMissing may change after fetch)
+    useEffect(() => {
+        if (typeof window === 'undefined' || addedToList) return;
+        try {
+            const list = JSON.parse(localStorage.getItem('vitala_shopping_manual_items') || '[]');
+            if (uniqueMissing.length > 0 && uniqueMissing.every((name: string) =>
+                list.some((item: any) => (item.name || '').toLowerCase().trim() === name.toLowerCase().trim())
+            )) setAddedToList(true);
+        } catch { /* ignore */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [liveIngs]);
     return (
         <div
             onClick={() => router.push(`/dashboard/library/meals/${recipe.id}`)}
