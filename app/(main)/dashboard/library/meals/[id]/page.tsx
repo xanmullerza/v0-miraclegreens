@@ -147,7 +147,7 @@ export default function RecipeDetailsPage() {
     const [instructions, setInstructions] = useState<Instruction[]>([]);
     const [loading, setLoading] = useState(true);
     const [showDetailedNutrients, setShowDetailedNutrients] = useState(true);
-    const [activeSection, setActiveSection] = useState<'ingredients' | 'nutrition' | 'related' | 'management' | null>('ingredients');
+    const [activeSection, setActiveSection] = useState<'recipe' | 'nutrition' | 'related' | 'management' | null>('recipe');
     const [showAdvancedNutrition, setShowAdvancedNutrition] = useState(false);
     const { searchQuery, setSearchQuery } = useSearch();
     const { setCustomSegmentLabel } = useHeaderActions();
@@ -1373,7 +1373,7 @@ export default function RecipeDetailsPage() {
                             <div className="flex-1 flex flex-col gap-2">
                                 <div className="grid grid-cols-2 gap-1.5">
                                     {[
-                                        { key: 'ingredients' as const, label: 'Ingredients', icon: Layers, color: 'text-emerald-500', activeBg: 'bg-emerald-500/10 border-emerald-500/30' },
+                                        { key: 'recipe' as const, label: 'Recipe', icon: Layers, color: 'text-emerald-500', activeBg: 'bg-emerald-500/10 border-emerald-500/30' },
                                         { key: 'nutrition' as const, label: 'Nutrition', icon: Activity, color: 'text-emerald-500', activeBg: 'bg-emerald-500/10 border-emerald-500/30' },
                                         { key: 'related' as const, label: 'Related', icon: UtensilsCrossed, color: 'text-amber-500', activeBg: 'bg-amber-500/10 border-amber-500/30' },
                                         { key: 'management' as const, label: 'Management', icon: ShoppingBasket, color: 'text-blue-500', activeBg: 'bg-blue-500/10 border-blue-500/30' },
@@ -1396,94 +1396,95 @@ export default function RecipeDetailsPage() {
                             </div>
                         </div>
 
-                        {/* Compact Stat Widgets Row */}
-                        <div className="flex items-center gap-3 flex-wrap">
-                            {recipe.source && (
-                                <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Source: {recipe.source}</span>
-                            )}
-
-                            {/* Prep Time */}
-                            <div className="flex items-center bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700/50 shadow-sm transition-all hover:border-emerald-500/30">
-                                <span className="text-sm font-black italic text-slate-900 dark:text-white pr-2 border-r border-slate-200 dark:border-slate-700 flex items-center gap-1.5">
-                                    <Clock size={14} className="text-emerald-500/50" />
-                                    {recipe.prep_time}
-                                </span>
-                                <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 pl-2">
-                                    Minutes
-                                </span>
-                            </div>
-
-                            {/* Servings */}
-                            <div className="flex items-center bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700/50 shadow-sm transition-all hover:border-emerald-500/30">
-                                <span className="text-sm font-black italic text-slate-900 dark:text-white border-r border-slate-200 dark:border-slate-700 pr-2">
-                                    {Number(calculations.totalServings.toFixed(2))}
-                                </span>
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger className="flex items-center gap-1 pl-1 text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
-                                        Servings
-                                        <ChevronDown className="w-3 h-3 text-slate-400" />
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent
-                                        align="start"
-                                        className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl p-2 min-w-[160px] shadow-2xl animate-in zoom-in-95 duration-200 z-[2000]"
-                                    >
-                                        <DropdownMenuItem
-                                            className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
-                                            onClick={() => setSelectedMemberIds(allPeople.map(p => p.id))}
-                                        >
-                                            Full Family ({allPeople.length})
-                                        </DropdownMenuItem>
-                                        {allPeople.map(person => (
-                                            <DropdownMenuItem
-                                                key={person.id}
-                                                className={cn(
-                                                    "text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all",
-                                                    selectedMemberIds.includes(person.id) ? "text-emerald-500" : "text-slate-500 dark:text-slate-400"
-                                                )}
-                                                onClick={() => {
-                                                    if (selectedMemberIds.includes(person.id)) {
-                                                        setSelectedMemberIds(prev => prev.filter(pid => pid !== person.id));
-                                                    } else {
-                                                        setSelectedMemberIds(prev => [...prev, person.id]);
-                                                    }
-                                                }}
-                                            >
-                                                {selectedMemberIds.includes(person.id) ? '✓ ' : ''}{person.name || (person as any).nickname || 'User'}
-                                            </DropdownMenuItem>
-                                        ))}
-                                        <DropdownMenuItem
-                                            className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-rose-500 focus:text-white transition-all text-slate-400"
-                                            onClick={() => setSelectedMemberIds([])}
-                                        >
-                                            Clear All
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
-
-                            {/* Weight */}
-                            <div className="flex items-center bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700/50 shadow-sm">
-                                <span className="text-sm font-black italic text-emerald-500 pr-2 border-r border-slate-200 dark:border-slate-700">
-                                    {totalWeight.toFixed(0)}
-                                </span>
-                                <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 pl-2">
-                                    Total Grams
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* Scaling Factor Indicator */}
-                        {currentScalingFactor !== 1 && (
-                            <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-500/5 w-fit px-3 py-1 rounded-full border border-emerald-500/20">
-                                <Scale size={12} />
-                                Scaled to {(currentScalingFactor * 100).toFixed(0)}% · Based on {calculations.maxTDEE.toFixed(0)} {energyUnit}
-                            </div>
-                        )}
                     </div>
 
-                    {/* ═══ INGREDIENTS SECTION ═══ */}
-                    {activeSection === 'ingredients' && (
+                    {/* ═══ RECIPE SECTION ═══ */}
+                    {activeSection === 'recipe' && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                            {/* Stat Widgets */}
+                            <div className="flex items-center gap-3 flex-wrap">
+                                {recipe.source && (
+                                    <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Source: {recipe.source}</span>
+                                )}
+
+                                {/* Prep Time */}
+                                <div className="flex items-center bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700/50 shadow-sm transition-all hover:border-emerald-500/30">
+                                    <span className="text-sm font-black italic text-slate-900 dark:text-white pr-2 border-r border-slate-200 dark:border-slate-700 flex items-center gap-1.5">
+                                        <Clock size={14} className="text-emerald-500/50" />
+                                        {recipe.prep_time}
+                                    </span>
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 pl-2">
+                                        Minutes
+                                    </span>
+                                </div>
+
+                                {/* Servings */}
+                                <div className="flex items-center bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700/50 shadow-sm transition-all hover:border-emerald-500/30">
+                                    <span className="text-sm font-black italic text-slate-900 dark:text-white border-r border-slate-200 dark:border-slate-700 pr-2">
+                                        {Number(calculations.totalServings.toFixed(2))}
+                                    </span>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger className="flex items-center gap-1 pl-1 text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
+                                            Servings
+                                            <ChevronDown className="w-3 h-3 text-slate-400" />
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent
+                                            align="start"
+                                            className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl p-2 min-w-[160px] shadow-2xl animate-in zoom-in-95 duration-200 z-[2000]"
+                                        >
+                                            <DropdownMenuItem
+                                                className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
+                                                onClick={() => setSelectedMemberIds(allPeople.map(p => p.id))}
+                                            >
+                                                Full Family ({allPeople.length})
+                                            </DropdownMenuItem>
+                                            {allPeople.map(person => (
+                                                <DropdownMenuItem
+                                                    key={person.id}
+                                                    className={cn(
+                                                        "text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all",
+                                                        selectedMemberIds.includes(person.id) ? "text-emerald-500" : "text-slate-500 dark:text-slate-400"
+                                                    )}
+                                                    onClick={() => {
+                                                        if (selectedMemberIds.includes(person.id)) {
+                                                            setSelectedMemberIds(prev => prev.filter(pid => pid !== person.id));
+                                                        } else {
+                                                            setSelectedMemberIds(prev => [...prev, person.id]);
+                                                        }
+                                                    }}
+                                                >
+                                                    {selectedMemberIds.includes(person.id) ? '✓ ' : ''}{person.name || (person as any).nickname || 'User'}
+                                                </DropdownMenuItem>
+                                            ))}
+                                            <DropdownMenuItem
+                                                className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-rose-500 focus:text-white transition-all text-slate-400"
+                                                onClick={() => setSelectedMemberIds([])}
+                                            >
+                                                Clear All
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+
+                                {/* Weight */}
+                                <div className="flex items-center bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700/50 shadow-sm">
+                                    <span className="text-sm font-black italic text-emerald-500 pr-2 border-r border-slate-200 dark:border-slate-700">
+                                        {totalWeight.toFixed(0)}
+                                    </span>
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 pl-2">
+                                        Total Grams
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Scaling Factor Indicator */}
+                            {currentScalingFactor !== 1 && (
+                                <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-500/5 w-fit px-3 py-1 rounded-full border border-emerald-500/20">
+                                    <Scale size={12} />
+                                    Scaled to {(currentScalingFactor * 100).toFixed(0)}% · Based on {calculations.maxTDEE.toFixed(0)} {energyUnit}
+                                </div>
+                            )}
+
                             <Card className="p-6 lg:p-8 space-y-6">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
@@ -1765,6 +1766,15 @@ export default function RecipeDetailsPage() {
                                     'Calcium & Magnesium': ['Calcium', 'Magnesium'],
                                     'Calcium & Phosphorus': ['Calcium', 'Phosphorus'],
                                 }} />
+
+                                {/* Phytonutrients */}
+                                {recipe && (
+                                    <DidYouKnow
+                                        phytonutrients={recipe.phytonutrients}
+                                        foodName={recipe.title}
+                                        className="pt-6 border-t border-slate-100 dark:border-slate-800"
+                                    />
+                                )}
                             </div>
                         )}
                     </div>
@@ -1850,14 +1860,7 @@ export default function RecipeDetailsPage() {
                         </div>
                     )}
 
-                    {/* DidYouKnow Section */}
-                    {recipe && (
-                        <DidYouKnow
-                            phytonutrients={recipe.phytonutrients}
-                            foodName={recipe.title}
-                            className="py-10 border-t border-slate-100 dark:border-slate-800 mt-10"
-                        />
-                    )}
+
                 </div>
 
                 {/* Modals */}
