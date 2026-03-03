@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { PantryView } from '@/components/kitchen/pantry-view';
@@ -328,7 +328,7 @@ export default function PantryPage() {
                                         {(() => {
                                                 const seen = new Set<number>();
                                                 return selectedFood.portions
-                                                    ?.filter((p: any) => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon/i.test(p.label))
+                                                    ?.filter((p: any) => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon|ring|wedge|strip|stalk|sprig|patty|fillet|spear|floret|link/i.test(p.label))
                                                     .filter((p: any) => { if (seen.has(p.weight_g)) return false; seen.add(p.weight_g); return true; })
                                                     .map((p: any) => (
                                                         <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>

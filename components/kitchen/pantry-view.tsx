@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -174,17 +174,17 @@ export function PantryView({
         raw: string;
     }
 
-    // Pluralize only the measurement unit label (e.g. "Cup" → "Cups", "Tbsp" stays "Tbsp")
+    // Pluralize only the measurement unit label (e.g. "Cup" ? "Cups", "Tbsp" stays "Tbsp")
     const pluralizeUnit = (label: string, qty: number): string => {
         if (qty <= 1) return label;
         const l = label.toLowerCase().trim();
-        // Units that already look plural or are abbreviations — leave unchanged
+        // Units that already look plural or are abbreviations � leave unchanged
         const unchanged = ['tbsp', 'tsp', 'ml', 'g', 'kg', 'oz', 'lb', 'lbs'];
         if (unchanged.includes(l)) return label;
         if (/[^aeiou]y$/i.test(label)) return label.slice(0, -1) + 'ies'; // rarely needed
-        if (/(s|sh|ch|x|z)$/i.test(label)) return label + 'es'; // Inch → Inches
+        if (/(s|sh|ch|x|z)$/i.test(label)) return label + 'es'; // Inch ? Inches
         if (/s$/i.test(label)) return label; // already plural
-        return label + 's'; // Cup → Cups, Slice → Slices, Piece → Pieces
+        return label + 's'; // Cup ? Cups, Slice ? Slices, Piece ? Pieces
     };
 
     const parseQuantityEntry = (s: string): QuantityEntry => {
@@ -299,7 +299,7 @@ export function PantryView({
         return qty;
     };
 
-    // Detect entries that are pure weight measures (gram, kilogram, or "1 x Ng") — these are fungible
+    // Detect entries that are pure weight measures (gram, kilogram, or "1 x Ng") � these are fungible
     const isWeightOnlyEntry = (entry: QuantityEntry): boolean => {
         if (!entry.label) return entry.weight_g != null && (entry.unit === 'g' || entry.unit === null);
         return /^(gram|kilogram)s?$/i.test(entry.label);
@@ -393,7 +393,7 @@ export function PantryView({
             }
             return existingEntries.join(' + ');
         }
-        // No matching entry — append incoming to the non-zero filtered entries
+        // No matching entry � append incoming to the non-zero filtered entries
         return `${existingEntries.join(' + ')} + ${incoming}`;
     };
 
@@ -548,7 +548,7 @@ export function PantryView({
                     const entryG = (parsed.qty || 0) * (parsed.weight_g || 0);
                     if (entryG <= 0) continue; // skip already-zero entries
                     if (gramsToRemove >= entryG) {
-                        // This entry is fully consumed — skip it
+                        // This entry is fully consumed � skip it
                         gramsToRemove -= entryG;
                     } else if (gramsToRemove > 0 && parsed.weight_g && parsed.weight_g > 0) {
                         // Partially consume this entry
@@ -1241,7 +1241,7 @@ export function PantryView({
                                                                         className="w-full px-3 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
                                                                     >
                                                                         <option value="">Weight...</option>
-                                                                        {(() => { const seen = new Set<number>(); return buyMorePortions.filter(p => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon/i.test(p.label)).filter(p => { if (seen.has(p.weight_g)) return false; seen.add(p.weight_g); return true; }).map(p => (
+                                                                        {(() => { const seen = new Set<number>(); return buyMorePortions.filter(p => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon|ring|wedge|strip|stalk|sprig|patty|fillet|spear|floret|link/i.test(p.label)).filter(p => { if (seen.has(p.weight_g)) return false; seen.add(p.weight_g); return true; }).map(p => (
                                                                             <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
                                                                         )); })()}
                                                                     </select>
@@ -1258,7 +1258,7 @@ export function PantryView({
                                                                         onClick={(e) => e.stopPropagation()}
                                                                         className="w-full px-3 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
                                                                     >
-                                                                        {(() => { const seen = new Set<number>(); return buyMorePortions.filter(p => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon/i.test(p.label)).filter(p => { if (seen.has(p.weight_g)) return false; seen.add(p.weight_g); return true; }).map(p => (
+                                                                        {(() => { const seen = new Set<number>(); return buyMorePortions.filter(p => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon|ring|wedge|strip|stalk|sprig|patty|fillet|spear|floret|link/i.test(p.label)).filter(p => { if (seen.has(p.weight_g)) return false; seen.add(p.weight_g); return true; }).map(p => (
                                                                             <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
                                                                         )); })()}
                                                                     </select>
@@ -1333,7 +1333,7 @@ export function PantryView({
                                                                         className="w-full px-3 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
                                                                     >
                                                                         <option value="">Weight...</option>
-                                                                        {(() => { const seen = new Set<number>(); return removePortions.filter(p => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon/i.test(p.label)).filter(p => { if (seen.has(p.weight_g)) return false; seen.add(p.weight_g); return true; }).map(p => (
+                                                                        {(() => { const seen = new Set<number>(); return removePortions.filter(p => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon|ring|wedge|strip|stalk|sprig|patty|fillet|spear|floret|link/i.test(p.label)).filter(p => { if (seen.has(p.weight_g)) return false; seen.add(p.weight_g); return true; }).map(p => (
                                                                             <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
                                                                         )); })()}
                                                                     </select>
@@ -1350,7 +1350,7 @@ export function PantryView({
                                                                         onClick={(e) => e.stopPropagation()}
                                                                         className="w-full px-3 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
                                                                     >
-                                                                        {(() => { const seen = new Set<number>(); return removePortions.filter(p => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon/i.test(p.label)).filter(p => { if (seen.has(p.weight_g)) return false; seen.add(p.weight_g); return true; }).map(p => (
+                                                                        {(() => { const seen = new Set<number>(); return removePortions.filter(p => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon|ring|wedge|strip|stalk|sprig|patty|fillet|spear|floret|link/i.test(p.label)).filter(p => { if (seen.has(p.weight_g)) return false; seen.add(p.weight_g); return true; }).map(p => (
                                                                             <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
                                                                         )); })()}
                                                                     </select>
@@ -1448,7 +1448,7 @@ export function PantryView({
                                                                                         {e.label ? (
                                                                                             <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">{pluralizeUnit(e.label, e.qty)} {foodName}</span>
                                                                                         ) : e.weight_g != null ? (
-                                                                                            <span className="text-sm font-semibold text-slate-400">× {e.weight_g}{e.unit} {foodName}</span>
+                                                                                            <span className="text-sm font-semibold text-slate-400">� {e.weight_g}{e.unit} {foodName}</span>
                                                                                         ) : (
                                                                                             <span className="text-sm font-semibold text-slate-400">{foodName}</span>
                                                                                         )}

@@ -499,7 +499,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                 if (measures && measures.length > 0) {
                     setPantryAddPortions(measures);
                     // Auto-select from shopping-friendly measures only
-                    const filtered = measures.filter((m: any) => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon/i.test(m.label));
+                    const filtered = measures.filter((m: any) => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon|ring|wedge|strip|stalk|sprig|patty|fillet|spear|floret|link/i.test(m.label));
                     // Deduplicate by weight_g (keep first occurrence)
                     const seen = new Set<number>();
                     const deduped = filtered.filter((m: any) => { if (seen.has(m.weight_g)) return false; seen.add(m.weight_g); return true; });
@@ -1242,7 +1242,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                             {(() => {
                                                                                 const seen = new Set<number>();
                                                                                 return pantryAddPortions
-                                                                                    .filter(p => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon/i.test(p.label))
+                                                                                    .filter(p => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon|ring|wedge|strip|stalk|sprig|patty|fillet|spear|floret|link/i.test(p.label))
                                                                                     .filter(p => { if (seen.has(p.weight_g)) return false; seen.add(p.weight_g); return true; })
                                                                                     .map(p => (
                                                                                         <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
