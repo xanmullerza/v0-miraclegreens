@@ -970,40 +970,34 @@ export function MealPlannerContent({
         : null;
 
     const EATEN_STORAGE_KEY = 'vitala_eaten_meals';
+    const eatenHydrated = React.useRef(false);
 
-    const [eatenMeals, setEatenMeals] = useState<Set<string>>(() => {
-        if (typeof window === 'undefined' || !planKey) return new Set();
-        try {
-            const saved = JSON.parse(localStorage.getItem(EATEN_STORAGE_KEY) || '{}');
-            if (saved.planKey === planKey && Array.isArray(saved.meals)) {
-                return new Set<string>(saved.meals);
-            }
-        } catch { /* ignore */ }
-        return new Set();
-    });
+    const [eatenMeals, setEatenMeals] = useState<Set<string>>(new Set());
 
-    // Persist eaten state whenever it changes
+    // Restore eaten state from localStorage when planKey first becomes available
     useEffect(() => {
         if (!planKey) return;
+        try {
+            const saved = JSON.parse(localStorage.getItem(EATEN_STORAGE_KEY) || '{}');
+            if (saved.planKey === planKey && Array.isArray(saved.meals) && saved.meals.length > 0) {
+                setEatenMeals(new Set<string>(saved.meals));
+            } else if (saved.planKey && saved.planKey !== planKey) {
+                // Different plan — ensure we start fresh
+                setEatenMeals(new Set());
+            }
+        } catch { /* ignore */ }
+        // Mark hydration complete AFTER this render cycle so persist doesn't overwrite
+        requestAnimationFrame(() => { eatenHydrated.current = true; });
+    }, [planKey]);
+
+    // Persist eaten state — only after hydration to avoid overwriting saved data
+    useEffect(() => {
+        if (!planKey || !eatenHydrated.current) return;
         localStorage.setItem(EATEN_STORAGE_KEY, JSON.stringify({
             planKey,
             meals: [...eatenMeals],
         }));
     }, [eatenMeals, planKey]);
-
-    // When planKey becomes available or changes: restore saved eaten state or reset.
-    // This covers the case where the lazy initializer ran before `plan` loaded from context.
-    useEffect(() => {
-        if (!planKey) return;
-        try {
-            const saved = JSON.parse(localStorage.getItem(EATEN_STORAGE_KEY) || '{}');
-            if (saved.planKey === planKey && Array.isArray(saved.meals)) {
-                setEatenMeals(new Set<string>(saved.meals));
-            } else if (saved.planKey && saved.planKey !== planKey) {
-                setEatenMeals(new Set());
-            }
-        } catch { /* ignore */ }
-    }, [planKey]);
 
     const [showRecipeNutrients, setShowRecipeNutrients] = useState(false);
     const [recipeMoringaGrams, setRecipeMoringaGrams] = useState(0);
