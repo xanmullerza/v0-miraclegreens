@@ -48,7 +48,10 @@ import {
     Bot,
     FlaskConical,
     History,
-    ArrowRight
+    ArrowRight,
+    Star,
+    ShoppingCart,
+    Lightbulb
 } from 'lucide-react';
 import { useHeaderActions } from '@/lib/context/header-actions-context';
 import { useSearch } from '@/lib/context/search-context';
@@ -144,6 +147,9 @@ export default function RecipeDetailsPage() {
     const [instructions, setInstructions] = useState<Instruction[]>([]);
     const [loading, setLoading] = useState(true);
     const [showDetailedNutrients, setShowDetailedNutrients] = useState(true);
+    const [activeSection, setActiveSection] = useState<'recipe' | 'nutrition' | 'related' | 'management' | null>('recipe');
+    const [showAdvancedNutrition, setShowAdvancedNutrition] = useState(false);
+    const [manualServings, setManualServings] = useState<number | null>(null);
     const { searchQuery, setSearchQuery } = useSearch();
     const { setCustomSegmentLabel } = useHeaderActions();
     const { deleteRecipe } = useDataPersistence();
@@ -371,17 +377,11 @@ export default function RecipeDetailsPage() {
     }, [selectedMemberIds, allPeople]);
 
     // Derived Scaling Factor
+    const displayServings = manualServings ?? calculations.totalServings;
     const currentScalingFactor = React.useMemo(() => {
-        if (!recipe?.servings || calculations.totalServings === 0) return 1;
-        // Logic: 
-        // We need 'calculations.totalServings' number of "Big Servings".
-        // The original recipe creates 'recipe.servings' number of "Original Servings".
-        // Crucial Assumption: 1 "Big Serving" calculated here ~= 1 "Original Serving" if the original recipe is a standard meal.
-        // If the recipe is small (e.g. cookies), this logic holds: I need 1.5 cookies.
-        // If the recipe is a full meal (2000kcal), I need 1.5 full meals.
-        // So:
-        return calculations.totalServings / recipe.servings;
-    }, [calculations.totalServings, recipe?.servings]);
+        if (!recipe?.servings || displayServings === 0) return 1;
+        return displayServings / recipe.servings;
+    }, [displayServings, recipe?.servings]);
 
     useEffect(() => {
         const getUser = async () => {
@@ -1063,10 +1063,20 @@ export default function RecipeDetailsPage() {
         setDraggedItemIndex(null);
     };
 
-    const toggleFavorite = () => {
+    const toggleFavorite = async () => {
         if (!recipe) return;
-        setRecipe({ ...recipe, is_favorite: !recipe.is_favorite });
-        toast.success(recipe.is_favorite ? "Removed from favorites" : "Added to favorites");
+        const newStatus = !recipe.is_favorite;
+        setRecipe({ ...recipe, is_favorite: newStatus });
+        toast.success(newStatus ? 'Added to favourites' : 'Removed from favourites');
+        if (!String(recipe.id).startsWith('local-')) {
+            try {
+                await supabase.from('recipes').update({ is_favorite: newStatus }).eq('id', recipe.id);
+            } catch (err) {
+                console.error('Failed to persist favourite:', err);
+                setRecipe({ ...recipe, is_favorite: !newStatus });
+                toast.error('Failed to update favourite');
+            }
+        }
     };
 
     const getVal = (keys: string[]) => {
@@ -1325,151 +1335,117 @@ export default function RecipeDetailsPage() {
     if (!recipe) return null;
 
     return (
-        <PageContainer maxWidth="max-w-7xl">
-            <div className="w-full space-y-10 animate-in fade-in duration-700 pb-32 px-4">
-                <div className="max-w-7xl mx-auto space-y-8">
-                    {/* Main Header Section (Image + Name) - Matching Food Page */}
-                    {/* Main Header Section (Image + Name) - Matching Food Page */}
-                    <div className="flex flex-col sm:flex-row items-start gap-6 animate-in slide-in-from-top-4 duration-700 pb-1">
-                        {/* Left Side: Image (Small, Inline) */}
-                        <div className="w-24 h-24 lg:w-32 lg:h-32 shrink-0">
-                            <Card className="w-full h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden rounded-2xl">
-                                <div className="w-full h-full rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
-                                    {recipe.image ? (
-                                        <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-slate-200">
-                                            <ChefHat size={32} className="opacity-10" />
+        <PageContainer maxWidth="max-w-6xl">
+            <div className="space-y-8 pb-20 animate-in fade-in duration-700">
+                <div className="space-y-8">
+                    {/* Main Header Section - Matching Meals Page */}
+                    <div className="space-y-3 animate-in slide-in-from-top-4 duration-700 pt-4">
+                        {/* Full-width centered title */}
+                        <h1 className="text-xl font-black tracking-tighter uppercase italic leading-tight mb-3 text-center">
+                            <span className="text-emerald-500">{recipe.title}</span>
+                        </h1>
+
+                        {/* Image + 2x2 grid row */}
+                        <div className="flex flex-row items-center gap-4">
+                            {/* Image */}
+                            <div className="w-20 h-20 shrink-0">
+                                <Card className="w-full h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden rounded-2xl">
+                                    <div className="w-full h-full rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
+                                        {recipe.image ? (
+                                            <img src={recipe.image} alt={recipe.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-slate-200">
+                                                <ChefHat size={24} className="opacity-10" />
+                                            </div>
+                                        )}
+                                        <div className="absolute top-1 left-1">
+                                            <Badge className="bg-emerald-600/90 text-white border-none text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 backdrop-blur-md shadow-xl w-fit">
+                                                {recipe.type}
+                                            </Badge>
                                         </div>
-                                    )}
-                                    <div className="absolute top-1 left-1">
-                                        <Badge className="bg-emerald-600/90 text-white border-none text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 backdrop-blur-md shadow-xl w-fit">
-                                            {recipe.type}
-                                        </Badge>
                                     </div>
+                                </Card>
+                            </div>
+
+                            {/* 2x2 Action Grid */}
+                            <div className="flex-1 flex flex-col gap-2">
+                                <div className="grid grid-cols-2 gap-1.5">
+                                    {[
+                                        { key: 'recipe' as const, label: 'Recipe', icon: Layers, color: 'text-emerald-500', activeBg: 'bg-emerald-500/10 border-emerald-500/30' },
+                                        { key: 'nutrition' as const, label: 'Nutrition', icon: Activity, color: 'text-emerald-500', activeBg: 'bg-emerald-500/10 border-emerald-500/30' },
+                                        { key: 'related' as const, label: 'Related', icon: UtensilsCrossed, color: 'text-amber-500', activeBg: 'bg-amber-500/10 border-amber-500/30' },
+                                        { key: 'management' as const, label: 'Management', icon: ShoppingBasket, color: 'text-blue-500', activeBg: 'bg-blue-500/10 border-blue-500/30' },
+                                    ].map(({ key, label, icon: Icon, color, activeBg }) => (
+                                        <button
+                                            key={key}
+                                            onClick={() => setActiveSection(prev => prev === key ? null : key)}
+                                            className={cn(
+                                                'flex items-center gap-1.5 px-2.5 py-2 rounded-xl border text-[9px] font-black uppercase tracking-widest transition-all',
+                                                activeSection === key
+                                                    ? `${activeBg} ${color}`
+                                                    : 'border-slate-200 dark:border-slate-800 text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
+                                            )}
+                                        >
+                                            <Icon size={11} />
+                                            {label}
+                                        </button>
+                                    ))}
                                 </div>
-                            </Card>
+                            </div>
                         </div>
+                    </div>
 
-                        {/* Right Side: Text Content */}
-                        <div className="flex-1 flex flex-col pt-1 w-full">
-                            <div className="flex items-center justify-between gap-4 mb-4">
-                                <h1 className="text-2xl sm:text-3xl font-black tracking-tighter uppercase italic leading-tight">
-                                    <span className="text-emerald-500">{recipe.title}</span>
-                                </h1>
-                                {(String(recipe.id).startsWith('local-') || recipe.is_curated === false) && (
-                                    <div className="flex items-center gap-2 shrink-0">
-                                        <button
-                                            onClick={handleEdit}
-                                            className="w-10 h-10 rounded-full flex items-center justify-center transition-all border bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-indigo-500 border-slate-100 dark:border-slate-700"
-                                            title="Edit Mix"
-                                        >
-                                            <Pencil size={16} />
-                                        </button>
-                                        <button
-                                            onClick={handleDelete}
-                                            className="w-10 h-10 rounded-full flex items-center justify-center transition-all border bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 border-slate-100 dark:border-slate-700"
-                                            title="Delete Mix"
-                                        >
-                                            <Trash2 size={16} />
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
+                    {/* ═══ RECIPE SECTION ═══ */}
+                    {activeSection === 'recipe' && (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                            {/* Stat Widgets */}
                             <div className="flex items-center gap-4 flex-wrap">
-                                {recipe.source && (
-                                    <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Source: {recipe.source}</span>
-                                )}
-
-                                <div className="flex items-center gap-3 sm:gap-6 flex-wrap w-full sm:w-auto">
-                                    {/* Prep Time Widget */}
-                                    <div className="flex items-center bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700/50 shadow-sm transition-all hover:border-emerald-500/30">
-                                        <span className="text-sm font-black italic text-slate-900 dark:text-white pr-2 border-r border-slate-200 dark:border-slate-700 flex items-center gap-1.5">
-                                            <Clock size={14} className="text-emerald-500/50" />
-                                            {recipe.prep_time}
-                                        </span>
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 pl-2">
-                                            Minutes
-                                        </span>
-                                    </div>
-
-                                    {/* Servings Module */}
-                                    <div className="flex items-center gap-2">
-                                        <div className="flex items-center bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700/50 shadow-sm transition-all hover:border-emerald-500/30">
-                                            <span className="text-sm font-black italic text-slate-900 dark:text-white border-r border-slate-200 dark:border-slate-700 pr-2">
-                                                {Number(calculations.totalServings.toFixed(2))}
-                                            </span>
-                                            <DropdownMenu>
-                                                <DropdownMenuTrigger className="flex items-center gap-1 pl-1 text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
-                                                    Servings
-                                                    <ChevronDown className="w-3 h-3 text-slate-400" />
-                                                </DropdownMenuTrigger>
-                                                <DropdownMenuContent
-                                                    align="start"
-                                                    className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl p-2 min-w-[160px] shadow-2xl animate-in zoom-in-95 duration-200 z-[2000]"
-                                                >
-                                                    <DropdownMenuItem
-                                                        className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
-                                                        onClick={() => setSelectedMemberIds(allPeople.map(p => p.id))}
-                                                    >
-                                                        Full Family ({allPeople.length})
-                                                    </DropdownMenuItem>
-                                                    {allPeople.map(person => (
-                                                        <DropdownMenuItem
-                                                            key={person.id}
-                                                            className={cn(
-                                                                "text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all",
-                                                                selectedMemberIds.includes(person.id) ? "text-emerald-500" : "text-slate-500 dark:text-slate-400"
-                                                            )}
-                                                            onClick={() => {
-                                                                if (selectedMemberIds.includes(person.id)) {
-                                                                    setSelectedMemberIds(prev => prev.filter(pid => pid !== person.id));
-                                                                } else {
-                                                                    setSelectedMemberIds(prev => [...prev, person.id]);
-                                                                }
-                                                            }}
-                                                        >
-                                                            {selectedMemberIds.includes(person.id) ? '✓ ' : ''}{person.name || (person as any).nickname || 'User'}
-                                                        </DropdownMenuItem>
-                                                    ))}
-                                                    <DropdownMenuItem
-                                                        className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-rose-500 focus:text-white transition-all text-slate-400"
-                                                        onClick={() => setSelectedMemberIds([])}
-                                                    >
-                                                        Clear All
-                                                    </DropdownMenuItem>
-                                                </DropdownMenuContent>
-                                            </DropdownMenu>
-                                        </div>
-                                    </div>
-
-                                    {/* Weight Widget */}
-                                    <div className="flex items-center bg-slate-100 dark:bg-slate-800/50 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700/50 shadow-sm">
-                                        <span className="text-sm font-black italic text-emerald-500 pr-2 border-r border-slate-200 dark:border-slate-700">
-                                            {totalWeight.toFixed(0)}
-                                        </span>
-                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 pl-2">
-                                            Total Grams
-                                        </span>
-                                    </div>
+                                {/* Prep Time - plain text */}
+                                <div className="flex items-center gap-1.5">
+                                    <Clock size={14} className="text-emerald-500/50" />
+                                    <span className="text-sm font-black italic text-slate-900 dark:text-white">{recipe.prep_time}</span>
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">min</span>
                                 </div>
+
+                                <div className="w-px h-4 bg-slate-200 dark:bg-slate-700" />
+
+                                {/* Servings - editable */}
+                                <div className="flex items-center gap-1">
+                                    <span className="text-sm font-black italic text-slate-900 dark:text-white min-w-[20px] text-center">{Number(displayServings.toFixed(1))}</span>
+                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">serving{displayServings !== 1 ? 's' : ''}</span>
+                                    <button
+                                        onClick={() => setManualServings(prev => (prev ?? calculations.totalServings) + 1)}
+                                        className="w-6 h-6 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-emerald-500 hover:border-emerald-500/30 transition-all"
+                                    >
+                                        <Plus size={12} />
+                                    </button>
+                                    <button
+                                        onClick={() => setManualServings(prev => Math.max(1, (prev ?? calculations.totalServings) - 1))}
+                                        className="w-6 h-6 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-emerald-500 hover:border-emerald-500/30 transition-all"
+                                    >
+                                        <Minus size={12} />
+                                    </button>
+                                </div>
+
+                                <div className="w-px h-4 bg-slate-200 dark:bg-slate-700" />
+
+                                {/* Weight - plain text */}
+                                <span className="text-sm font-black italic text-emerald-500">{totalWeight.toFixed(0)}</span>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 -ml-2.5">g</span>
                             </div>
 
-                            {/* Scaling Factor Indicator - Integrated into Header */}
+                            {recipe.source && (
+                                <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Source: {recipe.source}</span>
+                            )}
+
+                            {/* Scaling Factor Indicator */}
                             {currentScalingFactor !== 1 && (
-                                <div className="mt-4 flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-500/5 w-fit px-3 py-1 rounded-full border border-emerald-500/20">
+                                <div className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-emerald-500 bg-emerald-500/5 w-fit px-3 py-1 rounded-full border border-emerald-500/20">
                                     <Scale size={12} />
                                     Scaled to {(currentScalingFactor * 100).toFixed(0)}% · Based on {calculations.maxTDEE.toFixed(0)} {energyUnit}
                                 </div>
                             )}
-                        </div>
-                    </div>
 
-                    {/* Main Content Grid - Ingredients + Nutrition */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Left Column - Ingredients & Instructions */}
-                        <div className="lg:col-span-2 space-y-6">
-                            {/* ═══ INGREDIENTS SECTION ═══ */}
                             <Card className="p-6 lg:p-8 space-y-6">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
@@ -1536,10 +1512,12 @@ export default function RecipeDetailsPage() {
                                 </Card>
                             )}
                         </div>
+                    )}
 
-                        {/* Right Column - Related Meals & Sidebar Content */}
-                        <div className="space-y-6">
-                            {(relatedRecipes.length > 0 || loadingRelated) && (
+                    {/* ═══ RELATED MIXES SECTION ═══ */}
+                    {activeSection === 'related' && (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                            {(relatedRecipes.length > 0 || loadingRelated) ? (
                                 <div className="space-y-6">
                                     <div className="flex items-center justify-between px-2">
                                         <div className="flex items-center gap-3">
@@ -1589,12 +1567,90 @@ export default function RecipeDetailsPage() {
                                         </div>
                                     )}
                                 </div>
+                            ) : (
+                                <p className="text-sm text-slate-400 font-bold py-6 text-center">No related mixes found.</p>
                             )}
                         </div>
-                    </div>
+                    )}
 
-                    {/* Nutritional Profile Section */}
-                    <div className="space-y-6 pt-10 border-t border-slate-100 dark:border-slate-800">
+                    {/* ═══ MANAGEMENT SECTION ═══ */}
+                    {activeSection === 'management' && (() => {
+                        const canEditDelete = isAdmin || (recipe.user_id && recipe.user_id === currentUserId) || String(recipe.id).startsWith('local-') || recipe.is_curated === false;
+                        return (
+                        <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                            {/* Favourite Toggle */}
+                            <button
+                                onClick={toggleFavorite}
+                                className={cn(
+                                    'w-full flex items-center gap-4 p-4 rounded-2xl border transition-all group text-left',
+                                    recipe.is_favorite
+                                        ? 'border-amber-200 dark:border-amber-800/50 bg-amber-50/50 dark:bg-amber-900/10 hover:bg-amber-100/60 dark:hover:bg-amber-900/20'
+                                        : 'border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 hover:bg-slate-100/60 dark:hover:bg-slate-800/30'
+                                )}
+                            >
+                                <div className={cn(
+                                    'w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-lg',
+                                    recipe.is_favorite ? 'bg-amber-400 shadow-amber-400/20' : 'bg-slate-200 dark:bg-slate-700 shadow-slate-200/20'
+                                )}>
+                                    <Star size={16} className={recipe.is_favorite ? 'text-white fill-white' : 'text-slate-500 dark:text-slate-300'} />
+                                </div>
+                                <div className="flex-1">
+                                    <p className={cn('text-xs font-black uppercase tracking-[0.15em]', recipe.is_favorite ? 'text-amber-600 dark:text-amber-400' : 'text-slate-600 dark:text-slate-300')}>
+                                        {recipe.is_favorite ? 'Remove from Favourites' : 'Add to Favourites'}
+                                    </p>
+                                    <p className="text-[9px] font-bold text-slate-400 mt-0.5">
+                                        {recipe.is_favorite ? 'This mix is in your favourites collection' : 'Save this mix for quick access'}
+                                    </p>
+                                </div>
+                            </button>
+
+                            {/* Edit & Delete */}
+                            {canEditDelete && (
+                                <div className="grid grid-cols-2 gap-2">
+                                    <button
+                                        onClick={handleEdit}
+                                        className="flex items-center gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 hover:border-blue-500/30 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all group text-left"
+                                    >
+                                        <div className="w-9 h-9 rounded-xl bg-blue-500 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20">
+                                            <Pencil size={14} className="text-white" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-black uppercase tracking-[0.15em] text-slate-600 dark:text-slate-300 group-hover:text-blue-500 transition-colors">Edit</p>
+                                            <p className="text-[9px] font-bold text-slate-400 mt-0.5">Modify mix</p>
+                                        </div>
+                                    </button>
+                                    <button
+                                        onClick={handleDelete}
+                                        className="flex items-center gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 hover:border-rose-500/30 hover:bg-rose-50/50 dark:hover:bg-rose-900/10 transition-all group text-left"
+                                    >
+                                        <div className="w-9 h-9 rounded-xl bg-rose-500 flex items-center justify-center shrink-0 shadow-lg shadow-rose-500/20">
+                                            <Trash2 size={14} className="text-white" />
+                                        </div>
+                                        <div>
+                                            <p className="text-xs font-black uppercase tracking-[0.15em] text-slate-600 dark:text-slate-300 group-hover:text-rose-500 transition-colors">Delete</p>
+                                            <p className="text-[9px] font-bold text-slate-400 mt-0.5">Remove mix</p>
+                                        </div>
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* More Actions - Coming Soon */}
+                            <div className="flex items-center gap-4 p-4 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-900/20 opacity-50">
+                                <div className="w-9 h-9 rounded-xl bg-slate-200 dark:bg-slate-700 flex items-center justify-center shrink-0">
+                                    <Lightbulb size={16} className="text-slate-400" />
+                                </div>
+                                <div>
+                                    <p className="text-xs font-black uppercase tracking-[0.15em] text-slate-400">More Actions</p>
+                                    <p className="text-[9px] font-bold text-slate-400 mt-0.5">Coming soon</p>
+                                </div>
+                            </div>
+                        </div>
+                        );
+                    })()}
+
+                    {/* ═══ NUTRITIONAL PROFILE SECTION ═══ */}
+                    {activeSection === 'nutrition' && (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
                         <div className="pb-4">
                             <h3 className="text-sm font-black uppercase tracking-[0.3em] text-emerald-500 italic flex items-center gap-2">
                                 <Activity size={18} />
@@ -1632,7 +1688,6 @@ export default function RecipeDetailsPage() {
                             'B3 (Niacin)': ['B3 (Niacin)', 'niacin_mg'],
                             'B5 (Pantothenic Acid)': ['B5 (Pantothenic Acid)', 'pantothenic_acid_mg'],
                             'B6 (Pyridoxine)': ['B6 (Pyridoxine)', 'vitamin_b6_mg'],
-                            'B7 (Biotin)': ['Biotin', 'biotin_ug'],
                             'B9 (Folate)': ['B9 (Folate)', 'folate_ug'],
                             'B12 (Cobalamin)': ['B12 (Cobalamin)', 'vitamin_b12_ug'],
                             'Vitamin C': ['Vitamin C', 'vitamin_c_mg'],
@@ -1646,29 +1701,45 @@ export default function RecipeDetailsPage() {
                             'Vitamin K': ['Vitamin K', 'vitamin_k_ug'],
                         }} />
 
-                        <div className="pt-12 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6 font-display">
-                            <h3 className="text-sm font-black uppercase tracking-[0.3em] text-amber-500 italic flex items-center gap-2">
-                                <Dna size={18} />
-                                Advanced Bio-Markers
-                            </h3>
-                        </div>
+                        {/* Advanced Nutrition Toggle */}
+                        <button
+                            onClick={() => setShowAdvancedNutrition(prev => !prev)}
+                            className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl border border-dashed border-amber-300 dark:border-amber-700/50 text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/10 transition-all text-[10px] font-black uppercase tracking-widest"
+                        >
+                            <Dna size={14} />
+                            {showAdvancedNutrition ? 'Hide' : 'Show'} Advanced Bio-Markers
+                            {showAdvancedNutrition ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                        </button>
 
-                        <NutrientGrid title="Extra Markers" icon={Activity} theme="amber" subtitle="Extra health markers worth tracking" forceRaw={true} items={{
-                            'Fiber': ['Fiber', 'fiber_g'],
-                            'Sugars': ['Sugars', 'sugars_g'],
-                            'Oxalate': ['Oxalate', 'oxalate_mg'],
-                            'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
-                        }} />
+                        {showAdvancedNutrition && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-300">
+                                <NutrientGrid title="Extra Markers" icon={Activity} theme="amber" subtitle="Extra health markers worth tracking" forceRaw={true} items={{
+                                    'Fiber': ['Fiber', 'fiber_g'],
+                                    'Sugars': ['Sugars', 'sugars_g'],
+                                    'Oxalate': ['Oxalate', 'oxalate_mg'],
+                                    'Cholesterol': ['Cholesterol', 'cholesterol_mg'],
+                                }} />
 
-                        <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Key nutrient balances for a healthy body" items={{
-                            'Sodium & Potassium': ['Sodium', 'Potassium'],
-                            'Zinc & Copper': ['Zinc', 'Copper'],
-                            'Omega 3 to 6 ratio': ['Omega-6', 'Omega-3'],
-                            'Calcium & Magnesium': ['Calcium', 'Magnesium'],
-                            'Calcium & Phosphorus': ['Calcium', 'Phosphorus'],
-                        }} />
+                                <NutrientGrid title="Biological Ratios" icon={Dna} theme="amber" subtitle="Key nutrient balances for a healthy body" items={{
+                                    'Sodium & Potassium': ['Sodium', 'Potassium'],
+                                    'Zinc & Copper': ['Zinc', 'Copper'],
+                                    'Omega 3 to 6 ratio': ['Omega-6', 'Omega-3'],
+                                    'Calcium & Magnesium': ['Calcium', 'Magnesium'],
+                                    'Calcium & Phosphorus': ['Calcium', 'Phosphorus'],
+                                }} />
 
+                                {/* Phytonutrients */}
+                                {recipe && (
+                                    <DidYouKnow
+                                        phytonutrients={recipe.phytonutrients}
+                                        foodName={recipe.title}
+                                        className="pt-6 border-t border-slate-100 dark:border-slate-800"
+                                    />
+                                )}
+                            </div>
+                        )}
                     </div>
+                    )}
 
                     {/* Breakdown Overlay */}
                     {breakdownNutrient && (
@@ -1750,14 +1821,7 @@ export default function RecipeDetailsPage() {
                         </div>
                     )}
 
-                    {/* DidYouKnow Section */}
-                    {recipe && (
-                        <DidYouKnow
-                            phytonutrients={recipe.phytonutrients}
-                            foodName={recipe.title}
-                            className="py-10 border-t border-slate-100 dark:border-slate-800 mt-10"
-                        />
-                    )}
+
                 </div>
 
                 {/* Modals */}
