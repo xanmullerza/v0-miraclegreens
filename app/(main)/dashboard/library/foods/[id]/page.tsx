@@ -867,97 +867,89 @@ export default function FoodDetailsPage() {
                     </div>
 
                     {/* Right Side: Text Content + Actions */}
-                    <div className="flex-1 flex flex-col gap-4">
-                        <div className="flex items-start gap-3 justify-between">
-                            <h1 className="text-2xl lg:text-4xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.9] flex-1">
-                                <span className="text-emerald-500">{formatFoodName(food.common_name || food.name)}</span>
-                            </h1>
-                            {/* Action Buttons */}
-                            <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex-1 flex flex-col gap-2">
+                        <h1 className="text-2xl lg:text-4xl font-black tracking-tighter text-slate-900 dark:text-white uppercase italic leading-[0.9]">
+                            <span className="text-emerald-500">{formatFoodName(food.common_name || food.name)}</span>
+                        </h1>
+                        {/* Action Buttons - below food name */}
+                        <div className="flex items-center gap-2">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className={cn("h-8 w-8 rounded-xl transition-all", showQuickAdd ? "text-emerald-500 bg-emerald-50 dark:bg-emerald-900/10" : "text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10")}
+                                onClick={() => {
+                                    if (showQuickAdd) {
+                                        setShowQuickAdd(false);
+                                    } else {
+                                        setShowQuickAdd(true);
+                                        setQuickAddQty('1');
+                                        setQuickAddWeight('');
+                                    }
+                                }}
+                                title="Add to Pantry or Groceries"
+                            >
+                                <Plus size={16} />
+                            </Button>
+
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className={cn("h-8 w-8 rounded-xl transition-all", food.is_favorite ? "text-rose-500" : "text-slate-400 hover:text-rose-500")}
+                                onClick={toggleFavorite}
+                                title="Favorite"
+                            >
+                                <Heart size={16} fill={food.is_favorite ? "currentColor" : "none"} />
+                            </Button>
+
+                            {/* Admin Edit */}
+                            {currentUserEmail?.toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase() && (
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className={cn("h-8 w-8 rounded-xl transition-all", showQuickAdd ? "text-emerald-500 bg-emerald-50 dark:bg-emerald-900/10" : "text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10")}
-                                    onClick={() => {
-                                        if (showQuickAdd) {
-                                            setShowQuickAdd(false);
-                                        } else {
-                                            setShowQuickAdd(true);
-                                            setQuickAddQty('1');
-                                            setQuickAddWeight('');
-                                        }
-                                    }}
-                                    title="Add to Pantry or Groceries"
+                                    onClick={() => router.push(`/dashboard/library/foods/new?edit=${food.id}`)}
+                                    className="h-8 w-8 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                                    title="Edit Food"
                                 >
-                                    <Plus size={16} />
+                                    <Edit2 size={16} />
                                 </Button>
+                            )}
 
+                            {(food.id.startsWith('food-') || isAdmin) && (
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className={cn("h-8 w-8 rounded-xl transition-all", food.is_favorite ? "text-rose-500" : "text-slate-400 hover:text-rose-500")}
-                                    onClick={toggleFavorite}
-                                    title="Favorite"
+                                    onClick={handleDelete}
+                                    className="h-8 w-8 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-colors"
+                                    title="Delete Food"
                                 >
-                                    <Heart size={16} fill={food.is_favorite ? "currentColor" : "none"} />
+                                    <Trash2 size={16} />
                                 </Button>
+                            )}
 
-                                {/* Admin Edit */}
-                                {currentUserEmail?.toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || '').toLowerCase() && (
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => router.push(`/dashboard/library/foods/new?edit=${food.id}`)}
-                                        className="h-8 w-8 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                                        title="Edit Food"
-                                    >
-                                        <Edit2 size={16} />
-                                    </Button>
-                                )}
-
-                                {(food.id.startsWith('food-') || isAdmin) && (
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={handleDelete}
-                                        className="h-8 w-8 rounded-xl text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-colors"
-                                        title="Delete Food"
-                                    >
-                                        <Trash2 size={16} />
-                                    </Button>
-                                )}
-                            </div>
+                            {food.quantity && (
+                                <span className="ml-1 text-[9px] font-black uppercase tracking-widest text-emerald-500">
+                                    In Stock: {food.quantity}
+                                </span>
+                            )}
                         </div>
-
-                        {/* Description - Styled as Subtext */}
-                        {(food.details || FOOD_DETAILS[food.id]) && (
-                            <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] leading-relaxed max-w-2xl">
-                                {(food.details || FOOD_DETAILS[food.id]).description}
-                                {food.quantity && (
-                                    <span className="ml-3 text-emerald-500">
-                                        In Stock: {food.quantity}
-                                    </span>
-                                )}
-                            </p>
-                        )}
                     </div>
                 </div>
 
                 {/* Quick Add Panel */}
                 {showQuickAdd && (
                     <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-6 animate-in slide-in-from-top duration-300 rounded-2xl">
-                        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                            <div className="flex items-center gap-4 flex-1">
-                                <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center">
-                                    <ShoppingBasket size={24} className="text-emerald-500" />
+                        <div className="flex flex-col gap-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0">
+                                    <ShoppingBasket size={18} className="text-emerald-500" />
                                 </div>
-                                <div className="flex-1">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">Quick Action</p>
+                                <div>
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-0.5">Quick Action</p>
                                     <p className="text-sm font-black text-slate-900 dark:text-white">{food?.name}</p>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-4 w-full md:w-auto">
+                            <div className="flex flex-wrap items-end gap-3 w-full">
                                 <div className="flex-1 md:flex-none">
                                     <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Quantity</Label>
                                     <Input
@@ -1077,61 +1069,58 @@ export default function FoodDetailsPage() {
                     </div>
                 )}
 
-                <div className="flex items-center gap-3 animate-in fade-in slide-in-from-bottom-2 duration-700">
-                    <div className="flex items-center bg-white dark:bg-slate-900 px-2 py-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm group/amount transition-all hover:border-emerald-500/50 shrink-0">
-                        <div className="flex items-center">
-                            <input
-                                type="number"
-                                value={amount}
-                                onChange={(e) => setAmount(Number(e.target.value))}
-                                className="w-16 bg-transparent text-lg font-black italic text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-center border-r border-slate-100 dark:border-slate-800"
-                            />
-
-                            <div className="relative group/select pl-3 pr-2">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger className="flex items-center gap-1.5 pr-2 text-[10px] font-black uppercase tracking-tighter text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
-                                        {selectedPortion?.label || 'Gram (g)'}
-                                        <ChevronDown className="w-3 h-3 text-slate-400 group-hover/select:text-emerald-500" />
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent
-                                        align="end"
-                                        className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-[1.5rem] p-2 min-w-[140px] shadow-2xl animate-in zoom-in-95 duration-200"
-                                    >
-                                        <DropdownMenuItem
-                                            className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
-                                            onClick={() => {
-                                                setSelectedPortion(null);
-                                                if (amount === 1) setAmount(100);
-                                            }}
-                                        >
-                                            Gram (g)
-                                        </DropdownMenuItem>
-                                        {food?.portions?.map(p => (
-                                            <DropdownMenuItem
-                                                key={p.label}
-                                                className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
-                                                onClick={() => {
-                                                    setSelectedPortion(p);
-                                                    if (amount >= 10) setAmount(1);
-                                                }}
-                                            >
-                                                {p.label}
-                                            </DropdownMenuItem>
-                                        ))}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 {/* Nutrient Grids - Removed Hero Wrapper */}
                 <div className="space-y-6">
-                    <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6">
-                        <h3 className="text-sm font-black uppercase tracking-[0.3em] text-emerald-500 italic flex items-center gap-2">
+                    <div className="pt-4 pb-2 border-b border-slate-100 dark:border-slate-800 mb-6 flex items-center justify-between gap-4">
+                        <h3 className="text-sm font-black uppercase tracking-[0.3em] text-emerald-500 italic flex items-center gap-2 shrink-0">
                             <Activity size={18} />
                             Essential Nutrients
                         </h3>
+                        {/* Weight Widget - compact, inline with heading */}
+                        <div className="flex items-center bg-white dark:bg-slate-900 px-2 py-1 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm group/amount transition-all hover:border-emerald-500/50">
+                            <div className="flex items-center">
+                                <input
+                                    type="number"
+                                    value={amount}
+                                    onChange={(e) => setAmount(Number(e.target.value))}
+                                    className="w-12 bg-transparent text-sm font-black italic text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-center border-r border-slate-100 dark:border-slate-800"
+                                />
+                                <div className="relative group/select pl-2 pr-1">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger className="flex items-center gap-1 text-[9px] font-black uppercase tracking-tighter text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
+                                            {selectedPortion?.label || 'Gram (g)'}
+                                            <ChevronDown className="w-2.5 h-2.5 text-slate-400 group-hover/select:text-emerald-500" />
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent
+                                            align="end"
+                                            className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-[1.5rem] p-2 min-w-[140px] shadow-2xl animate-in zoom-in-95 duration-200"
+                                        >
+                                            <DropdownMenuItem
+                                                className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
+                                                onClick={() => {
+                                                    setSelectedPortion(null);
+                                                    if (amount === 1) setAmount(100);
+                                                }}
+                                            >
+                                                Gram (g)
+                                            </DropdownMenuItem>
+                                            {food?.portions?.map(p => (
+                                                <DropdownMenuItem
+                                                    key={p.label}
+                                                    className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
+                                                    onClick={() => {
+                                                        setSelectedPortion(p);
+                                                        if (amount >= 10) setAmount(1);
+                                                    }}
+                                                >
+                                                    {p.label}
+                                                </DropdownMenuItem>
+                                            ))}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
 
