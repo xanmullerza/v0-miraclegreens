@@ -87,6 +87,7 @@ interface FoodItem {
     is_favorite?: boolean;
     quantity?: string;
     is_in_pantry?: boolean;
+    user_id?: string | null;
     details?: import('@/lib/data/food-details').FoodDetail;
     portions?: { label: string; weight_g: number }[];
 }
@@ -935,130 +936,89 @@ export default function FoodDetailsPage() {
                 </div>
 
                 {/* Quick Add Panel */}
-                {activeSection === 'management' && (
-                    <div className="border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 p-6 animate-in slide-in-from-top duration-300 rounded-2xl">
-                        <div className="flex flex-col gap-4">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center shrink-0">
-                                    <ShoppingBasket size={18} className="text-emerald-500" />
-                                </div>
-                                <div>
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-0.5">Quick Action</p>
-                                    <p className="text-sm font-black text-slate-900 dark:text-white">{food?.name}</p>
-                                </div>
+                {activeSection === 'management' && (() => {
+                    const canEditDelete = isAdmin || (food.user_id && food.user_id === user?.id);
+                    return (
+                    <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                        {/* Add to Pantry */}
+                        <button
+                            onClick={async () => {
+                                try {
+                                    await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', food.id);
+                                    setFood(prev => prev ? { ...prev, is_in_pantry: true } : null);
+                                    toast.success('Added to pantry');
+                                    router.push('/dashboard/meal-o-matic/pantry');
+                                } catch { toast.error('Failed to update pantry'); }
+                            }}
+                            className="w-full flex items-center gap-4 p-4 rounded-2xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50/50 dark:bg-emerald-900/10 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/20 transition-all group text-left"
+                        >
+                            <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
+                                <ShoppingBasket size={16} className="text-white" />
                             </div>
-
-                            <div className="flex flex-wrap items-end gap-3 w-full">
-                                <div className="flex-1 md:flex-none">
-                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Quantity</Label>
-                                    <Input
-                                        type="number"
-                                        value={quickAddQty}
-                                        onChange={(e) => setQuickAddQty(e.target.value)}
-                                        className="w-20 text-center"
-                                    />
-                                </div>
-
-                                {food?.portions && food.portions.length > 0 && !selectedPortion ? (
-                                    <div className="flex-1 md:flex-none">
-                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Serving</Label>
-                                        <select
-                                            onChange={(e) => {
-                                                const portion = food.portions?.find((p: any) => p.label === e.target.value);
-                                                if (portion) {
-                                                    setSelectedPortion(portion);
-                                                }
-                                            }}
-                                            className="w-auto px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                        >
-                                            <option value="">Select a serving...</option>
-                                            {food.portions?.map((p: any) => (
-                                                <option key={p.label} value={p.label}>
-                                                    {p.label} ({p.weight_g}g)
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                ) : selectedPortion ? (
-                                    <div className="flex-1 md:flex-none">
-                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Serving</Label>
-                                        <select
-                                            value={selectedPortion.label}
-                                            onChange={(e) => {
-                                                const portion = food?.portions?.find((p: any) => p.label === e.target.value);
-                                                if (portion) {
-                                                    setSelectedPortion(portion);
-                                                }
-                                            }}
-                                            className="w-auto px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                        >
-                                            {food?.portions?.map((p: any) => (
-                                                <option key={p.label} value={p.label}>
-                                                    {p.label} ({p.weight_g}g)
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <div className="flex-1 md:flex-none">
-                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Weight</Label>
-                                            <Input
-                                                type="number"
-                                                value={quickAddWeight}
-                                                onChange={(e) => setQuickAddWeight(e.target.value)}
-                                                placeholder="e.g. 100"
-                                                className="w-20 text-center"
-                                            />
-                                        </div>
-
-                                        <div className="flex-1 md:flex-none">
-                                            <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Unit</Label>
-                                            <select
-                                                value={quickAddUnit}
-                                                onChange={(e) => setQuickAddUnit(e.target.value)}
-                                                className="w-20 px-2 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                            >
-                                                <option value="g">g</option>
-                                                <option value="ml">ml</option>
-                                                <option value="oz">oz</option>
-                                                <option value="lb">lb</option>
-                                            </select>
-                                        </div>
-                                    </>
-                                )}
-                                <div className="flex-1 md:flex-none">
-                                    <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Destination</Label>
-                                    <select
-                                        value={quickAddMode}
-                                        onChange={(e) => setQuickAddMode(e.target.value as 'pantry' | 'shopping')}
-                                        className="w-auto px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
-                                    >
-                                        <option value="pantry">Pantry</option>
-                                        <option value="shopping">Groceries</option>
-                                    </select>
-                                </div>
-
-                                <div className="flex items-center gap-2 self-end">
-                                    <Button
-                                        onClick={handleQuickAdd}
-                                        className="gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest text-[9px] h-9 px-4"
-                                    >
-                                        <Plus size={14} />
-                                        Add
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        onClick={() => setActiveSection(null)}
-                                        className="h-9 px-4 font-black uppercase tracking-widest text-[9px] text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
-                                    >
-                                        Cancel
-                                    </Button>
-                                </div>
+                            <div className="flex-1">
+                                <p className="text-xs font-black uppercase tracking-[0.15em] text-emerald-600 dark:text-emerald-400">
+                                    {food.is_in_pantry ? 'Go to Pantry' : 'Add to Pantry'}
+                                </p>
+                                <p className="text-[10px] text-slate-400 font-medium mt-0.5">
+                                    {food.is_in_pantry ? 'Already in your pantry — tap to view' : 'Mark as stocked and open pantry'}
+                                </p>
                             </div>
-                        </div>
+                            <ChevronDown className="w-4 h-4 text-emerald-400 -rotate-90 shrink-0" />
+                        </button>
+
+                        {/* Favourite Toggle */}
+                        <button
+                            onClick={toggleFavorite}
+                            className={cn(
+                                'w-full flex items-center gap-4 p-4 rounded-2xl border transition-all group text-left',
+                                food.is_favorite
+                                    ? 'border-amber-200 dark:border-amber-800/50 bg-amber-50/50 dark:bg-amber-900/10 hover:bg-amber-100/60 dark:hover:bg-amber-900/20'
+                                    : 'border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 hover:bg-slate-100/60 dark:hover:bg-slate-800/30'
+                            )}
+                        >
+                            <div className={cn(
+                                'w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-lg',
+                                food.is_favorite ? 'bg-amber-400 shadow-amber-400/20' : 'bg-slate-200 dark:bg-slate-700 shadow-slate-200/20'
+                            )}>
+                                <Star size={16} className={food.is_favorite ? 'text-white fill-white' : 'text-slate-500 dark:text-slate-300'} />
+                            </div>
+                            <div className="flex-1">
+                                <p className={cn('text-xs font-black uppercase tracking-[0.15em]', food.is_favorite ? 'text-amber-600 dark:text-amber-400' : 'text-slate-600 dark:text-slate-300')}>
+                                    {food.is_favorite ? 'Remove from Favourites' : 'Add to Favourites'}
+                                </p>
+                                <p className="text-[10px] text-slate-400 font-medium mt-0.5">
+                                    {food.is_favorite ? 'Tap to unfavourite this food' : 'Pin this food to your favourites'}
+                                </p>
+                            </div>
+                            <Star size={14} className={cn('shrink-0', food.is_favorite ? 'text-amber-400 fill-amber-400' : 'text-slate-300')} />
+                        </button>
+
+                        {/* Edit & Delete — admin or food creator only */}
+                        {canEditDelete && (
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    onClick={() => router.push(`/dashboard/library/foods/new?edit=${food.id}`)}
+                                    className="flex items-center gap-3 p-4 rounded-2xl border border-blue-200 dark:border-blue-800/50 bg-blue-50/50 dark:bg-blue-900/10 hover:bg-blue-100/60 dark:hover:bg-blue-900/20 transition-all group text-left"
+                                >
+                                    <div className="w-8 h-8 rounded-xl bg-blue-500 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20">
+                                        <Pencil size={14} className="text-white" />
+                                    </div>
+                                    <span className="text-xs font-black uppercase tracking-[0.15em] text-blue-600 dark:text-blue-400">Edit</span>
+                                </button>
+                                <button
+                                    onClick={handleDelete}
+                                    className="flex items-center gap-3 p-4 rounded-2xl border border-rose-200 dark:border-rose-800/50 bg-rose-50/50 dark:bg-rose-900/10 hover:bg-rose-100/60 dark:hover:bg-rose-900/20 transition-all group text-left"
+                                >
+                                    <div className="w-8 h-8 rounded-xl bg-rose-500 flex items-center justify-center shrink-0 shadow-lg shadow-rose-500/20">
+                                        <Trash2 size={14} className="text-white" />
+                                    </div>
+                                    <span className="text-xs font-black uppercase tracking-[0.15em] text-rose-600 dark:text-rose-400">Delete</span>
+                                </button>
+                            </div>
+                        )}
                     </div>
-                )}
+                    );
+                })()
 
                 {/* Know Your Food Section */}
                 {
