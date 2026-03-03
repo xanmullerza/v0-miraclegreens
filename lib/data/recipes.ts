@@ -10,6 +10,7 @@ export interface Ingredient {
     weightG?: number; // Structured weight in grams (base amount before scaling)
     measureLabel?: string; // e.g., "cup", "slice"
     modifier?: string; // e.g. "chopped", "shredded"
+    foodName?: string | null; // Authoritative name from food_items table (common_name or name)
 }
 
 export interface Recipe {
