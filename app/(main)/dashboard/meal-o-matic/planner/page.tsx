@@ -613,7 +613,6 @@ export function MealPlannerContent({
     const [step, setStep] = useState<1 | 2 | 3>(1);
     const [generating, setGenerating] = useState(false);
     const [pantryItems, setPantryItems] = useState<any[]>([]);
-    const [eatenMeals, setEatenMeals] = useState<Set<string>>(new Set());
 
     // HeroSearch state
     const [heroSearchQuery, setHeroSearchQuery] = useState('');
@@ -963,6 +962,49 @@ export function MealPlannerContent({
         dailyPlan: plan,
         updateDailyPlan: setPlan
     } = useUserPreferences();
+
+    // Build a stable key from the current plan's recipe IDs so eaten state
+    // is tied to THIS specific plan and resets when a new plan is generated.
+    const planKey = plan
+        ? `${plan.breakfast.id}_${plan.lunch.id}_${plan.dinner.id}`
+        : null;
+
+    const EATEN_STORAGE_KEY = 'vitala_eaten_meals';
+
+    const [eatenMeals, setEatenMeals] = useState<Set<string>>(() => {
+        if (typeof window === 'undefined' || !planKey) return new Set();
+        try {
+            const saved = JSON.parse(localStorage.getItem(EATEN_STORAGE_KEY) || '{}');
+            if (saved.planKey === planKey && Array.isArray(saved.meals)) {
+                return new Set<string>(saved.meals);
+            }
+        } catch { /* ignore */ }
+        return new Set();
+    });
+
+    // Persist eaten state whenever it changes
+    useEffect(() => {
+        if (!planKey) return;
+        localStorage.setItem(EATEN_STORAGE_KEY, JSON.stringify({
+            planKey,
+            meals: [...eatenMeals],
+        }));
+    }, [eatenMeals, planKey]);
+
+    // When planKey becomes available or changes: restore saved eaten state or reset.
+    // This covers the case where the lazy initializer ran before `plan` loaded from context.
+    useEffect(() => {
+        if (!planKey) return;
+        try {
+            const saved = JSON.parse(localStorage.getItem(EATEN_STORAGE_KEY) || '{}');
+            if (saved.planKey === planKey && Array.isArray(saved.meals)) {
+                setEatenMeals(new Set<string>(saved.meals));
+            } else if (saved.planKey && saved.planKey !== planKey) {
+                setEatenMeals(new Set());
+            }
+        } catch { /* ignore */ }
+    }, [planKey]);
+
     const [showRecipeNutrients, setShowRecipeNutrients] = useState(false);
     const [recipeMoringaGrams, setRecipeMoringaGrams] = useState(0);
     const [moringaGrams, setMoringaGrams] = useState(0);
