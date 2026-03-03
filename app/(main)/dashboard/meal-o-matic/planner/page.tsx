@@ -252,6 +252,7 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
     const uniqueMatched = Array.from(new Set(matchedIngredients));
     const uniqueMissing = Array.from(new Set(missingIngredients));
     const [activePanel, setActivePanel] = useState<'stocked' | 'toBuy' | null>(null);
+    const [addedToList, setAddedToList] = useState(false);
     return (
         <div
             onClick={() => router.push(`/dashboard/library/meals/${recipe.id}`)}
@@ -504,11 +505,18 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                                 }
                                 localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(currentList));
                                 window.dispatchEvent(new CustomEvent('shopping-list-updated'));
+                                setAddedToList(true);
                                 toast.success(`${addedCount > 0 ? `${addedCount} item${addedCount !== 1 ? 's' : ''} added` : 'Already on your list'}`);
                             }}
-                            className="mt-2.5 w-full text-[10px] font-black uppercase tracking-widest py-2 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-1.5"
+                            disabled={addedToList}
+                            className={cn(
+                                "mt-2.5 w-full text-[10px] font-black uppercase tracking-widest py-2 rounded-lg border transition-all flex items-center justify-center gap-1.5",
+                                addedToList
+                                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 cursor-default"
+                                    : "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500 hover:text-white cursor-pointer"
+                            )}
                         >
-                            <Plus size={10} /> Add All to Shopping List
+                            <Plus size={10} /> {addedToList ? 'Added to Shopping List' : 'Add All to Shopping List'}
                         </button>
                     )}
                 </div>

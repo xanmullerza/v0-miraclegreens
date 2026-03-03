@@ -1073,12 +1073,13 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
 
                                                         {/* Pantry tick button */}
                                                         {(() => {
-                                                            const portionReady = pantryAddItem?.id === item.id && !!pantryAddSelectedPortion;
+                                                            // Green as soon as this item's panel is open — no portion required
+                                                            const panelOpen = pantryAddItem?.id === item.id;
                                                             return (
                                                                 <button
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
-                                                                        if (portionReady) {
+                                                                        if (panelOpen) {
                                                                             confirmPantryAdd();
                                                                         } else {
                                                                             clearAllPanels(true);
@@ -1086,16 +1087,16 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                             openPantryAddPanel(item);
                                                                         }
                                                                     }}
-                                                                    disabled={pantryAddLoading && pantryAddItem?.id === item.id}
-                                                                    title={portionReady ? 'Add to pantry' : 'Select weight to enable'}
+                                                                    disabled={pantryAddLoading && panelOpen}
+                                                                    title={panelOpen ? 'Confirm — add to pantry' : 'Open weight picker'}
                                                                     className={cn(
                                                                         "p-1.5 rounded-full border-2 transition-all flex-shrink-0",
-                                                                        portionReady
+                                                                        panelOpen
                                                                             ? "border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white cursor-pointer"
                                                                             : "border-slate-300 dark:border-slate-600 text-slate-300 dark:text-slate-600 cursor-pointer hover:border-emerald-400 hover:text-emerald-400"
                                                                     )}
                                                                 >
-                                                                    {pantryAddLoading && pantryAddItem?.id === item.id
+                                                                    {pantryAddLoading && panelOpen
                                                                         ? <Loader2 size={13} className="animate-spin" />
                                                                         : <CheckCircle2 size={13} />}
                                                                 </button>
