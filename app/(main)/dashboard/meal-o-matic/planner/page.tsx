@@ -189,6 +189,29 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
 }) => {
     const router = useRouter();
 
+    // Always use live DB ingredients so stale plan snapshots don't show removed items
+    const [liveIngs, setLiveIngs] = useState(recipe.ingredients || []);
+    useEffect(() => {
+        let cancelled = false;
+        supabase
+            .from('ingredients')
+            .select('item, base_ingredient, food_item_id, weight_g, amount, measure_label, is_miracle_product')
+            .eq('recipe_id', recipe.id)
+            .then(({ data }) => {
+                if (cancelled || !data || data.length === 0) return;
+                setLiveIngs(data.map((i: any) => ({
+                    item: i.item,
+                    amount: i.amount,
+                    isMiracleProduct: i.is_miracle_product,
+                    baseIngredient: i.base_ingredient,
+                    food_item_id: i.food_item_id,
+                    weightG: i.weight_g,
+                    measureLabel: i.measure_label,
+                })));
+            });
+        return () => { cancelled = true; };
+    }, [recipe.id]);
+
     // Match Analysis Logic
     const pantryIds = new Set(pantryItems.map(f => f.id));
     const pantryNames = new Set<string>();
@@ -206,7 +229,7 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
             else pantryNames.add(n + 's');
         }
     });
-    const recipeIngs = recipe.ingredients || [];
+    const recipeIngs = liveIngs;
 
     let matchCount = 0;
     const matchedIngredients: string[] = [];
