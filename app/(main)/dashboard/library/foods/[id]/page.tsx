@@ -1181,65 +1181,7 @@ export default function FoodDetailsPage() {
                             <Activity size={18} />
                             Essential Nutrients
                         </h3>
-                        {/* Weight Widget - compact, inline with heading */}
-                        <div className="flex items-center bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                            {/* Decrease */}
-                            <button
-                                onClick={() => setAmount(a => Math.max(1, a - (selectedPortion ? 1 : 10)))}
-                                className="px-1.5 py-1 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-colors"
-                            >
-                                <ChevronDown className="w-3 h-3" />
-                            </button>
-                            <div className="flex items-center border-x border-slate-100 dark:border-slate-800">
-                                <input
-                                    type="number"
-                                    value={amount}
-                                    onChange={(e) => setAmount(Number(e.target.value))}
-                                    className="w-10 bg-transparent text-xs font-black italic text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-center"
-                                />
-                                <div className="relative group/select pr-1">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger className="flex items-center gap-0.5 text-[9px] font-black uppercase tracking-tighter text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
-                                            {selectedPortion?.label || 'g'}
-                                            <ChevronDown className="w-2.5 h-2.5 text-slate-400 group-hover/select:text-emerald-500" />
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent
-                                            align="end"
-                                            className="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-[1.5rem] p-2 min-w-[140px] shadow-2xl animate-in zoom-in-95 duration-200"
-                                        >
-                                            <DropdownMenuItem
-                                                className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
-                                                onClick={() => {
-                                                    setSelectedPortion(null);
-                                                    if (amount === 1) setAmount(100);
-                                                }}
-                                            >
-                                                Gram (g)
-                                            </DropdownMenuItem>
-                                            {food?.portions?.map(p => (
-                                                <DropdownMenuItem
-                                                    key={p.label}
-                                                    className="text-[10px] font-black uppercase tracking-tighter rounded-xl px-4 py-2.5 cursor-pointer focus:bg-emerald-500 focus:text-white dark:focus:bg-emerald-600 transition-all text-slate-500 dark:text-slate-400"
-                                                    onClick={() => {
-                                                        setSelectedPortion(p);
-                                                        if (amount >= 10) setAmount(1);
-                                                    }}
-                                                >
-                                                    {p.label}
-                                                </DropdownMenuItem>
-                                            ))}
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </div>
-                            </div>
-                            {/* Increase */}
-                            <button
-                                onClick={() => setAmount(a => a + (selectedPortion ? 1 : 10))}
-                                className="px-1.5 py-1 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-colors"
-                            >
-                                <ChevronUp className="w-3 h-3" />
-                            </button>
-                        </div>
+                        <span className="text-xs font-black italic text-slate-400 tracking-tight">100g</span>
                     </div>
 
 
