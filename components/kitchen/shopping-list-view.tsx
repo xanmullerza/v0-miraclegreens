@@ -103,6 +103,15 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
     const [selectedRemoveItem, setSelectedRemoveItem] = useState<ShoppingListItem | null>(null);
     const [expandedBreakdownId, setExpandedBreakdownId] = useState<string | null>(null);
 
+    // Helper to clear all expanded sub-panels
+    const clearAllPanels = (exceptAction?: boolean) => {
+        if (!exceptAction) setExpandedActionId(null);
+        setExpandedRemoveId(null);
+        setSelectedRemoveItem(null);
+        setExpandedBreakdownId(null);
+        setPantryAddItem(null);
+    };
+
     // Load manual items from local storage on mount and when storage changes
     useEffect(() => {
         const loadManualItems = () => {
@@ -124,10 +133,27 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         return () => window.removeEventListener('storage', loadManualItems);
     }, []);
 
-    // Save manual items to local storage whenever they change
+    // Save manual items to local storage whenever they change (with dedup)
     useEffect(() => {
-        if (!loading) { // Avoid saving empty list on initial load before manual items are restored
-            localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(manualItems));
+        if (!loading) {
+            // Deduplicate by food_item_id before saving
+            const deduped: ShoppingListItem[] = [];
+            const seenFoodIds = new Map<string, number>();
+            for (const item of manualItems) {
+                if (item.food_item_id && seenFoodIds.has(item.food_item_id)) {
+                    const idx = seenFoodIds.get(item.food_item_id)!;
+                    const existing = deduped[idx];
+                    deduped[idx] = { ...existing, quantity: `${existing.quantity} + ${item.quantity}` };
+                } else {
+                    if (item.food_item_id) seenFoodIds.set(item.food_item_id, deduped.length);
+                    deduped.push(item);
+                }
+            }
+            // If dedup reduced items, update state too
+            if (deduped.length < manualItems.length) {
+                setManualItems(deduped);
+            }
+            localStorage.setItem('vitala_shopping_manual_items', JSON.stringify(deduped));
         }
     }, [manualItems, loading]);
 
@@ -136,7 +162,25 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         let isCancelled = false;
 
         const combineAndEnrich = async () => {
-            let combined = [...manualItems];
+            // Deduplicate manualItems by food_item_id (merge quantities)
+            const deduped: ShoppingListItem[] = [];
+            const seenFoodIds = new Map<string, number>(); // food_item_id -> index in deduped
+            for (const item of manualItems) {
+                if (item.food_item_id && seenFoodIds.has(item.food_item_id)) {
+                    const idx = seenFoodIds.get(item.food_item_id)!;
+                    const existing = deduped[idx];
+                    // Merge quantities
+                    const merged = existing.quantity && item.quantity
+                        ? `${existing.quantity} + ${item.quantity}`
+                        : existing.quantity || item.quantity;
+                    deduped[idx] = { ...existing, quantity: merged };
+                } else {
+                    if (item.food_item_id) seenFoodIds.set(item.food_item_id, deduped.length);
+                    deduped.push(item);
+                }
+            }
+
+            let combined = [...deduped];
 
             if (dailyPlan) {
                 const mealPlanItems = generateShoppingList(dailyPlan);
@@ -460,13 +504,18 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         }
     };
 
-    // Open the inline pantry-add panel for a grocery item
+    // Open the inline add panel for a grocery item
     const openPantryAddPanel = async (item: ShoppingListItem) => {
         // If already open for this item, close it
         if (pantryAddItem?.id === item.id) {
             setPantryAddItem(null);
             return;
         }
+
+        // Close sibling panels
+        setExpandedRemoveId(null);
+        setSelectedRemoveItem(null);
+        setExpandedBreakdownId(null);
 
         // Pre-fill qty from the grocery item's quantity (strip non-numeric prefixes)
         const qtyMatch = (item.quantity || '1').match(/^(\d+(?:\.\d+)?)/);
@@ -517,6 +566,9 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
             setSelectedRemoveItem(null);
             return;
         }
+        // Close sibling panels
+        setPantryAddItem(null);
+        setExpandedBreakdownId(null);
         setSelectedRemoveItem(item);
         setExpandedRemoveId(item.id);
     };
@@ -1116,7 +1168,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                     <Fragment key={item.id}>
                                                     <div
                                                         className="flex items-center gap-3 px-3 py-2 rounded-xl border transition-all bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-emerald-400/50 hover:bg-white dark:hover:bg-slate-800 cursor-pointer group"
-                                                        onClick={(e) => { e.stopPropagation(); setExpandedActionId(expandedActionId === item.id ? null : item.id); }}
+                                                        onClick={(e) => { e.stopPropagation(); clearAllPanels(false); setExpandedActionId(expandedActionId === item.id ? null : item.id); }}
                                                     >
                                                         {/* Food Image */}
                                                         <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 shrink-0 flex items-center justify-center">
@@ -1141,7 +1193,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
 
                                                         {/* Expand chevron */}
                                                         <button
-                                                            onClick={(e) => { e.stopPropagation(); setExpandedActionId(expandedActionId === item.id ? null : item.id); }}
+                                                            onClick={(e) => { e.stopPropagation(); clearAllPanels(false); setExpandedActionId(expandedActionId === item.id ? null : item.id); }}
                                                             className={cn(
                                                                 "p-1.5 rounded-lg transition-all flex-shrink-0",
                                                                 expandedActionId === item.id
@@ -1160,7 +1212,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                             <button
                                                                 onClick={(e) => { e.stopPropagation(); openPantryAddPanel(item); }}
                                                                 className="p-2.5 rounded-lg transition-all flex-shrink-0 text-slate-400 hover:bg-emerald-100 dark:hover:bg-emerald-950/40 hover:text-emerald-500"
-                                                                title="Add to pantry"
+                                                                title="Add more to list"
                                                             >
                                                                 <Plus size={18} />
                                                             </button>
@@ -1172,7 +1224,7 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                 <Minus size={18} />
                                                             </button>
                                                             <button
-                                                                onClick={(e) => { e.stopPropagation(); setExpandedBreakdownId(expandedBreakdownId === item.id ? null : item.id); }}
+                                                                onClick={(e) => { e.stopPropagation(); setPantryAddItem(null); setExpandedRemoveId(null); setSelectedRemoveItem(null); setExpandedBreakdownId(expandedBreakdownId === item.id ? null : item.id); }}
                                                                 className="p-2.5 rounded-lg transition-all flex-shrink-0 text-slate-400 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:text-amber-500"
                                                                 title="View package sizes"
                                                             >
