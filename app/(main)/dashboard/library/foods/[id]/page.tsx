@@ -24,6 +24,7 @@ import {
     Camera,
     Save,
     ChevronDown,
+    ChevronUp,
     Layers,
     BookOpen,
     Globe,
@@ -1028,23 +1029,6 @@ export default function FoodDetailsPage() {
                                         </div>
                                     </>
                                 )}
-                                {food?.portions && food.portions.length > 0 && (
-                                    <button
-                                        onClick={() => {
-                                            if (selectedPortion) {
-                                                setSelectedPortion(null);
-                                                setQuickAddWeight(`${selectedPortion.weight_g}`);
-                                                setQuickAddUnit('g');
-                                            } else {
-                                                setSelectedPortion(food?.portions?.[0] || null);
-                                            }
-                                        }}
-                                        className="text-[9px] font-black uppercase tracking-widest text-slate-500 hover:text-emerald-500 transition-colors whitespace-nowrap self-end mb-0.5"
-                                    >
-                                        {selectedPortion ? 'Use Weight' : 'Use Serving'}
-                                    </button>
-                                )}
-
                                 <div className="flex-1 md:flex-none">
                                     <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Destination</Label>
                                     <select
@@ -1057,13 +1041,22 @@ export default function FoodDetailsPage() {
                                     </select>
                                 </div>
 
-                                <Button
-                                    onClick={handleQuickAdd}
-                                    className="gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest text-[9px] h-10"
-                                >
-                                    <Plus size={16} />
-                                    Add
-                                </Button>
+                                <div className="flex items-center gap-2 self-end">
+                                    <Button
+                                        onClick={handleQuickAdd}
+                                        className="gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest text-[9px] h-9 px-4"
+                                    >
+                                        <Plus size={14} />
+                                        Add
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        onClick={() => setShowQuickAdd(false)}
+                                        className="h-9 px-4 font-black uppercase tracking-widest text-[9px] text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
+                                    >
+                                        Cancel
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1077,18 +1070,25 @@ export default function FoodDetailsPage() {
                             Essential Nutrients
                         </h3>
                         {/* Weight Widget - compact, inline with heading */}
-                        <div className="flex items-center bg-white dark:bg-slate-900 px-2 py-1 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm group/amount transition-all hover:border-emerald-500/50">
-                            <div className="flex items-center">
+                        <div className="flex items-center bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+                            {/* Decrease */}
+                            <button
+                                onClick={() => setAmount(a => Math.max(1, a - (selectedPortion ? 1 : 10)))}
+                                className="px-1.5 py-1 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-colors"
+                            >
+                                <ChevronDown className="w-3 h-3" />
+                            </button>
+                            <div className="flex items-center border-x border-slate-100 dark:border-slate-800">
                                 <input
                                     type="number"
                                     value={amount}
                                     onChange={(e) => setAmount(Number(e.target.value))}
-                                    className="w-12 bg-transparent text-sm font-black italic text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-center border-r border-slate-100 dark:border-slate-800"
+                                    className="w-10 bg-transparent text-xs font-black italic text-slate-900 dark:text-white outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-center"
                                 />
-                                <div className="relative group/select pl-2 pr-1">
+                                <div className="relative group/select pr-1">
                                     <DropdownMenu>
-                                        <DropdownMenuTrigger className="flex items-center gap-1 text-[9px] font-black uppercase tracking-tighter text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
-                                            {selectedPortion?.label || 'Gram (g)'}
+                                        <DropdownMenuTrigger className="flex items-center gap-0.5 text-[9px] font-black uppercase tracking-tighter text-slate-500 dark:text-slate-400 outline-none hover:text-emerald-500 transition-colors">
+                                            {selectedPortion?.label || 'g'}
                                             <ChevronDown className="w-2.5 h-2.5 text-slate-400 group-hover/select:text-emerald-500" />
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent
@@ -1120,6 +1120,13 @@ export default function FoodDetailsPage() {
                                     </DropdownMenu>
                                 </div>
                             </div>
+                            {/* Increase */}
+                            <button
+                                onClick={() => setAmount(a => a + (selectedPortion ? 1 : 10))}
+                                className="px-1.5 py-1 text-slate-400 hover:text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-colors"
+                            >
+                                <ChevronUp className="w-3 h-3" />
+                            </button>
                         </div>
                     </div>
 
