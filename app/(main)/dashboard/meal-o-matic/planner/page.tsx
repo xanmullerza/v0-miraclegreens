@@ -758,15 +758,18 @@ export function MealPlannerContent({
                     items = [...items, ...personalItems];
                 }
 
-                // Merge in LocalStorage quantities (even for logged out users)
+                // Merge in LocalStorage quantities — only overlay on already-fetched items,
+                // and only create phantom entries for admins (non-admins use pantry_items)
                 const saved = localStorage.getItem('pantry_quantities');
                 if (saved) {
                     const localQ = JSON.parse(saved);
-                    Object.keys(localQ).forEach(id => {
-                        if (!items.find(it => it.id === id)) {
-                            items.push({ id: id, is_in_pantry: true });
-                        }
-                    });
+                    if (admin) {
+                        Object.keys(localQ).forEach(id => {
+                            if (!items.find(it => it.id === id)) {
+                                items.push({ id: id, is_in_pantry: true });
+                            }
+                        });
+                    }
                 }
 
                 setPantryItems(items);
