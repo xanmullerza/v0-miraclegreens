@@ -966,17 +966,6 @@ export default function FoodDetailsPage() {
                             <Star size={14} className={cn('shrink-0', food.is_favorite ? 'text-amber-400 fill-amber-400' : 'text-slate-300')} />
                         </button>
 
-                        {/* Coming Soon */}
-                        <div className="w-full flex items-center gap-4 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 opacity-60 cursor-not-allowed">
-                            <div className="w-9 h-9 rounded-xl bg-slate-200 dark:bg-slate-700 flex items-center justify-center shrink-0">
-                                <Layers size={16} className="text-slate-400" />
-                            </div>
-                            <div className="flex-1">
-                                <p className="text-xs font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">More Actions</p>
-                                <p className="text-[10px] text-slate-400 font-medium mt-0.5">Coming soon</p>
-                            </div>
-                        </div>
-
                         {/* Edit & Delete — admin or food creator only */}
                         {canEditDelete && (
                             <div className="grid grid-cols-2 gap-3">
@@ -1000,6 +989,17 @@ export default function FoodDetailsPage() {
                                 </button>
                             </div>
                         )}
+
+                        {/* Coming Soon */}
+                        <div className="w-full flex items-center gap-4 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 opacity-60 cursor-not-allowed">
+                            <div className="w-9 h-9 rounded-xl bg-slate-200 dark:bg-slate-700 flex items-center justify-center shrink-0">
+                                <Layers size={16} className="text-slate-400" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-xs font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">More Actions</p>
+                                <p className="text-[10px] text-slate-400 font-medium mt-0.5">Coming soon</p>
+                            </div>
+                        </div>
                     </div>
                     );
                 })()}
