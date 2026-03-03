@@ -560,46 +560,43 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
 
         const qty = pantryAddQty || '1';
         const quantityString = pantryAddSelectedPortion
-            ? `${qty} ${pantryAddSelectedPortion.label}`
+            ? `${qty} ${pantryAddSelectedPortion.label} (${pantryAddSelectedPortion.weight_g}g)`
             : qty;
 
-        // Check if item already exists by name
+        // Match existing item by food_item_id (most reliable), then fall back to name
         const normalize = (s: string) => s.toLowerCase().trim();
-        const existingIndex = manualItems.findIndex(
-            item => normalize(item.name) === normalize(pantryAddItem.name)
-        );
+        const existingIndex = manualItems.findIndex(item => {
+            if (pantryAddItem.food_item_id && item.food_item_id) {
+                return item.food_item_id === pantryAddItem.food_item_id;
+            }
+            return normalize(item.name) === normalize(pantryAddItem.name);
+        });
 
         if (existingIndex >= 0) {
-            // Item exists - aggregate quantities
+            // Item exists — intelligently combine quantities
             const existing = manualItems[existingIndex];
             const existingQty = existing.quantity || '1';
-            const currentQty = parseFloat(qty) || 1;
-            const existingQtyNum = parseFloat(existingQty) || 1;
-            const newQty = currentQty + existingQtyNum;
-
-            const updatedItem = {
-                ...existing,
-                quantity: newQty.toString(),
-            };
+            const combined = smartCombineQuantities(existingQty, quantityString);
 
             const updated = [...manualItems];
-            updated[existingIndex] = updatedItem;
+            updated[existingIndex] = { ...existing, quantity: combined };
             setManualItems(updated);
-            toast.success(`Updated ${pantryAddItem.name} (now ${newQty} total)`);
+            toast.success(`Updated ${pantryAddItem.common_name || pantryAddItem.name} quantity`);
         } else {
             // New item
             const newItem: ShoppingListItem = {
                 id: `manual-${Date.now()}`,
-                name: pantryAddItem.name,
-                quantity: qty,
-                unit: pantryAddSelectedPortion?.label || 'each',
+                name: pantryAddItem.common_name || pantryAddItem.name,
+                quantity: quantityString,
+                unit: '',
                 source: 'manual',
+                image: pantryAddItem.image,
                 image_url: pantryAddItem.image_url,
                 food_item_id: pantryAddItem.food_item_id,
             };
 
             setManualItems(prev => [...prev, newItem]);
-            toast.success(`Added ${pantryAddItem.name} to groceries`);
+            toast.success(`Added ${pantryAddItem.common_name || pantryAddItem.name} to shopping list`);
         }
 
         // Close the form and reset
@@ -608,6 +605,41 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         setPantryAddPortions([]);
         setPantryAddSelectedPortion(null);
         setPantryAddFoodId(null);
+    };
+
+    // Smart quantity combiner — sums same-portion entries, concatenates different portions
+    const smartCombineQuantities = (existing: string, incoming: string): string => {
+        // Parse a quantity string like "5 Extra Large (223g)" or "3" or "200 Extra Large (223g) + 5 Medium (145g)"
+        const parseEntry = (s: string) => {
+            const portionMatch = s.trim().match(/^(\d+(?:\.\d+)?)\s+(.+?)\s+\((\d+(?:\.\d+)?)g\)$/);
+            if (portionMatch) return { value: parseFloat(portionMatch[1]), label: portionMatch[2].trim(), weight: portionMatch[3] };
+            const simpleMatch = s.trim().match(/^(\d+(?:\.\d+)?)$/);
+            if (simpleMatch) return { value: parseFloat(simpleMatch[1]), label: '', weight: '' };
+            return null;
+        };
+
+        // Split existing multi-part quantities and incoming into entries
+        const existingParts = existing.split(/\s*\+\s*/).map(s => s.trim()).filter(Boolean);
+        const incomingParsed = parseEntry(incoming);
+        if (!incomingParsed) return existing ? `${existing} + ${incoming}` : incoming;
+
+        // Try to find a matching entry with the same label+weight to sum
+        let merged = false;
+        const updatedParts = existingParts.map(part => {
+            const parsed = parseEntry(part);
+            if (parsed && parsed.label === incomingParsed.label && parsed.weight === incomingParsed.weight) {
+                merged = true;
+                const newValue = parsed.value + incomingParsed.value;
+                return parsed.label
+                    ? `${newValue} ${parsed.label} (${parsed.weight}g)`
+                    : `${newValue}`;
+            }
+            return part;
+        });
+
+        if (merged) return updatedParts.join(' + ');
+        // Different portion type — append
+        return existing ? `${existing} + ${incoming}` : incoming;
     };
 
     // Confirm adding a grocery item to the pantry with the chosen qty + portion
