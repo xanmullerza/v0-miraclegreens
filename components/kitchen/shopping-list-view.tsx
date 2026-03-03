@@ -1212,8 +1212,9 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
 
                                                     {/* Inline pantry-add panel */}
                                                     {pantryAddItem?.id === item.id && (
-                                                        <div className="mb-0.5 p-4 rounded-xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50 dark:bg-emerald-950/20 animate-in slide-in-from-top-2 duration-200">
-                                                            <div className="flex flex-wrap items-end gap-3">
+                                                        <div className="mt-1 mb-0.5 px-4 py-3 rounded-xl border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-950/20 animate-in slide-in-from-top-2 duration-200">
+                                                            <p className="text-[9px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400 mb-3">Add Stock</p>
+                                                            <div className="space-y-3">
                                                                 <div>
                                                                     <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Qty</Label>
                                                                     <Input
@@ -1223,21 +1224,44 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                         value={pantryAddQty}
                                                                         onChange={(e) => setPantryAddQty(e.target.value)}
                                                                         onClick={(e) => e.stopPropagation()}
-                                                                        className="w-16 text-center h-9"
+                                                                        className="w-full h-9 text-sm"
                                                                     />
                                                                 </div>
 
-                                                                {pantryAddPortions.length > 0 ? (
+                                                                {pantryAddPortions.length > 0 && !pantryAddSelectedPortion ? (
                                                                     <div>
                                                                         <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Serving</Label>
                                                                         <select
-                                                                            value={pantryAddSelectedPortion?.label || ''}
                                                                             onChange={(e) => {
                                                                                 const p = pantryAddPortions.find(p => p.label === e.target.value);
                                                                                 if (p) setPantryAddSelectedPortion(p);
                                                                             }}
                                                                             onClick={(e) => e.stopPropagation()}
-                                                                            className="px-2 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                                                            className="w-full px-3 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
+                                                                        >
+                                                                            <option value="">Weight...</option>
+                                                                            {(() => {
+                                                                                const seen = new Set<number>();
+                                                                                return pantryAddPortions
+                                                                                    .filter(p => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon|ring|wedge|strip|stalk|sprig|patty|fillet|spear|floret|link/i.test(p.label))
+                                                                                    .filter(p => { if (seen.has(p.weight_g)) return false; seen.add(p.weight_g); return true; })
+                                                                                    .map(p => (
+                                                                                        <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
+                                                                                    ));
+                                                                            })()}
+                                                                        </select>
+                                                                    </div>
+                                                                ) : pantryAddSelectedPortion ? (
+                                                                    <div>
+                                                                        <Label className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-1.5 block">Serving</Label>
+                                                                        <select
+                                                                            value={pantryAddSelectedPortion.label}
+                                                                            onChange={(e) => {
+                                                                                const p = pantryAddPortions.find(p => p.label === e.target.value);
+                                                                                if (p) setPantryAddSelectedPortion(p);
+                                                                            }}
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                            className="w-full px-3 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
                                                                         >
                                                                             {(() => {
                                                                                 const seen = new Set<number>();
@@ -1251,49 +1275,18 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                         </select>
                                                                     </div>
                                                                 ) : (
-                                                                    <span className="text-xs text-slate-400 pb-2">No portions found</span>
+                                                                    <span className="text-xs text-slate-400">No portions found</span>
                                                                 )}
 
                                                                 <Button
-                                                                    size="sm"
-                                                                    onClick={(e) => { e.stopPropagation(); confirmAddToGroceries(); }}
-                                                                    disabled={pantryAddLoading}
-                                                                    className="h-9 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold"
-                                                                >
-                                                                    {pantryAddLoading ? <Loader2 size={14} className="animate-spin" /> : <ShoppingCart size={14} className="mr-1" />}
-                                                                    Add to Groceries
-                                                                </Button>
-                                                                <Button
-                                                                    size="sm"
                                                                     onClick={(e) => { e.stopPropagation(); confirmPantryAdd(); }}
                                                                     disabled={pantryAddLoading || !pantryAddSelectedPortion}
-                                                                    className="h-9 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                                                                    className="w-full h-10 gap-2 bg-amber-500 hover:bg-amber-600 text-white font-black uppercase tracking-widest text-xs"
                                                                 >
-                                                                    {pantryAddLoading ? <Loader2 size={14} className="animate-spin" /> : <Package size={14} className="mr-1" />}
-                                                                    Add to Pantry
+                                                                    <Plus size={16} />
+                                                                    {pantryAddLoading ? 'Adding...' : 'Add'}
                                                                 </Button>
-                                                                <Button
-                                                                    size="sm"
-                                                                    variant="ghost"
-                                                                    onClick={(e) => { e.stopPropagation(); setPantryAddItem(null); }}
-                                                                    className="h-9 px-3 text-slate-500"
-                                                                >
-                                                                    Cancel
-                                                                </Button>
-
-                                                                <button
-                                                                    onClick={(e) => { e.stopPropagation(); removeItem(item.id); setPantryAddItem(null); }}
-                                                                    className="p-2 rounded-lg hover:bg-rose-100 dark:hover:bg-rose-950/40 text-slate-300 dark:text-slate-600 hover:text-rose-500 transition-all flex-shrink-0 ml-auto"
-                                                                    title="Remove from list"
-                                                                >
-                                                                    <Trash2 size={16} />
-                                                                </button>
                                                             </div>
-                                                            {pantryAddSelectedPortion && (
-                                                                <p className="text-[10px] text-slate-400 mt-2">
-                                                                    Total: {Math.round(parseFloat(pantryAddQty || '0') * pantryAddSelectedPortion.weight_g)}g
-                                                                </p>
-                                                            )}
                                                         </div>
                                                     )}
                                                     </Fragment>
