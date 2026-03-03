@@ -870,65 +870,68 @@ export default function FoodDetailsPage() {
     return (
         <PageContainer maxWidth="max-w-6xl">
             <div className="space-y-8 pb-20 animate-in fade-in duration-700">
-                {/* NEW Main Header Section (Image + Name + Description) */}
-                <div className="flex flex-row items-end gap-6 animate-in slide-in-from-top-4 duration-700 pb-1">
-                    {/* Left Side: Image (Inline with Text) */}
-                    <div className="w-24 h-24 lg:w-24 lg:h-24 shrink-0">
-                        <Card className="w-full h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden rounded-2xl">
-                            <div className="w-full h-full rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
-                                {food.image ? (
-                                    <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-slate-200">
-                                        <Beef size={24} className="opacity-10" />
-                                    </div>
-                                )}
-                                <div className="absolute top-1 left-1 flex flex-col gap-1">
-                                    {food.protein_g > 15 && (
-                                        <Badge className="bg-red-600/90 text-white border-none text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 backdrop-blur-md shadow-xl w-fit">
-                                            HP
-                                        </Badge>
-                                    )}
-                                </div>
-                            </div>
-                        </Card>
-                    </div>
+                {/* NEW Main Header Section */}
+                <div className="space-y-3 animate-in slide-in-from-top-4 duration-700">
+                    {/* Full-width title */}
+                    <h1 className="text-xl font-black tracking-tighter uppercase italic leading-tight">
+                        <span className="text-emerald-500">{formatFoodName(food.common_name || food.name)}</span>
+                    </h1>
 
-                    {/* Right Side: Text Content + 2x2 Grid */}
-                    <div className="flex-1 flex flex-col gap-3">
-                        <div>
-                            <h1 className="text-base font-black tracking-tighter uppercase italic leading-tight">
-                                <span className="text-emerald-500">{formatFoodName(food.common_name || food.name)}</span>
-                            </h1>
+                    {/* Image + controls row */}
+                    <div className="flex flex-row items-start gap-4">
+                        {/* Image */}
+                        <div className="w-20 h-20 shrink-0">
+                            <Card className="w-full h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden rounded-2xl">
+                                <div className="w-full h-full rounded-xl bg-slate-50 dark:bg-slate-950 overflow-hidden relative border border-slate-100 dark:border-slate-800">
+                                    {food.image ? (
+                                        <img src={food.image} alt={food.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-slate-200">
+                                            <Beef size={24} className="opacity-10" />
+                                        </div>
+                                    )}
+                                    <div className="absolute top-1 left-1 flex flex-col gap-1">
+                                        {food.protein_g > 15 && (
+                                            <Badge className="bg-red-600/90 text-white border-none text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 backdrop-blur-md shadow-xl w-fit">
+                                                HP
+                                            </Badge>
+                                        )}
+                                    </div>
+                                </div>
+                            </Card>
+                        </div>
+
+                        {/* In Stock + 2x2 Grid */}
+                        <div className="flex-1 flex flex-col gap-2">
                             {food.quantity && (
                                 <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500">In Stock: {food.quantity}</span>
                             )}
-                        </div>
-                        {/* 2x2 Action Grid */}
-                        <div className="grid grid-cols-2 gap-1.5">
-                            {[
-                                { key: 'facts' as const, label: 'About', icon: Lightbulb, color: 'text-purple-500', activeBg: 'bg-purple-500/10 border-purple-500/30', hidden: !(food.details || FOOD_DETAILS[food.id]) },
-                                { key: 'nutrition' as const, label: 'Nutrition', icon: Activity, color: 'text-emerald-500', activeBg: 'bg-emerald-500/10 border-emerald-500/30' },
-                                { key: 'recipes' as const, label: 'Recipes', icon: UtensilsCrossed, color: 'text-amber-500', activeBg: 'bg-amber-500/10 border-amber-500/30' },
-                                { key: 'management' as const, label: 'Management', icon: ShoppingBasket, color: 'text-blue-500', activeBg: 'bg-blue-500/10 border-blue-500/30' },
-                            ].filter(b => !b.hidden).map(({ key, label, icon: Icon, color, activeBg }) => (
-                                <button
-                                    key={key}
-                                    onClick={() => {
-                                        setActiveSection(prev => prev === key ? null : key);
-                                        if (key === 'management') { setQuickAddQty('1'); setQuickAddWeight(''); }
-                                    }}
-                                    className={cn(
-                                        'flex items-center gap-1.5 px-2.5 py-2 rounded-xl border text-[9px] font-black uppercase tracking-widest transition-all',
-                                        activeSection === key
-                                            ? `${activeBg} ${color}`
-                                            : 'border-slate-200 dark:border-slate-800 text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
-                                    )}
-                                >
-                                    <Icon size={11} />
-                                    {label}
-                                </button>
-                            ))}
+                            {/* 2x2 Action Grid */}
+                            <div className="grid grid-cols-2 gap-1.5">
+                                {[
+                                    { key: 'facts' as const, label: 'About', icon: Lightbulb, color: 'text-purple-500', activeBg: 'bg-purple-500/10 border-purple-500/30', hidden: !(food.details || FOOD_DETAILS[food.id]) },
+                                    { key: 'nutrition' as const, label: 'Nutrition', icon: Activity, color: 'text-emerald-500', activeBg: 'bg-emerald-500/10 border-emerald-500/30' },
+                                    { key: 'recipes' as const, label: 'Recipes', icon: UtensilsCrossed, color: 'text-amber-500', activeBg: 'bg-amber-500/10 border-amber-500/30' },
+                                    { key: 'management' as const, label: 'Management', icon: ShoppingBasket, color: 'text-blue-500', activeBg: 'bg-blue-500/10 border-blue-500/30' },
+                                ].filter(b => !b.hidden).map(({ key, label, icon: Icon, color, activeBg }) => (
+                                    <button
+                                        key={key}
+                                        onClick={() => {
+                                            setActiveSection(prev => prev === key ? null : key);
+                                            if (key === 'management') { setQuickAddQty('1'); setQuickAddWeight(''); }
+                                        }}
+                                        className={cn(
+                                            'flex items-center gap-1.5 px-2.5 py-2 rounded-xl border text-[9px] font-black uppercase tracking-widest transition-all',
+                                            activeSection === key
+                                                ? `${activeBg} ${color}`
+                                                : 'border-slate-200 dark:border-slate-800 text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
+                                        )}
+                                    >
+                                        <Icon size={11} />
+                                        {label}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
