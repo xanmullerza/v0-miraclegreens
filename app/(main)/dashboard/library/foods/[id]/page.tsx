@@ -113,7 +113,7 @@ export default function FoodDetailsPage() {
     const [user, setUser] = useState<any>(null);
     const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
-    const [activeSection, setActiveSection] = useState<'facts' | 'nutrition' | 'recipes' | 'management' | null>(null);
+    const [activeSection, setActiveSection] = useState<'facts' | 'nutrition' | 'recipes' | 'management' | null>('recipes');
     const [quickAddQty, setQuickAddQty] = useState('1');
     const [quickAddWeight, setQuickAddWeight] = useState('');
     const [quickAddUnit, setQuickAddUnit] = useState('g');
@@ -871,7 +871,7 @@ export default function FoodDetailsPage() {
         <PageContainer maxWidth="max-w-6xl">
             <div className="space-y-8 pb-20 animate-in fade-in duration-700">
                 {/* NEW Main Header Section */}
-                <div className="space-y-3 animate-in slide-in-from-top-4 duration-700">
+                <div className="space-y-3 animate-in slide-in-from-top-4 duration-700 pt-4">
                     {/* Full-width title */}
                     <h1 className="text-xl font-black tracking-tighter uppercase italic leading-tight mb-3">
                         <span className="text-emerald-500">{formatFoodName(food.common_name || food.name)}</span>
