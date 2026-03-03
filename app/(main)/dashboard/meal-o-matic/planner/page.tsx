@@ -15,6 +15,7 @@ import {
     RotateCcw,
     ChefHat,
     ShoppingBasket,
+    ShoppingCart,
     Sparkles,
     Download,
     Egg,
@@ -262,6 +263,10 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
             );
         } catch { return false; }
     });
+    // 3-state to-buy button: toAdd → toBuy → ready
+    const toBuyState: 'toAdd' | 'toBuy' | 'ready' =
+        uniqueMissing.length === 0 ? 'ready' : addedToList ? 'toBuy' : 'toAdd';
+
     // Re-check when live DB ingredients load in (uniqueMissing may change after fetch)
     useEffect(() => {
         if (typeof window === 'undefined' || addedToList) return;
@@ -339,18 +344,26 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                             <ShoppingBasket size={10} />
                             {matchCount} / {recipeIngs.length} Stocked
                         </button>
-                        {uniqueMissing.length > 0 ? (
+                        {toBuyState === 'ready' ? (
+                            <div className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 flex items-center justify-center gap-1.5">
+                                <Sparkles size={10} /> Ready
+                            </div>
+                        ) : (
                             <button
                                 onClick={(e: React.MouseEvent) => { e.stopPropagation(); setActivePanel(activePanel === 'toBuy' ? null : 'toBuy'); }}
-                                className={cn("text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-1.5", activePanel === 'toBuy' && "ring-2 ring-offset-1 ring-amber-500")}
+                                className={cn(
+                                    "text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border hover:text-white transition-all flex items-center justify-center gap-1.5",
+                                    toBuyState === 'toBuy'
+                                        ? "border-blue-500/30 bg-blue-500/10 text-blue-500 hover:bg-blue-500"
+                                        : "border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500",
+                                    activePanel === 'toBuy' && "ring-2 ring-offset-1 ring-current"
+                                )}
                             >
-                                <ShoppingBasket size={10} />
-                                {uniqueMissing.length} / {recipeIngs.length} To Buy
+                                {toBuyState === 'toBuy'
+                                    ? <><ShoppingCart size={10} />{uniqueMissing.length} / {recipeIngs.length} To Buy</>
+                                    : <><ShoppingBasket size={10} />{uniqueMissing.length} / {recipeIngs.length} To Add</>
+                                }
                             </button>
-                        ) : (
-                            <div className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 flex items-center justify-center gap-1.5">
-                                <Sparkles size={10} /> Fully Stocked
-                            </div>
                         )}
                         {onMarkEaten && (
                             <button
@@ -416,17 +429,26 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                                 <ShoppingBasket size={9} />
                                 {matchCount}/{recipeIngs.length} Stocked
                             </button>
-                            {uniqueMissing.length > 0 ? (
+                            {toBuyState === 'ready' ? (
+                                <div className="text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 flex items-center justify-center gap-1">
+                                    <Sparkles size={9} /> Ready
+                                </div>
+                            ) : (
                                 <button
                                     onClick={(e: React.MouseEvent) => { e.stopPropagation(); setActivePanel(activePanel === 'toBuy' ? null : 'toBuy'); }}
-                                    className={cn("text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center gap-1", activePanel === 'toBuy' && "ring-2 ring-offset-1 ring-amber-500")}
+                                    className={cn(
+                                        "text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg border hover:text-white transition-all flex items-center justify-center gap-1",
+                                        toBuyState === 'toBuy'
+                                            ? "border-blue-500/30 bg-blue-500/10 text-blue-500 hover:bg-blue-500"
+                                            : "border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500",
+                                        activePanel === 'toBuy' && "ring-2 ring-offset-1 ring-current"
+                                    )}
                                 >
-                                    {uniqueMissing.length}/{recipeIngs.length} To Buy
+                                    {toBuyState === 'toBuy'
+                                        ? <><ShoppingCart size={9} />{uniqueMissing.length}/{recipeIngs.length} To Buy</>
+                                        : <><ShoppingBasket size={9} />{uniqueMissing.length}/{recipeIngs.length} To Add</>
+                                    }
                                 </button>
-                            ) : (
-                                <div className="text-[9px] font-black uppercase tracking-widest px-2 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 flex items-center justify-center gap-1">
-                                    <Sparkles size={9} /> Stocked
-                                </div>
                             )}
                             {onMarkEaten ? (
                                 <button
