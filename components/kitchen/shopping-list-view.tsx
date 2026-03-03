@@ -500,8 +500,11 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                     setPantryAddPortions(measures);
                     // Auto-select from shopping-friendly measures only
                     const filtered = measures.filter((m: any) => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon/i.test(m.label));
-                    const each = filtered.find((m: any) => /each/i.test(m.label));
-                    setPantryAddSelectedPortion(each || filtered[0] || null);
+                    // Deduplicate by weight_g (keep first occurrence)
+                    const seen = new Set<number>();
+                    const deduped = filtered.filter((m: any) => { if (seen.has(m.weight_g)) return false; seen.add(m.weight_g); return true; });
+                    const each = deduped.find((m: any) => /each/i.test(m.label));
+                    setPantryAddSelectedPortion(each || deduped[0] || null);
                 }
             } catch (e) { /* ignore */ }
         }
@@ -1236,9 +1239,15 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                             onClick={(e) => e.stopPropagation()}
                                                                             className="px-2 py-2 h-9 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm font-bold text-slate-900 dark:text-white"
                                                                         >
-                                                                            {pantryAddPortions.filter(p => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon/i.test(p.label)).map(p => (
-                                                                                <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
-                                                                            ))}
+                                                                            {(() => {
+                                                                                const seen = new Set<number>();
+                                                                                return pantryAddPortions
+                                                                                    .filter(p => !/cup|tbsp|tsp|tablespoon|teaspoon|slice|serving|fluid|pint|quart|gallon/i.test(p.label))
+                                                                                    .filter(p => { if (seen.has(p.weight_g)) return false; seen.add(p.weight_g); return true; })
+                                                                                    .map(p => (
+                                                                                        <option key={p.label} value={p.label}>{p.label} ({p.weight_g}g)</option>
+                                                                                    ));
+                                                                            })()}
                                                                         </select>
                                                                     </div>
                                                                 ) : (
