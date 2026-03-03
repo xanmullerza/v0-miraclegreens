@@ -360,6 +360,80 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
         }
     };
 
+    // Tick button: directly add item to pantry using its existing shopping-list quantity
+    const [tickLoadingId, setTickLoadingId] = useState<string | null>(null);
+    const quickAddToPantry = async (item: ShoppingListItem) => {
+        setTickLoadingId(item.id);
+        try {
+            // Resolve food_item_id
+            let foodItemId = item.food_item_id || null;
+            if (!foodItemId && item.name) {
+                const normalize = (s: string) => s.replace(/\(.*?\)/g, '').replace(/[^a-zA-Z0-9 ]/g, '').trim();
+                const { data } = await supabase
+                    .from('food_items')
+                    .select('id')
+                    .or(`name.ilike.%${normalize(item.name)}%,common_name.ilike.%${normalize(item.name)}%`)
+                    .limit(1)
+                    .maybeSingle();
+                if (data) foodItemId = data.id;
+            }
+            if (!foodItemId) {
+                // Fall back to match dialog if still unresolved
+                moveToPantry(item);
+                return;
+            }
+
+            // Use the item's existing quantity, stripping leading "As needed +" noise
+            const rawQty = (item.quantity || '').trim();
+            const quantityString = rawQty
+                .split(/\s*\+\s*/)
+                .map((s: string) => s.trim())
+                .filter((s: string) => !/^as\s+needed$/i.test(s) && s.length > 0)
+                .join(' + ') || rawQty || '1';
+
+            // Persist to pantry_quantities
+            const saved = localStorage.getItem('pantry_quantities');
+            const quantities: Record<string, string> = saved ? JSON.parse(saved) : {};
+            const existing = quantities[foodItemId];
+            quantities[foodItemId] = existing ? `${existing} + ${quantityString}` : quantityString;
+            localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
+
+            // Write to Supabase
+            const { data: { user: currentUser } } = await supabase.auth.getUser();
+            const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+            const userIsAdmin = !!(currentUser?.email && adminEmail && currentUser.email === adminEmail);
+            if (userIsAdmin) {
+                await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', foodItemId);
+            } else if (currentUser) {
+                const { data: existingRow } = await supabase
+                    .from('pantry_items')
+                    .select('id')
+                    .eq('user_id', currentUser.id)
+                    .eq('food_item_id', foodItemId)
+                    .maybeSingle();
+                if (!existingRow) {
+                    await supabase.from('pantry_items').insert({
+                        user_id: currentUser.id,
+                        name: item.name,
+                        quantity: quantities[foodItemId],
+                        food_item_id: foodItemId
+                    });
+                } else {
+                    await supabase.from('pantry_items')
+                        .update({ quantity: quantities[foodItemId] })
+                        .eq('id', existingRow.id);
+                }
+            }
+
+            removeItem(item.id);
+            toast.success(`"${item.common_name || item.name}" added to pantry`);
+        } catch (e) {
+            toast.error('Failed to add to pantry');
+        } finally {
+            setTickLoadingId(null);
+        }
+    };
+
     // Open the inline add panel for a grocery item
     const openPantryAddPanel = async (item: ShoppingListItem) => {
         // If already open for this item, close it
@@ -1071,32 +1145,26 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                             </div>
                                                         </div>
 
-                                                        {/* Pantry tick button */}
+                                                        {/* Pantry tick button — green only when a real weight exists */}
                                                         {(() => {
-                                                            // Green as soon as this item's panel is open — no portion required
-                                                            const panelOpen = pantryAddItem?.id === item.id;
+                                                            const realParts = (item.quantity || '')
+                                                                .split(/\s*\+\s*/)
+                                                                .map((s: string) => s.trim())
+                                                                .filter((s: string) => s.length > 0 && !/^as\s+needed$/i.test(s) && /\d/.test(s));
+                                                            const hasWeight = realParts.length > 0;
                                                             return (
                                                                 <button
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        if (panelOpen) {
-                                                                            confirmPantryAdd();
-                                                                        } else {
-                                                                            clearAllPanels(true);
-                                                                            setExpandedActionId(null);
-                                                                            openPantryAddPanel(item);
-                                                                        }
-                                                                    }}
-                                                                    disabled={pantryAddLoading && panelOpen}
-                                                                    title={panelOpen ? 'Confirm — add to pantry' : 'Open weight picker'}
+                                                                    onClick={(e) => { e.stopPropagation(); if (hasWeight) quickAddToPantry(item); }}
+                                                                    disabled={tickLoadingId === item.id || !hasWeight}
+                                                                    title={hasWeight ? 'Add to pantry' : 'Use the + button to add a weight first'}
                                                                     className={cn(
                                                                         "p-1.5 rounded-full border-2 transition-all flex-shrink-0",
-                                                                        panelOpen
+                                                                        hasWeight
                                                                             ? "border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white cursor-pointer"
-                                                                            : "border-slate-300 dark:border-slate-600 text-slate-300 dark:text-slate-600 cursor-pointer hover:border-emerald-400 hover:text-emerald-400"
+                                                                            : "border-slate-300 dark:border-slate-600 text-slate-300 dark:text-slate-600 cursor-not-allowed"
                                                                     )}
                                                                 >
-                                                                    {pantryAddLoading && panelOpen
+                                                                    {tickLoadingId === item.id
                                                                         ? <Loader2 size={13} className="animate-spin" />
                                                                         : <CheckCircle2 size={13} />}
                                                                 </button>
