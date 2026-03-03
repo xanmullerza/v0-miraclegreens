@@ -935,37 +935,10 @@ export default function FoodDetailsPage() {
                     </div>
                 </div>
 
-                {/* Quick Add Panel */}
                 {activeSection === 'management' && (() => {
                     const canEditDelete = isAdmin || (food.user_id && food.user_id === user?.id);
                     return (
                     <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                        {/* Add to Pantry */}
-                        <button
-                            onClick={async () => {
-                                try {
-                                    await supabase.from('food_items').update({ is_in_pantry: true } as any).eq('id', food.id);
-                                    setFood(prev => prev ? { ...prev, is_in_pantry: true } : null);
-                                    toast.success('Added to pantry');
-                                    router.push('/dashboard/meal-o-matic/pantry');
-                                } catch { toast.error('Failed to update pantry'); }
-                            }}
-                            className="w-full flex items-center gap-4 p-4 rounded-2xl border border-emerald-200 dark:border-emerald-800/50 bg-emerald-50/50 dark:bg-emerald-900/10 hover:bg-emerald-100/60 dark:hover:bg-emerald-900/20 transition-all group text-left"
-                        >
-                            <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
-                                <ShoppingBasket size={16} className="text-white" />
-                            </div>
-                            <div className="flex-1">
-                                <p className="text-xs font-black uppercase tracking-[0.15em] text-emerald-600 dark:text-emerald-400">
-                                    {food.is_in_pantry ? 'Go to Pantry' : 'Add to Pantry'}
-                                </p>
-                                <p className="text-[10px] text-slate-400 font-medium mt-0.5">
-                                    {food.is_in_pantry ? 'Already in your pantry — tap to view' : 'Mark as stocked and open pantry'}
-                                </p>
-                            </div>
-                            <ChevronDown className="w-4 h-4 text-emerald-400 -rotate-90 shrink-0" />
-                        </button>
-
                         {/* Favourite Toggle */}
                         <button
                             onClick={toggleFavorite}
@@ -992,6 +965,17 @@ export default function FoodDetailsPage() {
                             </div>
                             <Star size={14} className={cn('shrink-0', food.is_favorite ? 'text-amber-400 fill-amber-400' : 'text-slate-300')} />
                         </button>
+
+                        {/* Coming Soon */}
+                        <div className="w-full flex items-center gap-4 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 opacity-60 cursor-not-allowed">
+                            <div className="w-9 h-9 rounded-xl bg-slate-200 dark:bg-slate-700 flex items-center justify-center shrink-0">
+                                <Layers size={16} className="text-slate-400" />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-xs font-black uppercase tracking-[0.15em] text-slate-500 dark:text-slate-400">More Actions</p>
+                                <p className="text-[10px] text-slate-400 font-medium mt-0.5">Coming soon</p>
+                            </div>
+                        </div>
 
                         {/* Edit & Delete — admin or food creator only */}
                         {canEditDelete && (
