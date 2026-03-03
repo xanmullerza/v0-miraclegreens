@@ -1428,10 +1428,8 @@ export default function RecipeDetailsPage() {
                                 <div className="w-px h-4 bg-slate-200 dark:bg-slate-700" />
 
                                 {/* Weight - plain text */}
-                                <div className="flex items-center gap-1.5">
-                                    <span className="text-sm font-black italic text-emerald-500">{totalWeight.toFixed(0)}</span>
-                                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">grams</span>
-                                </div>
+                                <span className="text-sm font-black italic text-emerald-500">{totalWeight.toFixed(0)}</span>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 -ml-2.5">g</span>
                             </div>
 
                             {recipe.source && (
