@@ -30,7 +30,8 @@ import {
     Pill,
     Box,
     Minus,
-    List
+    List,
+    CheckCircle2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -1069,6 +1070,37 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                                                                 </span>
                                                             </div>
                                                         </div>
+
+                                                        {/* Pantry tick button */}
+                                                        {(() => {
+                                                            const portionReady = pantryAddItem?.id === item.id && !!pantryAddSelectedPortion;
+                                                            return (
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        if (portionReady) {
+                                                                            confirmPantryAdd();
+                                                                        } else {
+                                                                            clearAllPanels(true);
+                                                                            setExpandedActionId(null);
+                                                                            openPantryAddPanel(item);
+                                                                        }
+                                                                    }}
+                                                                    disabled={pantryAddLoading && pantryAddItem?.id === item.id}
+                                                                    title={portionReady ? 'Add to pantry' : 'Select weight to enable'}
+                                                                    className={cn(
+                                                                        "p-1.5 rounded-full border-2 transition-all flex-shrink-0",
+                                                                        portionReady
+                                                                            ? "border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white cursor-pointer"
+                                                                            : "border-slate-300 dark:border-slate-600 text-slate-300 dark:text-slate-600 cursor-pointer hover:border-emerald-400 hover:text-emerald-400"
+                                                                    )}
+                                                                >
+                                                                    {pantryAddLoading && pantryAddItem?.id === item.id
+                                                                        ? <Loader2 size={13} className="animate-spin" />
+                                                                        : <CheckCircle2 size={13} />}
+                                                                </button>
+                                                            );
+                                                        })()}
 
                                                         {/* Expand chevron */}
                                                         <button
