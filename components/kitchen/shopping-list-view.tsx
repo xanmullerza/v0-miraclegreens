@@ -428,10 +428,12 @@ export function ShoppingListView({ scannerOpen: externalScannerOpen, onScannerOp
                     const foodItem = item.food_items;
                     const scannedProduct = item.scanned_products;
                     combinedPantry.push({
-                        id: item.id,
+                        id: item.food_item_id || item.id,
+                        food_item_id: item.food_item_id,
                         name: foodItem?.name || scannedProduct?.name || item.custom_name || item.name,
                         common_name: foodItem?.common_name || foodItem?.name || scannedProduct?.name || item.custom_name || item.name,
-                        category: foodItem?.category || 'General'
+                        category: foodItem?.category || 'General',
+                        quantity: item.quantity
                     });
                 });
             }
