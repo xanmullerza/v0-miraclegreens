@@ -178,7 +178,7 @@ export function PantryView({
     const pluralizeUnit = (label: string, qty: number): string => {
         if (qty <= 1) return label;
         const l = label.toLowerCase().trim();
-        // Units that already look plural or are abbreviations — leave unchanged
+        // Units that already look plural or are abbreviations ï¿½ leave unchanged
         const unchanged = ['tbsp', 'tsp', 'ml', 'g', 'kg', 'oz', 'lb', 'lbs'];
         if (unchanged.includes(l)) return label;
         if (/[^aeiou]y$/i.test(label)) return label.slice(0, -1) + 'ies'; // rarely needed
@@ -299,7 +299,7 @@ export function PantryView({
         return qty;
     };
 
-    // Detect entries that are pure weight measures (gram, kilogram, or "1 x Ng") — these are fungible
+    // Detect entries that are pure weight measures (gram, kilogram, or "1 x Ng") ï¿½ these are fungible
     const isWeightOnlyEntry = (entry: QuantityEntry): boolean => {
         if (!entry.label) return entry.weight_g != null && (entry.unit === 'g' || entry.unit === null);
         return /^(gram|kilogram)s?$/i.test(entry.label);
@@ -393,7 +393,7 @@ export function PantryView({
             }
             return existingEntries.join(' + ');
         }
-        // No matching entry — append incoming to the non-zero filtered entries
+        // No matching entry ï¿½ append incoming to the non-zero filtered entries
         return `${existingEntries.join(' + ')} + ${incoming}`;
     };
 
@@ -548,7 +548,7 @@ export function PantryView({
                     const entryG = (parsed.qty || 0) * (parsed.weight_g || 0);
                     if (entryG <= 0) continue; // skip already-zero entries
                     if (gramsToRemove >= entryG) {
-                        // This entry is fully consumed — skip it
+                        // This entry is fully consumed ï¿½ skip it
                         gramsToRemove -= entryG;
                     } else if (gramsToRemove > 0 && parsed.weight_g && parsed.weight_g > 0) {
                         // Partially consume this entry
@@ -1448,7 +1448,7 @@ export function PantryView({
                                                                                         {e.label ? (
                                                                                             <span className="text-sm font-semibold text-slate-600 dark:text-slate-400">{pluralizeUnit(e.label, e.qty)} {foodName}</span>
                                                                                         ) : e.weight_g != null ? (
-                                                                                            <span className="text-sm font-semibold text-slate-400">× {e.weight_g}{e.unit} {foodName}</span>
+                                                                                            <span className="text-sm font-semibold text-slate-400">ï¿½ {e.weight_g}{e.unit} {foodName}</span>
                                                                                         ) : (
                                                                                             <span className="text-sm font-semibold text-slate-400">{foodName}</span>
                                                                                         )}
