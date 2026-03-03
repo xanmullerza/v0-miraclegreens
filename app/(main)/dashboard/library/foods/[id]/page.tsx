@@ -873,12 +873,12 @@ export default function FoodDetailsPage() {
                 {/* NEW Main Header Section */}
                 <div className="space-y-3 animate-in slide-in-from-top-4 duration-700">
                     {/* Full-width title */}
-                    <h1 className="text-xl font-black tracking-tighter uppercase italic leading-tight">
+                    <h1 className="text-xl font-black tracking-tighter uppercase italic leading-tight mb-3">
                         <span className="text-emerald-500">{formatFoodName(food.common_name || food.name)}</span>
                     </h1>
 
                     {/* Image + controls row */}
-                    <div className="flex flex-row items-start gap-4">
+                    <div className="flex flex-row items-center gap-4">
                         {/* Image */}
                         <div className="w-20 h-20 shrink-0">
                             <Card className="w-full h-full relative p-1 bg-white dark:bg-slate-900 border-none group overflow-hidden rounded-2xl">
