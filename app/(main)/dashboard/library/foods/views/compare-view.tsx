@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import {
     Search,
     X,
@@ -22,7 +23,8 @@ import {
     History,
     ArrowRight,
     Leaf,
-    Beaker
+    Beaker,
+    Wallet
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -117,6 +119,7 @@ interface CompareViewProps {
 }
 
 export function CompareView({ showStats = false, stats }: CompareViewProps) {
+    const router = useRouter();
     const [selectedFoods, setSelectedFoods] = useState<(FoodItem | null)[]>([null, null, null]);
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
@@ -363,6 +366,29 @@ export function CompareView({ showStats = false, stats }: CompareViewProps) {
                     }}
                     theme="emerald"
                     placeholder="SEARCH FOOD LIBRARY..."
+                    idleIconRaw
+                    idleIcon={
+                        <div className="flex items-center justify-center gap-3">
+                            <button
+                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/nutridex'); }}
+                                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
+                                title="Nutridex"
+                            >
+                                <Activity size={16} />
+                            </button>
+                            <div className="w-12 h-12 rounded-full bg-emerald-500/10 border-2 border-emerald-500/30 flex items-center justify-center text-emerald-500 shadow-sm relative">
+                                <Scale size={20} />
+                                <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
+                            </div>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/lifeguard'); }}
+                                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
+                                title="Life Guard"
+                            >
+                                <Wallet size={16} />
+                            </button>
+                        </div>
+                    }
                     idleTitle="Ready to Compare?"
                     idleSubtitle="Search below to add your first food item"
                     noResultsMessage="No matching items found"
