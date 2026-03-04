@@ -15,7 +15,8 @@ import {
     Library,
     Dna,
     Target,
-    Calendar
+    Calendar,
+    Wallet
 } from 'lucide-react';
 import {
     DropdownMenu,
@@ -347,7 +348,29 @@ export default function NutrientsPage() {
                     }}
                     theme="emerald"
                     placeholder="SEARCH NUTRIENTS..."
-                    idleIcon={<Activity size={20} className="text-emerald-500" />}
+                    idleIconRaw
+                    idleIcon={
+                        <div className="flex items-center justify-center gap-3">
+                            <button
+                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/comparator'); }}
+                                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
+                                title="Comparator"
+                            >
+                                <Scale size={16} />
+                            </button>
+                            <div className="w-12 h-12 rounded-full bg-emerald-500/10 border-2 border-emerald-500/30 flex items-center justify-center text-emerald-500 shadow-sm relative">
+                                <Activity size={20} />
+                                <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
+                            </div>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/lifeguard'); }}
+                                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
+                                title="Life Guard"
+                            >
+                                <Wallet size={16} />
+                            </button>
+                        </div>
+                    }
                     idleTitle="Nutridex"
                     idleSubtitle="Search vitamins, minerals, and macronutrients"
                     noResultsMessage="No matching nutrients found"
