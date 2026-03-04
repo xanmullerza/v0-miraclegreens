@@ -1797,10 +1797,10 @@ export function MealPlannerContent({
                         {/* Left: Often Overlooked */}
                         {(() => {
                             const OVERLOOKED = [
-                                { label: 'Water',     keys: ['Water'],                                unit: 'g',   rdaOverride: 700,  color: '#06b6d4', desc: 'from food' },
-                                { label: 'Fiber',     keys: ['Fiber', 'fiber_g'],                    unit: 'g',   rdaOverride: null, color: '#22c55e', desc: null },
-                                { label: 'Vitamin D', keys: ['Vitamin D', 'vitamin_d_iu'],           unit: 'IU',  rdaOverride: null, color: '#f59e0b', desc: null },
-                                { label: 'Choline',   keys: ['Choline', 'choline_mg'],               unit: 'mg',  rdaOverride: null, color: '#a855f7', desc: null },
+                                { label: 'Water',       keys: ['Water'],                                    unit: 'g',   rdaOverride: 700,  color: '#06b6d4', desc: 'from food' },
+                                { label: 'Fiber',       keys: ['Fiber', 'fiber_g'],                        unit: 'g',   rdaOverride: null, color: '#22c55e', desc: null },
+                                { label: 'B7 (Biotin)', keys: ['B7 (Biotin)', 'Biotin', 'biotin_mcg'],    unit: 'µg',  rdaOverride: null, color: '#ec4899', desc: null },
+                                { label: 'Choline',     keys: ['Choline', 'choline_mg'],                   unit: 'mg',  rdaOverride: null, color: '#a855f7', desc: null },
                             ];
                             const micro = plan.micronutrients || {};
                             return (
@@ -1852,7 +1852,7 @@ export function MealPlannerContent({
                                 { label: 'B3 (Niacin)',         short: 'B3' },
                                 { label: 'B5 (Pantothenic Acid)', short: 'B5' },
                                 { label: 'B6 (Pyridoxine)',     short: 'B6' },
-                                { label: 'B7 (Biotin)',         short: 'B7' },
+                                { label: 'Vitamin D',           short: 'D'  },
                                 { label: 'B9 (Folate)',         short: 'B9' },
                                 { label: 'B12 (Cobalamin)',     short: 'B12' },
                                 { label: 'Vitamin A',           short: 'A' },
