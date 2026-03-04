@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Leaf, ChevronRight, ShoppingBag, ShoppingCart, Plus, X, ScanLine, Calendar, Package } from 'lucide-react';
+import { Leaf, ChevronRight, ShoppingBag, ShoppingCart, Plus, X, ScanLine, Calendar, Package, Library, LayoutGrid } from 'lucide-react';
 import { ShoppingListView } from '@/components/kitchen/shopping-list-view';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
@@ -232,6 +232,10 @@ export default function ShoppingListPage() {
                     isActive={isSearchActive}
                     setIsActive={setIsSearchActive}
                     onSelect={handleSelectFood}
+                    sideNav={{
+                        left: { icon: <Library size={16} />, label: 'Library', href: '/dashboard/library/foods' },
+                        right: { icon: <LayoutGrid size={16} />, label: 'Widgets', href: '/dashboard/widgets/nutridex' },
+                    }}
                     theme="emerald"
                     placeholder="SEARCH FOODS TO ADD..."
                     idleIconRaw

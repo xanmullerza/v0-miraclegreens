@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Search, X, Activity, Info } from 'lucide-react';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
 export type HeroTheme = 'emerald' | 'amber';
@@ -45,6 +46,11 @@ interface HeroSearchProps<T = any> {
     hideResults?: boolean;
     /** When true, idleIcon is rendered directly without the rounded wrapper + ping animation. */
     idleIconRaw?: boolean;
+    /** Half-circle nav buttons on the left/right edges for section-level navigation. */
+    sideNav?: {
+        left: { icon: React.ReactNode; label: string; href: string };
+        right: { icon: React.ReactNode; label: string; href: string };
+    };
 }
 
 const themeStyles: Record<HeroTheme, { ring: string; border: string; accent: string; accentBg: string; iconColor: string }> = {
@@ -88,7 +94,27 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
     const style = themeStyles[theme];
 
     return (
-        <div className="w-full md:max-w-[900px] mx-auto">
+        <div className={cn("w-full md:max-w-[900px] mx-auto", props.sideNav && "relative px-10 md:px-14")}>
+            {props.sideNav && (
+                <>
+                    <Link
+                        href={props.sideNav.left.href}
+                        className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 md:w-10 h-20 md:h-24 rounded-r-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-l-0 border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-white hover:bg-slate-600 dark:hover:bg-slate-600 transition-all shadow-lg group active:scale-95"
+                        title={props.sideNav.left.label}
+                    >
+                        <span className="scale-75 md:scale-100">{props.sideNav.left.icon}</span>
+                        <span className="text-[5px] md:text-[7px] font-black uppercase tracking-wider opacity-60 group-hover:opacity-100 leading-none">{props.sideNav.left.label}</span>
+                    </Link>
+                    <Link
+                        href={props.sideNav.right.href}
+                        className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 md:w-10 h-20 md:h-24 rounded-l-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-r-0 border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-white hover:bg-slate-600 dark:hover:bg-slate-600 transition-all shadow-lg group active:scale-95"
+                        title={props.sideNav.right.label}
+                    >
+                        <span className="scale-75 md:scale-100">{props.sideNav.right.icon}</span>
+                        <span className="text-[5px] md:text-[7px] font-black uppercase tracking-wider opacity-60 group-hover:opacity-100 leading-none">{props.sideNav.right.label}</span>
+                    </Link>
+                </>
+            )}
             <div
                 className={cn(
                     'w-full bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col max-h-[240px]',

@@ -9,7 +9,7 @@ import { HeroSearch } from '@/components/ui/hero-search';
 import {
     Wallet, Search, X, ArrowRight, Loader2, Sparkles,
     Zap, Activity, Info, Utensils, ChefHat, Plus,
-    Beef, ChevronRight
+    Beef, ChevronRight, Library, Calendar
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/lib/supabase';
@@ -422,6 +422,10 @@ export default function SurvivalModePage() {
                                 isActive={isHeroActive}
                                 setIsActive={setIsHeroActive}
                                 onSelect={addIngredient}
+                                sideNav={{
+                                    left: { icon: <Library size={16} />, label: 'Library', href: '/dashboard/library/foods' },
+                                    right: { icon: <Calendar size={16} />, label: 'Meals', href: '/dashboard/meal-o-matic/planner' },
+                                }}
                                 theme="emerald"
                                 placeholder="SEARCH FOOD LIBRARY..."
                                 idleIcon={<Wallet size={20} className="text-emerald-500" />}

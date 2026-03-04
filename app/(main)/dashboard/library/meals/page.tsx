@@ -1,7 +1,7 @@
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
-import { Loader2, ChefHat } from 'lucide-react';
+import { Loader2, ChefHat, Calendar, LayoutGrid } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { RecipesView } from '@/components/ingredients/recipes-view';
 import { HeroSearch } from '@/components/ui/hero-search';
@@ -34,6 +34,10 @@ export default function MealsPage() {
                         setIsActive={setIsSearchActive}
                         onSelect={noop}
                         hideResults
+                        sideNav={{
+                            left: { icon: <Calendar size={16} />, label: 'Meals', href: '/dashboard/meal-o-matic/planner' },
+                            right: { icon: <LayoutGrid size={16} />, label: 'Widgets', href: '/dashboard/widgets/nutridex' },
+                        }}
                         theme="emerald"
                         placeholder="SEARCH MEALS LIBRARY..."
                         idleIcon={<ChefHat size={20} className="text-emerald-500" />}

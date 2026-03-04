@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { PantryView } from '@/components/kitchen/pantry-view';
-import { Beef, ChevronRight, Plus, X, Package, Receipt, Calendar, ShoppingBag } from 'lucide-react';
+import { Beef, ChevronRight, Plus, X, Package, Receipt, Calendar, ShoppingBag, Library, LayoutGrid } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
 import { supabase } from '@/lib/supabase';
@@ -275,6 +275,10 @@ export default function PantryPage() {
                         isActive={isActive}
                         setIsActive={setIsActive}
                         onSelect={handleSelectFood}
+                        sideNav={{
+                            left: { icon: <Library size={16} />, label: 'Library', href: '/dashboard/library/foods' },
+                            right: { icon: <LayoutGrid size={16} />, label: 'Widgets', href: '/dashboard/widgets/nutridex' },
+                        }}
                         theme="amber"
                         placeholder="SEARCH FOOD LIBRARY..."
                         idleIconRaw

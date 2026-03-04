@@ -1328,6 +1328,10 @@ export function MealPlannerContent({
                 isLoading={isHeroSearching}
                 isActive={isHeroActive}
                 setIsActive={setIsHeroActive}
+                sideNav={{
+                    left: { icon: <Library size={16} />, label: 'Library', href: '/dashboard/library/foods' },
+                    right: { icon: <LayoutGrid size={16} />, label: 'Widgets', href: '/dashboard/widgets/nutridex' },
+                }}
                 onSelect={(item) => {
                     const base = item.is_mix ? 'mixes' : 'meals';
                     router.push(`/dashboard/library/${base}/${item.id}`);

@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { useState, useEffect } from 'react';
-import { Leaf } from 'lucide-react';
+import { Leaf, Calendar, LayoutGrid } from 'lucide-react';
 import { ExploreView } from './views/explore-view';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
@@ -30,6 +30,10 @@ export default function IngredientsPage() {
                     setIsActive={setIsSearchActive}
                     onSelect={noop}
                     hideResults
+                    sideNav={{
+                        left: { icon: <Calendar size={16} />, label: 'Meals', href: '/dashboard/meal-o-matic/planner' },
+                        right: { icon: <LayoutGrid size={16} />, label: 'Widgets', href: '/dashboard/widgets/nutridex' },
+                    }}
                     theme="emerald"
                     placeholder="SEARCH FOOD LIBRARY..."
                     idleIcon={<Leaf size={20} className="text-emerald-500" />}
