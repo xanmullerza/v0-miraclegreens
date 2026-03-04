@@ -277,50 +277,6 @@ export default function PantryPage() {
                         onSelect={handleSelectFood}
                         theme="amber"
                         placeholder="SEARCH FOOD LIBRARY..."
-                        idleIconRaw
-                        idleIcon={
-                            <div className="flex items-center justify-center">
-                                {/* Outer left big button */}
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); router.push('/dashboard/library/foods'); }}
-                                    className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400 hover:text-amber-500 hover:border-amber-500/50 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-all active:scale-95 mr-6"
-                                    title="Library"
-                                >
-                                    <Library size={26} />
-                                </button>
-                                {/* Center 3 nav buttons */}
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); router.push('/dashboard/meal-o-matic/shopping'); }}
-                                        className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-amber-500 hover:border-amber-500/40 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-all active:scale-95"
-                                        title="Shopping List"
-                                    >
-                                        <ShoppingBag size={16} />
-                                    </button>
-                                    <div className="w-12 h-12 rounded-full bg-amber-500/10 border-2 border-amber-500/30 flex items-center justify-center text-amber-500 shadow-sm relative">
-                                        <Package size={20} />
-                                        <div className="absolute inset-0 rounded-full bg-amber-500/20 animate-ping" />
-                                    </div>
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); router.push('/dashboard/meal-o-matic/planner'); }}
-                                        className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-amber-500 hover:border-amber-500/40 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-all active:scale-95"
-                                        title="Meal Planner"
-                                    >
-                                        <Calendar size={16} />
-                                    </button>
-                                </div>
-                                {/* Outer right big button */}
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/nutridex'); }}
-                                    className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400 hover:text-amber-500 hover:border-amber-500/50 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-all active:scale-95 ml-6"
-                                    title="Widgets"
-                                >
-                                    <LayoutGrid size={26} />
-                                </button>
-                            </div>
-                        }
-                        idleTitle="Pantry Inventory"
-                        idleSubtitle="Search foods to stock your personal pantry"
                         noResultsMessage="No matching items found"
                         enterMessage="Enter item name to search"
                         searchingMessage="Searching Library..."

@@ -1379,7 +1379,6 @@ export function MealPlannerContent({
                 }}
                 theme="amber"
                 placeholder="SEARCH RECIPES..."
-                idleIconRaw
                 powerButton={
                     <button
                         onClick={() => setActiveMaker(prev => prev ? null : 'menu')}
@@ -1394,49 +1393,6 @@ export function MealPlannerContent({
                         <Plus size={16} className={activeMaker ? 'text-white rotate-45 transition-transform' : 'text-slate-900 dark:text-white transition-transform'} />
                     </button>
                 }
-                idleIcon={
-                    <div className="flex items-center justify-center">
-                        {/* Outer left big button */}
-                        <button
-                            onClick={(e) => { e.stopPropagation(); router.push('/dashboard/library/foods'); }}
-                            className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400 hover:text-amber-500 hover:border-amber-500/50 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-all active:scale-95 mr-6"
-                            title="Library"
-                        >
-                            <Library size={26} />
-                        </button>
-                        {/* Center 3 nav buttons */}
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/meal-o-matic/shopping'); }}
-                                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-amber-500 hover:border-amber-500/40 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-all active:scale-95"
-                                title="Shopping List"
-                            >
-                                <ShoppingBag size={16} />
-                            </button>
-                            <div className="w-12 h-12 rounded-full bg-amber-500/10 border-2 border-amber-500/30 flex items-center justify-center text-amber-500 shadow-sm relative">
-                                <Calendar size={20} />
-                                <div className="absolute inset-0 rounded-full bg-amber-500/20 animate-ping" />
-                            </div>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/meal-o-matic/pantry'); }}
-                                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-amber-500 hover:border-amber-500/40 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-all active:scale-95"
-                                title="Pantry"
-                            >
-                                <Package size={16} />
-                            </button>
-                        </div>
-                        {/* Outer right big button */}
-                        <button
-                            onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/nutridex'); }}
-                            className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400 hover:text-amber-500 hover:border-amber-500/50 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-all active:scale-95 ml-6"
-                            title="Widgets"
-                        >
-                            <LayoutGrid size={26} />
-                        </button>
-                    </div>
-                }
-                idleTitle="Meal Planner"
-                idleSubtitle="Search recipes or generate a daily meal plan below"
                 noResultsMessage="No matching recipes found"
                 enterMessage="Enter recipe name to search"
                 searchingMessage="Searching Recipes..."
