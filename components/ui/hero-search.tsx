@@ -94,33 +94,25 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
     const style = themeStyles[theme];
 
     return (
-        <div className={cn("w-full md:max-w-[900px] mx-auto", props.sideNav && "relative px-10 md:px-14")}>
-            {props.sideNav && (
-                <>
+        <div className="w-full md:max-w-[900px] mx-auto">
+            <div className={cn("flex items-center", props.sideNav ? "gap-1 md:gap-2" : "")}>
+                {props.sideNav && (
                     <Link
                         href={props.sideNav.left.href}
-                        className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-9 md:w-11 h-20 md:h-24 rounded-r-2xl bg-slate-100 dark:bg-slate-700 border-2 border-l-0 border-slate-300 dark:border-slate-500 flex flex-col items-center justify-center gap-1 text-slate-500 dark:text-slate-300 hover:text-white hover:bg-emerald-600 hover:border-emerald-500 dark:hover:bg-emerald-600 dark:hover:border-emerald-500 transition-all shadow-xl group active:scale-95"
+                        className="shrink-0 w-9 md:w-11 h-20 md:h-24 rounded-2xl bg-slate-100 dark:bg-slate-700 border-2 border-slate-300 dark:border-slate-500 flex flex-col items-center justify-center gap-1 text-slate-500 dark:text-slate-300 hover:text-white hover:bg-emerald-600 hover:border-emerald-500 dark:hover:bg-emerald-600 dark:hover:border-emerald-500 transition-all shadow-xl group active:scale-95"
                         title={props.sideNav.left.label}
                     >
                         <span className="scale-90 md:scale-100">{props.sideNav.left.icon}</span>
                         <span className="text-[6px] md:text-[7px] font-black uppercase tracking-wider opacity-80 group-hover:opacity-100 leading-none">{props.sideNav.left.label}</span>
                     </Link>
-                    <Link
-                        href={props.sideNav.right.href}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-9 md:w-11 h-20 md:h-24 rounded-l-2xl bg-slate-100 dark:bg-slate-700 border-2 border-r-0 border-slate-300 dark:border-slate-500 flex flex-col items-center justify-center gap-1 text-slate-500 dark:text-slate-300 hover:text-white hover:bg-emerald-600 hover:border-emerald-500 dark:hover:bg-emerald-600 dark:hover:border-emerald-500 transition-all shadow-xl group active:scale-95"
-                        title={props.sideNav.right.label}
-                    >
-                        <span className="scale-90 md:scale-100">{props.sideNav.right.icon}</span>
-                        <span className="text-[6px] md:text-[7px] font-black uppercase tracking-wider opacity-80 group-hover:opacity-100 leading-none">{props.sideNav.right.label}</span>
-                    </Link>
-                </>
-            )}
-            <div
-                className={cn(
-                    'w-full bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col max-h-[240px]',
-                    isActive ? `${style.ring} ${style.border}` : ''
                 )}
-            >
+                <div className="flex-1 min-w-0">
+                <div
+                    className={cn(
+                        'w-full bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden transition-all duration-500 flex flex-col max-h-[240px]',
+                        isActive ? `${style.ring} ${style.border}` : ''
+                    )}
+                >
                 {/* Dynamic content */}
                 <div className="overflow-y-auto flex-1 p-3 md:p-6 custom-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1 rounded-[2.5rem]">
                     {isActive && !hideResults ? (
@@ -223,7 +215,19 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
                         </div>
                     )}
                 </div>
-            </div>
+            </div>{/* end card */}
+            </div>{/* end flex-1 card wrapper */}
+                {props.sideNav && (
+                    <Link
+                        href={props.sideNav.right.href}
+                        className="shrink-0 w-9 md:w-11 h-20 md:h-24 rounded-2xl bg-slate-100 dark:bg-slate-700 border-2 border-slate-300 dark:border-slate-500 flex flex-col items-center justify-center gap-1 text-slate-500 dark:text-slate-300 hover:text-white hover:bg-emerald-600 hover:border-emerald-500 dark:hover:bg-emerald-600 dark:hover:border-emerald-500 transition-all shadow-xl group active:scale-95"
+                        title={props.sideNav.right.label}
+                    >
+                        <span className="scale-90 md:scale-100">{props.sideNav.right.icon}</span>
+                        <span className="text-[6px] md:text-[7px] font-black uppercase tracking-wider opacity-80 group-hover:opacity-100 leading-none">{props.sideNav.right.label}</span>
+                    </Link>
+                )}
+            </div>{/* end flex row */}
         </div>
     );
 }
