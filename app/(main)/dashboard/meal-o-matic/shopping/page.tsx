@@ -232,18 +232,21 @@ export default function ShoppingListPage() {
                     isActive={isSearchActive}
                     setIsActive={setIsSearchActive}
                     onSelect={handleSelectFood}
-                    sideNav={{
-                        left: { icon: <Library size={16} />, label: 'Library', href: '/dashboard/library/foods' },
-                        right: { icon: <LayoutGrid size={16} />, label: 'Widgets', href: '/dashboard/widgets/nutridex' },
-                    }}
                     theme="emerald"
                     placeholder="SEARCH FOODS TO ADD..."
                     idleIconRaw
                     idleIcon={
-                        <div className="flex items-center justify-center gap-3">
+                        <div className="flex items-center justify-center gap-2">
+                            <button
+                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/library/foods'); }}
+                                className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all active:scale-95"
+                                title="Library"
+                            >
+                                <Library size={18} />
+                            </button>
                             <button
                                 onClick={(e) => { e.stopPropagation(); router.push('/dashboard/meal-o-matic/pantry'); }}
-                                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-amber-500 hover:border-amber-500/40 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-all active:scale-95"
+                                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all active:scale-95"
                                 title="Pantry"
                             >
                                 <Package size={16} />
@@ -254,10 +257,17 @@ export default function ShoppingListPage() {
                             </div>
                             <button
                                 onClick={(e) => { e.stopPropagation(); router.push('/dashboard/meal-o-matic/planner'); }}
-                                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-amber-500 hover:border-amber-500/40 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-all active:scale-95"
+                                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all active:scale-95"
                                 title="Meal Planner"
                             >
                                 <Calendar size={16} />
+                            </button>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/nutridex'); }}
+                                className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all active:scale-95"
+                                title="Widgets"
+                            >
+                                <LayoutGrid size={18} />
                             </button>
                         </div>
                     }

@@ -342,15 +342,18 @@ export default function NutrientsPage() {
                         setIsHeroActive(false);
                         setHeroQuery('');
                     }}
-                    sideNav={{
-                        left: { icon: <Library size={16} />, label: 'Library', href: '/dashboard/library/foods' },
-                        right: { icon: <Calendar size={16} />, label: 'Meals', href: '/dashboard/meal-o-matic/planner' },
-                    }}
                     theme="emerald"
                     placeholder="SEARCH NUTRIENTS..."
                     idleIconRaw
                     idleIcon={
-                        <div className="flex items-center justify-center gap-3">
+                        <div className="flex items-center justify-center gap-2">
+                            <button
+                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/library/foods'); }}
+                                className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
+                                title="Library"
+                            >
+                                <Library size={18} />
+                            </button>
                             <button
                                 onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/comparator'); }}
                                 className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
@@ -368,6 +371,13 @@ export default function NutrientsPage() {
                                 title="Life Guard"
                             >
                                 <Wallet size={16} />
+                            </button>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/meal-o-matic/planner'); }}
+                                className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
+                                title="Meals"
+                            >
+                                <Calendar size={18} />
                             </button>
                         </div>
                     }
