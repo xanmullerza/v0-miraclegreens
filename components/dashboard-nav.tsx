@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { Book, Apple, Calendar, ShoppingBasket, ShelvingUnit, CookingPot, LayoutGrid, Salad } from 'lucide-react';
+import { Book, Apple, Calendar, ShoppingBasket, Shell, CookingPot, LayoutGrid, Salad } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function DashboardNav() {
@@ -114,7 +114,7 @@ export function DashboardNav() {
                             )}
                             title="Pantry"
                         >
-                            <ShelvingUnit size={16} />
+                            <Shell size={16} />
                         </button>
                         <button
                             onClick={() => router.push('/dashboard/meal-o-matic/planner')}
