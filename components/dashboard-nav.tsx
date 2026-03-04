@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { Books, Calendar, ShoppingBag, Package, ChefHat, LayoutGrid } from 'lucide-react';
+import { Books, Leaf, Calendar, ShoppingBag, Package, ChefHat, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function DashboardNav() {
