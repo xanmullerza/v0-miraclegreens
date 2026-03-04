@@ -346,38 +346,43 @@ export default function NutrientsPage() {
                     placeholder="SEARCH NUTRIENTS..."
                     idleIconRaw
                     idleIcon={
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-center">
+                            {/* Outer left big button */}
                             <button
                                 onClick={(e) => { e.stopPropagation(); router.push('/dashboard/library/foods'); }}
-                                className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
+                                className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/50 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95 mr-6"
                                 title="Library"
                             >
-                                <Library size={18} />
+                                <Library size={26} />
                             </button>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/comparator'); }}
-                                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
-                                title="Comparator"
-                            >
-                                <Scale size={16} />
-                            </button>
-                            <div className="w-12 h-12 rounded-full bg-emerald-500/10 border-2 border-emerald-500/30 flex items-center justify-center text-emerald-500 shadow-sm relative">
-                                <Activity size={20} />
-                                <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
+                            {/* Center 3 nav buttons */}
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/comparator'); }}
+                                    className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
+                                    title="Comparator"
+                                >
+                                    <Scale size={16} />
+                                </button>
+                                <div className="w-12 h-12 rounded-full bg-emerald-500/10 border-2 border-emerald-500/30 flex items-center justify-center text-emerald-500 shadow-sm relative">
+                                    <Activity size={20} />
+                                    <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
+                                </div>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/lifeguard'); }}
+                                    className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
+                                    title="Life Guard"
+                                >
+                                    <Wallet size={16} />
+                                </button>
                             </div>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/lifeguard'); }}
-                                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
-                                title="Life Guard"
-                            >
-                                <Wallet size={16} />
-                            </button>
+                            {/* Outer right big button */}
                             <button
                                 onClick={(e) => { e.stopPropagation(); router.push('/dashboard/meal-o-matic/planner'); }}
-                                className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
+                                className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/50 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95 ml-6"
                                 title="Meals"
                             >
-                                <Calendar size={18} />
+                                <Calendar size={26} />
                             </button>
                         </div>
                     }
