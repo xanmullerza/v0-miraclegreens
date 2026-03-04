@@ -316,6 +316,70 @@ export default function SurvivalModePage() {
 
             <div className="max-w-4xl mx-auto space-y-12 animate-in fade-in duration-700 pb-20">
 
+                {/* Always-visible Hero Search with navigation */}
+                <HeroSearch
+                    searchQuery={heroSearchQuery}
+                    onQueryChange={handleHeroSearchInput}
+                    results={heroResults}
+                    isLoading={isHeroSearching}
+                    isActive={isHeroActive}
+                    setIsActive={(active) => {
+                        setIsHeroActive(active);
+                        if (active && step !== 'ingredients') setStep('ingredients');
+                    }}
+                    onSelect={addIngredient}
+                    sideNav={{
+                        left: { icon: <Library size={16} />, label: 'Library', href: '/dashboard/library/foods' },
+                        right: { icon: <Calendar size={16} />, label: 'Meals', href: '/dashboard/meal-o-matic/planner' },
+                    }}
+                    theme="emerald"
+                    placeholder="SEARCH FOOD LIBRARY..."
+                    idleIconRaw
+                    idleIcon={
+                        <div className="flex items-center justify-center gap-3">
+                            <button
+                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/comparator'); }}
+                                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
+                                title="Comparator"
+                            >
+                                <Scale size={16} />
+                            </button>
+                            <div className="w-12 h-12 rounded-full bg-emerald-500/10 border-2 border-emerald-500/30 flex items-center justify-center text-emerald-500 shadow-sm relative">
+                                <Wallet size={20} />
+                                <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
+                            </div>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/nutridex'); }}
+                                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
+                                title="Nutridex"
+                            >
+                                <Activity size={16} />
+                            </button>
+                        </div>
+                    }
+                    idleTitle="Life Guard"
+                    idleSubtitle="Add foods to simulate a survival scenario"
+                    noResultsMessage="No matching items found"
+                    enterMessage="Enter item name to compare"
+                    searchingMessage="Searching Library..."
+                    renderResult={(food: any) => (
+                        <>
+                            <div className="flex items-center gap-4 min-w-0">
+                                <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
+                                    {food.image ? <img src={food.image} className="w-full h-full object-cover" /> : <Beef className="m-auto opacity-10 h-full w-5" />}
+                                </div>
+                                <div className="min-w-0">
+                                    <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{food.common_name || food.name}</h4>
+                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                                        {energyUnit === 'kJ' ? (food.energy_kcal * 4.184).toFixed(0) : food.energy_kcal.toFixed(0)} {energyUnit} <span className="text-slate-200 dark:text-slate-700">|</span> 100g
+                                    </p>
+                                </div>
+                            </div>
+                            <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={20} />
+                        </>
+                    )}
+                />
+
 
 
 
@@ -415,67 +479,6 @@ export default function SurvivalModePage() {
 
                     {step === 'ingredients' && (
                         <div className="space-y-12 animate-in fade-in duration-500">
-                            {/* Search Hero Bar - shared component */}
-                            <HeroSearch
-                                searchQuery={heroSearchQuery}
-                                onQueryChange={handleHeroSearchInput}
-                                results={heroResults}
-                                isLoading={isHeroSearching}
-                                isActive={isHeroActive}
-                                setIsActive={setIsHeroActive}
-                                onSelect={addIngredient}
-                                sideNav={{
-                                    left: { icon: <Library size={16} />, label: 'Library', href: '/dashboard/library/foods' },
-                                    right: { icon: <Calendar size={16} />, label: 'Meals', href: '/dashboard/meal-o-matic/planner' },
-                                }}
-                                theme="emerald"
-                                placeholder="SEARCH FOOD LIBRARY..."
-                                idleIconRaw
-                                idleIcon={
-                                    <div className="flex items-center justify-center gap-3">
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/comparator'); }}
-                                            className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
-                                            title="Comparator"
-                                        >
-                                            <Scale size={16} />
-                                        </button>
-                                        <div className="w-12 h-12 rounded-full bg-emerald-500/10 border-2 border-emerald-500/30 flex items-center justify-center text-emerald-500 shadow-sm relative">
-                                            <Wallet size={20} />
-                                            <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
-                                        </div>
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/nutridex'); }}
-                                            className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
-                                            title="Nutridex"
-                                        >
-                                            <Activity size={16} />
-                                        </button>
-                                    </div>
-                                }
-                                idleTitle="Life Guard"
-                                idleSubtitle="Add foods to simulate a survival scenario"
-                                noResultsMessage="No matching items found"
-                                enterMessage="Enter item name to compare"
-                                searchingMessage="Searching Library..."
-                                renderResult={(food: any) => (
-                                    <>
-                                        <div className="flex items-center gap-4 min-w-0">
-                                            <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-100 dark:border-slate-800">
-                                                {food.image ? <img src={food.image} className="w-full h-full object-cover" /> : <Beef className="m-auto opacity-10 h-full w-5" />}
-                                            </div>
-                                            <div className="min-w-0">
-                                                <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{food.common_name || food.name}</h4>
-                                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
-                                                    {energyUnit === 'kJ' ? (food.energy_kcal * 4.184).toFixed(0) : food.energy_kcal.toFixed(0)} {energyUnit} <span className="text-slate-200 dark:text-slate-700">|</span> 100g
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <ChevronRight className="text-slate-200 group-hover:text-emerald-500 transition-colors shrink-0" size={20} />
-                                    </>
-                                )}
-                            />
-
 
                             {/* Inventory Section - Below Search Bar */}
                             <div className="space-y-6">
