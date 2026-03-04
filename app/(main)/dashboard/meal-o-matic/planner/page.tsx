@@ -52,7 +52,8 @@ import {
     Users,
     Camera,
     Database,
-    CalendarDays
+    CalendarDays,
+    HelpCircle
 } from 'lucide-react';
 import {
     Sheet,
@@ -1006,6 +1007,7 @@ export function MealPlannerContent({
     const [nutrientsView, setNutrientView] = useState<'closed' | 'essential' | 'advanced'>('closed');
     const [mineralThreshold, setMineralThreshold] = useState<50 | 75 | 100>(75);
     const [vitaminThreshold, setVitaminThreshold] = useState<50 | 75 | 100>(75);
+    const [b7InfoOpen, setB7InfoOpen] = useState(false);
     const [dailyMoringaGrams, setDailyMoringaGrams] = useState(0);
     const [activeBoostContext, setActiveBoostContext] = useState<'daily' | 'recipe' | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
@@ -1797,10 +1799,10 @@ export function MealPlannerContent({
                         {/* Left: Often Overlooked */}
                         {(() => {
                             const OVERLOOKED = [
-                                { label: 'Water',       keys: ['Water'],                                    unit: 'g',   rdaOverride: 700,  color: '#06b6d4', desc: 'from food' },
-                                { label: 'Fiber',       keys: ['Fiber', 'fiber_g'],                        unit: 'g',   rdaOverride: null, color: '#22c55e', desc: null },
-                                { label: 'B7 (Biotin)', keys: ['B7 (Biotin)', 'Biotin', 'biotin_mcg'],    unit: 'µg',  rdaOverride: null, color: '#ec4899', desc: null },
-                                { label: 'Choline',     keys: ['Choline', 'choline_mg'],                   unit: 'mg',  rdaOverride: null, color: '#a855f7', desc: null },
+                                { label: 'Water',     keys: ['Water'],                                unit: 'g',   rdaOverride: 700,  color: '#06b6d4', desc: 'from food' },
+                                { label: 'Fiber',     keys: ['Fiber', 'fiber_g'],                    unit: 'g',   rdaOverride: null, color: '#22c55e', desc: null },
+                                { label: 'Vitamin D', keys: ['Vitamin D', 'vitamin_d_iu'],           unit: 'IU',  rdaOverride: null, color: '#f59e0b', desc: null },
+                                { label: 'Choline',   keys: ['Choline', 'choline_mg'],               unit: 'mg',  rdaOverride: null, color: '#a855f7', desc: null },
                             ];
                             const micro = plan.micronutrients || {};
                             return (
@@ -1847,30 +1849,31 @@ export function MealPlannerContent({
                         {/* Right: Vitamins 6+6 */}
                         {(() => {
                             const ALL_VITAMINS = [
-                                { label: 'B1 (Thiamine)',       short: 'B1' },
-                                { label: 'B2 (Riboflavin)',     short: 'B2' },
-                                { label: 'B3 (Niacin)',         short: 'B3' },
+                                { label: 'B1 (Thiamine)',         short: 'B1' },
+                                { label: 'B2 (Riboflavin)',       short: 'B2' },
+                                { label: 'B3 (Niacin)',           short: 'B3' },
                                 { label: 'B5 (Pantothenic Acid)', short: 'B5' },
-                                { label: 'B6 (Pyridoxine)',     short: 'B6' },
-                                { label: 'Vitamin D',           short: 'D'  },
-                                { label: 'B9 (Folate)',         short: 'B9' },
-                                { label: 'B12 (Cobalamin)',     short: 'B12' },
-                                { label: 'Vitamin A',           short: 'A' },
-                                { label: 'Vitamin C',           short: 'C' },
-                                { label: 'Vitamin E',           short: 'E' },
-                                { label: 'Vitamin K',           short: 'K' },
+                                { label: 'B6 (Pyridoxine)',       short: 'B6' },
+                                { label: 'B7 (Biotin)',           short: 'B7', excludeFromCount: true },
+                                { label: 'B9 (Folate)',           short: 'B9' },
+                                { label: 'B12 (Cobalamin)',       short: 'B12' },
+                                { label: 'Vitamin A',             short: 'A' },
+                                { label: 'Vitamin C',             short: 'C' },
+                                { label: 'Vitamin E',             short: 'E' },
+                                { label: 'Vitamin K',             short: 'K' },
                             ];
                             const micro = plan.micronutrients || {};
-                            const vitaminData = ALL_VITAMINS.map(({ label, short }) => {
+                            const vitaminData = ALL_VITAMINS.map(({ label, short, excludeFromCount }) => {
                                 let val = 0;
                                 const match = findNutrientMatch(micro, label);
                                 if (match !== null && match !== undefined && micro[match] !== undefined) { val = micro[match]; }
                                 const rda = userRDAs?.[label] || 0;
                                 const pct = rda > 0 ? Math.round((val / rda) * 100) : 0;
-                                return { label, short, pct };
+                                return { label, short, pct, excludeFromCount: !!excludeFromCount };
                             });
-                            const count = vitaminData.filter(v => v.pct >= vitaminThreshold).length;
-                            const total = vitaminData.length;
+                            const counted = vitaminData.filter(v => !v.excludeFromCount);
+                            const count = counted.filter(v => v.pct >= vitaminThreshold).length;
+                            const total = counted.length;
                             const arcPct = total > 0 ? count / total : 0;
                             const R2 = 38, S2 = 8, C2 = 2 * Math.PI * R2;
                             const thresholds: (50 | 75 | 100)[] = [50, 75, 100];
@@ -1913,7 +1916,39 @@ export function MealPlannerContent({
                                     </div>
                                     {/* Vitamin pills — 6+6 in 2 cols */}
                                     <div className="grid grid-cols-2 gap-1.5">
-                                        {vitaminData.map(({ label, short, pct }) => {
+                                        {vitaminData.map(({ label, short, pct, excludeFromCount }) => {
+                                            if (excludeFromCount) {
+                                                // B7 special pill — full bar, click for explanation
+                                                return (
+                                                    <div key={label} className="col-span-2">
+                                                        <button
+                                                            onClick={() => setB7InfoOpen(o => !o)}
+                                                            className="w-full flex items-center justify-between rounded-lg px-2 py-1.5 text-[10px] font-bold border bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400 hover:border-amber-400/40 hover:text-amber-500 dark:hover:text-amber-400 transition-colors"
+                                                        >
+                                                            <span className="flex items-center gap-1">
+                                                                B7
+                                                                <span className="text-[8px] italic opacity-60 font-normal">Biotin</span>
+                                                            </span>
+                                                            <span className="flex items-center gap-1 text-amber-400 dark:text-amber-500">
+                                                                <span className="text-[9px] italic">not tracked</span>
+                                                                <HelpCircle className="w-3 h-3" />
+                                                            </span>
+                                                        </button>
+                                                        {b7InfoOpen && (
+                                                            <div className="mt-1 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/50 p-2.5 text-[9px] text-amber-800 dark:text-amber-300 leading-relaxed">
+                                                                <p className="font-black uppercase tracking-wide mb-1">Why isn't B7 (Biotin) tracked?</p>
+                                                                <ul className="space-y-0.5 list-none">
+                                                                    <li>• Biotin is <strong>everywhere</strong> in food — deficiency is extremely rare in healthy people.</li>
+                                                                    <li>• Your gut bacteria <strong>synthesise meaningful amounts</strong> of it continuously, independent of diet.</li>
+                                                                    <li>• It has <strong>no established Tolerable Upper Intake Level</strong> — it's that safe.</li>
+                                                                    <li>• Nutrition databases have <strong>incomplete biotin data</strong>, so any figure would be unreliable.</li>
+                                                                    <li>• For these reasons it's <strong>rarely printed on food labels</strong> and excluded from most dietary tracking tools.</li>
+                                                                </ul>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                );
+                                            }
                                             const hit = pct >= vitaminThreshold;
                                             return (
                                                 <div key={label} className={cn(
