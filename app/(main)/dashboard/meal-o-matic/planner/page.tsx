@@ -1750,9 +1750,9 @@ export function MealPlannerContent({
                                     </div>
 
                                     {/* Donut + big number */}
-                                    <div className="flex items-center gap-4">
-                                        <div className="relative flex-shrink-0" style={{ width: 80, height: 80 }}>
-                                            <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90">
+                                    <div className="flex items-center justify-center gap-4">
+                                        <div className="relative flex-shrink-0" style={{ width: 88, height: 88 }}>
+                                            <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90" overflow="visible">
                                                 <circle cx="40" cy="40" r={R2} fill="none" stroke="currentColor" strokeWidth={S2} className="text-slate-200 dark:text-slate-800" />
                                                 <circle cx="40" cy="40" r={R2} fill="none" stroke="#10b981" strokeWidth={S2} strokeLinecap="butt"
                                                     style={{ strokeDasharray: `${arcPct * C2} ${C2}`, transition: 'stroke-dasharray 0.7s ease' }} />
@@ -1894,9 +1894,9 @@ export function MealPlannerContent({
                                         ))}
                                     </div>
                                     {/* Donut + big number */}
-                                    <div className="flex items-center gap-4">
-                                        <div className="relative flex-shrink-0" style={{ width: 80, height: 80 }}>
-                                            <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90">
+                                    <div className="flex items-center justify-center gap-4">
+                                        <div className="relative flex-shrink-0" style={{ width: 88, height: 88 }}>
+                                            <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90" overflow="visible">
                                                 <circle cx="40" cy="40" r={R2} fill="none" stroke="currentColor" strokeWidth={S2} className="text-slate-200 dark:text-slate-800" />
                                                 <circle cx="40" cy="40" r={R2} fill="none" stroke="#8b5cf6" strokeWidth={S2} strokeLinecap="butt"
                                                     style={{ strokeDasharray: `${arcPct * C2} ${C2}`, transition: 'stroke-dasharray 0.7s ease' }} />
