@@ -38,48 +38,6 @@ export default function MixesPage() {
                         hideResults
                         theme="emerald"
                         placeholder="SEARCH MIXES LIBRARY..."
-                        idleIconRaw
-                        idleIcon={
-                            <div className="flex items-center justify-center">
-                                {/* Outer left big button */}
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); router.push('/dashboard/meal-o-matic/planner'); }}
-                                    className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:border-emerald-500/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all active:scale-95 mr-6"
-                                    title="Mealomatic"
-                                >
-                                    <Calendar size={26} />
-                                </button>
-                                {/* Center 3 nav buttons */}
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); router.push('/dashboard/library/foods'); }}
-                                        className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all active:scale-95"
-                                        title="Foods"
-                                    >
-                                        <Leaf size={16} />
-                                    </button>
-                                    <div className="w-12 h-12 rounded-full bg-emerald-500/10 border-2 border-emerald-500/30 flex items-center justify-center text-emerald-500 shadow-sm relative">
-                                        <Beaker size={20} />
-                                        <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
-                                    </div>
-                                    <button
-                                        onClick={(e) => { e.stopPropagation(); router.push('/dashboard/library/meals'); }}
-                                        className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all active:scale-95"
-                                        title="Meals"
-                                    >
-                                        <ChefHat size={16} />
-                                    </button>
-                                </div>
-                                {/* Outer right big button */}
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); router.push('/dashboard/meal-o-matic/planner'); }}
-                                    className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400 hover:text-amber-500 hover:border-amber-500/50 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-all active:scale-95 ml-6"
-                                    title="Mealomatic"
-                                >
-                                    <Calendar size={26} />
-                                </button>
-                            </div>
-                        }
                         idleTitle="Mixes Library"
                         idleSubtitle="Browse and search our mixes library"
                     />

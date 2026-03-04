@@ -330,48 +330,6 @@ export default function SurvivalModePage() {
                     onSelect={addIngredient}
                     theme="emerald"
                     placeholder="SEARCH FOOD LIBRARY..."
-                    idleIconRaw
-                    idleIcon={
-                        <div className="flex items-center justify-center">
-                            {/* Outer left big button */}
-                            <button
-                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/library/foods'); }}
-                                className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/50 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95 mr-6"
-                                title="Library"
-                            >
-                                <Library size={26} />
-                            </button>
-                            {/* Center 3 nav buttons */}
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/comparator'); }}
-                                    className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
-                                    title="Comparator"
-                                >
-                                    <Scale size={16} />
-                                </button>
-                                <div className="w-12 h-12 rounded-full bg-emerald-500/10 border-2 border-emerald-500/30 flex items-center justify-center text-emerald-500 shadow-sm relative">
-                                    <Wallet size={20} />
-                                    <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
-                                </div>
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/nutridex'); }}
-                                    className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95"
-                                    title="Nutridex"
-                                >
-                                    <Activity size={16} />
-                                </button>
-                            </div>
-                            {/* Outer right big button */}
-                            <button
-                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/meal-o-matic/planner'); }}
-                                className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400 hover:text-purple-500 hover:border-purple-500/50 hover:bg-purple-50 dark:hover:bg-purple-950/30 transition-all active:scale-95 ml-6"
-                                title="Mealomatic"
-                            >
-                                <Calendar size={26} />
-                            </button>
-                        </div>
-                    }
                     idleTitle="Life Guard"
                     idleSubtitle="Add foods to simulate a survival scenario"
                     noResultsMessage="No matching items found"
