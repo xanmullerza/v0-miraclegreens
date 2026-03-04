@@ -1804,7 +1804,7 @@ export function MealPlannerContent({
                             ];
                             const micro = plan.micronutrients || {};
                             return (
-                                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-3">
+                                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-3 order-2 md:order-1">
                                     <div>
                                         <div className="text-[11px] font-black uppercase tracking-widest text-slate-400">Often Overlooked</div>
                                         <div className="text-[10px] text-slate-400 mt-0.5">Nutrients people rarely track</div>
@@ -1875,7 +1875,7 @@ export function MealPlannerContent({
                             const R2 = 38, S2 = 8, C2 = 2 * Math.PI * R2;
                             const thresholds: (50 | 75 | 100)[] = [50, 75, 100];
                             return (
-                                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4">
+                                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4 order-1 md:order-2">
                                     {/* Threshold toggle */}
                                     <div className="flex gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5">
                                         {thresholds.map(t => (
