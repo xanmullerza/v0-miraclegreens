@@ -57,7 +57,7 @@ export function RecipeFormDialog({ onClose, onSave, isMix: initialIsMix = false 
     const handleImportSelect = (item: any) => {
         if (builderRef.current) {
             builderRef.current.handleAddIngredient(item);
-            toast.success(`Imported "${item.name}" from Library`);
+            toast.success(`Imported "${item.common_name || item.name}" from Library`);
         }
     };
 

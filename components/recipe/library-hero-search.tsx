@@ -86,7 +86,10 @@ export function LibraryHeroSearch({ onSelect, placeholder = "SEARCH LOCAL REGIST
                                                 <Leaf className="m-auto opacity-10 h-full w-5" />
                                             </div>
                                             <div className="min-w-0">
-                                                <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{food.name}</h4>
+                                                <h4 className="font-black text-sm uppercase text-slate-900 dark:text-white truncate">{food.common_name || food.name}</h4>
+                                                {food.common_name && (
+                                                    <p className="text-[8px] font-bold text-slate-400 truncate opacity-50">{food.name}</p>
+                                                )}
                                                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
                                                     {Math.round(food.energy_kcal)} KCAL <span className="text-slate-200 dark:text-slate-700">|</span> {food.source || 'LOCAL'}
                                                 </p>
