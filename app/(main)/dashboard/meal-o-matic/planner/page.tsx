@@ -1587,6 +1587,127 @@ export function MealPlannerContent({
                             )}
                         </div>
 
+                        {/* Macros Circle Graph */}
+                        {(() => {
+                            // Reuse the same RDA calculations from the nutrients panel
+                            const energyRdaKcal = Math.max(1200, Math.round((profile?.gender === 'male'
+                                ? ((10 * (Number(profile?.weight) || 70)) + (6.25 * (Number(profile?.height) || 170)) - (5 * (Number(profile?.age) || 30)) + 5)
+                                : ((10 * (Number(profile?.weight) || 70)) + (6.25 * (Number(profile?.height) || 170)) - (5 * (Number(profile?.age) || 30)) - 161)) * 1.2));
+                            const energyRda = unit === 'kJ' ? energyRdaKcal * 4.184 : energyRdaKcal;
+                            const proteinRda = userRDAs?.['Protein'] || (Number(profile?.weight) || 70) * 1.6;
+                            const carbsRda = userRDAs?.['Carbs'] || 250;
+                            const fatRda = userRDAs?.['Fat'] || 70;
+
+                            const energyVal = unit === 'kJ' ? plan.totalCalories * 4.184 : plan.totalCalories;
+                            const proteinVal = plan.macros.protein;
+                            const carbsVal = plan.macros.carbs;
+                            const fatVal = plan.macros.fat;
+
+                            const energyPct = Math.min(Math.round((energyVal / energyRda) * 100), 999);
+                            const proteinPct = Math.min(Math.round((proteinVal / proteinRda) * 100), 999);
+                            const carbsPct = Math.min(Math.round((carbsVal / carbsRda) * 100), 999);
+                            const fatPct = Math.min(Math.round((fatVal / fatRda) * 100), 999);
+
+                            // Donut: segments proportional to caloric contribution, total fill = energy % of RDA (capped at 100 for the ring)
+                            const proteinCal = proteinVal * 4;
+                            const carbsCal = carbsVal * 4;
+                            const fatCal = fatVal * 9;
+                            const totalCal = proteinCal + carbsCal + fatCal || 1;
+                            const fillPct = Math.min(energyPct, 100) / 100; // 0..1
+
+                            const carbsFrac = (carbsCal / totalCal) * fillPct;
+                            const fatFrac = (fatCal / totalCal) * fillPct;
+                            const proteinFrac = (proteinCal / totalCal) * fillPct;
+
+                            // SVG donut params
+                            const R = 54, STROKE = 10, C = 2 * Math.PI * R;
+                            const seg = (offset: number, frac: number) => ({
+                                strokeDasharray: `${frac * C} ${C}`,
+                                strokeDashoffset: `${-offset * C}`,
+                            });
+                            let off = 0;
+                            const carbsSeg = seg(off, carbsFrac); off += carbsFrac;
+                            const fatSeg = seg(off, fatFrac); off += fatFrac;
+                            const proteinSeg = seg(off, proteinFrac);
+
+                            const formatVal = (v: number) => v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v.toFixed(1);
+
+                            return (
+                                <div className="flex items-center gap-5 py-4 px-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+                                    {/* Donut */}
+                                    <div className="relative flex-shrink-0" style={{ width: 128, height: 128 }}>
+                                        <svg viewBox="0 0 128 128" className="w-full h-full -rotate-90">
+                                            {/* Background track */}
+                                            <circle cx="64" cy="64" r={R} fill="none" stroke="currentColor" strokeWidth={STROKE} className="text-slate-200 dark:text-slate-800" />
+                                            {/* Carbs segment — blue */}
+                                            <circle cx="64" cy="64" r={R} fill="none" stroke="#3b82f6" strokeWidth={STROKE} strokeLinecap="round"
+                                                style={{ ...carbsSeg, transition: 'stroke-dasharray 0.6s ease, stroke-dashoffset 0.6s ease' }} />
+                                            {/* Fat segment — amber */}
+                                            <circle cx="64" cy="64" r={R} fill="none" stroke="#f59e0b" strokeWidth={STROKE} strokeLinecap="round"
+                                                style={{ ...fatSeg, transition: 'stroke-dasharray 0.6s ease, stroke-dashoffset 0.6s ease' }} />
+                                            {/* Protein segment — rose */}
+                                            <circle cx="64" cy="64" r={R} fill="none" stroke="#f43f5e" strokeWidth={STROKE} strokeLinecap="round"
+                                                style={{ ...proteinSeg, transition: 'stroke-dasharray 0.6s ease, stroke-dashoffset 0.6s ease' }} />
+                                        </svg>
+                                        {/* Centre label */}
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                            <span className="text-xl font-black text-slate-900 dark:text-white leading-none">{energyPct}%</span>
+                                            <span className="text-[8px] uppercase tracking-widest text-slate-400 font-bold mt-0.5">Energy</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Breakdown */}
+                                    <div className="flex-1 grid grid-cols-1 gap-2.5 min-w-0">
+                                        {/* Energy row */}
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <Flame size={13} className="text-emerald-500 flex-shrink-0" />
+                                                <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Energy</span>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="text-sm font-black text-slate-900 dark:text-white">{formatVal(energyVal)}</span>
+                                                <span className="text-[9px] text-slate-400 ml-0.5">{unit}</span>
+                                                <span className="text-[9px] text-slate-500 ml-1.5">/ {formatVal(energyRda)}</span>
+                                            </div>
+                                        </div>
+                                        {/* Carbs */}
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
+                                                <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Carbs</span>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="text-sm font-black text-blue-500">{carbsPct}%</span>
+                                                <span className="text-[9px] text-slate-400 ml-1.5">{carbsVal.toFixed(1)}g / {carbsRda.toFixed(0)}g</span>
+                                            </div>
+                                        </div>
+                                        {/* Fat */}
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" />
+                                                <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Fat</span>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="text-sm font-black text-amber-500">{fatPct}%</span>
+                                                <span className="text-[9px] text-slate-400 ml-1.5">{fatVal.toFixed(1)}g / {fatRda.toFixed(0)}g</span>
+                                            </div>
+                                        </div>
+                                        {/* Protein */}
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full bg-rose-500 flex-shrink-0" />
+                                                <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">Protein</span>
+                                            </div>
+                                            <div className="text-right">
+                                                <span className="text-sm font-black text-rose-500">{proteinPct}%</span>
+                                                <span className="text-[9px] text-slate-400 ml-1.5">{proteinVal.toFixed(1)}g / {proteinRda.toFixed(0)}g</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            );
+                        })()}
+
                         {/* Action Buttons */}
                         <div className="grid grid-cols-3 gap-3 pt-2">
                             <button
