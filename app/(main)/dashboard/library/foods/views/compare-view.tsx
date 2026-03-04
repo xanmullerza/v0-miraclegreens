@@ -24,7 +24,9 @@ import {
     ArrowRight,
     Leaf,
     Beaker,
-    Wallet
+    Wallet,
+    Library,
+    Calendar
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/lib/supabase';
@@ -363,6 +365,10 @@ export function CompareView({ showStats = false, stats }: CompareViewProps) {
                             const firstEmpty = selectedFoods.findIndex(f => f === null);
                             setActiveSlot(firstEmpty !== -1 ? firstEmpty : 0);
                         }
+                    }}
+                    sideNav={{
+                        left: { icon: <Library size={16} />, label: 'Library', href: '/dashboard/library/foods' },
+                        right: { icon: <Calendar size={16} />, label: 'Meals', href: '/dashboard/meal-o-matic/planner' },
                     }}
                     theme="emerald"
                     placeholder="SEARCH FOOD LIBRARY..."
