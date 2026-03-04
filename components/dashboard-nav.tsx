@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { Books, Leaf, Calendar, ShoppingBag, Package, ChefHat, LayoutGrid } from 'lucide-react';
+import { Book, Leaf, Calendar, ShoppingBag, Package, ChefHat, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function DashboardNav() {
@@ -44,7 +44,7 @@ export function DashboardNav() {
                     )}
                     title="Library"
                 >
-                    <Books size={24} />
+                    <Book size={24} />
                 </button>
 
                 {/* Center buttons - Library section */}
