@@ -43,6 +43,8 @@ interface HeroSearchProps<T = any> {
      * Use this when another component (e.g. ExploreView) handles the search display.
      */
     hideResults?: boolean;
+    /** When true, idleIcon is rendered directly without the rounded wrapper + ping animation. */
+    idleIconRaw?: boolean;
 }
 
 const themeStyles: Record<HeroTheme, { ring: string; border: string; accent: string; accentBg: string; iconColor: string }> = {
@@ -134,10 +136,14 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
                         </div>
                     ) : (
                         <div className="flex flex-col items-center justify-start pt-2 md:pt-4 text-center h-full animate-in fade-in duration-700">
-                            <div className={cn("w-12 h-12 rounded-full flex items-center justify-center mb-4 relative", style.accentBg)}>
-                                {idleIcon}
-                                <div className={cn("absolute inset-0 rounded-full animate-ping", style.accentBg)} />
-                            </div>
+                            {props.idleIconRaw ? (
+                                <div className="mb-4">{idleIcon}</div>
+                            ) : (
+                                <div className={cn("w-12 h-12 rounded-full flex items-center justify-center mb-4 relative", style.accentBg)}>
+                                    {idleIcon}
+                                    <div className={cn("absolute inset-0 rounded-full animate-ping", style.accentBg)} />
+                                </div>
+                            )}
                             <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase italic tracking-tight mb-1">{idleTitle}</h3>
                             {idleSubtitle && <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest max-w-xs">{idleSubtitle}</p>}
                             {props.idleExtra}

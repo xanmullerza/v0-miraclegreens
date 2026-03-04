@@ -53,7 +53,9 @@ import {
     Camera,
     Database,
     CalendarDays,
-    HelpCircle
+    HelpCircle,
+    Package,
+    ShoppingBag
 } from 'lucide-react';
 import {
     Sheet,
@@ -1332,7 +1334,29 @@ export function MealPlannerContent({
                 }}
                 theme="amber"
                 placeholder="SEARCH RECIPES..."
-                idleIcon={<Calendar size={20} className="text-amber-500" />}
+                idleIconRaw
+                idleIcon={
+                    <div className="flex items-center justify-center gap-3">
+                        <button
+                            onClick={(e) => { e.stopPropagation(); router.push('/dashboard/meal-o-matic/shopping'); }}
+                            className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all active:scale-95"
+                            title="Shopping List"
+                        >
+                            <ShoppingBag size={16} />
+                        </button>
+                        <div className="w-12 h-12 rounded-full bg-amber-500/10 border-2 border-amber-500/30 flex items-center justify-center text-amber-500 shadow-sm relative">
+                            <Calendar size={20} />
+                            <div className="absolute inset-0 rounded-full bg-amber-500/20 animate-ping" />
+                        </div>
+                        <button
+                            onClick={(e) => { e.stopPropagation(); router.push('/dashboard/meal-o-matic/pantry'); }}
+                            className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all active:scale-95"
+                            title="Pantry"
+                        >
+                            <Package size={16} />
+                        </button>
+                    </div>
+                }
                 idleTitle="Meal Planner"
                 idleSubtitle="Search recipes or generate a daily meal plan below"
                 noResultsMessage="No matching recipes found"
