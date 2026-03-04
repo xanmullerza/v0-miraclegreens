@@ -1005,6 +1005,7 @@ export function MealPlannerContent({
     const [showDailyNutrients, setShowDailyNutrients] = useState(false);
     const [nutrientsView, setNutrientView] = useState<'closed' | 'essential' | 'advanced'>('closed');
     const [mineralThreshold, setMineralThreshold] = useState<50 | 75 | 100>(75);
+    const [vitaminThreshold, setVitaminThreshold] = useState<50 | 75 | 100>(75);
     const [dailyMoringaGrams, setDailyMoringaGrams] = useState(0);
     const [activeBoostContext, setActiveBoostContext] = useState<'daily' | 'recipe' | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
@@ -1789,6 +1790,149 @@ export function MealPlannerContent({
                         })()}
 
                         </div>{/* end macros+minerals grid */}
+
+                        {/* Second row: Often Overlooked + Vitamins */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+                        {/* Left: Often Overlooked */}
+                        {(() => {
+                            const OVERLOOKED = [
+                                { label: 'Water',     keys: ['Water'],                                unit: 'g',   rdaOverride: 700,  color: '#06b6d4', desc: 'from food' },
+                                { label: 'Fiber',     keys: ['Fiber', 'fiber_g'],                    unit: 'g',   rdaOverride: null, color: '#22c55e', desc: null },
+                                { label: 'Vitamin D', keys: ['Vitamin D', 'vitamin_d_iu'],           unit: 'IU',  rdaOverride: null, color: '#f59e0b', desc: null },
+                                { label: 'Choline',   keys: ['Choline', 'choline_mg'],               unit: 'mg',  rdaOverride: null, color: '#a855f7', desc: null },
+                            ];
+                            const micro = plan.micronutrients || {};
+                            return (
+                                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-3">
+                                    <div>
+                                        <div className="text-[11px] font-black uppercase tracking-widest text-slate-400">Often Overlooked</div>
+                                        <div className="text-[10px] text-slate-400 mt-0.5">Nutrients people rarely track</div>
+                                    </div>
+                                    <div className="space-y-3">
+                                        {OVERLOOKED.map(({ label, keys, unit, rdaOverride, color, desc }) => {
+                                            let val = 0;
+                                            for (const k of keys) {
+                                                const match = findNutrientMatch(micro, k);
+                                                if (match !== null && match !== undefined && micro[match] !== undefined) { val = micro[match]; break; }
+                                            }
+                                            const rda = rdaOverride ?? (userRDAs?.[label] || 0);
+                                            const pct = rda > 0 ? Math.min(Math.round((val / rda) * 100), 150) : 0;
+                                            const barPct = Math.min(pct, 100);
+                                            return (
+                                                <div key={label}>
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">{label}</span>
+                                                        <div className="flex items-center gap-1.5">
+                                                            <span className="text-[10px] text-slate-400">{val.toFixed(1)}{unit}{desc ? ` (${desc})` : ''}</span>
+                                                            {rda > 0 && <span className="text-[10px] font-black" style={{ color }}>{pct}%</span>}
+                                                        </div>
+                                                    </div>
+                                                    <div className="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                                                        <div className="h-full rounded-full transition-all duration-700" style={{ width: `${barPct}%`, backgroundColor: color }} />
+                                                    </div>
+                                                    {rda > 0 && (
+                                                        <div className="text-[9px] text-slate-300 dark:text-slate-600 mt-0.5">
+                                                            target {rda % 1 === 0 ? rda : rda.toFixed(1)}{unit}{label === 'Water' ? ' (from food est.)' : ' RDA'}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            );
+                        })()}
+
+                        {/* Right: Vitamins 6+6 */}
+                        {(() => {
+                            const ALL_VITAMINS = [
+                                { label: 'B1 (Thiamine)',       short: 'B1' },
+                                { label: 'B2 (Riboflavin)',     short: 'B2' },
+                                { label: 'B3 (Niacin)',         short: 'B3' },
+                                { label: 'B5 (Pantothenic Acid)', short: 'B5' },
+                                { label: 'B6 (Pyridoxine)',     short: 'B6' },
+                                { label: 'B7 (Biotin)',         short: 'B7' },
+                                { label: 'B9 (Folate)',         short: 'B9' },
+                                { label: 'B12 (Cobalamin)',     short: 'B12' },
+                                { label: 'Vitamin A',           short: 'A' },
+                                { label: 'Vitamin C',           short: 'C' },
+                                { label: 'Vitamin E',           short: 'E' },
+                                { label: 'Vitamin K',           short: 'K' },
+                            ];
+                            const micro = plan.micronutrients || {};
+                            const vitaminData = ALL_VITAMINS.map(({ label, short }) => {
+                                let val = 0;
+                                const match = findNutrientMatch(micro, label);
+                                if (match !== null && match !== undefined && micro[match] !== undefined) { val = micro[match]; }
+                                const rda = userRDAs?.[label] || 0;
+                                const pct = rda > 0 ? Math.round((val / rda) * 100) : 0;
+                                return { label, short, pct };
+                            });
+                            const count = vitaminData.filter(v => v.pct >= vitaminThreshold).length;
+                            const total = vitaminData.length;
+                            const arcPct = total > 0 ? count / total : 0;
+                            const R2 = 38, S2 = 8, C2 = 2 * Math.PI * R2;
+                            const thresholds: (50 | 75 | 100)[] = [50, 75, 100];
+                            return (
+                                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4">
+                                    {/* Threshold toggle */}
+                                    <div className="flex gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5">
+                                        {thresholds.map(t => (
+                                            <button
+                                                key={t}
+                                                onClick={() => setVitaminThreshold(t)}
+                                                className={cn(
+                                                    'flex-1 text-[10px] font-black py-1.5 rounded-md transition-all uppercase tracking-widest',
+                                                    vitaminThreshold === t
+                                                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                                                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                                                )}
+                                            >
+                                                {t}%
+                                            </button>
+                                        ))}
+                                    </div>
+                                    {/* Donut + big number */}
+                                    <div className="flex items-center gap-4">
+                                        <div className="relative flex-shrink-0" style={{ width: 80, height: 80 }}>
+                                            <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90">
+                                                <circle cx="40" cy="40" r={R2} fill="none" stroke="currentColor" strokeWidth={S2} className="text-slate-200 dark:text-slate-800" />
+                                                <circle cx="40" cy="40" r={R2} fill="none" stroke="#8b5cf6" strokeWidth={S2} strokeLinecap="butt"
+                                                    style={{ strokeDasharray: `${arcPct * C2} ${C2}`, transition: 'stroke-dasharray 0.7s ease' }} />
+                                            </svg>
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                                <span className="text-lg font-black text-slate-900 dark:text-white leading-none">{count}</span>
+                                                <span className="text-[8px] text-slate-400 font-bold">/ {total}</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className="text-xl font-black text-slate-900 dark:text-white">{Math.round(arcPct * 100)}%</div>
+                                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-tight">vitamins<br/>≥ {vitaminThreshold}% RDA</div>
+                                        </div>
+                                    </div>
+                                    {/* Vitamin pills — 6+6 in 2 cols */}
+                                    <div className="grid grid-cols-2 gap-1.5">
+                                        {vitaminData.map(({ label, short, pct }) => {
+                                            const hit = pct >= vitaminThreshold;
+                                            return (
+                                                <div key={label} className={cn(
+                                                    'flex items-center justify-between rounded-lg px-2 py-1.5 text-[10px] font-bold border',
+                                                    hit
+                                                        ? 'bg-violet-500/10 border-violet-500/30 text-violet-600 dark:text-violet-400'
+                                                        : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400'
+                                                )}>
+                                                    <span>{short}</span>
+                                                    <span className={hit ? 'font-black' : ''}>{pct}%</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            );
+                        })()}
+
+                        </div>{/* end overlooked+vitamins grid */}
 
                         {/* Action Buttons */}
                         <div className="grid grid-cols-3 gap-3 pt-2">
