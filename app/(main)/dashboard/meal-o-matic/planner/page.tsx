@@ -55,7 +55,8 @@ import {
     CalendarDays,
     HelpCircle,
     Package,
-    ShoppingBag
+    ShoppingBag,
+    Leaf
 } from 'lucide-react';
 import {
     Sheet,
@@ -298,7 +299,7 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                 )
             )) setAddedToList(true);
         } catch { /* ignore */ }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [liveIngs]);
     return (
         <div
@@ -352,65 +353,65 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                         // orange = <50% possessed, blue = 50-99%, green = 100%
                         const tier = matchScore === 1 ? 'green' : matchScore >= 0.5 ? 'blue' : 'orange';
                         const colors = {
-                            green:  { btn: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500' },
-                            blue:   { btn: 'border-blue-500/30 bg-blue-500/10 text-blue-500 hover:bg-blue-500' },
+                            green: { btn: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500' },
+                            blue: { btn: 'border-blue-500/30 bg-blue-500/10 text-blue-500 hover:bg-blue-500' },
                             orange: { btn: 'border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500' },
                         };
                         const c = colors[tier];
                         return (
-                    <div className="mt-3 grid grid-cols-2 gap-2 lg:hidden">
-                        <button
-                            onClick={(e: React.MouseEvent) => { e.stopPropagation(); setActivePanel(activePanel === 'stocked' ? null : 'stocked'); }}
-                            className={cn("text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border hover:text-white transition-all flex items-center justify-center gap-1.5", c.btn, activePanel === 'stocked' && "ring-2 ring-offset-1 ring-current")}
-                        >
-                            <ShoppingBasket size={10} />
-                            {matchCount} / {recipeIngs.length} Stocked
-                        </button>
-                        {toBuyState === 'ready' ? (
-                            <div className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 flex items-center justify-center gap-1.5">
-                                <Sparkles size={10} /> Ready
+                            <div className="mt-3 grid grid-cols-2 gap-2 lg:hidden">
+                                <button
+                                    onClick={(e: React.MouseEvent) => { e.stopPropagation(); setActivePanel(activePanel === 'stocked' ? null : 'stocked'); }}
+                                    className={cn("text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border hover:text-white transition-all flex items-center justify-center gap-1.5", c.btn, activePanel === 'stocked' && "ring-2 ring-offset-1 ring-current")}
+                                >
+                                    <ShoppingBasket size={10} />
+                                    {matchCount} / {recipeIngs.length} Stocked
+                                </button>
+                                {toBuyState === 'ready' ? (
+                                    <div className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 flex items-center justify-center gap-1.5">
+                                        <Sparkles size={10} /> Ready
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={(e: React.MouseEvent) => { e.stopPropagation(); setActivePanel(activePanel === 'toBuy' ? null : 'toBuy'); }}
+                                        className={cn(
+                                            "text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border hover:text-white transition-all flex items-center justify-center gap-1.5",
+                                            toBuyState === 'toBuy'
+                                                ? "border-blue-500/30 bg-blue-500/10 text-blue-500 hover:bg-blue-500"
+                                                : "border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500",
+                                            activePanel === 'toBuy' && "ring-2 ring-offset-1 ring-current"
+                                        )}
+                                    >
+                                        {toBuyState === 'toBuy'
+                                            ? <><ShoppingCart size={10} />{uniqueMissing.length} / {recipeIngs.length} To Buy</>
+                                            : <><ShoppingBasket size={10} />{uniqueMissing.length} / {recipeIngs.length} To Add</>
+                                        }
+                                    </button>
+                                )}
+                                {onMarkEaten && (
+                                    <button
+                                        onClick={(e: React.MouseEvent) => { e.stopPropagation(); if (!isEaten) onMarkEaten(); }}
+                                        className={cn(
+                                            "text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border transition-all flex items-center justify-center gap-1.5",
+                                            isEaten
+                                                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 cursor-default"
+                                                : "border-slate-500/30 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white"
+                                        )}
+                                    >
+                                        {isEaten && <Check size={10} />}
+                                        {isEaten ? "Eaten" : "Eaten?"}
+                                    </button>
+                                )}
+                                {onRegenerate && !isEaten && (
+                                    <button
+                                        onClick={(e: React.MouseEvent) => { e.stopPropagation(); onRegenerate(); }}
+                                        className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-slate-500/30 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white transition-all flex items-center justify-center gap-1.5"
+                                    >
+                                        <RotateCcw size={10} />
+                                        Shuffle
+                                    </button>
+                                )}
                             </div>
-                        ) : (
-                            <button
-                                onClick={(e: React.MouseEvent) => { e.stopPropagation(); setActivePanel(activePanel === 'toBuy' ? null : 'toBuy'); }}
-                                className={cn(
-                                    "text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border hover:text-white transition-all flex items-center justify-center gap-1.5",
-                                    toBuyState === 'toBuy'
-                                        ? "border-blue-500/30 bg-blue-500/10 text-blue-500 hover:bg-blue-500"
-                                        : "border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500",
-                                    activePanel === 'toBuy' && "ring-2 ring-offset-1 ring-current"
-                                )}
-                            >
-                                {toBuyState === 'toBuy'
-                                    ? <><ShoppingCart size={10} />{uniqueMissing.length} / {recipeIngs.length} To Buy</>
-                                    : <><ShoppingBasket size={10} />{uniqueMissing.length} / {recipeIngs.length} To Add</>
-                                }
-                            </button>
-                        )}
-                        {onMarkEaten && (
-                            <button
-                                onClick={(e: React.MouseEvent) => { e.stopPropagation(); if (!isEaten) onMarkEaten(); }}
-                                className={cn(
-                                    "text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border transition-all flex items-center justify-center gap-1.5",
-                                    isEaten
-                                        ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-500 cursor-default"
-                                        : "border-slate-500/30 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white"
-                                )}
-                            >
-                                {isEaten && <Check size={10} />}
-                                {isEaten ? "Eaten" : "Eaten?"}
-                            </button>
-                        )}
-                        {onRegenerate && !isEaten && (
-                            <button
-                                onClick={(e: React.MouseEvent) => { e.stopPropagation(); onRegenerate(); }}
-                                className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1.5 rounded-lg border border-slate-500/30 bg-slate-500/10 text-slate-400 hover:bg-slate-500 hover:text-white transition-all flex items-center justify-center gap-1.5"
-                            >
-                                <RotateCcw size={10} />
-                                Shuffle
-                            </button>
-                        )}
-                    </div>
                         );
                     })()}
                 </div>
@@ -437,8 +438,8 @@ const RecipeListItem = ({ recipe, mealLabel, unit = 'kJ', onRegenerate, onMarkEa
                 {(() => {
                     const tier = matchScore === 1 ? 'green' : matchScore >= 0.5 ? 'blue' : 'orange';
                     const colors = {
-                        green:  { btn: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500' },
-                        blue:   { btn: 'border-blue-500/30 bg-blue-500/10 text-blue-500 hover:bg-blue-500' },
+                        green: { btn: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500' },
+                        blue: { btn: 'border-blue-500/30 bg-blue-500/10 text-blue-500 hover:bg-blue-500' },
                         orange: { btn: 'border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500' },
                     };
                     const c = colors[tier];
@@ -623,6 +624,48 @@ export function MealPlannerContent({
     const [isHeroSearching, setIsHeroSearching] = useState(false);
     const [isHeroActive, setIsHeroActive] = useState(false);
     const heroSearchTimeout = React.useRef<NodeJS.Timeout | null>(null);
+
+    // Maker overlay state
+    const [showMakerOverlay, setShowMakerOverlay] = useState(false);
+
+    const MAKER_OPTIONS = [
+        {
+            id: 'food',
+            label: 'New Food',
+            description: 'Add a whole food ingredient with full nutrition data',
+            icon: Leaf,
+            href: '/dashboard/meal-o-matic/maker/food',
+            iconColor: 'text-emerald-500',
+            borderColor: 'border-emerald-500/30',
+            bgColor: 'bg-emerald-500/10',
+            hoverBorder: 'hover:border-emerald-500/60',
+            shadowColor: 'hover:shadow-emerald-500/10',
+        },
+        {
+            id: 'meal',
+            label: 'New Meal',
+            description: 'Build a meal recipe with ingredients and instructions',
+            icon: ChefHat,
+            href: '/dashboard/meal-o-matic/maker/meal',
+            iconColor: 'text-amber-500',
+            borderColor: 'border-amber-500/30',
+            bgColor: 'bg-amber-500/10',
+            hoverBorder: 'hover:border-amber-500/60',
+            shadowColor: 'hover:shadow-amber-500/10',
+        },
+        {
+            id: 'mix',
+            label: 'New Mix',
+            description: 'Create a custom ingredient blend or base mix',
+            icon: FlaskConical,
+            href: '/dashboard/meal-o-matic/maker/mix',
+            iconColor: 'text-indigo-500',
+            borderColor: 'border-indigo-500/30',
+            bgColor: 'bg-indigo-500/10',
+            hoverBorder: 'hover:border-indigo-500/60',
+            shadowColor: 'hover:shadow-indigo-500/10',
+        },
+    ];
 
     const performHeroSearch = async (query: string) => {
         if (!query || query.length < 2) { setHeroSearchResults([]); return; }
@@ -820,12 +863,12 @@ export function MealPlannerContent({
 
         console.log('[markEaten] Final quantities to save:', quantities);
         console.log('[markEaten] Total subtracted:', subtracted);
-        
+
         // Log if any item is being set to 0 and move to shopping list
         const savedBefore = localStorage.getItem('pantry_quantities');
         const beforeObj = savedBefore ? JSON.parse(savedBefore) : {};
         const itemsToReplenish: { id: string; name: string }[] = [];
-        
+
         Object.entries(quantities).forEach(([id, qty]) => {
             if ((qty === '0 grams' || qty === '0 g' || qty === '0') && beforeObj[id] !== qty) {
                 console.warn('🥔 [markEaten] ⚠️ ITEM ZEROED OUT!', { id, wasBefore: beforeObj[id], nowIs: qty, recipe: recipe.title });
@@ -836,9 +879,9 @@ export function MealPlannerContent({
                 }
             }
         });
-        
+
         localStorage.setItem('pantry_quantities', JSON.stringify(quantities));
-        
+
         // Move zeroed items to shopping list and remove from pantry
         if (itemsToReplenish.length > 0) {
             try {
@@ -853,18 +896,18 @@ export function MealPlannerContent({
                         checked: false,
                         source: 'auto-replenish'
                     });
-                    
+
                     // Remove from pantry (only admin modifies global flag)
                     const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
                     const { data: { user: currentUser } } = await supabase.auth.getUser();
                     const admin = !!(currentUser?.email && adminEmail && currentUser.email === adminEmail);
-                    
+
                     if (admin) {
                         const foodItemUpdate = await supabase
                             .from('food_items')
                             .update({ is_in_pantry: false } as any)
                             .eq('id', item.id);
-                        
+
                         if (foodItemUpdate.error) {
                             console.warn('[markEaten] Failed to remove', item.name, 'from pantry:', foodItemUpdate.error);
                         } else {
@@ -881,7 +924,7 @@ export function MealPlannerContent({
                 console.error('[markEaten] Failed to auto-replenish items:', e);
             }
         }
-        
+
         // Notify any mounted pantry views to re-apply the updated quantities
         window.dispatchEvent(new CustomEvent('pantry-quantities-updated'));
         setEatenMeals(prev => new Set([...prev, mealType]));
@@ -1335,6 +1378,20 @@ export function MealPlannerContent({
                 theme="amber"
                 placeholder="SEARCH RECIPES..."
                 idleIconRaw
+                powerButton={
+                    <button
+                        onClick={() => setShowMakerOverlay(prev => !prev)}
+                        className={cn(
+                            "w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all shrink-0",
+                            showMakerOverlay
+                                ? "bg-amber-500 border-amber-500 text-white shadow-lg shadow-amber-500/30"
+                                : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-amber-500 hover:bg-amber-500/10"
+                        )}
+                        title="Open Maker"
+                    >
+                        <Plus size={16} className={showMakerOverlay ? 'text-white rotate-45 transition-transform' : 'text-slate-900 dark:text-white transition-transform'} />
+                    </button>
+                }
                 idleIcon={
                     <div className="flex items-center justify-center">
                         {/* Outer left big button */}
@@ -1400,6 +1457,65 @@ export function MealPlannerContent({
                     </div>
                 )}
             />
+
+            {/* Maker Overlay */}
+            {showMakerOverlay && (
+                <div className="animate-in slide-in-from-top-3 fade-in duration-300 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-xl overflow-hidden">
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                                <Plus size={16} className="text-amber-500" />
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white">Maker</h3>
+                                <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Create new foods, meals &amp; mixes</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => setShowMakerOverlay(false)}
+                            className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95"
+                            title="Close"
+                        >
+                            <X size={16} />
+                        </button>
+                    </div>
+                    {/* Maker Options */}
+                    <div className="p-4 grid gap-3">
+                        {MAKER_OPTIONS.map((option) => {
+                            const Icon = option.icon;
+                            return (
+                                <button
+                                    key={option.id}
+                                    onClick={() => { setShowMakerOverlay(false); router.push(option.href); }}
+                                    className={cn(
+                                        'group w-full text-left p-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer',
+                                        'bg-white dark:bg-slate-900/50',
+                                        option.borderColor,
+                                        option.hoverBorder,
+                                        'hover:shadow-lg',
+                                        option.shadowColor,
+                                    )}
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className={cn(
+                                            'w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110',
+                                            option.bgColor,
+                                        )}>
+                                            <Icon size={20} className={option.iconColor} />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">{option.label}</h4>
+                                            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-0.5">{option.description}</p>
+                                        </div>
+                                        <ChevronRight size={16} className={cn('shrink-0 transition-all duration-300 text-slate-300 dark:text-slate-600 group-hover:translate-x-0.5', `group-hover:${option.iconColor}`)} />
+                                    </div>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
 
             {/* Controls Row */}
             {/* Header Actions (Refactored from Controls Row) */}
@@ -1637,377 +1753,377 @@ export function MealPlannerContent({
                         {/* Macros + Minerals Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
-                        {/* Left: Macros */}
-                        {(() => {
-                            const energyRdaKcal = Math.max(1200, Math.round((profile?.gender === 'male'
-                                ? ((10 * (Number(profile?.weight) || 70)) + (6.25 * (Number(profile?.height) || 170)) - (5 * (Number(profile?.age) || 30)) + 5)
-                                : ((10 * (Number(profile?.weight) || 70)) + (6.25 * (Number(profile?.height) || 170)) - (5 * (Number(profile?.age) || 30)) - 161)) * 1.2));
-                            const energyRda = unit === 'kJ' ? energyRdaKcal * 4.184 : energyRdaKcal;
-                            const proteinRda = userRDAs?.['Protein'] || (Number(profile?.weight) || 70) * 1.6;
-                            const carbsRda = userRDAs?.['Carbs'] || 250;
-                            const fatRda = userRDAs?.['Fat'] || 70;
+                            {/* Left: Macros */}
+                            {(() => {
+                                const energyRdaKcal = Math.max(1200, Math.round((profile?.gender === 'male'
+                                    ? ((10 * (Number(profile?.weight) || 70)) + (6.25 * (Number(profile?.height) || 170)) - (5 * (Number(profile?.age) || 30)) + 5)
+                                    : ((10 * (Number(profile?.weight) || 70)) + (6.25 * (Number(profile?.height) || 170)) - (5 * (Number(profile?.age) || 30)) - 161)) * 1.2));
+                                const energyRda = unit === 'kJ' ? energyRdaKcal * 4.184 : energyRdaKcal;
+                                const proteinRda = userRDAs?.['Protein'] || (Number(profile?.weight) || 70) * 1.6;
+                                const carbsRda = userRDAs?.['Carbs'] || 250;
+                                const fatRda = userRDAs?.['Fat'] || 70;
 
-                            const energyVal = unit === 'kJ' ? plan.totalCalories * 4.184 : plan.totalCalories;
-                            const proteinVal = plan.macros.protein;
-                            const carbsVal = plan.macros.carbs;
-                            const fatVal = plan.macros.fat;
+                                const energyVal = unit === 'kJ' ? plan.totalCalories * 4.184 : plan.totalCalories;
+                                const proteinVal = plan.macros.protein;
+                                const carbsVal = plan.macros.carbs;
+                                const fatVal = plan.macros.fat;
 
-                            const energyPct = Math.round((energyVal / energyRda) * 100);
-                            const proteinPct = Math.min(Math.round((proteinVal / proteinRda) * 100), 100);
-                            const carbsPct = Math.min(Math.round((carbsVal / carbsRda) * 100), 100);
-                            const fatPct = Math.min(Math.round((fatVal / fatRda) * 100), 100);
+                                const energyPct = Math.round((energyVal / energyRda) * 100);
+                                const proteinPct = Math.min(Math.round((proteinVal / proteinRda) * 100), 100);
+                                const carbsPct = Math.min(Math.round((carbsVal / carbsRda) * 100), 100);
+                                const fatPct = Math.min(Math.round((fatVal / fatRda) * 100), 100);
 
-                            // Donut segments — proportional to caloric contribution, ring fills to energy % of RDA (capped at 100%)
-                            const proteinCal = proteinVal * 4;
-                            const carbsCal = carbsVal * 4;
-                            const fatCal = fatVal * 9;
-                            const totalCal = proteinCal + carbsCal + fatCal || 1;
-                            const fillPct = Math.min(energyPct, 100) / 100;
+                                // Donut segments — proportional to caloric contribution, ring fills to energy % of RDA (capped at 100%)
+                                const proteinCal = proteinVal * 4;
+                                const carbsCal = carbsVal * 4;
+                                const fatCal = fatVal * 9;
+                                const totalCal = proteinCal + carbsCal + fatCal || 1;
+                                const fillPct = Math.min(energyPct, 100) / 100;
 
-                            const carbsFrac = (carbsCal / totalCal) * fillPct;
-                            const fatFrac = (fatCal / totalCal) * fillPct;
-                            const proteinFrac = (proteinCal / totalCal) * fillPct;
+                                const carbsFrac = (carbsCal / totalCal) * fillPct;
+                                const fatFrac = (fatCal / totalCal) * fillPct;
+                                const proteinFrac = (proteinCal / totalCal) * fillPct;
 
-                            const R = 44, STROKE = 9, C = 2 * Math.PI * R;
-                            const seg = (offset: number, frac: number) => ({
-                                strokeDasharray: `${frac * C} ${C}`,
-                                strokeDashoffset: `${-offset * C}`,
-                                transition: 'stroke-dasharray 0.7s ease, stroke-dashoffset 0.7s ease',
-                            });
-                            let off = 0;
-                            const carbsSeg = seg(off, carbsFrac); off += carbsFrac;
-                            const fatSeg = seg(off, fatFrac); off += fatFrac;
-                            const proteinSeg = seg(off, proteinFrac);
+                                const R = 44, STROKE = 9, C = 2 * Math.PI * R;
+                                const seg = (offset: number, frac: number) => ({
+                                    strokeDasharray: `${frac * C} ${C}`,
+                                    strokeDashoffset: `${-offset * C}`,
+                                    transition: 'stroke-dasharray 0.7s ease, stroke-dashoffset 0.7s ease',
+                                });
+                                let off = 0;
+                                const carbsSeg = seg(off, carbsFrac); off += carbsFrac;
+                                const fatSeg = seg(off, fatFrac); off += fatFrac;
+                                const proteinSeg = seg(off, proteinFrac);
 
-                            const fmt = (v: number) => v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v % 1 === 0 ? `${v}` : v.toFixed(1);
-                            const remaining = Math.max(0, energyRda - energyVal);
-                            const over = energyVal > energyRda;
+                                const fmt = (v: number) => v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v % 1 === 0 ? `${v}` : v.toFixed(1);
+                                const remaining = Math.max(0, energyRda - energyVal);
+                                const over = energyVal > energyRda;
 
-                            const MacroBar = ({ pct, color }: { pct: number; color: string }) => (
-                                <div className="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
-                                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, backgroundColor: color }} />
-                                </div>
-                            );
-
-                            return (
-                                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                                    {/* Top row: donut left, energy summary right */}
-                                    <div className="flex items-center gap-4 mb-4">
-                                        {/* Donut */}
-                                        <div className="relative flex-shrink-0" style={{ width: 96, height: 96 }}>
-                                            <svg viewBox="0 0 96 96" className="w-full h-full -rotate-90">
-                                                <circle cx="48" cy="48" r={R} fill="none" stroke="currentColor" strokeWidth={STROKE} className="text-slate-200 dark:text-slate-800" />
-                                                <circle cx="48" cy="48" r={R} fill="none" stroke="#3b82f6" strokeWidth={STROKE} strokeLinecap="butt" style={carbsSeg} />
-                                                <circle cx="48" cy="48" r={R} fill="none" stroke="#f59e0b" strokeWidth={STROKE} strokeLinecap="butt" style={fatSeg} />
-                                                <circle cx="48" cy="48" r={R} fill="none" stroke="#f43f5e" strokeWidth={STROKE} strokeLinecap="butt" style={proteinSeg} />
-                                            </svg>
-                                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                                <span className="text-base font-black text-slate-900 dark:text-white leading-none">{fmt(energyVal)}</span>
-                                                <span className="text-[8px] text-slate-400 font-bold mt-0.5">{unit}</span>
-                                            </div>
-                                        </div>
-
-                                        {/* Energy stats */}
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-baseline gap-1.5 flex-wrap">
-                                                <span className="text-2xl font-black text-slate-900 dark:text-white">{energyPct}%</span>
-                                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">of daily target</span>
-                                            </div>
-                                            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                                                {fmt(energyVal)} / {fmt(energyRda)} {unit}
-                                            </div>
-                                            <div className={cn("text-[11px] font-bold mt-1.5", over ? "text-rose-500" : "text-emerald-500")}>
-                                                {over
-                                                    ? `${fmt(energyVal - energyRda)} ${unit} over target`
-                                                    : `${fmt(remaining)} ${unit} remaining`
-                                                }
-                                            </div>
-                                        </div>
+                                const MacroBar = ({ pct, color }: { pct: number; color: string }) => (
+                                    <div className="flex-1 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                                        <div className="h-full rounded-full transition-all duration-700" style={{ width: `${pct}%`, backgroundColor: color }} />
                                     </div>
+                                );
 
-                                    {/* Macro bars */}
-                                    <div className="space-y-2.5">
-                                        {[
-                                            { label: 'Carbs', val: carbsVal, rda: carbsRda, pct: carbsPct, color: '#3b82f6', textColor: 'text-blue-500' },
-                                            { label: 'Fat', val: fatVal, rda: fatRda, pct: fatPct, color: '#f59e0b', textColor: 'text-amber-500' },
-                                            { label: 'Protein', val: proteinVal, rda: proteinRda, pct: proteinPct, color: '#f43f5e', textColor: 'text-rose-500' },
-                                        ].map(({ label, val, rda, pct, color, textColor }) => (
-                                            <div key={label} className="flex items-center gap-2.5">
-                                                <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 w-12 flex-shrink-0">{label}</span>
-                                                <MacroBar pct={pct} color={color} />
-                                                <span className={cn("text-[10px] font-black w-7 text-right flex-shrink-0", textColor)}>{pct}%</span>
-                                                <span className="text-[10px] text-slate-400 whitespace-nowrap flex-shrink-0">{val.toFixed(1)}g / {rda.toFixed(0)}g</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            );
-                        })()}
-
-                        {/* Right: Minerals Coverage */}
-                        {(() => {
-                            const MINERALS = [
-                                { label: 'Sodium', keys: ['Sodium', 'sodium_mg'] },
-                                { label: 'Potassium', keys: ['Potassium', 'potassium_mg'] },
-                                { label: 'Magnesium', keys: ['Magnesium', 'magnesium_mg'] },
-                                { label: 'Calcium', keys: ['Calcium', 'calcium_mg'] },
-                                { label: 'Phosphorus', keys: ['Phosphorus', 'phosphorus_mg'] },
-                                { label: 'Iron', keys: ['Iron', 'iron_mg'] },
-                                { label: 'Zinc', keys: ['Zinc', 'zinc_mg'] },
-                                { label: 'Copper', keys: ['Copper', 'copper_mg'] },
-                                { label: 'Manganese', keys: ['Manganese', 'manganese_mg'] },
-                                { label: 'Selenium', keys: ['Selenium', 'selenium_ug'] },
-                            ];
-                            const micro = plan.micronutrients || {};
-                            const mineralData = MINERALS.map(({ label, keys }) => {
-                                let val = 0;
-                                for (const k of keys) {
-                                    const match = findNutrientMatch(micro, k);
-                                    if (match !== null && match !== undefined && micro[match] !== undefined) { val = micro[match]; break; }
-                                }
-                                const rda = userRDAs?.[label] || 0;
-                                const pct = rda > 0 ? Math.round((val / rda) * 100) : 0;
-                                return { label, pct };
-                            });
-                            const total = mineralData.length;
-                            const count = mineralData.filter(m => m.pct >= mineralThreshold).length;
-                            const thresholds: (50 | 75 | 100)[] = [50, 75, 100];
-                            const arcPct = total > 0 ? count / total : 0;
-                            const R2 = 38, S2 = 8, C2 = 2 * Math.PI * R2;
-                            return (
-                                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4">
-                                    {/* Threshold toggle */}
-                                    <div className="flex gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5">
-                                        {thresholds.map(t => (
-                                            <button
-                                                key={t}
-                                                onClick={() => setMineralThreshold(t)}
-                                                className={cn(
-                                                    'flex-1 text-[10px] font-black py-1.5 rounded-md transition-all uppercase tracking-widest',
-                                                    mineralThreshold === t
-                                                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                                                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-                                                )}
-                                            >
-                                                {t}%
-                                            </button>
-                                        ))}
-                                    </div>
-
-                                    {/* Donut + big number */}
-                                    <div className="flex items-center justify-center gap-4">
-                                        <div className="relative flex-shrink-0" style={{ width: 88, height: 88 }}>
-                                            <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90" overflow="visible">
-                                                <circle cx="40" cy="40" r={R2} fill="none" stroke="currentColor" strokeWidth={S2} className="text-slate-200 dark:text-slate-800" />
-                                                <circle cx="40" cy="40" r={R2} fill="none" stroke="#10b981" strokeWidth={S2} strokeLinecap="butt"
-                                                    style={{ strokeDasharray: `${arcPct * C2} ${C2}`, transition: 'stroke-dasharray 0.7s ease' }} />
-                                            </svg>
-                                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                                <span className="text-lg font-black text-slate-900 dark:text-white leading-none">{count}</span>
-                                                <span className="text-[8px] text-slate-400 font-bold">/ {total}</span>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <div className="text-xl font-black text-slate-900 dark:text-white">{Math.round(arcPct * 100)}%</div>
-                                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-tight">minerals<br/>≥ {mineralThreshold}% RDA</div>
-                                        </div>
-                                    </div>
-
-                                    {/* Mineral pills */}
-                                    <div className="grid grid-cols-2 gap-1.5">
-                                        {mineralData.map(({ label, pct }) => {
-                                            const hit = pct >= mineralThreshold;
-                                            return (
-                                                <div key={label} className={cn(
-                                                    'flex items-center justify-between rounded-lg px-2 py-1.5 text-[10px] font-bold border',
-                                                    hit
-                                                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
-                                                        : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400'
-                                                )}>
-                                                    <span>{label}</span>
-                                                    <span className={hit ? 'font-black' : ''}>{pct}%</span>
+                                return (
+                                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
+                                        {/* Top row: donut left, energy summary right */}
+                                        <div className="flex items-center gap-4 mb-4">
+                                            {/* Donut */}
+                                            <div className="relative flex-shrink-0" style={{ width: 96, height: 96 }}>
+                                                <svg viewBox="0 0 96 96" className="w-full h-full -rotate-90">
+                                                    <circle cx="48" cy="48" r={R} fill="none" stroke="currentColor" strokeWidth={STROKE} className="text-slate-200 dark:text-slate-800" />
+                                                    <circle cx="48" cy="48" r={R} fill="none" stroke="#3b82f6" strokeWidth={STROKE} strokeLinecap="butt" style={carbsSeg} />
+                                                    <circle cx="48" cy="48" r={R} fill="none" stroke="#f59e0b" strokeWidth={STROKE} strokeLinecap="butt" style={fatSeg} />
+                                                    <circle cx="48" cy="48" r={R} fill="none" stroke="#f43f5e" strokeWidth={STROKE} strokeLinecap="butt" style={proteinSeg} />
+                                                </svg>
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                                    <span className="text-base font-black text-slate-900 dark:text-white leading-none">{fmt(energyVal)}</span>
+                                                    <span className="text-[8px] text-slate-400 font-bold mt-0.5">{unit}</span>
                                                 </div>
-                                            );
-                                        })}
+                                            </div>
+
+                                            {/* Energy stats */}
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-baseline gap-1.5 flex-wrap">
+                                                    <span className="text-2xl font-black text-slate-900 dark:text-white">{energyPct}%</span>
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">of daily target</span>
+                                                </div>
+                                                <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                                    {fmt(energyVal)} / {fmt(energyRda)} {unit}
+                                                </div>
+                                                <div className={cn("text-[11px] font-bold mt-1.5", over ? "text-rose-500" : "text-emerald-500")}>
+                                                    {over
+                                                        ? `${fmt(energyVal - energyRda)} ${unit} over target`
+                                                        : `${fmt(remaining)} ${unit} remaining`
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Macro bars */}
+                                        <div className="space-y-2.5">
+                                            {[
+                                                { label: 'Carbs', val: carbsVal, rda: carbsRda, pct: carbsPct, color: '#3b82f6', textColor: 'text-blue-500' },
+                                                { label: 'Fat', val: fatVal, rda: fatRda, pct: fatPct, color: '#f59e0b', textColor: 'text-amber-500' },
+                                                { label: 'Protein', val: proteinVal, rda: proteinRda, pct: proteinPct, color: '#f43f5e', textColor: 'text-rose-500' },
+                                            ].map(({ label, val, rda, pct, color, textColor }) => (
+                                                <div key={label} className="flex items-center gap-2.5">
+                                                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 w-12 flex-shrink-0">{label}</span>
+                                                    <MacroBar pct={pct} color={color} />
+                                                    <span className={cn("text-[10px] font-black w-7 text-right flex-shrink-0", textColor)}>{pct}%</span>
+                                                    <span className="text-[10px] text-slate-400 whitespace-nowrap flex-shrink-0">{val.toFixed(1)}g / {rda.toFixed(0)}g</span>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            );
-                        })()}
+                                );
+                            })()}
+
+                            {/* Right: Minerals Coverage */}
+                            {(() => {
+                                const MINERALS = [
+                                    { label: 'Sodium', keys: ['Sodium', 'sodium_mg'] },
+                                    { label: 'Potassium', keys: ['Potassium', 'potassium_mg'] },
+                                    { label: 'Magnesium', keys: ['Magnesium', 'magnesium_mg'] },
+                                    { label: 'Calcium', keys: ['Calcium', 'calcium_mg'] },
+                                    { label: 'Phosphorus', keys: ['Phosphorus', 'phosphorus_mg'] },
+                                    { label: 'Iron', keys: ['Iron', 'iron_mg'] },
+                                    { label: 'Zinc', keys: ['Zinc', 'zinc_mg'] },
+                                    { label: 'Copper', keys: ['Copper', 'copper_mg'] },
+                                    { label: 'Manganese', keys: ['Manganese', 'manganese_mg'] },
+                                    { label: 'Selenium', keys: ['Selenium', 'selenium_ug'] },
+                                ];
+                                const micro = plan.micronutrients || {};
+                                const mineralData = MINERALS.map(({ label, keys }) => {
+                                    let val = 0;
+                                    for (const k of keys) {
+                                        const match = findNutrientMatch(micro, k);
+                                        if (match !== null && match !== undefined && micro[match] !== undefined) { val = micro[match]; break; }
+                                    }
+                                    const rda = userRDAs?.[label] || 0;
+                                    const pct = rda > 0 ? Math.round((val / rda) * 100) : 0;
+                                    return { label, pct };
+                                });
+                                const total = mineralData.length;
+                                const count = mineralData.filter(m => m.pct >= mineralThreshold).length;
+                                const thresholds: (50 | 75 | 100)[] = [50, 75, 100];
+                                const arcPct = total > 0 ? count / total : 0;
+                                const R2 = 38, S2 = 8, C2 = 2 * Math.PI * R2;
+                                return (
+                                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4">
+                                        {/* Threshold toggle */}
+                                        <div className="flex gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5">
+                                            {thresholds.map(t => (
+                                                <button
+                                                    key={t}
+                                                    onClick={() => setMineralThreshold(t)}
+                                                    className={cn(
+                                                        'flex-1 text-[10px] font-black py-1.5 rounded-md transition-all uppercase tracking-widest',
+                                                        mineralThreshold === t
+                                                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                                                            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                                                    )}
+                                                >
+                                                    {t}%
+                                                </button>
+                                            ))}
+                                        </div>
+
+                                        {/* Donut + big number */}
+                                        <div className="flex items-center justify-center gap-4">
+                                            <div className="relative flex-shrink-0" style={{ width: 88, height: 88 }}>
+                                                <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90" overflow="visible">
+                                                    <circle cx="40" cy="40" r={R2} fill="none" stroke="currentColor" strokeWidth={S2} className="text-slate-200 dark:text-slate-800" />
+                                                    <circle cx="40" cy="40" r={R2} fill="none" stroke="#10b981" strokeWidth={S2} strokeLinecap="butt"
+                                                        style={{ strokeDasharray: `${arcPct * C2} ${C2}`, transition: 'stroke-dasharray 0.7s ease' }} />
+                                                </svg>
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                                    <span className="text-lg font-black text-slate-900 dark:text-white leading-none">{count}</span>
+                                                    <span className="text-[8px] text-slate-400 font-bold">/ {total}</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div className="text-xl font-black text-slate-900 dark:text-white">{Math.round(arcPct * 100)}%</div>
+                                                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-tight">minerals<br />≥ {mineralThreshold}% RDA</div>
+                                            </div>
+                                        </div>
+
+                                        {/* Mineral pills */}
+                                        <div className="grid grid-cols-2 gap-1.5">
+                                            {mineralData.map(({ label, pct }) => {
+                                                const hit = pct >= mineralThreshold;
+                                                return (
+                                                    <div key={label} className={cn(
+                                                        'flex items-center justify-between rounded-lg px-2 py-1.5 text-[10px] font-bold border',
+                                                        hit
+                                                            ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
+                                                            : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400'
+                                                    )}>
+                                                        <span>{label}</span>
+                                                        <span className={hit ? 'font-black' : ''}>{pct}%</span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                );
+                            })()}
 
                         </div>{/* end macros+minerals grid */}
 
                         {/* Second row: Often Overlooked + Vitamins */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
-                        {/* Left: Often Overlooked */}
-                        {(() => {
-                            const OVERLOOKED = [
-                                { label: 'Water',     keys: ['Water'],                                unit: 'g',   rdaOverride: 700,  color: '#06b6d4', desc: 'from food' },
-                                { label: 'Fiber',     keys: ['Fiber', 'fiber_g'],                    unit: 'g',   rdaOverride: null, color: '#22c55e', desc: null },
-                                { label: 'Vitamin D', keys: ['Vitamin D', 'vitamin_d_iu'],           unit: 'IU',  rdaOverride: null, color: '#f59e0b', desc: null },
-                                { label: 'Choline',   keys: ['Choline', 'choline_mg'],               unit: 'mg',  rdaOverride: null, color: '#a855f7', desc: null },
-                            ];
-                            const micro = plan.micronutrients || {};
-                            return (
-                                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-3 order-2 md:order-1">
-                                    <div>
-                                        <div className="text-[11px] font-black uppercase tracking-widest text-slate-400">Often Overlooked</div>
-                                        <div className="text-[10px] text-slate-400 mt-0.5">Nutrients people rarely track</div>
-                                    </div>
-                                    <div className="space-y-3">
-                                        {OVERLOOKED.map(({ label, keys, unit, rdaOverride, color, desc }) => {
-                                            let val = 0;
-                                            for (const k of keys) {
-                                                const match = findNutrientMatch(micro, k);
-                                                if (match !== null && match !== undefined && micro[match] !== undefined) { val = micro[match]; break; }
-                                            }
-                                            const rda = rdaOverride ?? (userRDAs?.[label] || 0);
-                                            const pct = rda > 0 ? Math.min(Math.round((val / rda) * 100), 150) : 0;
-                                            const barPct = Math.min(pct, 100);
-                                            return (
-                                                <div key={label}>
-                                                    <div className="flex items-center justify-between mb-1">
-                                                        <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">{label}</span>
-                                                        <div className="flex items-center gap-1.5">
-                                                            <span className="text-[10px] text-slate-400">{val.toFixed(1)}{unit}{desc ? ` (${desc})` : ''}</span>
-                                                            {rda > 0 && <span className="text-[10px] font-black" style={{ color }}>{pct}%</span>}
-                                                        </div>
-                                                    </div>
-                                                    <div className="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                                                        <div className="h-full rounded-full transition-all duration-700" style={{ width: `${barPct}%`, backgroundColor: color }} />
-                                                    </div>
-                                                    {rda > 0 && (
-                                                        <div className="text-[9px] text-slate-300 dark:text-slate-600 mt-0.5">
-                                                            target {rda % 1 === 0 ? rda : rda.toFixed(1)}{unit}{label === 'Water' ? ' (from food est.)' : ' RDA'}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            );
-                        })()}
-
-                        {/* Right: Vitamins 6+6 */}
-                        {(() => {
-                            const ALL_VITAMINS = [
-                                { label: 'B1 (Thiamine)',         fullName: 'Vitamin B1',  subtitle: 'Thiamine' },
-                                { label: 'B2 (Riboflavin)',       fullName: 'Vitamin B2',  subtitle: 'Riboflavin' },
-                                { label: 'B3 (Niacin)',           fullName: 'Vitamin B3',  subtitle: 'Niacin' },
-                                { label: 'B5 (Pantothenic Acid)', fullName: 'Vitamin B5',  subtitle: 'Pantothenic Acid' },
-                                { label: 'B6 (Pyridoxine)',       fullName: 'Vitamin B6',  subtitle: 'Pyridoxine' },
-                                { label: 'B7 (Biotin)',           fullName: 'Vitamin B7',  subtitle: 'Biotin', excludeFromCount: true },
-                                { label: 'B9 (Folate)',           fullName: 'Vitamin B9',  subtitle: 'Folate' },
-                                { label: 'B12 (Cobalamin)',       fullName: 'Vitamin B12', subtitle: 'Cobalamin' },
-                                { label: 'Vitamin A',             fullName: 'Vitamin A',   subtitle: 'Retinol' },
-                                { label: 'Vitamin C',             fullName: 'Vitamin C',   subtitle: 'Ascorbic Acid' },
-                                { label: 'Vitamin E',             fullName: 'Vitamin E',   subtitle: 'Tocopherol' },
-                                { label: 'Vitamin K',             fullName: 'Vitamin K',   subtitle: 'Phylloquinone' },
-                            ];
-                            const micro = plan.micronutrients || {};
-                            const vitaminData = ALL_VITAMINS.map(({ label, fullName, subtitle, excludeFromCount }) => {
-                                let val = 0;
-                                const match = findNutrientMatch(micro, label);
-                                if (match !== null && match !== undefined && micro[match] !== undefined) { val = micro[match]; }
-                                const rda = userRDAs?.[label] || 0;
-                                const pct = rda > 0 ? Math.round((val / rda) * 100) : 0;
-                                return { label, fullName, subtitle, pct, excludeFromCount: !!excludeFromCount };
-                            });
-                            const counted = vitaminData.filter(v => !v.excludeFromCount);
-                            const count = counted.filter(v => v.pct >= vitaminThreshold).length;
-                            const total = counted.length;
-                            const arcPct = total > 0 ? count / total : 0;
-                            const R2 = 38, S2 = 8, C2 = 2 * Math.PI * R2;
-                            const thresholds: (50 | 75 | 100)[] = [50, 75, 100];
-                            return (
-                                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4 order-1 md:order-2">
-                                    {/* Threshold toggle */}
-                                    <div className="flex gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5">
-                                        {thresholds.map(t => (
-                                            <button
-                                                key={t}
-                                                onClick={() => setVitaminThreshold(t)}
-                                                className={cn(
-                                                    'flex-1 text-[10px] font-black py-1.5 rounded-md transition-all uppercase tracking-widest',
-                                                    vitaminThreshold === t
-                                                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                                                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
-                                                )}
-                                            >
-                                                {t}%
-                                            </button>
-                                        ))}
-                                    </div>
-                                    {/* Donut + big number */}
-                                    <div className="flex items-center justify-center gap-4">
-                                        <div className="relative flex-shrink-0" style={{ width: 88, height: 88 }}>
-                                            <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90" overflow="visible">
-                                                <circle cx="40" cy="40" r={R2} fill="none" stroke="currentColor" strokeWidth={S2} className="text-slate-200 dark:text-slate-800" />
-                                                <circle cx="40" cy="40" r={R2} fill="none" stroke="#8b5cf6" strokeWidth={S2} strokeLinecap="butt"
-                                                    style={{ strokeDasharray: `${arcPct * C2} ${C2}`, transition: 'stroke-dasharray 0.7s ease' }} />
-                                            </svg>
-                                            <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                                <span className="text-lg font-black text-slate-900 dark:text-white leading-none">{count}</span>
-                                                <span className="text-[8px] text-slate-400 font-bold">/ {total}</span>
-                                            </div>
-                                        </div>
+                            {/* Left: Often Overlooked */}
+                            {(() => {
+                                const OVERLOOKED = [
+                                    { label: 'Water', keys: ['Water'], unit: 'g', rdaOverride: 700, color: '#06b6d4', desc: 'from food' },
+                                    { label: 'Fiber', keys: ['Fiber', 'fiber_g'], unit: 'g', rdaOverride: null, color: '#22c55e', desc: null },
+                                    { label: 'Vitamin D', keys: ['Vitamin D', 'vitamin_d_iu'], unit: 'IU', rdaOverride: null, color: '#f59e0b', desc: null },
+                                    { label: 'Choline', keys: ['Choline', 'choline_mg'], unit: 'mg', rdaOverride: null, color: '#a855f7', desc: null },
+                                ];
+                                const micro = plan.micronutrients || {};
+                                return (
+                                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-3 order-2 md:order-1">
                                         <div>
-                                            <div className="text-xl font-black text-slate-900 dark:text-white">{Math.round(arcPct * 100)}%</div>
-                                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-tight">vitamins<br/>≥ {vitaminThreshold}% RDA</div>
+                                            <div className="text-[11px] font-black uppercase tracking-widest text-slate-400">Often Overlooked</div>
+                                            <div className="text-[10px] text-slate-400 mt-0.5">Nutrients people rarely track</div>
                                         </div>
-                                    </div>
-                                    {/* Vitamin pills — 6+6 in 2 cols */}
-                                    <div className="grid grid-cols-2 gap-1.5">
-                                        {vitaminData.map(({ label, fullName, subtitle, pct, excludeFromCount }) => {
-                                            if (excludeFromCount) {
+                                        <div className="space-y-3">
+                                            {OVERLOOKED.map(({ label, keys, unit, rdaOverride, color, desc }) => {
+                                                let val = 0;
+                                                for (const k of keys) {
+                                                    const match = findNutrientMatch(micro, k);
+                                                    if (match !== null && match !== undefined && micro[match] !== undefined) { val = micro[match]; break; }
+                                                }
+                                                const rda = rdaOverride ?? (userRDAs?.[label] || 0);
+                                                const pct = rda > 0 ? Math.min(Math.round((val / rda) * 100), 150) : 0;
+                                                const barPct = Math.min(pct, 100);
                                                 return (
-                                                    <React.Fragment key={label}>
-                                                        <button
-                                                            onClick={() => setB7InfoOpen(o => !o)}
-                                                            className="flex items-center justify-between rounded-lg px-2 py-2 font-bold border bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400 hover:border-amber-400/40 hover:text-amber-500 dark:hover:text-amber-400 transition-colors"
-                                                        >
-                                                            <div className="text-left">
-                                                                <div className="text-[10px] font-black">{fullName}</div>
-                                                                <div className="text-[8px] font-normal opacity-60">{subtitle}</div>
+                                                    <div key={label}>
+                                                        <div className="flex items-center justify-between mb-1">
+                                                            <span className="text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300">{label}</span>
+                                                            <div className="flex items-center gap-1.5">
+                                                                <span className="text-[10px] text-slate-400">{val.toFixed(1)}{unit}{desc ? ` (${desc})` : ''}</span>
+                                                                {rda > 0 && <span className="text-[10px] font-black" style={{ color }}>{pct}%</span>}
                                                             </div>
-                                                            <HelpCircle className="w-4 h-4 text-amber-400 dark:text-amber-500 flex-shrink-0" />
-                                                        </button>
-                                                        {b7InfoOpen && (
-                                                            <div className="col-span-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/50 p-2.5 text-[9px] text-amber-800 dark:text-amber-300 leading-relaxed">
-                                                                <p className="font-black uppercase tracking-wide mb-1">Why isn't B7 (Biotin) tracked?</p>
-                                                                <ul className="space-y-0.5 list-none">
-                                                                    <li>• Biotin is <strong>everywhere</strong> in food — deficiency is extremely rare in healthy people.</li>
-                                                                    <li>• Your gut bacteria <strong>synthesise meaningful amounts</strong> of it continuously, independent of diet.</li>
-                                                                    <li>• It has <strong>no established Tolerable Upper Intake Level</strong> — it's that safe.</li>
-                                                                    <li>• Nutrition databases have <strong>incomplete biotin data</strong>, so any figure would be unreliable.</li>
-                                                                    <li>• For these reasons it's <strong>rarely printed on food labels</strong> and excluded from most dietary tracking tools.</li>
-                                                                </ul>
+                                                        </div>
+                                                        <div className="h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                                                            <div className="h-full rounded-full transition-all duration-700" style={{ width: `${barPct}%`, backgroundColor: color }} />
+                                                        </div>
+                                                        {rda > 0 && (
+                                                            <div className="text-[9px] text-slate-300 dark:text-slate-600 mt-0.5">
+                                                                target {rda % 1 === 0 ? rda : rda.toFixed(1)}{unit}{label === 'Water' ? ' (from food est.)' : ' RDA'}
                                                             </div>
                                                         )}
-                                                    </React.Fragment>
-                                                );
-                                            }
-                                            const hit = pct >= vitaminThreshold;
-                                            return (
-                                                <div key={label} className={cn(
-                                                    'flex items-center justify-between rounded-lg px-2 py-2 font-bold border',
-                                                    hit
-                                                        ? 'bg-violet-500/10 border-violet-500/30 text-violet-600 dark:text-violet-400'
-                                                        : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400'
-                                                )}>
-                                                    <div className="text-left">
-                                                        <div className="text-[10px] font-black">{fullName}</div>
-                                                        <div className="text-[8px] font-normal opacity-60">{subtitle}</div>
                                                     </div>
-                                                    <span className={cn('text-[10px]', hit ? 'font-black' : '')}>{pct}%</span>
-                                                </div>
-                                            );
-                                        })}
+                                                );
+                                            })}
+                                        </div>
                                     </div>
-                                </div>
-                            );
-                        })()}
+                                );
+                            })()}
+
+                            {/* Right: Vitamins 6+6 */}
+                            {(() => {
+                                const ALL_VITAMINS = [
+                                    { label: 'B1 (Thiamine)', fullName: 'Vitamin B1', subtitle: 'Thiamine' },
+                                    { label: 'B2 (Riboflavin)', fullName: 'Vitamin B2', subtitle: 'Riboflavin' },
+                                    { label: 'B3 (Niacin)', fullName: 'Vitamin B3', subtitle: 'Niacin' },
+                                    { label: 'B5 (Pantothenic Acid)', fullName: 'Vitamin B5', subtitle: 'Pantothenic Acid' },
+                                    { label: 'B6 (Pyridoxine)', fullName: 'Vitamin B6', subtitle: 'Pyridoxine' },
+                                    { label: 'B7 (Biotin)', fullName: 'Vitamin B7', subtitle: 'Biotin', excludeFromCount: true },
+                                    { label: 'B9 (Folate)', fullName: 'Vitamin B9', subtitle: 'Folate' },
+                                    { label: 'B12 (Cobalamin)', fullName: 'Vitamin B12', subtitle: 'Cobalamin' },
+                                    { label: 'Vitamin A', fullName: 'Vitamin A', subtitle: 'Retinol' },
+                                    { label: 'Vitamin C', fullName: 'Vitamin C', subtitle: 'Ascorbic Acid' },
+                                    { label: 'Vitamin E', fullName: 'Vitamin E', subtitle: 'Tocopherol' },
+                                    { label: 'Vitamin K', fullName: 'Vitamin K', subtitle: 'Phylloquinone' },
+                                ];
+                                const micro = plan.micronutrients || {};
+                                const vitaminData = ALL_VITAMINS.map(({ label, fullName, subtitle, excludeFromCount }) => {
+                                    let val = 0;
+                                    const match = findNutrientMatch(micro, label);
+                                    if (match !== null && match !== undefined && micro[match] !== undefined) { val = micro[match]; }
+                                    const rda = userRDAs?.[label] || 0;
+                                    const pct = rda > 0 ? Math.round((val / rda) * 100) : 0;
+                                    return { label, fullName, subtitle, pct, excludeFromCount: !!excludeFromCount };
+                                });
+                                const counted = vitaminData.filter(v => !v.excludeFromCount);
+                                const count = counted.filter(v => v.pct >= vitaminThreshold).length;
+                                const total = counted.length;
+                                const arcPct = total > 0 ? count / total : 0;
+                                const R2 = 38, S2 = 8, C2 = 2 * Math.PI * R2;
+                                const thresholds: (50 | 75 | 100)[] = [50, 75, 100];
+                                return (
+                                    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4 order-1 md:order-2">
+                                        {/* Threshold toggle */}
+                                        <div className="flex gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5">
+                                            {thresholds.map(t => (
+                                                <button
+                                                    key={t}
+                                                    onClick={() => setVitaminThreshold(t)}
+                                                    className={cn(
+                                                        'flex-1 text-[10px] font-black py-1.5 rounded-md transition-all uppercase tracking-widest',
+                                                        vitaminThreshold === t
+                                                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                                                            : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                                                    )}
+                                                >
+                                                    {t}%
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {/* Donut + big number */}
+                                        <div className="flex items-center justify-center gap-4">
+                                            <div className="relative flex-shrink-0" style={{ width: 88, height: 88 }}>
+                                                <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90" overflow="visible">
+                                                    <circle cx="40" cy="40" r={R2} fill="none" stroke="currentColor" strokeWidth={S2} className="text-slate-200 dark:text-slate-800" />
+                                                    <circle cx="40" cy="40" r={R2} fill="none" stroke="#8b5cf6" strokeWidth={S2} strokeLinecap="butt"
+                                                        style={{ strokeDasharray: `${arcPct * C2} ${C2}`, transition: 'stroke-dasharray 0.7s ease' }} />
+                                                </svg>
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                                    <span className="text-lg font-black text-slate-900 dark:text-white leading-none">{count}</span>
+                                                    <span className="text-[8px] text-slate-400 font-bold">/ {total}</span>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div className="text-xl font-black text-slate-900 dark:text-white">{Math.round(arcPct * 100)}%</div>
+                                                <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-tight">vitamins<br />≥ {vitaminThreshold}% RDA</div>
+                                            </div>
+                                        </div>
+                                        {/* Vitamin pills — 6+6 in 2 cols */}
+                                        <div className="grid grid-cols-2 gap-1.5">
+                                            {vitaminData.map(({ label, fullName, subtitle, pct, excludeFromCount }) => {
+                                                if (excludeFromCount) {
+                                                    return (
+                                                        <React.Fragment key={label}>
+                                                            <button
+                                                                onClick={() => setB7InfoOpen(o => !o)}
+                                                                className="flex items-center justify-between rounded-lg px-2 py-2 font-bold border bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400 hover:border-amber-400/40 hover:text-amber-500 dark:hover:text-amber-400 transition-colors"
+                                                            >
+                                                                <div className="text-left">
+                                                                    <div className="text-[10px] font-black">{fullName}</div>
+                                                                    <div className="text-[8px] font-normal opacity-60">{subtitle}</div>
+                                                                </div>
+                                                                <HelpCircle className="w-4 h-4 text-amber-400 dark:text-amber-500 flex-shrink-0" />
+                                                            </button>
+                                                            {b7InfoOpen && (
+                                                                <div className="col-span-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/50 p-2.5 text-[9px] text-amber-800 dark:text-amber-300 leading-relaxed">
+                                                                    <p className="font-black uppercase tracking-wide mb-1">Why isn't B7 (Biotin) tracked?</p>
+                                                                    <ul className="space-y-0.5 list-none">
+                                                                        <li>• Biotin is <strong>everywhere</strong> in food — deficiency is extremely rare in healthy people.</li>
+                                                                        <li>• Your gut bacteria <strong>synthesise meaningful amounts</strong> of it continuously, independent of diet.</li>
+                                                                        <li>• It has <strong>no established Tolerable Upper Intake Level</strong> — it's that safe.</li>
+                                                                        <li>• Nutrition databases have <strong>incomplete biotin data</strong>, so any figure would be unreliable.</li>
+                                                                        <li>• For these reasons it's <strong>rarely printed on food labels</strong> and excluded from most dietary tracking tools.</li>
+                                                                    </ul>
+                                                                </div>
+                                                            )}
+                                                        </React.Fragment>
+                                                    );
+                                                }
+                                                const hit = pct >= vitaminThreshold;
+                                                return (
+                                                    <div key={label} className={cn(
+                                                        'flex items-center justify-between rounded-lg px-2 py-2 font-bold border',
+                                                        hit
+                                                            ? 'bg-violet-500/10 border-violet-500/30 text-violet-600 dark:text-violet-400'
+                                                            : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400'
+                                                    )}>
+                                                        <div className="text-left">
+                                                            <div className="text-[10px] font-black">{fullName}</div>
+                                                            <div className="text-[8px] font-normal opacity-60">{subtitle}</div>
+                                                        </div>
+                                                        <span className={cn('text-[10px]', hit ? 'font-black' : '')}>{pct}%</span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                );
+                            })()}
 
                         </div>{/* end overlooked+vitamins grid */}
 
