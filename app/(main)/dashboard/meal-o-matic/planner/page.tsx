@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -56,7 +56,8 @@ import {
     HelpCircle,
     Package,
     ShoppingBag,
-    Leaf
+    Leaf,
+    Loader2
 } from 'lucide-react';
 import {
     Sheet,
@@ -88,6 +89,10 @@ import { getNutrientLevelStyles } from '@/lib/utils/nutrient-styles';
 import { useRouter } from 'next/navigation';
 import { useSearch } from '@/lib/context/search-context';
 import { HeroSearch } from '@/components/ui/hero-search';
+
+import { FoodItemCreatorContent } from '../maker/food/page';
+import { UserRecipeBuilder as MealBuilderContent } from '../maker/meal/page';
+import { UserRecipeBuilder as MixBuilderContent } from '../maker/mix/page';
 
 const showShop = false;
 
@@ -626,7 +631,7 @@ export function MealPlannerContent({
     const heroSearchTimeout = React.useRef<NodeJS.Timeout | null>(null);
 
     // Maker overlay state
-    const [showMakerOverlay, setShowMakerOverlay] = useState(false);
+    const [activeMaker, setActiveMaker] = useState<'menu' | 'food' | 'meal' | 'mix' | null>(null);
 
     const MAKER_OPTIONS = [
         {
@@ -634,7 +639,6 @@ export function MealPlannerContent({
             label: 'New Food',
             description: 'Add a whole food ingredient with full nutrition data',
             icon: Leaf,
-            href: '/dashboard/meal-o-matic/maker/food',
             iconColor: 'text-emerald-500',
             borderColor: 'border-emerald-500/30',
             bgColor: 'bg-emerald-500/10',
@@ -646,7 +650,6 @@ export function MealPlannerContent({
             label: 'New Meal',
             description: 'Build a meal recipe with ingredients and instructions',
             icon: ChefHat,
-            href: '/dashboard/meal-o-matic/maker/meal',
             iconColor: 'text-amber-500',
             borderColor: 'border-amber-500/30',
             bgColor: 'bg-amber-500/10',
@@ -658,7 +661,6 @@ export function MealPlannerContent({
             label: 'New Mix',
             description: 'Create a custom ingredient blend or base mix',
             icon: FlaskConical,
-            href: '/dashboard/meal-o-matic/maker/mix',
             iconColor: 'text-indigo-500',
             borderColor: 'border-indigo-500/30',
             bgColor: 'bg-indigo-500/10',
@@ -1380,16 +1382,16 @@ export function MealPlannerContent({
                 idleIconRaw
                 powerButton={
                     <button
-                        onClick={() => setShowMakerOverlay(prev => !prev)}
+                        onClick={() => setActiveMaker(prev => prev ? null : 'menu')}
                         className={cn(
                             "w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all shrink-0",
-                            showMakerOverlay
+                            activeMaker
                                 ? "bg-amber-500 border-amber-500 text-white shadow-lg shadow-amber-500/30"
                                 : "bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 hover:border-amber-500 hover:bg-amber-500/10"
                         )}
                         title="Open Maker"
                     >
-                        <Plus size={16} className={showMakerOverlay ? 'text-white rotate-45 transition-transform' : 'text-slate-900 dark:text-white transition-transform'} />
+                        <Plus size={16} className={activeMaker ? 'text-white rotate-45 transition-transform' : 'text-slate-900 dark:text-white transition-transform'} />
                     </button>
                 }
                 idleIcon={
@@ -1459,21 +1461,34 @@ export function MealPlannerContent({
             />
 
             {/* Maker Overlay */}
-            {showMakerOverlay && (
-                <div className="animate-in slide-in-from-top-3 fade-in duration-300 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-xl overflow-hidden">
+            {activeMaker && (
+                <div className="animate-in slide-in-from-top-3 fade-in duration-300 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-xl overflow-hidden mt-4">
                     {/* Header */}
-                    <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-10">
                         <div className="flex items-center gap-3">
+                            {activeMaker !== 'menu' && (
+                                <button
+                                    onClick={() => setActiveMaker('menu')}
+                                    className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95"
+                                    title="Back to Menu"
+                                >
+                                    <ChevronRight size={16} className="rotate-180" />
+                                </button>
+                            )}
                             <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
                                 <Plus size={16} className="text-amber-500" />
                             </div>
                             <div>
-                                <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white">Maker</h3>
-                                <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">Create new foods, meals &amp; mixes</p>
+                                <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                                    {activeMaker === 'menu' ? 'Maker' : `New ${activeMaker}`}
+                                </h3>
+                                <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400">
+                                    {activeMaker === 'menu' ? 'Create new foods, meals & mixes' : 'Inline builder workspace'}
+                                </p>
                             </div>
                         </div>
                         <button
-                            onClick={() => setShowMakerOverlay(false)}
+                            onClick={() => setActiveMaker(null)}
                             className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-95"
                             title="Close"
                         >
@@ -1481,39 +1496,63 @@ export function MealPlannerContent({
                         </button>
                     </div>
                     {/* Maker Options */}
-                    <div className="p-4 grid gap-3">
-                        {MAKER_OPTIONS.map((option) => {
-                            const Icon = option.icon;
-                            return (
-                                <button
-                                    key={option.id}
-                                    onClick={() => { setShowMakerOverlay(false); router.push(option.href); }}
-                                    className={cn(
-                                        'group w-full text-left p-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer',
-                                        'bg-white dark:bg-slate-900/50',
-                                        option.borderColor,
-                                        option.hoverBorder,
-                                        'hover:shadow-lg',
-                                        option.shadowColor,
-                                    )}
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className={cn(
-                                            'w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110',
-                                            option.bgColor,
-                                        )}>
-                                            <Icon size={20} className={option.iconColor} />
+                    {activeMaker === 'menu' && (
+                        <div className="p-4 grid gap-3 max-w-2xl mx-auto py-8">
+                            {MAKER_OPTIONS.map((option) => {
+                                const Icon = option.icon;
+                                return (
+                                    <button
+                                        key={option.id}
+                                        onClick={() => setActiveMaker(option.id as any)}
+                                        className={cn(
+                                            'group w-full text-left p-4 rounded-2xl border-2 transition-all duration-300 cursor-pointer',
+                                            'bg-white dark:bg-slate-900',
+                                            option.borderColor,
+                                            option.hoverBorder,
+                                            'hover:shadow-lg',
+                                            option.shadowColor,
+                                        )}
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <div className={cn(
+                                                'w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-110',
+                                                option.bgColor,
+                                            )}>
+                                                <Icon size={20} className={option.iconColor} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">{option.label}</h4>
+                                                <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-0.5">{option.description}</p>
+                                            </div>
+                                            <ChevronRight size={16} className={cn('shrink-0 transition-all duration-300 text-slate-300 dark:text-slate-600 group-hover:translate-x-0.5', `group-hover:${option.iconColor}`)} />
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h4 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">{option.label}</h4>
-                                            <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 mt-0.5">{option.description}</p>
-                                        </div>
-                                        <ChevronRight size={16} className={cn('shrink-0 transition-all duration-300 text-slate-300 dark:text-slate-600 group-hover:translate-x-0.5', `group-hover:${option.iconColor}`)} />
-                                    </div>
-                                </button>
-                            );
-                        })}
-                    </div>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
+                    {/* Inline Workspaces */}
+                    {activeMaker === 'food' && (
+                        <div className="p-4 md:p-8 max-h-[80vh] overflow-y-auto custom-scrollbar">
+                            <Suspense fallback={<div className="p-12 text-center text-slate-400"><Loader2 className="animate-spin inline mr-2" /></div>}>
+                                <FoodItemCreatorContent />
+                            </Suspense>
+                        </div>
+                    )}
+                    {activeMaker === 'meal' && (
+                        <div className="p-4 md:p-8 max-h-[80vh] overflow-y-auto custom-scrollbar">
+                            <Suspense fallback={<div className="p-12 text-center text-slate-400"><Loader2 className="animate-spin inline mr-2" /></div>}>
+                                <MealBuilderContent />
+                            </Suspense>
+                        </div>
+                    )}
+                    {activeMaker === 'mix' && (
+                        <div className="p-4 md:p-8 max-h-[80vh] overflow-y-auto custom-scrollbar">
+                            <Suspense fallback={<div className="p-12 text-center text-slate-400"><Loader2 className="animate-spin inline mr-2" /></div>}>
+                                <MixBuilderContent />
+                            </Suspense>
+                        </div>
+                    )}
                 </div>
             )}
 

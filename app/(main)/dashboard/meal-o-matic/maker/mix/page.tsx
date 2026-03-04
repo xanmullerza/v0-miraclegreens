@@ -29,7 +29,7 @@ const Card = React.forwardRef<HTMLDivElement, { children: React.ReactNode, class
 ));
 Card.displayName = "Card";
 
-function UserRecipeBuilder() {
+export function UserRecipeBuilder() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const recipeIdToEdit = searchParams.get('edit');

@@ -91,7 +91,7 @@ export default function AddFoodPage() {
     );
 }
 
-function FoodItemCreatorContent() {
+export function FoodItemCreatorContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const foodIdToEdit = searchParams.get('edit');
@@ -378,7 +378,7 @@ Fat: ${food.fat_g || 0}g
                 }
                 const localData = localStorage.getItem('local_foods');
                 let localFoods = localData ? JSON.parse(localData) : [];
-                
+
                 if (editingFoodId) {
                     // Update existing local food
                     const index = localFoods.findIndex((f: any) => f.id === editingFoodId);
