@@ -1004,6 +1004,7 @@ export function MealPlannerContent({
     const [moringaGrams, setMoringaGrams] = useState(0);
     const [showDailyNutrients, setShowDailyNutrients] = useState(false);
     const [nutrientsView, setNutrientView] = useState<'closed' | 'essential' | 'advanced'>('closed');
+    const [mineralThreshold, setMineralThreshold] = useState<50 | 75 | 100>(75);
     const [dailyMoringaGrams, setDailyMoringaGrams] = useState(0);
     const [activeBoostContext, setActiveBoostContext] = useState<'daily' | 'recipe' | null>(null);
     const [breakdownNutrient, setBreakdownNutrient] = useState<string | null>(null);
@@ -1587,7 +1588,10 @@ export function MealPlannerContent({
                             )}
                         </div>
 
-                        {/* Macros Summary */}
+                        {/* Macros + Minerals Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+                        {/* Left: Macros */}
                         {(() => {
                             const energyRdaKcal = Math.max(1200, Math.round((profile?.gender === 'male'
                                 ? ((10 * (Number(profile?.weight) || 70)) + (6.25 * (Number(profile?.height) || 170)) - (5 * (Number(profile?.age) || 30)) + 5)
@@ -1693,6 +1697,98 @@ export function MealPlannerContent({
                                 </div>
                             );
                         })()}
+
+                        {/* Right: Minerals Coverage */}
+                        {(() => {
+                            const MINERALS = [
+                                { label: 'Sodium', keys: ['Sodium', 'sodium_mg'] },
+                                { label: 'Potassium', keys: ['Potassium', 'potassium_mg'] },
+                                { label: 'Magnesium', keys: ['Magnesium', 'magnesium_mg'] },
+                                { label: 'Calcium', keys: ['Calcium', 'calcium_mg'] },
+                                { label: 'Phosphorus', keys: ['Phosphorus', 'phosphorus_mg'] },
+                                { label: 'Iron', keys: ['Iron', 'iron_mg'] },
+                                { label: 'Zinc', keys: ['Zinc', 'zinc_mg'] },
+                                { label: 'Copper', keys: ['Copper', 'copper_mg'] },
+                                { label: 'Manganese', keys: ['Manganese', 'manganese_mg'] },
+                                { label: 'Selenium', keys: ['Selenium', 'selenium_ug'] },
+                            ];
+                            const micro = plan.micronutrients || {};
+                            const mineralData = MINERALS.map(({ label, keys }) => {
+                                let val = 0;
+                                for (const k of keys) {
+                                    const match = findNutrientMatch(micro, k);
+                                    if (match !== null && match !== undefined && micro[match] !== undefined) { val = micro[match]; break; }
+                                }
+                                const rda = userRDAs?.[label] || 0;
+                                const pct = rda > 0 ? Math.round((val / rda) * 100) : 0;
+                                return { label, pct };
+                            });
+                            const total = mineralData.length;
+                            const count = mineralData.filter(m => m.pct >= mineralThreshold).length;
+                            const thresholds: (50 | 75 | 100)[] = [50, 75, 100];
+                            const arcPct = total > 0 ? count / total : 0;
+                            const R2 = 38, S2 = 8, C2 = 2 * Math.PI * R2;
+                            return (
+                                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 flex flex-col gap-4">
+                                    {/* Threshold toggle */}
+                                    <div className="flex gap-1 rounded-lg bg-slate-100 dark:bg-slate-800 p-0.5">
+                                        {thresholds.map(t => (
+                                            <button
+                                                key={t}
+                                                onClick={() => setMineralThreshold(t)}
+                                                className={cn(
+                                                    'flex-1 text-[10px] font-black py-1.5 rounded-md transition-all uppercase tracking-widest',
+                                                    mineralThreshold === t
+                                                        ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                                                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                                                )}
+                                            >
+                                                {t}%
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {/* Donut + big number */}
+                                    <div className="flex items-center gap-4">
+                                        <div className="relative flex-shrink-0" style={{ width: 80, height: 80 }}>
+                                            <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90">
+                                                <circle cx="40" cy="40" r={R2} fill="none" stroke="currentColor" strokeWidth={S2} className="text-slate-200 dark:text-slate-800" />
+                                                <circle cx="40" cy="40" r={R2} fill="none" stroke="#10b981" strokeWidth={S2} strokeLinecap="butt"
+                                                    style={{ strokeDasharray: `${arcPct * C2} ${C2}`, transition: 'stroke-dasharray 0.7s ease' }} />
+                                            </svg>
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                                <span className="text-lg font-black text-slate-900 dark:text-white leading-none">{count}</span>
+                                                <span className="text-[8px] text-slate-400 font-bold">/ {total}</span>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div className="text-xl font-black text-slate-900 dark:text-white">{Math.round(arcPct * 100)}%</div>
+                                            <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider leading-tight">minerals<br/>≥ {mineralThreshold}% RDA</div>
+                                        </div>
+                                    </div>
+
+                                    {/* Mineral pills */}
+                                    <div className="grid grid-cols-2 gap-1.5">
+                                        {mineralData.map(({ label, pct }) => {
+                                            const hit = pct >= mineralThreshold;
+                                            return (
+                                                <div key={label} className={cn(
+                                                    'flex items-center justify-between rounded-lg px-2 py-1.5 text-[10px] font-bold border',
+                                                    hit
+                                                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400'
+                                                        : 'bg-slate-100 dark:bg-slate-800 border-transparent text-slate-400'
+                                                )}>
+                                                    <span>{label}</span>
+                                                    <span className={hit ? 'font-black' : ''}>{pct}%</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            );
+                        })()}
+
+                        </div>{/* end macros+minerals grid */}
 
                         {/* Action Buttons */}
                         <div className="grid grid-cols-3 gap-3 pt-2">
