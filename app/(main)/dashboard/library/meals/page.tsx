@@ -1,7 +1,8 @@
 'use client';
 
 import { Suspense, useState, useEffect } from 'react';
-import { Loader2, ChefHat, Calendar, LayoutGrid } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Loader2, ChefHat, Leaf, Beaker, Calendar, LayoutGrid } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { RecipesView } from '@/components/ingredients/recipes-view';
 import { HeroSearch } from '@/components/ui/hero-search';
@@ -11,6 +12,7 @@ const noop = () => {};
 const EMPTY: never[] = [];
 
 export default function MealsPage() {
+    const router = useRouter();
     const { searchQuery, setSearchQuery } = useSearch();
     const [isSearchActive, setIsSearchActive] = useState(false);
 
@@ -40,7 +42,29 @@ export default function MealsPage() {
                         }}
                         theme="emerald"
                         placeholder="SEARCH MEALS LIBRARY..."
-                        idleIcon={<ChefHat size={20} className="text-emerald-500" />}
+                        idleIconRaw
+                        idleIcon={
+                            <div className="flex items-center justify-center gap-3">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); router.push('/dashboard/library/foods'); }}
+                                    className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all active:scale-95"
+                                    title="Foods"
+                                >
+                                    <Leaf size={16} />
+                                </button>
+                                <div className="w-12 h-12 rounded-full bg-emerald-500/10 border-2 border-emerald-500/30 flex items-center justify-center text-emerald-500 shadow-sm relative">
+                                    <ChefHat size={20} />
+                                    <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
+                                </div>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); router.push('/dashboard/library/mixes'); }}
+                                    className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all active:scale-95"
+                                    title="Mixes"
+                                >
+                                    <Beaker size={16} />
+                                </button>
+                            </div>
+                        }
                         idleTitle="Meals Library"
                         idleSubtitle="Browse and search our meals library"
                     />

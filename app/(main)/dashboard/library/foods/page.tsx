@@ -1,7 +1,8 @@
 ﻿'use client';
 
 import { useState, useEffect } from 'react';
-import { Leaf, Calendar, LayoutGrid } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Leaf, ChefHat, Beaker, Calendar, LayoutGrid } from 'lucide-react';
 import { ExploreView } from './views/explore-view';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
@@ -11,6 +12,7 @@ const noop = () => {};
 const EMPTY: never[] = [];
 
 export default function IngredientsPage() {
+    const router = useRouter();
     const { searchQuery, setSearchQuery } = useSearch();
     const [isSearchActive, setIsSearchActive] = useState(false);
 
@@ -36,7 +38,29 @@ export default function IngredientsPage() {
                     }}
                     theme="emerald"
                     placeholder="SEARCH FOOD LIBRARY..."
-                    idleIcon={<Leaf size={20} className="text-emerald-500" />}
+                    idleIconRaw
+                    idleIcon={
+                        <div className="flex items-center justify-center gap-3">
+                            <button
+                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/library/meals'); }}
+                                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all active:scale-95"
+                                title="Meals"
+                            >
+                                <ChefHat size={16} />
+                            </button>
+                            <div className="w-12 h-12 rounded-full bg-emerald-500/10 border-2 border-emerald-500/30 flex items-center justify-center text-emerald-500 shadow-sm relative">
+                                <Leaf size={20} />
+                                <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
+                            </div>
+                            <button
+                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/library/mixes'); }}
+                                className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all active:scale-95"
+                                title="Mixes"
+                            >
+                                <Beaker size={16} />
+                            </button>
+                        </div>
+                    }
                     idleTitle="Food Library"
                     idleSubtitle="Browse and search our foods library"
                 />
