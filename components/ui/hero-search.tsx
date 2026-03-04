@@ -99,19 +99,19 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
                 <>
                     <Link
                         href={props.sideNav.left.href}
-                        className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-8 md:w-10 h-20 md:h-24 rounded-r-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-l-0 border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-white hover:bg-slate-600 dark:hover:bg-slate-600 transition-all shadow-lg group active:scale-95"
+                        className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-9 md:w-11 h-20 md:h-24 rounded-r-2xl bg-slate-100 dark:bg-slate-700 border-2 border-l-0 border-slate-300 dark:border-slate-500 flex flex-col items-center justify-center gap-1 text-slate-500 dark:text-slate-300 hover:text-white hover:bg-emerald-600 hover:border-emerald-500 dark:hover:bg-emerald-600 dark:hover:border-emerald-500 transition-all shadow-xl group active:scale-95"
                         title={props.sideNav.left.label}
                     >
-                        <span className="scale-75 md:scale-100">{props.sideNav.left.icon}</span>
-                        <span className="text-[5px] md:text-[7px] font-black uppercase tracking-wider opacity-60 group-hover:opacity-100 leading-none">{props.sideNav.left.label}</span>
+                        <span className="scale-90 md:scale-100">{props.sideNav.left.icon}</span>
+                        <span className="text-[6px] md:text-[7px] font-black uppercase tracking-wider opacity-80 group-hover:opacity-100 leading-none">{props.sideNav.left.label}</span>
                     </Link>
                     <Link
                         href={props.sideNav.right.href}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-8 md:w-10 h-20 md:h-24 rounded-l-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-r-0 border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-white hover:bg-slate-600 dark:hover:bg-slate-600 transition-all shadow-lg group active:scale-95"
+                        className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-9 md:w-11 h-20 md:h-24 rounded-l-2xl bg-slate-100 dark:bg-slate-700 border-2 border-r-0 border-slate-300 dark:border-slate-500 flex flex-col items-center justify-center gap-1 text-slate-500 dark:text-slate-300 hover:text-white hover:bg-emerald-600 hover:border-emerald-500 dark:hover:bg-emerald-600 dark:hover:border-emerald-500 transition-all shadow-xl group active:scale-95"
                         title={props.sideNav.right.label}
                     >
-                        <span className="scale-75 md:scale-100">{props.sideNav.right.icon}</span>
-                        <span className="text-[5px] md:text-[7px] font-black uppercase tracking-wider opacity-60 group-hover:opacity-100 leading-none">{props.sideNav.right.label}</span>
+                        <span className="scale-90 md:scale-100">{props.sideNav.right.icon}</span>
+                        <span className="text-[6px] md:text-[7px] font-black uppercase tracking-wider opacity-80 group-hover:opacity-100 leading-none">{props.sideNav.right.label}</span>
                     </Link>
                 </>
             )}
