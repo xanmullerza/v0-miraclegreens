@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { Book, Leaf, Calendar, ShoppingBag, Package, ChefHat, LayoutGrid } from 'lucide-react';
+import { Book, Apple, Calendar, ShoppingBasket, ShelvingUnit, CookingPot, LayoutGrid, Salad } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function DashboardNav() {
@@ -60,7 +60,7 @@ export function DashboardNav() {
                             )}
                             title="Foods"
                         >
-                            <Leaf size={16} />
+                            <Apple size={16} />
                         </button>
                         <button
                             onClick={() => router.push('/dashboard/library/meals')}
@@ -72,7 +72,7 @@ export function DashboardNav() {
                             )}
                             title="Meals"
                         >
-                            <ChefHat size={16} />
+                            <CookingPot size={16} />
                         </button>
                         <button
                             onClick={() => router.push('/dashboard/library/widgets')}
@@ -102,7 +102,7 @@ export function DashboardNav() {
                             )}
                             title="Shopping"
                         >
-                            <ShoppingBag size={16} />
+                            <ShoppingBasket size={16} />
                         </button>
                         <button
                             onClick={() => router.push('/dashboard/meal-o-matic/pantry')}
@@ -114,7 +114,7 @@ export function DashboardNav() {
                             )}
                             title="Pantry"
                         >
-                            <Package size={16} />
+                            <ShelvingUnit size={16} />
                         </button>
                         <button
                             onClick={() => router.push('/dashboard/meal-o-matic/planner')}
@@ -142,7 +142,7 @@ export function DashboardNav() {
                     )}
                     title="Mealomatic"
                 >
-                    <Calendar size={24} />
+                    <Salad size={24} />
                 </button>
             </div>
         </div>
