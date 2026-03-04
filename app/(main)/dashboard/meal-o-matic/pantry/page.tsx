@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { PantryView } from '@/components/kitchen/pantry-view';
-import { Beef, ChevronRight, Plus, X, Package, Receipt } from 'lucide-react';
+import { Beef, ChevronRight, Plus, X, Package, Receipt, Calendar, ShoppingBag } from 'lucide-react';
 import { PageContainer } from '@/components/ui/page-container';
 import { HeroSearch } from '@/components/ui/hero-search';
 import { supabase } from '@/lib/supabase';
@@ -12,8 +12,10 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 
 export default function PantryPage() {
+    const router = useRouter();
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
@@ -275,7 +277,29 @@ export default function PantryPage() {
                         onSelect={handleSelectFood}
                         theme="amber"
                         placeholder="SEARCH FOOD LIBRARY..."
-                        idleIcon={<Package size={20} className="text-amber-500" />}
+                        idleIconRaw
+                        idleIcon={
+                            <div className="flex items-center justify-center gap-3">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); router.push('/dashboard/meal-o-matic/shopping'); }}
+                                    className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all active:scale-95"
+                                    title="Shopping List"
+                                >
+                                    <ShoppingBag size={16} />
+                                </button>
+                                <div className="w-12 h-12 rounded-full bg-amber-500/10 border-2 border-amber-500/30 flex items-center justify-center text-amber-500 shadow-sm relative">
+                                    <Package size={20} />
+                                    <div className="absolute inset-0 rounded-full bg-amber-500/20 animate-ping" />
+                                </div>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); router.push('/dashboard/meal-o-matic/planner'); }}
+                                    className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-amber-500 hover:border-amber-500/40 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-all active:scale-95"
+                                    title="Meal Planner"
+                                >
+                                    <Calendar size={16} />
+                                </button>
+                            </div>
+                        }
                         idleTitle="Pantry Inventory"
                         idleSubtitle="Search foods to stock your personal pantry"
                         noResultsMessage="No matching items found"
