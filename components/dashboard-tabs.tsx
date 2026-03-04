@@ -43,11 +43,11 @@ const TAB_CONFIG: TopTab[] = [
         activeColor: 'text-emerald-400',
         activeBg: 'bg-emerald-500/10 border-emerald-500/30',
         defaultHref: '/dashboard/library/foods',
-        matchPaths: ['/dashboard/library/foods', '/dashboard/library/meals', '/dashboard/library/mixes'],
+        matchPaths: ['/dashboard/library/foods', '/dashboard/library/meals', '/dashboard/library/widgets'],
         subtabs: [
             { id: 'foods', label: 'Foods', href: '/dashboard/library/foods', icon: Leaf },
             { id: 'meals', label: 'Meals', href: '/dashboard/library/meals', icon: ChefHat },
-            { id: 'mixes', label: 'Mixes', href: '/dashboard/library/mixes', icon: Beaker },
+            { id: 'widgets', label: 'Widgets', href: '/dashboard/library/widgets', icon: LayoutGrid },
         ],
     },
     {
@@ -74,7 +74,7 @@ const TAB_CONFIG: TopTab[] = [
         activeColor: 'text-purple-400',
         activeBg: 'bg-purple-500/10 border-purple-500/30',
         defaultHref: '/dashboard/widgets/comparator',
-        matchPaths: ['/dashboard/widgets'],
+        matchPaths: ['/dashboard/widgets/comparator', '/dashboard/widgets/nutridex', '/dashboard/widgets/lifeguard'],
         adminOnly: true,
         subtabs: [
             { id: 'comparator', label: 'Comparator', href: '/dashboard/widgets/comparator', icon: Scale },

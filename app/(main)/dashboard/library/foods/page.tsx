@@ -59,20 +59,20 @@ export default function IngredientsPage() {
                                     <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping" />
                                 </div>
                                 <button
-                                    onClick={(e) => { e.stopPropagation(); router.push('/dashboard/library/mixes'); }}
+                                    onClick={(e) => { e.stopPropagation(); router.push('/dashboard/library/widgets'); }}
                                     className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all active:scale-95"
-                                    title="Mixes"
+                                    title="Widgets"
                                 >
-                                    <Beaker size={16} />
+                                    <LayoutGrid size={16} />
                                 </button>
                             </div>
                             {/* Outer right big button */}
                             <button
-                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/nutridex'); }}
-                                className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:border-emerald-500/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all active:scale-95 ml-6"
-                                title="Widgets"
+                                onClick={(e) => { e.stopPropagation(); router.push('/dashboard/meal-o-matic/planner'); }}
+                                className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400 hover:text-amber-500 hover:border-amber-500/50 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-all active:scale-95 ml-6"
+                                title="Mealomatic"
                             >
-                                <LayoutGrid size={26} />
+                                <Calendar size={26} />
                             </button>
                         </div>
                     }

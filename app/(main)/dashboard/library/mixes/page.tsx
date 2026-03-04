@@ -72,11 +72,11 @@ export default function MixesPage() {
                                 </div>
                                 {/* Outer right big button */}
                                 <button
-                                    onClick={(e) => { e.stopPropagation(); router.push('/dashboard/widgets/nutridex'); }}
-                                    className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400 hover:text-emerald-500 hover:border-emerald-500/50 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all active:scale-95 ml-6"
-                                    title="Widgets"
+                                    onClick={(e) => { e.stopPropagation(); router.push('/dashboard/meal-o-matic/planner'); }}
+                                    className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-400 hover:text-amber-500 hover:border-amber-500/50 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-all active:scale-95 ml-6"
+                                    title="Mealomatic"
                                 >
-                                    <LayoutGrid size={26} />
+                                    <Calendar size={26} />
                                 </button>
                             </div>
                         }
