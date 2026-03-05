@@ -1,11 +1,9 @@
 ﻿'use client';
 import Link from 'next/link';
-import Image from 'next/image';
 import { LayoutDashboard, User, LogOut, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
 import { useState, useEffect } from 'react';
-// import { ModeToggle } from '@/components/mode-toggle';
 
 const showDashboard = true;
 
@@ -77,7 +75,6 @@ export function Header() {
 							</Button>
 						)}
 					</div>
-					{/* <ModeToggle className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground ml-2" /> */}
 				</div>
 			</div>
 		</header >
