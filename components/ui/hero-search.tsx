@@ -196,10 +196,10 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
                             autoFocus={isActive}
                             placeholder={isActive ? placeholder : ''}
                             className={cn(
-                                "w-full bg-slate-50 dark:bg-slate-800/50 border-2 transition-all shadow-sm text-[10px] md:text-sm font-black uppercase tracking-widest h-8 md:h-10 rounded-[1.5rem] md:rounded-[2rem] pl-10 pr-4 text-slate-900 dark:text-white placeholder:text-slate-300",
+                                "w-full bg-slate-50 dark:bg-slate-800/50 transition-all shadow-sm text-[10px] md:text-sm font-black uppercase tracking-widest h-8 md:h-10 rounded-[1.5rem] md:rounded-[2rem] pl-10 pr-4 text-slate-900 dark:text-white placeholder:text-slate-300",
                                 isActive
-                                    ? `border-${theme}-500/30 focus:border-${theme}-500/80 focus:ring-4 focus:ring-${theme}-500/10 focus:bg-white dark:focus:bg-slate-800/80`
-                                    : "border-slate-100 dark:border-slate-800 cursor-pointer hover:border-blue-500/20"
+                                    ? `border-0 focus:border-0 focus:ring-4 focus:ring-${theme}-500/10 focus:bg-white dark:focus:bg-slate-800/80`
+                                    : "border-0 dark:border-slate-800 cursor-pointer hover:border-blue-500/20"
                             )}
                             value={searchQuery}
                             onFocus={() => {
