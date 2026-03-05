@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { Apple, Calendar, ShoppingBasket, Shapes, Salad, LayoutGrid } from 'lucide-react';
+import { Home, Apple, Calendar, ShoppingBasket, Shapes, Salad, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function DashboardNav() {
@@ -10,6 +10,7 @@ export function DashboardNav() {
 
     // Determine active button
     const getActiveButton = () => {
+        if (pathname.includes('/browse')) return 'home';
         if (pathname.includes('/dashboard/library/foods')) return 'foods';
         if (pathname.includes('/dashboard/library/meals')) return 'meals';
         if (pathname.includes('/dashboard/library/widgets')) return 'widgets';
@@ -22,6 +23,7 @@ export function DashboardNav() {
     const activeButton = getActiveButton();
 
     const buttons = [
+        { id: 'home', icon: Home, label: 'Home', path: '/browse', color: 'indigo' },
         { id: 'foods', icon: Apple, label: 'Foods', path: '/dashboard/library/foods', color: 'emerald' },
         { id: 'meals', icon: Salad, label: 'Meals', path: '/dashboard/library/meals', color: 'rose' },
         { id: 'shopping', icon: ShoppingBasket, label: 'Shopping', path: '/dashboard/meal-o-matic/shopping', color: 'amber' },
@@ -38,6 +40,10 @@ export function DashboardNav() {
                     const isActive = activeButton === btn.id;
                     const color = btn.color;
                     const colorClasses: Record<string, { active: string; inactive: string }> = {
+                        indigo: {
+                            active: "bg-indigo-500/10 border-indigo-500/50 text-indigo-500",
+                            inactive: "bg-slate-100/10 border-slate-400/30 text-slate-400 hover:text-indigo-500 hover:border-indigo-500/40 hover:bg-indigo-500/5"
+                        },
                         emerald: {
                             active: "bg-emerald-500/10 border-emerald-500/50 text-emerald-500",
                             inactive: "bg-slate-100/10 border-slate-400/30 text-slate-400 hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-500/5"
