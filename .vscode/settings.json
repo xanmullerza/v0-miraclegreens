@@ -42,10 +42,6 @@
         },
         "cp": true,
         "get_errors": true,
-        "Rename-Item": true,
-        "/^git reflog 2>&1$/": {
-            "approve": true,
-            "matchCommandLine": true
-        }
+        "Rename-Item": true
     }
 }
