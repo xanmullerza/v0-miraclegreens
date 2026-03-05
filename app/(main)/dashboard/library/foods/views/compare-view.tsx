@@ -462,15 +462,7 @@ export function CompareView({ showStats = false, stats }: CompareViewProps) {
                         <thead className="sticky top-0 z-30 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-sm">
                             <tr>
                                 <th className="p-2 md:p-8 text-left bg-slate-50/50 dark:bg-slate-800/30 w-[100px] md:w-1/4 min-w-[100px] md:min-w-[200px] sticky left-0 z-40 bg-white dark:bg-slate-900 shadow-[2px_0_5px_rgba(0,0,0,0.05)] border-r border-slate-100 dark:border-slate-800">
-                                    <div className="flex items-center gap-1 md:gap-3">
-                                        <div className="w-7 h-7 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                                            <Scale size={14} className="md:w-5 md:h-5" />
-                                        </div>
-                                        <div>
-                                            <h3 className="font-black text-[9px] md:text-sm uppercase italic text-slate-900 dark:text-white leading-none mb-1">Nutrition</h3>
-                                            <p className="text-[7px] md:text-[9px] font-black text-emerald-500 uppercase tracking-widest leading-none">per 100g</p>
-                                        </div>
-                                    </div>
+                                    <p className="text-[7px] md:text-[9px] font-black text-emerald-500 uppercase tracking-widest leading-none">per 100g</p>
                                 </th>
                                 {[0, 1, 2].map((i) => (
                                     <th key={i} className="p-2 md:p-8 text-center border-l border-slate-100 dark:border-slate-800 w-[85px] md:w-1/4 min-w-[85px] md:min-w-0">
@@ -542,10 +534,7 @@ export function CompareView({ showStats = false, stats }: CompareViewProps) {
                                 <React.Fragment key={group.title}>
                                     <tr className="bg-slate-50/80 dark:bg-slate-800/50">
                                         <td colSpan={4} className="px-2 md:px-8 py-2 md:py-3 sticky left-0 z-20 bg-slate-50/80 dark:bg-slate-800 shadow-[2px_0_5px_rgba(0,0,0,0.02)] border-r border-slate-100 dark:border-slate-800">
-                                            <div className="flex items-center gap-1.5">
-                                                <group.icon size={11} className={cn("md:w-[14px] md:h-[14px]", themes[group.theme as keyof typeof themes].split(' ')[0])} />
-                                                <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.15em] md:tracking-[0.2em] text-slate-400">{group.title}</span>
-                                            </div>
+                                            <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.15em] md:tracking-[0.2em] text-slate-400">{group.title}</span>
                                         </td>
                                     </tr>
                                     {group.keys.map((nutrient) => {
