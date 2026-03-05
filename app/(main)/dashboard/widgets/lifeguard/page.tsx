@@ -501,37 +501,64 @@ export default function SurvivalModePage() {
 
                     {step === 'lifeline' && (
                         <div className="space-y-12 animate-in slide-in-from-bottom-8 duration-700">
-                            {/* Visual Timeline Sticky Wrapper */}
-                            <div className="sticky top-20 z-40 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl p-8 rounded-[3rem] border-2 border-slate-100 dark:border-slate-800 shadow-2xl">
-                                <div className="space-y-8">
+                            {/* LONGEVITY METER - Big Visual */}
+                            <div className="sticky top-20 z-40 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-800 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 backdrop-blur-xl p-12 rounded-[3rem] border-2 border-amber-500/20 shadow-2xl overflow-hidden relative">
+                                {/* Animated Background */}
+                                <div className="absolute inset-0 opacity-10">
+                                    <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-transparent to-transparent animate-pulse" />
+                                </div>
+                                
+                                <div className="relative space-y-8">
                                     <div className="flex items-center justify-between">
-                                        <div className="space-y-1">
-                                            <h2 className="text-3xl font-black uppercase italic tracking-tighter">Day {simulationDay} Project</h2>
-                                            <div className="flex items-center gap-2">
-                                                <div className={cn("px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest",
-                                                    profileType === 'starvation' ? "bg-rose-500 text-white" : "bg-emerald-500 text-white")}>
-                                                    {profileType} Profile
-                                                </div>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="text-[8px] uppercase font-black"
-                                                    onClick={() => setProfileType(profileType === 'maintenance' ? 'starvation' : 'maintenance')}
-                                                >
-                                                    Switch Calculation
-                                                </Button>
-                                            </div>
+                                        <div className="space-y-2">
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-amber-400">Survival Window</p>
+                                            <h2 className="text-5xl font-black italic text-white tracking-tighter">{(() => {
+                                                // Calculate days until critical failure
+                                                const profile = SURVIVAL_PROFILES[profileType];
+                                                const energyDays = inventory.reduce((acc, i) => acc + (i.nutrition?.energy_kcal || 0) * (i.weight_g / 100), 0) / profile.energy_floor;
+                                                const criticalDay = Math.max(0, Math.ceil(energyDays + 20)); // 20 day body fat reserve
+                                                return Math.min(criticalDay, 30);
+                                            })()}</h2>
+                                            <p className="text-[12px] font-bold text-amber-300">DAYS BEFORE CRITICAL FAILURE</p>
                                         </div>
-                                        <div className="text-right">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Status</p>
-                                            <p className={cn("text-xl font-black uppercase italic", simStatus.isTerminal ? "text-rose-500" : "text-emerald-500")}>
-                                                {simStatus.isTerminal ? 'Critical Failure' : 'Stable Ops'}
-                                            </p>
+                                        
+                                        {/* Status Ring */}
+                                        <div className="flex flex-col items-center gap-4">
+                                            <div className={cn("w-32 h-32 rounded-full flex items-center justify-center border-4 animate-pulse", simStatus.isTerminal ? "border-rose-500 bg-rose-500/10" : "border-emerald-500 bg-emerald-500/10")}>
+                                                <div className="text-center">
+                                                    <p className={cn("text-3xl font-black", simStatus.isTerminal ? "text-rose-500" : "text-emerald-500")}>
+                                                        {simStatus.results.energy > 0 ? '✓' : '✗'}
+                                                    </p>
+                                                    <p className="text-[8px] font-black uppercase mt-2 text-white">
+                                                        {simStatus.isTerminal ? 'CRITICAL' : 'STABLE'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className={cn("px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest", profileType === 'starvation' ? "bg-rose-500 text-white" : "bg-emerald-500 text-white")}>
+                                                {profileType} Profile
+                                            </div>
                                         </div>
                                     </div>
 
                                     {/* The Slider */}
-                                    <div className="space-y-4">
+                                    <div className="space-y-4 pt-6 border-t border-slate-700">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Day {simulationDay} Projection</h3>
+                                                <p className="text-[12px] font-bold text-white">
+                                                    Energy: <span className={simStatus.results.energy > 0 ? "text-emerald-400" : "text-rose-400"}>{Math.round(simStatus.results.energy)} kcal</span>
+                                                </p>
+                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-[8px] uppercase font-black text-amber-400 hover:text-amber-300"
+                                                onClick={() => setProfileType(profileType === 'maintenance' ? 'starvation' : 'maintenance')}
+                                            >
+                                                Switch Profile
+                                            </Button>
+                                        </div>
                                         <input
                                             type="range"
                                             min="0"
@@ -539,13 +566,49 @@ export default function SurvivalModePage() {
                                             step="1"
                                             value={simulationDay}
                                             onChange={(e) => setSimulationDay(parseInt(e.target.value))}
-                                            className="w-full h-4 bg-slate-100 dark:bg-slate-800 rounded-full appearance-none cursor-pointer accent-amber-500"
+                                            className="w-full h-3 bg-slate-700 rounded-full appearance-none cursor-pointer accent-amber-500"
                                         />
-                                        <div className="flex justify-between px-2 text-[8px] font-black text-slate-400 uppercase tracking-widest">
-                                            <span>Immediate (Day 0)</span>
-                                            <span>The Red Line (Day 30)</span>
+                                        <div className="flex justify-between px-2 text-[8px] font-black text-slate-500 uppercase tracking-widest">
+                                            <span>Now</span>
+                                            <span>30 Days</span>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+
+                            {/* NUTRIENT CASCADE TIMELINE */}
+                            <div className="space-y-6 bg-slate-50 dark:bg-slate-800/30 p-8 rounded-[3rem] border border-slate-200 dark:border-slate-700">
+                                <div className="flex items-center gap-2">
+                                    <Calendar size={16} className="text-purple-500" />
+                                    <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Nutrient Cascade Timeline</h3>
+                                </div>
+                                <div className="space-y-3">
+                                    {(() => {
+                                        const profile = SURVIVAL_PROFILES[profileType];
+                                        const cascade = [
+                                            { label: 'Thiamine (B1)', day: Math.ceil((INITIAL_STORES.b1 * profile.b1_floor + inventory.reduce((acc, i) => acc + (i.nutrition?.micronutrients?.['B1 (Thiamine)'] || 0) * (i.weight_g / 100), 0)) / profile.b1_floor), icon: '💊', color: 'from-purple-500 to-purple-600' },
+                                            { label: 'Vitamin C', day: Math.ceil((INITIAL_STORES.vit_c * profile.vit_c_floor + inventory.reduce((acc, i) => acc + (i.nutrition?.micronutrients?.['Vitamin C'] || 0) * (i.weight_g / 100), 0)) / profile.vit_c_floor), icon: '🍊', color: 'from-orange-500 to-orange-600' },
+                                            { label: 'Potassium', day: Math.ceil((INITIAL_STORES.potassium + inventory.reduce((acc, i) => acc + (i.nutrition?.micronutrients?.['Potassium'] || 0) * (i.weight_g / 100), 0)) / profile.potassium_floor), icon: '⚡', color: 'from-yellow-500 to-yellow-600' },
+                                            { label: 'Energy Stores', day: Math.ceil((INITIAL_STORES.energy + inventory.reduce((acc, i) => acc + (i.nutrition?.energy_kcal || 0) * (i.weight_g / 100), 0)) / profile.energy_floor), icon: '🔥', color: 'from-red-500 to-red-600' }
+                                        ].sort((a, b) => a.day - b.day);
+                                        
+                                        return cascade.map((item, idx) => (
+                                            <div key={item.label} className="space-y-2">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xl">{item.icon}</span>
+                                                        <span className="text-[9px] font-black uppercase tracking-widest text-slate-900 dark:text-white">{item.label}</span>
+                                                    </div>
+                                                    <span className={cn("px-3 py-1 rounded-lg text-[8px] font-black uppercase", item.day > 20 ? "bg-emerald-500 text-white" : item.day > 10 ? "bg-amber-500 text-white" : "bg-rose-500 text-white")}>
+                                                        Day {item.day}
+                                                    </span>
+                                                </div>
+                                                <div className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                                    <div className={cn("h-full bg-gradient-to-r transition-all duration-500", item.color)} style={{ width: `${Math.min((item.day / 30) * 100, 100)}%` }} />
+                                                </div>
+                                            </div>
+                                        ));
+                                    })()}
                                 </div>
                             </div>
 
@@ -662,6 +725,113 @@ export default function SurvivalModePage() {
                                             </div>
                                         ));
                                     })()}
+                                </div>
+                            </div>
+
+                            {/* WATER PURIFICATION GUIDE - Based on water status */}
+                            {waterStatus !== 'clean' && (
+                                <div className="space-y-6 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-500/10 dark:to-cyan-500/10 p-8 rounded-[3rem] border-2 border-blue-200 dark:border-blue-500/30">
+                                    <div className="flex items-center gap-2">
+                                        <Droplet size={16} className="text-blue-600 dark:text-blue-400" />
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-blue-900 dark:text-blue-200">Water Purification Protocol</h3>
+                                    </div>
+                                    <div className="space-y-4">
+                                        {waterStatus === 'dirty' ? (
+                                            <>
+                                                <div className="p-4 bg-white/60 dark:bg-slate-900/40 rounded-2xl border border-blue-200 dark:border-blue-500/20">
+                                                    <p className="text-[9px] font-black uppercase tracking-widest text-blue-900 dark:text-blue-200 mb-2">🔥 Method 1: Boiling (Most Effective)</p>
+                                                    <p className="text-[8px] font-medium text-blue-800 dark:text-blue-300">Bring water to rolling boil for 1 minute (3 min above 6,500 ft). Kills 99.9% pathogens. First, filter through cloth to remove particles.</p>
+                                                </div>
+                                                <div className="p-4 bg-white/60 dark:bg-slate-900/40 rounded-2xl border border-amber-200 dark:border-amber-500/20">
+                                                    <p className="text-[9px] font-black uppercase tracking-widest text-amber-900 dark:text-amber-200 mb-2">💊 Method 2: Chemical (Bleach)</p>
+                                                    <p className="text-[8px] font-medium text-amber-800 dark:text-amber-300">Add 2 drops unscented bleach per quart. Stir well and wait 30 minutes. Cup in hand - liquid should smell faintly of chlorine.</p>
+                                                </div>
+                                                <div className="p-4 bg-white/60 dark:bg-slate-900/40 rounded-2xl border border-emerald-200 dark:border-emerald-500/20">
+                                                    <p className="text-[9px] font-black uppercase tracking-widest text-emerald-900 dark:text-emerald-200 mb-2">☀️ Method 3: Solar (SODIS)</p>
+                                                    <p className="text-[8px] font-medium text-emerald-800 dark:text-emerald-300">Clear plastic bottle in direct sun for 6-8 hours. UV radiation inactivates pathogens. Works if weather is clear.</p>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <div className="p-4 bg-white/60 dark:bg-slate-900/40 rounded-2xl border border-blue-200 dark:border-blue-500/20">
+                                                    <p className="text-[9px] font-black uppercase tracking-widest text-blue-900 dark:text-blue-200 mb-2">🌊 Finding Water</p>
+                                                    <p className="text-[8px] font-medium text-blue-800 dark:text-blue-300">Look for: green vegetation areas, animal tracks, morning dew on leaves (collect with cloth). Avoid seawater and urine—both cause severe dehydration.</p>
+                                                </div>
+                                                <div className="p-4 bg-white/60 dark:bg-slate-900/40 rounded-2xl border border-rose-200 dark:border-rose-500/20">
+                                                    <p className="text-[9px] font-black uppercase tracking-widest text-rose-900 dark:text-rose-200 mb-2">⚠️ Dehydration Warning</p>
+                                                    <p className="text-[8px] font-medium text-rose-800 dark:text-rose-300">Even 2% fluid loss impairs cognition. Dark urine = dehydrated. Prioritize finding water immediately. Rationing without water found = fatal strategy.</p>
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* RECOVERY PROTOCOLS - Smart food suggestions */}
+                            {simStatus.activeSymptoms.length > 0 && inventory.length > 0 && (
+                                <div className="space-y-6 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-500/10 dark:to-teal-500/10 p-8 rounded-[3rem] border-2 border-emerald-200 dark:border-emerald-500/30">
+                                    <div className="flex items-center gap-2">
+                                        <Plus size={16} className="text-emerald-600 dark:text-emerald-400" />
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-emerald-900 dark:text-emerald-200">Recovery Protocols</h3>
+                                        <span className="text-[8px] font-black text-emerald-700 dark:text-emerald-300 ml-auto">Add foods to extend survival</span>
+                                    </div>
+                                    <div className="space-y-3">
+                                        {simStatus.activeSymptoms.slice(0, 3).map(symptom => (
+                                            <div key={symptom.name} className="p-4 bg-white/60 dark:bg-slate-900/40 rounded-2xl border border-emerald-200 dark:border-emerald-500/20">
+                                                <div className="flex items-start justify-between mb-2">
+                                                    <h4 className="text-[9px] font-black uppercase tracking-widest text-emerald-900 dark:text-emerald-100">{symptom.name}</h4>
+                                                    <span className="text-[7px] font-black text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-500/20 px-2 py-1 rounded">Need: {symptom.nutrient}</span>
+                                                </div>
+                                                <p className="text-[8px] font-medium text-slate-600 dark:text-slate-400 mb-3">
+                                                    {symptom.nutrient === 'b1' && 'Add whole grains, legumes, nuts to restore thiamine levels'}
+                                                    {symptom.nutrient === 'vit_c' && 'Add citrus, peppers, kale, or berries for ascorbic acid'}
+                                                    {symptom.nutrient === 'potassium' && 'Add potatoes, beans, spinach, or bananas'}
+                                                    {symptom.nutrient === 'sodium' && 'Add salt, dried fish, or cured meats to restore electrolytes'}
+                                                    {symptom.nutrient === 'energy' && 'Add oils, nuts, grains, or any calorie-dense foods'}
+                                                    {symptom.nutrient === 'water' && 'Prioritize finding clean water source immediately'}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* EMERGENCY FOOD RANKING - Top survival foods */}
+                            <div className="space-y-6 bg-slate-50 dark:bg-slate-800/30 p-8 rounded-[3rem] border border-slate-200 dark:border-slate-700">
+                                <div className="flex items-center gap-2">
+                                    <Library size={16} className="text-amber-500" />
+                                    <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Emergency Food Ranking</h3>
+                                    <span className="text-[8px] font-black text-slate-500 ml-auto">Top survival foods by score</span>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                    {[
+                                        { name: 'Rice', kcal: 130, score: 95, nutrients: ['Carbs', 'B1'], shelf: '∞', icon: '🍚' },
+                                        { name: 'Beans', kcal: 95, score: 98, nutrients: ['Protein', 'B1', 'Fiber'], shelf: '∞', icon: '🫘' },
+                                        { name: 'Nuts', kcal: 160, score: 96, nutrients: ['Fats', 'Minerals'], shelf: '2y', icon: '🥜' },
+                                        { name: 'Honey', kcal: 65, score: 92, nutrients: ['Sugar', 'Energy'], shelf: '∞', icon: '🍯' },
+                                        { name: 'Powdered Milk', kcal: 110, score: 89, nutrients: ['Protein', 'Calcium'], shelf: '1y', icon: '🥛' },
+                                        { name: 'Oats', kcal: 150, score: 94, nutrients: ['Carbs', 'B1', 'Fiber'], shelf: '2y', icon: '🌾' },
+                                        { name: 'Peanut Butter', kcal: 188, score: 97, nutrients: ['Protein', 'Fats', 'B1'], shelf: '1y', icon: '🥜' },
+                                        { name: 'Dried Fruit', kcal: 80, score: 85, nutrients: ['Sugars', 'Vit C', 'Fiber'], shelf: '1y', icon: '🍇' },
+                                        { name: 'Canned Fish', kcal: 60, score: 91, nutrients: ['Protein', 'Omega3'], shelf: '5y', icon: '🐟' }
+                                    ].map((food, idx) => (
+                                        <div key={food.name} className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 hover:shadow-lg transition-all">
+                                            <div className="flex items-start justify-between mb-2">
+                                                <span className="text-2xl">{food.icon}</span>
+                                                <div className={cn("px-2 py-1 rounded-lg text-[8px] font-black uppercase text-white", food.score >= 95 ? "bg-emerald-500" : "bg-amber-500")}>
+                                                    #{idx + 1}
+                                                </div>
+                                            </div>
+                                            <p className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white mb-1">{food.name}</p>
+                                            <div className="space-y-1">
+                                                <p className="text-[8px] font-bold text-slate-600 dark:text-slate-400">{food.kcal} kcal/100g</p>
+                                                <div className="flex gap-1 flex-wrap">
+                                                    {food.nutrients.map(n => <span key={n} className="px-1.5 py-0.5 bg-sky-100 dark:bg-sky-500/20 text-[7px] font-black text-sky-700 dark:text-sky-300 rounded">{n}</span>)}
+                                                </div>
+                                                <p className="text-[7px] font-bold text-slate-500 mt-2">Shelf: {food.shelf}</p>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
 
