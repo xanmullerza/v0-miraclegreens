@@ -501,62 +501,64 @@ export default function SurvivalModePage() {
 
                     {step === 'lifeline' && (
                         <div className="space-y-12 animate-in slide-in-from-bottom-8 duration-700">
-                            {/* LONGEVITY METER - Big Visual */}
-                            <div className="sticky top-20 z-40 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-800 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 backdrop-blur-xl p-12 rounded-[3rem] border-2 border-amber-500/20 shadow-2xl overflow-hidden relative">
+                            {/* LONGEVITY METER - Compact Header */}
+                            <div className="sticky top-20 z-40 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-800 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 backdrop-blur-xl p-4 rounded-2xl border-2 border-amber-500/20 shadow-2xl overflow-hidden relative">
                                 {/* Animated Background */}
                                 <div className="absolute inset-0 opacity-10">
                                     <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-transparent to-transparent animate-pulse" />
                                 </div>
                                 
-                                <div className="relative space-y-8">
+                                <div className="relative space-y-2">
+                                    {/* Title + Ring Row */}
                                     <div className="flex items-center justify-between">
-                                        <div className="space-y-2">
-                                            <p className="text-[10px] font-black uppercase tracking-widest text-amber-400">Survival Window</p>
-                                            <h2 className="text-5xl font-black italic text-white tracking-tighter">{(() => {
-                                                // Calculate days until critical failure
-                                                const profile = SURVIVAL_PROFILES[profileType];
-                                                const energyDays = inventory.reduce((acc, i) => acc + (i.nutrition?.energy_kcal || 0) * (i.weight_g / 100), 0) / profile.energy_floor;
-                                                const criticalDay = Math.max(0, Math.ceil(energyDays + 20)); // 20 day body fat reserve
-                                                return Math.min(criticalDay, 30);
-                                            })()}</h2>
-                                            <p className="text-[12px] font-bold text-amber-300">DAYS BEFORE CRITICAL FAILURE</p>
+                                        <div className="flex-1">
+                                            <div className="flex items-baseline gap-2">
+                                                <p className="text-[8px] font-black uppercase tracking-widest text-amber-400">Survival Window:</p>
+                                                <h2 className="text-3xl font-black italic text-white tracking-tighter">{(() => {
+                                                    // Calculate days until critical failure
+                                                    const profile = SURVIVAL_PROFILES[profileType];
+                                                    const energyDays = inventory.reduce((acc, i) => acc + (i.nutrition?.energy_kcal || 0) * (i.weight_g / 100), 0) / profile.energy_floor;
+                                                    const criticalDay = Math.max(0, Math.ceil(energyDays + 20)); // 20 day body fat reserve
+                                                    return Math.min(criticalDay, 30);
+                                                })()}</h2>
+                                                <p className="text-[8px] font-bold text-amber-300">days</p>
+                                            </div>
                                         </div>
                                         
-                                        {/* Status Ring */}
-                                        <div className="flex flex-col items-center gap-4">
-                                            <div className={cn("w-32 h-32 rounded-full flex items-center justify-center border-4 animate-pulse", simStatus.isTerminal ? "border-rose-500 bg-rose-500/10" : "border-emerald-500 bg-emerald-500/10")}>
+                                        {/* Status Ring - Compact */}
+                                        <div className="flex items-center gap-2 shrink-0">
+                                            <div className={cn("w-16 h-16 rounded-full flex items-center justify-center border-3 animate-pulse", simStatus.isTerminal ? "border-rose-500 bg-rose-500/10" : "border-emerald-500 bg-emerald-500/10")}>
                                                 <div className="text-center">
-                                                    <p className={cn("text-3xl font-black", simStatus.isTerminal ? "text-rose-500" : "text-emerald-500")}>
+                                                    <p className={cn("text-2xl font-black", simStatus.isTerminal ? "text-rose-500" : "text-emerald-500")}>
                                                         {simStatus.results.energy > 0 ? '✓' : '✗'}
                                                     </p>
-                                                    <p className="text-[8px] font-black uppercase mt-2 text-white">
-                                                        {simStatus.isTerminal ? 'CRITICAL' : 'STABLE'}
+                                                    <p className="text-[6px] font-black uppercase leading-none text-white">
+                                                        {simStatus.isTerminal ? 'CRIT' : 'OK'}
                                                     </p>
                                                 </div>
                                             </div>
                                             
-                                            <div className={cn("px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-widest", profileType === 'starvation' ? "bg-rose-500 text-white" : "bg-emerald-500 text-white")}>
-                                                {profileType} Profile
+                                            <div className={cn("px-2 py-1 rounded-full text-[7px] font-black uppercase tracking-widest whitespace-nowrap", profileType === 'starvation' ? "bg-rose-500 text-white" : "bg-emerald-500 text-white")}>
+                                                {profileType === 'starvation' ? 'STARV' : 'MAINT'}
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* The Slider */}
-                                    <div className="space-y-4 pt-6 border-t border-slate-700">
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Day {simulationDay} Projection</h3>
-                                                <p className="text-[12px] font-bold text-white">
-                                                    Energy: <span className={simStatus.results.energy > 0 ? "text-emerald-400" : "text-rose-400"}>{Math.round(simStatus.results.energy)} kcal</span>
+                                    {/* Slider Row - Compact */}
+                                    <div className="space-y-1 pt-2 border-t border-slate-700">
+                                        <div className="flex items-center justify-between gap-2">
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-[8px] font-bold text-white truncate">
+                                                    Day {simulationDay} • Energy: <span className={simStatus.results.energy > 0 ? "text-emerald-400" : "text-rose-400"}>{Math.round(simStatus.results.energy)}</span> kcal
                                                 </p>
                                             </div>
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                className="text-[8px] uppercase font-black text-amber-400 hover:text-amber-300"
+                                                className="text-[7px] uppercase font-black text-amber-400 hover:text-amber-300 px-2 py-0 h-auto"
                                                 onClick={() => setProfileType(profileType === 'maintenance' ? 'starvation' : 'maintenance')}
                                             >
-                                                Switch Profile
+                                                Switch
                                             </Button>
                                         </div>
                                         <input
@@ -566,9 +568,9 @@ export default function SurvivalModePage() {
                                             step="1"
                                             value={simulationDay}
                                             onChange={(e) => setSimulationDay(parseInt(e.target.value))}
-                                            className="w-full h-3 bg-slate-700 rounded-full appearance-none cursor-pointer accent-amber-500"
+                                            className="w-full h-2 bg-slate-700 rounded-full appearance-none cursor-pointer accent-amber-500"
                                         />
-                                        <div className="flex justify-between px-2 text-[8px] font-black text-slate-500 uppercase tracking-widest">
+                                        <div className="flex justify-between px-1 text-[7px] font-black text-slate-500 uppercase tracking-widest">
                                             <span>Now</span>
                                             <span>30 Days</span>
                                         </div>
