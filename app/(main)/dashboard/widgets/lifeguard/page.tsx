@@ -684,6 +684,112 @@ export default function SurvivalModePage() {
                                 )}
                             </div>
 
+                            {/* MEAL RECOMMENDATIONS - Auto-suggest based on inventory */}
+                            {inventory.length > 0 && (
+                                <div className="space-y-4 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-500/10 dark:to-indigo-500/10 p-6 rounded-2xl border border-purple-200 dark:border-purple-500/30">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <ChefHat size={16} className="text-purple-500" />
+                                            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Optimal Meal Plans</h3>
+                                        </div>
+                                        <p className="text-[8px] font-bold text-slate-500 dark:text-slate-400">Maximize survival potential</p>
+                                    </div>
+
+                                    {(() => {
+                                        // Calculate optimal meal suggestions based on inventory
+                                        const profile = SURVIVAL_PROFILES[profileType];
+                                        const totalEnergy = inventory.reduce((acc, i) => acc + (i.nutrition?.energy_kcal || 0) * (i.weight_g / 100), 0);
+                                        const avgEnergy = inventory.length > 0 ? totalEnergy / inventory.length : 0;
+                                        
+                                        // Generate meal suggestions based on nutrient deficits
+                                        const deficit = {
+                                            energy: Math.max(0, (profile.energy_floor * 30) - totalEnergy),
+                                            vitC: Math.max(0, (profile.vit_c_floor * 30) - (INITIAL_STORES.vit_c * profile.vit_c_floor + inventory.reduce((acc, i) => acc + (i.nutrition?.micronutrients?.['Vitamin C'] || 0) * (i.weight_g / 100), 0))),
+                                            b1: Math.max(0, (profile.b1_floor * 30) - (INITIAL_STORES.b1 * profile.b1_floor + inventory.reduce((acc, i) => acc + (i.nutrition?.micronutrients?.['B1 (Thiamine)'] || 0) * (i.weight_g / 100), 0)))
+                                        };
+
+                                        const mealSuggestions = [
+                                            {
+                                                name: "Energy Boost",
+                                                description: "Maximize caloric intake",
+                                                items: inventory.filter(i => (i.nutrition?.energy_kcal || 0) > 200).sort((a, b) => (b.nutrition?.energy_kcal || 0) - (a.nutrition?.energy_kcal || 0)).slice(0, 3),
+                                                benefit: `+${Math.round(avgEnergy * 3)} kcal`,
+                                                servings: 250,
+                                                icon: "🔥"
+                                            },
+                                            {
+                                                name: "Vitamin Protocol",
+                                                description: "Prevent deficiency symptoms",
+                                                items: inventory.filter(i => (i.nutrition?.micronutrients?.['Vitamin C'] || 0) > 10 || (i.nutrition?.micronutrients?.['B1 (Thiamine)'] || 0) > 1).slice(0, 3),
+                                                benefit: deficit.vitC > 0 ? `+400mg Vit C` : "✓ Sufficient",
+                                                servings: 125,
+                                                icon: "💊"
+                                            },
+                                            {
+                                                name: "Balanced Meal",
+                                                description: "Mix all food groups available",
+                                                items: inventory.slice(0, 3),
+                                                benefit: `Sustains ${Math.max(1, Math.ceil(((totalEnergy / 3) / profile.energy_floor)))} days`,
+                                                servings: 300,
+                                                icon: "🍽️"
+                                            }
+                                        ].filter(m => m.items.length > 0);
+
+                                        return (
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                {mealSuggestions.map((meal, idx) => (
+                                                    <div key={idx} className="p-4 bg-white/60 dark:bg-slate-900/40 rounded-lg border border-purple-100 dark:border-purple-500/20 space-y-3 hover:bg-white/80 dark:hover:bg-slate-900/60 transition-colors">
+                                                        <div className="flex items-start justify-between gap-2">
+                                                            <div>
+                                                                <div className="flex items-center gap-2 mb-1">
+                                                                    <span className="text-lg">{meal.icon}</span>
+                                                                    <p className="text-[9px] font-black uppercase text-slate-900 dark:text-white">{meal.name}</p>
+                                                                </div>
+                                                                <p className="text-[7px] text-slate-500 dark:text-slate-400">{meal.description}</p>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="space-y-2">
+                                                            <div className="flex items-center gap-2 flex-wrap">
+                                                                {meal.items.slice(0, 2).map((item, i) => (
+                                                                    <span key={i} className="text-[7px] font-black uppercase px-2 py-1 rounded-full bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 truncate max-w-[120px]">
+                                                                        {item.name}
+                                                                    </span>
+                                                                ))}
+                                                                {meal.items.length > 2 && (
+                                                                    <span className="text-[7px] font-black text-slate-400">+{meal.items.length - 2} more</span>
+                                                                )}
+                                                            </div>
+
+                                                            <div className="p-2 bg-purple-50 dark:bg-purple-500/10 rounded border border-purple-100 dark:border-purple-500/20">
+                                                                <p className="text-[8px] font-black text-purple-700 dark:text-purple-300">Impact: {meal.benefit}</p>
+                                                            </div>
+
+                                                            <button
+                                                                onClick={() => {
+                                                                    let updated = [...inventory];
+                                                                    meal.items.forEach(item => {
+                                                                        updated = updated.map(invItem =>
+                                                                            invItem.id === item.id ? { ...invItem, weight_g: Math.max(0, invItem.weight_g - meal.servings) } : invItem
+                                                                        );
+                                                                    });
+                                                                    setInventory(updated.filter(item => item.weight_g > 0));
+                                                                    toast.success(`Meal consumed! ${meal.servings}g from each item.`);
+                                                                    addBoost(`MEAL COMPLETE: ${meal.name.toUpperCase()}`);
+                                                                }}
+                                                                className="w-full text-[8px] font-black uppercase px-2 py-1.5 rounded-lg bg-purple-500 hover:bg-purple-600 text-white transition-colors"
+                                                            >
+                                                                Consume →
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        );
+                                    })()}
+                                </div>
+                            )}
+
                             {/* NUTRIENT CASCADE TIMELINE */}
                             <div className="space-y-6 bg-slate-50 dark:bg-slate-800/30 p-8 rounded-[3rem] border border-slate-200 dark:border-slate-700">
                                 <div className="flex items-center gap-2">
