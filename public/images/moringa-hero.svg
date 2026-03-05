@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1500" viewBox="0 0 1200 1500">
+  <rect width="100%" height="100%" fill="#e6f4ea" />
+  <g transform="translate(120,120)">
+    <circle cx="400" cy="300" r="180" fill="#a8d5a3" />
+    <rect x="380" y="420" width="40" height="240" fill="#6b8a58" rx="8" />
+    <text x="50" y="110" font-size="48" fill="#2b5b2b" font-family="sans-serif">MORINGA HERO</text>
+    <text x="50" y="160" font-size="22" fill="#2b5b2b" font-family="sans-serif">Placeholder image — replace with real photo</text>
+  </g>
+</svg>

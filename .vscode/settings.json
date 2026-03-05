@@ -1,0 +1,47 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "npx tsc": true,
+        "Test-Path": true,
+        "New-Object": true,
+        "/^cd \"c:\\\\Users\\\\FamilyPC\\\\Documents\\\\miraclegreens\\\\v0-miraclegreens\\\\v0-miraclegreens\" ; powershell -Command \"\n`\\$file = 'app\\\\\\(main\\)\\\\dashboard\\\\recipes\\\\meal-o-matic\\\\page\\.tsx'\n`\\$content = Get-Content `\\$file -Raw\n# Replace the toast message and add reload logic\n`\\$content = `\\$content -replace 'if \\\\\\(subtracted > 0\\\\\\) \\\\\\{\\\\s\\*toast\\\\\\.success\\\\\\(`Marked as eaten\\[\\^`\\]\\*\\?updated`\\\\\\);\\\\s\\*\\\\\\}', 'if \\(subtracted > 0\\) \\{\n            toast\\.success\\(`Marked as eaten\\. `\\$\\{subtracted\\} pantry item`\\$\\{subtracted !== 1 \\? '\\\\''s'\\\\'' : '\\\\'''\\\\''\\} updated`\\);\n            setTimeout\\(\\(\\) => \\{\n                window\\.location\\.reload\\(\\);\n            \\}, 1000\\);\n        \\}'\nSet-Content `\\$file `\\$content\nWrite-Host 'File updated successfully'\n\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd \"c:\\\\Users\\\\FamilyPC\\\\Documents\\\\miraclegreens\\\\v0-miraclegreens\\\\v0-miraclegreens\" ; node -e \"\nconst fs = require\\('fs'\\);\nconst content = fs\\.readFileSync\\('app/\\(main\\)/dashboard/recipes/meal-o-matic/page\\.tsx', 'utf8'\\);\nconst updated = content\\.replace\\(\n    /if \\\\\\(subtracted > 0\\\\\\) \\\\\\{\\\\s\\*toast\\\\\\.success\\\\\\(\\\\`Marked as eaten\\.\\+\\?updated\\\\`\\\\\\);\\\\s\\*\\\\\\} else \\\\\\{/,\n    'if \\(subtracted > 0\\) \\{\\\\n            toast\\.success\\(\\\\`Marked as eaten\\. \\\\\\$\\{subtracted\\} pantry item\\\\\\$\\{subtracted !== 1 \\? \\\\'s\\\\' : \\\\'\\\\'\\} updated\\\\`\\);\\\\n            setTimeout\\(\\(\\) => \\{\\\\n                window\\.location\\.reload\\(\\);\\\\n            \\}, 1000\\);\\\\n        \\} else \\{'\n\\);\nfs\\.writeFileSync\\('app/\\(main\\)/dashboard/recipes/meal-o-matic/page\\.tsx', updated\\);\nconsole\\.log\\('Updated successfully'\\);\n\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^cd \"c:\\\\Users\\\\FamilyPC\\\\Documents\\\\miraclegreens\\\\v0-miraclegreens\\\\v0-miraclegreens\" ; powershell -Command \"\n`\\$file = 'app/\\(main\\)/dashboard/recipes/meal-o-matic/page\\.tsx'\n`\\$lines = Get-Content `\\$file\n`\\$line504 = `\\$lines\\[503\\]\nWrite-Host 'Line 504: ' \\+ `\\$line504\nWrite-Host 'Length: ' \\+ `\\$line504\\.Length\n\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^python fix_reload\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^python fix_duplicate\\.py$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "ForEach-Object": true,
+        "/^node -e \"const fs=require\\('fs'\\),path=require\\('path'\\); function walk\\(d\\)\\{const r=\\[\\];for\\(const f of fs\\.readdirSync\\(d\\)\\)\\{const p=path\\.join\\(d,f\\);fs\\.statSync\\(p\\)\\.isDirectory\\(\\)\\?r\\.push\\(\\.\\.\\.walk\\(p\\)\\):\\(/\\\\\\.tsx\\?\\$/\\.test\\(f\\)\\)&&r\\.push\\(p\\)\\}return r\\} const files=\\[\\.\\.\\.walk\\('app'\\),\\.\\.\\.walk\\('components'\\)\\]; let n=0; for\\(const f of files\\)\\{const c=fs\\.readFileSync\\(f,'utf8'\\); if\\(c\\.includes\\('dashboard/ingredients'\\)\\)\\{const u=c\\.replace\\(/dashboard\\\\/ingredients/g,'dashboard/library'\\); fs\\.writeFileSync\\(f,u,'utf8'\\); n\\+\\+; console\\.log\\('Updated:',f\\)\\}\\} console\\.log\\('Total:',n\\)\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node -e \"const fs=require\\('fs'\\),path=require\\('path'\\); function walk\\(d\\)\\{const r=\\[\\];for\\(const f of fs\\.readdirSync\\(d\\)\\)\\{const p=path\\.join\\(d,f\\);fs\\.statSync\\(p\\)\\.isDirectory\\(\\)\\?r\\.push\\(\\.\\.\\.walk\\(p\\)\\):\\(/\\\\\\.tsx\\?\\$/\\.test\\(f\\)\\)&&r\\.push\\(p\\)\\}return r\\} const files=\\[\\.\\.\\.walk\\('app'\\),\\.\\.\\.walk\\('components'\\)\\]; let n=0; for\\(const f of files\\)\\{const c=fs\\.readFileSync\\(f,'utf8'\\); if\\(c\\.includes\\('meal-o-matic/meals'\\)\\|\\|c\\.includes\\('meal-o-matic/mixes'\\)\\)\\{const u=c\\.replace\\(/meal-o-matic\\\\/meals/g,'library/meals'\\)\\.replace\\(/meal-o-matic\\\\/mixes/g,'library/mixes'\\); fs\\.writeFileSync\\(f,u,'utf8'\\); n\\+\\+; console\\.log\\('Updated:',f\\)\\}\\} console\\.log\\('Total:',n\\)\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node -e \"const fs=require\\('fs'\\); const f='components/kitchen/pantry-view\\.tsx'; let c=fs\\.readFileSync\\(f,'utf8'\\); const before=c\\.length; c=c\\.replace\\(/\\^\\\\s\\*console\\\\\\.log\\\\\\(\\[\\^\\)\\]\\*\\\\\\[pantry-view\\\\\\]\\[\\^\\)\\]\\*\\\\\\);\\\\s\\*\\\\n/gm,''\\); c=c\\.replace\\(/\\^\\\\s\\*console\\\\\\.log\\\\\\(\\[\\^\\)\\]\\*\\\\\\[removeFromPantry\\\\\\]\\[\\^\\)\\]\\*\\\\\\);\\\\s\\*\\\\n/gm,''\\); c=c\\.replace\\(/\\^\\\\s\\*console\\\\\\.log\\\\\\(\\[\\^\\)\\]\\*\\\\\\[updatePantryQuantity\\\\\\]\\[\\^\\)\\]\\*\\\\\\);\\\\s\\*\\\\n/gm,''\\); c=c\\.replace\\(/\\^\\\\s\\*console\\\\\\.log\\\\\\('🥔\\[\\^\\)\\]\\*\\\\\\);\\\\s\\*\\\\n/gm,''\\); fs\\.writeFileSync\\(f,c,'utf8'\\); console\\.log\\('Removed console\\.log lines, saved',before-c\\.length,'chars'\\)\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^node -e \"const fs=require\\('fs'\\); const f='components/kitchen/pantry-view\\.tsx'; let c=fs\\.readFileSync\\(f,'utf8'\\); const before=c\\.length; c=c\\.replace\\(/\\^\\[ \\\\t\\]\\*console\\\\\\.log\\\\\\(\\[\\^\\\\n\\]\\*\\\\\\);\\\\s\\*\\\\n/gm,''\\); fs\\.writeFileSync\\(f,c,'utf8'\\); console\\.log\\('Removed',before-c\\.length,'chars'\\)\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "cp": true,
+        "get_errors": true,
+        "Rename-Item": true
+    }
+}
