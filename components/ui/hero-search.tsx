@@ -139,7 +139,7 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
                     )}
                 >
                 {/* Dynamic content */}
-                <div className="overflow-y-auto flex-1 p-3 md:p-6 custom-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1 rounded-[2.5rem]">
+                <div className="overflow-y-auto flex-1 p-3 md:p-6 custom-scrollbar bg-slate-50/50 dark:bg-slate-800/10 order-1 rounded-t-[2.5rem] border-t-0">
                     {isActive && !hideResults ? (
                         <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                             {isLoading ? (
