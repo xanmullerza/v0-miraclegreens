@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { Apple, Calendar, ShoppingBasket, Shapes, CookingPot, LayoutGrid } from 'lucide-react';
+import { Apple, Calendar, ShoppingBasket, Shapes, Salad, LayoutGrid } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function DashboardNav() {
@@ -22,12 +22,12 @@ export function DashboardNav() {
     const activeButton = getActiveButton();
 
     const buttons = [
-        { id: 'foods', icon: Apple, label: 'Foods', path: '/dashboard/library/foods', theme: 'emerald' },
-        { id: 'meals', icon: CookingPot, label: 'Meals', path: '/dashboard/library/meals', theme: 'emerald' },
-        { id: 'shopping', icon: ShoppingBasket, label: 'Shopping', path: '/dashboard/meal-o-matic/shopping', theme: 'amber' },
-        { id: 'pantry', icon: Shapes, label: 'Pantry', path: '/dashboard/meal-o-matic/pantry', theme: 'amber' },
-        { id: 'planner', icon: Calendar, label: 'Planner', path: '/dashboard/meal-o-matic/planner', theme: 'amber' },
-        { id: 'widgets', icon: LayoutGrid, label: 'Widgets', path: '/dashboard/library/widgets', theme: 'emerald' },
+        { id: 'foods', icon: Apple, label: 'Foods', path: '/dashboard/library/foods', color: 'emerald' },
+        { id: 'meals', icon: Salad, label: 'Meals', path: '/dashboard/library/meals', color: 'rose' },
+        { id: 'shopping', icon: ShoppingBasket, label: 'Shopping', path: '/dashboard/meal-o-matic/shopping', color: 'amber' },
+        { id: 'pantry', icon: Shapes, label: 'Pantry', path: '/dashboard/meal-o-matic/pantry', color: 'sky' },
+        { id: 'planner', icon: Calendar, label: 'Planner', path: '/dashboard/meal-o-matic/planner', color: 'purple' },
+        { id: 'widgets', icon: LayoutGrid, label: 'Widgets', path: '/dashboard/library/widgets', color: 'cyan' },
     ];
 
     return (
@@ -36,6 +36,33 @@ export function DashboardNav() {
                 {buttons.map((btn) => {
                     const Icon = btn.icon;
                     const isActive = activeButton === btn.id;
+                    const color = btn.color;
+                    const colorClasses: Record<string, { active: string; inactive: string }> = {
+                        emerald: {
+                            active: "bg-emerald-500/10 border-emerald-500/50 text-emerald-500",
+                            inactive: "bg-slate-100/10 border-slate-400/30 text-slate-400 hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-500/5"
+                        },
+                        rose: {
+                            active: "bg-rose-500/10 border-rose-500/50 text-rose-500",
+                            inactive: "bg-slate-100/10 border-slate-400/30 text-slate-400 hover:text-rose-500 hover:border-rose-500/40 hover:bg-rose-500/5"
+                        },
+                        amber: {
+                            active: "bg-amber-500/10 border-amber-500/50 text-amber-500",
+                            inactive: "bg-slate-100/10 border-slate-400/30 text-slate-400 hover:text-amber-500 hover:border-amber-500/40 hover:bg-amber-500/5"
+                        },
+                        sky: {
+                            active: "bg-sky-500/10 border-sky-500/50 text-sky-500",
+                            inactive: "bg-slate-100/10 border-slate-400/30 text-slate-400 hover:text-sky-500 hover:border-sky-500/40 hover:bg-sky-500/5"
+                        },
+                        purple: {
+                            active: "bg-purple-500/10 border-purple-500/50 text-purple-500",
+                            inactive: "bg-slate-100/10 border-slate-400/30 text-slate-400 hover:text-purple-500 hover:border-purple-500/40 hover:bg-purple-500/5"
+                        },
+                        cyan: {
+                            active: "bg-cyan-500/10 border-cyan-500/50 text-cyan-500",
+                            inactive: "bg-slate-100/10 border-slate-400/30 text-slate-400 hover:text-cyan-500 hover:border-cyan-500/40 hover:bg-cyan-500/5"
+                        }
+                    };
                     
                     return (
                         <button
@@ -43,10 +70,7 @@ export function DashboardNav() {
                             onClick={() => router.push(btn.path)}
                             className={cn(
                                 "w-10 h-10 rounded-full border flex items-center justify-center transition-all active:scale-95",
-                                isActive && btn.theme === 'emerald' && "bg-emerald-500/10 border-emerald-500/50 text-emerald-500",
-                                isActive && btn.theme === 'amber' && "bg-amber-500/10 border-amber-500/50 text-amber-500",
-                                !isActive && btn.theme === 'emerald' && "bg-slate-100/10 border-slate-400/30 text-slate-400 hover:text-emerald-500 hover:border-emerald-500/40 hover:bg-emerald-500/5",
-                                !isActive && btn.theme === 'amber' && "bg-slate-100/10 border-slate-400/30 text-slate-400 hover:text-amber-500 hover:border-amber-500/40 hover:bg-amber-500/5"
+                                isActive ? colorClasses[color].active : colorClasses[color].inactive
                             )}
                             title={btn.label}
                         >
