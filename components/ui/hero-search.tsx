@@ -3,6 +3,7 @@
 import React from 'react';
 import { Search, X, Activity, Info } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 export type HeroTheme = 'emerald' | 'amber';
@@ -71,6 +72,33 @@ const themeStyles: Record<HeroTheme, { ring: string; border: string; accent: str
 };
 
 export function HeroSearch<T>(props: HeroSearchProps<T>) {
+    const pathname = usePathname();
+    
+    // Generate personalized idle title based on current page
+    const getPersonalizedTitle = () => {
+        const pathLower = pathname.toLowerCase();
+        
+        if (pathLower.includes('/pantry')) {
+            return 'Add to Pantry?';
+        } else if (pathLower.includes('/shopping')) {
+            return 'Add to Groceries?';
+        } else if (pathLower.includes('/planner')) {
+            return 'Plan Your Meals?';
+        } else if (pathLower.includes('/maker')) {
+            return 'Create a Meal?';
+        } else if (pathLower.includes('meal-o-matic') && pathLower === '/dashboard/meal-o-matic') {
+            return 'Explore Meals?';
+        } else if (pathLower.includes('/library')) {
+            return 'Explore Foods?';
+        } else if (pathLower.includes('/widgets')) {
+            return 'Create Widgets?';
+        } else if (pathLower.includes('/browse')) {
+            return 'Discover & Learn?';
+        }
+        
+        return 'Ready to Search?';
+    };
+    
     const {
         searchQuery,
         onQueryChange,
@@ -82,7 +110,7 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
         onFocus,
         placeholder = 'SEARCH…',
         idleIcon = <Info />, 
-        idleTitle = 'Ready to Search?',
+        idleTitle = undefined,
         idleSubtitle = null,
         noResultsMessage = 'No matching items found',
         enterMessage = 'Enter item name to search',
@@ -90,6 +118,9 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
         theme = 'emerald',
         hideResults = false,
     } = props;
+
+    // Use provided idleTitle or fall back to personalized title
+    const finalIdleTitle = idleTitle !== undefined ? idleTitle : getPersonalizedTitle();
 
     const style = themeStyles[theme];
 
@@ -162,7 +193,7 @@ export function HeroSearch<T>(props: HeroSearchProps<T>) {
                                     <div className={cn("absolute inset-0 rounded-full animate-ping", style.accentBg)} />
                                 </div>
                             )}
-                            <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase italic tracking-tight mb-1">{idleTitle}</h3>
+                            <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase italic tracking-tight mb-1">{finalIdleTitle}</h3>
                             {idleSubtitle && <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest max-w-xs">{idleSubtitle}</p>}
                             {props.idleExtra}
                         </div>
