@@ -295,8 +295,35 @@ export default function SurvivalModePage() {
         toast.info(`Protocol marked as eaten. Pantry adjusted (-${count} items).`);
     };
 
+    // Apply water system impact to inventory
+    const adjustedInventory = useMemo(() => {
+        if (waterStatus === 'none' || waterStatus === null) {
+            // No water source: increase dehydration risk (reduce effective inventory by 15%)
+            return inventory.map(item => ({
+                ...item,
+                nutrition: {
+                    ...item.nutrition,
+                    energy_kcal: (item.nutrition?.energy_kcal || 0) * 0.85
+                }
+            }));
+        } else if (waterStatus === 'dirty') {
+            // Dirty water: reduce some nutrient absorption (75% effective)
+            return inventory.map(item => ({
+                ...item,
+                nutrition: {
+                    ...item.nutrition,
+                    energy_kcal: (item.nutrition?.energy_kcal || 0) * 0.75,
+                    micronutrients: item.nutrition?.micronutrients ? Object.fromEntries(
+                        Object.entries(item.nutrition.micronutrients).map(([k, v]: [string, any]) => [k, v * 0.85])
+                    ) : {}
+                }
+            }));
+        }
+        return inventory;
+    }, [inventory, waterStatus]);
+
     const simStatus = calculateSurvivalStatus(
-        inventory,
+        adjustedInventory,
         simulationDay,
         profileType,
         waterStatus === 'clean'
@@ -684,6 +711,112 @@ export default function SurvivalModePage() {
                                 )}
                             </div>
 
+                            {/* SCENARIO PRESETS - Quick-load realistic survival kits */}
+                            <div className="space-y-4 bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-500/10 dark:to-blue-500/10 p-6 rounded-2xl border border-cyan-200 dark:border-cyan-500/30">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <Wallet size={16} className="text-cyan-500" />
+                                        <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Scenario Presets</h3>
+                                    </div>
+                                    <p className="text-[8px] font-bold text-slate-500 dark:text-slate-400">Quick-load survival kits</p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    {[
+                                        { name: 'Desert', emoji: '🏜️', desc: 'High-energy, minimal water', foods: ['Peanut butter', 'Beef jerky', 'Honey', 'Dates', 'Almonds'] },
+                                        { name: 'Mountain', emoji: '⛰️', desc: 'Preserved, high-calorie', foods: ['Canned beans', 'Dark chocolate', 'Trail mix', 'Hardtack', 'Cheese'] },
+                                        { name: 'Urban', emoji: '🏙️', desc: 'Balanced, accessible', foods: ['Rice', 'Canned vegetables', 'Pasta', 'Oats', 'Canned tuna'] }
+                                    ].map((scenario) => (
+                                        <button
+                                            key={scenario.name}
+                                            onClick={async () => {
+                                                const newInv: InventoryItem[] = [];
+                                                for (const foodName of scenario.foods) {
+                                                    try {
+                                                        const results = await searchLocalFood(foodName);
+                                                        if (results.length > 0) {
+                                                            const food = results[0];
+                                                            newInv.push({
+                                                                id: food.id,
+                                                                name: food.common_name || food.name,
+                                                                weight_g: 800,
+                                                                nutrition: food
+                                                            });
+                                                        }
+                                                    } catch (e) { console.error('Failed to load scenario food', e); }
+                                                }
+                                                if (newInv.length > 0) {
+                                                    setInventory(newInv);
+                                                    toast.success(`Loaded ${scenario.name} Scenario (+${newInv.length} items)`);
+                                                    addBoost(`SCENARIO ACTIVE: ${scenario.name.toUpperCase()}`);
+                                                }
+                                            }}
+                                            className="p-4 bg-white/60 dark:bg-slate-900/40 rounded-lg border border-cyan-100 dark:border-cyan-500/20 hover:bg-white/80 dark:hover:bg-slate-900/60 transition-colors text-left space-y-2 group"
+                                        >
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <span className="text-2xl">{scenario.emoji}</span>
+                                                <div>
+                                                    <p className="text-[9px] font-black uppercase text-slate-900 dark:text-white">{scenario.name}</p>
+                                                    <p className="text-[7px] text-slate-500 dark:text-slate-400">{scenario.desc}</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex gap-1 flex-wrap">
+                                                {scenario.foods.map((f, i) => (
+                                                    <span key={i} className="text-[6px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300">
+                                                        {f.split(' ')[0]}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <div className="pt-2 border-t border-cyan-100 dark:border-cyan-500/20">
+                                                <p className="text-[8px] font-black uppercase text-cyan-600 dark:text-cyan-400 group-hover:text-cyan-700">Load Kit →</p>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* CRITICAL ALERTS - Nutrient depletion warnings */}
+                            {(() => {
+                                const profile = SURVIVAL_PROFILES[profileType];
+                                const totalEnergy = adjustedInventory.reduce((acc, i) => acc + (i.nutrition?.energy_kcal || 0) * (i.weight_g / 100), 0);
+                                const totalVitC = INITIAL_STORES.vit_c * profile.vit_c_floor + adjustedInventory.reduce((acc, i) => acc + (i.nutrition?.micronutrients?.['Vitamin C'] || 0) * (i.weight_g / 100), 0);
+                                const totalB1 = INITIAL_STORES.b1 * profile.b1_floor + adjustedInventory.reduce((acc, i) => acc + (i.nutrition?.micronutrients?.['B1 (Thiamine)'] || 0) * (i.weight_g / 100), 0);
+                                
+                                const alerts = [
+                                    { nutrient: 'Energy', total: totalEnergy, floor: profile.energy_floor, icon: '🔥', color: 'rose' },
+                                    { nutrient: 'Vitamin C', total: totalVitC, floor: profile.vit_c_floor, icon: '🍊', color: 'orange' },
+                                    { nutrient: 'B1 (Thiamine)', total: totalB1, floor: profile.b1_floor, icon: '💊', color: 'purple' }
+                                ].map(a => ({ ...a, daysLeft: Math.ceil(a.total / a.floor) }))
+                                  .filter(a => a.daysLeft < 10);
+
+                                return alerts.length > 0 ? (
+                                    <div className="space-y-3 bg-rose-50 dark:bg-rose-500/10 p-6 rounded-2xl border-2 border-rose-200 dark:border-rose-500/30">
+                                        <div className="flex items-center gap-2">
+                                            <Zap size={16} className="text-rose-500 animate-pulse" />
+                                            <h3 className="text-[10px] font-black uppercase tracking-widest text-rose-600 dark:text-rose-400">⚠️ Critical Nutrient Alerts</h3>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                            {alerts.map((alert) => (
+                                                <div key={alert.nutrient} className="p-3 rounded-lg border-2 bg-white/50 dark:bg-slate-900/30 border-rose-300 dark:border-rose-500/30">
+                                                    <div className="flex items-start justify-between mb-2">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-lg">{alert.icon}</span>
+                                                            <p className="text-[8px] font-black uppercase text-slate-900 dark:text-white">{alert.nutrient}</p>
+                                                        </div>
+                                                        <Badge className="bg-rose-500 text-white text-[7px] font-black">
+                                                            {alert.daysLeft}d
+                                                        </Badge>
+                                                    </div>
+                                                    <p className="text-[7px] text-slate-600 dark:text-slate-300 font-bold">
+                                                        {alert.daysLeft <= 3 ? '🚨 CRITICAL - Add sources NOW' : alert.daysLeft <= 7 ? '⚠️ Depletion risk soon' : '⚠️ Monitor levels'}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : null;
+                            })()}
+
                             {/* MEAL RECOMMENDATIONS - Auto-suggest based on inventory */}
                             {inventory.length > 0 && (
                                 <div className="space-y-4 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-500/10 dark:to-indigo-500/10 p-6 rounded-2xl border border-purple-200 dark:border-purple-500/30">
@@ -691,6 +824,11 @@ export default function SurvivalModePage() {
                                         <div className="flex items-center gap-2">
                                             <ChefHat size={16} className="text-purple-500" />
                                             <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400">Optimal Meal Plans</h3>
+                                            {waterStatus && waterStatus !== 'clean' && (
+                                                <Badge className="bg-amber-500/20 text-amber-700 dark:text-amber-300 text-[7px] font-black">
+                                                    {waterStatus === 'dirty' ? '-25% nutrients' : '-15% energy'}
+                                                </Badge>
+                                            )}
                                         </div>
                                         <p className="text-[8px] font-bold text-slate-500 dark:text-slate-400">Maximize survival potential</p>
                                     </div>
